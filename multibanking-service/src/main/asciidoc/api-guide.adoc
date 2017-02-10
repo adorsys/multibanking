@@ -1,0 +1,41 @@
+= Multibanking-Service API Dokumentation
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 4
+:sectlinks:
+
+
+[[resources]]
+= Resources
+
+== User
+
+=== Create user
+
+*Request fields*
+
+include::{snippets}/users-create-example/request-fields.adoc[]
+
+*Response fields*
+
+Location-Header for new created user
+
+*Request/Response Beispiel*
+
+include::{snippets}/users-create-example/http-request.adoc[]
+
+include::{snippets}/users-create-example/http-response.adoc[]
+
+include::{snippets}/users-create-example/curl-request.adoc[]
+
+
+[[errors]]
+= Error Codes
+
+== Http Error 404
+Resource not found, no body.
+
+== Http Error 500
+Internal server error, no body.
