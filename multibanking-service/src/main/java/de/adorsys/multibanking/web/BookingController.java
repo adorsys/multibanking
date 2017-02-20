@@ -1,10 +1,13 @@
-package de.adorsys.multibanking.web.userservice;
+package de.adorsys.multibanking.web;
 
+import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.Booking;
+import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.repository.BookingRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,9 +29,19 @@ public class BookingController {
     private BookingRepository bookingRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    public Resources<List<Booking>> getBankAccounts(@PathVariable("userId") String userId, @PathVariable(value = "accessId") String accessId, @PathVariable(value = "accountId") String accountId) {
+    public Resources<List<Booking>> getBookings(@PathVariable("userId") String userId, @PathVariable(value = "accessId") String accessId,
+                                                @PathVariable(value = "accountId") String accountId) {
         List<Booking> bookings = bookingRepository.findByAccountId(accountId).get();
         return new Resources(bookings);
     }
 
+    @RequestMapping(value = "/{bookingId}", method = RequestMethod.GET)
+    public Resource<Booking> getBooking(@PathVariable("userId") String userId, @PathVariable(value = "accessId") String accessId,
+                                        @PathVariable(value = "accountId") String accountId, @PathVariable(value = "bookingId") String bookingId) {
+
+        Booking BookingEntity = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException(BankAccess.class, accessId));
+
+        return new Resource<>(BookingEntity);
+    }
 }

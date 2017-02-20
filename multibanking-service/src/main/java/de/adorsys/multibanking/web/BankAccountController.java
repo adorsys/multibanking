@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.web.userservice;
+package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.banking.OnlineBankingService;
 import de.adorsys.multibanking.domain.BankAccess;
@@ -12,7 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,8 +45,17 @@ public class BankAccountController {
         return new Resources(bankAccounts);
     }
 
+    @RequestMapping(value = "/{accountId}", method = RequestMethod.GET)
+    public Resource<BankAccount> getBankAccess(@PathVariable("userId") String userId, @PathVariable(value = "accountId") String accountId) {
+
+        BankAccount bankAccountEntity = bankAccountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException(BankAccess.class, accountId));
+
+        return new Resource<>(bankAccountEntity);
+    }
+
     @RequestMapping(path = "/{accountId}/sync", method = RequestMethod.PUT)
-    public Resources<List<Booking>> syncBookings(@PathVariable("userId") String userId, @PathVariable(value = "accessId") String accessId, @PathVariable(value = "accountId") String accountId, @RequestBody String pin) {
+    public HttpEntity<Void> syncBookings(@PathVariable("userId") String userId, @PathVariable(value = "accessId") String accessId, @PathVariable(value = "accountId") String accountId, @RequestBody String pin) {
         BankAccess bankAccess = bankAccessRepository.findById(accessId)
                 .orElseThrow(() -> new ResourceNotFoundException(BankAccess.class, accessId));
 
@@ -57,6 +70,6 @@ public class BankAccountController {
             //ignore it
         }
 
-        return new Resources(bookings);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.web.userservice;
+package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.banking.OnlineBankingService;
 import de.adorsys.multibanking.domain.BankAccess;
@@ -48,11 +48,11 @@ public class BankAccessController {
         return new Resources(bankAccesses);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Resource<BankAccess> getBankAccess(@PathVariable("userId") String userId, @PathVariable(value = "id") String id) {
+    @RequestMapping(value = "/{accessId}", method = RequestMethod.GET)
+    public Resource<BankAccess> getBankAccess(@PathVariable("userId") String userId, @PathVariable(value = "accessId") String accessId) {
 
-        BankAccess bankAccessEntity = bankAccessRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(BankAccess.class, id));
+        BankAccess bankAccessEntity = bankAccessRepository.findById(accessId)
+                .orElseThrow(() -> new ResourceNotFoundException(BankAccess.class, accessId));
 
         return new Resource<>(bankAccessEntity);
     }

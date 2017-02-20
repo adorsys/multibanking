@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.web.userservice;
+package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.User;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
@@ -28,11 +28,11 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    public Resource<User> getUser(@PathVariable(value = "id") String id) {
+    @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
+    public Resource<User> getUser(@PathVariable(value = "userId") String userId) {
 
-        User userEntry = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(User.class, id));
+        User userEntry = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(User.class, userId));
 
         return new Resource<>(userEntry);
     }
