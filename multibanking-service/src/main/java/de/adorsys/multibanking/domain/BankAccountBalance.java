@@ -16,10 +16,10 @@ import java.math.BigDecimal;
 @Builder
 public class BankAccountBalance {
 
-    private BigDecimal readyHbciBalance = new BigDecimal("0.00");
-    private BigDecimal unreadyHbciBalance = new BigDecimal("0.00");
-    private BigDecimal creditHbciBalance = new BigDecimal("0.00");
-    private BigDecimal availableHbciBalance = new BigDecimal("0.00");
-    private BigDecimal usedHbciBalance = new BigDecimal("0.00");
+    private BigDecimal readyHbciBalance;
+    private BigDecimal unreadyHbciBalance;
+    private BigDecimal creditHbciBalance;
+    private BigDecimal availableHbciBalance;
+    private BigDecimal usedHbciBalance;
 
 }
