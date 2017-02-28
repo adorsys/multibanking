@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.domain.User;
+import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.repository.UserRepository;
 import org.slf4j.Logger;
@@ -20,6 +20,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
  * Created by alexg on 07.02.17.
  */
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping(path = "api/v1/users")
 public class UserController {
 
@@ -29,19 +30,19 @@ public class UserController {
     UserRepository userRepository;
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.GET)
-    public Resource<User> getUser(@PathVariable(value = "userId") String userId) {
+    public Resource<UserEntity> getUser(@PathVariable(value = "userId") String userId) {
 
-        User userEntry = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException(User.class, userId));
+        UserEntity userEntry = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(UserEntity.class, userId));
 
         return new Resource<>(userEntry);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public HttpEntity<Void> createUser(@RequestBody User user) {
+    public HttpEntity<Void> createUser(@RequestBody UserEntity user) {
 
-        User persistedUser = userRepository.save(user);
-        log.info("Neuen User [{}] angelegt.", persistedUser);
+        UserEntity persistedUser = userRepository.save(user);
+        log.info("Neuen UserEntity [{}] angelegt.", persistedUser);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(linkTo(methodOn(UserController.class).getUser(persistedUser.getId())).toUri());

@@ -1,9 +1,9 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.Application;
-import de.adorsys.multibanking.banking.OnlineBankingService;
-import de.adorsys.multibanking.domain.BankAccess;
-import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.banking.BankingService;
+import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.repository.BankAccessRepository;
 import de.adorsys.multibanking.repository.BankAccountRepository;
 import org.bson.types.ObjectId;
@@ -53,7 +53,7 @@ public class BankAccountControllerDocumentation extends AbstractControllerDocume
                                 parameterWithName("userId").description("Benutzer ID"),
                                 parameterWithName("accessId").description("Bankzugang ID")),
                         responseFields(
-                                fieldWithPath("_embedded.bankAccountList").description("Die Liste der Bankkonten")
+                                fieldWithPath("_embedded.bankAccountEntityList").description("Die Liste der Bankkonten")
                         )
                 ));
     }
@@ -102,8 +102,8 @@ public class BankAccountControllerDocumentation extends AbstractControllerDocume
                 ));
     }
 
-    public static BankAccount bankAccount() {
-        return BankAccount.builder()
+    public static BankAccountEntity bankAccount() {
+        return (BankAccountEntity)new BankAccountEntity()
                 .id(new ObjectId().toString())
                 .bankAccessId(new ObjectId().toString())
                 .countryHbciAccount("DE")
@@ -113,31 +113,30 @@ public class BankAccountControllerDocumentation extends AbstractControllerDocume
                 .currencyHbciAccount("EUR")
                 .nameHbciAccount("Max Mustermann")
                 .bicHbciAccount("GENODEF1S06")
-                .ibanHbciAccount("DE12345600098765432")
-                .build();
+                .ibanHbciAccount("DE12345600098765432");
     }
 
     public static class TestConfiguration {
 
-        private static OnlineBankingService mockedOnlineBankingService = mock(OnlineBankingService.class);
+        private static BankingService mockedOnlineBankingService = mock(BankingService.class);
         private static BankAccessRepository mockedBankAccessRepository = mock(BankAccessRepository.class);
         private static BankAccountRepository mockedBankAccountRepository = mock(BankAccountRepository.class);
 
         static {
             when(mockedBankAccountRepository.findByBankAccessId(any(String.class))).thenAnswer(invocationOnMock ->
             {
-                List<BankAccount> bankAccountList = new ArrayList<>();
+                List<BankAccountEntity> bankAccountList = new ArrayList<>();
                 bankAccountList.add(bankAccount());
                 return Optional.of(bankAccountList);
             });
 
             when(mockedBankAccessRepository.findById(any(String.class)))
-                    .thenReturn(Optional.of(BankAccess.builder().id(new ObjectId().toString()).build()));
+                    .thenReturn(Optional.of(new BankAccessEntity().id(new ObjectId().toString())));
 
             when(mockedBankAccountRepository.findById(any(String.class)))
-                    .thenReturn(Optional.of(BankAccount.builder().id(new ObjectId().toString()).build()));
+                    .thenReturn(Optional.of(new BankAccountEntity().id(new ObjectId().toString())));
 
-            when(mockedOnlineBankingService.loadBookings(any(BankAccess.class), any(BankAccount.class), any(String.class))).thenAnswer(invocationOnMock ->
+            when(mockedOnlineBankingService.loadBookings(any(BankAccessEntity.class), any(BankAccountEntity.class), any(String.class))).thenAnswer(invocationOnMock ->
                     Optional.of(Collections.emptyList()));
         }
 
@@ -155,7 +154,7 @@ public class BankAccountControllerDocumentation extends AbstractControllerDocume
 
         @Bean
         @Primary
-        public OnlineBankingService getBankOnlineBankingServiceMock() {
+        public BankingService getBankOnlineBankingServiceMock() {
             return mockedOnlineBankingService;
         }
     }

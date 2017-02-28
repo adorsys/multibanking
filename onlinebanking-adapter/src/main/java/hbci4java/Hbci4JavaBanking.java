@@ -1,13 +1,8 @@
-package de.adorsys.multibanking.banking.hbci4java;
+package hbci4java;
 
-
-import de.adorsys.multibanking.banking.OnlineBankingService;
-import de.adorsys.multibanking.domain.BankAccess;
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankAccountBalance;
-import de.adorsys.multibanking.domain.Booking;
-import de.adorsys.multibanking.repository.BankAccessRepository;
-import de.adorsys.multibanking.repository.BankAccountRepository;
+import domain.BankAccess;
+import domain.BankAccount;
+import domain.Booking;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
@@ -18,27 +13,17 @@ import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 
-@Service
 public class Hbci4JavaBanking implements OnlineBankingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(Hbci4JavaBanking.class);
-
-    @Autowired
-    private BankAccountRepository bankAccountRepository;
-    @Autowired
-    private BankAccessRepository bankAccessRepository;
-
-    @PostConstruct
-    public void init() {
+    
+    public Hbci4JavaBanking() {
         try {
             HBCIUtils.refreshBLZList(HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream());
         } catch (Exception e) {
@@ -46,6 +31,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
+    @Override
     public Optional<List<BankAccount>> loadBankAccounts(BankAccess bankAccess, String pin) {
         LOG.info("Loading Account list for access {}", bankAccess);
         HbciPassport hbciPassport = createPassport(bankAccess, pin);
@@ -55,7 +41,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             for (Konto konto : hbciPassport.getAccounts()) {
                 hbciAccounts.add(new BankAccount(konto));
             }
-            updatePassportState(bankAccess, hbciPassport.getState());
+            if (hbciPassport.getState().isPresent()) {
+                bankAccess.setPassportState(hbciPassport.getState().get().toJson());
+            }
             handle.close();
             return Optional.of(hbciAccounts);
         } catch (HBCI_Exception e) {
@@ -84,8 +72,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 LOG.error("Status of SaldoReq+KUmsAll batch job not OK " + status);
             }
 
-            updatePassportState(bankAccess, hbciPassport.getState());
-            updateAccountBalance(bankAccount, HbciFactory.createBalance((GVRSaldoReq)balanceJob.getJobResult()));
+            if (hbciPassport.getState().isPresent()) {
+                bankAccess.setPassportState(hbciPassport.getState().get().toJson());
+            }
+            bankAccount.bankAccountBalance(HbciFactory.createBalance((GVRSaldoReq)balanceJob.getJobResult()));
 
             return Optional.of(HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult()));
         } catch (HBCI_Exception e) {
@@ -107,22 +97,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         properties.put("client.passport.blz", bankAccess.getBankCode());
         properties.put("client.passport.customerId", bankAccess.getBankLogin());
 
-        HbciPassport passport = new HbciPassport(bankAccess.getPassportState(), properties, null);
+        HbciPassport passport = new HbciPassport(bankAccess.passportState(), properties, null);
         passport.setPIN(pin);
 
         return passport;
-    }
-
-    private void updateAccountBalance(BankAccount bankAccount, BankAccountBalance bankAccountBalance) {
-        bankAccount.setBankAccountBalance(bankAccountBalance);
-        bankAccountRepository.save(bankAccount);
-    }
-
-    private void updatePassportState(BankAccess accessEntity, Optional<HbciPassport.State> passportState) {
-        if (passportState.isPresent()) {
-            accessEntity.setPassportState(passportState.get().toJson());
-            bankAccessRepository.save(accessEntity);
-        }
     }
 
 

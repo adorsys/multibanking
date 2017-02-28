@@ -22,8 +22,6 @@
         <start-class />
     </properties>
 
-
-
 	<dependencyManagement>
         <dependencies>
             <!--https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-build-systems.html#using-boot-maven-without-a-parent-->

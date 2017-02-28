@@ -1,8 +1,9 @@
-package de.adorsys.multibanking.banking;
+package hbci4java;
 
-import de.adorsys.multibanking.domain.BankAccess;
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.Booking;
+
+import domain.BankAccess;
+import domain.BankAccount;
+import domain.Booking;
 
 import java.util.List;
 import java.util.Optional;

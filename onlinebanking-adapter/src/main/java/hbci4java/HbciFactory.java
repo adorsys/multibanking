@@ -1,8 +1,9 @@
-package de.adorsys.multibanking.banking.hbci4java;
+package hbci4java;
 
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankAccountBalance;
-import de.adorsys.multibanking.domain.Booking;
+
+import domain.BankAccount;
+import domain.BankAccountBalance;
+import domain.Booking;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.kapott.hbci.GV_Result.GVRKUms;
@@ -26,19 +27,19 @@ public final class HbciFactory {
             GVRSaldoReq.Info[] infos = gvSaldoReq.getEntries();
             if (infos.length > 0) {
                 if (infos[0] != null && infos[0].ready != null && infos[0].ready.value != null) {
-                    result.setReadyHbciBalance(infos[0].ready.value.getBigDecimalValue().setScale(2));
+                    result.readyHbciBalance(infos[0].ready.value.getBigDecimalValue().setScale(2));
                 }
                 if (infos[0] != null && infos[0].available != null) {
-                    result.setAvailableHbciBalance(infos[0].available.getBigDecimalValue().setScale(2));
+                    result.availableHbciBalance(infos[0].available.getBigDecimalValue().setScale(2));
                 }
                 if (infos[0] != null && infos[0].kredit != null) {
-                    result.setCreditHbciBalance(infos[0].kredit.getBigDecimalValue().setScale(2));
+                    result.creditHbciBalance(infos[0].kredit.getBigDecimalValue().setScale(2));
                 }
                 if (infos[0] != null && infos[0].unready != null && infos[0].unready.value != null) {
-                    result.setUnreadyHbciBalance(infos[0].unready.value.getBigDecimalValue().setScale(2));
+                    result.unreadyHbciBalance(infos[0].unready.value.getBigDecimalValue().setScale(2));
                 }
                 if (infos[0] != null && infos[0].used != null) {
-                    result.setUsedHbciBalance(infos[0].used.getBigDecimalValue().setScale(2));
+                    result.usedHbciBalance(infos[0].used.getBigDecimalValue().setScale(2));
                 }
             }
         }
@@ -62,30 +63,30 @@ public final class HbciFactory {
                     continue;
                 }
                 Booking booking = new Booking();
-                booking.setBookingDate(line.bdate);
-                booking.setAmount(line.value.getBigDecimalValue().setScale(2));
-                booking.setAdditional(line.additional);
-                booking.setAddkey(line.addkey);
-                booking.setCustomerRef(line.customerref);
-                booking.setInstRef(line.instref);
-                booking.setReversal(line.isStorno);
-                booking.setSepa(line.isSepa);
-                booking.setPrimanota(line.primanota);
-                booking.setText(line.text);
-                booking.setValutaDate(line.valuta);
+                booking.bookingDate(line.bdate);
+                booking.amount(line.value.getBigDecimalValue().setScale(2));
+                booking.additional(line.additional);
+                booking.addkey(line.addkey);
+                booking.customerRef(line.customerref);
+                booking.instRef(line.instref);
+                booking.reversal(line.isStorno);
+                booking.sepa(line.isSepa);
+                booking.primanota(line.primanota);
+                booking.text(line.text);
+                booking.valutaDate(line.valuta);
                 if (line.saldo != null && line.saldo.value != null) {
-                    booking.setBalance(line.saldo.value.getBigDecimalValue().setScale(2));
+                    booking.balance(line.saldo.value.getBigDecimalValue().setScale(2));
                 }
                 if (line.charge_value != null) {
-                    booking.setChargeValue(line.charge_value.getBigDecimalValue().setScale(2));
+                    booking.chargeValue(line.charge_value.getBigDecimalValue().setScale(2));
                 }
                 if (line.orig_value != null) {
-                    booking.setOrigValue(line.orig_value.getBigDecimalValue().setScale(2));
+                    booking.origValue(line.orig_value.getBigDecimalValue().setScale(2));
                 }
                 if (line.other != null) {
-                    booking.setOtherAccount(new BankAccount(line.other));
+                    booking.otherAccount(new BankAccount(line.other));
                 }
-                booking.setExternalId("B-" + line.bdate.getTime() + "_" + line.value.getLongValue()
+                booking.externalId("B-" + line.bdate.getTime() + "_" + line.value.getLongValue()
                         + "_" + line.saldo.value.getLongValue());
 
                 bookings.add(0, booking);
@@ -131,7 +132,7 @@ public final class HbciFactory {
             lineIndex++;
         }
 
-        booking.setUsage(WordUtils.capitalizeFully(verwendungszweck.trim(), ' ', '/'));
+        booking.usage(WordUtils.capitalizeFully(verwendungszweck.trim(), ' ', '/'));
     }
 
     /**

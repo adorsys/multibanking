@@ -1,7 +1,7 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.Application;
-import de.adorsys.multibanking.domain.Booking;
+import de.adorsys.multibanking.domain.BookingEntity;
 import de.adorsys.multibanking.repository.BookingRepository;
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class BookingControllerDocumentation extends AbstractControllerDocumentat
                                 parameterWithName("accessId").description("Bankzugang ID"),
                                 parameterWithName("accountId").description("Bankkonto ID")),
                         responseFields(
-                                fieldWithPath("_embedded.bookingList").description("Die Liste der Umsätze")
+                                fieldWithPath("_embedded.bookingEntityList").description("Die Liste der Umsätze")
                         )
                 ));
     }
@@ -92,22 +92,21 @@ public class BookingControllerDocumentation extends AbstractControllerDocumentat
                 ));
     }
 
-    public static Booking booking() {
-        return Booking.builder()
+    public static BookingEntity booking() {
+        return (BookingEntity)new BookingEntity()
                 .id(new ObjectId().toString())
                 .accountId(new ObjectId().toString())
                 .externalId(UUID.randomUUID().toString())
                 .valutaDate(new Date())
                 .bookingDate(new Date())
                 .amount(new BigDecimal(100))
-                .isReversal(false)
+                .reversal(false)
                 .balance(new BigDecimal(200))
                 .customerRef("NONREF")
                 .instRef("")
                 .origValue(new BigDecimal(100))
                 .chargeValue(new BigDecimal(100))
-                .isSepa(false)
-                .build();
+                .sepa(false);
     }
 
     public static class TestConfiguration {
@@ -117,7 +116,7 @@ public class BookingControllerDocumentation extends AbstractControllerDocumentat
         static {
             when(mockedBookingRepository.findByAccountId(any(String.class))).thenAnswer(invocationOnMock ->
             {
-                List<Booking> bankAccountList = new ArrayList<>();
+                List<BookingEntity> bankAccountList = new ArrayList<>();
                 bankAccountList.add(booking());
                 return Optional.of(bankAccountList);
             });

@@ -1,8 +1,8 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.Application;
-import de.adorsys.multibanking.banking.OnlineBankingService;
-import de.adorsys.multibanking.domain.BankAccess;
+import de.adorsys.multibanking.banking.BankingService;
+import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.repository.BankAccessRepository;
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
                 .andExpect(content().contentType(APPLICATION_HAL_JSON_UTF8))
                 .andDo(document.document(
                         responseFields(
-                                fieldWithPath("_embedded.bankAccessList").description("Die Liste der Bankzugänge")
+                                fieldWithPath("_embedded.bankAccessEntityList").description("Die Liste der Bankzugänge")
                         )
                 ));
     }
@@ -67,7 +67,8 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
                                 fieldWithPath("id").description("Bankzugang ID"),
                                 fieldWithPath("userId").description("Benutzer ID"),
                                 fieldWithPath("bankLogin").description("Benutzername zum Bankzugang"),
-                                fieldWithPath("bankCode").description("BLZ des Bankzugangs")
+                                fieldWithPath("bankCode").description("BLZ des Bankzugangs"),
+                                fieldWithPath("pin").description("PIN")
                         )
                 ));
     }
@@ -78,44 +79,45 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
         mockMvc
                 .perform(
                         post("/api/v1/users/{userId}/bankaccesses", new ObjectId().toString()).contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(bankAccessBuilder().id(null).build())))
+                                .content(objectMapper.writeValueAsString(bankAccessEntity().id(null))))
                 .andExpect(status().isCreated())
                 .andDo(document.document(
                         requestFields(
                                 fieldWithPath("id").description("Bankzugang ID (wird am Server vergeben)"),
                                 fieldWithPath("userId").description("Benutzer ID"),
                                 fieldWithPath("bankLogin").description("Benutzername zum Bankzugang"),
-                                fieldWithPath("bankCode").description("BLZ des Bankzugangs"))));
+                                fieldWithPath("bankCode").description("BLZ des Bankzugangs"),
+                                fieldWithPath("pin").description("PIN des Bankzugangs"))));
     }
 
-    public static BankAccess.BankAccessBuilder bankAccessBuilder() {
-        return BankAccess.builder().id(new ObjectId().toHexString()).bankCode("bankCode").bankLogin("bankLogin").userId(new ObjectId().toString());
+    public static BankAccessEntity bankAccessEntity() {
+        return (BankAccessEntity)new BankAccessEntity().id(new ObjectId().toHexString()).userId(new ObjectId().toString()).bankCode("bankCode").bankLogin("bankLogin");
     }
 
     public static class TestConfiguration {
 
-        private static OnlineBankingService mockedOnlineBankingService = mock(OnlineBankingService.class);
+        private static BankingService mockedOnlineBankingService = mock(BankingService.class);
         private static BankAccessRepository mockedRepository = mock(BankAccessRepository.class);
 
         static {
             when(mockedRepository.findByUserId(any(String.class))).thenAnswer(invocationOnMock ->
             {
-                List<BankAccess> bankAccessList = new ArrayList<>();
-                bankAccessList.add(bankAccessBuilder().build());
+                List<BankAccessEntity> bankAccessList = new ArrayList<>();
+                bankAccessList.add(bankAccessEntity());
                 return Optional.of(bankAccessList);
             });
 
-            when(mockedRepository.save(any(BankAccess.class))).thenAnswer(invocationOnMock ->
+            when(mockedRepository.save(any(BankAccessEntity.class))).thenAnswer(invocationOnMock ->
             {
-                BankAccess bankAccess = (BankAccess) invocationOnMock.getArguments()[0];
-                bankAccess.setId(new ObjectId().toString());
+                BankAccessEntity bankAccess = (BankAccessEntity) invocationOnMock.getArguments()[0];
+                bankAccess.id(new ObjectId().toString());
                 return bankAccess;
             });
 
             when(mockedRepository.findById(any(String.class)))
-                    .thenReturn(Optional.of(BankAccess.builder().id(new ObjectId().toString()).build()));
+                    .thenReturn(Optional.of(new BankAccessEntity().id(new ObjectId().toString())));
 
-            when(mockedOnlineBankingService.loadBankAccounts(any(BankAccess.class), any(String.class))).thenAnswer(invocationOnMock ->
+            when(mockedOnlineBankingService.loadBankAccounts(any(BankAccessEntity.class), any(String.class))).thenAnswer(invocationOnMock ->
                     Optional.of(Collections.emptyList()));
         }
 
@@ -127,7 +129,7 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
 
         @Bean
         @Primary
-        public OnlineBankingService getBankOnlineBankingServiceMock() {
+        public BankingService getBankOnlineBankingServiceMock() {
             return mockedOnlineBankingService;
         }
     }

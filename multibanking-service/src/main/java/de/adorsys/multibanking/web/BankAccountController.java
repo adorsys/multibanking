@@ -1,9 +1,9 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.banking.OnlineBankingService;
-import de.adorsys.multibanking.domain.BankAccess;
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.Booking;
+import de.adorsys.multibanking.banking.BankingService;
+import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankAccountEntity;
+import de.adorsys.multibanking.domain.BookingEntity;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.repository.BankAccessRepository;
 import de.adorsys.multibanking.repository.BankAccountRepository;
@@ -25,13 +25,14 @@ import java.util.List;
  * Created by alexg on 07.02.17.
  */
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping(path = "api/v1/users/{userId}/bankaccesses/{accessId}/accounts")
 public class BankAccountController {
 
     private static final Logger log = LoggerFactory.getLogger(BankAccountController.class);
 
     @Autowired
-    private OnlineBankingService onlineBankingService;
+    private BankingService bankingService;
     @Autowired
     private BankAccountRepository bankAccountRepository;
     @Autowired
@@ -40,30 +41,30 @@ public class BankAccountController {
     private BookingRepository bookingRepository;
 
     @RequestMapping(method = RequestMethod.GET)
-    public Resources<List<BankAccount>> getBankAccounts(@PathVariable("userId") String userId, @PathVariable(value = "accessId") String accessId) {
-        List<BankAccount> bankAccounts = bankAccountRepository.findByBankAccessId(accessId).get();
+    public Resources<List<BankAccountEntity>> getBankAccounts(@PathVariable("userId") String userId, @PathVariable(value = "accessId") String accessId) {
+        List<BankAccountEntity> bankAccounts = bankAccountRepository.findByBankAccessId(accessId);
         return new Resources(bankAccounts);
     }
 
     @RequestMapping(value = "/{accountId}", method = RequestMethod.GET)
-    public Resource<BankAccount> getBankAccess(@PathVariable("userId") String userId, @PathVariable(value = "accountId") String accountId) {
+    public Resource<BankAccountEntity> getBankAccess(@PathVariable("userId") String userId, @PathVariable(value = "accountId") String accountId) {
 
-        BankAccount bankAccountEntity = bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException(BankAccess.class, accountId));
+        BankAccountEntity bankAccountEntity = bankAccountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accountId));
 
         return new Resource<>(bankAccountEntity);
     }
 
     @RequestMapping(path = "/{accountId}/sync", method = RequestMethod.PUT)
     public HttpEntity<Void> syncBookings(@PathVariable("userId") String userId, @PathVariable(value = "accessId") String accessId, @PathVariable(value = "accountId") String accountId, @RequestBody String pin) {
-        BankAccess bankAccess = bankAccessRepository.findById(accessId)
-                .orElseThrow(() -> new ResourceNotFoundException(BankAccess.class, accessId));
+        BankAccessEntity bankAccess = bankAccessRepository.findById(accessId)
+                .orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accessId));
 
-        BankAccount bankAccount = bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException(BankAccount.class, accountId));
+        BankAccountEntity bankAccount = bankAccountRepository.findById(accountId)
+                .orElseThrow(() -> new ResourceNotFoundException(BankAccountEntity.class, accountId));
 
-        List<Booking> bookings = onlineBankingService.loadBookings(bankAccess, bankAccount, pin).get();
-        bookings.forEach(booking -> booking.setAccountId(accountId));
+        List<BookingEntity> bookings = bankingService.loadBookings(bankAccess, bankAccount, pin).get();
+        bookings.forEach(booking -> booking.accountId(accountId));
         try {
             bookingRepository.insert(bookings);
         } catch (DuplicateKeyException e) {

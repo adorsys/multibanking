@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.banking.hbci4java;
+package hbci4java;
 
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.manager.HBCIUtils;

@@ -1,7 +1,7 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.Application;
-import de.adorsys.multibanking.domain.User;
+import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.junit.Test;
@@ -55,16 +55,11 @@ public class UserControllerDocumentation extends AbstractControllerDocumentation
         mockMvc
                 .perform(
                         post("/api/v1/users").contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(user())))
+                                .content(objectMapper.writeValueAsString(new UserEntity())))
                 .andExpect(status().isCreated())
                 .andDo(document.document(
                         requestFields(
                                 fieldWithPath("id").description("Benutzer ID (wird am Server vergeben)"))));
-    }
-
-    public static User user() {
-        return User.builder()
-                .build();
     }
 
     public static class TestConfiguration {
@@ -72,15 +67,15 @@ public class UserControllerDocumentation extends AbstractControllerDocumentation
         private static UserRepository mockedRepository = mock(UserRepository.class);
 
         static {
-            when(mockedRepository.save(any(User.class))).thenAnswer(invocationOnMock ->
+            when(mockedRepository.save(any(UserEntity.class))).thenAnswer(invocationOnMock ->
             {
-                User user = (User) invocationOnMock.getArguments()[0];
-                user.setId(new ObjectId().toString());
+                UserEntity user = (UserEntity) invocationOnMock.getArguments()[0];
+                user.id(new ObjectId().toString());
                 return user;
             });
 
             when(mockedRepository.findById(any(String.class)))
-                    .thenReturn(Optional.of(User.builder().id(new ObjectId().toString()).build()));
+                    .thenReturn(Optional.of(new UserEntity().id(new ObjectId().toString())));
 
         }
 
