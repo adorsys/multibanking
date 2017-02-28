@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>New Bank Access</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="bankaccess-create-content" padding>
+  <form (ngSubmit)="createBankAccess()" #createForm="ngForm">
+    <ion-list>
+      <ion-item>
+        <ion-label floating>Bank Code</ion-label>
+        <ion-input type="text" name="bankCode" [(ngModel)]="bankAccess.bankCode"
+                   required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label floating>Bank Login</ion-label>
+        <ion-input type="text" name="bankLogin" [(ngModel)]="bankAccess.bankLogin"
+                   required></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label floating>Password</ion-label>
+        <ion-input type="password" name="pin" [(ngModel)]="bankAccess.pin"
+                   required></ion-input>
+      </ion-item>
+
+    </ion-list>
+    <button ion-button color="primary" block type="submit" [disabled]="!createForm.form.valid">Submit</button>
+
+  </form>
+</ion-content>

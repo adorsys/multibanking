@@ -1,0 +1,18 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Bank Accesses</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="createBankAccess()">
+        <ion-icon name="add"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="bankaccessList-content" padding>
+  <ion-list>
+    <button ion-item *ngFor="let bankaccess of bankaccesses" (click)="itemSelected(bankaccess)">
+      {{ bankaccess.bankCode }}
+    </button>
+  </ion-list>
+</ion-content>

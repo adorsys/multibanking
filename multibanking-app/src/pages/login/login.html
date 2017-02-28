@@ -1,0 +1,18 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Login</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="login-content" padding>
+    <form (ngSubmit)="login()" #registerForm="ngForm">
+      <ion-list>
+        <ion-item>
+          <ion-label floating>User Id</ion-label>
+          <ion-input type="text" name="bankCode" [(ngModel)]="credentials.userId" required></ion-input>
+        </ion-item>
+      </ion-list>
+      <button ion-button color="primary" block type="submit" [disabled]="!registerForm.form.valid">Login</button>
+      <button ion-button color="secondary" block outline (click)="createAccount()">Create New Account</button>
+    </form>
+</ion-content>

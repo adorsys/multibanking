@@ -1,0 +1,14 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Bank Accounts</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+<ion-content class="bankaccountList-content" padding>
+  <ion-list>
+    <button ion-item *ngFor="let bankAccount of bankAccounts" (click)="itemSelected(bankAccount)">
+      {{ bankAccount.numberHbciAccount }}
+    </button>
+  </ion-list>
+</ion-content>

@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Bookings</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="syncBookingsPromptPin()">
+        <ion-icon name="refresh"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="bookingList-content" padding>
+  <ion-list>
+    <ion-item *ngFor="let booking of bookings" (click)="itemSelected(booking)">
+      <h3>{{ booking.bookingDate | date }}</h3>
+      <h2>{{ booking.otherAccount !=null ? booking.otherAccount.nameHbciAccount : ""}}</h2>
+      <h2 item-right>{{ booking.amount | currency:'EUR':true }}</h2>
+    </ion-item>
+  </ion-list>
+</ion-content>
