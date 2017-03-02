@@ -127,7 +127,7 @@ public class BankAccountControllerDocumentation extends AbstractControllerDocume
             {
                 List<BankAccountEntity> bankAccountList = new ArrayList<>();
                 bankAccountList.add(bankAccount());
-                return Optional.of(bankAccountList);
+                return bankAccountList;
             });
 
             when(mockedBankAccessRepository.findById(any(String.class)))

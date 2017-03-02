@@ -118,7 +118,7 @@ public class BookingControllerDocumentation extends AbstractControllerDocumentat
             {
                 List<BookingEntity> bankAccountList = new ArrayList<>();
                 bankAccountList.add(booking());
-                return Optional.of(bankAccountList);
+                return bankAccountList;
             });
 
             when(mockedBookingRepository.findById(any(String.class)))

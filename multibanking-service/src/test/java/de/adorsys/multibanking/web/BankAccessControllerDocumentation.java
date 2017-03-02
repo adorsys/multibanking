@@ -4,6 +4,7 @@ import de.adorsys.multibanking.Application;
 import de.adorsys.multibanking.banking.BankingService;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.repository.BankAccessRepository;
+import de.adorsys.multibanking.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.refEq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -98,13 +100,16 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
 
         private static BankingService mockedOnlineBankingService = mock(BankingService.class);
         private static BankAccessRepository mockedRepository = mock(BankAccessRepository.class);
+        private static UserRepository mockedUserRepository = mock(UserRepository.class);
 
         static {
+            when(mockedUserRepository.exists(any(String.class))).thenAnswer(invocationOnMock -> true);
+
             when(mockedRepository.findByUserId(any(String.class))).thenAnswer(invocationOnMock ->
             {
                 List<BankAccessEntity> bankAccessList = new ArrayList<>();
                 bankAccessList.add(bankAccessEntity());
-                return Optional.of(bankAccessList);
+                return bankAccessList;
             });
 
             when(mockedRepository.save(any(BankAccessEntity.class))).thenAnswer(invocationOnMock ->
@@ -125,6 +130,12 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
         @Primary
         public BankAccessRepository getBankAccessRepositoryMock() {
             return mockedRepository;
+        }
+
+        @Bean
+        @Primary
+        public UserRepository getUserRepositoryMock() {
+            return mockedUserRepository;
         }
 
         @Bean
