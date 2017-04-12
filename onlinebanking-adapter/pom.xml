@@ -10,9 +10,9 @@
     <dependencies>
         <!-- hbci -->
         <dependency>
-            <groupId>org.kapott</groupId>
-            <artifactId>hbci4java</artifactId>
-            <version>2.5.13-SNAPSHOT</version>
+            <groupId>com.github.hbci4j</groupId>
+            <artifactId>hbci4j-core</artifactId>
+            <version>3.0.9-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
