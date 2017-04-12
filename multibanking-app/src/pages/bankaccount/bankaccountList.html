@@ -8,7 +8,9 @@
 <ion-content class="bankaccountList-content" padding>
   <ion-list>
     <button ion-item *ngFor="let bankAccount of bankAccounts" (click)="itemSelected(bankAccount)">
-      {{ bankAccount.numberHbciAccount }}
+      <h3>{{ bankAccount.numberHbciAccount }}</h3>
+      <h2>{{ bankAccount.typeHbciAccount }}</h2>
+      <h2 *ngIf="bankAccount.bankAccountBalance" item-right>{{ bankAccount.bankAccountBalance.readyHbciBalance | currency:'EUR':true }}</h2>
     </button>
   </ion-list>
 </ion-content>

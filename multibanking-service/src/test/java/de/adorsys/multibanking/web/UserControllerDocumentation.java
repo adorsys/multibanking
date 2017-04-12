@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class, de.adorsys.multibanking.web.UserControllerDocumentation.TestConfiguration.class})
 @WebAppConfiguration
-@ActiveProfiles("ewu")
+@ActiveProfiles("ewu, fongo")
 public class UserControllerDocumentation extends AbstractControllerDocumentation {
 
     @Test

@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Properties;
 
 public class Hbci4JavaBanking implements OnlineBankingService {
@@ -32,11 +31,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public Optional<List<BankAccount>> loadBankAccounts(BankAccess bankAccess, String pin) {
+    public List<BankAccount> loadBankAccounts(BankAccess bankAccess, String pin) {
         LOG.info("Loading Account list for access {}", bankAccess);
         HbciPassport hbciPassport = createPassport(bankAccess, pin);
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
         try {
+            bankAccess.setBankName(hbciPassport.getInstName());
             List<BankAccount> hbciAccounts = new ArrayList<>();
             for (Konto konto : hbciPassport.getAccounts()) {
                 hbciAccounts.add(new BankAccount(konto));
@@ -45,7 +45,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 bankAccess.setPassportState(hbciPassport.getState().get().toJson());
             }
             handle.close();
-            return Optional.of(hbciAccounts);
+            return hbciAccounts;
         } catch (HBCI_Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -54,7 +54,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public Optional<List<Booking>> loadBookings(BankAccess bankAccess, BankAccount bankAccount, String pin) {
+    public List<Booking> loadBookings(BankAccess bankAccess, BankAccount bankAccount, String pin) {
         HbciPassport hbciPassport = createPassport(bankAccess, pin);
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
         try {
@@ -77,7 +77,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
             bankAccount.bankAccountBalance(HbciFactory.createBalance((GVRSaldoReq)balanceJob.getJobResult()));
 
-            return Optional.of(HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult()));
+            return HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult());
         } catch (HBCI_Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -97,7 +97,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         properties.put("client.passport.blz", bankAccess.getBankCode());
         properties.put("client.passport.customerId", bankAccess.getBankLogin());
 
-        HbciPassport passport = new HbciPassport(bankAccess.passportState(), properties, null);
+        HbciPassport passport = new HbciPassport(bankAccess.getPassportState(), properties, null);
         passport.setPIN(pin);
 
         return passport;

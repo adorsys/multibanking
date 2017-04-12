@@ -50,7 +50,7 @@ public class BankAccountController {
     public Resource<BankAccountEntity> getBankAccess(@PathVariable("userId") String userId, @PathVariable(value = "accountId") String accountId) {
 
         BankAccountEntity bankAccountEntity = bankAccountRepository.findById(accountId)
-                .orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accountId));
+                .orElseThrow(() -> new ResourceNotFoundException(BankAccountEntity.class, accountId));
 
         return new Resource<>(bankAccountEntity);
     }
@@ -63,13 +63,7 @@ public class BankAccountController {
         BankAccountEntity bankAccount = bankAccountRepository.findById(accountId)
                 .orElseThrow(() -> new ResourceNotFoundException(BankAccountEntity.class, accountId));
 
-        List<BookingEntity> bookings = bankingService.loadBookings(bankAccess, bankAccount, pin).get();
-        bookings.forEach(booking -> booking.accountId(accountId));
-        try {
-            bookingRepository.insert(bookings);
-        } catch (DuplicateKeyException e) {
-            //ignore it
-        }
+        bankingService.loadBookings(bankAccess, bankAccount, pin);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

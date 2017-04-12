@@ -5,6 +5,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
@@ -13,7 +14,6 @@ import org.springframework.data.mongodb.core.*;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -21,6 +21,7 @@ import java.util.List;
  * Created by alexg on 08.02.17.
  */
 @Configuration
+@Profile({"mongo"})
 @PropertySource(value = "classpath:/mongo.properties")
 public class LocalMongoConfig {
 
@@ -46,24 +47,19 @@ public class LocalMongoConfig {
         } else {
             return new MongoClient(
                     new ServerAddress(env.getProperty("mongo.server"), Integer.parseInt(env.getProperty("mongo.port"))),
-                    Arrays.asList(mongoCredential),
+                    Collections.singletonList(mongoCredential),
                     options);
         }
     }
 
     @Bean
     public MongoDbFactory mongoDbFactory() throws UnknownHostException {
-        MongoDbFactory mongoDbFactory = new SimpleMongoDbFactory(mongoClient(),
-                env.getProperty("mongo.databaseName"));
-
-        return mongoDbFactory;
-
+        return new SimpleMongoDbFactory(mongoClient(), env.getProperty("mongo.databaseName"));
     }
 
     @Bean
     public MongoTemplate mongoTemplate() throws UnknownHostException {
-        MongoTemplate mongoTemplate = new ContinueOnBatchErrorTemplate(mongoDbFactory());
-        return mongoTemplate;
+        return new ContinueOnBatchErrorTemplate(mongoDbFactory());
     }
 
     private class ContinueOnBatchErrorTemplate extends MongoTemplate {
@@ -93,7 +89,7 @@ public class LocalMongoConfig {
                 }
             });
 
-            List<ObjectId> ids = new ArrayList<ObjectId>();
+            List<ObjectId> ids = new ArrayList<>();
             for (DBObject dbo : dbDocList) {
                 Object id = dbo.get(ID_FIELD);
                 if (id instanceof ObjectId) {

@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Data
 @Document
-@JsonIgnoreProperties({"passportState"})
+@JsonIgnoreProperties({"getPassportState"})
 public class BankAccessEntity extends BankAccess {
 
     @Id

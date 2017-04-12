@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-
 /**
  * Created by alexg on 07.02.17.
  */

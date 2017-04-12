@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
-import { Platform } from 'ionic-angular';
-import { StatusBar, Splashscreen } from 'ionic-native';
+import {Component} from '@angular/core';
+import {Platform} from 'ionic-angular';
+import {StatusBar, Splashscreen} from 'ionic-native';
 
-import { LoginPage } from '../pages/login/login';
+import {LoginPage} from '../pages/login/login';
 
 @Component({
   templateUrl: 'app.html'

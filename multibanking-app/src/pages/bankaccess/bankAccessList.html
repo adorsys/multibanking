@@ -12,7 +12,8 @@
 <ion-content class="bankaccessList-content" padding>
   <ion-list>
     <button ion-item *ngFor="let bankaccess of bankaccesses" (click)="itemSelected(bankaccess)">
-      {{ bankaccess.bankCode }}
+      <h3>{{ bankaccess.bankCode }}</h3>
+      <h2>{{ bankaccess.bankName }}</h2>
     </button>
   </ion-list>
 </ion-content>

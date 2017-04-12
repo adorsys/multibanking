@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @Document
 @CompoundIndexes({
-        @CompoundIndex(name = "booking_unique_index", def = "{'externalId': 1}", unique = true)
+        @CompoundIndex(name = "booking_unique_index", def = "{'externalId': 1, 'accountId': 1}", unique = true)
 })
 public class BookingEntity extends Booking {
 

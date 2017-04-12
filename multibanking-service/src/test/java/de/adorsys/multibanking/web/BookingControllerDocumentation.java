@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class, BookingControllerDocumentation.TestConfiguration.class})
 @WebAppConfiguration
-@ActiveProfiles("ewu")
+@ActiveProfiles("ewu, fongo")
 public class BookingControllerDocumentation extends AbstractControllerDocumentation {
 
     @Test

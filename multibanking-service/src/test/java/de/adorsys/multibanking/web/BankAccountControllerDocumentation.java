@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class, BankAccountControllerDocumentation.TestConfiguration.class})
 @WebAppConfiguration
-@ActiveProfiles("ewu")
+@ActiveProfiles("ewu, fongo")
 public class BankAccountControllerDocumentation extends AbstractControllerDocumentation {
 
     @Test
@@ -135,9 +135,6 @@ public class BankAccountControllerDocumentation extends AbstractControllerDocume
 
             when(mockedBankAccountRepository.findById(any(String.class)))
                     .thenReturn(Optional.of(new BankAccountEntity().id(new ObjectId().toString())));
-
-            when(mockedOnlineBankingService.loadBookings(any(BankAccessEntity.class), any(BankAccountEntity.class), any(String.class))).thenAnswer(invocationOnMock ->
-                    Optional.of(Collections.emptyList()));
         }
 
         @Bean

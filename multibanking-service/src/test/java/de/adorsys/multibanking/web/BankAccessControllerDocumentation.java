@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.refEq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
@@ -36,7 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class, BankAccessControllerDocumentation.TestConfiguration.class})
 @WebAppConfiguration
-@ActiveProfiles("ewu")
+@ActiveProfiles("ewu, fongo")
 public class BankAccessControllerDocumentation extends AbstractControllerDocumentation {
 
     @Test
@@ -68,6 +67,7 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
                         responseFields(
                                 fieldWithPath("id").description("Bankzugang ID"),
                                 fieldWithPath("userId").description("Benutzer ID"),
+                                fieldWithPath("bankName").description("Bank Name"),
                                 fieldWithPath("bankLogin").description("Benutzername zum Bankzugang"),
                                 fieldWithPath("bankCode").description("BLZ des Bankzugangs"),
                                 fieldWithPath("pin").description("PIN")
@@ -88,6 +88,7 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
                                 fieldWithPath("id").description("Bankzugang ID (wird am Server vergeben)"),
                                 fieldWithPath("userId").description("Benutzer ID"),
                                 fieldWithPath("bankLogin").description("Benutzername zum Bankzugang"),
+                                fieldWithPath("bankName").description("Bank Name (wird am Server ermittelt)"),
                                 fieldWithPath("bankCode").description("BLZ des Bankzugangs"),
                                 fieldWithPath("pin").description("PIN des Bankzugangs"))));
     }
@@ -123,7 +124,7 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
                     .thenReturn(Optional.of(new BankAccessEntity().id(new ObjectId().toString())));
 
             when(mockedOnlineBankingService.loadBankAccounts(any(BankAccessEntity.class), any(String.class))).thenAnswer(invocationOnMock ->
-                    Optional.of(Collections.emptyList()));
+                    Collections.emptyList());
         }
 
         @Bean

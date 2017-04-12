@@ -17,7 +17,7 @@ export class BankAccessListPage {
 
   constructor(public navCtrl: NavController, private navparams: NavParams, private bankAccountService: BankAccountService, private bankAccessService: BankAccessService) {
     this.userId = navparams.data.userId;
-    this.bankaccesses = navparams.data.bankAccesses;
+      this.bankaccesses = navparams.data.bankAccesses;
   }
 
   itemSelected(bankAccess) {

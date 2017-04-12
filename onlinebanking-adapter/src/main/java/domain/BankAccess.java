@@ -8,9 +8,20 @@ import lombok.Data;
 @Data
 public class BankAccess {
 
+    private String bankName;
     private String bankLogin;
     private String bankCode;
     private String passportState;
+
+
+    public String getBankName() {
+        return bankName;
+    }
+
+    public BankAccess bankName(String bankName) {
+        this.bankName = bankName;
+        return this;
+    }
 
     public String getBankLogin() {
         return bankLogin;
@@ -30,12 +41,14 @@ public class BankAccess {
         return this;
     }
 
-    public String passportState() {
+    public String getPassportState() {
         return passportState;
     }
 
-    public BankAccess setPassportState(String passportState) {
+    public BankAccess passportState(String passportState) {
         this.passportState = passportState;
         return this;
     }
+
+
 }

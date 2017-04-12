@@ -4,7 +4,6 @@ import de.adorsys.multibanking.banking.BankingService;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.UserEntity;
-import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.repository.BankAccessRepository;
 import de.adorsys.multibanking.repository.BankAccountRepository;
@@ -42,7 +41,7 @@ public class BankAccessController {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    BankingService BankingService;
+    BankingService bankingService;
 
     @RequestMapping(method = RequestMethod.GET)
     public Resources<List<BankAccessEntity>> getBankAccesses(@PathVariable("userId") String userId) {
@@ -66,9 +65,7 @@ public class BankAccessController {
 
     @RequestMapping(method = RequestMethod.POST)
     public HttpEntity<Void> createBankaccess(@PathVariable("userId") String userId, @RequestBody BankAccessEntity bankAccess) {
-        List<BankAccountEntity> bankAccounts = BankingService.loadBankAccounts(bankAccess, bankAccess.getPin())
-                .orElseThrow(() -> new InvalidBankAccessException(bankAccess.getBankCode(), bankAccess.getBankLogin())
-        );
+        List<BankAccountEntity> bankAccounts = bankingService.loadBankAccounts(bankAccess, bankAccess.getPin());
 
         BankAccessEntity persistedBankAccess = bankAccessRepository.save(bankAccess);
         log.info("Neuen Bankzugang [{}] angelegt.", persistedBankAccess.getId());
@@ -76,6 +73,10 @@ public class BankAccessController {
         bankAccounts.forEach(account -> account.bankAccessId(persistedBankAccess.getId()));
         bankAccountRepository.save(bankAccounts);
         log.info("[{}] Konten zu Bankzugang [{}] angelegt.", bankAccounts.size(), persistedBankAccess.getId());
+
+        bankAccounts.forEach(bankAccountEntity -> {
+            bankingService.loadBookingsAsync(bankAccess, bankAccountEntity, bankAccess.getPin());
+        });
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(linkTo(methodOn(BankAccessController.class).getBankAccess(userId, persistedBankAccess.getId())).toUri());
