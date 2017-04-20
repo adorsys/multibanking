@@ -42,7 +42,7 @@ public class UserController {
     public HttpEntity<Void> createUser(@RequestBody UserEntity user) {
 
         UserEntity persistedUser = userRepository.save(user);
-        log.info("Neuen UserEntity [{}] angelegt.", persistedUser);
+        log.info("Neuen User [{}] angelegt.", persistedUser.getId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(linkTo(methodOn(UserController.class).getUser(persistedUser.getId())).toUri());
