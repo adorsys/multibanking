@@ -1,3 +1,16 @@
 multibanking-persistence/target
 multibanking-service/target
 onlinebanking-adapter/target
+.project
+multibanking-parent/.project
+multibanking-parent/.settings/
+multibanking-persistence/.classpath
+multibanking-persistence/.project
+multibanking-persistence/.settings/
+multibanking-service/.classpath
+multibanking-service/.project
+multibanking-service/.settings/
+onlinebanking-adapter/.classpath
+onlinebanking-adapter/.project
+onlinebanking-adapter/.settings/
+	
