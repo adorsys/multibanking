@@ -70,6 +70,7 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
                                 fieldWithPath("bankName").description("Bank Name"),
                                 fieldWithPath("bankLogin").description("Benutzername zum Bankzugang"),
                                 fieldWithPath("bankCode").description("BLZ des Bankzugangs"),
+                                fieldWithPath("passportState").description("Wird nicht übertragen"),
                                 fieldWithPath("pin").description("PIN")
                         )
                 ));
@@ -90,6 +91,7 @@ public class BankAccessControllerDocumentation extends AbstractControllerDocumen
                                 fieldWithPath("bankLogin").description("Benutzername zum Bankzugang"),
                                 fieldWithPath("bankName").description("Bank Name (wird am Server ermittelt)"),
                                 fieldWithPath("bankCode").description("BLZ des Bankzugangs"),
+                                fieldWithPath("passportState").description("Wird nicht übertragen"),
                                 fieldWithPath("pin").description("PIN des Bankzugangs"))));
     }
 
