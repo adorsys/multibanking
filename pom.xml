@@ -6,6 +6,28 @@
     <artifactId>multibanking</artifactId>
     <version>1.1-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <name>Multibanking HBCI service</name>
+    <description>Multibanking service</description>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Alexander Geist</name>
+            <email>age@adorsys.de</email>
+            <organization>adorsys</organization>
+            <organizationUrl>https://adorsys.de/</organizationUrl>
+        </developer>
+        <developer>
+            <name>Francis Pouatcha</name>
+            <email>fpo@adorsys.de</email>
+            <organization>adorsys</organization>
+            <organizationUrl>https://adorsys.de/</organizationUrl>
+        </developer>
+    </developers>
 
     <properties>
         <spring-boot.version>1.5.2.RELEASE</spring-boot.version>

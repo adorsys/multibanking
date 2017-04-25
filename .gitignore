@@ -15,4 +15,4 @@ onlinebanking-adapter/.project
 onlinebanking-adapter/.settings/
 .idea
 *.iml
-
+target
