@@ -13,4 +13,6 @@ multibanking-service/.settings/
 onlinebanking-adapter/.classpath
 onlinebanking-adapter/.project
 onlinebanking-adapter/.settings/
-	
+.idea
+*.iml
+

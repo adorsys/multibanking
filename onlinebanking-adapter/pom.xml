@@ -2,18 +2,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>de.adorsys.multibanking</groupId>
+		<artifactId>multibanking</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
 
-	<groupId>de.adorsys.multibanking</groupId>
 	<artifactId>onlinebanking-adapter</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<dependencies>
 		<!-- hbci -->
 		<dependency>
-			<groupId>com.github.hbci4j</groupId>
-			<artifactId>hbci4j-core</artifactId>
-			<version>3.0.9-SNAPSHOT</version>
+			<groupId>de.adorsys</groupId>
+			<artifactId>hbci4j-adorsys</artifactId>
+			<version>3.0.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
