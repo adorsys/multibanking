@@ -32,7 +32,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public List<BankAccount> loadBankAccounts(BankAccess bankAccess, String pin) {
-        LOG.info("Loading Account list for access {}", bankAccess);
+        LOG.info("Loading Account list for access {}", bankAccess.getBankCode());
         HbciPassport hbciPassport = createPassport(bankAccess, pin);
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
         try {
