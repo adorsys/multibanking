@@ -24,9 +24,10 @@ export class BookingListPage {
 
   syncBookings(pin) {
     this.bankAccountService.syncBookings(this.userId, this.bankAccessId, this.bankAccountId, pin).subscribe(response => {
-      this.bookingService.getBookings(this.userId, this.bankAccessId, this.bankAccountId).subscribe(response => {
-        this.bookings = response;
-      })
+      // this.bookingService.getBookings(this.userId, this.bankAccessId, this.bankAccountId).subscribe(response => {
+      //   this.bookings = response;
+      // })
+      this.bookings = response;
     })
   }
 

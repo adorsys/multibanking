@@ -18,6 +18,7 @@ export class BankAccountService {
 
   syncBookings(userId, accessId, accountId, pin) {
     return this.http.put(this.appConfig.API_URL + "/users/" + userId + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/sync", pin)
+      .map((res: Response) => res.json()._embedded != null ? res.json()._embedded.bookingEntityList : [])
       .catch(this.handleError);
   }
 
