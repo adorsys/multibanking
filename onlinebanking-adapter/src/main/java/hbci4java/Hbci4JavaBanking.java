@@ -39,7 +39,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             bankAccess.setBankName(hbciPassport.getInstName());
             List<BankAccount> hbciAccounts = new ArrayList<>();
             for (Konto konto : hbciPassport.getAccounts()) {
-                hbciAccounts.add(new BankAccount(konto));
+                hbciAccounts.add(BankAccount.fromKonto(konto));
             }
             if (hbciPassport.getState().isPresent()) {
                 bankAccess.setPassportState(hbciPassport.getState().get().toJson());
@@ -75,7 +75,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             if (hbciPassport.getState().isPresent()) {
                 bankAccess.setPassportState(hbciPassport.getState().get().toJson());
             }
-            bankAccount.bankAccountBalance(HbciFactory.createBalance((GVRSaldoReq)balanceJob.getJobResult()));
+            bankAccount.setBankAccountBalance(HbciFactory.createBalance((GVRSaldoReq)balanceJob.getJobResult()));
 
             return HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult());
         } catch (HBCI_Exception e) {

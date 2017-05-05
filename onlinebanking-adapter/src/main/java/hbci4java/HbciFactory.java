@@ -27,19 +27,19 @@ public final class HbciFactory {
             GVRSaldoReq.Info[] infos = gvSaldoReq.getEntries();
             if (infos.length > 0) {
                 if (infos[0] != null && infos[0].ready != null && infos[0].ready.value != null) {
-                    result.readyHbciBalance(infos[0].ready.value.getBigDecimalValue().setScale(2));
+                    result.setReadyHbciBalance(infos[0].ready.value.getBigDecimalValue().setScale(2));
                 }
                 if (infos[0] != null && infos[0].available != null) {
-                    result.availableHbciBalance(infos[0].available.getBigDecimalValue().setScale(2));
+                    result.setAvailableHbciBalance(infos[0].available.getBigDecimalValue().setScale(2));
                 }
                 if (infos[0] != null && infos[0].kredit != null) {
-                    result.creditHbciBalance(infos[0].kredit.getBigDecimalValue().setScale(2));
+                    result.setCreditHbciBalance(infos[0].kredit.getBigDecimalValue().setScale(2));
                 }
                 if (infos[0] != null && infos[0].unready != null && infos[0].unready.value != null) {
-                    result.unreadyHbciBalance(infos[0].unready.value.getBigDecimalValue().setScale(2));
+                    result.setUnreadyHbciBalance(infos[0].unready.value.getBigDecimalValue().setScale(2));
                 }
                 if (infos[0] != null && infos[0].used != null) {
-                    result.usedHbciBalance(infos[0].used.getBigDecimalValue().setScale(2));
+                    result.setUsedHbciBalance(infos[0].used.getBigDecimalValue().setScale(2));
                 }
             }
         }
@@ -63,31 +63,33 @@ public final class HbciFactory {
                     continue;
                 }
                 Booking booking = new Booking();
-                booking.bookingDate(line.bdate);
-                booking.amount(line.value.getBigDecimalValue().setScale(2));
-                booking.additional(line.additional);
-                booking.addkey(line.addkey);
-                booking.customerRef(line.customerref);
-                booking.instRef(line.instref);
-                booking.reversal(line.isStorno);
-                booking.sepa(line.isSepa);
-                booking.primanota(line.primanota);
-                booking.text(line.text);
-                booking.valutaDate(line.valuta);
+                booking.setBookingDate(line.bdate);
+                booking.setAmount(line.value.getBigDecimalValue().setScale(2));
+                booking.setAdditional(line.additional);
+                booking.setAddkey(line.addkey);
+                booking.setCustomerRef(line.customerref);
+                booking.setInstRef(line.instref);
+                booking.setReversal(line.isStorno);
+                booking.setSepa(line.isSepa);
+                booking.setPrimanota(line.primanota);
+                booking.setText(line.text);
+                booking.setValutaDate(line.valuta);
                 if (line.saldo != null && line.saldo.value != null) {
-                    booking.balance(line.saldo.value.getBigDecimalValue().setScale(2));
+                    booking.setBalance(line.saldo.value.getBigDecimalValue().setScale(2));
                 }
                 if (line.charge_value != null) {
-                    booking.chargeValue(line.charge_value.getBigDecimalValue().setScale(2));
+                    booking.setChargeValue(line.charge_value.getBigDecimalValue().setScale(2));
                 }
                 if (line.orig_value != null) {
-                    booking.origValue(line.orig_value.getBigDecimalValue().setScale(2));
+                    booking.setOrigValue(line.orig_value.getBigDecimalValue().setScale(2));
                 }
                 if (line.other != null) {
-                    booking.otherAccount(new BankAccount(line.other));
+                    booking.setOtherAccount(BankAccount.fromKonto(line.other));
                 }
-                booking.externalId("B-" + line.bdate.getTime() + "_" + line.value.getLongValue()
+                booking.setExternalId("B-" + line.bdate.getTime() + "_" + line.value.getLongValue()
                         + "_" + line.saldo.value.getLongValue());
+
+                applyVerwendungszweck(line, booking);
 
                 bookings.add(0, booking);
             }
@@ -132,7 +134,7 @@ public final class HbciFactory {
             lineIndex++;
         }
 
-        booking.usage(WordUtils.capitalizeFully(verwendungszweck.trim(), ' ', '/'));
+        booking.setUsage(WordUtils.capitalizeFully(verwendungszweck.trim(), ' ', '/'));
     }
 
     /**

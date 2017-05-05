@@ -13,18 +13,9 @@ public class BankAccess {
     private String bankCode;
     private String passportState;
 
-
-    public String getBankName() {
-        return bankName;
-    }
-
     public BankAccess bankName(String bankName) {
         this.bankName = bankName;
         return this;
-    }
-
-    public String getBankLogin() {
-        return bankLogin;
     }
 
     public BankAccess bankLogin(String bankLogin) {
@@ -32,17 +23,9 @@ public class BankAccess {
         return this;
     }
 
-    public String getBankCode() {
-        return bankCode;
-    }
-
     public BankAccess bankCode(String bankCode) {
         this.bankCode = bankCode;
         return this;
-    }
-
-    public String getPassportState() {
-        return passportState;
     }
 
     public BankAccess passportState(String passportState) {

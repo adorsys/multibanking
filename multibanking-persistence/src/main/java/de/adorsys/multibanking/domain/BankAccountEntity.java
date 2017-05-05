@@ -9,8 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 /**
  * Created by alexg on 07.02.17.
  */
-@Document
 @Data
+@Document
 public class BankAccountEntity extends BankAccount {
 
     @Id
@@ -25,10 +25,6 @@ public class BankAccountEntity extends BankAccount {
     public BankAccountEntity id(String id) {
         this.id = id;
         return this;
-    }
-
-    public String getBankAccessId() {
-        return bankAccessId;
     }
 
     public BankAccountEntity bankAccessId(String bankAccessId) {

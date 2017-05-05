@@ -23,26 +23,14 @@ public class BankAccessEntity extends BankAccess {
     @Transient
     private String pin;
 
-    public String getId() {
-        return id;
-    }
-
     public BankAccessEntity id(String id) {
         this.id = id;
         return this;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
     public BankAccessEntity userId(String userId) {
         this.userId = userId;
         return this;
-    }
-
-    public String getPin() {
-        return pin;
     }
 
     public BankAccessEntity pin(String pin) {

@@ -19,22 +19,17 @@ public class BankAccount {
     private String bicHbciAccount;
     private String ibanHbciAccount;
 
-    public BankAccount() {
-    }
-
-    public BankAccount(Konto konto) {
-        this.numberHbciAccount = konto.number;
-        this.bicHbciAccount = konto.bic;
-        this.blzHbciAccount = konto.blz;
-        this.countryHbciAccount = konto.country;
-        this.currencyHbciAccount = konto.curr;
-        this.ibanHbciAccount = konto.iban;
-        this.nameHbciAccount = (konto.name + " " + (konto.name2 != null ? konto.name2 : "")).trim();
-        this.typeHbciAccount = konto.type;
-    }
-
-    public BankAccountBalance getBankAccountBalance() {
-        return bankAccountBalance;
+    public static BankAccount fromKonto(Konto konto) {
+        BankAccount BankAccount = new BankAccount();
+        BankAccount.numberHbciAccount(konto.number);
+        BankAccount.bicHbciAccount(konto.bic);
+        BankAccount.blzHbciAccount(konto.blz);
+        BankAccount.countryHbciAccount(konto.country);
+        BankAccount.currencyHbciAccount(konto.curr);
+        BankAccount.ibanHbciAccount(konto.iban);
+        BankAccount.nameHbciAccount((konto.name + " " + (konto.name2 != null ? konto.name2 : "")).trim());
+        BankAccount.typeHbciAccount(konto.type);
+        return BankAccount;
     }
 
     public BankAccount bankAccountBalance(BankAccountBalance bankAccountBalance) {
@@ -42,17 +37,9 @@ public class BankAccount {
         return this;
     }
 
-    public String getCountryHbciAccount() {
-        return countryHbciAccount;
-    }
-
     public BankAccount countryHbciAccount(String countryHbciAccount) {
         this.countryHbciAccount = countryHbciAccount;
         return this;
-    }
-
-    public String getBlzHbciAccount() {
-        return blzHbciAccount;
     }
 
     public BankAccount blzHbciAccount(String blzHbciAccount) {
@@ -60,17 +47,9 @@ public class BankAccount {
         return this;
     }
 
-    public String getNumberHbciAccount() {
-        return numberHbciAccount;
-    }
-
     public BankAccount numberHbciAccount(String numberHbciAccount) {
         this.numberHbciAccount = numberHbciAccount;
         return this;
-    }
-
-    public String getTypeHbciAccount() {
-        return typeHbciAccount;
     }
 
     public BankAccount typeHbciAccount(String typeHbciAccount) {
@@ -78,17 +57,9 @@ public class BankAccount {
         return this;
     }
 
-    public String getCurrencyHbciAccount() {
-        return currencyHbciAccount;
-    }
-
     public BankAccount currencyHbciAccount(String currencyHbciAccount) {
         this.currencyHbciAccount = currencyHbciAccount;
         return this;
-    }
-
-    public String getNameHbciAccount() {
-        return nameHbciAccount;
     }
 
     public BankAccount nameHbciAccount(String nameHbciAccount) {
@@ -96,17 +67,9 @@ public class BankAccount {
         return this;
     }
 
-    public String getBicHbciAccount() {
-        return bicHbciAccount;
-    }
-
     public BankAccount bicHbciAccount(String bicHbciAccount) {
         this.bicHbciAccount = bicHbciAccount;
         return this;
-    }
-
-    public String getIbanHbciAccount() {
-        return ibanHbciAccount;
     }
 
     public BankAccount ibanHbciAccount(String ibanHbciAccount) {

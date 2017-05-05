@@ -22,18 +22,11 @@ public class BookingEntity extends Booking {
     private String id;
     @Indexed
     private String accountId;
-
-    public String getId() {
-        return id;
-    }
+    private CategoryEntity category;
 
     public BookingEntity id(String id) {
         this.id = id;
         return this;
-    }
-
-    public String getAccountId() {
-        return accountId;
     }
 
     public BookingEntity accountId(String accountId) {

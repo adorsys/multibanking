@@ -14,6 +14,8 @@
     <ion-item *ngFor="let booking of bookings" (click)="itemSelected(booking)">
       <h3>{{ booking.bookingDate | date }}</h3>
       <h2>{{ booking.otherAccount !=null ? booking.otherAccount.nameHbciAccount : ""}}</h2>
+      <h3 *ngIf="booking.category">{{ booking.category.mainCategory}}</h3>
+      <h3 *ngIf="booking.category">{{ booking.category.specification}}</h3>
       <h2 item-right>{{ booking.amount | currency:'EUR':true }}</h2>
     </ion-item>
   </ion-list>

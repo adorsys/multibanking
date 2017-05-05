@@ -14,10 +14,6 @@ public class UserEntity {
     @Id
     private String id;
 
-    public String getId() {
-        return id;
-    }
-
     public UserEntity id(String id) {
         this.id = id;
         return this;
