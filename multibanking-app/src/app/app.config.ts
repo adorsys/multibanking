@@ -1,6 +1,5 @@
-import { Injectable } from '@angular/core';
-
-Injectable()
-export class AppConfig{
-  API_URL = 'https://multibanking-service.dev.adorsys.de/api/v1';
-}
+export const AppConfig = {
+  production: false,
+  auth_url: 'https://multibanking-service.dev.adorsys.de/auth',
+  api_url: 'https://multibanking-service.dev.adorsys.de/api/v1'
+};

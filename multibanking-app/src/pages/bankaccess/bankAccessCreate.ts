@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {NavController, NavParams} from 'ionic-angular';
-import {BankAccessService} from "../../services/BankAccessService";
+import {BankAccessService} from "../../services/bankAccessService";
 
 @Component({
   selector: 'page-bankaccess-create',

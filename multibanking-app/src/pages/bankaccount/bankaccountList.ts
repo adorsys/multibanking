@@ -1,8 +1,7 @@
-import {Component} from '@angular/core';
-import {NavController} from 'ionic-angular';
-import {NavParams} from 'ionic-angular';
-import {BookingService} from "../../services/BookingService";
-import {BookingListPage} from "../booking/bookingList";
+import {Component} from "@angular/core";
+import {NavController, NavParams} from "ionic-angular";
+import {BankAccountService} from "../../services/bankAccountService";
+import {AnalyticsPage} from "../analytics/analytics";
 
 @Component({
   selector: 'page-bankaccountList',
@@ -14,21 +13,32 @@ export class BankAccountListPage {
   bankAccessId;
   bankAccounts;
 
-  constructor(public navCtrl: NavController, private navparams: NavParams, private bookingService: BookingService) {
+  constructor(public navCtrl: NavController,
+              private navparams: NavParams,
+              private bankAccountService: BankAccountService) {
+
     this.userId = navparams.data.userId;
     this.bankAccessId = navparams.data.bankAccessId;
-    this.bankAccounts = navparams.data.bankAccounts;
-  }
 
-  itemSelected(bankAccount) {
-    this.bookingService.getBookings(this.userId, this.bankAccessId, bankAccount.id).subscribe(response => {
-      this.navCtrl.push(BookingListPage, {
-        userId: this.userId,
-        bankAccessId: this.bankAccessId,
-        bankAccountId: bankAccount.id,
-        bookings: response
-      })
+    this.loadBankAccounts();
+
+    bankAccountService.bookingsChangedObservable.subscribe(changed => {
+      this.loadBankAccounts();
     })
   }
 
+  loadBankAccounts() {
+    this.bankAccountService.getBankAccounts(this.userId, this.bankAccessId).subscribe(response => {
+      this.bankAccounts = response;
+    })
+  }
+
+  itemSelected(bankAccount) {
+    this.navCtrl.push(AnalyticsPage, {
+      userId: this.userId,
+      bankAccessId: this.bankAccessId,
+      bankAccountId: bankAccount.id,
+    })
+
+  }
 }

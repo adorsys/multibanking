@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.domain;
 
+import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.BankAccount;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -11,6 +12,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Data
 @Document
+@Encrypted(fields = {"blzHbciAccount", "numberHbciAccount", "typeHbciAccount", "typeHbciAccount",
+        "nameHbciAccount", "bicHbciAccount", "ibanHbciAccount", "bankAccountBalance.readyHbciBalance"})
 public class BankAccountEntity extends BankAccount {
 
     @Id

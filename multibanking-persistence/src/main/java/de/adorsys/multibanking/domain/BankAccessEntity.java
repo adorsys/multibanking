@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.BankAccess;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @Document
 @JsonIgnoreProperties({"getPassportState"})
+@Encrypted(fields = {"bankName", "bankLogin", "bankCode", "passportState"})
 public class BankAccessEntity extends BankAccess {
 
     @Id

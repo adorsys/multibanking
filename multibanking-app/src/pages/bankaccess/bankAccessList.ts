@@ -1,10 +1,10 @@
 import {Component} from '@angular/core';
 import {NavController} from 'ionic-angular';
-import {NavParams} from 'ionic-angular';
-import {BankAccountService} from "../../services/BankAccountService";
+import {BankAccountService} from "../../services/bankAccountService";
 import {BankAccountListPage} from "../bankaccount/bankaccountList";
 import {BankAccessCreatePage} from "./bankAccessCreate";
-import {BankAccessService} from "../../services/BankAccessService";
+import {BankAccessService} from "../../services/bankAccessService";
+import {KeycloakService} from "../../auth/keycloak.service";
 
 @Component({
   selector: 'page-bankaccessList',
@@ -15,15 +15,21 @@ export class BankAccessListPage {
   userId;
   bankaccesses;
 
-  constructor(public navCtrl: NavController, private navparams: NavParams, private bankAccountService: BankAccountService, private bankAccessService: BankAccessService) {
-    this.userId = navparams.data.userId;
-      this.bankaccesses = navparams.data.bankAccesses;
+  constructor(public navCtrl: NavController, private bankAccountService: BankAccountService, private bankAccessService: BankAccessService,
+              private keycloakService: KeycloakService) {
+
+      this.userId = keycloakService.getUsername();
+      this.bankAccessService.getBankAccesses(this.userId).subscribe(
+        response => {
+          this.bankaccesses = response
+        });
   }
 
   itemSelected(bankAccess) {
-    this.bankAccountService.getBankAccounts(this.userId, bankAccess.id).subscribe(response => {
-      this.navCtrl.push(BankAccountListPage, {userId: this.userId, bankAccessId: bankAccess.id, bankAccounts: response});
-    })
+    this.navCtrl.push(BankAccountListPage, {
+      userId: this.userId,
+      bankAccessId: bankAccess.id,
+    });
   }
 
   createBankAccess() {
@@ -31,9 +37,9 @@ export class BankAccessListPage {
   }
 
   bankAccessCreated() {
-      this.bankAccessService.getBankAccesses(this.userId).subscribe(response => {
-        this.bankaccesses = response;
-      });
+    this.bankAccessService.getBankAccesses(this.userId).subscribe(response => {
+      this.bankaccesses = response;
+    });
   }
 
 }

@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.domain;
 
+import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.Booking;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -16,13 +17,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @CompoundIndexes({
         @CompoundIndex(name = "booking_unique_index", def = "{'externalId': 1, 'accountId': 1}", unique = true)
 })
+@Encrypted(fields = {"amount", "usage", "balance", "otherAccount.blzHbciAccount",
+        "otherAccount.numberHbciAccount", "otherAccount.nameHbciAccount"})
 public class BookingEntity extends Booking {
 
     @Id
     private String id;
     @Indexed
     private String accountId;
-    private CategoryEntity category;
+    private BookingCategoryEntity category;
 
     public BookingEntity id(String id) {
         this.id = id;

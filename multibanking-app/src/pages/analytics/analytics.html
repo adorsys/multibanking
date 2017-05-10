@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Analytics {{ analytics?.analyticsDate | date }}</ion-title>
+    <ion-buttons end>
+      <button ion-button (click)="syncBookingsPromptPin()">
+        Reload
+      </button>
+      <button ion-button (click)="showBookings()">
+        Bookings
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="bookingList-content" padding>
+  <ion-item-group>
+    <ion-item-divider color="light">Balance end of month: {{analytics?.balanceCalculated | currency:'EUR':true}}
+    </ion-item-divider>
+    <ion-item-divider color="light">Income</ion-item-divider>
+    <ion-item>Total: {{analytics?.incomeTotal | currency:'EUR':true}}</ion-item>
+    <ion-item>Fix: {{analytics?.incomeFixed | currency:'EUR':true}}</ion-item>
+    <ion-item>Next: {{analytics?.incomeNext | currency:'EUR':true}}</ion-item>
+  </ion-item-group>
+  <ion-item-group>
+    <ion-item-divider color="light">Expenses</ion-item-divider>
+    <ion-item>Total: {{analytics?.expensesTotal | currency:'EUR':true}}</ion-item>
+    <ion-item>Fix: {{analytics?.expensesFixed | currency:'EUR':true}}</ion-item>
+    <ion-item>Next: {{analytics?.expensesNext | currency:'EUR':true}}</ion-item>
+  </ion-item-group>
+</ion-content>
