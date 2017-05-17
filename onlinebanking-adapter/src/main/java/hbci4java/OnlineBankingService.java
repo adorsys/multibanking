@@ -1,16 +1,22 @@
 package hbci4java;
 
 
-import domain.BankAccess;
-import domain.BankAccount;
-import domain.Booking;
+import domain.*;
 
 import java.util.List;
 
 public interface OnlineBankingService {
 
-    List<BankAccount> loadBankAccounts(BankAccess bankAccess, String pin);
+    BankApi bankApiIdentifier();
 
-    List<Booking> loadBookings(BankAccess bankAccess, BankAccount bankAccount, String pin);
+    boolean userRegistrationRequired();
+
+    BankApiUser registerUser(String uid);
+
+    List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin);
+
+    List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin);
+
+    boolean bankSupported(String bankCode);
 
 }

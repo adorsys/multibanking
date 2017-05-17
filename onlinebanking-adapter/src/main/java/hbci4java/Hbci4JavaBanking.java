@@ -1,12 +1,11 @@
 package hbci4java;
 
-import domain.BankAccess;
-import domain.BankAccount;
-import domain.Booking;
+import domain.*;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.exceptions.HBCI_Exception;
+import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIHandler;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.status.HBCIExecStatus;
@@ -31,7 +30,23 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankAccess bankAccess, String pin) {
+    public BankApi bankApiIdentifier() {
+        return BankApi.HBCI;
+    }
+
+    @Override
+    public boolean userRegistrationRequired() {
+        return false;
+    }
+
+    @Override
+    public BankApiUser registerUser(String uid) {
+        //no registration needed
+        return null;
+    }
+
+    @Override
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin) {
         LOG.info("Loading Account list for access {}", bankAccess.getBankCode());
         HbciPassport hbciPassport = createPassport(bankAccess, pin);
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
@@ -39,7 +54,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             bankAccess.setBankName(hbciPassport.getInstName());
             List<BankAccount> hbciAccounts = new ArrayList<>();
             for (Konto konto : hbciPassport.getAccounts()) {
-                hbciAccounts.add(BankAccount.fromKonto(konto));
+                hbciAccounts.add(HbciFactory.toBankAccount(konto));
             }
             if (hbciPassport.getState().isPresent()) {
                 bankAccess.setPassportState(hbciPassport.getState().get().toJson());
@@ -54,7 +69,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<Booking> loadBookings(BankAccess bankAccess, BankAccount bankAccount, String pin) {
+    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin) {
         HbciPassport hbciPassport = createPassport(bankAccess, pin);
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
         try {
@@ -83,6 +98,16 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         } finally {
             handle.close();
         }
+    }
+
+    @Override
+    public boolean bankSupported(String bankCode) {
+        BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
+        if (bankInfo == null || bankInfo.getPinTanVersion() == null) {
+            return false;
+        }
+        return true;
+
     }
 
     private HbciPassport createPassport(BankAccess bankAccess, String pin) {

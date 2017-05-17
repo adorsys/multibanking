@@ -1,7 +1,9 @@
 package domain;
 
 import lombok.Data;
-import org.kapott.hbci.structures.Konto;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by alexg on 07.02.17.
@@ -9,7 +11,9 @@ import org.kapott.hbci.structures.Konto;
 @Data
 public class BankAccount {
 
+    private Map<BankApi, String> externalIdMap;
     private BankAccountBalance bankAccountBalance;
+    private String owner;
     private String countryHbciAccount;
     private String blzHbciAccount;
     private String numberHbciAccount;
@@ -18,19 +22,6 @@ public class BankAccount {
     private String nameHbciAccount;
     private String bicHbciAccount;
     private String ibanHbciAccount;
-
-    public static BankAccount fromKonto(Konto konto) {
-        BankAccount BankAccount = new BankAccount();
-        BankAccount.numberHbciAccount(konto.number);
-        BankAccount.bicHbciAccount(konto.bic);
-        BankAccount.blzHbciAccount(konto.blz);
-        BankAccount.countryHbciAccount(konto.country);
-        BankAccount.currencyHbciAccount(konto.curr);
-        BankAccount.ibanHbciAccount(konto.iban);
-        BankAccount.nameHbciAccount((konto.name + " " + (konto.name2 != null ? konto.name2 : "")).trim());
-        BankAccount.typeHbciAccount(konto.type);
-        return BankAccount;
-    }
 
     public BankAccount bankAccountBalance(BankAccountBalance bankAccountBalance) {
         this.bankAccountBalance = bankAccountBalance;
@@ -76,4 +67,19 @@ public class BankAccount {
         this.ibanHbciAccount = ibanHbciAccount;
         return this;
     }
+
+    public BankAccount externalId(BankApi bankApi, String externalId) {
+        if (externalIdMap == null) {
+            externalIdMap = new HashMap<>();
+            externalIdMap.put(bankApi, externalId);
+        }
+        return this;
+    }
+
+    public BankAccount owner(String owner) {
+        this.owner = owner;
+        return this;
+    }
+
+
 }

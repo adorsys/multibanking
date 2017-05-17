@@ -3,11 +3,13 @@ package hbci4java;
 
 import domain.BankAccount;
 import domain.BankAccountBalance;
+import domain.BankApi;
 import domain.Booking;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
+import org.kapott.hbci.structures.Konto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +65,7 @@ public final class HbciFactory {
                     continue;
                 }
                 Booking booking = new Booking();
+                booking.setBankApi(BankApi.HBCI);
                 booking.setBookingDate(line.bdate);
                 booking.setAmount(line.value.getBigDecimalValue().setScale(2));
                 booking.setAdditional(line.additional);
@@ -84,7 +87,7 @@ public final class HbciFactory {
                     booking.setOrigValue(line.orig_value.getBigDecimalValue().setScale(2));
                 }
                 if (line.other != null) {
-                    booking.setOtherAccount(BankAccount.fromKonto(line.other));
+                    booking.setOtherAccount(toBankAccount(line.other));
                 }
                 booking.setExternalId("B-" + line.bdate.getTime() + "_" + line.value.getLongValue()
                         + "_" + line.saldo.value.getLongValue());
@@ -96,6 +99,19 @@ public final class HbciFactory {
         }
         LOG.debug("Received {} bookings: {}", bookings.size(), bookings);
         return bookings;
+    }
+
+    public static BankAccount toBankAccount(Konto konto) {
+        BankAccount BankAccount = new BankAccount();
+        BankAccount.numberHbciAccount(konto.number);
+        BankAccount.bicHbciAccount(konto.bic);
+        BankAccount.blzHbciAccount(konto.blz);
+        BankAccount.countryHbciAccount(konto.country);
+        BankAccount.currencyHbciAccount(konto.curr);
+        BankAccount.ibanHbciAccount(konto.iban);
+        BankAccount.nameHbciAccount((konto.name + " " + (konto.name2 != null ? konto.name2 : "")).trim());
+        BankAccount.typeHbciAccount(konto.type);
+        return BankAccount;
     }
 
     private static void applyVerwendungszweck(GVRKUms.UmsLine u, Booking booking) {
