@@ -11,7 +11,7 @@ export class BookingService {
   }
 
   getBookings(userId, accessId, accountId) {
-    return this.http.get(AppConfig.api_url + userId + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/bookings")
+    return this.http.get(AppConfig.api_url + "/users/" + userId + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/bookings")
       .map((res: Response) => res.json()._embedded != null ? res.json()._embedded.bookingEntityList : [])
       .catch(this.handleError);
   }

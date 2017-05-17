@@ -11,13 +11,13 @@ export class BankAccessService {
   }
 
   getBankAccesses(userId) {
-    return this.http.get(AppConfig.api_url + userId + "/bankaccesses")
+    return this.http.get(AppConfig.api_url + "/users/" + userId + "/bankaccesses")
       .map((res: Response) => res.json()._embedded != null ? res.json()._embedded.bankAccessEntityList : [])
       .catch(this.handleError);
   }
 
   crateBankAcccess(userId, bankaccess) {
-    return this.http.post(AppConfig.api_url + userId + "/bankaccesses", bankaccess)
+    return this.http.post(AppConfig.api_url + "/users/" + userId + "/bankaccesses", bankaccess)
       .catch(this.handleError);
   }
 

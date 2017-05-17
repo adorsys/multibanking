@@ -27,6 +27,7 @@ export class AnalyticsPage {
     bankAccountService.bookingsChangedObservable.subscribe(changed => {
       this.loadAnalytics();
     })
+    this.loadAnalytics();
   }
 
   loadAnalytics() {

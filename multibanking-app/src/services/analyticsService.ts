@@ -11,7 +11,7 @@ export class AnalyticsService {
   }
 
   getAnalytics(userId, accessId, accountId) {
-    return this.http.get(AppConfig.api_url + userId + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/analytics")
+    return this.http.get(AppConfig.api_url + "/users/" + userId + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/analytics")
       .map((res: Response) => res.json() != null ? res.json() : {})
       .catch((error: Response) => {
         if (error.json() && error.json().message == "RESCOURCE_NOT_FOUND") {

@@ -14,13 +14,13 @@ export class BankAccountService {
   }
 
   getBankAccounts(userId, accessId) {
-    return this.http.get(AppConfig.api_url + userId + "/bankaccesses/" + accessId + "/accounts")
+    return this.http.get(AppConfig.api_url + "/users/" + userId + "/bankaccesses/" + accessId + "/accounts")
       .map((res: Response) => res.json()._embedded.bankAccountEntityList)
       .catch(this.handleError);
   }
 
   syncBookings(userId, accessId, accountId, pin) {
-    return this.http.put(AppConfig.api_url + userId + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/sync", pin)
+    return this.http.put(AppConfig.api_url + "/users/" + userId + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/sync", pin)
       .map((res: Response) => {
         this.bookingsChangedObservable.next(true);
 
