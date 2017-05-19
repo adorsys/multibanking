@@ -12,6 +12,7 @@ import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spi.OnlineBankingService;
 
 import java.util.ArrayList;
 import java.util.List;

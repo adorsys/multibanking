@@ -1,7 +1,7 @@
 package figo;
 
 import domain.*;
-import hbci4java.OnlineBankingService;
+import spi.OnlineBankingService;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;

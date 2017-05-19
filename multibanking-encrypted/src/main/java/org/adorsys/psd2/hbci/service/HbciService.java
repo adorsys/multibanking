@@ -13,7 +13,7 @@ import org.adorsys.psd2.hbci.domain.HbciLoadBookingsRequest;
 import domain.BankAccount;
 import domain.Booking;
 import hbci4java.Hbci4JavaBanking;
-import hbci4java.OnlineBankingService;
+import spi.OnlineBankingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;

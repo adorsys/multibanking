@@ -1,4 +1,4 @@
-package hbci4java;
+package spi;
 
 
 import domain.*;
