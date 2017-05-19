@@ -35,30 +35,4 @@ public class BankAccessEntity extends BankAccess {
         this.id = id;
         return this;
     }
-
-    public static void main(String[] args) {
-        ObjectMapper mapper = new ObjectMapper();
-
-        BankAccessEntity bankAccessEntity = new BankAccessEntity();
-        bankAccessEntity.setPin("pin12345");
-        bankAccessEntity.setUserId("userasdfasdf");
-
-        try {
-            System.out.println(mapper.writeValueAsString(bankAccessEntity));
-        } catch (JsonProcessingException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        String jsonString = "{ \"pin\":\"pin12345\",\"userId\":\"userasdfasdf\" }";
-        try {
-            bankAccessEntity = mapper.readValue(jsonString, BankAccessEntity.class);
-
-            System.out.println(bankAccessEntity.getPin());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-    }
 }
