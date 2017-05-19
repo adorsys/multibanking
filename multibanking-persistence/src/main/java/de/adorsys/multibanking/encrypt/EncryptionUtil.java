@@ -13,9 +13,9 @@ import javax.crypto.spec.IvParameterSpec;
 /**
  * Created by alexg on 09.05.17.
  */
-public class FieldEncryptionUtil {
+public class EncryptionUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(FieldEncryptionUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(EncryptionUtil.class);
 
     private static final String AES_CBC_PKCS5_PADDING = "AES/CBC/PKCS5Padding";
 

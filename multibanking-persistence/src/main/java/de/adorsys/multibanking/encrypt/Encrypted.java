@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Encrypted {
 
-    String[] fields();
+    String[] exclude();
 }

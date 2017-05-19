@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.domain;
 
+import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.BankApiUser;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -12,6 +13,7 @@ import java.util.List;
  */
 @Data
 @Document
+@Encrypted(exclude = "_id")
 public class UserEntity {
 
     @Id

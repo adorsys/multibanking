@@ -13,9 +13,9 @@ import java.util.Optional;
 @Repository
 public interface BookingRepository extends MongoRepository<BookingEntity, String> {
 
-    List<BookingEntity> findByAccountId(String bankAccountId);
+    List<BookingEntity> findByUserIdAndAccountId(String userId, String bankAccountId);
 
-    Optional<BookingEntity> findById(String bookingId);
+    Optional<BookingEntity> findByUserIdAndId(String userId, String bookingId);
 
 
 }

@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface BankAccessRepository extends MongoRepository<BankAccessEntity, String> {
 
-    Optional<BankAccessEntity> findByIdAndUserId(String id, String userId);
+    Optional<BankAccessEntity> findByUserIdAndId(String userId, String id);
 
     List<BankAccessEntity> findByUserId(String userId);
 }

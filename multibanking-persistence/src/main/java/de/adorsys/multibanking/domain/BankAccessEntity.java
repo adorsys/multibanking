@@ -6,6 +6,8 @@ import domain.BankAccess;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,29 +16,18 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Data
 @Document
-@JsonIgnoreProperties({"getPassportState"})
-@Encrypted(fields = {"bankName", "bankLogin", "bankCode", "passportState"})
+@JsonIgnoreProperties({"getPassportState", "getPin"})
+@Encrypted(exclude = {"_id", "userId"})
 public class BankAccessEntity extends BankAccess {
 
     @Id
     private String id;
     @Indexed
     private String userId;
-    @Transient
     private String pin;
 
     public BankAccessEntity id(String id) {
         this.id = id;
-        return this;
-    }
-
-    public BankAccessEntity userId(String userId) {
-        this.userId = userId;
-        return this;
-    }
-
-    public BankAccessEntity pin(String pin) {
-        this.pin = pin;
         return this;
     }
 }

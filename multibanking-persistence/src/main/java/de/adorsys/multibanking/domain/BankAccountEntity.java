@@ -4,6 +4,8 @@ import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.BankAccount;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,14 +14,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Data
 @Document
-@Encrypted(fields = {"blzHbciAccount", "numberHbciAccount", "typeHbciAccount", "typeHbciAccount",
-        "nameHbciAccount", "bicHbciAccount", "ibanHbciAccount", "bankAccountBalance.readyHbciBalance"})
+@Encrypted(exclude = {"_id", "bankAccessId", "userId", "syncStatus"})
+@CompoundIndexes({
+        @CompoundIndex(name = "account_index", def = "{'userId': 1, 'bankAccessId': 1}")
+})
 public class BankAccountEntity extends BankAccount {
 
     @Id
     private String id;
-    @Indexed
     private String bankAccessId;
+    private String userId;
 
     public String getId() {
         return id;

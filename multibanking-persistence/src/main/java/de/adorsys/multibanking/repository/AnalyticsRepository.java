@@ -12,6 +12,6 @@ import java.util.Optional;
 @Repository
 public interface AnalyticsRepository extends MongoRepository<AccountAnalyticsEntity, String> {
 
-    Optional<AccountAnalyticsEntity> findLastByAccountId(String bankAccountId);
+    Optional<AccountAnalyticsEntity> findLastByUserIdAndAccountId(String userId, String bankAccountId);
 
 }

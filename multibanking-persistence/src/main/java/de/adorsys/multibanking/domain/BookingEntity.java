@@ -15,25 +15,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @Document
 @CompoundIndexes({
+        @CompoundIndex(name = "booking_index", def = "{'userId': 1, 'accountId': 1}"),
         @CompoundIndex(name = "booking_unique_index", def = "{'externalId': 1, 'accountId': 1}", unique = true)
 })
-@Encrypted(fields = {"amount", "usage", "balance", "otherAccount.blzHbciAccount",
-        "otherAccount.numberHbciAccount", "otherAccount.nameHbciAccount"})
+@Encrypted(exclude = {"_id", "accountId", "externalId", "userId", "valutaDate", "bookingDate"})
 public class BookingEntity extends Booking {
 
     @Id
     private String id;
-    @Indexed
     private String accountId;
-    private BookingCategoryEntity category;
+    private String userId;
 
     public BookingEntity id(String id) {
         this.id = id;
-        return this;
-    }
-
-    public BookingEntity accountId(String accountId) {
-        this.accountId = accountId;
         return this;
     }
 }

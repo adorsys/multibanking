@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface BankAccountRepository extends MongoRepository<BankAccountEntity, String> {
 
-    List<BankAccountEntity> findByBankAccessId(String bankAccessId);
+    List<BankAccountEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId);
 
-    Optional<BankAccountEntity> findById(String id);
+    Optional<BankAccountEntity> findByUserIdAndId(String userId, String id);
 }
