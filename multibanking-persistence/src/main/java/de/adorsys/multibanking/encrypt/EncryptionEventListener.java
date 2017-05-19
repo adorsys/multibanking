@@ -42,7 +42,8 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
         if (source.getClass().isAnnotationPresent(Encrypted.class)) {
             try {
                 //encrypt dbobject
-                String json = objectMapper.writeValueAsString(source);
+                String json = objectMapper.writeValueAsString(event.getDBObject());
+
                 String encrypted = EncryptionUtil.encrypt(json, secretKey);
 
                 //cleanup dbobject exclude annotated fields
