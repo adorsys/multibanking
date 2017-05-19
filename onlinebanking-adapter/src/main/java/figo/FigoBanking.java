@@ -16,20 +16,18 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static utils.Utils.getSecureRandom;
+
 /**
  * Created by alexg on 17.05.17.
  */
 public class FigoBanking implements OnlineBankingService {
-
-    private String figoClientId;
-    private String figoSecret;
-    private int figoTimeout;
-    private String figoConnectionUrl;
 
     private FigoConnection figoConnection;
 
@@ -46,10 +44,10 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     public FigoBanking() {
-        figoClientId = EnvProperties.getEnvOrSysProp("figoClientId", "CKmGgL2cUq8fL-IaTM3jloNzIqptWogQYCGolQT-9r7Y");
-        figoSecret = EnvProperties.getEnvOrSysProp("figoSecret", "S-Y7598_mYfjxo0vYLVpk52YYfom-Fxo0_OQ8HSCdfmY");
-        figoTimeout = Integer.parseInt(EnvProperties.getEnvOrSysProp("figoTimeout", "0"));
-        figoConnectionUrl = EnvProperties.getEnvOrSysProp("figoConnectionUrl", "https://api.figo.me");
+        String figoClientId = EnvProperties.getEnvOrSysProp("figoClientId", "CKmGgL2cUq8fL-IaTM3jloNzIqptWogQYCGolQT-9r7Y");
+        String figoSecret = EnvProperties.getEnvOrSysProp("figoSecret", "S-Y7598_mYfjxo0vYLVpk52YYfom-Fxo0_OQ8HSCdfmY");
+        int figoTimeout = Integer.parseInt(EnvProperties.getEnvOrSysProp("figoTimeout", "0"));
+        String figoConnectionUrl = EnvProperties.getEnvOrSysProp("figoConnectionUrl", "https://api.figo.me");
 
         figoConnection = new FigoConnection(figoClientId, figoSecret, "http://nowhere.here", figoTimeout, figoConnectionUrl);
     }
@@ -62,6 +60,11 @@ public class FigoBanking implements OnlineBankingService {
     @Override
     public boolean bankSupported(String bankCode) {
         return true;
+    }
+
+    @Override
+    public boolean bookingsCategorized() {
+        return false;
     }
 
     @Override
@@ -155,9 +158,9 @@ public class FigoBanking implements OnlineBankingService {
                     .map(transaction -> {
                                 Booking booking = new Booking();
                                 booking.setExternalId(transaction.getTransactionId());
-                                booking.setBankApi(BankApi.FIGO);
-                                booking.setBookingDate(transaction.getBookingDate());
-                                booking.setValutaDate(transaction.getValueDate());
+                                booking.setBankApi(bankApiIdentifier());
+                                booking.setBookingDate(transaction.getBookingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                                booking.setValutaDate(transaction.getValueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                                 booking.setAmount(transaction.getAmount());
                                 booking.setUsage(transaction.getPurposeText());
 
@@ -208,17 +211,4 @@ public class FigoBanking implements OnlineBankingService {
 
         return Status.OK;
     }
-
-    private static SecureRandom getSecureRandom() {
-        try {
-            random = new SecureRandom();
-            byte seed[] = random.generateSeed(20);
-            random.setSeed(seed);
-        } catch (Exception e) {
-            LOG.error("ALCommonUtils.getSecureRandom", e);
-            return null;
-        }
-        return random;
-    }
-
 }

@@ -3,6 +3,7 @@ package domain;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Date;
 
 /**
@@ -13,8 +14,8 @@ public class Booking {
 
     private String externalId;
     private BankAccount otherAccount;
-    private Date valutaDate;
-    private Date bookingDate;
+    private LocalDate valutaDate;
+    private LocalDate bookingDate;
     private BigDecimal amount;
     private boolean isReversal;
     private BigDecimal balance;
@@ -29,5 +30,6 @@ public class Booking {
     private String addkey;
     private boolean isSepa;
     private BankApi bankApi;
+    private BookingCategory bookingCategory;
 
 }

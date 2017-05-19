@@ -49,6 +49,7 @@
         <module>multibanking-encrypted</module>
         <module>multibanking-persistence</module>
         <module>onlinebanking-adapter</module>
+        <module>finapi-adapter</module>
     </modules>
 
 	<dependencyManagement>

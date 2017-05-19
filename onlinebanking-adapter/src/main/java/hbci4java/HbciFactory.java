@@ -13,6 +13,7 @@ import org.kapott.hbci.structures.Konto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,7 +67,7 @@ public final class HbciFactory {
                 }
                 Booking booking = new Booking();
                 booking.setBankApi(BankApi.HBCI);
-                booking.setBookingDate(line.bdate);
+                booking.setBookingDate(line.bdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                 booking.setAmount(line.value.getBigDecimalValue().setScale(2));
                 booking.setAdditional(line.additional);
                 booking.setAddkey(line.addkey);
@@ -76,7 +77,7 @@ public final class HbciFactory {
                 booking.setSepa(line.isSepa);
                 booking.setPrimanota(line.primanota);
                 booking.setText(line.text);
-                booking.setValutaDate(line.valuta);
+                booking.setValutaDate(line.valuta.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                 if (line.saldo != null && line.saldo.value != null) {
                     booking.setBalance(line.saldo.value.getBigDecimalValue().setScale(2));
                 }

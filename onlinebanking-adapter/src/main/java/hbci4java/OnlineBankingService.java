@@ -19,4 +19,6 @@ public interface OnlineBankingService {
 
     boolean bankSupported(String bankCode);
 
+    boolean bookingsCategorized();
+
 }

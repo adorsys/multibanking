@@ -46,6 +46,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
+    public boolean bookingsCategorized() {
+        return false;
+    }
+
+    @Override
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin) {
         LOG.info("Loading Account list for access {}", bankAccess.getBankCode());
         HbciPassport hbciPassport = createPassport(bankAccess, pin);

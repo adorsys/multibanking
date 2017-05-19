@@ -11,6 +11,10 @@ import java.util.Map;
 @Data
 public class BankAccount {
 
+    public enum SyncStatus {
+        PENDING, SYNC, READY
+    }
+
     private Map<BankApi, String> externalIdMap;
     private BankAccountBalance bankAccountBalance;
     private String owner;
@@ -22,6 +26,7 @@ public class BankAccount {
     private String nameHbciAccount;
     private String bicHbciAccount;
     private String ibanHbciAccount;
+    private SyncStatus syncStatus = SyncStatus.PENDING;
 
     public BankAccount bankAccountBalance(BankAccountBalance bankAccountBalance) {
         this.bankAccountBalance = bankAccountBalance;
