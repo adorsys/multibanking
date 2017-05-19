@@ -38,7 +38,7 @@ public class HbciService {
 			@ApiResponse(code = 400, message = "Bad request", responseHeaders=@ResponseHeader(name="ERROR_KEY", description="BAD_REQUEST"))})
 	public EncryptedListOfHbciBankAccounts loadBankAccounts(@ApiParam(value="The encrypted bank access object") EncryptedHbciLoadAccountRequest encryptedRequest) {
 		HbciLoadAccountsRequest request = encryptionService.decrypt(encryptedRequest.getJweString(), HbciLoadAccountsRequest.class);
-		List<BankAccount> bancAccountList = onlineBankingService.loadBankAccounts(request.getBankAccess(), request.getPin());
+		List<BankAccount> bancAccountList = onlineBankingService.loadBankAccounts(null, request.getBankAccess(), request.getPin());
 
 		String encryptedJwe = encryptionService.encrypt(bancAccountList, request);
 		EncryptedListOfHbciBankAccounts resp = new EncryptedListOfHbciBankAccounts();
@@ -51,7 +51,7 @@ public class HbciService {
 			@ApiResponse(code = 400, message = "Bad request", responseHeaders=@ResponseHeader(name="ERROR_KEY", description="BAD_REQUEST"))})
 	public EncryptedListOfHbciBookings loadPostings(@ApiParam(value="The encrypted bank access object") EncryptedHbciLoadBookingsRequest encryptedRequest) {
 		HbciLoadBookingsRequest request = encryptionService.decrypt(encryptedRequest.getJweString(), HbciLoadBookingsRequest.class);
-		List<Booking> bookingList = onlineBankingService.loadBookings(request.getBankAccess(), request.getBankAccount(), request.getPin());
+		List<Booking> bookingList = onlineBankingService.loadBookings(null, request.getBankAccess(), request.getBankAccount(), request.getPin());
 
 		String encryptedJwe = encryptionService.encrypt(bookingList, request);
 		EncryptedListOfHbciBookings resp = new EncryptedListOfHbciBookings();

@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.repository;
 
 import de.adorsys.multibanking.domain.BookingEntity;
+import domain.BankApi;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface BookingRepository extends MongoRepository<BookingEntity, String> {
 
-    List<BookingEntity> findByUserIdAndAccountId(String userId, String bankAccountId);
+    List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId, BankApi bankApi);
 
     Optional<BookingEntity> findByUserIdAndId(String userId, String bookingId);
 
