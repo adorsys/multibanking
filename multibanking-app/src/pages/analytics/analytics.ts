@@ -1,7 +1,5 @@
-import {Component} from '@angular/core';
-import {NavController, AlertController} from 'ionic-angular';
-import {NavParams} from 'ionic-angular';
-import {BookingService} from "../../services/bookingService";
+import {Component} from "@angular/core";
+import {NavController, AlertController, ToastController, NavParams} from "ionic-angular";
 import {BookingListPage} from "../booking/bookingList";
 import {BankAccountService} from "../../services/bankAccountService";
 import {AnalyticsService} from "../../services/analyticsService";
@@ -18,8 +16,13 @@ export class AnalyticsPage {
   bankAccountId;
   bookings;
 
-  constructor(public navCtrl: NavController, private navparams: NavParams, private alertCtrl: AlertController,
-              private bankAccountService: BankAccountService, private bookingService: BookingService, private analyticsService: AnalyticsService) {
+  constructor(public navCtrl: NavController,
+              private navparams: NavParams,
+              private alertCtrl: AlertController,
+              private toastCtrl: ToastController,
+              private bankAccountService: BankAccountService,
+              private analyticsService: AnalyticsService) {
+
     this.userId = navparams.data.userId;
     this.bankAccessId = navparams.data.bankAccessId;
     this.bankAccountId = navparams.data.bankAccountId;
@@ -31,9 +34,19 @@ export class AnalyticsPage {
   }
 
   loadAnalytics() {
-    this.analyticsService.getAnalytics(this.userId, this.bankAccessId, this.bankAccountId).subscribe(response => {
-      this.analytics = response;
-    })
+    this.analyticsService.getAnalytics(this.userId, this.bankAccessId, this.bankAccountId).subscribe(
+      response => {
+        this.analytics = response;
+      },
+      error => {
+        if (error == "SYNC_IN_PROGRESS") {
+          this.toastCtrl.create({
+            message: 'Account sync in progress',
+            showCloseButton: true,
+            position: 'top'
+          }).present();
+        }
+      })
   }
 
   syncBookingsPromptPin() {
@@ -65,9 +78,19 @@ export class AnalyticsPage {
   }
 
   syncBookings(pin) {
-    this.bankAccountService.syncBookings(this.userId, this.bankAccessId, this.bankAccountId, pin).subscribe(response => {
-      this.bookings = response;
-    })
+    this.bankAccountService.syncBookings(this.userId, this.bankAccessId, this.bankAccountId, pin).subscribe(
+      response => {
+        this.bookings = response;
+      },
+      error => {
+        if (error == "SYNC_IN_PROGRESS") {
+          this.toastCtrl.create({
+            message: 'Account sync in progress',
+            showCloseButton: true,
+            position: 'top'
+          }).present();
+        }
+      })
   }
 
   showBookings() {

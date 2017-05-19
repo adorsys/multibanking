@@ -16,9 +16,18 @@ export class BookingService {
       .catch(this.handleError);
   }
 
-  handleError(error) {
+  handleError(error): Observable<any> {
     console.error(error);
-    return Observable.throw(error.json().error || 'Server error');
+    let errorJson = error.json();
+    if (errorJson) {
+      if (errorJson.message == "SYNC_IN_PROGRESS") {
+        return Observable.throw(errorJson.message);
+      } else {
+        return Observable.throw(errorJson || 'Server error');
+      }
+    } else {
+      return Observable.throw(error || 'Server error');
+    }
   }
 
 
