@@ -21,7 +21,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>de.adorsys.multibanking</groupId>
-			<artifactId>onlinebanking-adapter</artifactId>
+			<artifactId>onlinebanking-facade</artifactId>
 			<version>1.5-SNAPSHOT</version>
 		</dependency>
 

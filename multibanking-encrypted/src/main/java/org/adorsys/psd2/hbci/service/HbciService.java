@@ -12,7 +12,6 @@ import org.adorsys.psd2.hbci.domain.HbciLoadBookingsRequest;
 
 import domain.BankAccount;
 import domain.Booking;
-import hbci4java.Hbci4JavaBanking;
 import spi.OnlineBankingService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,7 +24,7 @@ import io.swagger.annotations.ResponseHeader;
 @Api(value = "/v1/hbci", tags={"Access To Account HBCI"}, authorizations = @Authorization(value = "BearerToken"), description = "HBCI Frontend access to payment data")
 public class HbciService {
 
-	private OnlineBankingService onlineBankingService = new Hbci4JavaBanking();
+	private OnlineBankingService onlineBankingService;
 	
 	private EncryptionService encryptionService;
 
