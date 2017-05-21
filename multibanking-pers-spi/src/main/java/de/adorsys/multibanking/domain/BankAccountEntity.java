@@ -1,13 +1,13 @@
 package de.adorsys.multibanking.domain;
 
-import de.adorsys.multibanking.encrypt.Encrypted;
-import domain.BankAccount;
-import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import de.adorsys.multibanking.encrypt.Encrypted;
+import domain.BankAccount;
+import lombok.Data;
 
 /**
  * Created by alexg on 07.02.17.
