@@ -112,18 +112,20 @@ public class FigoBanking implements OnlineBankingService {
 
             bankAccess.setBankName(session.getAccounts().size() > 0 ? session.getAccounts().get(0).getBankName() : null);
 
-            return session.getAccounts().stream().map(account ->
-                    new BankAccount()
-                            .externalId(bankApiIdentifier(), account.getAccountId())
-                            .owner(account.getOwner())
-                            .numberHbciAccount(account.getAccountNumber())
-                            .nameHbciAccount(account.getName())
-                            .bicHbciAccount(account.getBIC())
-                            .blzHbciAccount(bankAccess.getBankCode())
-                            .ibanHbciAccount(account.getIBAN())
-                            .typeHbciAccount(account.getType())
-                            .bankAccountBalance(new BankAccountBalance()
-                                    .readyHbciBalance(account.getBalance().getBalance())))
+            return session.getAccounts().stream()
+                    .filter(account -> account.getBankCode().equals(bankAccess.getBankCode()))
+                    .map(account ->
+                            new BankAccount()
+                                    .externalId(bankApiIdentifier(), account.getAccountId())
+                                    .owner(account.getOwner())
+                                    .numberHbciAccount(account.getAccountNumber())
+                                    .nameHbciAccount(account.getName())
+                                    .bicHbciAccount(account.getBIC())
+                                    .blzHbciAccount(bankAccess.getBankCode())
+                                    .ibanHbciAccount(account.getIBAN())
+                                    .typeHbciAccount(account.getType())
+                                    .bankAccountBalance(new BankAccountBalance()
+                                            .readyHbciBalance(account.getBalance().getBalance())))
                     .collect(Collectors.toList());
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
