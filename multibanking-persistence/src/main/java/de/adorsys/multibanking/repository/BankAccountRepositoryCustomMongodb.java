@@ -4,6 +4,7 @@ import de.adorsys.multibanking.domain.BankAccountEntity;
 import domain.BankAccount;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -14,7 +15,8 @@ import org.springframework.stereotype.Repository;
  * Created by alexg on 07.02.17.
  */
 @Repository
-public class BankAccountRepositoryCustom  {
+@Profile({"mongo", "fongo"})
+public class BankAccountRepositoryCustomMongodb {
 
     @Autowired
     private MongoTemplate mongoTemplate;

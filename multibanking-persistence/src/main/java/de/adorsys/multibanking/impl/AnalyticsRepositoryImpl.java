@@ -1,18 +1,20 @@
-package de.adorsys.multibanking.repository.impl;
+package de.adorsys.multibanking.impl;
 
 import de.adorsys.multibanking.domain.AccountAnalyticsEntity;
-import de.adorsys.multibanking.pers.spi.repository.AnalyticsRepositoryIF;
-import de.adorsys.multibanking.repository.AnalyticsRepository;
+import de.adorsys.multibanking.pers.spi.repository.AnalyticsRepositoryIf;
+import de.adorsys.multibanking.repository.AnalyticsRepositoryMongodb;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Profile({"mongo", "fongo"})
 @Service
-public class AnalyticsRepositoryImpl implements AnalyticsRepositoryIF {
+public class AnalyticsRepositoryImpl implements AnalyticsRepositoryIf {
 
     @Autowired
-    private AnalyticsRepository analyticsRepository;
+    private AnalyticsRepositoryMongodb analyticsRepository;
 	
 	@Override
 	public Optional<AccountAnalyticsEntity> findLastByUserIdAndAccountId(String userId, String bankAccountId) {

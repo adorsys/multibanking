@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.repository;
+package de.adorsys.multibanking.conf;
 
 import com.github.fakemongo.Fongo;
 import com.mongodb.Mongo;

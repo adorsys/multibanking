@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.pers.jcloud.domain.UserMainRecord;
-import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIF;
-import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIF;
+import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
+import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.pers.utils.ObjectPersistenceAdapter;
 import de.adorsys.multibanking.pers.utils.UserDataNamingPolicy;
 
 @Service
-public class UserRepositoryImpl implements UserRepositoryIF, BankAccessRepositoryIF {
+public class UserRepositoryImpl implements UserRepositoryIf, BankAccessRepositoryIf {
 
     @Autowired
     private KeyCredentials keyCredentials;

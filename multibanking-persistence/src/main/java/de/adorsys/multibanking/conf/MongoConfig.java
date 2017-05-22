@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.repository;
+package de.adorsys.multibanking.conf;
 
 import com.mongodb.*;
 import org.bson.types.ObjectId;

@@ -10,7 +10,7 @@ import domain.BankApi;
  * @author alexg on 07.02.17
  * @author fpo on 21.05.2017
  */
-public interface BookingRepositoryIF {
+public interface BookingRepositoryIf {
 
     List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId, BankApi bankApi);
 

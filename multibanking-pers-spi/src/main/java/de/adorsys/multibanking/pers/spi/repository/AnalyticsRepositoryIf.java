@@ -8,7 +8,7 @@ import de.adorsys.multibanking.domain.AccountAnalyticsEntity;
  * @author alexg on 07.02.17
  * @author fpo on 21.05.2017
  */
-public interface AnalyticsRepositoryIF {
+public interface AnalyticsRepositoryIf {
 
     Optional<AccountAnalyticsEntity> findLastByUserIdAndAccountId(String userId, String bankAccountId);
 

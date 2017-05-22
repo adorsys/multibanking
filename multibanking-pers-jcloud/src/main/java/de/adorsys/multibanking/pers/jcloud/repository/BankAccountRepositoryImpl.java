@@ -18,12 +18,12 @@ import org.springframework.stereotype.Service;
 
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.pers.jcloud.domain.UserMainRecord;
-import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIF;
+import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.utils.ObjectPersistenceAdapter;
 import de.adorsys.multibanking.pers.utils.UserDataNamingPolicy;
 
 @Service
-public class BankAccountRepositoryImpl implements BankAccountRepositoryIF {
+public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 
     @Autowired
     private KeyCredentials keyCredentials;

@@ -1,17 +1,21 @@
-package de.adorsys.multibanking.repository.impl;
+package de.adorsys.multibanking.impl;
 
 import de.adorsys.multibanking.domain.BookingEntity;
-import de.adorsys.multibanking.pers.spi.repository.BookingRepositoryIF;
-import de.adorsys.multibanking.repository.BookingRepository;
+import de.adorsys.multibanking.pers.spi.repository.BookingRepositoryIf;
+import de.adorsys.multibanking.repository.BookingRepositoryMongodb;
 import domain.BankApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-public class BookingRepositoryImpl implements BookingRepositoryIF {
+@Profile({"mongo", "fongo"})
+@Service
+public class BookingRepositoryImpl implements BookingRepositoryIf {
 	@Autowired
-	BookingRepository bookingRepository;
+    BookingRepositoryMongodb bookingRepository;
 
 	@Override
 	public List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId,

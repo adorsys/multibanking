@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 
 import de.adorsys.multibanking.domain.BookingEntity;
 import de.adorsys.multibanking.pers.jcloud.domain.UserBookingRecord;
-import de.adorsys.multibanking.pers.spi.repository.BookingRepositoryIF;
+import de.adorsys.multibanking.pers.spi.repository.BookingRepositoryIf;
 import de.adorsys.multibanking.pers.utils.ObjectPersistenceAdapter;
 import de.adorsys.multibanking.pers.utils.UserDataNamingPolicy;
 import domain.BankApi;
 
 @Service
-public class BookingRepositoryImpl implements BookingRepositoryIF {
+public class BookingRepositoryImpl implements BookingRepositoryIf {
 
     @Autowired
     private KeyCredentials keyCredentials;

@@ -8,7 +8,7 @@ import de.adorsys.multibanking.domain.UserEntity;
  * @author alexg on 07.02.17
  * @author fpo on 21.05.2017
  */
-public interface UserRepositoryIF {
+public interface UserRepositoryIf {
 
     Optional<UserEntity> findById(String id);
 

@@ -1,17 +1,21 @@
-package de.adorsys.multibanking.repository.impl;
+package de.adorsys.multibanking.impl;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIF;
-import de.adorsys.multibanking.repository.BankAccessRepository;
+import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
+import de.adorsys.multibanking.repository.BankAccessRepositoryMongodb;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
-public class BankAccessRepositoryImpl implements BankAccessRepositoryIF {
+@Profile({"mongo", "fongo"})
+@Service
+public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 
     @Autowired
-    BankAccessRepository bankAccessRepository;
+    BankAccessRepositoryMongodb bankAccessRepository;
 	
 	@Override
 	public Optional<BankAccessEntity> findByUserIdAndId(String userId, String id) {

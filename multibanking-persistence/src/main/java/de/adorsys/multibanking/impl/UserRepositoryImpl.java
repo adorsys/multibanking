@@ -1,15 +1,20 @@
-package de.adorsys.multibanking.repository.impl;
+package de.adorsys.multibanking.impl;
 
 import de.adorsys.multibanking.domain.UserEntity;
-import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIF;
-import de.adorsys.multibanking.repository.UserRepository;
+import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
+import de.adorsys.multibanking.repository.UserRepositoryMongodb;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-public class UserRepositoryImpl implements UserRepositoryIF {
+@Profile({"mongo", "fongo"})
+@Service
+public class UserRepositoryImpl implements UserRepositoryIf {
+
 	@Autowired
-	private UserRepository userRepository;
+	private UserRepositoryMongodb userRepository;
 	
 	@Override
 	public Optional<UserEntity> findById(String id) {
