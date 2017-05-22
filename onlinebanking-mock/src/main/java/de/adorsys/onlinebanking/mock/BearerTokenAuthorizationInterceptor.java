@@ -1,12 +1,12 @@
 package de.adorsys.onlinebanking.mock;
 
-import java.io.IOException;
-
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.Assert;
+
+import java.io.IOException;
 
 public class BearerTokenAuthorizationInterceptor  implements ClientHttpRequestInterceptor {
 

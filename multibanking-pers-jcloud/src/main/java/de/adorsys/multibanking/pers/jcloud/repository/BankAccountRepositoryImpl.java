@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import domain.BankAccount;
 import org.adorsys.encobject.domain.KeyCredentials;
 import org.adorsys.encobject.domain.ObjectHandle;
 import org.apache.commons.lang3.StringUtils;
@@ -101,7 +102,17 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIF {
 		Map<String, List<BankAccountEntity>> bankAccountMap = userMainRecord.getBankAccountMap();
 		add(bankAccountMap, bankAccount);
 	}
-	
+
+	@Override
+	public BankAccount.SyncStatus getSyncStatus(String accountId) {
+		return null;
+	}
+
+	@Override
+	public void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus) {
+
+	}
+
 	private void add(Map<String, List<BankAccountEntity>> bankAccountMap, BankAccountEntity bankAccount){
 		String bankAccessId = bankAccount.getBankAccessId();
 		List<BankAccountEntity> list = bankAccountMap.get(bankAccessId);

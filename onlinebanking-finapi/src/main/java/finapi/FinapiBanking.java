@@ -1,7 +1,6 @@
 package finapi;
 
 import domain.*;
-import spi.OnlineBankingService;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.*;
@@ -10,6 +9,7 @@ import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spi.OnlineBankingService;
 
 import java.security.SecureRandom;
 import java.text.ParsePosition;

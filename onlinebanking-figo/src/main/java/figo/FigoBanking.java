@@ -1,7 +1,6 @@
 package figo;
 
 import domain.*;
-import spi.OnlineBankingService;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -13,6 +12,7 @@ import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spi.OnlineBankingService;
 
 import java.io.IOException;
 import java.security.SecureRandom;

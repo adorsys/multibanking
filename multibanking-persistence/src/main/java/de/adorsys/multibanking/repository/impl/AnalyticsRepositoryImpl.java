@@ -1,13 +1,12 @@
 package de.adorsys.multibanking.repository.impl;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import de.adorsys.multibanking.domain.AccountAnalyticsEntity;
 import de.adorsys.multibanking.pers.spi.repository.AnalyticsRepositoryIF;
 import de.adorsys.multibanking.repository.AnalyticsRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class AnalyticsRepositoryImpl implements AnalyticsRepositoryIF {

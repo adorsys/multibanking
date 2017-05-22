@@ -1,12 +1,11 @@
 package de.adorsys.multibanking.repository.impl;
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIF;
 import de.adorsys.multibanking.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Optional;
 
 public class UserRepositoryImpl implements UserRepositoryIF {
 	@Autowired

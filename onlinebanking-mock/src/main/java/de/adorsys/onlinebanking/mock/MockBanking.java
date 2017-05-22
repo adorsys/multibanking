@@ -1,30 +1,17 @@
 package de.adorsys.onlinebanking.mock;
 
-import java.util.ArrayList;
+import domain.*;
+import org.adorsys.envutils.EnvProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
+import spi.OnlineBankingService;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.adorsys.envutils.EnvProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
-
-import domain.AccessToken;
-import domain.BankAccess;
-import domain.BankAccount;
-import domain.BankApi;
-import domain.BankApiUser;
-import domain.Booking;
-import spi.OnlineBankingService;
 
 /**
  * Created by alexg on 17.05.17.

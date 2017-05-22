@@ -1,4 +1,4 @@
-package domain;
+package de.adorsys.onlinebanking.mock;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
