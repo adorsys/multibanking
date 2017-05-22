@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import de.adorsys.multibanking.pers.jcloud.domain.UserBookingRecord;
 import de.adorsys.multibanking.pers.jcloud.domain.UserMainRecord;
 
 @Service
@@ -48,9 +49,17 @@ public class ObjectPersistenceAdapter {
 	}
 
 	public void store(ObjectHandle userMainRecordhandle, UserMainRecord userMainRecord, KeyCredentials keyCredentials) {
+		storeInternal(userMainRecordhandle, userMainRecord, keyCredentials);
+	}
+
+	public void store(ObjectHandle userBookingRecordhandle, UserBookingRecord userBookingRecord, KeyCredentials keyCredentials) {
+		storeInternal(userBookingRecordhandle, userBookingRecord, keyCredentials);
+	}
+
+	private void storeInternal(ObjectHandle handle, Object obj, KeyCredentials keyCredentials) {
 		try {
-			byte[] data = objectMapper.writeValueAsBytes(userMainRecord);
-			encObjectService.writeObject(data, null, userMainRecordhandle, keyCredentials);
+			byte[] data = objectMapper.writeValueAsBytes(obj);
+			encObjectService.writeObject(data, null, handle, keyCredentials);
 		} catch (CertificateException | ObjectNotFoundException | WrongKeystoreCredentialException
 				| MissingKeystoreAlgorithmException | MissingKeystoreProviderException | MissingKeyAlgorithmException
 				| IOException | UnsupportedEncAlgorithmException | WrongKeyCredentialException
@@ -59,5 +68,4 @@ public class ObjectPersistenceAdapter {
 		}
 		
 	}
-
 }

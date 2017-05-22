@@ -1,17 +1,15 @@
 package de.adorsys.multibanking.pers.jcloud.repository;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import domain.BankAccount;
 import org.adorsys.encobject.domain.KeyCredentials;
 import org.adorsys.encobject.domain.ObjectHandle;
+import org.adorsys.encobject.service.ObjectNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +19,7 @@ import de.adorsys.multibanking.pers.jcloud.domain.UserMainRecord;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.utils.ObjectPersistenceAdapter;
 import de.adorsys.multibanking.pers.utils.UserDataNamingPolicy;
+import domain.BankAccount;
 
 @Service
 public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
@@ -38,45 +37,24 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 	public List<BankAccountEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId) {
 		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
 		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);
-		if(userMainRecord==null || userMainRecord.getBankAccountMap()==null) return Collections.emptyList();
-		
-		Map<String, List<BankAccountEntity>> bankAccountMap = userMainRecord.getBankAccountMap();
-		return bankAccountMap.get(bankAccessId);
+		if(userMainRecord==null) return Collections.emptyList();
+		return userMainRecord.getBankAccountMap().get(bankAccessId);
 	}
 
 	@Override
 	public Optional<BankAccountEntity> findByUserIdAndId(String userId, String id) {
 		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
 		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);
-		if(userMainRecord==null || userMainRecord.getBankAccountMap()==null) return Optional.empty();
-		
-		Map<String, List<BankAccountEntity>> bankAccountMap = userMainRecord.getBankAccountMap();
-		Collection<List<BankAccountEntity>> values = bankAccountMap.values();
-		for (List<BankAccountEntity> list : values) {
-			if(list==null) continue;
-			for (BankAccountEntity bankAccountEntity : list) {
-				if(bankAccountEntity==null) continue;
-				if(StringUtils.equals(id, bankAccountEntity.getId())) return Optional.of(bankAccountEntity);
-			}
-		}
-		return Optional.empty();
+		BankAccountEntity accountEntity = ListUtils.find(userMainRecord, id);
+		if(accountEntity==null) return Optional.empty();
+		return Optional.of(accountEntity);
 	}
 
 	@Override
 	public boolean exists(String accountId) {
 		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
 		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);
-		if(userMainRecord==null || userMainRecord.getBankAccountMap()==null) return false;
-		Map<String, List<BankAccountEntity>> bankAccountMap = userMainRecord.getBankAccountMap();
-		Collection<List<BankAccountEntity>> values = bankAccountMap.values();
-		for (List<BankAccountEntity> list : values) {
-			if(list==null) continue;
-			for (BankAccountEntity bankAccountEntity : list) {
-				if(bankAccountEntity==null) continue;
-				if(StringUtils.equals(accountId, bankAccountEntity.getId())) return true;
-			}
-		}
-		return false;
+		return ListUtils.find(userMainRecord, accountId)!=null;
 	}
 
 	@Override
@@ -84,12 +62,11 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
 		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);
 		if(userMainRecord==null)userMainRecord = new UserMainRecord();
-		if(userMainRecord.getBankAccountMap()==null)userMainRecord.setBankAccountMap(new HashMap<>());
-		
 		Map<String, List<BankAccountEntity>> bankAccountMap = userMainRecord.getBankAccountMap();
 		for (BankAccountEntity bankAccountEntity : bankAccounts) {
 			add(bankAccountMap, bankAccountEntity);
 		}
+		objectPersistenceAdapter.store(userMainRecordhandle, userMainRecord, keyCredentials);
 	}
 
 	@Override
@@ -97,22 +74,46 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
 		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);
 		if(userMainRecord==null)userMainRecord = new UserMainRecord();
-		if(userMainRecord.getBankAccountMap()==null)userMainRecord.setBankAccountMap(new HashMap<>());
-
 		Map<String, List<BankAccountEntity>> bankAccountMap = userMainRecord.getBankAccountMap();
 		add(bankAccountMap, bankAccount);
+		objectPersistenceAdapter.store(userMainRecordhandle, userMainRecord, keyCredentials);
 	}
 
 	@Override
 	public BankAccount.SyncStatus getSyncStatus(String accountId) {
-		return null;
+		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
+		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);
+		BankAccountEntity accountEntity = ListUtils.find(userMainRecord, accountId);
+		if(accountEntity==null) return BankAccount.SyncStatus.READY;
+		return accountEntity.getSyncStatus();
 	}
 
 	@Override
 	public void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus) {
-
+		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
+		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);
+		BankAccountEntity accountEntity = ListUtils.find(userMainRecord, accountId);
+		if(accountEntity==null) throw new RuntimeException( new ObjectNotFoundException("Account with id: " + accountId + " not found"));
+		accountEntity.setSyncStatus(syncStatus);
+		add(userMainRecord.getBankAccountMap(), accountEntity);
+		objectPersistenceAdapter.store(userMainRecordhandle, userMainRecord, keyCredentials);
 	}
 
+	static ListItemHandler<BankAccountEntity> handler = new ListItemHandler<BankAccountEntity>() {
+
+		@Override
+		public boolean idEquals(BankAccountEntity a, BankAccountEntity b) {
+			return StringUtils.equals(a.getId(), b.getId());
+		}
+
+		@Override
+		public boolean newId(BankAccountEntity a) {
+			if(StringUtils.isNoneBlank(a.getId())) return false;
+			a.setId(UUID.randomUUID().toString());
+			return true;
+		}
+	};
+	
 	private void add(Map<String, List<BankAccountEntity>> bankAccountMap, BankAccountEntity bankAccount){
 		String bankAccessId = bankAccount.getBankAccessId();
 		List<BankAccountEntity> list = bankAccountMap.get(bankAccessId);
@@ -121,24 +122,7 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 			bankAccountMap.put(bankAccessId, list);
 		}
 		
-		int index = -1;
-		for (int i = 0; i < list.size(); i++) {
-			BankAccountEntity bankAccessEntity = list.get(i);
-			if(bankAccessEntity==null) continue;
-			if(StringUtils.equals(bankAccessEntity.getId(), bankAccount.getId())) {
-				index = i;
-				break;
-			}
-		}
-		if(index<0){
-			list.add(bankAccount);
-		} else {
-			if(bankAccount.getId()==null){
-				bankAccount.setId(UUID.randomUUID().toString());
-			}
-			list.set(index, bankAccount);
-		}
-		
+		ListUtils.add(bankAccount, list, handler);
 	}
 
 }
