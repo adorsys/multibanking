@@ -1,0 +1,21 @@
+<assembly>
+  <id>module</id>
+  <formats>
+    <format>tar.gz</format>
+    <format>dir</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <files>
+    <file>
+      <source>module.xml</source>
+      <outputDirectory>de/adorsys/keycloak/mapper/main</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+    <file>
+      <source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source>
+      <outputDirectory>de/adorsys/keycloak/mapper/main</outputDirectory>
+    </file>
+  </files>
+</assembly>
