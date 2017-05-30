@@ -4,15 +4,26 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWEObject;
+import com.nimbusds.jose.crypto.RSADecrypter;
+import com.nimbusds.jose.jwk.JWKSet;
+import com.nimbusds.jose.jwk.RSAKey;
+import de.adorsys.multibanking.domain.KeyStoreEntity;
+import de.adorsys.multibanking.impl.KeyStoreRepositoryImpl;
+import org.adorsys.envutils.EnvProperties;
+import org.keycloak.KeycloakPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Principal;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,10 +35,12 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
 
     @Autowired
     Principal principal;
+    @Autowired
+    KeyStoreRepositoryImpl keyStoreRepository;
+
+    private JWKSet privateKeys;
 
     private ObjectMapper objectMapper = new ObjectMapper();
-
-    private SecretKey secretKey = new SecretKeySpec("1234567890123456".getBytes(), "AES");
 
     @Override
     public void onBeforeSave(BeforeSaveEvent<Object> event) {
@@ -35,6 +48,9 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
 
         if (source.getClass().isAnnotationPresent(Encrypted.class)) {
             try {
+                String secret = getUserSecret();
+                SecretKey secretKey = new SecretKeySpec(secret.getBytes(), "AES");
+
                 //encrypt dbobject
                 String json = objectMapper.writeValueAsString(event.getDBObject());
 
@@ -65,6 +81,9 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
                 return;
             }
 
+            String secret = getUserSecret();
+            SecretKey secretKey = new SecretKeySpec(secret.getBytes(), "AES");
+
             String decryptedJson = EncryptionUtil.decrypt(event.getDBObject().get("encrypted").toString(), secretKey);
             DBObject decryptedDbObject = (DBObject) JSON.parse(decryptedJson);
             List<String> exclude = Arrays.asList(((Encrypted) source.getAnnotation(Encrypted.class)).exclude());
@@ -88,5 +107,30 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
         }
     }
 
+    private String getUserSecret() {
+        String userSecret = (String) ((KeycloakPrincipal) principal).getKeycloakSecurityContext().getToken().getOtherClaims().get("custom_secret");
+        if (userSecret == null) {
+            throw new IllegalStateException("secret not exists in jwt");
+        }
 
+        try {
+            RSADecrypter decrypter = new RSADecrypter((RSAKey) getPrivateKeys().getKeys().iterator().next());
+
+            JWEObject jweObject = JWEObject.parse(userSecret);
+            jweObject.decrypt(decrypter);
+
+            return jweObject.getPayload().toString();
+        } catch (ParseException | JOSEException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public JWKSet getPrivateKeys() {
+        if (privateKeys == null) {
+            String serverKeystoreName = EnvProperties.getEnvOrSysProp("SERVER_KEYSTORE_NAME", "multibanking-service-keystore");
+            KeyStoreEntity keyStoreEntity = keyStoreRepository.findOne(serverKeystoreName);
+            privateKeys = KeyStoreUtils.loadPrivateKeys(keyStoreEntity);
+        }
+        return privateKeys;
+    }
 }

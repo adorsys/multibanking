@@ -1,21 +1,21 @@
 <assembly>
-  <id>module</id>
+  <id>jar-with-dependencies</id>
+  <containerDescriptorHandlers>
+    <containerDescriptorHandler>
+      <handlerName>metaInf-services</handlerName>
+    </containerDescriptorHandler>
+  </containerDescriptorHandlers>
   <formats>
-    <format>tar.gz</format>
-    <format>dir</format>
+    <format>jar</format>
   </formats>
-
   <includeBaseDirectory>false</includeBaseDirectory>
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/</outputDirectory>
+      <useProjectArtifact>true</useProjectArtifact>
+      <unpack>true</unpack>
+      <scope>runtime</scope>
+    </dependencySet>
+  </dependencySets>
 
-  <files>
-    <file>
-      <source>module.xml</source>
-      <outputDirectory>de/adorsys/keycloak/mapper/main</outputDirectory>
-      <filtered>true</filtered>
-    </file>
-    <file>
-      <source>${project.build.directory}/${project.build.finalName}.${project.packaging}</source>
-      <outputDirectory>de/adorsys/keycloak/mapper/main</outputDirectory>
-    </file>
-  </files>
 </assembly>

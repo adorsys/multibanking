@@ -94,7 +94,7 @@ public class SecretTokenMapper extends AbstractOIDCProtocolMapper implements OID
     public AccessToken transformAccessToken(AccessToken token, ProtocolMapperModel mappingModel, KeycloakSession session,
                                             UserSessionModel userSession, ClientSessionModel clientSession) {
 
-    	String customSecretAttr = null;
+    	String customSecretAttr;
     	List<String> attribute = userSession.getUser().getAttribute(CREDENTIAL_TYPE);
     	if(attribute==null || attribute.isEmpty()){    		
     		customSecretAttr = generateUserSecret(userSession);
@@ -115,14 +115,16 @@ public class SecretTokenMapper extends AbstractOIDCProtocolMapper implements OID
      */
     private String wrapSecretForResourceServer(String customSecretAttr, UserSessionModel userSession, KeycloakSession session) {
 		try {
+			//decrypt with database encryption pass
 			JWEObject jweObject = JWEObject.parse(customSecretAttr);
 			JWEDecrypter decrypter = new DirectDecrypter(secretEncryptionPassword);
 			jweObject.decrypt(decrypter);
 			Payload payload = jweObject.getPayload();
-			
+
+            //encrypt with remote server public key
 			String url = EnvProperties.getEnvOrSysProp(userSession.getRealm().getName().toUpperCase()+"_PUBLIC_KEY_URL", false);
 			JsonNode publicKeyResponse = JsonSimpleHttp.asJson(JsonSimpleHttp.doGet(url, session));
-			JWKSet jwkSet = JWKSet.parse(publicKeyResponse.asText());
+			JWKSet jwkSet = JWKSet.parse(publicKeyResponse.toString());
 			JWK jwk = jwkSet.getKeys().iterator().next();
 			JWEEncrypter jweEncrypter = JWEEncryptedSelector.geEncrypter(jwk, null, null);
 			// JWE encrypt secret.
