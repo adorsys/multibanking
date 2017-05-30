@@ -86,6 +86,11 @@
 				<version>1.5.13</version>
 			</dependency>
 			<dependency>
+				<groupId>org.keycloak</groupId>
+				<artifactId>keycloak-core</artifactId>
+				<version>3.1.0.Final</version>
+			</dependency>
+			<dependency>
 				<groupId>org.slf4j</groupId>
 				<version>1.7.24</version>
 				<artifactId>slf4j-api</artifactId>
@@ -100,27 +105,36 @@
 				<artifactId>jjwk</artifactId>
 				<version>0.1</version>
 			</dependency>
-
+			<dependency>
+				<groupId>de.adorsys.cryptoutils</groupId>
+				<artifactId>encobject</artifactId>
+				<version>0.1</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<version>3.5</version>
-			</dependency>
-
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.12</version>
-				<scope>test</scope>
-				<!-- <exclusions> <exclusion> <groupId>org.hamcrest</groupId> <artifactId>hamcrest-core</artifactId> 
-					</exclusion> </exclusions> -->
 			</dependency>
 			<dependency>
 				<groupId>com.nimbusds</groupId>
 				<artifactId>nimbus-jose-jwt</artifactId>
 				<version>4.34.1</version>
 			</dependency>
-
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcpkix-jdk15on</artifactId>
+				<version>1.57</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk15on</artifactId>
+				<version>1.57</version>
+			</dependency>
+            <dependency>
+                <groupId>com.github.fakemongo</groupId>
+                <artifactId>fongo</artifactId>
+                <version>2.0.12</version>
+            </dependency>
 		</dependencies>
 	</dependencyManagement>
 

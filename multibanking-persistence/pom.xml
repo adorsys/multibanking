@@ -38,7 +38,6 @@
         <dependency>
             <groupId>com.github.fakemongo</groupId>
             <artifactId>fongo</artifactId>
-            <version>2.0.12</version>
         </dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -47,7 +46,6 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
-            <version>3.1.0.Final</version>
         </dependency>
         <dependency>
             <groupId>com.nimbusds</groupId>
@@ -56,17 +54,14 @@
         <dependency>
             <groupId>de.adorsys.cryptoutils</groupId>
             <artifactId>encobject</artifactId>
-            <version>0.1</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.57</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.57</version>
         </dependency>
     </dependencies>
 </project>
