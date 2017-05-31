@@ -57,12 +57,12 @@ public class AccountParams {
   }
 
    /**
-   * Identifier of account type.<br/><br/>1 = Checking,<br/>2 = Savings,<br/>3 = CreditCard,<br/>4 = Security,<br/>5 = Loan,<br/>6 = Pocket (DEPRECATED; will not be returned for any account unless this type has explicitly been set via PATCH),<br/>7 = Membership<br/><br/>
+   * Identifier of account type.<br><br>1 = Checking,<br>2 = Savings,<br>3 = CreditCard,<br>4 = Security,<br>5 = Loan,<br>6 = Pocket (DEPRECATED; will not be returned for any account unless this type has explicitly been set via PATCH),<br>7 = Membership<br><br>
    * minimum: 1
    * maximum: 7
    * @return accountTypeId
   **/
-  @ApiModelProperty(example = "null", value = "Identifier of account type.<br/><br/>1 = Checking,<br/>2 = Savings,<br/>3 = CreditCard,<br/>4 = Security,<br/>5 = Loan,<br/>6 = Pocket (DEPRECATED; will not be returned for any account unless this type has explicitly been set via PATCH),<br/>7 = Membership<br/><br/>")
+  @ApiModelProperty(example = "null", value = "Identifier of account type.<br><br>1 = Checking,<br>2 = Savings,<br>3 = CreditCard,<br>4 = Security,<br>5 = Loan,<br>6 = Pocket (DEPRECATED; will not be returned for any account unless this type has explicitly been set via PATCH),<br>7 = Membership<br><br>")
   public Long getAccountTypeId() {
     return accountTypeId;
   }
