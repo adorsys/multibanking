@@ -163,10 +163,10 @@ public class Apiv1testsmockBatchUpdateNewTransactions {
   }
 
    /**
-   * Booking date in the format 'yyyy-MM-dd'.<br/><br/>If the date lies back more than 10 days from the booking date of the latest transaction that currently exists in the account, then this transaction will be ignored and not imported. If the date depicts a date in the future, then finAPI will deal with it the same way as it does with real transactions during a real update (see fields 'bankBookingDate' and 'finapiBookingDate' in the Transaction Resource for explanation).<br/><br/>This field is optional, default value is the current date.
+   * Booking date in the format 'yyyy-MM-dd'.<br><br>If the date lies back more than 10 days from the booking date of the latest transaction that currently exists in the account, then this transaction will be ignored and not imported. If the date depicts a date in the future, then finAPI will deal with it the same way as it does with real transactions during a real update (see fields 'bankBookingDate' and 'finapiBookingDate' in the Transaction Resource for explanation).<br><br>This field is optional, default value is the current date.
    * @return bookingDate
   **/
-  @ApiModelProperty(example = "null", value = "Booking date in the format 'yyyy-MM-dd'.<br/><br/>If the date lies back more than 10 days from the booking date of the latest transaction that currently exists in the account, then this transaction will be ignored and not imported. If the date depicts a date in the future, then finAPI will deal with it the same way as it does with real transactions during a real update (see fields 'bankBookingDate' and 'finapiBookingDate' in the Transaction Resource for explanation).<br/><br/>This field is optional, default value is the current date.")
+  @ApiModelProperty(example = "null", value = "Booking date in the format 'yyyy-MM-dd'.<br><br>If the date lies back more than 10 days from the booking date of the latest transaction that currently exists in the account, then this transaction will be ignored and not imported. If the date depicts a date in the future, then finAPI will deal with it the same way as it does with real transactions during a real update (see fields 'bankBookingDate' and 'finapiBookingDate' in the Transaction Resource for explanation).<br><br>This field is optional, default value is the current date.")
   public String getBookingDate() {
     return bookingDate;
   }
