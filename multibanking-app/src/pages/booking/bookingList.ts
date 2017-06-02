@@ -1,6 +1,5 @@
-import {Component} from '@angular/core';
-import {NavController, AlertController, ToastController} from 'ionic-angular';
-import {NavParams} from 'ionic-angular';
+import {Component} from "@angular/core";
+import {NavController, AlertController, ToastController, NavParams} from "ionic-angular";
 import {BankAccountService} from "../../services/bankAccountService";
 import {BookingService} from "../../services/bookingService";
 
@@ -27,9 +26,19 @@ export class BookingListPage {
     this.bankAccountId = navparams.data.bankAccountId;
 
     if (!navparams.data.bookings) {
-      this.bookingService.getBookings(this.userId, this.bankAccessId, this.bankAccountId).subscribe(response => {
-        this.bookings = response;
-      })
+      this.bookingService.getBookings(this.userId, this.bankAccessId, this.bankAccountId).subscribe(
+        response => {
+          this.bookings = response;
+        },
+        error => {
+          if (error == "SYNC_IN_PROGRESS") {
+            this.toastCtrl.create({
+              message: 'Account sync in progress',
+              showCloseButton: true,
+              position: 'top'
+            }).present();
+          }
+        })
     }
   }
 

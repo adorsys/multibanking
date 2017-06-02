@@ -117,5 +117,10 @@ public class UserRepositoryImpl implements UserRepositoryIf, BankAccessRepositor
 		objectPersistenceAdapter.store(userMainRecordhandle, userMainRecord, keyCredentials);
 		return bankAccess;
 	}
-	
+
+	@Override
+	public String getBankCode(String bankAccessId) {
+		return null;
+	}
+
 }
