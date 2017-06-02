@@ -16,4 +16,6 @@ public interface BankAccessRepositoryIf {
     List<BankAccessEntity> findByUserId(String userId);
 
 	BankAccessEntity save(BankAccessEntity bankAccess);
+
+    String getBankCode(String id);
 }
