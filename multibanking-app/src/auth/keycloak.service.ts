@@ -23,7 +23,7 @@ export class KeycloakService {
           KeycloakService.auth.loggedIn = true;
           KeycloakService.auth.authz = keycloakAuth;
           KeycloakService.auth.logoutUrl = keycloakAuth.authServerUrl
-            + '/realms/rezeptsuite-client/protocol/openid-connect/logout?redirect_uri='
+            + '/realms/multibanking/protocol/openid-connect/logout?redirect_uri='
             + document.baseURI;
           resolve();
         })

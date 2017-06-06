@@ -44,12 +44,17 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     public FigoBanking() {
-        String figoClientId = EnvProperties.getEnvOrSysProp("FIGO_CLIENT_ID", false);
-        String figoSecret = EnvProperties.getEnvOrSysProp("FIGO_SECRET", false);
+        String figoClientId = EnvProperties.getEnvOrSysProp("FIGO_CLIENT_ID", true);
+        String figoSecret = EnvProperties.getEnvOrSysProp("FIGO_SECRET", true);
         int figoTimeout = Integer.parseInt(EnvProperties.getEnvOrSysProp("FIGO_TIMEOUT", "0"));
         String figoConnectionUrl = EnvProperties.getEnvOrSysProp("FIGO_CONNECTION_URL", "https://api.figo.me");
 
-        figoConnection = new FigoConnection(figoClientId, figoSecret, "http://nowhere.here", figoTimeout, figoConnectionUrl);
+        if (figoClientId == null || figoSecret == null) {
+            LOG.warn("missing env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
+        } else {
+            figoConnection = new FigoConnection(figoClientId, figoSecret, "http://nowhere.here", figoTimeout, figoConnectionUrl);
+        }
+
     }
 
     @Override
@@ -59,6 +64,9 @@ public class FigoBanking implements OnlineBankingService {
 
     @Override
     public boolean bankSupported(String bankCode) {
+        if (figoConnection == null) {
+            LOG.warn("skip figo bank api, figo connection not available, check env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
+        }
         return true;
     }
 

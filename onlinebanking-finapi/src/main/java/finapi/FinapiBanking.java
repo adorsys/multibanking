@@ -41,11 +41,15 @@ public class FinapiBanking implements OnlineBankingService {
     private static final Logger LOG = LoggerFactory.getLogger(FinapiBanking.class);
 
     public FinapiBanking() {
-        finapiClientId = EnvProperties.getEnvOrSysProp("finapiClientId", "6e220fb9-ba6e-4af0-bba7-5431f692ab26");
-        finapiSecret = EnvProperties.getEnvOrSysProp("finapiSecret", "e4d32b93-67da-4664-add8-d5e84ea4cb1b");
-        finapiConnectionUrl = EnvProperties.getEnvOrSysProp("figoConnectionUrl", "https://sandbox.finapi.io/");
+        finapiClientId = EnvProperties.getEnvOrSysProp("FINAPI_CLIENT_ID", true);
+        finapiSecret = EnvProperties.getEnvOrSysProp("FINAPI_SECRET", true);
+        finapiConnectionUrl = EnvProperties.getEnvOrSysProp("FINAPI_CONNECTION_URL", "https://sandbox.finapi.io/");
 
-        authorizeClient();
+        if (finapiClientId == null || finapiSecret == null) {
+            LOG.warn("missing env properties FINAPI_CLIENT_ID and/or FINAPI_SECRET");
+        } else {
+            authorizeClient();
+        }
     }
 
     @Override
@@ -55,6 +59,14 @@ public class FinapiBanking implements OnlineBankingService {
 
     @Override
     public boolean userRegistrationRequired() {
+        return true;
+    }
+
+    @Override
+    public boolean bankSupported(String bankCode) {
+        if (clientToken == null) {
+            LOG.warn("skip finapi bank api, client token not available, check env properties FINAPI_CLIENT_ID and/or FINAPI_SECRET");
+        }
         return true;
     }
 
@@ -199,11 +211,6 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean bankSupported(String bankCode) {
-        return true;
-    }
-
-    @Override
     public boolean bookingsCategorized() {
         return true;
     }
@@ -233,7 +240,7 @@ public class FinapiBanking implements OnlineBankingService {
         try {
             clientToken = new AuthorizationApi(createApiClient()).getToken("client_credentials", finapiClientId, finapiSecret, null, null, null);
         } catch (ApiException e) {
-            throw new RuntimeException(e);
+            LOG.error(e.getMessage(), e);
         }
     }
 }
