@@ -29,9 +29,9 @@ public class KeyStoreUtils {
 
     public static JWKSet loadPrivateKeys(KeyStoreEntity keyStoreEntity) {
         String serverKeystoreName = EnvProperties.getEnvOrSysProp("SERVER_KEYSTORE_NAME", "multibanking-service-keystore");
-        String serverKeystorePassword = EnvProperties.getEnvOrSysProp("keystore.password", true);
+        String serverKeystorePassword = EnvProperties.getEnvOrSysProp("KEYSTORE_PASSWORD", true);
         if (StringUtils.isBlank(serverKeystorePassword))
-            throw new IllegalStateException("Missing environment property keystore.password");
+            throw new IllegalStateException("Missing environment property KEYSTORE_PASSWORD");
 
         char[] keyPairPassword = serverKeystorePassword.toCharArray();
         CallbackHandler storePassHandler = new PasswordCallbackHandler(keyPairPassword);
