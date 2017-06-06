@@ -12,4 +12,10 @@
       <http-listener name="default" socket-binding="http" redirect-socket="https" proxy-address-forwarding="true"/>
     </xsl:template>
 
+    <xsl:template match="@*|node()">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+
 </xsl:stylesheet>

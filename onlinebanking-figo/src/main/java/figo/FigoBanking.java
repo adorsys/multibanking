@@ -44,10 +44,10 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     public FigoBanking() {
-        String figoClientId = EnvProperties.getEnvOrSysProp("figoClientId", "CKmGgL2cUq8fL-IaTM3jloNzIqptWogQYCGolQT-9r7Y");
-        String figoSecret = EnvProperties.getEnvOrSysProp("figoSecret", "S-Y7598_mYfjxo0vYLVpk52YYfom-Fxo0_OQ8HSCdfmY");
-        int figoTimeout = Integer.parseInt(EnvProperties.getEnvOrSysProp("figoTimeout", "0"));
-        String figoConnectionUrl = EnvProperties.getEnvOrSysProp("figoConnectionUrl", "https://api.figo.me");
+        String figoClientId = EnvProperties.getEnvOrSysProp("FIGO_CLIENT_ID", false);
+        String figoSecret = EnvProperties.getEnvOrSysProp("FIGO_SECRET", false);
+        int figoTimeout = Integer.parseInt(EnvProperties.getEnvOrSysProp("FIGO_TIMEOUT", "0"));
+        String figoConnectionUrl = EnvProperties.getEnvOrSysProp("FIGO_CONNECTION_URL", "https://api.figo.me");
 
         figoConnection = new FigoConnection(figoClientId, figoSecret, "http://nowhere.here", figoTimeout, figoConnectionUrl);
     }
