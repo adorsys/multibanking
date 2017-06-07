@@ -37,7 +37,7 @@ public class HbciService {
 			@ApiResponse(code = 400, message = "Bad request", responseHeaders=@ResponseHeader(name="ERROR_KEY", description="BAD_REQUEST"))})
 	public EncryptedListOfHbciBankAccounts loadBankAccounts(@ApiParam(value="The encrypted bank access object") EncryptedHbciLoadAccountRequest encryptedRequest) {
 		HbciLoadAccountsRequest request = encryptionService.decrypt(encryptedRequest.getJweString(), HbciLoadAccountsRequest.class);
-		List<BankAccount> bancAccountList = onlineBankingService.loadBankAccounts(null, request.getBankAccess(), request.getPin());
+		List<BankAccount> bancAccountList = onlineBankingService.loadBankAccounts(null, request.getBankAccess(), request.getPin(), true);
 
 		String encryptedJwe = encryptionService.encrypt(bancAccountList, request);
 		EncryptedListOfHbciBankAccounts resp = new EncryptedListOfHbciBankAccounts();
