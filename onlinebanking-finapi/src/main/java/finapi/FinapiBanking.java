@@ -89,7 +89,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
         LOG.info("load bank accounts");
         try {
             InlineResponse2006 searchAllBanks = new BanksApi(createApiClient()).getAndSearchAllBanks(null, bankAccess.getBankCode(), null, null, null, null, null);
@@ -106,7 +106,7 @@ public class FinapiBanking implements OnlineBankingService {
                     .bankId(searchAllBanks.getBanks().get(0).getId())
                     .bankingUserId(bankAccess.getBankLogin())
                     .bankingPin(pin)
-                    .storePin(true));
+                    .storePin(storePin));
 
             bankAccess.externalId(bankApiIdentifier(), connections.getId().toString());
 

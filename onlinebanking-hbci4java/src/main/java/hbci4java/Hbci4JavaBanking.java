@@ -52,7 +52,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
         LOG.info("Loading Account list for access {}", bankAccess.getBankCode());
         HbciPassport hbciPassport = createPassport(bankAccess, pin);
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);

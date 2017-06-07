@@ -60,7 +60,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
     	RestTemplate restTemplate = new RestTemplate();
     	Map<String,String> map = new HashMap<>();
     	map.put("bankLogin", bankAccess.getBankLogin());

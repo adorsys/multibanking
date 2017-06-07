@@ -99,7 +99,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
             FigoSession session = new FigoSession(tokenResponse.getAccessToken());
@@ -109,7 +109,7 @@ public class FigoBanking implements OnlineBankingService {
                     "de",
                     Arrays.asList(bankAccess.getBankLogin(), pin),
                     Collections.singletonList("standingOrders"),
-                    true,
+                    storePin,
                     true
             );
 

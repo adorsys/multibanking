@@ -30,6 +30,7 @@ public class BankAccessEntity extends BankAccess {
     @Indexed
     private String userId;
     private String pin;
+    private boolean storePin;
 
     public BankAccessEntity id(String id) {
         this.id = id;
