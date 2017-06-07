@@ -28,7 +28,7 @@ export class BankAccessListPage {
   itemSelected(bankAccess) {
     this.navCtrl.push(BankAccountListPage, {
       userId: this.userId,
-      bankAccessId: bankAccess.id,
+      bankAccess: bankAccess,
     });
   }
 

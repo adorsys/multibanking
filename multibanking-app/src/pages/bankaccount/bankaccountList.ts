@@ -1,7 +1,7 @@
 import {Component} from "@angular/core";
 import {NavController, NavParams} from "ionic-angular";
 import {BankAccountService} from "../../services/bankAccountService";
-import {AnalyticsPage} from "../analytics/analytics";
+import {BookingListPage} from "../booking/bookingList";
 
 @Component({
   selector: 'page-bankaccountList',
@@ -10,7 +10,7 @@ import {AnalyticsPage} from "../analytics/analytics";
 export class BankAccountListPage {
 
   userId;
-  bankAccessId;
+  bankAccess;
   bankAccounts;
 
   constructor(public navCtrl: NavController,
@@ -18,7 +18,7 @@ export class BankAccountListPage {
               private bankAccountService: BankAccountService) {
 
     this.userId = navparams.data.userId;
-    this.bankAccessId = navparams.data.bankAccessId;
+    this.bankAccess = navparams.data.bankAccess;
 
     this.loadBankAccounts();
 
@@ -28,17 +28,16 @@ export class BankAccountListPage {
   }
 
   loadBankAccounts() {
-    this.bankAccountService.getBankAccounts(this.userId, this.bankAccessId).subscribe(response => {
+    this.bankAccountService.getBankAccounts(this.userId, this.bankAccess.id).subscribe(response => {
       this.bankAccounts = response;
     })
   }
 
   itemSelected(bankAccount) {
-    this.navCtrl.push(AnalyticsPage, {
+    this.navCtrl.push(BookingListPage, {
       userId: this.userId,
-      bankAccessId: this.bankAccessId,
+      bankAccess: this.bankAccess,
       bankAccountId: bankAccount.id,
     })
-
   }
 }
