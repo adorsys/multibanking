@@ -43,4 +43,9 @@ public class AnalyticsRepositoryImpl implements AnalyticsRepositoryIf {
 		userMainRecord.getAnalytics().put(accountAnalyticsEntity.getAccountId(), accountAnalyticsEntity);
 	}
 
+	@Override
+	public void deleteByAccountId(String id) {
+		//TODO
+	}
+
 }

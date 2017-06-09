@@ -18,4 +18,5 @@ public interface BankAccessRepositoryMongodb extends MongoRepository<BankAccessE
     Optional<BankAccessEntity> findByUserIdAndId(String userId, String id);
 
     List<BankAccessEntity> findByUserId(String userId);
+
 }

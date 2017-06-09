@@ -57,4 +57,9 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 		bankAccountRepositoryCustom.updateSyncStatus(accountId, syncStatus);
 	}
 
+	@Override
+	public List<BankAccountEntity> deleteByBankAccess(String accessId) {
+		return bankAccountRepository.deleteByBankAccessId(accessId);
+	}
+
 }

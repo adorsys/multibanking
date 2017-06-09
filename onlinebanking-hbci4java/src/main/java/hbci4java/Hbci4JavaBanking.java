@@ -63,7 +63,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 hbciAccounts.add(HbciFactory.toBankAccount(konto));
             }
             if (hbciPassport.getState().isPresent()) {
-                bankAccess.setPassportState(hbciPassport.getState().get().toJson());
+                bankAccess.setHbciPassportState(hbciPassport.getState().get().toJson());
             }
             handle.close();
             return hbciAccounts;
@@ -94,7 +94,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
 
             if (hbciPassport.getState().isPresent()) {
-                bankAccess.setPassportState(hbciPassport.getState().get().toJson());
+                bankAccess.setHbciPassportState(hbciPassport.getState().get().toJson());
             }
             bankAccount.setBankAccountBalance(HbciFactory.createBalance((GVRSaldoReq)balanceJob.getJobResult()));
 
@@ -128,7 +128,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         properties.put("client.passport.blz", bankAccess.getBankCode());
         properties.put("client.passport.customerId", bankAccess.getBankLogin());
 
-        HbciPassport passport = new HbciPassport(bankAccess.getPassportState(), properties, null);
+        HbciPassport passport = new HbciPassport(bankAccess.getHbciPassportState(), properties, null);
         passport.setPIN(pin);
 
         return passport;

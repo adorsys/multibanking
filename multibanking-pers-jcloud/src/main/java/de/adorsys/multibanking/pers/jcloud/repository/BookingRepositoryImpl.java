@@ -73,6 +73,11 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 		}
 	}
 
+	@Override
+	public void deleteByAccountId(String id) {
+		//TODO
+	}
+
 	private void addBooking(UserBookingRecord userBookingRecord, BookingEntity booking){
 		ListUtils.add(booking, userBookingRecord.getBookings(), handler);
 	}

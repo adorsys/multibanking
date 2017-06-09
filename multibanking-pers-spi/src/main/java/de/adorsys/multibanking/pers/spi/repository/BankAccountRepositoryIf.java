@@ -25,4 +25,6 @@ public interface BankAccountRepositoryIf {
 	public BankAccount.SyncStatus getSyncStatus(String accountId);
 
 	public void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus);
+
+    List<BankAccountEntity> deleteByBankAccess(String accessId);
 }

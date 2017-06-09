@@ -16,4 +16,5 @@ public interface AnalyticsRepositoryMongodb extends MongoRepository<AccountAnaly
 
     Optional<AccountAnalyticsEntity> findLastByUserIdAndAccountId(String userId, String bankAccountId);
 
+    void deleteByAccountId(String id);
 }

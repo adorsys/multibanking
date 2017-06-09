@@ -21,7 +21,7 @@ import java.io.IOException;
  */
 @Data
 @Document
-@JsonIgnoreProperties(value = {"pin", "passportState", "externalIdMap"}, allowSetters = true)
+@JsonIgnoreProperties(value = {"pin", "hbciPassportState", "externalIdMap"}, allowSetters = true)
 @Encrypted(exclude = {"_id", "userId"})
 public class BankAccessEntity extends BankAccess {
 
@@ -31,6 +31,9 @@ public class BankAccessEntity extends BankAccess {
     private String userId;
     private String pin;
     private boolean storePin;
+    private boolean storeBookings;
+    private boolean categorizeBookings;
+    private boolean storeAnalytics;
 
     public BankAccessEntity id(String id) {
         this.id = id;

@@ -18,4 +18,8 @@ public interface BankAccessRepositoryIf {
 	BankAccessEntity save(BankAccessEntity bankAccess);
 
     String getBankCode(String id);
+
+    boolean exists(String accessId);
+
+    boolean deleteByUserIdAndBankAccessId(String userId, String bankAccessId);
 }

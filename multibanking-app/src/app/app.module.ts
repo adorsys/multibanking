@@ -18,12 +18,14 @@ import {BankAccountService} from '../services/bankAccountService';
 import {BookingService} from '../services/bookingService';
 import {KeycloakService} from '../auth/keycloak.service';
 import {KEYCLOAK_HTTP_PROVIDER} from '../auth/keycloak.http';
+import {BankAccessUpdatePage} from "../pages/bankaccess/bankAccessUpdate";
 
 @NgModule({
   declarations: [
     MyApp,
     BankAccessListPage,
     BankAccessCreatePage,
+    BankAccessUpdatePage,
     BankAccountListPage,
     BookingListPage,
     AnalyticsPage
@@ -38,6 +40,7 @@ import {KEYCLOAK_HTTP_PROVIDER} from '../auth/keycloak.http';
     MyApp,
     BankAccessListPage,
     BankAccessCreatePage,
+    BankAccessUpdatePage,
     BankAccountListPage,
     BookingListPage,
     AnalyticsPage

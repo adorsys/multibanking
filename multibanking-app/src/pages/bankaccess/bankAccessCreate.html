@@ -13,7 +13,7 @@
                    required></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label floating>Bank Login</ion-label>
+        <ion-label floating>Bank Login Name / Customer ID</ion-label>
         <ion-input type="text" name="bankLogin" [(ngModel)]="bankAccess.bankLogin"
                    required></ion-input>
       </ion-item>
@@ -26,6 +26,21 @@
       <ion-item>
         <ion-label>Save Pin</ion-label>
         <ion-toggle [(ngModel)]="bankAccess.storePin" [ngModelOptions]="{standalone: true}"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Save Bookings</ion-label>
+        <ion-toggle [(ngModel)]="bankAccess.storeBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Categorize Bookings</ion-label>
+          <ion-toggle [(ngModel)]="bankAccess.categorizeBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Save Analytics</ion-label>
+          <ion-toggle [(ngModel)]="bankAccess.storeAnalytics" [ngModelOptions]="{standalone: true}"></ion-toggle>
       </ion-item>
 
     </ion-list>

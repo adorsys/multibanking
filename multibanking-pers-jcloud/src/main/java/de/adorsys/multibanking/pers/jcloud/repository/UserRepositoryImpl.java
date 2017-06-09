@@ -52,6 +52,12 @@ public class UserRepositoryImpl implements UserRepositoryIf, BankAccessRepositor
 	}
 
 	@Override
+	public boolean deleteByUserIdAndBankAccessId(String userId, String bankAccessId) {
+		//TODO
+		return false;
+	}
+
+	@Override
 	public void save(UserEntity userEntity) {
 		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
 		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);

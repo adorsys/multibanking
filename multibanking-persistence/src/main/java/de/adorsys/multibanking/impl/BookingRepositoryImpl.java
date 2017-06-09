@@ -15,6 +15,7 @@ import java.util.Optional;
 @Profile({"mongo", "fongo"})
 @Service
 public class BookingRepositoryImpl implements BookingRepositoryIf {
+
 	@Autowired
     BookingRepositoryMongodb bookingRepository;
 
@@ -32,6 +33,11 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 	@Override
 	public void insert(List<BookingEntity> bookingEntities) {
 		bookingRepository.insert(bookingEntities);
+	}
+
+	@Override
+	public void deleteByAccountId(String id) {
+		bookingRepository.deleteByAccountId(id);
 	}
 
 }

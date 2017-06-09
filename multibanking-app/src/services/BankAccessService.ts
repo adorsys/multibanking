@@ -16,8 +16,18 @@ export class BankAccessService {
       .catch(this.handleError);
   }
 
-  crateBankAcccess(userId, bankaccess) {
+  createBankAcccess(userId, bankaccess) {
     return this.http.post(AppConfig.api_url + "/users/" + userId + "/bankaccesses", bankaccess)
+      .catch(this.handleError);
+  }
+
+  updateBankAcccess(bankaccess) {
+    return this.http.put(AppConfig.api_url + "/users/" + bankaccess.userId + "/bankaccesses/"+bankaccess.id, bankaccess)
+      .catch(this.handleError);
+  }
+
+  deleteBankAccess(userId, accessId) {
+    return this.http.delete(AppConfig.api_url + "/users/" + userId + "/bankaccesses/" + accessId)
       .catch(this.handleError);
   }
 

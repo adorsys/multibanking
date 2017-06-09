@@ -26,4 +26,9 @@ public class AnalyticsRepositoryImpl implements AnalyticsRepositoryIf {
 		analyticsRepository.save(accountAnalyticsEntity);
 	}
 
+	@Override
+	public void deleteByAccountId(String id) {
+		analyticsRepository.deleteByAccountId(id);
+	}
+
 }

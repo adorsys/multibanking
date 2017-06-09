@@ -20,8 +20,7 @@ public class BankAccess {
     private String bankLogin;
 	@ApiModelProperty(value = "The bank code", required=true, example="76070024")
     private String bankCode;
-	@ApiModelProperty(value = "The passport state", required=true)
-    private String passportState;
+    private String hbciPassportState;
     private Map<BankApi, String> externalIdMap;
 
     public BankAccess externalId(BankApi bankApi, String externalId) {
