@@ -6,6 +6,7 @@ import de.adorsys.multibanking.repository.BookingRepositoryMongodb;
 import domain.BankApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 	@Override
 	public List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId,
 			BankApi bankApi) {
-		return bookingRepository.findByUserIdAndAccountIdAndBankApi(userId, bankAccountId, bankApi);
+		return bookingRepository.findByUserIdAndAccountIdAndBankApi(userId, bankAccountId, bankApi, new Sort(Sort.Direction.DESC, "valutaDate"));
 	}
 
 	@Override
