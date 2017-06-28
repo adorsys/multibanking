@@ -130,7 +130,7 @@ public class FinapiBanking implements OnlineBankingService {
 
     @Override
     public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin) {
-        LOG.debug("load bookings for account [{}]", bankAccount.getNumberHbciAccount());
+        LOG.debug("load bookings for account [{}]", bankAccount.getAccountNumber());
         ApiClient apiClient = createUserApiClient();
         apiClient.setAccessToken(authorizeUser(bankApiUser));
 
@@ -163,8 +163,8 @@ public class FinapiBanking implements OnlineBankingService {
 
                             if (transaction.getCounterpartName() != null) {
                                 booking.setOtherAccount(new BankAccount());
-                                booking.getOtherAccount().setNameHbciAccount(transaction.getCounterpartName());
-                                booking.getOtherAccount().setNumberHbciAccount(transaction.getCounterpartAccountNumber());
+                                booking.getOtherAccount().setName(transaction.getCounterpartName());
+                                booking.getOtherAccount().setAccountNumber(transaction.getCounterpartAccountNumber());
                             }
 
                             if (transaction.getCategory() != null) {
@@ -178,7 +178,7 @@ public class FinapiBanking implements OnlineBankingService {
                         }
                 ).collect(Collectors.toList()));
             }
-            LOG.info("loaded [{}] bookings for account [{}]", bookingList.size(), bankAccount.getNumberHbciAccount());
+            LOG.info("loaded [{}] bookings for account [{}]", bookingList.size(), bankAccount.getAccountNumber());
             return bookingList;
         } catch (ApiException e) {
             throw new RuntimeException(e);

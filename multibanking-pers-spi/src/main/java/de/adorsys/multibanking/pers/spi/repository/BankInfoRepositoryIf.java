@@ -12,6 +12,6 @@ import java.util.Optional;
  */
 public interface BankInfoRepositoryIf {
 
-    Optional<BankInfoEntity> findByBankCode(String userId);
+    Optional<BankInfoEntity> findByBankCode(String bankCode);
 
 }

@@ -4,10 +4,7 @@ import domain.*;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
-import me.figo.internal.SyncTokenRequest;
-import me.figo.internal.TaskStatusResponse;
-import me.figo.internal.TaskTokenResponse;
-import me.figo.internal.TokenResponse;
+import me.figo.internal.*;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -65,7 +62,7 @@ public class FigoBanking implements OnlineBankingService {
     @Override
     public boolean bankSupported(String bankCode) {
         if (figoConnection == null) {
-            LOG.warn("skip figo bank api, figo connection not available, check env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
+            throw new IllegalArgumentException("figo connection not available, check env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
         }
         return true;
     }
@@ -82,6 +79,10 @@ public class FigoBanking implements OnlineBankingService {
 
     @Override
     public BankApiUser registerUser(String uid) {
+        if (figoConnection == null) {
+            throw new IllegalArgumentException("figo connection not available, check env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
+        }
+
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
 
         try {
@@ -158,9 +159,12 @@ public class FigoBanking implements OnlineBankingService {
                     ),
                     "POST", TaskTokenResponse.class);
 
-            String taskToken = response.getTaskToken();
-            while (checkState(session, taskToken) == Status.SYNC) {
-                Thread.sleep(1000);
+            Status status = waitForFinish(session, response.getTaskToken(), pin);
+            if (status == Status.PIN) {
+                TaskStatusRequest request = new TaskStatusRequest(response.getTaskToken());
+                request.setPin(pin);
+                session.queryApi("/task/progress?id=" + response.getTaskToken(), request, "POST", TaskStatusResponse.class);
+                waitForFinish(session, response.getTaskToken(), pin);
             }
 
             return session.getTransactions(bankAccount.getExternalIdMap().get(bankApiIdentifier()))
@@ -176,8 +180,8 @@ public class FigoBanking implements OnlineBankingService {
 
                                 if (transaction.getName() != null) {
                                     booking.setOtherAccount(new BankAccount());
-                                    booking.getOtherAccount().setNameHbciAccount(transaction.getName());
-                                    booking.getOtherAccount().setCurrencyHbciAccount(transaction.getCurrency());
+                                    booking.getOtherAccount().setName(transaction.getName());
+                                    booking.getOtherAccount().setCurrency(transaction.getCurrency());
                                 }
                                 return booking;
                             }
@@ -189,7 +193,16 @@ public class FigoBanking implements OnlineBankingService {
         }
     }
 
-    public Status checkState(FigoSession figoSession, String taskToken) {
+    private Status waitForFinish(FigoSession session, String taskToken, String pin) throws IOException, FigoException, InterruptedException {
+        Status status;
+        while ((status = checkState(session, taskToken)) == Status.SYNC) {
+            Thread.sleep(1000);
+        }
+
+        return status;
+    }
+
+    private Status checkState(FigoSession figoSession, String taskToken) throws IOException, FigoException {
         TaskStatusResponse taskStatus;
         try {
             taskStatus = figoSession.getTaskState(taskToken);
@@ -201,7 +214,7 @@ public class FigoBanking implements OnlineBankingService {
         return resolveStatus(taskStatus);
     }
 
-    private Status resolveStatus(TaskStatusResponse taskStatus) {
+    private Status resolveStatus(TaskStatusResponse taskStatus) throws IOException, FigoException {
         if (!taskStatus.isEnded() && !taskStatus.isErroneous() && !taskStatus.isWaitingForPin()
                 && !taskStatus.isWaitingForResponse()) {
             return Status.SYNC;

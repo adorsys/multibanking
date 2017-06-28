@@ -21,27 +21,23 @@ public class EncryptionUtil {
 
     public static String encrypt(String valueToEnc, SecretKey key) {
         try {
-            Cipher encryptor = Cipher.getInstance(AES_CBC_PKCS5_PADDING);;
+            Cipher encryptor = Cipher.getInstance(AES_CBC_PKCS5_PADDING);
             encryptor.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(new byte[16]));
 
             return new BASE64Encoder().encode(encryptor.doFinal(valueToEnc.getBytes()));
         } catch (Exception e) {
-            log.error("{} encrypting value.{}", e.getClass().getName(), valueToEnc);
-            log.error(e.getMessage());
-            return valueToEnc;
+            throw new RuntimeException(e);
         }
     }
 
     public static String decrypt(String encryptedValue, SecretKey key) {
         try {
-            Cipher decryptor = Cipher.getInstance(AES_CBC_PKCS5_PADDING);;
+            Cipher decryptor = Cipher.getInstance(AES_CBC_PKCS5_PADDING);
             decryptor.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(new byte[16]));
             byte[] decValue = decryptor.doFinal(new BASE64Decoder().decodeBuffer(encryptedValue));
             return new String(decValue);
         } catch (Exception e) {
-            log.error("{} decrypting value.{}", e.getClass().getName(), encryptedValue);
-            log.error(e.getMessage());
-            return encryptedValue;
+            throw new RuntimeException(e);
         }
     }
 

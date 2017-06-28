@@ -79,7 +79,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         HbciPassport hbciPassport = createPassport(bankAccess, pin);
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
         try {
-            Konto account = hbciPassport.getAccount(bankAccount.getNumberHbciAccount());
+            Konto account = hbciPassport.getAccount(bankAccount.getAccountNumber());
             HBCIJob balanceJob = handle.newJob("SaldoReq");
             balanceJob.setParam("my", account);
             balanceJob.addToQueue();

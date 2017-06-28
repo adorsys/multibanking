@@ -21,13 +21,10 @@ public class BankAccess {
 	@ApiModelProperty(value = "The bank code", required=true, example="76070024")
     private String bankCode;
     private String hbciPassportState;
-    private Map<BankApi, String> externalIdMap;
+    private Map<BankApi, String> externalIdMap = new HashMap<>();
 
     public BankAccess externalId(BankApi bankApi, String externalId) {
-        if (externalIdMap == null) {
-            externalIdMap = new HashMap<>();
-            externalIdMap.put(bankApi, externalId);
-        }
+        externalIdMap.put(bankApi, externalId);
         return this;
     }
 

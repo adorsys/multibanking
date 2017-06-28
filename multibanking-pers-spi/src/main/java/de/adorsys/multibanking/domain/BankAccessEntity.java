@@ -15,14 +15,15 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created by alexg on 07.02.17.
  */
 @Data
 @Document
-@JsonIgnoreProperties(value = {"pin", "hbciPassportState", "externalIdMap"}, allowSetters = true)
-@Encrypted(exclude = {"_id", "userId"})
+@JsonIgnoreProperties(value = {"pin", "hbciPassportState"}, allowSetters = true)
+@Encrypted(exclude = {"_id", "userId", "expireBankAccess"})
 public class BankAccessEntity extends BankAccess {
 
     @Id
@@ -30,10 +31,14 @@ public class BankAccessEntity extends BankAccess {
     @Indexed
     private String userId;
     private String pin;
+    private boolean temporary;
     private boolean storePin;
     private boolean storeBookings;
     private boolean categorizeBookings;
     private boolean storeAnalytics;
+
+    @Indexed(name="expireBankAccess", expireAfterSeconds=0)
+    private Date expireBankAccess;
 
     public BankAccessEntity id(String id) {
         this.id = id;
