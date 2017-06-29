@@ -1,27 +1,30 @@
 package hbci4java;
 
 import domain.*;
+import exception.InvalidPinException;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.exceptions.HBCI_Exception;
+import org.kapott.hbci.exceptions.ProcessException;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIHandler;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.status.HBCIExecStatus;
+import org.kapott.hbci.status.HBCIMsgStatus;
+import org.kapott.hbci.status.HBCIRetVal;
 import org.kapott.hbci.structures.Konto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
+import sun.java2d.InvalidPipeException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class Hbci4JavaBanking implements OnlineBankingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(Hbci4JavaBanking.class);
-    
+
     public Hbci4JavaBanking() {
         try {
             HBCIUtils.refreshBLZList(HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream());
@@ -55,8 +58,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
         LOG.info("Loading Account list for access {}", bankAccess.getBankCode());
         HbciPassport hbciPassport = createPassport(bankAccess, pin);
-        HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
+        HBCIHandler handle = null;
         try {
+            handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
             bankAccess.setBankName(hbciPassport.getInstName());
             List<BankAccount> hbciAccounts = new ArrayList<>();
             for (Konto konto : hbciPassport.getAccounts()) {
@@ -68,9 +72,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             handle.close();
             return hbciAccounts;
         } catch (HBCI_Exception e) {
-            throw new RuntimeException(e);
+            handleHbciException(e);
+            return null;
         } finally {
-            handle.close();
+            if (handle != null) {
+                handle.close();
+            }
         }
     }
 
@@ -96,11 +103,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             if (hbciPassport.getState().isPresent()) {
                 bankAccess.setHbciPassportState(hbciPassport.getState().get().toJson());
             }
-            bankAccount.setBankAccountBalance(HbciFactory.createBalance((GVRSaldoReq)balanceJob.getJobResult()));
+            bankAccount.setBankAccountBalance(HbciFactory.createBalance((GVRSaldoReq) balanceJob.getJobResult()));
 
             return HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult());
         } catch (HBCI_Exception e) {
-            throw new RuntimeException(e);
+            handleHbciException(e);
+            return null;
         } finally {
             handle.close();
         }
@@ -134,5 +142,43 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return passport;
     }
 
+    private void handleHbciException(HBCI_Exception e) throws InvalidPinException {
+        Throwable processException = e;
+        while (processException.getCause() != null && !(processException.getCause() instanceof ProcessException)) {
+            processException = processException.getCause();
+        }
+
+        if (processException.getCause() != null && processException.getCause() instanceof ProcessException) {
+            HBCIMsgStatus msgStatus = ((ProcessException) processException.getCause()).getMsgStatus();
+            if (isInvalidPIN(msgStatus)) {
+                throw new InvalidPinException();
+            }
+        }
+
+        throw new RuntimeException(e);
+    }
+
+    /**
+     * Gibt zurück, ob der Fehler "PIN ungültig" zurückgemeldet wurde
+     *
+     * @return <code>true</code> oder <code>false</code>
+     */
+    public boolean isInvalidPIN(HBCIMsgStatus msgStatus) {
+
+        List<HBCIRetVal> retvals = new ArrayList<HBCIRetVal>(Arrays.asList(msgStatus.globStatus.getErrors()));
+        retvals.addAll(new ArrayList<>(Arrays.asList(msgStatus.segStatus.getErrors())));
+
+        for (Iterator<HBCIRetVal> i = retvals.iterator(); i.hasNext(); ) {
+            HBCIRetVal ret = i.next();
+
+            if (ret.code.equals("9931") || ret.code.equals("9942") ||      // PIN falsch (konkret)
+                    ret.code.equals("9340"))    // Signatur falsch (generisch)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 }

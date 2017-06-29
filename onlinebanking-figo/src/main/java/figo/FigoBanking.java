@@ -1,6 +1,7 @@
 package figo;
 
 import domain.*;
+import exception.InvalidPinException;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -229,6 +230,9 @@ public class FigoBanking implements OnlineBankingService {
         }
 
         if (taskStatus.isErroneous()) {
+            if (taskStatus.getError().getCode() == 10000 || taskStatus.getError().getCode() == 10001) {
+                throw new InvalidPinException();
+            }
             throw new RuntimeException(taskStatus.getError().getMessage());
         }
 
