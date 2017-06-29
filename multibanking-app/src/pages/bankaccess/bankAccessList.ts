@@ -5,6 +5,7 @@ import {BankAccountListPage} from "../bankaccount/bankaccountList";
 import {BankAccessCreatePage} from "./bankAccessCreate";
 import {BankAccessService} from "../../services/bankAccessService";
 import {KeycloakService} from "../../auth/keycloak.service";
+import {BankAccessUpdatePage} from "./bankAccessUpdate";
 
 @Component({
   selector: 'page-bankaccessList',
@@ -28,7 +29,7 @@ export class BankAccessListPage {
   itemSelected(bankAccess) {
     this.navCtrl.push(BankAccountListPage, {
       userId: this.userId,
-      bankAccessId: bankAccess.id,
+      bankAccess: bankAccess,
     });
   }
 
@@ -36,9 +37,21 @@ export class BankAccessListPage {
     this.navCtrl.push(BankAccessCreatePage, {userId: this.userId, parent: this});
   }
 
-  bankAccessCreated() {
+  bankAccessesChanged() {
     this.bankAccessService.getBankAccesses(this.userId).subscribe(response => {
       this.bankaccesses = response;
+    });
+  }
+
+  editBankAccess($event, bankAccess) {
+    $event.stopPropagation();
+    this.navCtrl.push(BankAccessUpdatePage, {bankAccess: bankAccess, parent: this});
+  }
+
+  deleteBankAccess($event, bankAccess) {
+    $event.stopPropagation();
+    this.bankAccessService.deleteBankAccess(this.userId, bankAccess.id).subscribe(response => {
+      this.bankAccessesChanged();
     });
   }
 

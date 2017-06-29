@@ -99,6 +99,12 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 		objectPersistenceAdapter.store(userMainRecordhandle, userMainRecord, keyCredentials);
 	}
 
+	@Override
+	public List<BankAccountEntity> deleteByBankAccess(String accessId) {
+		//TODO
+		return null;
+	}
+
 	static ListItemHandler<BankAccountEntity> handler = new ListItemHandler<BankAccountEntity>() {
 
 		@Override

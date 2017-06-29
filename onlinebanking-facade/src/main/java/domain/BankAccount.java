@@ -19,7 +19,7 @@ public class BankAccount {
     }
 
 	@ApiModelProperty(value = "A bank account can have an id with each API provider")
-    private Map<BankApi, String> externalIdMap;
+    private Map<BankApi, String> externalIdMap = new HashMap<>();
 	
     @ApiModelProperty(value = "The bank account balance.", example="2.000,00")
     private BankAccountBalance bankAccountBalance;
@@ -28,31 +28,31 @@ public class BankAccount {
     private String owner;
 
     @ApiModelProperty(value = "The ISO2 Country of this bank account", example="DE")
-    private String countryHbciAccount;
+    private String country;
 	
     @ApiModelProperty(value = "The bank code", example="76070024")
-    private String blzHbciAccount;
+    private String blz;
 	
     @ApiModelProperty(value = "The account number", example="430254900")
-    private String numberHbciAccount;
+    private String accountNumber;
 	
     @ApiModelProperty(value = "The type of this bank account", example="Current Account")
-    private String typeHbciAccount;
+    private String type;
 	
     @ApiModelProperty(value = "The currency of this bank account", example="EURO")
-    private String currencyHbciAccount;
+    private String currency;
 	
     @ApiModelProperty(value = "The name of this bank account if any")
-    private String nameHbciAccount;
+    private String name;
 	
     @ApiModelProperty(value = "The banc identification code", example="DEUTNL2A")
-    private String bicHbciAccount;
+    private String bic;
 	
     @ApiModelProperty(value = "The international banc account number", example="NL99DEU7430254900", required=true)
-    private String ibanHbciAccount;
+    private String iban;
 
 	@ApiModelProperty(value = "The synchronisation status", example="PENDING")
-	private SyncStatus syncStatus = SyncStatus.PENDING;
+	private SyncStatus syncStatus;
 
     public BankAccount bankAccountBalance(BankAccountBalance bankAccountBalance) {
         this.bankAccountBalance = bankAccountBalance;
@@ -60,50 +60,50 @@ public class BankAccount {
     }
 
     public BankAccount countryHbciAccount(String countryHbciAccount) {
-        this.countryHbciAccount = countryHbciAccount;
+        this.country = countryHbciAccount;
         return this;
     }
 
     public BankAccount blzHbciAccount(String blzHbciAccount) {
-        this.blzHbciAccount = blzHbciAccount;
+        this.blz = blzHbciAccount;
         return this;
     }
 
     public BankAccount numberHbciAccount(String numberHbciAccount) {
-        this.numberHbciAccount = numberHbciAccount;
+        this.accountNumber = numberHbciAccount;
         return this;
     }
 
     public BankAccount typeHbciAccount(String typeHbciAccount) {
-        this.typeHbciAccount = typeHbciAccount;
+        this.type = typeHbciAccount;
         return this;
     }
 
     public BankAccount currencyHbciAccount(String currencyHbciAccount) {
-        this.currencyHbciAccount = currencyHbciAccount;
+        this.currency = currencyHbciAccount;
         return this;
     }
 
     public BankAccount nameHbciAccount(String nameHbciAccount) {
-        this.nameHbciAccount = nameHbciAccount;
+        this.name = nameHbciAccount;
         return this;
     }
 
     public BankAccount bicHbciAccount(String bicHbciAccount) {
-        this.bicHbciAccount = bicHbciAccount;
+        this.bic = bicHbciAccount;
         return this;
     }
 
     public BankAccount ibanHbciAccount(String ibanHbciAccount) {
-        this.ibanHbciAccount = ibanHbciAccount;
+        this.iban = ibanHbciAccount;
         return this;
     }
 
     public BankAccount externalId(BankApi bankApi, String externalId) {
         if (externalIdMap == null) {
             externalIdMap = new HashMap<>();
-            externalIdMap.put(bankApi, externalId);
         }
+        externalIdMap.put(bankApi, externalId);
         return this;
     }
 

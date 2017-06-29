@@ -22,7 +22,7 @@ public class BankAccountRepositoryCustomMongodb {
     private MongoTemplate mongoTemplate;
 
     public BankAccount.SyncStatus getSyncStatus(String accountId) {
-        Query where = Query.query(Criteria.where("_id").is(new ObjectId(accountId)));
+        Query where = Query.query(Criteria.where("id").is(accountId));
 
         where.fields().include("syncStatus");
 
@@ -30,7 +30,7 @@ public class BankAccountRepositoryCustomMongodb {
     }
 
     public void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus) {
-        Query where = Query.query(Criteria.where("_id").is(new ObjectId(accountId)));
+        Query where = Query.query(Criteria.where("id").is(accountId));
         Update update = new Update().set("syncStatus", syncStatus);
         mongoTemplate.updateFirst(where, update, BankAccountEntity.class);
     }

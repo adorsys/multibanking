@@ -1,7 +1,8 @@
 import {Component} from "@angular/core";
-import {NavController, AlertController, ToastController, NavParams} from "ionic-angular";
+import {NavController, AlertController, ToastController, NavParams, LoadingController} from "ionic-angular";
 import {BankAccountService} from "../../services/bankAccountService";
 import {BookingService} from "../../services/bookingService";
+import {AnalyticsPage} from "../analytics/analytics";
 
 @Component({
   selector: 'page-bookingList',
@@ -10,7 +11,7 @@ import {BookingService} from "../../services/bookingService";
 export class BookingListPage {
 
   userId;
-  bankAccessId
+  bankAccess
   bankAccountId;
   bookings;
 
@@ -18,15 +19,16 @@ export class BookingListPage {
               private navparams: NavParams,
               private alertCtrl: AlertController,
               private toastCtrl: ToastController,
+              private loadingCtrl: LoadingController,
               private bankAccountService: BankAccountService,
               private bookingService: BookingService) {
 
     this.userId = navparams.data.userId;
-    this.bankAccessId = navparams.data.bankAccessId;
+    this.bankAccess = navparams.data.bankAccess;
     this.bankAccountId = navparams.data.bankAccountId;
 
     if (!navparams.data.bookings) {
-      this.bookingService.getBookings(this.userId, this.bankAccessId, this.bankAccountId).subscribe(
+      this.bookingService.getBookings(this.userId, this.bankAccess.id, this.bankAccountId).subscribe(
         response => {
           this.bookings = response;
         },
@@ -71,9 +73,19 @@ export class BookingListPage {
   }
 
   syncBookings(pin) {
-    this.bankAccountService.syncBookings(this.userId, this.bankAccessId, this.bankAccountId, pin).subscribe(
+    if (!pin && !this.bankAccess.storePin) {
+      return this.syncBookingsPromptPin();
+    }
+
+    let loading = this.loadingCtrl.create({
+      content: 'Please wait...'
+    });
+    loading.present();
+
+    this.bankAccountService.syncBookings(this.userId, this.bankAccess.id, this.bankAccountId, pin).subscribe(
       response => {
         this.bookings = response;
+        loading.dismiss();
       },
       error => {
         if (error == "SYNC_IN_PROGRESS") {
@@ -87,6 +99,14 @@ export class BookingListPage {
   }
 
   itemSelected(booking) {
+  }
+
+  showAnalytics() {
+    this.navCtrl.push(AnalyticsPage, {
+      userId: this.userId,
+      bankAccess: this.bankAccess,
+      bankAccountId: this.bankAccountId
+    })
   }
 
 

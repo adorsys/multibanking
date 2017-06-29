@@ -4,8 +4,11 @@ import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.BankApiUser;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,13 +16,16 @@ import java.util.List;
  */
 @Data
 @Document
-@Encrypted(exclude = "_id")
+@Encrypted(exclude = {"_id", "expireUser"})
 public class UserEntity {
 
     @Id
     private String id;
 
-    private List<BankApiUser> apiUser;
+    @Indexed(name="expireUser", expireAfterSeconds=0)
+    private Date expireUser;
+
+    private List<BankApiUser> apiUser = new ArrayList<>();
 
     public UserEntity id(String id) {
         this.id = id;

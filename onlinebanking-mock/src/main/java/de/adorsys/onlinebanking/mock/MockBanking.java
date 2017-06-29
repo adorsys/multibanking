@@ -60,7 +60,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
     	RestTemplate restTemplate = new RestTemplate();
     	Map<String,String> map = new HashMap<>();
     	map.put("bankLogin", bankAccess.getBankLogin());
@@ -87,8 +87,8 @@ public class MockBanking implements OnlineBankingService {
     	String bearerToken = responseEntity.getBody().getToken();
     	restTemplate.getInterceptors().add(new BearerTokenAuthorizationInterceptor(bearerToken));
 //    	HashMap<Object,Object> hashMap = new HashMap<>();
-//    	hashMap.put("accountId", bankAccount.getIbanHbciAccount());
-    	Booking[] bookings = restTemplate.getForObject(mockConnectionUrl + "/accounts/{accountId}/bookings", Booking[].class, bankAccount.getIbanHbciAccount());
+//    	hashMap.put("accountId", bankAccount.getIban());
+    	Booking[] bookings = restTemplate.getForObject(mockConnectionUrl + "/accounts/{accountId}/bookings", Booking[].class, bankAccount.getIban());
 
     	return Arrays.asList(bookings);
     }

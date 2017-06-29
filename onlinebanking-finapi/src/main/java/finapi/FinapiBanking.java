@@ -41,11 +41,15 @@ public class FinapiBanking implements OnlineBankingService {
     private static final Logger LOG = LoggerFactory.getLogger(FinapiBanking.class);
 
     public FinapiBanking() {
-        finapiClientId = EnvProperties.getEnvOrSysProp("finapiClientId", "6e220fb9-ba6e-4af0-bba7-5431f692ab26");
-        finapiSecret = EnvProperties.getEnvOrSysProp("finapiSecret", "e4d32b93-67da-4664-add8-d5e84ea4cb1b");
-        finapiConnectionUrl = EnvProperties.getEnvOrSysProp("figoConnectionUrl", "https://sandbox.finapi.io/");
+        finapiClientId = EnvProperties.getEnvOrSysProp("FINAPI_CLIENT_ID", true);
+        finapiSecret = EnvProperties.getEnvOrSysProp("FINAPI_SECRET", true);
+        finapiConnectionUrl = EnvProperties.getEnvOrSysProp("FINAPI_CONNECTION_URL", "https://sandbox.finapi.io/");
 
-        authorizeClient();
+        if (finapiClientId == null || finapiSecret == null) {
+            LOG.warn("missing env properties FINAPI_CLIENT_ID and/or FINAPI_SECRET");
+        } else {
+            authorizeClient();
+        }
     }
 
     @Override
@@ -55,6 +59,14 @@ public class FinapiBanking implements OnlineBankingService {
 
     @Override
     public boolean userRegistrationRequired() {
+        return true;
+    }
+
+    @Override
+    public boolean bankSupported(String bankCode) {
+        if (clientToken == null) {
+            LOG.warn("skip finapi bank api, client token not available, check env properties FINAPI_CLIENT_ID and/or FINAPI_SECRET");
+        }
         return true;
     }
 
@@ -77,7 +89,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
         LOG.info("load bank accounts");
         try {
             InlineResponse2006 searchAllBanks = new BanksApi(createApiClient()).getAndSearchAllBanks(null, bankAccess.getBankCode(), null, null, null, null, null);
@@ -94,7 +106,7 @@ public class FinapiBanking implements OnlineBankingService {
                     .bankId(searchAllBanks.getBanks().get(0).getId())
                     .bankingUserId(bankAccess.getBankLogin())
                     .bankingPin(pin)
-                    .storePin(true));
+                    .storePin(storePin));
 
             bankAccess.externalId(bankApiIdentifier(), connections.getId().toString());
 
@@ -118,7 +130,7 @@ public class FinapiBanking implements OnlineBankingService {
 
     @Override
     public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin) {
-        LOG.debug("load bookings for account [{}]", bankAccount.getNumberHbciAccount());
+        LOG.debug("load bookings for account [{}]", bankAccount.getAccountNumber());
         ApiClient apiClient = createUserApiClient();
         apiClient.setAccessToken(authorizeUser(bankApiUser));
 
@@ -151,8 +163,8 @@ public class FinapiBanking implements OnlineBankingService {
 
                             if (transaction.getCounterpartName() != null) {
                                 booking.setOtherAccount(new BankAccount());
-                                booking.getOtherAccount().setNameHbciAccount(transaction.getCounterpartName());
-                                booking.getOtherAccount().setNumberHbciAccount(transaction.getCounterpartAccountNumber());
+                                booking.getOtherAccount().setName(transaction.getCounterpartName());
+                                booking.getOtherAccount().setAccountNumber(transaction.getCounterpartAccountNumber());
                             }
 
                             if (transaction.getCategory() != null) {
@@ -166,7 +178,7 @@ public class FinapiBanking implements OnlineBankingService {
                         }
                 ).collect(Collectors.toList()));
             }
-            LOG.info("loaded [{}] bookings for account [{}]", bookingList.size(), bankAccount.getNumberHbciAccount());
+            LOG.info("loaded [{}] bookings for account [{}]", bookingList.size(), bankAccount.getAccountNumber());
             return bookingList;
         } catch (ApiException e) {
             throw new RuntimeException(e);
@@ -199,11 +211,6 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean bankSupported(String bankCode) {
-        return true;
-    }
-
-    @Override
     public boolean bookingsCategorized() {
         return true;
     }
@@ -233,7 +240,7 @@ public class FinapiBanking implements OnlineBankingService {
         try {
             clientToken = new AuthorizationApi(createApiClient()).getToken("client_credentials", finapiClientId, finapiSecret, null, null, null);
         } catch (ApiException e) {
-            throw new RuntimeException(e);
+            LOG.error(e.getMessage(), e);
         }
     }
 }

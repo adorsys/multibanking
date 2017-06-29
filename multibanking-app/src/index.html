@@ -13,14 +13,15 @@
 
   <!-- cordova.js required for cordova apps -->
   <script src="cordova.js"></script>
-  <script src="http://localhost:8080/auth/js/keycloak.js"></script>
+
+  <script src="https://multibanking-keycloak.dev.adorsys.de/auth/js/keycloak.js"></script>
 
   <!-- un-comment this code to enable service worker
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(() => console.log('service worker installed'))
-        .catch(err => console.log('Error', err));
+        .catch(err => console.error('Error', err));
     }
   </script>-->
 

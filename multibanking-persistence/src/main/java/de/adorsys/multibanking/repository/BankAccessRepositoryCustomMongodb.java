@@ -23,12 +23,19 @@ public class BankAccessRepositoryCustomMongodb {
     private MongoTemplate mongoTemplate;
 
     public String getBankCode(String id) {
-        Query where = Query.query(Criteria.where("_id").is(new ObjectId(id)));
+        Query where = Query.query(Criteria.where("id").is(id));
 
         where.fields().include("bankCode");
 
         return mongoTemplate.findOne(where, BankAccessEntity.class).getBankCode();
     }
+
+    public boolean deleteByUserIdAndId(String userId, String bankAccessId) {
+        Query where = Query.query(Criteria.where("id").is(bankAccessId).and("userId").is(userId));
+        return mongoTemplate.remove(where, BankAccessEntity.class).getN() > 0;
+    }
+
+
 
 
 }

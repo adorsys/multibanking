@@ -14,4 +14,5 @@ public interface AnalyticsRepositoryIf {
 
 	void save(AccountAnalyticsEntity accountAnalyticsEntity);
 
+    void deleteByAccountId(String id);
 }

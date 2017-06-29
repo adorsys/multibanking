@@ -14,6 +14,7 @@ import de.adorsys.multibanking.impl.KeyStoreRepositoryImpl;
 import org.adorsys.envutils.EnvProperties;
 import org.keycloak.KeycloakPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
@@ -33,6 +34,8 @@ import java.util.List;
 @Component
 public class EncryptionEventListener extends AbstractMongoEventListener<Object> {
 
+    @Value("${db_secret}")
+    String databaseSecret;
     @Autowired
     Principal principal;
     @Autowired
@@ -108,6 +111,10 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
     }
 
     private String getUserSecret() {
+        if (principal.getName().equals("anonymous")) {
+            return databaseSecret;
+        }
+
         String userSecret = (String) ((KeycloakPrincipal) principal).getKeycloakSecurityContext().getToken().getOtherClaims().get("custom_secret");
         if (userSecret == null) {
             throw new IllegalStateException("secret not exists in jwt");

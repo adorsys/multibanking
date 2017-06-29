@@ -40,4 +40,14 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 		return bankAccessRepositoryCustom.getBankCode(id);
 	}
 
+	@Override
+	public boolean exists(String accessId) {
+		return bankAccessRepository.exists(accessId);
+	}
+
+	@Override
+	public boolean deleteByUserIdAndBankAccessId(String userId, String bankAccessId) {
+		return bankAccessRepositoryCustom.deleteByUserIdAndId(userId, bankAccessId);
+	}
+
 }

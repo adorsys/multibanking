@@ -1,5 +1,5 @@
-import {Component} from '@angular/core';
-import {NavController, NavParams} from 'ionic-angular';
+import {Component} from "@angular/core";
+import {NavController, NavParams, LoadingController} from "ionic-angular";
 import {BankAccessService} from "../../services/bankAccessService";
 
 @Component({
@@ -9,18 +9,29 @@ import {BankAccessService} from "../../services/bankAccessService";
 export class BankAccessCreatePage {
 
   userId;
-  bankAccess = {bankCode: '', bankLogin: '', pin: '', userId: ''};
+  bankAccess = {bankCode: '', bankLogin: '', pin: '', userId: '', storePin: true, storeBookings: true, categorizeBookings: true, storeAnalytics: true};
   parent;
 
-  constructor(public navCtrl: NavController, private navparams: NavParams, private bankAccessService: BankAccessService) {
+  constructor(public navCtrl: NavController,
+              private navparams: NavParams,
+              private loadingCtrl: LoadingController,
+              private bankAccessService: BankAccessService) {
+
     this.userId = navparams.data.userId;
     this.bankAccess.userId = navparams.data.userId;
     this.parent = navparams.data.parent;
   }
 
   public createBankAccess() {
-    this.bankAccessService.crateBankAcccess(this.userId, this.bankAccess).subscribe(response => {
-      this.parent.bankAccessCreated();
+    let loading = this.loadingCtrl.create({
+      content: 'Please wait...'
+    });
+    loading.present();
+
+    this.bankAccessService.createBankAcccess(this.userId, this.bankAccess).subscribe(response => {
+      loading.dismiss();
+
+      this.parent.bankAccessesChanged();
       this.navCtrl.pop();
     })
   }

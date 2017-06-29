@@ -18,4 +18,6 @@ public interface BankAccountRepositoryMongodb extends MongoRepository<BankAccoun
     List<BankAccountEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId);
 
     Optional<BankAccountEntity> findByUserIdAndId(String userId, String id);
+
+    List<BankAccountEntity> deleteByBankAccessId(String accessId);
 }

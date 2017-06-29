@@ -22,7 +22,9 @@ public interface BankAccountRepositoryIf {
 
 	void save(BankAccountEntity bankAccount);
 
-	public BankAccount.SyncStatus getSyncStatus(String accountId);
+	BankAccount.SyncStatus getSyncStatus(String accountId);
 
-	public void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus);
+	void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus);
+
+    List<BankAccountEntity> deleteByBankAccess(String accessId);
 }

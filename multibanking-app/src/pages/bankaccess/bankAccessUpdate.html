@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Edit bank connection {{bankAccess.bankName}}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="bankaccess-create-content" padding>
+  <form (ngSubmit)="updateBankAccess()" #createForm="ngForm">
+    <ion-list>
+      <ion-item *ngIf="bankAccess.storePin">>
+        <ion-label floating>Pin</ion-label>
+        <ion-input type="password" name="pin" [(ngModel)]="bankAccess.pin"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Save Pin</ion-label>
+        <ion-toggle [(ngModel)]="bankAccess.storePin" [ngModelOptions]="{standalone: true}"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Save Bookings</ion-label>
+        <ion-toggle [(ngModel)]="bankAccess.storeBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Categorize Bookings</ion-label>
+          <ion-toggle [(ngModel)]="bankAccess.categorizeBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Save Analytics</ion-label>
+          <ion-toggle [(ngModel)]="bankAccess.storeAnalytics" [ngModelOptions]="{standalone: true}"></ion-toggle>
+      </ion-item>
+
+    </ion-list>
+    <button ion-button color="primary" block type="submit">Submit</button>
+
+  </form>
+</ion-content>
