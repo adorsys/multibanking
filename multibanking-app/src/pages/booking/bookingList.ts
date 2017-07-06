@@ -10,8 +10,7 @@ import {AnalyticsPage} from "../analytics/analytics";
 })
 export class BookingListPage {
 
-  userId;
-  bankAccess
+  bankAccess;
   bankAccountId;
   bookings;
 
@@ -22,13 +21,11 @@ export class BookingListPage {
               private loadingCtrl: LoadingController,
               private bankAccountService: BankAccountService,
               private bookingService: BookingService) {
-
-    this.userId = navparams.data.userId;
     this.bankAccess = navparams.data.bankAccess;
     this.bankAccountId = navparams.data.bankAccountId;
 
     if (!navparams.data.bookings) {
-      this.bookingService.getBookings(this.userId, this.bankAccess.id, this.bankAccountId).subscribe(
+      this.bookingService.getBookings(this.bankAccess.id, this.bankAccountId).subscribe(
         response => {
           this.bookings = response;
         },
@@ -82,7 +79,7 @@ export class BookingListPage {
     });
     loading.present();
 
-    this.bankAccountService.syncBookings(this.userId, this.bankAccess.id, this.bankAccountId, pin).subscribe(
+    this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccountId, pin).subscribe(
       response => {
         this.bookings = response;
         loading.dismiss();
@@ -103,7 +100,6 @@ export class BookingListPage {
 
   showAnalytics() {
     this.navCtrl.push(AnalyticsPage, {
-      userId: this.userId,
       bankAccess: this.bankAccess,
       bankAccountId: this.bankAccountId
     })

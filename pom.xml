@@ -6,9 +6,8 @@
 	<artifactId>multibanking</artifactId>
 	<version>1.8-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Multibanking HBCI service</name>
 	<url>https://github.com/adorsys/multibanking</url>
-	<description>Multibanking service</description>
+
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>

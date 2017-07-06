@@ -4,7 +4,6 @@ import {BankAccountService} from "../../services/bankAccountService";
 import {BankAccountListPage} from "../bankaccount/bankaccountList";
 import {BankAccessCreatePage} from "./bankAccessCreate";
 import {BankAccessService} from "../../services/bankAccessService";
-import {KeycloakService} from "../../auth/keycloak.service";
 import {BankAccessUpdatePage} from "./bankAccessUpdate";
 
 @Component({
@@ -13,14 +12,11 @@ import {BankAccessUpdatePage} from "./bankAccessUpdate";
 })
 export class BankAccessListPage {
 
-  userId;
   bankaccesses;
 
-  constructor(public navCtrl: NavController, private bankAccountService: BankAccountService, private bankAccessService: BankAccessService,
-              private keycloakService: KeycloakService) {
+  constructor(public navCtrl: NavController, private bankAccountService: BankAccountService, private bankAccessService: BankAccessService) {
 
-      this.userId = keycloakService.getUsername();
-      this.bankAccessService.getBankAccesses(this.userId).subscribe(
+      this.bankAccessService.getBankAccesses().subscribe(
         response => {
           this.bankaccesses = response
         });
@@ -28,17 +24,16 @@ export class BankAccessListPage {
 
   itemSelected(bankAccess) {
     this.navCtrl.push(BankAccountListPage, {
-      userId: this.userId,
       bankAccess: bankAccess,
     });
   }
 
   createBankAccess() {
-    this.navCtrl.push(BankAccessCreatePage, {userId: this.userId, parent: this});
+    this.navCtrl.push(BankAccessCreatePage, {parent: this});
   }
 
   bankAccessesChanged() {
-    this.bankAccessService.getBankAccesses(this.userId).subscribe(response => {
+    this.bankAccessService.getBankAccesses().subscribe(response => {
       this.bankaccesses = response;
     });
   }
@@ -50,7 +45,7 @@ export class BankAccessListPage {
 
   deleteBankAccess($event, bankAccess) {
     $event.stopPropagation();
-    this.bankAccessService.deleteBankAccess(this.userId, bankAccess.id).subscribe(response => {
+    this.bankAccessService.deleteBankAccess(bankAccess.id).subscribe(response => {
       this.bankAccessesChanged();
     });
   }

@@ -10,7 +10,6 @@ import {AnalyticsService} from "../../services/analyticsService";
 export class AnalyticsPage {
 
   analytics;
-  userId;
   bankAccess
   bankAccountId;
   bookings;
@@ -22,7 +21,6 @@ export class AnalyticsPage {
               private bankAccountService: BankAccountService,
               private analyticsService: AnalyticsService) {
 
-    this.userId = navparams.data.userId;
     this.bankAccess = navparams.data.bankAccess;
     this.bankAccountId = navparams.data.bankAccountId;
 
@@ -33,7 +31,7 @@ export class AnalyticsPage {
   }
 
   loadAnalytics() {
-    this.analyticsService.getAnalytics(this.userId, this.bankAccess.id, this.bankAccountId).subscribe(
+    this.analyticsService.getAnalytics(this.bankAccess.id, this.bankAccountId).subscribe(
       response => {
         this.analytics = response;
       },
@@ -86,7 +84,7 @@ export class AnalyticsPage {
     });
     loading.present();
 
-    this.bankAccountService.syncBookings(this.userId, this.bankAccess.id, this.bankAccountId, pin).subscribe(
+    this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccountId, pin).subscribe(
       response => {
         this.bookings = response;
         loading.dismiss();

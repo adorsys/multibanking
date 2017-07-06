@@ -34,7 +34,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApi bankApiIdentifier() {
+    public BankApi bankApi() {
         return BankApi.HBCI;
     }
 

@@ -36,12 +36,13 @@ public class MockBanking implements OnlineBankingService {
     }
 
     String mockConnectionUrl = null;
+
     public MockBanking() {
     	mockConnectionUrl = EnvProperties.getEnvOrSysProp("mockConnectionUrl", "http://localhost:10010");
     }
 
     @Override
-    public BankApi bankApiIdentifier() {
+    public BankApi bankApi() {
         return BankApi.MOCK;
     }
 
