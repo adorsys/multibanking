@@ -103,16 +103,16 @@ public final class HbciFactory {
     }
 
     public static BankAccount toBankAccount(Konto konto) {
-        BankAccount BankAccount = new BankAccount();
-        BankAccount.numberHbciAccount(konto.number);
-        BankAccount.bicHbciAccount(konto.bic);
-        BankAccount.blzHbciAccount(konto.blz);
-        BankAccount.countryHbciAccount(konto.country);
-        BankAccount.currencyHbciAccount(konto.curr);
-        BankAccount.ibanHbciAccount(konto.iban);
-        BankAccount.nameHbciAccount((konto.name + " " + (konto.name2 != null ? konto.name2 : "")).trim());
-        BankAccount.typeHbciAccount(konto.type);
-        return BankAccount;
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.numberHbciAccount(konto.number);
+        bankAccount.bicHbciAccount(konto.bic);
+        bankAccount.blzHbciAccount(konto.blz);
+        bankAccount.countryHbciAccount(konto.country);
+        bankAccount.currencyHbciAccount(konto.curr);
+        bankAccount.ibanHbciAccount(konto.iban);
+        bankAccount.owner((konto.name + " " + (konto.name2 != null ? konto.name2 : "")).trim());
+        bankAccount.typeHbciAccount(konto.type);
+        return bankAccount;
     }
 
     private static void applyVerwendungszweck(GVRKUms.UmsLine u, Booking booking) {
