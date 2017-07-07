@@ -56,7 +56,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApi bankApiIdentifier() {
+    public BankApi bankApi() {
         return BankApi.FIGO;
     }
 
@@ -126,7 +126,7 @@ public class FigoBanking implements OnlineBankingService {
                     .filter(account -> account.getBankCode().equals(bankAccess.getBankCode()))
                     .map(account ->
                             new BankAccount()
-                                    .externalId(bankApiIdentifier(), account.getAccountId())
+                                    .externalId(bankApi(), account.getAccountId())
                                     .owner(account.getOwner())
                                     .numberHbciAccount(account.getAccountNumber())
                                     .nameHbciAccount(account.getName())
@@ -153,7 +153,7 @@ public class FigoBanking implements OnlineBankingService {
                             RandomStringUtils.randomAlphanumeric(5),
                             null,
                             Collections.singletonList("standingOrders"),
-                            Collections.singletonList(bankAccount.getExternalIdMap().get(bankApiIdentifier())),
+                            Collections.singletonList(bankAccount.getExternalIdMap().get(bankApi())),
                             true,  // disable_notifications
                             0,     // if_not_synced_since
                             false  // auto_continue
@@ -168,12 +168,12 @@ public class FigoBanking implements OnlineBankingService {
                 waitForFinish(session, response.getTaskToken(), pin);
             }
 
-            return session.getTransactions(bankAccount.getExternalIdMap().get(bankApiIdentifier()))
+            return session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
                     .stream()
                     .map(transaction -> {
                                 Booking booking = new Booking();
                                 booking.setExternalId(transaction.getTransactionId());
-                                booking.setBankApi(bankApiIdentifier());
+                                booking.setBankApi(bankApi());
                                 booking.setBookingDate(transaction.getBookingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                                 booking.setValutaDate(transaction.getValueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                                 booking.setAmount(transaction.getAmount());

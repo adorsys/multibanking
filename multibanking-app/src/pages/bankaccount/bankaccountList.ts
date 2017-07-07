@@ -9,7 +9,6 @@ import {BookingListPage} from "../booking/bookingList";
 })
 export class BankAccountListPage {
 
-  userId;
   bankAccess;
   bankAccounts;
 
@@ -17,7 +16,6 @@ export class BankAccountListPage {
               private navparams: NavParams,
               private bankAccountService: BankAccountService) {
 
-    this.userId = navparams.data.userId;
     this.bankAccess = navparams.data.bankAccess;
 
     this.loadBankAccounts();
@@ -28,14 +26,13 @@ export class BankAccountListPage {
   }
 
   loadBankAccounts() {
-    this.bankAccountService.getBankAccounts(this.userId, this.bankAccess.id).subscribe(response => {
+    this.bankAccountService.getBankAccounts(this.bankAccess.id).subscribe(response => {
       this.bankAccounts = response;
     })
   }
 
   itemSelected(bankAccount) {
     this.navCtrl.push(BookingListPage, {
-      userId: this.userId,
       bankAccess: this.bankAccess,
       bankAccountId: bankAccount.id,
     })

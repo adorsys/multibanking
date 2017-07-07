@@ -6,7 +6,8 @@
 
 <ion-content class="bankaccess-create-content" padding>
   <form (ngSubmit)="createBankAccess()" #createForm="ngForm">
-    <ion-list>
+    <ion-item-group>
+      <ion-item-divider color="light">Bank login data</ion-item-divider>
       <ion-item>
         <ion-label floating>Bank Code</ion-label>
         <ion-input type="text" name="bankCode" [(ngModel)]="bankAccess.bankCode"
@@ -22,7 +23,9 @@
         <ion-input type="password" name="pin" [(ngModel)]="bankAccess.pin"
                    required></ion-input>
       </ion-item>
-
+    </ion-item-group>
+    <ion-item-group>
+      <ion-item-divider color="light">Bank settings</ion-item-divider>
       <ion-item>
         <ion-label>Save Pin</ion-label>
         <ion-toggle [(ngModel)]="bankAccess.storePin" [ngModelOptions]="{standalone: true}"></ion-toggle>
@@ -35,15 +38,15 @@
 
       <ion-item>
         <ion-label>Categorize Bookings</ion-label>
-          <ion-toggle [(ngModel)]="bankAccess.categorizeBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>
+        <ion-toggle [(ngModel)]="bankAccess.categorizeBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>
       </ion-item>
 
       <ion-item>
         <ion-label>Save Analytics</ion-label>
-          <ion-toggle [(ngModel)]="bankAccess.storeAnalytics" [ngModelOptions]="{standalone: true}"></ion-toggle>
+        <ion-toggle [(ngModel)]="bankAccess.storeAnalytics" [ngModelOptions]="{standalone: true}"></ion-toggle>
       </ion-item>
 
-    </ion-list>
+    </ion-item-group>
     <button ion-button color="primary" block type="submit" [disabled]="!createForm.form.valid">Submit</button>
 
   </form>

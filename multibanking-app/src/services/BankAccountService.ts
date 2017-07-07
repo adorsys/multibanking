@@ -1,9 +1,9 @@
-import {Injectable} from '@angular/core';
-import {AppConfig} from '../app/app.config';
-import {Http, Response} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import { Injectable } from '@angular/core';
+import { AppConfig } from '../app/app.config';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
-import {Subject} from "rxjs";
+import { Subject } from "rxjs";
 
 @Injectable()
 export class BankAccountService {
@@ -13,14 +13,14 @@ export class BankAccountService {
   constructor(private http: Http) {
   }
 
-  getBankAccounts(userId, accessId) {
-    return this.http.get(AppConfig.api_url + "/users/" + userId + "/bankaccesses/" + accessId + "/accounts")
+  getBankAccounts(accessId): Observable<any> {
+    return this.http.get(AppConfig.api_url + "/bankaccesses/" + accessId + "/accounts")
       .map((res: Response) => res.json()._embedded.bankAccountEntityList)
       .catch(this.handleError);
   }
 
-  syncBookings(userId, accessId, accountId, pin) {
-    return this.http.put(AppConfig.api_url + "/users/" + userId + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/sync", pin)
+  syncBookings(accessId, accountId, pin): Observable<any> {
+    return this.http.put(AppConfig.api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/sync", pin)
       .map((res: Response) => {
         this.bookingsChangedObservable.next(true);
 

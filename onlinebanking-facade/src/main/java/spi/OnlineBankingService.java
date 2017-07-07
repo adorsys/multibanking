@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface OnlineBankingService {
 
-    BankApi bankApiIdentifier();
+    BankApi bankApi();
 
     boolean userRegistrationRequired();
 

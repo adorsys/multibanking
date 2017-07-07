@@ -28,7 +28,7 @@ export class BankAccessCreatePage {
     });
     loading.present();
 
-    this.bankAccessService.createBankAcccess(this.userId, this.bankAccess).subscribe(response => {
+    this.bankAccessService.createBankAcccess(this.bankAccess).subscribe(response => {
       loading.dismiss();
 
       this.parent.bankAccessesChanged();

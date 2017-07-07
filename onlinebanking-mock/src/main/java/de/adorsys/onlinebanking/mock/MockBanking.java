@@ -4,10 +4,14 @@ import domain.*;
 import org.adorsys.envutils.EnvProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.CredentialsContainer;
 import org.springframework.web.client.RestTemplate;
 import spi.OnlineBankingService;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +23,9 @@ import java.util.Map;
 public class MockBanking implements OnlineBankingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MockBanking.class);
+    
+    @Autowired
+    private Principal principal;
 
     public enum Status {
         OK,
@@ -29,12 +36,13 @@ public class MockBanking implements OnlineBankingService {
     }
 
     String mockConnectionUrl = null;
+
     public MockBanking() {
     	mockConnectionUrl = EnvProperties.getEnvOrSysProp("mockConnectionUrl", "http://localhost:10010");
     }
 
     @Override
-    public BankApi bankApiIdentifier() {
+    public BankApi bankApi() {
         return BankApi.MOCK;
     }
 
@@ -61,35 +69,25 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
-    	RestTemplate restTemplate = new RestTemplate();
-    	Map<String,String> map = new HashMap<>();
-    	map.put("bankLogin", bankAccess.getBankLogin());
-    	map.put("password", pin);
-    	ResponseEntity<AccessToken> responseEntity = restTemplate.getForEntity(mockConnectionUrl + "/token/{bankLogin}/{password}", AccessToken.class, map);
-
-    	restTemplate = new RestTemplate();
-    	String bearerToken = responseEntity.getBody().getToken();
-    	restTemplate.getInterceptors().add(new BearerTokenAuthorizationInterceptor(bearerToken));
-    	BankAccount[] bankAccounts = restTemplate.getForObject(mockConnectionUrl + "/accounts/", BankAccount[].class);
+    	BankAccount[] bankAccounts = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/", BankAccount[].class);
 
     	return Arrays.asList(bankAccounts);
     }
 
     @Override
     public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin) {
-    	RestTemplate restTemplate = new RestTemplate();
-    	Map<String,String> map = new HashMap<>();
-    	map.put("bankLogin", bankAccess.getBankLogin());
-    	map.put("password", pin);
-    	ResponseEntity<AccessToken> responseEntity = restTemplate.getForEntity(mockConnectionUrl + "/token/{bankLogin}/{password}", AccessToken.class, map);
-
-    	restTemplate = new RestTemplate();
-    	String bearerToken = responseEntity.getBody().getToken();
-    	restTemplate.getInterceptors().add(new BearerTokenAuthorizationInterceptor(bearerToken));
-//    	HashMap<Object,Object> hashMap = new HashMap<>();
-//    	hashMap.put("accountId", bankAccount.getIban());
-    	Booking[] bookings = restTemplate.getForObject(mockConnectionUrl + "/accounts/{accountId}/bookings", Booking[].class, bankAccount.getIban());
+    	Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/{accountId}/bookings", Booking[].class, bankAccount.getIban());
 
     	return Arrays.asList(bookings);
+    }
+    
+    private RestTemplate getRestTemplate(){
+    	RestTemplate restTemplate = new RestTemplate();
+    	Authentication auth =  (Authentication) principal;
+    	@SuppressWarnings("unchecked")
+		Map<String, Object> credentials = (Map<String, Object>) auth.getCredentials();
+    	String token = (String) credentials.get("bearerToken");    	
+    	restTemplate.getInterceptors().add(new BearerTokenAuthorizationInterceptor(token));
+    	return restTemplate;
     }
 }

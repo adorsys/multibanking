@@ -86,7 +86,6 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
 
             String secret = getUserSecret();
             SecretKey secretKey = new SecretKeySpec(secret.getBytes(), "AES");
-
             String decryptedJson = EncryptionUtil.decrypt(event.getDBObject().get("encrypted").toString(), secretKey);
             DBObject decryptedDbObject = (DBObject) JSON.parse(decryptedJson);
             List<String> exclude = Arrays.asList(((Encrypted) source.getAnnotation(Encrypted.class)).exclude());

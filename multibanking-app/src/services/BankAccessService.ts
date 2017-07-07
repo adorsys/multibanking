@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {AppConfig} from '../app/app.config';
-import {Http, Response} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import { Injectable } from '@angular/core';
+import { AppConfig } from '../app/app.config';
+import { Http, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 
 @Injectable()
@@ -10,24 +10,24 @@ export class BankAccessService {
   constructor(private http: Http) {
   }
 
-  getBankAccesses(userId) {
-    return this.http.get(AppConfig.api_url + "/users/" + userId + "/bankaccesses")
+  getBankAccesses(): Observable<any> {
+    return this.http.get(AppConfig.api_url + "/bankaccesses")
       .map((res: Response) => res.json()._embedded != null ? res.json()._embedded.bankAccessEntityList : [])
       .catch(this.handleError);
   }
 
-  createBankAcccess(userId, bankaccess) {
-    return this.http.post(AppConfig.api_url + "/users/" + userId + "/bankaccesses", bankaccess)
+  createBankAcccess(bankaccess): Observable<any> {
+    return this.http.post(AppConfig.api_url + "/bankaccesses", bankaccess)
       .catch(this.handleError);
   }
 
-  updateBankAcccess(bankaccess) {
-    return this.http.put(AppConfig.api_url + "/users/" + bankaccess.userId + "/bankaccesses/"+bankaccess.id, bankaccess)
+  updateBankAcccess(bankaccess): Observable<any> {
+    return this.http.put(AppConfig.api_url + "/bankaccesses/" + bankaccess.id, bankaccess)
       .catch(this.handleError);
   }
 
-  deleteBankAccess(userId, accessId) {
-    return this.http.delete(AppConfig.api_url + "/users/" + userId + "/bankaccesses/" + accessId)
+  deleteBankAccess(accessId): Observable<any> {
+    return this.http.delete(AppConfig.api_url + "/bankaccesses/" + accessId)
       .catch(this.handleError);
   }
 
