@@ -4,7 +4,7 @@
 
 	<groupId>de.adorsys.multibanking</groupId>
 	<artifactId>multibanking</artifactId>
-	<version>1.8.1</version>
+	<version>1.9-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Multibanking HBCI service</name>
 	<url>https://github.com/adorsys/multibanking</url>
@@ -287,7 +287,7 @@
 		<connection>scm:git@github.com:adorsys/multibanking.git</connection>
 		<developerConnection>scm:git:git@github.com:adorsys/multibanking.git</developerConnection>
 		<url>git@github.com:adorsys/multibanking.git</url>
-		<tag>multibanking-1.8.1</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<profiles>
 		<profile>
