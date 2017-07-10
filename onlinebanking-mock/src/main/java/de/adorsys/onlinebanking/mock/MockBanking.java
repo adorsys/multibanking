@@ -3,16 +3,12 @@ package de.adorsys.onlinebanking.mock;
 import java.util.Arrays;
 import java.util.List;
 
+import domain.*;
 import org.adorsys.envutils.EnvProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
-import domain.BankAccess;
-import domain.BankAccount;
-import domain.BankApi;
-import domain.BankApiUser;
-import domain.Booking;
 import spi.OnlineBankingService;
 
 /**
@@ -62,6 +58,11 @@ public class MockBanking implements OnlineBankingService {
     @Override
     public BankApiUser registerUser(String uid) {
         //no registration needed
+        return null;
+    }
+
+    @Override
+    public BankLoginSettings getBankLoginSettings(String bankCode) {
         return null;
     }
 

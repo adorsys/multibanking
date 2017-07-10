@@ -50,6 +50,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
+    public BankLoginSettings getBankLoginSettings(String bankCode) {
+        return null;
+    }
+
+    @Override
     public boolean bookingsCategorized() {
         return false;
     }
