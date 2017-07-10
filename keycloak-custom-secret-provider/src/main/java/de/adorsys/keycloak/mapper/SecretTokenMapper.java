@@ -103,6 +103,7 @@ public class SecretTokenMapper extends AbstractOIDCProtocolMapper implements OID
         }
     	String serializedSecret = wrapSecretForResourceServer(customSecretAttr, userSession, session);
 		token.getOtherClaims().put("custom_secret", serializedSecret);
+
         return token;
     }
 
@@ -134,17 +135,19 @@ public class SecretTokenMapper extends AbstractOIDCProtocolMapper implements OID
 		} catch (ParseException | JOSEException | UnsupportedEncAlgorithmException | IOException | KeyExtractionException | UnsupportedKeyLengthException e) {
 			throw new IllegalStateException(e);
 		}
-
 	}
 
 	private JWEHeader getHeader(JWK jwk) throws JOSEException {
-        if (jwk instanceof RSAKey) {
-            return new JWEHeader(JWEAlgorithm.RSA_OAEP, EncryptionMethod.A128GCM);
-        } else if (jwk instanceof ECKey) {
-            return new JWEHeader(JWEAlgorithm.ECDH_ES_A128KW, EncryptionMethod.A192GCM);
-        }
-        return null;
-    }
+		JWEHeader header;
+		if (jwk instanceof RSAKey) {
+			header = new JWEHeader(JWEAlgorithm.RSA_OAEP, EncryptionMethod.A128GCM);
+		} else if (jwk instanceof ECKey) {
+			header = new JWEHeader(JWEAlgorithm.ECDH_ES_A128KW, EncryptionMethod.A192GCM);
+		} else {
+			return null;
+		}
+		return new JWEHeader.Builder(header).keyID(jwk.getKeyID()).build();
+	}
     
 	/**
 	 * TODO implement caching

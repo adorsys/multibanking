@@ -1,12 +1,9 @@
 package de.adorsys.multibanking.encrypt;
 
-import java.security.Principal;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.DBObject;
+import com.mongodb.util.JSON;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
@@ -14,13 +11,10 @@ import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.DBObject;
-import com.mongodb.util.JSON;
-import com.nimbusds.jose.jwk.JWKSet;
-
-import de.adorsys.multibanking.impl.KeyStoreRepositoryImpl;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by alexg on 09.05.17.
@@ -31,14 +25,7 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
     @Value("${db_secret}")
     String databaseSecret;
     @Autowired
-    Principal principal;
-    @Autowired
     UserSecret userSecret;
-    
-    @Autowired
-    KeyStoreRepositoryImpl keyStoreRepository;
-
-    private JWKSet privateKeys;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -107,7 +94,7 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
     }
 
     private String getUserSecret() {
-        if (principal.getName().equals("anonymous")) {
+        if (userSecret.getSecret() == null) {
             return databaseSecret;
         }
         return userSecret.getSecret();
