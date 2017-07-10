@@ -53,19 +53,19 @@ public class SecretTokenMapper extends AbstractOIDCProtocolMapper implements OID
     private byte[] secretEncryptionPassword;
     private static final String CREDENTIAL_TYPE = "custom_secret";
 
-    
+
     @Override
-	public void postInit(KeycloakSessionFactory factory) {
+    public void postInit(KeycloakSessionFactory factory) {
         String prop = EnvProperties.getEnvOrSysProp("SECRET_ENCRYPTION_PASSWORD", false);
         try {
-			secretEncryptionPassword = prop.getBytes("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(e);
-		}
-		super.postInit(factory);
-	}
+            secretEncryptionPassword = prop.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
+        super.postInit(factory);
+    }
 
-	@Override
+    @Override
     public String getDisplayCategory() {
         return TOKEN_MAPPER_CATEGORY;
     }
@@ -94,80 +94,86 @@ public class SecretTokenMapper extends AbstractOIDCProtocolMapper implements OID
     public AccessToken transformAccessToken(AccessToken token, ProtocolMapperModel mappingModel, KeycloakSession session,
                                             UserSessionModel userSession, ClientSessionModel clientSession) {
 
-    	String customSecretAttr;
-    	List<String> attribute = userSession.getUser().getAttribute(CREDENTIAL_TYPE);
-    	if(attribute==null || attribute.isEmpty()){    		
-    		customSecretAttr = generateUserSecret(userSession);
+        String customSecretAttr;
+        List<String> attribute = userSession.getUser().getAttribute(CREDENTIAL_TYPE);
+        if (attribute == null || attribute.isEmpty()) {
+            customSecretAttr = generateUserSecret(userSession);
         } else {
-        	customSecretAttr = attribute.iterator().next();
+            customSecretAttr = attribute.iterator().next();
         }
-    	String serializedSecret = wrapSecretForResourceServer(customSecretAttr, userSession, session);
-		token.getOtherClaims().put("custom_secret", serializedSecret);
+        String serializedSecret = wrapSecretForResourceServer(customSecretAttr, userSession, session);
+        if (serializedSecret != null) {
+            token.getOtherClaims().put("custom_secret", serializedSecret);
+        }
 
         return token;
     }
 
     /**
      * TODO implement caching.
+     *
      * @param customSecretAttr
      * @param userSession
      * @param session
      * @return
      */
     private String wrapSecretForResourceServer(String customSecretAttr, UserSessionModel userSession, KeycloakSession session) {
-		try {
-			//decrypt with database encryption pass
-			JWEObject jweObject = JWEObject.parse(customSecretAttr);
-			JWEDecrypter decrypter = new DirectDecrypter(secretEncryptionPassword);
-			jweObject.decrypt(decrypter);
-			Payload payload = jweObject.getPayload();
+        try {
+            //decrypt with database encryption pass
+            JWEObject jweObject = JWEObject.parse(customSecretAttr);
+            JWEDecrypter decrypter = new DirectDecrypter(secretEncryptionPassword);
+            jweObject.decrypt(decrypter);
+            Payload payload = jweObject.getPayload();
 
             //encrypt with remote server public key
-			String url = EnvProperties.getEnvOrSysProp(userSession.getRealm().getName().toUpperCase()+"_PUBLIC_KEY_URL", false);
-			JsonNode publicKeyResponse = JsonSimpleHttp.asJson(JsonSimpleHttp.doGet(url, session));
-			JWKSet jwkSet = JWKSet.parse(publicKeyResponse.toString());
-			JWK jwk = jwkSet.getKeys().iterator().next();
-			JWEEncrypter jweEncrypter = JWEEncryptedSelector.geEncrypter(jwk, null, null);
-			// JWE encrypt secret.
-			JWEObject jweObj = new JWEObject(getHeader(jwk), payload);
-			jweObj.encrypt(jweEncrypter);
-			return jweObj.serialize();
-		} catch (ParseException | JOSEException | UnsupportedEncAlgorithmException | IOException | KeyExtractionException | UnsupportedKeyLengthException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+            String url = EnvProperties.getEnvOrSysProp(userSession.getRealm().getName().toUpperCase() + "_PUBLIC_KEY_URL", true);
+            if (url == null) {
+                return null;
+            }
+            JsonNode publicKeyResponse = JsonSimpleHttp.asJson(JsonSimpleHttp.doGet(url, session));
+            JWKSet jwkSet = JWKSet.parse(publicKeyResponse.toString());
+            JWK jwk = jwkSet.getKeys().iterator().next();
+            JWEEncrypter jweEncrypter = JWEEncryptedSelector.geEncrypter(jwk, null, null);
+            // JWE encrypt secret.
+            JWEObject jweObj = new JWEObject(getHeader(jwk), payload);
+            jweObj.encrypt(jweEncrypter);
+            return jweObj.serialize();
+        } catch (ParseException | JOSEException | UnsupportedEncAlgorithmException | IOException | KeyExtractionException | UnsupportedKeyLengthException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
-	private JWEHeader getHeader(JWK jwk) throws JOSEException {
-		JWEHeader header;
-		if (jwk instanceof RSAKey) {
-			header = new JWEHeader(JWEAlgorithm.RSA_OAEP, EncryptionMethod.A128GCM);
-		} else if (jwk instanceof ECKey) {
-			header = new JWEHeader(JWEAlgorithm.ECDH_ES_A128KW, EncryptionMethod.A192GCM);
-		} else {
-			return null;
-		}
-		return new JWEHeader.Builder(header).keyID(jwk.getKeyID()).build();
-	}
-    
-	/**
-	 * TODO implement caching
-	 */
-    private String generateUserSecret(UserSessionModel userSession){
-    	String randomGraph = RandomStringUtils.randomGraph(16);
-		Builder headerBuilder = new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A128GCM);
-		JWEObject jweObj = new JWEObject(headerBuilder.build(), new Payload(randomGraph));
-		try {
-			DirectEncrypter encrypter = new DirectEncrypter(secretEncryptionPassword);
-			// You can now use the encrypter on one or more JWE objects 
-			// that you wish to secure
-			jweObj.encrypt(encrypter);
-		} catch (JOSEException e){
-			throw new IllegalStateException(e);
-		}
-		String customSecretAttr = jweObj.serialize();
-    	
-		userSession.getUser().setAttribute(CREDENTIAL_TYPE, Arrays.asList(customSecretAttr));
-		return customSecretAttr;
+    private JWEHeader getHeader(JWK jwk) throws JOSEException {
+        JWEHeader header;
+        if (jwk instanceof RSAKey) {
+            header = new JWEHeader(JWEAlgorithm.RSA_OAEP, EncryptionMethod.A128GCM);
+        } else if (jwk instanceof ECKey) {
+            header = new JWEHeader(JWEAlgorithm.ECDH_ES_A128KW, EncryptionMethod.A192GCM);
+        } else {
+            return null;
+        }
+        return new JWEHeader.Builder(header).keyID(jwk.getKeyID()).build();
+    }
+
+    /**
+     * TODO implement caching
+     */
+    private String generateUserSecret(UserSessionModel userSession) {
+        String randomGraph = RandomStringUtils.randomGraph(16);
+        Builder headerBuilder = new JWEHeader.Builder(JWEAlgorithm.DIR, EncryptionMethod.A128GCM);
+        JWEObject jweObj = new JWEObject(headerBuilder.build(), new Payload(randomGraph));
+        try {
+            DirectEncrypter encrypter = new DirectEncrypter(secretEncryptionPassword);
+            // You can now use the encrypter on one or more JWE objects
+            // that you wish to secure
+            jweObj.encrypt(encrypter);
+        } catch (JOSEException e) {
+            throw new IllegalStateException(e);
+        }
+        String customSecretAttr = jweObj.serialize();
+
+        userSession.getUser().setAttribute(CREDENTIAL_TYPE, Arrays.asList(customSecretAttr));
+        return customSecretAttr;
     }
 
 }
