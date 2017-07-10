@@ -4,15 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEObject;
-import com.nimbusds.jose.crypto.RSADecrypter;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.RSAKey;
-import de.adorsys.multibanking.domain.KeyStoreEntity;
-import de.adorsys.multibanking.impl.KeyStoreRepositoryImpl;
-import org.adorsys.envutils.EnvProperties;
-import org.keycloak.KeycloakPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
@@ -20,11 +11,8 @@ import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.Principal;
-import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -37,11 +25,7 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
     @Value("${db_secret}")
     String databaseSecret;
     @Autowired
-    Principal principal;
-    @Autowired
-    KeyStoreRepositoryImpl keyStoreRepository;
-
-    private JWKSet privateKeys;
+    UserSecret userSecret;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -110,33 +94,9 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
     }
 
     private String getUserSecret() {
-        if (principal.getName().equals("anonymous")) {
+        if (userSecret.getSecret() == null) {
             return databaseSecret;
         }
-
-        String userSecret = (String) ((KeycloakPrincipal) principal).getKeycloakSecurityContext().getToken().getOtherClaims().get("custom_secret");
-        if (userSecret == null) {
-            throw new IllegalStateException("secret not exists in jwt");
-        }
-
-        try {
-            RSADecrypter decrypter = new RSADecrypter((RSAKey) getPrivateKeys().getKeys().iterator().next());
-
-            JWEObject jweObject = JWEObject.parse(userSecret);
-            jweObject.decrypt(decrypter);
-
-            return jweObject.getPayload().toString();
-        } catch (ParseException | JOSEException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public JWKSet getPrivateKeys() {
-        if (privateKeys == null) {
-            String serverKeystoreName = EnvProperties.getEnvOrSysProp("SERVER_KEYSTORE_NAME", "multibanking-service-keystore");
-            KeyStoreEntity keyStoreEntity = keyStoreRepository.findOne(serverKeystoreName);
-            privateKeys = KeyStoreUtils.loadPrivateKeys(keyStoreEntity);
-        }
-        return privateKeys;
+        return userSecret.getSecret();
     }
 }

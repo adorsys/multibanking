@@ -6,6 +6,8 @@ import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
 import me.figo.internal.*;
+import me.figo.models.BankLoginSettings;
+import me.figo.models.Service;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import spi.OnlineBankingService;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,11 +30,15 @@ import static utils.Utils.getSecureRandom;
  */
 public class FigoBanking implements OnlineBankingService {
 
+    public static final String MAIL_SUFFIX = "@admb.de";
     private FigoConnection figoConnection;
 
     private static SecureRandom random = getSecureRandom();
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#%^*()-_=+[{]},<>";
     private static final Logger LOG = LoggerFactory.getLogger(FigoBanking.class);
+
+    private String figoTechUser;
+    private String figoTechUserCredential;
 
     public enum Status {
         OK,
@@ -53,6 +60,11 @@ public class FigoBanking implements OnlineBankingService {
             figoConnection = new FigoConnection(figoClientId, figoSecret, "http://nowhere.here", figoTimeout, figoConnectionUrl);
         }
 
+        figoTechUser = EnvProperties.getEnvOrSysProp("FIGO_TECH_USER", true);
+        figoTechUserCredential = EnvProperties.getEnvOrSysProp("FIGO_TECH_USER_CREDENTIAL", true);
+        if (figoTechUser == null || figoTechUserCredential == null) {
+            LOG.warn("missing env properties FIGO_TECH_USER and/or FIGO_TECH_USER_CREDENTIAL");
+        }
     }
 
     @Override
@@ -101,9 +113,40 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
+    public domain.BankLoginSettings getBankLoginSettings(String bankCode) {
+        FigoSession figoSession = loginTechUser();
+
+        BankLoginSettings figoBankLoginSettings = null;
+        try {
+            figoBankLoginSettings = figoSession.queryApi("/rest/catalog/banks/de/" + bankCode, null, "GET", BankLoginSettings.class);
+        } catch (IOException | FigoException e) {
+            throw new RuntimeException(e);
+        }
+        domain.BankLoginSettings bankLoginSettings = new domain.BankLoginSettings();
+        bankLoginSettings.setAdditional_icons(figoBankLoginSettings.getAdditionalIcons());
+        bankLoginSettings.setAdvice(figoBankLoginSettings.getAdvice());
+        bankLoginSettings.setAuth_type(figoBankLoginSettings.getAuthType());
+        bankLoginSettings.setBank_name(figoBankLoginSettings.getBankName());
+        bankLoginSettings.setIcon(figoBankLoginSettings.getIcon());
+        bankLoginSettings.setSupported(figoBankLoginSettings.isSupported());
+        bankLoginSettings.setCredentials(new ArrayList<>());
+
+        figoBankLoginSettings.getCredentials().forEach(credential -> {
+            BankLoginCredential bankLoginCredential = new BankLoginCredential();
+            bankLoginCredential.setLabel(credential.getLabel());
+            bankLoginCredential.setMasked(credential.isMasked());
+            bankLoginCredential.setOptional(credential.isOptional());
+
+            bankLoginSettings.getCredentials().add(bankLoginCredential);
+        });
+
+        return bankLoginSettings;
+    }
+
+    @Override
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
         try {
-            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
+            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX, bankApiUser.getApiPassword());
             FigoSession session = new FigoSession(tokenResponse.getAccessToken());
 
             TaskTokenResponse response = session.setupNewAccount(
@@ -237,5 +280,28 @@ public class FigoBanking implements OnlineBankingService {
         }
 
         return Status.OK;
+    }
+
+    /**
+     * Erzeugt eine ZB-Session mit dem technischen Figo-User.
+     */
+    FigoSession loginTechUser() {
+        String username = figoTechUser + MAIL_SUFFIX;
+        String accessToken;
+
+        try {
+            accessToken = figoConnection.credentialLogin(username, figoTechUserCredential).getAccessToken();
+        } catch (Exception e) {
+            //login not possible, try create technical user
+            try {
+                figoConnection.addUser(figoTechUser, username, figoTechUserCredential, "de");
+                accessToken = figoConnection.credentialLogin(username, figoTechUserCredential).getAccessToken();
+            } catch (Exception e1) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return new FigoSession(accessToken);
+
     }
 }
