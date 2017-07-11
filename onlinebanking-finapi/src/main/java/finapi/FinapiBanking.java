@@ -89,6 +89,12 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
+    public BankLoginSettings getBankLoginSettings(String bankCode) {
+        //TODO
+        return null;
+    }
+
+    @Override
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
         LOG.info("load bank accounts");
         try {

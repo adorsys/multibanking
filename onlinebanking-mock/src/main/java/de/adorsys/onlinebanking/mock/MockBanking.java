@@ -1,21 +1,15 @@
 package de.adorsys.onlinebanking.mock;
 
+import java.util.Arrays;
+import java.util.List;
+
 import domain.*;
 import org.adorsys.envutils.EnvProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.CredentialsContainer;
 import org.springframework.web.client.RestTemplate;
-import spi.OnlineBankingService;
 
-import java.security.Principal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import spi.OnlineBankingService;
 
 /**
  * Created by alexg on 17.05.17.
@@ -24,8 +18,7 @@ public class MockBanking implements OnlineBankingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MockBanking.class);
     
-    @Autowired
-    private Principal principal;
+    private String bearerToken;
 
     public enum Status {
         OK,
@@ -37,8 +30,9 @@ public class MockBanking implements OnlineBankingService {
 
     String mockConnectionUrl = null;
 
-    public MockBanking() {
+    public MockBanking(String bearerToken) {
     	mockConnectionUrl = EnvProperties.getEnvOrSysProp("mockConnectionUrl", "http://localhost:10010");
+    	this.bearerToken = bearerToken;
     }
 
     @Override
@@ -58,12 +52,17 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public boolean userRegistrationRequired() {
-        return true;
+        return false;
     }
 
     @Override
     public BankApiUser registerUser(String uid) {
         //no registration needed
+        return null;
+    }
+
+    @Override
+    public BankLoginSettings getBankLoginSettings(String bankCode) {
         return null;
     }
 
@@ -83,11 +82,7 @@ public class MockBanking implements OnlineBankingService {
     
     private RestTemplate getRestTemplate(){
     	RestTemplate restTemplate = new RestTemplate();
-    	Authentication auth =  (Authentication) principal;
-    	@SuppressWarnings("unchecked")
-		Map<String, Object> credentials = (Map<String, Object>) auth.getCredentials();
-    	String token = (String) credentials.get("bearerToken");    	
-    	restTemplate.getInterceptors().add(new BearerTokenAuthorizationInterceptor(token));
+    	restTemplate.getInterceptors().add(new BearerTokenAuthorizationInterceptor(bearerToken));
     	return restTemplate;
     }
 }

@@ -27,7 +27,9 @@ public class BankAccessRepositoryCustomMongodb {
 
         where.fields().include("bankCode");
 
-        return mongoTemplate.findOne(where, BankAccessEntity.class).getBankCode();
+        // Francis null pointer when noting is found
+        BankAccessEntity found = mongoTemplate.findOne(where, BankAccessEntity.class);
+        return found!=null?found.getBankCode():null;
     }
 
     public boolean deleteByUserIdAndId(String userId, String bankAccessId) {
