@@ -69,7 +69,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             bankAccess.setBankName(hbciPassport.getInstName());
             List<BankAccount> hbciAccounts = new ArrayList<>();
             for (Konto konto : hbciPassport.getAccounts()) {
-                hbciAccounts.add(HbciFactory.toBankAccount(konto));
+                BankAccount bankAccount = HbciFactory.toBankAccount(konto);
+                bankAccount.externalId(bankApi(), UUID.randomUUID().toString());
+                hbciAccounts.add(bankAccount);
             }
             if (hbciPassport.getState().isPresent()) {
                 bankAccess.setHbciPassportState(hbciPassport.getState().get().toJson());
