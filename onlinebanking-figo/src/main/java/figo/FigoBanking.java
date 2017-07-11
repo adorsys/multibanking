@@ -10,6 +10,8 @@ import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import me.figo.models.Transaction;
 import spi.OnlineBankingService;
 
 import java.io.IOException;
@@ -170,28 +172,38 @@ public class FigoBanking implements OnlineBankingService {
 
             return session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
                     .stream()
-                    .map(transaction -> {
-                                Booking booking = new Booking();
-                                booking.setExternalId(transaction.getTransactionId());
-                                booking.setBankApi(bankApi());
-                                booking.setBookingDate(transaction.getBookingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                                booking.setValutaDate(transaction.getValueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                                booking.setAmount(transaction.getAmount());
-                                booking.setUsage(transaction.getPurposeText());
-
-                                if (transaction.getName() != null) {
-                                    booking.setOtherAccount(new BankAccount());
-                                    booking.getOtherAccount().setName(transaction.getName());
-                                    booking.getOtherAccount().setCurrency(transaction.getCurrency());
-                                }
-                                return booking;
-                            }
-                    )
+                    .map(this::mapBooking)
                     .collect(Collectors.toList());
 
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Booking mapBooking(Transaction transaction) {
+        Booking booking = new Booking();
+        booking.setExternalId(transaction.getTransactionId());
+        booking.setBankApi(bankApi());
+        booking.setBookingDate(transaction.getBookingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        booking.setValutaDate(transaction.getValueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        booking.setAmount(transaction.getAmount());
+        booking.setUsage(transaction.getPurposeText());
+        booking.setText(transaction.getBookingText());
+        booking.setTransactionCode(transaction.getTransactionCode());
+
+        if (transaction.getName() != null) {
+            booking.setOtherAccount(mapBookingAccount(transaction));
+        }
+        return booking;
+    }
+
+    private BankAccount mapBookingAccount(Transaction transaction) {
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setName(transaction.getName());
+        bankAccount.setCurrency(transaction.getCurrency());
+        bankAccount.setAccountNumber(transaction.getAccountNumber());
+        bankAccount.setBlz(transaction.getBankCode());
+        return bankAccount;
     }
 
     private Status waitForFinish(FigoSession session, String taskToken, String pin) throws IOException, FigoException, InterruptedException {
