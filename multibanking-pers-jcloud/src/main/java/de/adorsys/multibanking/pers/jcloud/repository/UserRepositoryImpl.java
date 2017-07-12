@@ -46,7 +46,8 @@ public class UserRepositoryImpl implements UserRepositoryIf, BankAccessRepositor
 	}
 
     @Override
-    public List<UserEntity> findExpiredUser() {
+    public List<String> findExpiredUser() {
+        //TODO
         return null;
     }
 
