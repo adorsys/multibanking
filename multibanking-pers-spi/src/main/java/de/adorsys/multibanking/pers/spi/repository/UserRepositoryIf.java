@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import de.adorsys.multibanking.domain.UserEntity;
@@ -11,6 +12,8 @@ import de.adorsys.multibanking.domain.UserEntity;
 public interface UserRepositoryIf {
 
     Optional<UserEntity> findById(String id);
+
+	List<String> findExpiredUser();
 
 	boolean exists(String userId);
 

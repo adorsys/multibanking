@@ -3,10 +3,13 @@ package de.adorsys.multibanking.impl;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.repository.BankAccountRepositoryMongodb;
-import de.adorsys.multibanking.repository.BankAccountRepositoryCustomMongodb;
 import domain.BankAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +22,8 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
     @Autowired
     private BankAccountRepositoryMongodb bankAccountRepository;
 
-	@Autowired
-	private BankAccountRepositoryCustomMongodb bankAccountRepositoryCustom;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
 	@Override
 	public List<BankAccountEntity> findByUserId(String userId) {
@@ -54,12 +57,18 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 
 	@Override
 	public BankAccount.SyncStatus getSyncStatus(String accountId) {
-		return bankAccountRepositoryCustom.getSyncStatus(accountId);
+		Query where = Query.query(Criteria.where("id").is(accountId));
+
+		where.fields().include("syncStatus");
+
+		return mongoTemplate.findOne(where, BankAccountEntity.class).getSyncStatus();
 	}
 
 	@Override
 	public void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus) {
-		bankAccountRepositoryCustom.updateSyncStatus(accountId, syncStatus);
+		Query where = Query.query(Criteria.where("id").is(accountId));
+		Update update = new Update().set("syncStatus", syncStatus);
+		mongoTemplate.updateFirst(where, update, BankAccountEntity.class);
 	}
 
 	@Override

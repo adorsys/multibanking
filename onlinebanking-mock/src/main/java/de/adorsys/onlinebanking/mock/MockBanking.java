@@ -63,6 +63,10 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
+    public void removeUser(BankApiUser bankApiUser) {
+    }
+
+    @Override
     public BankLoginSettings getBankLoginSettings(String bankCode) {
         return null;
     }
@@ -75,6 +79,11 @@ public class MockBanking implements OnlineBankingService {
             bankAccount.externalId(bankApi(), UUID.randomUUID().toString());
         }
         return Arrays.asList(bankAccounts);
+    }
+
+    @Override
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
+
     }
 
     @Override

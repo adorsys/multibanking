@@ -45,7 +45,12 @@ public class UserRepositoryImpl implements UserRepositoryIf, BankAccessRepositor
 		return Optional.of(userMainRecord.getUserEntity());
 	}
 
-	@Override
+    @Override
+    public List<UserEntity> findExpiredUser() {
+        return null;
+    }
+
+    @Override
 	public boolean exists(String userId) {
 		String userContainer = namingPolicy.nameUserContainer(userId);
 		return containerPersistence.containerExists(userContainer);

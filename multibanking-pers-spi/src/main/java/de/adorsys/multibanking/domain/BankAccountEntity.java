@@ -18,7 +18,7 @@ import java.util.Date;
  */
 @Data
 @Document
-@Encrypted(exclude = {"_id", "bankAccessId", "userId", "syncStatus", "expireBankAccount"})
+@Encrypted(exclude = {"_id", "bankAccessId", "userId", "syncStatus"})
 @JsonIgnoreProperties(value = {"externalIdMap"}, allowSetters = true)
 @CompoundIndexes({
         @CompoundIndex(name = "account_index", def = "{'userId': 1, 'bankAccessId': 1}")
@@ -29,9 +29,6 @@ public class BankAccountEntity extends BankAccount {
     private String id;
     private String bankAccessId;
     private String userId;
-
-    @Indexed(name="expireBankAccount", expireAfterSeconds=0)
-    private Date expireBankAccount;
 
     public String getId() {
         return id;

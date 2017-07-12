@@ -7,6 +7,7 @@ import me.figo.FigoException;
 import me.figo.FigoSession;
 import me.figo.internal.*;
 import me.figo.models.Account;
+import me.figo.models.Bank;
 import me.figo.models.BankLoginSettings;
 import me.figo.models.Service;
 import org.adorsys.envutils.EnvProperties;
@@ -114,6 +115,17 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
+    public void removeUser(BankApiUser bankApiUser) {
+        try {
+            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX, bankApiUser.getApiPassword());
+            FigoSession session = new FigoSession(tokenResponse.getAccessToken());
+            session.removeUser();
+        } catch (IOException | FigoException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public domain.BankLoginSettings getBankLoginSettings(String bankCode) {
         FigoSession figoSession = loginTechUser();
 
@@ -180,6 +192,18 @@ public class FigoBanking implements OnlineBankingService {
                                             .readyHbciBalance(account.getBalance().getBalance())))
                     .collect(Collectors.toList());
         } catch (IOException | FigoException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
+        try {
+            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX, bankApiUser.getApiPassword());
+            FigoSession session = new FigoSession(tokenResponse.getAccessToken());
+
+            session.removeAccount(bankAccount.getExternalIdMap().get(bankApi()));
+        } catch (IOException | FigoException e) {
             throw new RuntimeException(e);
         }
     }

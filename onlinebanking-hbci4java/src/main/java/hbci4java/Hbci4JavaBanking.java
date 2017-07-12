@@ -50,6 +50,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
+    public void removeUser(BankApiUser bankApiUser) {
+    }
+
+    @Override
     public BankLoginSettings getBankLoginSettings(String bankCode) {
         return null;
     }
@@ -87,6 +91,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 handle.close();
             }
         }
+    }
+
+    @Override
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
+
     }
 
     @Override

@@ -2,10 +2,12 @@ package de.adorsys.multibanking.impl;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
-import de.adorsys.multibanking.repository.BankAccessRepositoryCustomMongodb;
 import de.adorsys.multibanking.repository.BankAccessRepositoryMongodb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,9 +19,10 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 
     @Autowired
     BankAccessRepositoryMongodb bankAccessRepository;
-	@Autowired
-	BankAccessRepositoryCustomMongodb bankAccessRepositoryCustom;
-	
+
+    @Autowired
+    private MongoTemplate mongoTemplate;
+
 	@Override
 	public Optional<BankAccessEntity> findByUserIdAndId(String userId, String id) {
 		return bankAccessRepository.findByUserIdAndId(userId, id);
@@ -42,7 +45,13 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 
 	@Override
 	public String getBankCode(String id) {
-		return bankAccessRepositoryCustom.getBankCode(id);
+        Query where = Query.query(Criteria.where("id").is(id));
+
+        where.fields().include("bankCode");
+
+        // Francis null pointer when noting is found
+        BankAccessEntity found = mongoTemplate.findOne(where, BankAccessEntity.class);
+        return found!=null?found.getBankCode():null;
 	}
 
 	@Override
@@ -52,7 +61,8 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 
 	@Override
 	public boolean deleteByUserIdAndBankAccessId(String userId, String bankAccessId) {
-		return bankAccessRepositoryCustom.deleteByUserIdAndId(userId, bankAccessId);
+        Query where = Query.query(Criteria.where("id").is(bankAccessId).and("userId").is(userId));
+        return mongoTemplate.remove(where, BankAccessEntity.class).getN() > 0;
 	}
 
 }

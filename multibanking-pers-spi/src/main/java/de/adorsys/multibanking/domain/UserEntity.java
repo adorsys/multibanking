@@ -22,7 +22,7 @@ public class UserEntity {
     @Id
     private String id;
 
-    @Indexed(name="expireUser", expireAfterSeconds=0)
+    @Indexed
     private Date expireUser;
 
     private List<BankApiUser> apiUser = new ArrayList<>();
