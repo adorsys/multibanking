@@ -34,6 +34,11 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
     private ObjectPersistenceAdapter objectPersistenceAdapter;
 
 	@Override
+	public List<BankAccountEntity> findByUserId(String userId) {
+		return null;
+	}
+
+	@Override
 	public List<BankAccountEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId) {
 		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
 		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);
