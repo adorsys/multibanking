@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {NavController, NavParams, LoadingController} from "ionic-angular";
+import {NavController, NavParams, LoadingController, ToastController} from "ionic-angular";
 import {BankAccessService} from "../../services/bankAccessService";
 
 @Component({
@@ -9,12 +9,22 @@ import {BankAccessService} from "../../services/bankAccessService";
 export class BankAccessCreatePage {
 
   userId;
-  bankAccess = {bankCode: '', bankLogin: '', pin: '', userId: '', storePin: true, storeBookings: true, categorizeBookings: true, storeAnalytics: true};
+  bankAccess = {
+    bankCode: '',
+    bankLogin: '',
+    pin: '',
+    userId: '',
+    storePin: true,
+    storeBookings: true,
+    categorizeBookings: true,
+    storeAnalytics: true
+  };
   parent;
 
   constructor(public navCtrl: NavController,
               private navparams: NavParams,
               private loadingCtrl: LoadingController,
+              private toastCtrl: ToastController,
               private bankAccessService: BankAccessService) {
 
     this.userId = navparams.data.userId;
@@ -28,12 +38,23 @@ export class BankAccessCreatePage {
     });
     loading.present();
 
-    this.bankAccessService.createBankAcccess(this.bankAccess).subscribe(response => {
-      loading.dismiss();
+    this.bankAccessService.createBankAcccess(this.bankAccess).subscribe(
+      response => {
+        loading.dismiss();
 
-      this.parent.bankAccessesChanged();
-      this.navCtrl.pop();
-    })
+        this.parent.bankAccessesChanged();
+        this.navCtrl.pop();
+      },
+      error => {
+        loading.dismiss();
+        if (error == "BANK_ACCESS_ALREADY_EXIST") {
+          this.toastCtrl.create({
+            message: 'Bank connection already exists',
+            showCloseButton: true,
+            position: 'top'
+          }).present();
+        }
+      })
   }
 
 
