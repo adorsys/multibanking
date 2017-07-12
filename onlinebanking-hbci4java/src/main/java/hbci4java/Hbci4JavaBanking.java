@@ -203,4 +203,14 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return false;
     }
 
+    @Override
+    public List<BankInfos> getBankInfos(String query){
+         return HBCIUtils.searchBankInfo(query)
+    			        .stream()
+    			        .map(bi ->new BankInfos(bi.getBlz(), bi.getBic(), bi.getChecksumMethod(), bi.getLocation(),
+    			     			  bi.getName(), bi.getPinTanAddress(), bi.getRdhAddress()))
+    			        .collect(Collectors.toList());
+    }
+    
+
 }

@@ -327,4 +327,10 @@ public class FigoBanking implements OnlineBankingService {
         return new FigoSession(accessToken);
 
     }
+
+	@Override
+	public List<BankInfos> getBankInfos(String query) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
