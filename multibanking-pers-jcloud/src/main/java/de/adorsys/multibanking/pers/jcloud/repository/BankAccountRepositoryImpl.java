@@ -105,6 +105,12 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 		return null;
 	}
 
+	@Override
+	public BankAccountEntity findOne(String accountId) {
+		//TODO
+		return null;
+	}
+
 	static ListItemHandler<BankAccountEntity> handler = new ListItemHandler<BankAccountEntity>() {
 
 		@Override

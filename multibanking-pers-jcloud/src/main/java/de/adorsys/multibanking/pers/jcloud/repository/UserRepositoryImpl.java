@@ -58,6 +58,12 @@ public class UserRepositoryImpl implements UserRepositoryIf, BankAccessRepositor
 	}
 
 	@Override
+	public BankAccessEntity findOne(String id) {
+		//TODO
+		return null;
+	}
+
+	@Override
 	public void save(UserEntity userEntity) {
 		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
 		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);

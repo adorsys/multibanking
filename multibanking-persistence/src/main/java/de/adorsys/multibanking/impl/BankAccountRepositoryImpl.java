@@ -62,4 +62,9 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 		return bankAccountRepository.deleteByBankAccessId(accessId);
 	}
 
+	@Override
+	public BankAccountEntity findOne(String accountId) {
+		return bankAccountRepository.findOne(accountId);
+	}
+
 }
