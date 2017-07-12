@@ -12,6 +12,8 @@ import domain.BankAccount;
  */
 public interface BankAccountRepositoryIf {
 
+	List<BankAccountEntity> findByUserId(String userId);
+
     List<BankAccountEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId);
 
     Optional<BankAccountEntity> findByUserIdAndId(String userId, String id);
@@ -27,4 +29,6 @@ public interface BankAccountRepositoryIf {
 	void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus);
 
     List<BankAccountEntity> deleteByBankAccess(String accessId);
+
+    BankAccountEntity findOne(String accountId);
 }

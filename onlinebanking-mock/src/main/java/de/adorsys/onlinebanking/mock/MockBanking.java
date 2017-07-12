@@ -2,6 +2,7 @@ package de.adorsys.onlinebanking.mock;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import domain.*;
 import org.adorsys.envutils.EnvProperties;
@@ -17,7 +18,7 @@ import spi.OnlineBankingService;
 public class MockBanking implements OnlineBankingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MockBanking.class);
-    
+
     private String bearerToken;
 
     public enum Status {
@@ -31,8 +32,8 @@ public class MockBanking implements OnlineBankingService {
     String mockConnectionUrl = null;
 
     public MockBanking(String bearerToken) {
-    	mockConnectionUrl = EnvProperties.getEnvOrSysProp("mockConnectionUrl", "http://localhost:10010");
-    	this.bearerToken = bearerToken;
+        mockConnectionUrl = EnvProperties.getEnvOrSysProp("mockConnectionUrl", "http://localhost:10010");
+        this.bearerToken = bearerToken;
     }
 
     @Override
@@ -68,21 +69,24 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
-    	BankAccount[] bankAccounts = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/", BankAccount[].class);
-
-    	return Arrays.asList(bankAccounts);
+        BankAccount[] bankAccounts = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/", BankAccount[].class);
+        for (BankAccount bankAccount : bankAccounts) {
+            bankAccount.bankName(bankAccess.getBankName());
+            bankAccount.externalId(bankApi(), UUID.randomUUID().toString());
+        }
+        return Arrays.asList(bankAccounts);
     }
 
     @Override
     public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin) {
-    	Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/{accountId}/bookings", Booking[].class, bankAccount.getIban());
+        Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/{accountId}/bookings", Booking[].class, bankAccount.getIban());
 
-    	return Arrays.asList(bookings);
+        return Arrays.asList(bookings);
     }
-    
-    private RestTemplate getRestTemplate(){
-    	RestTemplate restTemplate = new RestTemplate();
-    	restTemplate.getInterceptors().add(new BearerTokenAuthorizationInterceptor(bearerToken));
-    	return restTemplate;
+
+    private RestTemplate getRestTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.getInterceptors().add(new BearerTokenAuthorizationInterceptor(bearerToken));
+        return restTemplate;
     }
 }

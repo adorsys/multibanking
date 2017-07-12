@@ -121,6 +121,7 @@ public class FinapiBanking implements OnlineBankingService {
                     new BankAccount()
                             .externalId(bankApi(), account.getId().toString())
                             .owner(account.getAccountHolderName())
+                            .bankName(bankAccess.getBankName())
                             .numberHbciAccount(account.getAccountNumber())
                             .nameHbciAccount(account.getAccountName())
                             .ibanHbciAccount(account.getIban())

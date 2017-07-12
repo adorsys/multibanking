@@ -17,9 +17,9 @@ import org.kapott.hbci.structures.Konto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
-import sun.java2d.InvalidPipeException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Hbci4JavaBanking implements OnlineBankingService {
 
@@ -69,7 +69,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             bankAccess.setBankName(hbciPassport.getInstName());
             List<BankAccount> hbciAccounts = new ArrayList<>();
             for (Konto konto : hbciPassport.getAccounts()) {
-                hbciAccounts.add(HbciFactory.toBankAccount(konto));
+                BankAccount bankAccount = HbciFactory.toBankAccount(konto);
+                bankAccount.externalId(bankApi(), UUID.randomUUID().toString());
+                bankAccount.bankName(bankAccess.getBankName());
+                hbciAccounts.add(bankAccount);
             }
             if (hbciPassport.getState().isPresent()) {
                 bankAccess.setHbciPassportState(hbciPassport.getState().get().toJson());
@@ -110,7 +113,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
             bankAccount.setBankAccountBalance(HbciFactory.createBalance((GVRSaldoReq) balanceJob.getJobResult()));
 
-            return HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult());
+            List<Booking> bookings = HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult());
+
+            return bookings.stream()
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                    () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
+
         } catch (HBCI_Exception e) {
             handleHbciException(e);
             return null;

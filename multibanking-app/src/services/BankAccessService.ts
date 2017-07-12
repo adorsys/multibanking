@@ -33,7 +33,16 @@ export class BankAccessService {
 
   handleError(error) {
     console.error(error.json());
-    return Observable.throw(error.json() || 'Server error');
+    let errorJson = error.json();
+    if (errorJson) {
+      if (errorJson.message == "BANK_ACCESS_ALREADY_EXIST") {
+        return Observable.throw(errorJson.message);
+      } else {
+        return Observable.throw(errorJson || 'Server error');
+      }
+    } else {
+      return Observable.throw(error || 'Server error');
+    }
   }
 
 

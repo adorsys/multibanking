@@ -19,6 +19,7 @@ import java.util.Date;
 @Data
 @Document
 @Encrypted(exclude = {"_id", "bankAccessId", "userId", "syncStatus", "expireBankAccount"})
+@JsonIgnoreProperties(value = {"externalIdMap"}, allowSetters = true)
 @CompoundIndexes({
         @CompoundIndex(name = "account_index", def = "{'userId': 1, 'bankAccessId': 1}")
 })

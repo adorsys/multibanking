@@ -26,6 +26,11 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 	}
 
 	@Override
+	public BankAccessEntity findOne(String id) {
+		return bankAccessRepository.findOne(id);
+	}
+
+	@Override
 	public List<BankAccessEntity> findByUserId(String userId) {
 		return bankAccessRepository.findByUserId(userId);
 	}

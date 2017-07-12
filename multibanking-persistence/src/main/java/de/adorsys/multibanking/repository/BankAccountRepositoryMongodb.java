@@ -15,6 +15,8 @@ import java.util.Optional;
 @Profile({"mongo", "fongo"})
 public interface BankAccountRepositoryMongodb extends MongoRepository<BankAccountEntity, String> {
 
+    List<BankAccountEntity> findByUserId(String userId);
+
     List<BankAccountEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId);
 
     Optional<BankAccountEntity> findByUserIdAndId(String userId, String id);
