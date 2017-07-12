@@ -21,7 +21,12 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 
 	@Autowired
 	private BankAccountRepositoryCustomMongodb bankAccountRepositoryCustom;
-	
+
+	@Override
+	public List<BankAccountEntity> findByUserId(String userId) {
+		return bankAccountRepository.findByUserId(userId);
+	}
+
 	@Override
 	public List<BankAccountEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId) {
 		return bankAccountRepository.findByUserIdAndBankAccessId(userId, bankAccessId);

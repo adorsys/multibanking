@@ -32,7 +32,10 @@ public class BankAccount {
 	
     @ApiModelProperty(value = "The bank code", example="76070024")
     private String blz;
-	
+
+    @ApiModelProperty(value = "The bank name", example="Deutsche Bank")
+    private String bankName;
+
     @ApiModelProperty(value = "The account number", example="430254900")
     private String accountNumber;
 	
@@ -86,6 +89,11 @@ public class BankAccount {
 
     public BankAccount nameHbciAccount(String nameHbciAccount) {
         this.name = nameHbciAccount;
+        return this;
+    }
+
+    public BankAccount bankName(String bankName) {
+        this.bankName = bankName;
         return this;
     }
 

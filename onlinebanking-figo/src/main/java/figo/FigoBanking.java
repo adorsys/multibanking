@@ -6,6 +6,7 @@ import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
 import me.figo.internal.*;
+import me.figo.models.Account;
 import me.figo.models.BankLoginSettings;
 import me.figo.models.Service;
 import org.adorsys.envutils.EnvProperties;
@@ -116,7 +117,7 @@ public class FigoBanking implements OnlineBankingService {
     public domain.BankLoginSettings getBankLoginSettings(String bankCode) {
         FigoSession figoSession = loginTechUser();
 
-        BankLoginSettings figoBankLoginSettings = null;
+        BankLoginSettings figoBankLoginSettings;
         try {
             figoBankLoginSettings = figoSession.queryApi("/rest/catalog/banks/de/" + bankCode, null, "GET", BankLoginSettings.class);
         } catch (IOException | FigoException e) {
@@ -163,18 +164,16 @@ public class FigoBanking implements OnlineBankingService {
                 Thread.sleep(1000);
             }
 
-            bankAccess.setBankName(session.getAccounts().size() > 0 ? session.getAccounts().get(0).getBankName() : null);
-
             return session.getAccounts().stream()
-                    .filter(account -> account.getBankCode().equals(bankAccess.getBankCode()))
                     .map(account ->
                             new BankAccount()
                                     .externalId(bankApi(), account.getAccountId())
                                     .owner(account.getOwner())
                                     .numberHbciAccount(account.getAccountNumber())
                                     .nameHbciAccount(account.getName())
+                                    .bankName(account.getBankName())
                                     .bicHbciAccount(account.getBIC())
-                                    .blzHbciAccount(bankAccess.getBankCode())
+                                    .blzHbciAccount(account.getBankCode())
                                     .ibanHbciAccount(account.getIBAN())
                                     .typeHbciAccount(account.getType())
                                     .bankAccountBalance(new BankAccountBalance()

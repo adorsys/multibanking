@@ -71,6 +71,7 @@ public class MockBanking implements OnlineBankingService {
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
         BankAccount[] bankAccounts = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/", BankAccount[].class);
         for (BankAccount bankAccount : bankAccounts) {
+            bankAccount.bankName(bankAccess.getBankName());
             bankAccount.externalId(bankApi(), UUID.randomUUID().toString());
         }
         return Arrays.asList(bankAccounts);

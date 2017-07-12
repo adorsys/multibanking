@@ -12,6 +12,8 @@ import domain.BankAccount;
  */
 public interface BankAccountRepositoryIf {
 
+	List<BankAccountEntity> findByUserId(String userId);
+
     List<BankAccountEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId);
 
     Optional<BankAccountEntity> findByUserIdAndId(String userId, String id);
