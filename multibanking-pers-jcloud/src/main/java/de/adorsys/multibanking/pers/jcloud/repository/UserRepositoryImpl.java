@@ -87,7 +87,12 @@ public class UserRepositoryImpl implements UserRepositoryIf, BankAccessRepositor
 		objectPersistenceAdapter.store(userMainRecordhandle, userMainRecord, keyCredentials);
 	}
 
-	@Override
+    @Override
+    public void delete(String userId) {
+
+    }
+
+    @Override
 	public Optional<BankAccessEntity> findByUserIdAndId(String userId, String id) {
 		ObjectHandle userMainRecordhandle = namingPolicy.handleForUserMainRecord(keyCredentials);
 		UserMainRecord userMainRecord = objectPersistenceAdapter.load(userMainRecordhandle, UserMainRecord.class, keyCredentials);

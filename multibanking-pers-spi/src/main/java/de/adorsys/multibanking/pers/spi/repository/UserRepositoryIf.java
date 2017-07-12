@@ -18,4 +18,6 @@ public interface UserRepositoryIf {
 	boolean exists(String userId);
 
 	void save(UserEntity userEntity);
+
+    void delete(String userId);
 }

@@ -19,19 +19,19 @@ import java.util.stream.Collectors;
 @Service
 public class UserRepositoryImpl implements UserRepositoryIf {
 
-	@Autowired
-	private UserRepositoryMongodb userRepository;
+    @Autowired
+    private UserRepositoryMongodb userRepository;
 
     @Autowired
     private MongoTemplate mongoTemplate;
-	
-	@Override
-	public Optional<UserEntity> findById(String id) {
-		return userRepository.findById(id);
-	}
 
-	@Override
-	public List<String> findExpiredUser() {
+    @Override
+    public Optional<UserEntity> findById(String id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
+    public List<String> findExpiredUser() {
         Query query = new Query(
                 Criteria.where("expireUser").lte(new Date())
         );
@@ -41,16 +41,21 @@ public class UserRepositoryImpl implements UserRepositoryIf {
                 .stream()
                 .map(userEntity -> userEntity.getId())
                 .collect(Collectors.toList());
-	}
+    }
 
-	@Override
-	public boolean exists(String userId) {
-		return userRepository.exists(userId);
-	}
+    @Override
+    public boolean exists(String userId) {
+        return userRepository.exists(userId);
+    }
 
-	@Override
-	public void save(UserEntity userEntity) {
-		userRepository.save(userEntity);
-	}
+    @Override
+    public void save(UserEntity userEntity) {
+        userRepository.save(userEntity);
+    }
+
+    @Override
+    public void delete(String userId) {
+        userRepository.delete(userId);
+    }
 
 }
