@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
+import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
@@ -94,9 +95,14 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
     }
 
     private String getUserSecret() {
-        if (userSecret.getSecret() == null) {
+        try {
+            if (userSecret.getSecret() == null) {
+                return databaseSecret;
+            }
+            return userSecret.getSecret();
+            //user secret not available outside request scopes
+        } catch (BeanCreationException e) {
             return databaseSecret;
         }
-        return userSecret.getSecret();
     }
 }

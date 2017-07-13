@@ -23,7 +23,7 @@ import java.util.Date;
 @Data
 @Document
 @JsonIgnoreProperties(value = {"pin", "hbciPassportState"}, allowSetters = true)
-@Encrypted(exclude = {"_id", "userId", "expireBankAccess"})
+@Encrypted(exclude = {"_id", "userId"})
 public class BankAccessEntity extends BankAccess {
 
     @Id
@@ -36,9 +36,6 @@ public class BankAccessEntity extends BankAccess {
     private boolean storeBookings;
     private boolean categorizeBookings;
     private boolean storeAnalytics;
-
-    @Indexed(name="expireBankAccess", expireAfterSeconds=0)
-    private Date expireBankAccess;
 
     public BankAccessEntity id(String id) {
         this.id = id;

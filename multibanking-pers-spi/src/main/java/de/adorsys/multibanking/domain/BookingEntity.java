@@ -20,16 +20,13 @@ import java.util.Date;
         @CompoundIndex(name = "booking_index", def = "{'userId': 1, 'accountId': 1}"),
         @CompoundIndex(name = "booking_unique_index", def = "{'externalId': 1, 'accountId': 1}", unique = true)
 })
-@Encrypted(exclude = {"_id", "accountId", "externalId", "userId", "valutaDate", "bookingDate", "bankApi", "expireBooking"})
+@Encrypted(exclude = {"_id", "accountId", "externalId", "userId", "valutaDate", "bookingDate", "bankApi"})
 public class BookingEntity extends Booking {
 
     @Id
     private String id;
     private String accountId;
     private String userId;
-
-    @Indexed(name="expireBooking", expireAfterSeconds=0)
-    private Date expireBooking;
 
     public BookingEntity id(String id) {
         this.id = id;

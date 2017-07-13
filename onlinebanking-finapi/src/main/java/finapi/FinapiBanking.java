@@ -89,6 +89,15 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
+    public void removeUser(BankApiUser bankApiUser) {
+        try {
+            new UsersApi(createApiClient()).deleteUnverifiedUser(bankApiUser.getApiUserId());
+        } catch (ApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public BankLoginSettings getBankLoginSettings(String bankCode) {
         //TODO
         return null;
@@ -130,6 +139,18 @@ public class FinapiBanking implements OnlineBankingService {
                             .bankAccountBalance(new BankAccountBalance()
                                     .readyHbciBalance(account.getBalance())))
                     .collect(Collectors.toList());
+        } catch (ApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
+        ApiClient apiClient = createUserApiClient();
+        apiClient.setAccessToken(authorizeUser(bankApiUser));
+
+        try {
+            new AccountsApi(apiClient).deleteAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
