@@ -4,11 +4,11 @@
 
 	<groupId>de.adorsys.multibanking</groupId>
 	<artifactId>multibanking</artifactId>
-	<version>1.11-SNAPSHOT</version>
+	<version>1.13-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Multibanking HBCI service</name>
+	<name>Multibanking</name>
 	<url>https://github.com/adorsys/multibanking</url>
-	<description>Multibanking service</description>
+	<description>Multibanking modules</description>
 	<licenses>
 		<license>
 			<name>The Apache License, Version 2.0</name>
