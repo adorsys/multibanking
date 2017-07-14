@@ -67,7 +67,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankLoginSettings getBankLoginSettings(String bankCode) {
+    public Bank getBankLoginSettings(String bankCode) {
         return null;
     }
 

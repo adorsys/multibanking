@@ -6,10 +6,7 @@ import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
 import me.figo.internal.*;
-import me.figo.models.Account;
-import me.figo.models.Bank;
 import me.figo.models.BankLoginSettings;
-import me.figo.models.Service;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -126,7 +123,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public domain.BankLoginSettings getBankLoginSettings(String bankCode) {
+    public Bank getBankLoginSettings(String bankCode) {
         FigoSession figoSession = loginTechUser();
 
         BankLoginSettings figoBankLoginSettings;
@@ -135,14 +132,17 @@ public class FigoBanking implements OnlineBankingService {
         } catch (IOException | FigoException e) {
             throw new RuntimeException(e);
         }
-        domain.BankLoginSettings bankLoginSettings = new domain.BankLoginSettings();
-        bankLoginSettings.setAdditional_icons(figoBankLoginSettings.getAdditionalIcons());
-        bankLoginSettings.setAdvice(figoBankLoginSettings.getAdvice());
-        bankLoginSettings.setAuth_type(figoBankLoginSettings.getAuthType());
-        bankLoginSettings.setBank_name(figoBankLoginSettings.getBankName());
-        bankLoginSettings.setIcon(figoBankLoginSettings.getIcon());
-        bankLoginSettings.setSupported(figoBankLoginSettings.isSupported());
-        bankLoginSettings.setCredentials(new ArrayList<>());
+        Bank bank = new Bank();
+        domain.BankLoginSettings loginSettings = new domain.BankLoginSettings();
+        bank.setLoginSettings(loginSettings);
+
+        loginSettings.setAdditional_icons(figoBankLoginSettings.getAdditionalIcons());
+        loginSettings.setAdvice(figoBankLoginSettings.getAdvice());
+        loginSettings.setAuth_type(figoBankLoginSettings.getAuthType());
+        loginSettings.setBank_name(figoBankLoginSettings.getBankName());
+        loginSettings.setIcon(figoBankLoginSettings.getIcon());
+        loginSettings.setSupported(figoBankLoginSettings.isSupported());
+        loginSettings.setCredentials(new ArrayList<>());
 
         figoBankLoginSettings.getCredentials().forEach(credential -> {
             BankLoginCredential bankLoginCredential = new BankLoginCredential();
@@ -150,10 +150,10 @@ public class FigoBanking implements OnlineBankingService {
             bankLoginCredential.setMasked(credential.isMasked());
             bankLoginCredential.setOptional(credential.isOptional());
 
-            bankLoginSettings.getCredentials().add(bankLoginCredential);
+            loginSettings.getCredentials().add(bankLoginCredential);
         });
 
-        return bankLoginSettings;
+        return bank;
     }
 
     @Override
