@@ -4,7 +4,7 @@
 
 	<groupId>de.adorsys.multibanking</groupId>
 	<artifactId>multibanking</artifactId>
-	<version>1.13-SNAPSHOT</version>
+	<version>1.12-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Multibanking</name>
 	<url>https://github.com/adorsys/multibanking</url>
@@ -38,7 +38,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
+        <multibanking.version>1.13-SNAPSHOT</multibanking.version>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZZ</maven.build.timestamp.format>
 		<maven.build-timestamp>${maven.build.timestamp}</maven.build-timestamp>
 		<scmBranch />
