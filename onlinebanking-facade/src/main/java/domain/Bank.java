@@ -12,6 +12,8 @@ import java.util.List;
 public class Bank {
 
     private String bankCode;
+    private String bic;
+    private String name;
     private BankLoginSettings loginSettings;
 
 
