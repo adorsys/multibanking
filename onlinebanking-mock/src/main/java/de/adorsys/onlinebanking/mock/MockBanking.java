@@ -98,4 +98,10 @@ public class MockBanking implements OnlineBankingService {
         restTemplate.getInterceptors().add(new BearerTokenAuthorizationInterceptor(bearerToken));
         return restTemplate;
     }
+
+	@Override
+	public List<BankInfos> getBankInfos(String query) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

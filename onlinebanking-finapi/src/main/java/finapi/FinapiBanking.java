@@ -271,4 +271,10 @@ public class FinapiBanking implements OnlineBankingService {
             LOG.error(e.getMessage(), e);
         }
     }
+
+	@Override
+	public List<BankInfos> getBankInfos(String query) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

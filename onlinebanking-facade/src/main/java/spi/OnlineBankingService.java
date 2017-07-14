@@ -1,10 +1,15 @@
 package spi;
 
 
-import domain.*;
-
-import java.io.IOException;
 import java.util.List;
+
+import domain.BankAccess;
+import domain.BankAccount;
+import domain.BankApi;
+import domain.BankApiUser;
+import domain.BankInfos;
+import domain.BankLoginSettings;
+import domain.Booking;
 
 public interface OnlineBankingService {
 
@@ -27,5 +32,7 @@ public interface OnlineBankingService {
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
+    
+    List<BankInfos> getBankInfos(String query);
 
 }
