@@ -11,8 +11,6 @@ import java.util.List;
 @Data
 public class BankLoginSettings {
 
-    private String bank_name;
-    private boolean supported;
     private String icon;
     private HashMap<String, String> additional_icons;
     private List<BankLoginCredential> credentials;

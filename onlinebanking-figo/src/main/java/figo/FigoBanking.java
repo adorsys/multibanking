@@ -133,15 +133,16 @@ public class FigoBanking implements OnlineBankingService {
             throw new RuntimeException(e);
         }
         Bank bank = new Bank();
+        bank.setName(figoBankLoginSettings.getBankName());
+
         domain.BankLoginSettings loginSettings = new domain.BankLoginSettings();
         bank.setLoginSettings(loginSettings);
 
         loginSettings.setAdditional_icons(figoBankLoginSettings.getAdditionalIcons());
         loginSettings.setAdvice(figoBankLoginSettings.getAdvice());
         loginSettings.setAuth_type(figoBankLoginSettings.getAuthType());
-        loginSettings.setBank_name(figoBankLoginSettings.getBankName());
         loginSettings.setIcon(figoBankLoginSettings.getIcon());
-        loginSettings.setSupported(figoBankLoginSettings.isSupported());
+//        loginSettings.setSupported(figoBankLoginSettings.isSupported());
         loginSettings.setCredentials(new ArrayList<>());
 
         figoBankLoginSettings.getCredentials().forEach(credential -> {
