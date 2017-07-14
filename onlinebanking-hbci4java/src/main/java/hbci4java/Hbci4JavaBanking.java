@@ -7,7 +7,6 @@ import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.exceptions.ProcessException;
-import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIHandler;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.status.HBCIExecStatus;
@@ -51,10 +50,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public void removeUser(BankApiUser bankApiUser) {
+        //not needed
     }
 
     @Override
-    public BankLoginSettings getBankLoginSettings(String bankCode) {
+    public Bank getBankLoginSettings(String bankCode) {
         return null;
     }
 
@@ -95,7 +95,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
-
+        //not needed
     }
 
     @Override
@@ -138,7 +138,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public boolean bankSupported(String bankCode) {
-        BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
+        org.kapott.hbci.manager.BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
         if (bankInfo == null || bankInfo.getPinTanVersion() == null) {
             return false;
         }
