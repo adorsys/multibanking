@@ -1,6 +1,6 @@
-import {Component} from "@angular/core";
-import {NavController, NavParams, LoadingController, ToastController} from "ionic-angular";
-import {BankAccessService} from "../../services/bankAccessService";
+import { Component } from "@angular/core";
+import { NavController, NavParams, LoadingController, AlertController } from "ionic-angular";
+import { BankAccessService } from "../../services/bankAccessService";
 
 @Component({
   selector: 'page-bankaccess-create',
@@ -22,10 +22,10 @@ export class BankAccessCreatePage {
   parent;
 
   constructor(public navCtrl: NavController,
-              private navparams: NavParams,
-              private loadingCtrl: LoadingController,
-              private toastCtrl: ToastController,
-              private bankAccessService: BankAccessService) {
+    private navparams: NavParams,
+    private loadingCtrl: LoadingController,
+    private alertCtrl: AlertController,
+    private bankAccessService: BankAccessService) {
 
     this.userId = navparams.data.userId;
     this.bankAccess.userId = navparams.data.userId;
@@ -47,12 +47,19 @@ export class BankAccessCreatePage {
       },
       error => {
         loading.dismiss();
-        if (error == "BANK_ACCESS_ALREADY_EXIST") {
-          this.toastCtrl.create({
-            message: 'Bank connection already exists',
-            showCloseButton: true,
-            position: 'top'
-          }).present();
+        if (error && error.message) {
+          if (error.message == "BANK_ACCESS_ALREADY_EXIST") {
+            this.alertCtrl.create({
+              message: 'Bank connection already exists',
+              buttons: ['OK']
+            }).present();
+          }
+          else if (error.message == "INVALID_BANK_ACCESS") {
+            this.alertCtrl.create({
+              message: 'Bank not supported',
+              buttons: ['OK']
+            }).present();
+          }
         }
       })
   }
