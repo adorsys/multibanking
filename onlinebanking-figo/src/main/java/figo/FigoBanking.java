@@ -16,10 +16,7 @@ import spi.OnlineBankingService;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static utils.Utils.getSecureRandom;
@@ -166,7 +163,11 @@ public class FigoBanking implements OnlineBankingService {
             TaskTokenResponse response = session.setupNewAccount(
                     bankAccess.getBankCode(),
                     "de",
-                    Arrays.asList(bankAccess.getBankLogin(), pin),
+                    createCredentials(
+                            bankAccess.getBankLogin(),
+                            bankAccess.getBankLogin2(),
+                            pin
+                    ),
                     Collections.singletonList("standingOrders"),
                     storePin,
                     true
@@ -326,6 +327,11 @@ public class FigoBanking implements OnlineBankingService {
         }
 
         return new FigoSession(accessToken);
+    }
 
+    private List<String> createCredentials(String... credentials) {
+        return Arrays.stream(credentials)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 }
