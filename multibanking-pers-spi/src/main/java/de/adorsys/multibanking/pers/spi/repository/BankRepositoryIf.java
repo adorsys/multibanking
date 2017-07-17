@@ -3,6 +3,7 @@ package de.adorsys.multibanking.pers.spi.repository;
 import de.adorsys.multibanking.domain.BankEntity;
 import domain.Bank;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -13,4 +14,6 @@ public interface BankRepositoryIf {
     Optional<BankEntity> findByBankCode(String bankCode);
 
     void save(BankEntity bank);
+
+    public List<BankEntity> findAll();
 }

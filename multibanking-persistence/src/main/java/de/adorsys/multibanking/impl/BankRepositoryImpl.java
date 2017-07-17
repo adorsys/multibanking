@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Profile({"mongo", "fongo"})
@@ -25,5 +26,10 @@ public class BankRepositoryImpl implements BankRepositoryIf {
 	@Override
 	public void save(BankEntity bank) {
 		bankRepositoryMongodb.save(bank);
+	}
+
+	@Override
+	public List<BankEntity> findAll() {
+		return bankRepositoryMongodb.findAll();
 	}
 }
