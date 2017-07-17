@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,8 +26,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     private static final Logger LOG = LoggerFactory.getLogger(Hbci4JavaBanking.class);
 
     public Hbci4JavaBanking() {
-        try {
-            HBCIUtils.refreshBLZList(HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream());
+        try (InputStream inputStream = HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream()) {
+            HBCIUtils.refreshBLZList(inputStream);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -125,8 +126,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             List<Booking> bookings = HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult());
 
             return bookings.stream()
-                .collect(Collectors.collectingAndThen(Collectors.toCollection(
-                    () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
+                    .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                            () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
 
         } catch (HBCI_Exception e) {
             handleHbciException(e);

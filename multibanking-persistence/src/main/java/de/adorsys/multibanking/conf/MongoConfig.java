@@ -45,6 +45,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
         return new ContinueOnBatchErrorTemplate(mongoDbFactory());
     }
 
+    @Bean
     public MongoClient mongoClient() throws UnknownHostException {
         MongoClientOptions.Builder builder = new MongoClientOptions.Builder();
         builder.connectionsPerHost(50);

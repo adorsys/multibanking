@@ -18,7 +18,7 @@ public class BankAccount {
         PENDING, SYNC, READY
     }
 
-	@ApiModelProperty(value = "A bank account can have an id with each API provider")
+    @ApiModelProperty(hidden = true)
     private Map<BankApi, String> externalIdMap = new HashMap<>();
 	
     @ApiModelProperty(value = "The bank account balance.", example="2.000,00")
