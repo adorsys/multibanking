@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.conf;
 
 import com.mongodb.*;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -55,7 +56,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
 
         ServerAddress serverAddress = getServerAddress();
 
-        if (env.getProperty("mongo.userName") == null) {
+        if (StringUtils.isEmpty(env.getProperty("mongo.userName"))) {
             return new MongoClient(serverAddress, options);
         } else {
             MongoCredential mongoCredential = MongoCredential
