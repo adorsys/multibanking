@@ -6,6 +6,8 @@ import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
 import me.figo.internal.*;
+import me.figo.models.Account;
+import me.figo.models.AccountBalance;
 import me.figo.models.BankLoginSettings;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -15,6 +17,7 @@ import spi.OnlineBankingService;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -198,6 +201,19 @@ public class FigoBanking implements OnlineBankingService {
         }
     }
 
+
+    private BankAccountBalance getBalance(FigoSession figoSession, String accountId) {
+        try {
+            Account account = figoSession.getAccount(accountId);
+            AccountBalance accountBalance = account.getBalance();
+            BankAccountBalance bankAccountBalance = new BankAccountBalance();
+            bankAccountBalance.setReadyHbciBalance(accountBalance.getBalance());
+            return bankAccountBalance;
+        } catch (IOException | FigoException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         try {
@@ -236,7 +252,7 @@ public class FigoBanking implements OnlineBankingService {
                 waitForFinish(session, response.getTaskToken(), pin);
             }
 
-            return session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
+            List<Booking> bookings = session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
                     .stream()
                     .map(transaction -> {
                                 Booking booking = new Booking();
@@ -256,6 +272,10 @@ public class FigoBanking implements OnlineBankingService {
                             }
                     )
                     .collect(Collectors.toList());
+
+            bankAccount.setBankAccountBalance(getBalance(session, bankAccount.getExternalIdMap().get(bankApi())));
+
+            return bookings;
 
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
