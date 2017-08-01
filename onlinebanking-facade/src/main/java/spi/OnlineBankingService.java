@@ -17,11 +17,11 @@ public interface OnlineBankingService {
 
     Bank getBankLoginSettings(String bankCode);
 
-    List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin);
+    List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin);
 
     void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
 
-    List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin);
+    List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin);
 
     boolean bankSupported(String bankCode);
 

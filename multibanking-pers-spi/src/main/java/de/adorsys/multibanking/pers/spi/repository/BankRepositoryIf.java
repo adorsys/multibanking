@@ -15,5 +15,5 @@ public interface BankRepositoryIf {
 
     void save(BankEntity bank);
 
-    public List<BankEntity> findAll();
+    List<BankEntity> search(String terms);
 }
