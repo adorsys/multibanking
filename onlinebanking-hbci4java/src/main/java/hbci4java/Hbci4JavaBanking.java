@@ -2,6 +2,7 @@ package hbci4java;
 
 import domain.*;
 import exception.InvalidPinException;
+import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
@@ -65,9 +66,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
         LOG.info("Loading Account list for access {}", bankAccess.getBankCode());
-        HbciPassport hbciPassport = createPassport(bankAccess, pin);
+        HbciPassport hbciPassport = createPassport(bankAccess, bankCode, pin);
         HBCIHandler handle = null;
         try {
             handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
@@ -100,8 +101,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin) {
-        HbciPassport hbciPassport = createPassport(bankAccess, pin);
+    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+        HbciPassport hbciPassport = createPassport(bankAccess, bankCode, pin);
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
         try {
             Konto account = hbciPassport.getAccount(bankAccount.getAccountNumber());
@@ -147,7 +148,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     }
 
-    private HbciPassport createPassport(BankAccess bankAccess, String pin) {
+    private HbciPassport createPassport(BankAccess bankAccess, String bankCode, String pin) {
         Properties properties = new Properties();
         properties.put("kernel.rewriter", "InvalidSegment,WrongStatusSegOrder,WrongSequenceNumbers,MissingMsgRef,HBCIVersion,SigIdLeadingZero,InvalidSuppHBCIVersion,SecTypeTAN,KUmsDelimiters,KUmsEmptyBDateSets");
         properties.put("log.loglevel.default", "2");
@@ -156,8 +157,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         properties.put("client.passport.PinTan.init", "1");
 
         properties.put("client.passport.country", "DE");
-        properties.put("client.passport.blz", bankAccess.getBankCode());
+        properties.put("client.passport.blz", bankCode != null ? bankCode : bankAccess.getBankCode());
         properties.put("client.passport.customerId", bankAccess.getBankLogin());
+        if (StringUtils.isNotBlank(bankAccess.getBankLogin2())) {
+            properties.put("client.passport.userId", bankAccess.getBankLogin2());
+        }
 
         HbciPassport passport = new HbciPassport(bankAccess.getHbciPassportState(), properties, null);
         passport.setPIN(pin);
