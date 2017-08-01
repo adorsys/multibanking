@@ -44,14 +44,14 @@ public class BankRepositoryImpl implements BankRepositoryIf {
             searchIdx.add(term.toLowerCase());
         }
 
-        Criteria searchIndex = new Criteria();
-        for (String term : terms) {
-            searchIndex
+        Criteria criteria = new Criteria();
+        for (String term : searchIdx) {
+            criteria
                     .and("searchIndex")
                     .regex(Pattern.compile("^" + Pattern.quote(term)));
         }
 
-        List<BankEntity> bankEntities = mongoTemplate.find(Query.query(searchIndex), BankEntity.class);
+        List<BankEntity> bankEntities = mongoTemplate.find(Query.query(criteria), BankEntity.class);
 
         return bankEntities;
     }
