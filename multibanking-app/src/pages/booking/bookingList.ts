@@ -1,8 +1,8 @@
-import {Component} from "@angular/core";
-import {NavController, AlertController, ToastController, NavParams, LoadingController} from "ionic-angular";
-import {BankAccountService} from "../../services/bankAccountService";
-import {BookingService} from "../../services/bookingService";
-import {AnalyticsPage} from "../analytics/analytics";
+import { Component } from "@angular/core";
+import { NavController, AlertController, ToastController, NavParams, LoadingController } from "ionic-angular";
+import { BankAccountService } from "../../services/bankAccountService";
+import { BookingService } from "../../services/bookingService";
+import { AnalyticsPage } from "../analytics/analytics";
 
 @Component({
   selector: 'page-bookingList',
@@ -15,30 +15,30 @@ export class BookingListPage {
   bookings;
 
   constructor(public navCtrl: NavController,
-              private navparams: NavParams,
-              private alertCtrl: AlertController,
-              private toastCtrl: ToastController,
-              private loadingCtrl: LoadingController,
-              private bankAccountService: BankAccountService,
-              private bookingService: BookingService) {
+    private navparams: NavParams,
+    private alertCtrl: AlertController,
+    private toastCtrl: ToastController,
+    private loadingCtrl: LoadingController,
+    private bankAccountService: BankAccountService,
+    private bookingService: BookingService) {
     this.bankAccess = navparams.data.bankAccess;
     this.bankAccountId = navparams.data.bankAccountId;
+  }
 
-    if (!navparams.data.bookings) {
-      this.bookingService.getBookings(this.bankAccess.id, this.bankAccountId).subscribe(
-        response => {
-          this.bookings = response;
-        },
-        error => {
-          if (error == "SYNC_IN_PROGRESS") {
-            this.toastCtrl.create({
-              message: 'Account sync in progress',
-              showCloseButton: true,
-              position: 'top'
-            }).present();
-          }
-        })
-    }
+  ngOnInit() {
+    this.bookingService.getBookings(this.bankAccess.id, this.bankAccountId).subscribe(
+      response => {
+        this.bookings = response;
+      },
+      error => {
+        if (error == "SYNC_IN_PROGRESS") {
+          this.toastCtrl.create({
+            message: 'Account sync in progress',
+            showCloseButton: true,
+            position: 'top'
+          }).present();
+        }
+      })
   }
 
   syncBookingsPromptPin() {
