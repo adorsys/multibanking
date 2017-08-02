@@ -15,8 +15,10 @@ export class BankAccessListPage {
   bankaccesses;
 
   constructor(public navCtrl: NavController, private bankAccountService: BankAccountService, private bankAccessService: BankAccessService) {
+  }
 
-      this.bankAccessService.getBankAccesses().subscribe(
+  ngOnInit() {
+    this.bankAccessService.getBankAccesses().subscribe(
         response => {
           this.bankaccesses = response
         });
