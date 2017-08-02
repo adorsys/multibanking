@@ -3,6 +3,7 @@ import { AppConfig } from '../app/app.config';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
+import { Booking } from "../api/Booking";
 
 @Injectable()
 export class BookingService {
@@ -10,7 +11,7 @@ export class BookingService {
   constructor(private http: Http) {
   }
 
-  getBookings(accessId, accountId): Observable<any> {
+  getBookings(accessId, accountId): Observable<Array<Booking>> {
     return this.http.get(AppConfig.api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/bookings")
       .map((res: Response) => res.json()._embedded != null ? res.json()._embedded.bookingEntityList : [])
       .catch(this.handleError);

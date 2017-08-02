@@ -3,6 +3,7 @@ import { AppConfig } from '../app/app.config';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
+import { BankAccess } from "../api/BankAccess";
 
 @Injectable()
 export class BankAccessService {
@@ -10,18 +11,20 @@ export class BankAccessService {
   constructor(private http: Http) {
   }
 
-  getBankAccesses(): Observable<any> {
+  getBankAccesses(): Observable<Array<BankAccess>> {
     return this.http.get(AppConfig.api_url + "/bankaccesses")
-      .map((res: Response) => res.json()._embedded != null ? res.json()._embedded.bankAccessEntityList : [])
+      .map((res: Response) => {
+        return res.json()._embedded != null ? res.json()._embedded.bankAccessEntityList : []
+      })
       .catch(this.handleError);
   }
 
-  createBankAcccess(bankaccess): Observable<any> {
+  createBankAcccess(bankaccess: BankAccess): Observable<any> {
     return this.http.post(AppConfig.api_url + "/bankaccesses", bankaccess)
       .catch(this.handleError);
   }
 
-  updateBankAcccess(bankaccess): Observable<any> {
+  updateBankAcccess(bankaccess: BankAccess): Observable<any> {
     return this.http.put(AppConfig.api_url + "/bankaccesses/" + bankaccess.id, bankaccess)
       .catch(this.handleError);
   }

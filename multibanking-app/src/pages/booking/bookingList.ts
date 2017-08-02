@@ -3,6 +3,9 @@ import { NavController, AlertController, ToastController, NavParams, LoadingCont
 import { BankAccountService } from "../../services/bankAccountService";
 import { BookingService } from "../../services/bookingService";
 import { AnalyticsPage } from "../analytics/analytics";
+import { BankAccess } from "../../api/BankAccess";
+import { Booking } from "../../api/Booking";
+import { AppConfig } from "../../app/app.config";
 
 @Component({
   selector: 'page-bookingList',
@@ -10,9 +13,9 @@ import { AnalyticsPage } from "../analytics/analytics";
 })
 export class BookingListPage {
 
-  bankAccess;
-  bankAccountId;
-  bookings;
+  bankAccess: BankAccess;
+  bankAccountId: string;
+  bookings: Array<Booking>;
 
   constructor(public navCtrl: NavController,
     private navparams: NavParams,
@@ -67,6 +70,10 @@ export class BookingListPage {
       ]
     });
     alert.present();
+  }
+
+  getCompanyLogoUrl(booking: Booking) {
+    return AppConfig.api_url + "/image/"+booking.bookingCategory.contract.logo;
   }
 
   syncBookings(pin) {
