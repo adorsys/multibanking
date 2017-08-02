@@ -6,6 +6,7 @@ import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.multibanking.repository.BankRepositoryMongodb;
 import domain.Bank;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -39,19 +40,13 @@ public class BankRepositoryImpl implements BankRepositoryIf {
     @Override
     public List<BankEntity> search(String text) {
         Collection<String> terms = Sets.newHashSet(Arrays.asList(text.split(" ")));
-        ArrayList<String> searchIdx = Lists.newArrayList();
-        for (String term : terms) {
-            searchIdx.add(term.toLowerCase());
-        }
 
-        Criteria criteria = new Criteria();
-        for (String term : searchIdx) {
-            criteria
-                    .and("searchIndex")
-                    .regex(Pattern.compile("^" + Pattern.quote(term)));
-        }
+        Criteria[] criterias = terms
+                .stream()
+                .map(s -> Criteria.where("searchIndex").regex(s.toLowerCase(), "iu"))
+                .toArray(Criteria[]::new);
 
-        List<BankEntity> bankEntities = mongoTemplate.find(Query.query(criteria), BankEntity.class);
+        List<BankEntity> bankEntities = mongoTemplate.find(Query.query( new Criteria().andOperator(criterias)), BankEntity.class);
 
         return bankEntities;
     }
