@@ -3,6 +3,8 @@ import { NavController, NavParams, LoadingController, AlertController } from "io
 import { BankAccessService } from "../../services/bankAccessService";
 import { BankAutoCompleteService } from "../../services/bankAutoCompleteService";
 import { AutoCompleteComponent } from "ionic2-auto-complete";
+import { BankAccess } from "../../api/BankAccess";
+import { Bank } from "../../api/Bank";
 
 @Component({
   selector: 'page-bankaccess-create',
@@ -13,10 +15,10 @@ export class BankAccessCreatePage {
   @ViewChild('autocomplete')
   autocomplete: AutoCompleteComponent;
 
-  selectedBank;
+  selectedBank: Bank;
 
-  userId;
-  bankAccess = {
+  userId: string;
+  bankAccess: BankAccess = {
     bankCode: '',
     bankLogin: '',
     bankLogin2: '',
@@ -42,8 +44,13 @@ export class BankAccessCreatePage {
   }
 
   ngOnInit() {
-    console.log("test")
     this.autocomplete.itemSelected.subscribe(bank => {
+      if (!bank.loginSettings) {
+        bank.loginSettings = {
+          advice: "Bank login data",
+          credentials: [{ label: "customer id", masked: false }, { label: "pin", masked: true }]
+        }
+      }
       this.selectedBank = bank;
     });
 

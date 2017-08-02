@@ -9,7 +9,7 @@
   <form (ngSubmit)="createBankAccess()" #createForm="ngForm" *ngIf="selectedBank">
 
     <ion-item-group>
-      <ion-item-divider color="light">Bank login data</ion-item-divider>
+      <ion-item-divider color="light">{{selectedBank.loginSettings.advice ? selectedBank.loginSettings.advice :'Bank login data'}}</ion-item-divider>
       <ion-item *ngFor="let item of selectedBank.loginSettings.credentials">
         <ion-label floating>{{item.label}}</ion-label>
         <ion-input type="{{item.masked ? 'password' : 'text'}}" name="bankLogin" [(ngModel)]="item.input" required></ion-input>

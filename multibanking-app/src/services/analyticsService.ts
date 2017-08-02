@@ -3,6 +3,7 @@ import { AppConfig } from "../app/app.config";
 import { Http, Response } from "@angular/http";
 import { Observable } from "rxjs/Observable";
 import "rxjs/Rx";
+import { AccountAnalytics } from "../api/AccountAnalytics";
 
 @Injectable()
 export class AnalyticsService {
@@ -10,7 +11,7 @@ export class AnalyticsService {
   constructor(private http: Http) {
   }
 
-  getAnalytics(accessId, accountId): Observable<any> {
+  getAnalytics(accessId: string, accountId: string): Observable<AccountAnalytics> {
     return this.http.get(AppConfig.api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/analytics")
       .map((res: Response) => res.json() != null ? res.json() : {})
       .catch(this.handleError);
