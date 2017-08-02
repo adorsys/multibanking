@@ -3,7 +3,6 @@ import { AppConfig } from '../app/app.config';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
-import { AutoCompleteService } from "ionic2-auto-complete";
 
 @Injectable()
 export class BankAccessService {
