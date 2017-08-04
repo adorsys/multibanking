@@ -4,6 +4,8 @@ import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/Rx';
 import { Subject } from "rxjs";
+import { BankAccount } from "../api/BankAccount";
+import { Booking } from "../api/Booking";
 
 @Injectable()
 export class BankAccountService {
@@ -13,13 +15,13 @@ export class BankAccountService {
   constructor(private http: Http) {
   }
 
-  getBankAccounts(accessId): Observable<any> {
+  getBankAccounts(accessId: string): Observable<Array<BankAccount>> {
     return this.http.get(AppConfig.api_url + "/bankaccesses/" + accessId + "/accounts")
       .map((res: Response) => res.json()._embedded.bankAccountEntityList)
       .catch(this.handleError);
   }
 
-  syncBookings(accessId, accountId, pin): Observable<any> {
+  syncBookings(accessId: string, accountId: string, pin: string): Observable<Array<Booking>> {
     return this.http.put(AppConfig.api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/sync", pin)
       .map((res: Response) => {
         this.bookingsChangedObservable.next(true);

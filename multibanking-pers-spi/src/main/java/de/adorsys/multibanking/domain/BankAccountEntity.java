@@ -1,17 +1,17 @@
 package de.adorsys.multibanking.domain;
 
+import lombok.Data;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import de.adorsys.multibanking.encrypt.Encrypted;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.BankAccount;
-import lombok.Data;
-
-import java.util.Date;
 
 /**
  * Created by alexg on 07.02.17.

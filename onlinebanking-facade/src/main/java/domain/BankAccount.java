@@ -18,7 +18,7 @@ public class BankAccount {
         PENDING, SYNC, READY
     }
 
-	@ApiModelProperty(value = "A bank account can have an id with each API provider")
+    @ApiModelProperty(hidden = true)
     private Map<BankApi, String> externalIdMap = new HashMap<>();
 	
     @ApiModelProperty(value = "The bank account balance.", example="2.000,00")
@@ -48,10 +48,10 @@ public class BankAccount {
     @ApiModelProperty(value = "The name of this bank account if any")
     private String name;
 	
-    @ApiModelProperty(value = "The banc identification code", example="DEUTNL2A")
+    @ApiModelProperty(value = "The bank identification code", example="DEUTNL2A")
     private String bic;
 	
-    @ApiModelProperty(value = "The international banc account number", example="NL99DEU7430254900", required=true)
+    @ApiModelProperty(value = "The international bank account number", example="NL99DEU7430254900", required=true)
     private String iban;
 
 	@ApiModelProperty(value = "The synchronisation status", example="PENDING")

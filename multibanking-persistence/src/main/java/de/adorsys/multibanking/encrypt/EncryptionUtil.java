@@ -2,8 +2,7 @@ package de.adorsys.multibanking.encrypt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.springframework.util.Base64Utils;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -24,7 +23,7 @@ public class EncryptionUtil {
             Cipher encryptor = Cipher.getInstance(AES_CBC_PKCS5_PADDING);
             encryptor.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(new byte[16]));
 
-            return new BASE64Encoder().encode(encryptor.doFinal(valueToEnc.getBytes()));
+            return Base64Utils.encodeToString(encryptor.doFinal(valueToEnc.getBytes("UTF-8")));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -34,8 +33,8 @@ public class EncryptionUtil {
         try {
             Cipher decryptor = Cipher.getInstance(AES_CBC_PKCS5_PADDING);
             decryptor.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(new byte[16]));
-            byte[] decValue = decryptor.doFinal(new BASE64Decoder().decodeBuffer(encryptedValue));
-            return new String(decValue);
+            byte[] decValue = decryptor.doFinal(Base64Utils.decodeFromString(encryptedValue));
+            return new String(decValue, "UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

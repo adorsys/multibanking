@@ -5,23 +5,14 @@
 </ion-header>
 
 <ion-content class="bankaccess-create-content" padding>
-  <form (ngSubmit)="createBankAccess()" #createForm="ngForm">
+  <ion-auto-complete [dataProvider]="bankAutoCompleteService" [options]="{placeholder : 'Bank name or bank code'}" #autocomplete></ion-auto-complete>
+  <form (ngSubmit)="createBankAccess()" #createForm="ngForm" *ngIf="selectedBank">
+
     <ion-item-group>
-      <ion-item-divider color="light">Bank login data</ion-item-divider>
-      <ion-item>
-        <ion-label floating>Bank Code</ion-label>
-        <ion-input type="text" name="bankCode" [(ngModel)]="bankAccess.bankCode"
-                   required></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label floating>Bank Login Name / Customer ID</ion-label>
-        <ion-input type="text" name="bankLogin" [(ngModel)]="bankAccess.bankLogin"
-                   required></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label floating>Pin</ion-label>
-        <ion-input type="password" name="pin" [(ngModel)]="bankAccess.pin"
-                   required></ion-input>
+      <ion-item-divider color="light">{{selectedBank.loginSettings.advice ? selectedBank.loginSettings.advice :'Bank login data'}}</ion-item-divider>
+      <ion-item *ngFor="let item of selectedBank.loginSettings.credentials">
+        <ion-label floating>{{item.label}}</ion-label>
+        <ion-input type="{{item.masked ? 'password' : 'text'}}" name="bankLogin" [(ngModel)]="item.input" required></ion-input>
       </ion-item>
     </ion-item-group>
     <ion-item-group>

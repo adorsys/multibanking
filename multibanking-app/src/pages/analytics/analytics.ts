@@ -1,7 +1,9 @@
-import {Component} from "@angular/core";
-import {AlertController, ToastController, NavParams, LoadingController} from "ionic-angular";
-import {BankAccountService} from "../../services/bankAccountService";
-import {AnalyticsService} from "../../services/analyticsService";
+import { Component } from "@angular/core";
+import { AlertController, ToastController, NavParams, LoadingController } from "ionic-angular";
+import { BankAccountService } from "../../services/bankAccountService";
+import { AnalyticsService } from "../../services/analyticsService";
+import { BankAccess } from "../../api/BankAccess";
+import { AccountAnalytics } from "../../api/AccountAnalytics";
 
 @Component({
   selector: 'page-analytics',
@@ -9,22 +11,23 @@ import {AnalyticsService} from "../../services/analyticsService";
 })
 export class AnalyticsPage {
 
-  analytics;
-  bankAccess
-  bankAccountId;
-  bookings;
+  analytics: AccountAnalytics;
+  bankAccess: BankAccess;
+  bankAccountId: string;
 
   constructor(private navparams: NavParams,
-              private alertCtrl: AlertController,
-              private toastCtrl: ToastController,
-              private loadingCtrl: LoadingController,
-              private bankAccountService: BankAccountService,
-              private analyticsService: AnalyticsService) {
+    private alertCtrl: AlertController,
+    private toastCtrl: ToastController,
+    private loadingCtrl: LoadingController,
+    private bankAccountService: BankAccountService,
+    private analyticsService: AnalyticsService) {
 
     this.bankAccess = navparams.data.bankAccess;
     this.bankAccountId = navparams.data.bankAccountId;
+  }
 
-    bankAccountService.bookingsChangedObservable.subscribe(changed => {
+  ngOnInit() {
+    this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
       this.loadAnalytics();
     })
     this.loadAnalytics();
@@ -86,7 +89,6 @@ export class AnalyticsPage {
 
     this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccountId, pin).subscribe(
       response => {
-        this.bookings = response;
         loading.dismiss();
       },
       error => {

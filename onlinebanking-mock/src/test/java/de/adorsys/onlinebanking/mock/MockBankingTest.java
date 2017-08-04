@@ -46,18 +46,18 @@ public class MockBankingTest {
 	
 	@Test
 	public void testLoadBankAccounts() {
-		List<BankAccount> bankAccounts = mockBanking.loadBankAccounts(null, bankAccess, pin, true);
+		List<BankAccount> bankAccounts = mockBanking.loadBankAccounts(null, bankAccess, null, pin, true);
 		Assert.assertNotNull(bankAccounts);
 		Assert.assertFalse(bankAccounts.isEmpty());
 	}
 
 	@Test
 	public void testLoadBookings() {
-		List<BankAccount> bankAccounts = mockBanking.loadBankAccounts(null, bankAccess, pin, true);
+		List<BankAccount> bankAccounts = mockBanking.loadBankAccounts(null, bankAccess, null, pin, true);
 		Assume.assumeNotNull(bankAccounts);
 		Assume.assumeFalse(bankAccounts.isEmpty());
 		BankAccount bankAccount = bankAccounts.iterator().next();
-		List<Booking> bookings = mockBanking.loadBookings(null, bankAccess, bankAccount, pin);
+		List<Booking> bookings = mockBanking.loadBookings(null, bankAccess, null, bankAccount, pin);
 		Assert.assertNotNull(bookings);
 		Assert.assertFalse(bookings.isEmpty());
 	}

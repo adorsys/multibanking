@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.conf;
 
 import com.mongodb.*;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +23,8 @@ import java.util.List;
  * Created by alexg on 08.02.17.
  */
 @Configuration
+@PropertySource(value = "${mongo.properties.url}", ignoreResourceNotFound = true)
 @Profile({"mongo"})
-@PropertySource(value = "classpath:/mongo.properties")
 public class MongoConfig extends AbstractMongoConfiguration {
 
     @Autowired
@@ -45,6 +46,7 @@ public class MongoConfig extends AbstractMongoConfiguration {
         return new ContinueOnBatchErrorTemplate(mongoDbFactory());
     }
 
+    @Bean
     public MongoClient mongoClient() throws UnknownHostException {
         MongoClientOptions.Builder builder = new MongoClientOptions.Builder();
         builder.connectionsPerHost(50);
@@ -52,20 +54,23 @@ public class MongoConfig extends AbstractMongoConfiguration {
         builder.readPreference(ReadPreference.secondaryPreferred());
         MongoClientOptions options = builder.build();
 
-        MongoCredential mongoCredential = MongoCredential
-                .createMongoCRCredential(env.getProperty("mongo.userName"), env.getProperty("mongo.databaseName"),
-                        env.getProperty("mongo.password").toCharArray());
+        ServerAddress serverAddress = getServerAddress();
 
-        if (mongoCredential.getUserName().isEmpty()) {
-            return new MongoClient(
-                    new ServerAddress(env.getProperty("mongo.server"), Integer.parseInt(env.getProperty("mongo.port"))),
-                    options);
+        if (StringUtils.isEmpty(env.getProperty("mongo.userName"))) {
+            return new MongoClient(serverAddress, options);
         } else {
-            return new MongoClient(
-                    new ServerAddress(env.getProperty("mongo.server"), Integer.parseInt(env.getProperty("mongo.port"))),
-                    Collections.singletonList(mongoCredential),
-                    options);
+            MongoCredential mongoCredential = MongoCredential
+                    .createCredential(env.getProperty("mongo.userName"), env.getProperty("mongo.databaseName"),
+                            env.getProperty("mongo.password").toCharArray());
+
+            return new MongoClient(serverAddress, Collections.singletonList(mongoCredential), options);
         }
+    }
+
+    private ServerAddress getServerAddress() {
+        String[] serverParts = env.getProperty("mongo.server").replace("mongodb://", "").split(":");
+        return new ServerAddress(serverParts[0],
+                1 < serverParts.length ? Integer.valueOf(serverParts[1]) : ServerAddress.defaultPort());
     }
 
     public MongoDbFactory mongoDbFactory() throws UnknownHostException {
@@ -113,3 +118,5 @@ public class MongoConfig extends AbstractMongoConfiguration {
         }
     }
 }
+
+
