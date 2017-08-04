@@ -1,8 +1,7 @@
 package de.adorsys.multibanking.domain;
 
-import domain.Bank;
-import domain.BankApi;
 import lombok.Data;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -10,6 +9,8 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+
+import domain.Bank;
 
 /**
  * Created by alexg on 08.05.17.
@@ -26,6 +27,5 @@ public class BankEntity extends Bank {
     private String blzHbci;
     @Indexed
     private List<String> searchIndex;
-    private BankApi bankApi;
 
 }

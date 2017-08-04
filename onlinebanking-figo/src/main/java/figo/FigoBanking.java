@@ -202,7 +202,6 @@ public class FigoBanking implements OnlineBankingService {
         }
     }
 
-
     private BankAccountBalance getBalance(FigoSession figoSession, String accountId) {
         try {
             Account account = figoSession.getAccount(accountId);
@@ -277,16 +276,14 @@ public class FigoBanking implements OnlineBankingService {
         booking.setUsage(transaction.getPurposeText());
         booking.setText(transaction.getBookingText());
         booking.setTransactionCode(transaction.getTransactionCode());
-
-        if (transaction.getName() != null) {
-            booking.setOtherAccount(mapBookingAccount(transaction));
-        }
+        booking.setOtherAccount(mapBookingAccount(transaction));
         return booking;
     }
 
     private BankAccount mapBookingAccount(Transaction transaction) {
         BankAccount bankAccount = new BankAccount();
         bankAccount.setName(transaction.getName());
+        bankAccount.setBankName(transaction.getBankName());
         bankAccount.setCurrency(transaction.getCurrency());
         bankAccount.setAccountNumber(transaction.getAccountNumber());
         bankAccount.setBlz(transaction.getBankCode());
