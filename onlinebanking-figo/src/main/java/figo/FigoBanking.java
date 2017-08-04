@@ -7,22 +7,20 @@ import me.figo.FigoException;
 import me.figo.FigoSession;
 import me.figo.internal.*;
 import me.figo.models.Account;
-import me.figo.models.Bank;
+import me.figo.models.AccountBalance;
 import me.figo.models.BankLoginSettings;
-import me.figo.models.Service;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import me.figo.models.Transaction;
 import spi.OnlineBankingService;
 
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static utils.Utils.getSecureRandom;
@@ -126,7 +124,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public domain.BankLoginSettings getBankLoginSettings(String bankCode) {
+    public Bank getBankLoginSettings(String bankCode) {
         FigoSession figoSession = loginTechUser();
 
         BankLoginSettings figoBankLoginSettings;
@@ -135,14 +133,18 @@ public class FigoBanking implements OnlineBankingService {
         } catch (IOException | FigoException e) {
             throw new RuntimeException(e);
         }
-        domain.BankLoginSettings bankLoginSettings = new domain.BankLoginSettings();
-        bankLoginSettings.setAdditional_icons(figoBankLoginSettings.getAdditionalIcons());
-        bankLoginSettings.setAdvice(figoBankLoginSettings.getAdvice());
-        bankLoginSettings.setAuth_type(figoBankLoginSettings.getAuthType());
-        bankLoginSettings.setBank_name(figoBankLoginSettings.getBankName());
-        bankLoginSettings.setIcon(figoBankLoginSettings.getIcon());
-        bankLoginSettings.setSupported(figoBankLoginSettings.isSupported());
-        bankLoginSettings.setCredentials(new ArrayList<>());
+        Bank bank = new Bank();
+        bank.setName(figoBankLoginSettings.getBankName());
+
+        domain.BankLoginSettings loginSettings = new domain.BankLoginSettings();
+        bank.setLoginSettings(loginSettings);
+
+        loginSettings.setAdditional_icons(figoBankLoginSettings.getAdditionalIcons());
+        loginSettings.setAdvice(figoBankLoginSettings.getAdvice());
+        loginSettings.setAuth_type(figoBankLoginSettings.getAuthType());
+        loginSettings.setIcon(figoBankLoginSettings.getIcon());
+//        loginSettings.setSupported(figoBankLoginSettings.isSupported());
+        loginSettings.setCredentials(new ArrayList<>());
 
         figoBankLoginSettings.getCredentials().forEach(credential -> {
             BankLoginCredential bankLoginCredential = new BankLoginCredential();
@@ -150,14 +152,14 @@ public class FigoBanking implements OnlineBankingService {
             bankLoginCredential.setMasked(credential.isMasked());
             bankLoginCredential.setOptional(credential.isOptional());
 
-            bankLoginSettings.getCredentials().add(bankLoginCredential);
+            loginSettings.getCredentials().add(bankLoginCredential);
         });
 
-        return bankLoginSettings;
+        return bank;
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX, bankApiUser.getApiPassword());
             FigoSession session = new FigoSession(tokenResponse.getAccessToken());
@@ -165,7 +167,11 @@ public class FigoBanking implements OnlineBankingService {
             TaskTokenResponse response = session.setupNewAccount(
                     bankAccess.getBankCode(),
                     "de",
-                    Arrays.asList(bankAccess.getBankLogin(), pin),
+                    createCredentials(
+                            bankAccess.getBankLogin(),
+                            bankAccess.getBankLogin2(),
+                            pin
+                    ),
                     Collections.singletonList("standingOrders"),
                     storePin,
                     true
@@ -196,6 +202,19 @@ public class FigoBanking implements OnlineBankingService {
         }
     }
 
+
+    private BankAccountBalance getBalance(FigoSession figoSession, String accountId) {
+        try {
+            Account account = figoSession.getAccount(accountId);
+            AccountBalance accountBalance = account.getBalance();
+            BankAccountBalance bankAccountBalance = new BankAccountBalance();
+            bankAccountBalance.setReadyHbciBalance(accountBalance.getBalance());
+            return bankAccountBalance;
+        } catch (IOException | FigoException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         try {
@@ -209,7 +228,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin) {
+    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
             FigoSession session = new FigoSession(tokenResponse.getAccessToken());
@@ -234,30 +253,44 @@ public class FigoBanking implements OnlineBankingService {
                 waitForFinish(session, response.getTaskToken(), pin);
             }
 
-            return session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
+            List<Booking> bookings = session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
                     .stream()
-                    .map(transaction -> {
-                                Booking booking = new Booking();
-                                booking.setExternalId(transaction.getTransactionId());
-                                booking.setBankApi(bankApi());
-                                booking.setBookingDate(transaction.getBookingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                                booking.setValutaDate(transaction.getValueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-                                booking.setAmount(transaction.getAmount());
-                                booking.setUsage(transaction.getPurposeText());
-
-                                if (transaction.getName() != null) {
-                                    booking.setOtherAccount(new BankAccount());
-                                    booking.getOtherAccount().setName(transaction.getName());
-                                    booking.getOtherAccount().setCurrency(transaction.getCurrency());
-                                }
-                                return booking;
-                            }
-                    )
+                    .map(this::mapBooking)
                     .collect(Collectors.toList());
+
+            bankAccount.setBankAccountBalance(getBalance(session, bankAccount.getExternalIdMap().get(bankApi())));
+
+            return bookings;
 
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private Booking mapBooking(Transaction transaction) {
+        Booking booking = new Booking();
+        booking.setExternalId(transaction.getTransactionId());
+        booking.setBankApi(bankApi());
+        booking.setBookingDate(transaction.getBookingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        booking.setValutaDate(transaction.getValueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+        booking.setAmount(transaction.getAmount());
+        booking.setUsage(transaction.getPurposeText());
+        booking.setText(transaction.getBookingText());
+        booking.setTransactionCode(transaction.getTransactionCode());
+
+        if (transaction.getName() != null) {
+            booking.setOtherAccount(mapBookingAccount(transaction));
+        }
+        return booking;
+    }
+
+    private BankAccount mapBookingAccount(Transaction transaction) {
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setName(transaction.getName());
+        bankAccount.setCurrency(transaction.getCurrency());
+        bankAccount.setAccountNumber(transaction.getAccountNumber());
+        bankAccount.setBlz(transaction.getBankCode());
+        return bankAccount;
     }
 
     private Status waitForFinish(FigoSession session, String taskToken, String pin) throws IOException, FigoException, InterruptedException {
@@ -325,6 +358,11 @@ public class FigoBanking implements OnlineBankingService {
         }
 
         return new FigoSession(accessToken);
+    }
 
+    private List<String> createCredentials(String... credentials) {
+        return Arrays.stream(credentials)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 }

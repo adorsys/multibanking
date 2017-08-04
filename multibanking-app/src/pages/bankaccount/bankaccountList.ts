@@ -1,7 +1,9 @@
-import {Component} from "@angular/core";
-import {NavController, NavParams} from "ionic-angular";
-import {BankAccountService} from "../../services/bankAccountService";
-import {BookingListPage} from "../booking/bookingList";
+import { Component } from "@angular/core";
+import { NavController, NavParams } from "ionic-angular";
+import { BankAccountService } from "../../services/bankAccountService";
+import { BookingListPage } from "../booking/bookingList";
+import { BankAccess } from "../../api/BankAccess";
+import { BankAccount } from "../../api/BankAccount";
 
 @Component({
   selector: 'page-bankaccountList',
@@ -9,18 +11,20 @@ import {BookingListPage} from "../booking/bookingList";
 })
 export class BankAccountListPage {
 
-  bankAccess;
-  bankAccounts;
+  bankAccess: BankAccess;
+  bankAccounts: Array<BankAccount>;
 
   constructor(public navCtrl: NavController,
-              private navparams: NavParams,
-              private bankAccountService: BankAccountService) {
+    private navparams: NavParams,
+    private bankAccountService: BankAccountService) {
 
-    this.bankAccess = navparams.data.bankAccess;
+    this.bankAccess = navparams.data.bankAccess; 
+  }
 
+  ngOnInit() {
     this.loadBankAccounts();
 
-    bankAccountService.bookingsChangedObservable.subscribe(changed => {
+    this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
       this.loadBankAccounts();
     })
   }

@@ -1,6 +1,7 @@
 package finapi;
 
 import domain.*;
+import domain.Bank;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.*;
@@ -98,13 +99,13 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankLoginSettings getBankLoginSettings(String bankCode) {
+    public Bank getBankLoginSettings(String bankCode) {
         //TODO
         return null;
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
         LOG.info("load bank accounts");
         try {
             InlineResponse2006 searchAllBanks = new BanksApi(createApiClient()).getAndSearchAllBanks(null, bankAccess.getBankCode(), null, null, null, null, null);
@@ -157,7 +158,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin) {
+    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
         LOG.debug("load bookings for account [{}]", bankAccount.getAccountNumber());
         ApiClient apiClient = createUserApiClient();
         apiClient.setAccessToken(authorizeUser(bankApiUser));

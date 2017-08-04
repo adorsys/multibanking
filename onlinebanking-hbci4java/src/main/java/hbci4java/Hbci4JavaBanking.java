@@ -2,12 +2,12 @@ package hbci4java;
 
 import domain.*;
 import exception.InvalidPinException;
+import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.exceptions.ProcessException;
-import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIHandler;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.status.HBCIExecStatus;
@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,8 +27,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     private static final Logger LOG = LoggerFactory.getLogger(Hbci4JavaBanking.class);
 
     public Hbci4JavaBanking() {
-        try {
-            HBCIUtils.refreshBLZList(HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream());
+        try (InputStream inputStream = HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream()) {
+            HBCIUtils.refreshBLZList(inputStream);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -51,10 +52,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public void removeUser(BankApiUser bankApiUser) {
+        //not needed
     }
 
     @Override
-    public BankLoginSettings getBankLoginSettings(String bankCode) {
+    public Bank getBankLoginSettings(String bankCode) {
         return null;
     }
 
@@ -64,9 +66,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
         LOG.info("Loading Account list for access {}", bankAccess.getBankCode());
-        HbciPassport hbciPassport = createPassport(bankAccess, pin);
+        HbciPassport hbciPassport = createPassport(bankAccess, bankCode, pin);
         HBCIHandler handle = null;
         try {
             handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
@@ -95,12 +97,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
-
+        //not needed
     }
 
     @Override
-    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin) {
-        HbciPassport hbciPassport = createPassport(bankAccess, pin);
+    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+        HbciPassport hbciPassport = createPassport(bankAccess, bankCode, pin);
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
         try {
             Konto account = hbciPassport.getAccount(bankAccount.getAccountNumber());
@@ -125,8 +127,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             List<Booking> bookings = HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult());
 
             return bookings.stream()
-                .collect(Collectors.collectingAndThen(Collectors.toCollection(
-                    () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
+                    .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                            () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
 
         } catch (HBCI_Exception e) {
             handleHbciException(e);
@@ -138,7 +140,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public boolean bankSupported(String bankCode) {
-        BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
+        org.kapott.hbci.manager.BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
         if (bankInfo == null || bankInfo.getPinTanVersion() == null) {
             return false;
         }
@@ -146,7 +148,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     }
 
-    private HbciPassport createPassport(BankAccess bankAccess, String pin) {
+    private HbciPassport createPassport(BankAccess bankAccess, String bankCode, String pin) {
         Properties properties = new Properties();
         properties.put("kernel.rewriter", "InvalidSegment,WrongStatusSegOrder,WrongSequenceNumbers,MissingMsgRef,HBCIVersion,SigIdLeadingZero,InvalidSuppHBCIVersion,SecTypeTAN,KUmsDelimiters,KUmsEmptyBDateSets");
         properties.put("log.loglevel.default", "2");
@@ -155,8 +157,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         properties.put("client.passport.PinTan.init", "1");
 
         properties.put("client.passport.country", "DE");
-        properties.put("client.passport.blz", bankAccess.getBankCode());
+        properties.put("client.passport.blz", bankCode != null ? bankCode : bankAccess.getBankCode());
         properties.put("client.passport.customerId", bankAccess.getBankLogin());
+        if (StringUtils.isNotBlank(bankAccess.getBankLogin2())) {
+            properties.put("client.passport.userId", bankAccess.getBankLogin2());
+        }
 
         HbciPassport passport = new HbciPassport(bankAccess.getHbciPassportState(), properties, null);
         passport.setPIN(pin);

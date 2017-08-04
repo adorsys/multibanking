@@ -1,28 +1,19 @@
 package de.adorsys.multibanking.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.BankAccess;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.io.IOException;
-import java.util.Date;
 
 /**
  * Created by alexg on 07.02.17.
  */
 @Data
 @Document
-@JsonIgnoreProperties(value = {"pin", "hbciPassportState"}, allowSetters = true)
+@JsonIgnoreProperties(value = {"pin", "pin2", "hbciPassportState"}, allowSetters = true)
 @Encrypted(exclude = {"_id", "userId"})
 public class BankAccessEntity extends BankAccess {
 
@@ -31,6 +22,7 @@ public class BankAccessEntity extends BankAccess {
     @Indexed
     private String userId;
     private String pin;
+    private String pin2;
     private boolean temporary;
     private boolean storePin;
     private boolean storeBookings;

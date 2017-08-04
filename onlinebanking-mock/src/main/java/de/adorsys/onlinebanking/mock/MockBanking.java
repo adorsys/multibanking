@@ -67,12 +67,12 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankLoginSettings getBankLoginSettings(String bankCode) {
+    public Bank getBankLoginSettings(String bankCode) {
         return null;
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String pin, boolean storePin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
         BankAccount[] bankAccounts = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/", BankAccount[].class);
         for (BankAccount bankAccount : bankAccounts) {
             bankAccount.bankName(bankAccess.getBankName());
@@ -87,7 +87,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, BankAccount bankAccount, String pin) {
+    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
         Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/{accountId}/bookings", Booking[].class, bankAccount.getIban());
 
         return Arrays.asList(bookings);

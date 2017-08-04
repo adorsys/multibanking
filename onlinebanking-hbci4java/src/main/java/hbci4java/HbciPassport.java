@@ -280,12 +280,8 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
         }
 
         public String toJson() {
-            return writeJson(this);
-        }
-
-        public static String writeJson(State state) {
             try {
-                return OBJECT_MAPPER.writeValueAsString(state);
+                return OBJECT_MAPPER.writeValueAsString(this);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

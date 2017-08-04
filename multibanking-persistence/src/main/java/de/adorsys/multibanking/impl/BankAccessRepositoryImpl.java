@@ -23,46 +23,43 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     @Autowired
     private MongoTemplate mongoTemplate;
 
-	@Override
-	public Optional<BankAccessEntity> findByUserIdAndId(String userId, String id) {
-		return bankAccessRepository.findByUserIdAndId(userId, id);
-	}
+    @Override
+    public Optional<BankAccessEntity> findByUserIdAndId(String userId, String id) {
+        return bankAccessRepository.findByUserIdAndId(userId, id);
+    }
 
-	@Override
-	public BankAccessEntity findOne(String id) {
-		return bankAccessRepository.findOne(id);
-	}
+    @Override
+    public BankAccessEntity findOne(String id) {
+        return bankAccessRepository.findOne(id);
+    }
 
-	@Override
-	public List<BankAccessEntity> findByUserId(String userId) {
-		return bankAccessRepository.findByUserId(userId);
-	}
+    @Override
+    public List<BankAccessEntity> findByUserId(String userId) {
+        return bankAccessRepository.findByUserId(userId);
+    }
 
-	@Override
-	public BankAccessEntity save(BankAccessEntity bankAccess) {
-		return bankAccessRepository.save(bankAccess);
-	}
+    @Override
+    public BankAccessEntity save(BankAccessEntity bankAccess) {
+        return bankAccessRepository.save(bankAccess);
+    }
 
-	@Override
-	public String getBankCode(String id) {
+    @Override
+    public String getBankCode(String id) {
         Query where = Query.query(Criteria.where("id").is(id));
 
-        where.fields().include("bankCode");
-
-        // Francis null pointer when noting is found
         BankAccessEntity found = mongoTemplate.findOne(where, BankAccessEntity.class);
-        return found!=null?found.getBankCode():null;
-	}
+        return found != null ? found.getBankCode() : null;
+    }
 
-	@Override
-	public boolean exists(String accessId) {
-		return bankAccessRepository.exists(accessId);
-	}
+    @Override
+    public boolean exists(String accessId) {
+        return bankAccessRepository.exists(accessId);
+    }
 
-	@Override
-	public boolean deleteByUserIdAndBankAccessId(String userId, String bankAccessId) {
+    @Override
+    public boolean deleteByUserIdAndBankAccessId(String userId, String bankAccessId) {
         Query where = Query.query(Criteria.where("id").is(bankAccessId).and("userId").is(userId));
         return mongoTemplate.remove(where, BankAccessEntity.class).getN() > 0;
-	}
+    }
 
 }

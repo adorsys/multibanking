@@ -71,4 +71,6 @@ public class Booking {
     @ApiModelProperty(value = "Categories of this booking")
     private BookingCategory bookingCategory;
 
+    @ApiModelProperty(value = "Transaction type as DTA Tx Key code.", example = "4")
+    private String transactionCode;
 }

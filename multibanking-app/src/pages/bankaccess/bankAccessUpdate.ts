@@ -1,6 +1,7 @@
 import {Component} from "@angular/core";
 import {NavController, NavParams, LoadingController} from "ionic-angular";
 import {BankAccessService} from "../../services/bankAccessService";
+import { BankAccess } from "../../api/BankAccess";
 
 @Component({
   selector: 'page-bankaccess-update',
@@ -8,7 +9,7 @@ import {BankAccessService} from "../../services/bankAccessService";
 })
 export class BankAccessUpdatePage {
 
-  bankAccess;
+  bankAccess: BankAccess;
   parent;
 
   constructor(public navCtrl: NavController,

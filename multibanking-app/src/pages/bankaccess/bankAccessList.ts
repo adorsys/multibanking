@@ -5,6 +5,7 @@ import {BankAccountListPage} from "../bankaccount/bankaccountList";
 import {BankAccessCreatePage} from "./bankAccessCreate";
 import {BankAccessService} from "../../services/bankAccessService";
 import {BankAccessUpdatePage} from "./bankAccessUpdate";
+import { BankAccess } from "../../api/BankAccess";
 
 @Component({
   selector: 'page-bankaccessList',
@@ -12,11 +13,13 @@ import {BankAccessUpdatePage} from "./bankAccessUpdate";
 })
 export class BankAccessListPage {
 
-  bankaccesses;
+  bankaccesses: Array<BankAccess>;
 
   constructor(public navCtrl: NavController, private bankAccountService: BankAccountService, private bankAccessService: BankAccessService) {
+  }
 
-      this.bankAccessService.getBankAccesses().subscribe(
+  ngOnInit() {
+    this.bankAccessService.getBankAccesses().subscribe(
         response => {
           this.bankaccesses = response
         });
