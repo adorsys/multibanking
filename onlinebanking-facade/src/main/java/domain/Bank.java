@@ -2,9 +2,6 @@ package domain;
 
 import lombok.Data;
 
-import java.util.HashMap;
-import java.util.List;
-
 /**
  * Created by alexg on 10.07.17.
  */
@@ -15,6 +12,6 @@ public class Bank {
     private String bic;
     private String name;
     private BankLoginSettings loginSettings;
-
+    private BankApi bankApi;
 
 }

@@ -48,10 +48,10 @@ public class BankAccount {
     @ApiModelProperty(value = "The name of this bank account if any")
     private String name;
 	
-    @ApiModelProperty(value = "The banc identification code", example="DEUTNL2A")
+    @ApiModelProperty(value = "The bank identification code", example="DEUTNL2A")
     private String bic;
 	
-    @ApiModelProperty(value = "The international banc account number", example="NL99DEU7430254900", required=true)
+    @ApiModelProperty(value = "The international bank account number", example="NL99DEU7430254900", required=true)
     private String iban;
 
 	@ApiModelProperty(value = "The synchronisation status", example="PENDING")
