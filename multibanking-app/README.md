@@ -1,4 +1,6 @@
-This is a starter template for [Ionic](http://ionicframework.com/docs/) projects.
+# Multibanking Webapplication
+## Introduction
+This is a starter template for [Ionic](http://ionicframework.com/docs/) projects. Its purpose is to show users the functionality of the multibanking project. You can e.g. add your real bank accesses, choose your bank accounts and display bookings. You can furthermore decide weather you want your raw bookings or prepared transaction data.
 
 ## How to use this template
 
