@@ -26,6 +26,5 @@ public class BankEntity extends Bank {
     private String blzHbci;
     @Indexed
     private List<String> searchIndex;
-    private BankApi bankApi;
 
 }
