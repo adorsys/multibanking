@@ -11,17 +11,30 @@
 
 <ion-content class="bookingList-content" padding>
   <ion-item-group>
-    <ion-item-divider color="light">Balance end of month: {{analytics?.balanceCalculated | currency:'EUR':true}}
-    </ion-item-divider>
+    <ion-item-divider color="light">Balance end of month: {{analytics?.balanceCalculated | currency:'EUR':true}}</ion-item-divider>
     <ion-item-divider color="light">Income</ion-item-divider>
     <ion-item>Total: {{analytics?.incomeTotal | currency:'EUR':true}}</ion-item>
-    <ion-item>Fix: {{analytics?.incomeFixed | currency:'EUR':true}}</ion-item>
-    <ion-item>Next: {{analytics?.incomeNext | currency:'EUR':true}}</ion-item>
+    <ion-item (click)="itemSelected('Fix income', analytics?.incomeFixBookings)">Fix: {{analytics?.incomeFix | currency:'EUR':true}}
+      <button ion-button clear item-end>View</button>
+    </ion-item>
+    <ion-item (click)="itemSelected('Variable income', analytics?.incomeVariableBookings)">Variable: {{analytics?.incomeVariable | currency:'EUR':true}}
+      <button ion-button clear item-end>View</button>
+    </ion-item>
+    <ion-item (click)="itemSelected('Next income', analytics?.incomeNextBookings)">Next: {{analytics?.incomeNext | currency:'EUR':true}}
+      <button ion-button clear item-end>View</button>
+    </ion-item>
   </ion-item-group>
   <ion-item-group>
     <ion-item-divider color="light">Expenses</ion-item-divider>
     <ion-item>Total: {{analytics?.expensesTotal | currency:'EUR':true}}</ion-item>
-    <ion-item>Fix: {{analytics?.expensesFixed | currency:'EUR':true}}</ion-item>
-    <ion-item>Next: {{analytics?.expensesNext | currency:'EUR':true}}</ion-item>
+    <ion-item (click)="itemSelected('Fix expenses', analytics?.expensesFixBookings)">Fix: {{analytics?.expensesFix | currency:'EUR':true}}
+      <button ion-button clear item-end>View</button>
+    </ion-item>
+    <ion-item (click)="itemSelected('Variable expenses', analytics?.expensesVariableBookings)">Variable: {{analytics?.expensesVariable | currency:'EUR':true}}
+      <button ion-button clear item-end>View</button>
+    </ion-item>
+    <ion-item (click)="itemSelected('Next expenses', analytics?.expensesNextBookings)">Next: {{analytics?.expensesNext | currency:'EUR':true}}
+      <button ion-button clear item-end>View</button>
+    </ion-item>
   </ion-item-group>
 </ion-content>

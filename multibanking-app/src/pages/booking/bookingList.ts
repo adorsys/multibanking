@@ -103,6 +103,7 @@ export class BookingListPage {
   }
 
   itemSelected(booking) {
+    console.log(booking)
   }
 
   showAnalytics() {

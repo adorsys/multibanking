@@ -1,9 +1,12 @@
 import { Component } from "@angular/core";
-import { AlertController, ToastController, NavParams, LoadingController } from "ionic-angular";
+import { AlertController, ToastController, NavParams, LoadingController, NavController } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccountService";
 import { AnalyticsService } from "../../services/analyticsService";
 import { BankAccess } from "../../api/BankAccess";
 import { AccountAnalytics } from "../../api/AccountAnalytics";
+import { BookingGroup } from "../../api/BookingGroup";
+import { AppConfig } from "../../app/app.config";
+import { BookingGroupPage } from "./bookingGroup";
 
 @Component({
   selector: 'page-analytics',
@@ -15,7 +18,9 @@ export class AnalyticsPage {
   bankAccess: BankAccess;
   bankAccountId: string;
 
-  constructor(private navparams: NavParams,
+  constructor(
+    public navCtrl: NavController,
+    private navparams: NavParams,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
@@ -77,6 +82,10 @@ export class AnalyticsPage {
     alert.present();
   }
 
+  getCompanyLogoUrl(bookingGroup: BookingGroup) {
+    return AppConfig.api_url + "/image/"+bookingGroup.contract.logo;
+  }
+
   syncBookings(pin) {
     if (!pin && !this.bankAccess.storePin) {
       return this.syncBookingsPromptPin();
@@ -100,6 +109,10 @@ export class AnalyticsPage {
           }).present();
         }
       })
+  }
+
+  itemSelected(label: string, bookingGroups: Array<BookingGroup>) {
+    this.navCtrl.push(BookingGroupPage, {label: label, bookingGroups: bookingGroups})
   }
 
 }

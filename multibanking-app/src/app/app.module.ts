@@ -21,6 +21,7 @@ import { KeycloakService } from '../auth/keycloak.service';
 import { KEYCLOAK_HTTP_PROVIDER } from '../auth/keycloak.http';
 import { BankAccessUpdatePage } from "../pages/bankaccess/bankAccessUpdate";
 import { BankAutoCompleteService } from "../services/bankAutoCompleteService";
+import { BookingGroupPage } from "../pages/analytics/bookingGroup";
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { BankAutoCompleteService } from "../services/bankAutoCompleteService";
     BankAccessUpdatePage,
     BankAccountListPage,
     BookingListPage,
+    BookingGroupPage,
     AnalyticsPage
   ],
   imports: [
@@ -46,6 +48,7 @@ import { BankAutoCompleteService } from "../services/bankAutoCompleteService";
     BankAccessUpdatePage,
     BankAccountListPage,
     BookingListPage,
+    BookingGroupPage,
     AnalyticsPage
   ],
   providers: [
