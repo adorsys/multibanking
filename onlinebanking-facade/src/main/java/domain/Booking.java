@@ -20,10 +20,10 @@ public class Booking {
     @ApiModelProperty(value = "The opposite bank account")
     private BankAccount otherAccount;
     
-    @ApiModelProperty(value = "The value date", example="20121201")
+    @ApiModelProperty(value = "The value date", example="2012-12-01")
     private LocalDate valutaDate;
     
-    @ApiModelProperty(value = "The booking date", example="20121201")
+    @ApiModelProperty(value = "The booking date", example="2012-12-01")
     private LocalDate bookingDate;
     
     @ApiModelProperty(value = "The target aount", example="500")
