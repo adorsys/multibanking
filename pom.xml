@@ -51,6 +51,7 @@
 		<module>onlinebanking-facade</module>
 		<module>finapi-adapter</module>
 		<module>onlinebanking-figo</module>
+		<module>onlinebanking-figo-alternative</module>
 		<module>onlinebanking-finapi</module>
 		<module>onlinebanking-hbci4java</module>
 		<module>onlinebanking-mock</module>
