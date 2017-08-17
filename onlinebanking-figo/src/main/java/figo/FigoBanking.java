@@ -1,37 +1,55 @@
 package figo;
 
-import domain.*;
-import exception.InvalidPinException;
-import me.figo.FigoConnection;
-import me.figo.FigoException;
-import me.figo.FigoSession;
-import me.figo.internal.*;
-import me.figo.models.Account;
-import me.figo.models.AccountBalance;
-import me.figo.models.BankLoginSettings;
+import static utils.Utils.getSecureRandom;
+
 import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import me.figo.models.Transaction;
-import spi.OnlineBankingService;
-
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static utils.Utils.getSecureRandom;
+import domain.Bank;
+import domain.BankAccess;
+import domain.BankAccount;
+import domain.BankAccountBalance;
+import domain.BankApi;
+import domain.BankApiUser;
+import domain.BankLoginCredential;
+import domain.Booking;
+import exception.InvalidPinException;
+import me.figo.FigoConnection;
+import me.figo.FigoException;
+import me.figo.FigoSession;
+import me.figo.internal.SyncTokenRequest;
+import me.figo.internal.TaskStatusRequest;
+import me.figo.internal.TaskStatusResponse;
+import me.figo.internal.TaskTokenResponse;
+import me.figo.internal.TokenResponse;
+import me.figo.models.Account;
+import me.figo.models.AccountBalance;
+import me.figo.models.BankLoginSettings;
+import me.figo.models.Transaction;
+import spi.OnlineBankingService;
 
 /**
  * Created by alexg on 17.05.17.
  */
 public class FigoBanking implements OnlineBankingService {
 
-    public static final String MAIL_SUFFIX = "@admb.de";
-    private FigoConnection figoConnection;
+    private static final String MAIL_SUFFIX = "@admb.de";
+    FigoConnection figoConnection;
+    String clientId;
+    String secret;
+    int timeout;
 
     private static SecureRandom random = getSecureRandom();
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#%^*()-_=+[{]},<>";
@@ -49,22 +67,26 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     public FigoBanking() {
-        String figoClientId = EnvProperties.getEnvOrSysProp("FIGO_CLIENT_ID", true);
-        String figoSecret = EnvProperties.getEnvOrSysProp("FIGO_SECRET", true);
-        int figoTimeout = Integer.parseInt(EnvProperties.getEnvOrSysProp("FIGO_TIMEOUT", "0"));
+        clientId = EnvProperties.getEnvOrSysProp("FIGO_CLIENT_ID", true);
+        secret = EnvProperties.getEnvOrSysProp("FIGO_SECRET", true);
+        timeout = Integer.parseInt(EnvProperties.getEnvOrSysProp("FIGO_TIMEOUT", "0"));
         String figoConnectionUrl = EnvProperties.getEnvOrSysProp("FIGO_CONNECTION_URL", "https://api.figo.me");
 
-        if (figoClientId == null || figoSecret == null) {
-            LOG.warn("missing env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
+        if (clientId == null || secret == null) {
+            getLogger().warn("missing env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
         } else {
-            figoConnection = new FigoConnection(figoClientId, figoSecret, "http://nowhere.here", figoTimeout, figoConnectionUrl);
+            figoConnection = new FigoConnection(clientId, secret, "http://nowhere.here", timeout, figoConnectionUrl);
         }
 
         figoTechUser = EnvProperties.getEnvOrSysProp("FIGO_TECH_USER", true);
         figoTechUserCredential = EnvProperties.getEnvOrSysProp("FIGO_TECH_USER_CREDENTIAL", true);
         if (figoTechUser == null || figoTechUserCredential == null) {
-            LOG.warn("missing env properties FIGO_TECH_USER and/or FIGO_TECH_USER_CREDENTIAL");
+            getLogger().warn("missing env properties FIGO_TECH_USER and/or FIGO_TECH_USER_CREDENTIAL");
         }
+    }
+
+    Logger getLogger() {
+        return LOG;
     }
 
     @Override
@@ -107,7 +129,7 @@ public class FigoBanking implements OnlineBankingService {
         BankApiUser bankApiUser = new BankApiUser();
         bankApiUser.setApiUserId(uid);
         bankApiUser.setApiPassword(password);
-        bankApiUser.setBankApi(BankApi.FIGO);
+        bankApiUser.setBankApi(bankApi());
 
         return bankApiUser;
     }
@@ -116,7 +138,7 @@ public class FigoBanking implements OnlineBankingService {
     public void removeUser(BankApiUser bankApiUser) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX, bankApiUser.getApiPassword());
-            FigoSession session = new FigoSession(tokenResponse.getAccessToken());
+            FigoSession session = createSession(tokenResponse.getAccessToken());
             session.removeUser();
         } catch (IOException | FigoException e) {
             throw new RuntimeException(e);
@@ -162,7 +184,7 @@ public class FigoBanking implements OnlineBankingService {
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX, bankApiUser.getApiPassword());
-            FigoSession session = new FigoSession(tokenResponse.getAccessToken());
+            FigoSession session = createSession(tokenResponse.getAccessToken());
 
             TaskTokenResponse response = session.setupNewAccount(
                     bankAccess.getBankCode(),
@@ -183,19 +205,7 @@ public class FigoBanking implements OnlineBankingService {
             }
 
             return session.getAccounts().stream()
-                    .map(account ->
-                            new BankAccount()
-                                    .externalId(bankApi(), account.getAccountId())
-                                    .owner(account.getOwner())
-                                    .numberHbciAccount(account.getAccountNumber())
-                                    .nameHbciAccount(account.getName())
-                                    .bankName(account.getBankName())
-                                    .bicHbciAccount(account.getBIC())
-                                    .blzHbciAccount(account.getBankCode())
-                                    .ibanHbciAccount(account.getIBAN())
-                                    .typeHbciAccount(account.getType())
-                                    .bankAccountBalance(new BankAccountBalance()
-                                            .readyHbciBalance(account.getBalance().getBalance())))
+                    .map(this::mapBankAccount)
                     .collect(Collectors.toList());
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -206,9 +216,7 @@ public class FigoBanking implements OnlineBankingService {
         try {
             Account account = figoSession.getAccount(accountId);
             AccountBalance accountBalance = account.getBalance();
-            BankAccountBalance bankAccountBalance = new BankAccountBalance();
-            bankAccountBalance.setReadyHbciBalance(accountBalance.getBalance());
-            return bankAccountBalance;
+            return new BankAccountBalance().readyHbciBalance(accountBalance.getBalance());
         } catch (IOException | FigoException e) {
             throw new RuntimeException(e);
         }
@@ -217,8 +225,9 @@ public class FigoBanking implements OnlineBankingService {
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         try {
-            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX, bankApiUser.getApiPassword());
-            FigoSession session = new FigoSession(tokenResponse.getAccessToken());
+            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX,
+                bankApiUser.getApiPassword());
+            FigoSession session = createSession(tokenResponse.getAccessToken());
 
             session.removeAccount(bankAccount.getExternalIdMap().get(bankApi()));
         } catch (IOException | FigoException e) {
@@ -230,7 +239,7 @@ public class FigoBanking implements OnlineBankingService {
     public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
-            FigoSession session = new FigoSession(tokenResponse.getAccessToken());
+            FigoSession session = createSession(tokenResponse.getAccessToken());
 
             TaskTokenResponse response = session.queryApi("/rest/sync",
                     new SyncTokenRequest(
@@ -264,6 +273,21 @@ public class FigoBanking implements OnlineBankingService {
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private BankAccount mapBankAccount(Account account) {
+        return new BankAccount()
+            .externalId(bankApi(), account.getAccountId())
+            .owner(account.getOwner())
+            .numberHbciAccount(account.getAccountNumber())
+            .nameHbciAccount(account.getName())
+            .bankName(account.getBankName())
+            .bicHbciAccount(account.getBIC())
+            .blzHbciAccount(account.getBankCode())
+            .ibanHbciAccount(account.getIBAN())
+            .typeHbciAccount(account.getType())
+            .bankAccountBalance(new BankAccountBalance()
+                .readyHbciBalance(account.getBalance().getBalance()));
     }
 
     private Booking mapBooking(Transaction transaction) {
@@ -303,7 +327,7 @@ public class FigoBanking implements OnlineBankingService {
         TaskStatusResponse taskStatus;
         try {
             taskStatus = figoSession.getTaskState(taskToken);
-            LOG.info("figo.getTaskState {} {}", taskStatus.getAccountId(), taskStatus.getMessage());
+            getLogger().info("figo.getTaskState {} {}", taskStatus.getAccountId(), taskStatus.getMessage());
         } catch (IOException | FigoException e) {
             throw new RuntimeException(e);
         }
@@ -338,7 +362,7 @@ public class FigoBanking implements OnlineBankingService {
     /**
      * Erzeugt eine ZB-Session mit dem technischen Figo-User.
      */
-    FigoSession loginTechUser() {
+    private FigoSession loginTechUser() {
         String username = figoTechUser + MAIL_SUFFIX;
         String accessToken;
 
@@ -354,7 +378,11 @@ public class FigoBanking implements OnlineBankingService {
             }
         }
 
-        return new FigoSession(accessToken);
+        return createSession(accessToken);
+    }
+
+    private FigoSession createSession(String accessToken) {
+        return new FigoSession(accessToken, figoConnection.getTimeout(), figoConnection.getApiEndpoint());
     }
 
     private List<String> createCredentials(String... credentials) {
