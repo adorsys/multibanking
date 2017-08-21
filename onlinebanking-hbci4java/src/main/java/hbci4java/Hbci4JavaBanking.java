@@ -19,6 +19,7 @@ import org.kapott.hbci.structures.Konto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
+import utils.Utils;
 
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -144,8 +145,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                     standingOrders
                             .stream()
                             .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
-                                    so.inCycle(booking.getValutaDate()) &&
-                                    so.usageContains(booking.getUsage())
+                                    Utils.inCycle(booking.getValutaDate(), so.getExecutionDay()) &&
+                                    Utils.usageContains(booking.getUsage(), so.getUsage())
                             )
                             .findFirst()
                             .ifPresent(standingOrder -> {
