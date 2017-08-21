@@ -105,6 +105,12 @@ export class BankAccessCreatePage {
               buttons: ['OK']
             }).present();
           }
+          else if (error.message == "INVALID_PIN") {
+            this.alertCtrl.create({
+              message: 'Invalid pin',
+              buttons: ['OK']
+            }).present();
+          }
         }
       })
   }

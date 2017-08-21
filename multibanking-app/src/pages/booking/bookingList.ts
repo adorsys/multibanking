@@ -99,6 +99,12 @@ export class BookingListPage {
             position: 'top'
           }).present();
         }
+        else if (error.message == "INVALID_PIN") {
+            this.alertCtrl.create({
+              message: 'Invalid pin',
+              buttons: ['OK']
+            }).present();
+          }
       })
   }
 
