@@ -44,17 +44,16 @@ import utils.Utils;
 public class FigoBanking implements OnlineBankingService {
 
     private static final String MAIL_SUFFIX = "@admb.de";
-    protected FigoConnection figoConnection;
-    protected String clientId;
-    protected String secret;
-    protected int timeout;
+    private FigoConnection figoConnection;
 
     private static SecureRandom random = getSecureRandom();
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#%^*()-_=+[{]},<>";
-    private static final Logger LOG = LoggerFactory.getLogger(FigoBanking.class);
+    private Logger LOG = LoggerFactory.getLogger(getClass());
 
     private String figoTechUser;
     private String figoTechUserCredential;
+
+    private BankApi bankApi;
 
     public enum Status {
         OK,
@@ -64,32 +63,38 @@ public class FigoBanking implements OnlineBankingService {
         ERROR
     }
 
-    public FigoBanking() {
-        clientId = EnvProperties.getEnvOrSysProp("FIGO_CLIENT_ID", true);
-        secret = EnvProperties.getEnvOrSysProp("FIGO_SECRET", true);
-        timeout = Integer.parseInt(EnvProperties.getEnvOrSysProp("FIGO_TIMEOUT", "0"));
-        String figoConnectionUrl = EnvProperties.getEnvOrSysProp("FIGO_CONNECTION_URL", "https://api.figo.me");
+    public FigoBanking(BankApi bankApi) {
+        this.bankApi = bankApi;
+
+        String clientId = EnvProperties.getEnvOrSysProp("FIGO_CLIENT_ID", true);
+        String secret = EnvProperties.getEnvOrSysProp("FIGO_SECRET", true);
+        String timeout = EnvProperties.getEnvOrSysProp("FIGO_TIMEOUT", "0");
+        String connectionUrl = EnvProperties.getEnvOrSysProp("FIGO_CONNECTION_URL", "https://api.figo.me");
+
+        if (bankApi == BankApi.FIGO_ALTERNATIVE) {
+            clientId = EnvProperties.getEnvOrSysProp("FIGO_ALTERNATIVE_CLIENT_ID", clientId);
+            secret = EnvProperties.getEnvOrSysProp("FIGO_ALTERNATIVE_SECRETT", secret);
+            timeout = EnvProperties.getEnvOrSysProp("FIGO_ALTERNATIVE_TIMEOUT", timeout);
+            connectionUrl = EnvProperties.getEnvOrSysProp("FIGO_ALTERNATIVE_CONNECTION_URL", connectionUrl);
+            LOG = LoggerFactory.getLogger("figo.FigoBankingAlternative");
+        }
 
         if (clientId == null || secret == null) {
-            getLogger().warn("missing env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
+            LOG.warn("missing env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
         } else {
-            figoConnection = new FigoConnection(clientId, secret, "http://nowhere.here", timeout, figoConnectionUrl);
+            figoConnection = new FigoConnection(clientId, secret, "http://nowhere.here", Integer.parseInt(timeout), connectionUrl);
         }
 
         figoTechUser = EnvProperties.getEnvOrSysProp("FIGO_TECH_USER", true);
         figoTechUserCredential = EnvProperties.getEnvOrSysProp("FIGO_TECH_USER_CREDENTIAL", true);
         if (figoTechUser == null || figoTechUserCredential == null) {
-            getLogger().warn("missing env properties FIGO_TECH_USER and/or FIGO_TECH_USER_CREDENTIAL");
+            LOG.warn("missing env properties FIGO_TECH_USER and/or FIGO_TECH_USER_CREDENTIAL");
         }
-    }
-
-    protected Logger getLogger() {
-        return LOG;
     }
 
     @Override
     public BankApi bankApi() {
-        return BankApi.FIGO;
+        return bankApi;
     }
 
     @Override
@@ -339,7 +344,7 @@ public class FigoBanking implements OnlineBankingService {
         TaskStatusResponse taskStatus;
         try {
             taskStatus = figoSession.getTaskState(taskToken);
-            getLogger().info("figo.getTaskState {} {}", taskStatus.getAccountId(), taskStatus.getMessage());
+            LOG.info("figo.getTaskState {} {}", taskStatus.getAccountId(), taskStatus.getMessage());
         } catch (IOException | FigoException e) {
             throw new RuntimeException(e);
         }
