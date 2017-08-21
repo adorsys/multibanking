@@ -2,6 +2,7 @@ package figo;
 
 import static utils.Utils.getSecureRandom;
 
+import me.figo.models.*;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -34,11 +35,8 @@ import me.figo.internal.TaskStatusRequest;
 import me.figo.internal.TaskStatusResponse;
 import me.figo.internal.TaskTokenResponse;
 import me.figo.internal.TokenResponse;
-import me.figo.models.Account;
-import me.figo.models.AccountBalance;
-import me.figo.models.BankLoginSettings;
-import me.figo.models.Transaction;
 import spi.OnlineBankingService;
+import utils.Utils;
 
 /**
  * Created by alexg on 17.05.17.
@@ -50,7 +48,7 @@ public class FigoBanking implements OnlineBankingService {
 
     private static SecureRandom random = getSecureRandom();
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#%^*()-_=+[{]},<>";
-    private static Logger LOG = LoggerFactory.getLogger(FigoBanking.class);
+    private Logger LOG = LoggerFactory.getLogger(getClass());
 
     private String figoTechUser;
     private String figoTechUserCredential;
@@ -271,7 +269,21 @@ public class FigoBanking implements OnlineBankingService {
                     .map(this::mapBooking)
                     .collect(Collectors.toList());
 
+            List<StandingOrder> standingOrders = session.getStandingOrders(bankAccount.getExternalIdMap().get(bankApi()));
+
             bankAccount.setBankAccountBalance(getBalance(session, bankAccount.getExternalIdMap().get(bankApi())));
+
+            bookings.forEach(booking ->
+                    standingOrders
+                            .stream()
+                            .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
+                                    Utils.inCycle(booking.getValutaDate(), so.getExecutionDay()) &&
+                                    Utils.usageContains(booking.getUsage(), so.getPurposeText())
+                            )
+                            .findFirst()
+                            .ifPresent(standingOrder -> {
+                                booking.setStandingOrder(true);
+                            }));
 
             return bookings;
 
