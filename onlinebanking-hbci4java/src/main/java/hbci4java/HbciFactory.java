@@ -1,12 +1,10 @@
 package hbci4java;
 
 
-import domain.BankAccount;
-import domain.BankAccountBalance;
-import domain.BankApi;
-import domain.Booking;
+import domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
+import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.structures.Konto;
@@ -14,8 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by alexg on 08.02.17.
@@ -47,6 +44,37 @@ public final class HbciFactory {
             }
         }
         return result;
+    }
+
+    public static List<StandingOrder> createStandingOrders(GVRDauerList gvrDauerList) {
+        GVRDauerList.Dauer[] lines = gvrDauerList.getEntries();
+        List<StandingOrder> standingOrders = new ArrayList<>();
+
+
+        for (int i = 0; i < lines.length; ++i) {
+            GVRDauerList.Dauer line = lines[i];
+            StandingOrder auftrag = new StandingOrder();
+
+            if (line.firstdate != null) {
+                auftrag.setFirstBookingDate(line.firstdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+            }
+            if (line.lastdate != null) {
+                auftrag.setLastBookingDate(line.lastdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+            }
+            auftrag.setAmount(line.value.getBigDecimalValue());
+            auftrag.setOrderId(line.orderid);
+            auftrag.setOtherAccount(toBankAccount(line.other));
+            auftrag.setUsage(getUsage(Arrays.asList(line.usage)));
+            auftrag.setExecutionDay(line.execday);
+
+            StandingOrder.Cycle cycle = StandingOrder.Cycle.MONTHLY;
+            if ("W".equalsIgnoreCase(line.timeunit)) cycle = StandingOrder.Cycle.TWO_WEEKLY;
+            auftrag.setCycle(cycle);
+
+            standingOrders.add(auftrag);
+        }
+        return standingOrders;
+
     }
 
     public static List<Booking> createBookings(GVRKUms gvrkUms) {
@@ -93,7 +121,10 @@ public final class HbciFactory {
                 booking.setExternalId("B-" + line.bdate.getTime() + "_" + line.value.getLongValue()
                         + "_" + line.saldo.value.getLongValue());
 
-                applyVerwendungszweck(line, booking);
+                // die Bank liefert keine strukturierten Verwendungszwecke (gvcode=999).
+                // Daher verwenden wir den gesamten "additional"-Block und zerlegen ihn
+                // in 27-Zeichen lange Haeppchen
+                booking.setUsage(getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line.additional, 27)));
 
                 bookings.add(0, booking);
             }
@@ -115,7 +146,7 @@ public final class HbciFactory {
         return bankAccount;
     }
 
-    private static void applyVerwendungszweck(GVRKUms.UmsLine u, Booking booking) {
+    private static String getUsage(List<String> lines) {
         // BUGZILLA 146
         // Aus einer Mail von Stefan Palme
         //    Es geht noch besser. Wenn in "umsline.gvcode" nicht der Wert "999"
@@ -123,14 +154,6 @@ public final class HbciFactory {
         //    und "addkey" irgendwie sinnvoll gef�llt.  Steht in "gvcode" der Wert
         //    "999" drin, dann sind diese Variablen alle null, und der ungeparste
         //    Inhalt des Feldes :86: steht komplett in "additional".
-
-        String[] lines = u.usage.toArray(new String[u.usage.size()]);
-
-        // die Bank liefert keine strukturierten Verwendungszwecke (gvcode=999).
-        // Daher verwenden wir den gesamten "additional"-Block und zerlegen ihn
-        // in 27-Zeichen lange Haeppchen
-        if (lines.length == 0)
-            lines = parse(u.additional);
 
         // Es gibt eine erste Bank, die 40 Zeichen lange Verwendungszwecke lieferte.
         // Siehe Mail von Frank vom 06.02.2014
@@ -151,7 +174,7 @@ public final class HbciFactory {
             lineIndex++;
         }
 
-        booking.setUsage(WordUtils.capitalizeFully(verwendungszweck.trim(), ' ', '/'));
+        return WordUtils.capitalizeFully(verwendungszweck.trim(), ' ', '/');
     }
 
     /**
@@ -163,9 +186,9 @@ public final class HbciFactory {
      * @param lines die zu bereinigenden Zeilen.
      * @return die bereinigten Zeilen.
      */
-    private static List<String> clean(boolean trim, String... lines) {
+    private static List<String> clean(boolean trim, List<String> lines) {
         List<String> result = new ArrayList<>();
-        if (lines == null || lines.length == 0)
+        if (lines == null || lines.size() == 0)
             return result;
 
         for (String line : lines) {
@@ -181,22 +204,36 @@ public final class HbciFactory {
         return result;
     }
 
-    /**
-     * Zerlegt einen langen Verwendungszweck in 27 Zeichen lange Haeppchen.
-     *
-     * @param line die zu parsende Zeile.
-     * @return die 27 Zeichen langen Schnippsel.
-     */
-    private static String[] parse(String line) {
-        if (line == null || line.length() == 0)
-            return new String[0];
+//    /**
+//     * Zerlegt einen langen Verwendungszweck in 27 Zeichen lange Haeppchen.
+//     *
+//     * @param line die zu parsende Zeile.
+//     * @return die 27 Zeichen langen Schnippsel.
+//     */
+//    private static List<String> parse(String line) {
+//        if (line == null || line.length() == 0)
+//            return new ArrayList<>();
+//
+//        // Java's Regex-Implementierung ist sowas von daemlich.
+//        // String.split() macht nur Rotz, wenn man mit Quantifierern
+//        // arbeitet. Also ersetzten wir erst mal alles gegen nen
+//        // eigenen String und verwenden den dann zum Splitten.
+//        String s = line.replaceAll("(.{27})", "$1--##--##");
+//        return s.split("--##--##");
+//    }
 
-        // Java's Regex-Implementierung ist sowas von daemlich.
-        // String.split() macht nur Rotz, wenn man mit Quantifierern
-        // arbeitet. Also ersetzten wir erst mal alles gegen nen
-        // eigenen String und verwenden den dann zum Splitten.
-        String s = line.replaceAll("(.{27})", "$1--##--##");
-        return s.split("--##--##");
+    public static List<String> splitEqually(String text, int size) {
+        if (text == null || text.length() == 0)
+            return new ArrayList<>();
+
+        // Give the list the right capacity to start with. You could use an array
+        // instead if you wanted.
+        List<String> ret = new ArrayList<>((text.length() + size - 1) / size);
+
+        for (int start = 0; start < text.length(); start += size) {
+            ret.add(text.substring(start, Math.min(text.length(), start + size)));
+        }
+        return ret;
     }
 
     /**
@@ -208,8 +245,8 @@ public final class HbciFactory {
      * @param lines die Zeilen.
      * @return die neu umgebrochenen Zeilen.
      */
-    private static String[] rewrap(int limit, String... lines) {
-        if (lines == null || lines.length == 0)
+    private static List<String> rewrap(int limit, List<String> lines) {
+        if (lines == null || lines.size() == 0)
             return lines;
 
         boolean found = false;
@@ -229,8 +266,6 @@ public final class HbciFactory {
         l.forEach(sb::append);
         String result = sb.toString();
 
-        // und neu zerlegen
-        String s = result.replaceAll("(.{" + limit + "})", "$1--##--##");
-        return s.split("--##--##");
+        return splitEqually(result, limit);
     }
 }

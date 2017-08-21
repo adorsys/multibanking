@@ -11,7 +11,7 @@ import java.time.LocalDate;
  * Created by alexg on 07.02.17.
  */
 @Data
-@ApiModel(description="The balance of this bank account", value="BankAccountBalance" )
+@ApiModel(description="Single bank booking", value="Booking" )
 public class Booking {
 
     @ApiModelProperty(value = "External ID of this booking", required=true)
@@ -64,6 +64,9 @@ public class Booking {
     
     @ApiModelProperty(value = "Is this a SEPA transaction", example="true")
     private boolean isSepa;
+
+    @ApiModelProperty(value = "Is this a standing order transaction", example="false")
+    private boolean isStandingOrder;
     
     @ApiModelProperty(value = "Origin of this booking", example="HBCI")
     private BankApi bankApi;

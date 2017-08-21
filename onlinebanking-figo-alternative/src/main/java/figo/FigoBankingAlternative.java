@@ -26,7 +26,7 @@ public class FigoBankingAlternative extends FigoBanking {
     }
 
     @Override
-    Logger getLogger() {
+    protected Logger getLogger() {
         return LOG;
     }
 

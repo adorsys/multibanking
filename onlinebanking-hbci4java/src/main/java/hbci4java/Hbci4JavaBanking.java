@@ -3,7 +3,9 @@ package hbci4java;
 import domain.*;
 import exception.InvalidPinException;
 import org.apache.commons.lang3.StringUtils;
+import org.kapott.hbci.GV.GVDauerSEPAList;
 import org.kapott.hbci.GV.HBCIJob;
+import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.exceptions.HBCI_Exception;
@@ -19,7 +21,10 @@ import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Hbci4JavaBanking implements OnlineBankingService {
@@ -112,6 +117,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             HBCIJob bookingsJob = handle.newJob("KUmsAll");
             bookingsJob.setParam("my", account);
             bookingsJob.addToQueue();
+            HBCIJob standingOrdersJob = handle.newJob("DauerSEPAList");
+            standingOrdersJob.setParam("src", account);
+            standingOrdersJob.addToQueue();
 
             // Let the Handler execute all jobs in one batch
             HBCIExecStatus status = handle.execute();
@@ -126,10 +134,25 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             List<Booking> bookings = HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult());
 
-            return bookings.stream()
+            List<StandingOrder> standingOrders = HbciFactory.createStandingOrders((GVRDauerList) standingOrdersJob.getJobResult());
+
+            ArrayList<Booking> bookingList = bookings.stream()
                     .collect(Collectors.collectingAndThen(Collectors.toCollection(
                             () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
 
+            bookingList.forEach(booking ->
+                    standingOrders
+                            .stream()
+                            .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
+                                    so.inCycle(booking.getValutaDate()) &&
+                                    so.usageContains(booking.getUsage())
+                            )
+                            .findFirst()
+                            .ifPresent(standingOrder -> {
+                                booking.setStandingOrder(true);
+                            }));
+
+            return bookingList;
         } catch (HBCI_Exception e) {
             handleHbciException(e);
             return null;
@@ -145,7 +168,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             return false;
         }
         return true;
-
     }
 
     private HbciPassport createPassport(BankAccess bankAccess, String bankCode, String pin) {

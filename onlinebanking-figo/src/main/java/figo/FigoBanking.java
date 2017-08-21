@@ -46,10 +46,10 @@ import spi.OnlineBankingService;
 public class FigoBanking implements OnlineBankingService {
 
     private static final String MAIL_SUFFIX = "@admb.de";
-    FigoConnection figoConnection;
-    String clientId;
-    String secret;
-    int timeout;
+    protected FigoConnection figoConnection;
+    protected String clientId;
+    protected String secret;
+    protected int timeout;
 
     private static SecureRandom random = getSecureRandom();
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#%^*()-_=+[{]},<>";
@@ -85,7 +85,7 @@ public class FigoBanking implements OnlineBankingService {
         }
     }
 
-    Logger getLogger() {
+    protected Logger getLogger() {
         return LOG;
     }
 
