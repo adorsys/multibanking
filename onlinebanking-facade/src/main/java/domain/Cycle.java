@@ -13,6 +13,10 @@ public enum Cycle {
      */
     MONTHLY,
     /**
+     * every 2nd month.
+     */
+    TWO_MONTHLY,
+    /**
      * every 3 months.
      */
     QUARTERLY,
