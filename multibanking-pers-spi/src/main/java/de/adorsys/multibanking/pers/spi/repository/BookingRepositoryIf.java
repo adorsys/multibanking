@@ -18,5 +18,7 @@ public interface BookingRepositoryIf {
 
 	void insert(List<BookingEntity> bookingEntities);
 
+    List<BookingEntity> save(List<BookingEntity> bookingEntities);
+
     void deleteByAccountId(String id);
 }

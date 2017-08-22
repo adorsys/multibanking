@@ -74,6 +74,12 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 	}
 
 	@Override
+	public List<BookingEntity> save(List<BookingEntity> bookingEntities) {
+		//TODO
+		return bookingEntities;
+	}
+
+	@Override
 	public void deleteByAccountId(String id) {
 		//TODO
 	}
