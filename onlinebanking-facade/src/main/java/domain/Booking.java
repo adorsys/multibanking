@@ -67,7 +67,10 @@ public class Booking {
 
     @ApiModelProperty(value = "Is this a standing order transaction", example="false")
     private boolean isStandingOrder;
-    
+
+    @ApiModelProperty(value = "Creditor ID", example="De66zzz00001861569")
+    private String creditorId;
+
     @ApiModelProperty(value = "Origin of this booking", example="HBCI")
     private BankApi bankApi;
     

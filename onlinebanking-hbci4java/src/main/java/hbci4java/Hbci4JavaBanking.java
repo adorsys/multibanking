@@ -141,6 +141,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                     .collect(Collectors.collectingAndThen(Collectors.toCollection(
                             () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
 
+            bookingList.forEach(booking -> booking.setCreditorId((Utils.extractCreditorId(booking.getUsage()))));
+
             bookingList.forEach(booking ->
                     standingOrders
                             .stream()

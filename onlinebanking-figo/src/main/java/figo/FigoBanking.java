@@ -318,6 +318,7 @@ public class FigoBanking implements OnlineBankingService {
         booking.setText(transaction.getBookingText());
         booking.setTransactionCode(transaction.getTransactionCode());
         booking.setOtherAccount(mapBookingAccount(transaction));
+        booking.setCreditorId(Utils.extractCreditorId(transaction.getPurposeText()));
         return booking;
     }
 
