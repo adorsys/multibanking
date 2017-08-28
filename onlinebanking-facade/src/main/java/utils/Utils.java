@@ -14,6 +14,10 @@ public class Utils {
     private static Pattern creditorIdRegex = Pattern.compile("([deDE]{2}[0-9]{2,2}[A-Za-z0-9]{3,3}[0]{1}[0-9]{10})",
             Pattern.CASE_INSENSITIVE);
 
+    private static Pattern mandateReferenceRegex =
+            Pattern.compile("(?:mref|mandatsreferenz|mandatsref|mandat)[:\\+]?\\s*(\\S+?)(?:\\s+|\\+|CRED|MANDATSDATUM|EINREICHER-ID)", Pattern.CASE_INSENSITIVE);
+
+
     public static String extractCreditorId(String input) {
         if (input == null) {
             return null;
@@ -25,6 +29,16 @@ public class Utils {
         return null;
     }
 
+    public static String extractMandateReference(String input) {
+        if (input == null) {
+            return null;
+        }
+        Matcher matcher = mandateReferenceRegex.matcher(input);
+        if (matcher.find()) {
+            return matcher.group(1).replace("+", " ");
+        }
+        return null;
+    }
 
     public static SecureRandom getSecureRandom() {
         try {

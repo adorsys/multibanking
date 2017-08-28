@@ -71,6 +71,9 @@ public class Booking {
     @ApiModelProperty(value = "Creditor ID", example="De66zzz00001861569")
     private String creditorId;
 
+    @ApiModelProperty(value = "Reference for the SEPA mandate")
+    private String mandateReference;
+
     @ApiModelProperty(value = "Origin of this booking", example="HBCI")
     private BankApi bankApi;
     
