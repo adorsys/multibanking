@@ -2,6 +2,8 @@ package de.adorsys.multibanking.domain;
 
 import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.Booking;
+import domain.BookingCategory;
+import domain.Contract;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
@@ -10,6 +12,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * Created by alexg on 07.02.17.
@@ -31,5 +34,13 @@ public class BookingEntity extends Booking {
     public BookingEntity id(String id) {
         this.id = id;
         return this;
+    }
+
+    public boolean isContract() {
+        return Optional.of(this)
+                .map(BookingEntity::getBookingCategory)
+                .map(BookingCategory::getContract)
+                .map(Contract::getInterval)
+                .isPresent();
     }
 }
