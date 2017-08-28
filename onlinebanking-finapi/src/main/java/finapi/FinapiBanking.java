@@ -191,6 +191,7 @@ public class FinapiBanking implements OnlineBankingService {
                             booking.setAmount(transaction.getAmount());
                             booking.setUsage(transaction.getPurpose());
                             booking.setCreditorId(Utils.extractCreditorId(transaction.getPurpose()));
+                            booking.setMandateReference(Utils.extractMandateReference(transaction.getPurpose()));
 
                             if (transaction.getCounterpartName() != null) {
                                 booking.setOtherAccount(new BankAccount());

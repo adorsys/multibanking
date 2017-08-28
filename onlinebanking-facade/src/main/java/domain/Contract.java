@@ -14,6 +14,6 @@ public class Contract {
     private String homepage;
     private String hotline;
     private String email;
-    private String mandatReference;
+    private String mandateReference;
     private Cycle interval;
 }

@@ -4,7 +4,7 @@ export interface Contract {
     "hotline"?: string;
     "interval"?: Contract.IntervalEnum;
     "logo"?: string;
-    "mandatReference"?: string;
+    "mandateReference"?: string;
 }
 
 export namespace Contract {
