@@ -3,9 +3,11 @@ import { NavController, AlertController, ToastController, NavParams, LoadingCont
 import { BankAccountService } from "../../services/bankAccountService";
 import { BookingService } from "../../services/bookingService";
 import { AnalyticsPage } from "../analytics/analytics";
+import { ContractsComponent } from "../contracts/contracts.component";
 import { BankAccess } from "../../api/BankAccess";
 import { Booking } from "../../api/Booking";
 import { AppConfig } from "../../app/app.config";
+import { LogoService } from '../../services/LogoService';
 
 @Component({
   selector: 'page-bookingList',
@@ -15,17 +17,22 @@ export class BookingListPage {
 
   bankAccess: BankAccess;
   bankAccountId: string;
+  getLogo: Function;
   bookings: Array<Booking>;
 
-  constructor(public navCtrl: NavController,
+  constructor(
+    public navCtrl: NavController,
     private navparams: NavParams,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
     private bankAccountService: BankAccountService,
-    private bookingService: BookingService) {
+    private bookingService: BookingService,
+    private logoService: LogoService
+  ) {
     this.bankAccess = navparams.data.bankAccess;
     this.bankAccountId = navparams.data.bankAccountId;
+    this.getLogo = logoService.getLogo;
   }
 
   ngOnInit() {
@@ -72,10 +79,6 @@ export class BookingListPage {
     alert.present();
   }
 
-  getCompanyLogoUrl(booking: Booking) {
-    return AppConfig.api_url + "/image/"+booking.bookingCategory.contract.logo;
-  }
-
   syncBookings(pin) {
     if (!pin && !this.bankAccess.storePin) {
       return this.syncBookingsPromptPin();
@@ -119,5 +122,10 @@ export class BookingListPage {
     })
   }
 
-
+  showContracts() {
+    this.navCtrl.push(ContractsComponent, {
+      bankAccess: this.bankAccess,
+      bankAccountId: this.bankAccountId
+    })
+  }
 }

@@ -5,6 +5,9 @@
       <button ion-button (click)="syncBookings()">
         Reload
       </button>
+      <button ion-button (click)="showContracts()">
+        Contracts
+      </button>
       <button ion-button (click)="showAnalytics()">
         Analytics
       </button>
@@ -16,8 +19,8 @@
   <ion-list>
     <ion-item *ngFor="let booking of bookings" (click)="itemSelected(booking)">
        <ion-thumbnail item-left>
-        <img [src]="getCompanyLogoUrl(booking)" *ngIf="booking.bookingCategory && booking.bookingCategory.contract && booking.bookingCategory.contract.logo" item-left/>
-      </ion-thumbnail> 
+        <img *ngIf="booking.bookingCategory && booking.bookingCategory.contract && booking.bookingCategory.contract.logo" [src]="getLogo(booking.bookingCategory.contract.logo)" item-left/>
+      </ion-thumbnail>
       <h3>{{ booking.otherAccount !=null ? booking.otherAccount.owner : ""}}</h3>
       <h4 *ngIf="booking.bookingCategory">{{ booking.bookingCategory.mainCategory}}</h4>
       <h4 *ngIf="booking.bookingCategory">{{ booking.bookingCategory.subCategory}}</h4>
@@ -25,7 +28,7 @@
       <div item-right>
         <h4>{{ booking.bookingDate | date }}</h4>
         <h2>{{ booking.amount | currency:'EUR':true }}</h2>
-        </div>
+      </div>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -1,68 +1,73 @@
+import { AutoCompleteModule } from 'ionic2-auto-complete';
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
+import { HttpModule } from '@angular/http';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
-import { HttpModule } from '@angular/http';
-import { AutoCompleteModule } from 'ionic2-auto-complete';
 
-import { MyApp } from './app.component';
-
-import { BankAccessListPage } from '../pages/bankaccess/bankAccessList';
-import { BankAccessCreatePage } from '../pages/bankaccess/bankAccessCreate';
-import { BankAccountListPage } from '../pages/bankaccount/bankaccountList';
-import { BookingListPage } from '../pages/booking/bookingList';
 import { AnalyticsPage } from "../pages/analytics/analytics";
 import { AnalyticsService } from "../services/analyticsService";
+import { BankAccessCreatePage } from '../pages/bankaccess/bankAccessCreate';
+import { BankAccessListPage } from '../pages/bankaccess/bankAccessList';
 import { BankAccessService } from '../services/bankAccessService';
-import { BankAccountService } from '../services/bankAccountService';
-import { BookingService } from '../services/bookingService';
-import { KeycloakService } from '../auth/keycloak.service';
-import { KEYCLOAK_HTTP_PROVIDER } from '../auth/keycloak.http';
 import { BankAccessUpdatePage } from "../pages/bankaccess/bankAccessUpdate";
+import { BankAccountListPage } from '../pages/bankaccount/bankaccountList';
+import { BankAccountService } from '../services/bankAccountService';
 import { BankAutoCompleteService } from "../services/bankAutoCompleteService";
 import { BookingGroupPage } from "../pages/analytics/bookingGroup";
+import { BookingListPage } from '../pages/booking/bookingList';
+import { BookingService } from '../services/bookingService';
+import { ContractService } from "../pages/contracts/contract.service";
+import { ContractsComponent } from "../pages/contracts/contracts.component";
+import { KEYCLOAK_HTTP_PROVIDER } from '../auth/keycloak.http';
+import { KeycloakService } from '../auth/keycloak.service';
+import { LogoService } from '../services/LogoService';
+import { MyApp } from './app.component';
 
 @NgModule({
   declarations: [
-    MyApp,
-    BankAccessListPage,
+    AnalyticsPage,
     BankAccessCreatePage,
+    BankAccessListPage,
     BankAccessUpdatePage,
     BankAccountListPage,
-    BookingListPage,
     BookingGroupPage,
-    AnalyticsPage
+    BookingListPage,
+    ContractsComponent,
+    MyApp,
   ],
   imports: [
-    BrowserModule,
     AutoCompleteModule,
+    BrowserModule,
+    HttpModule,
     IonicModule.forRoot(MyApp),
-    HttpModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    MyApp,
-    BankAccessListPage,
+    AnalyticsPage,
     BankAccessCreatePage,
+    BankAccessListPage,
     BankAccessUpdatePage,
     BankAccountListPage,
-    BookingListPage,
     BookingGroupPage,
-    AnalyticsPage
+    BookingListPage,
+    ContractsComponent,
+    MyApp,
   ],
   providers: [
-    StatusBar,
-    SplashScreen,
+    AnalyticsService,
     BankAccessService,
     BankAccountService,
-    BookingService,
-    AnalyticsService,
-    KeycloakService,
     BankAutoCompleteService,
+    BookingService,
+    ContractService,
     KEYCLOAK_HTTP_PROVIDER,
-    { provide: ErrorHandler, useClass: IonicErrorHandler }
+    KeycloakService,
+    LogoService,
+    SplashScreen,
+    StatusBar,
+    { provide: ErrorHandler, useClass: IonicErrorHandler },
   ]
 })
-export class AppModule {
-}
+export class AppModule {}
