@@ -14,7 +14,7 @@ export class ContractsComponent {
   bankAccessId: string;
   bankAccountId: string;
   getLogo: Function;
-  contracts: Array<Contract>;
+  contracts;
 
   constructor(
     private navParams: NavParams,
@@ -24,10 +24,19 @@ export class ContractsComponent {
     this.bankAccessId = navParams.data.bankAccess.id;
     this.bankAccountId = navParams.data.bankAccountId;
     this.getLogo = logoService.getLogo;
+    this.contracts = {
+      income: [],
+      expenses: []
+    }
   }
 
   ngOnInit() {
     this.contractService.getContracts(this.bankAccessId, this.bankAccountId)
-      .subscribe(contracts => this.contracts = contracts);
+      .subscribe(contracts => {
+        contracts.reduce((acc, contract) => {
+          contract.amount > 0 ? acc.income.push(contract) : acc.expenses.push(contract)
+          return acc;
+        }, this.contracts)
+      });
   }
 }

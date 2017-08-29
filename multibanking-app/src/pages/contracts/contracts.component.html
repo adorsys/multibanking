@@ -6,16 +6,32 @@
 
 <ion-content class="contracts" padding>
   <ion-list>
-    <ion-item *ngFor="let contract of contracts">
+    <h3 class="type">Income</h3>
+    <ion-item *ngFor="let contract of contracts.income">
       <ion-thumbnail item-left>
         <img *ngIf="contract.logo" [src]="getLogo(contract.logo)" item-left/>
       </ion-thumbnail>
+      <h4 *ngIf="contract.provider">{{contract.provider}}</h4>
       <h4 *ngIf="contract.mainCategory">{{contract.mainCategory}}</h4>
       <h4 *ngIf="contract.subCategory">{{contract.subCategory}}</h4>
       <h4 *ngIf="contract.specification">{{contract.specification}}</h4>
       <div item-right>
-        <h2>{{ contract.amount | currency:'EUR':true }}</h2>
+        <h2>{{contract.amount | currency:'EUR':true}} {{contract.cycle | cycle}}</h2>
       </div>
     </ion-item>
+
+    <h3 class="type">Expenses</h3>
+    <ion-item *ngFor="let contract of contracts.expenses">
+        <ion-thumbnail item-left>
+          <img *ngIf="contract.logo" [src]="getLogo(contract.logo)" item-left/>
+        </ion-thumbnail>
+        <h4 *ngIf="contract.provider">{{contract.provider}}</h4>
+        <h4 *ngIf="contract.mainCategory">{{contract.mainCategory}}</h4>
+        <h4 *ngIf="contract.subCategory">{{contract.subCategory}}</h4>
+        <h4 *ngIf="contract.specification">{{contract.specification}}</h4>
+        <div item-right>
+          <h2>{{contract.amount | currency:'EUR':true}} {{contract.cycle | cycle}}</h2>
+        </div>
+      </ion-item>
   </ion-list>
 </ion-content>
