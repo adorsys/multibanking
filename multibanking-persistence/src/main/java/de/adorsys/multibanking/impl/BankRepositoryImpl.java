@@ -22,10 +22,10 @@ import java.util.regex.Pattern;
 public class BankRepositoryImpl implements BankRepositoryIf {
 
     @Autowired
-    BankRepositoryMongodb bankRepositoryMongodb;
+    private BankRepositoryMongodb bankRepositoryMongodb;
 
     @Autowired
-    MongoTemplate mongoTemplate;
+    private MongoTemplate mongoTemplate;
 
     @Override
     public Optional<BankEntity> findByBankCode(String blz) {

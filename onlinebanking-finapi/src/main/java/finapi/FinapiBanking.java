@@ -200,10 +200,10 @@ public class FinapiBanking implements OnlineBankingService {
                             }
 
                             if (transaction.getCategory() != null) {
-                                BookingCategory bookingCategory = new BookingCategory();
-                                bookingCategory.setMainCategory(transaction.getCategory().getParentName());
-                                bookingCategory.setSubCategory(transaction.getCategory().getName());
-                                booking.setBookingCategory(bookingCategory);
+                                booking.setBookingCategory(BookingCategory.builder()
+                                        .mainCategory(transaction.getCategory().getParentName())
+                                        .subCategory(transaction.getCategory().getName())
+                                        .build());
                             }
 
                             return booking;

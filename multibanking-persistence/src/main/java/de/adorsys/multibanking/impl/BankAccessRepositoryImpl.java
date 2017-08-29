@@ -18,7 +18,7 @@ import java.util.Optional;
 public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 
     @Autowired
-    BankAccessRepositoryMongodb bankAccessRepository;
+    private BankAccessRepositoryMongodb bankAccessRepository;
 
     @Autowired
     private MongoTemplate mongoTemplate;

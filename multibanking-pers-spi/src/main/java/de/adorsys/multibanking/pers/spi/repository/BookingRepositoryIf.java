@@ -14,6 +14,8 @@ public interface BookingRepositoryIf {
 
     List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId, BankApi bankApi);
 
+    List<BookingEntity> findContracts(String userId, String bankAccountId, BankApi bankApi);
+
     Optional<BookingEntity> findByUserIdAndId(String userId, String bookingId);
 
 	void insert(List<BookingEntity> bookingEntities);

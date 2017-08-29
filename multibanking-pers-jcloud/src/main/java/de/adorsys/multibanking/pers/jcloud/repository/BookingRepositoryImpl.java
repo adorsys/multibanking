@@ -44,6 +44,12 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 	}
 
 	@Override
+	public List<BookingEntity> findContracts(String userId, String bankAccountId, BankApi bankApi) {
+		//TODO
+		return null;
+	}
+
+	@Override
 	public Optional<BookingEntity> findByUserIdAndId(String userId, String bookingId) {
 		throw new UnsupportedOperationException();
 	}
