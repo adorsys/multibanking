@@ -1,5 +1,5 @@
 export interface Contract {
-  amount: string;
+  amount: number;
   mainCategory?: string;
   subCategory?: string;
   specification?: string;

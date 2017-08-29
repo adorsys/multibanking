@@ -20,6 +20,7 @@ import { BookingListPage } from '../pages/booking/bookingList';
 import { BookingService } from '../services/bookingService';
 import { ContractService } from "../pages/contracts/contract.service";
 import { ContractsComponent } from "../pages/contracts/contracts.component";
+import { CyclePipe } from '../pages/contracts/cycle.pipe';
 import { KEYCLOAK_HTTP_PROVIDER } from '../auth/keycloak.http';
 import { KeycloakService } from '../auth/keycloak.service';
 import { LogoService } from '../services/LogoService';
@@ -35,6 +36,7 @@ import { MyApp } from './app.component';
     BookingGroupPage,
     BookingListPage,
     ContractsComponent,
+    CyclePipe,
     MyApp,
   ],
   imports: [
