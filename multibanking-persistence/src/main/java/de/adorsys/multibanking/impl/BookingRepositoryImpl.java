@@ -7,6 +7,7 @@ import de.adorsys.multibanking.repository.BookingRepositoryMongodb;
 import domain.BankApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Profile({"mongo", "fongo"})
 @Service
@@ -51,12 +53,22 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 	}
 
 	@Override
-	public void insert(List<BookingEntity> bookingEntities) {
-		bookingRepository.insert(bookingEntities);
-	}
-
-	@Override
 	public List<BookingEntity> save(List<BookingEntity> bookingEntities) {
+        List<BookingEntity> newEntities = bookingEntities
+                .stream()
+                .filter(bookingEntity -> bookingEntity.getId() == null)
+                .collect(Collectors.toList());
+        try {
+            bookingRepository.insert(newEntities);
+        } catch (DuplicateKeyException e) {
+            //ignore it
+        }
+
+        List<BookingEntity> existingEntities = bookingEntities
+                .stream()
+                .filter(bookingEntity -> bookingEntity.getId() != null)
+                .collect(Collectors.toList());
+
 		return bookingRepository.save(bookingEntities);
 	}
 

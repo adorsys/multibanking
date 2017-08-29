@@ -55,34 +55,29 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 	}
 
 	@Override
-	public void insert(List<BookingEntity> bookingEntities) {
-		Map<String, UserBookingRecord> bookingRecords = new HashMap<>();
-		Map<String, ObjectHandle> bookingHandles = new HashMap<>();
-		for (BookingEntity bookingEntity : bookingEntities) {
-			String accountId = bookingEntity.getAccountId();
-			BankApi bankApi = bookingEntity.getBankApi();
-			ObjectHandle bookingsHandle = namingPolicy.handleForBookings(keyCredentials, accountId, bankApi);
-			UserBookingRecord userBookingRecord = bookingRecords.get(bookingsHandle.getName());
-			if(userBookingRecord==null){
-				userBookingRecord = objectPersistenceAdapter.load(bookingsHandle, UserBookingRecord.class, keyCredentials);
-				if(userBookingRecord==null){
-					userBookingRecord = new UserBookingRecord();
-				}
-				bookingRecords.put(bookingsHandle.getName(), userBookingRecord);
-				bookingHandles.put(bookingsHandle.getName(), bookingsHandle);
-			}
-			addBooking(userBookingRecord, bookingEntity);
-		}
-		Set<Entry<String,UserBookingRecord>> entrySet = bookingRecords.entrySet();
-		for (Entry<String, UserBookingRecord> entry : entrySet) {
-			objectPersistenceAdapter.store(bookingHandles.get(entry.getKey()), entry.getValue(), keyCredentials);
-		}
-	}
-
-	@Override
 	public List<BookingEntity> save(List<BookingEntity> bookingEntities) {
-		//TODO
-		return bookingEntities;
+        Map<String, UserBookingRecord> bookingRecords = new HashMap<>();
+        Map<String, ObjectHandle> bookingHandles = new HashMap<>();
+        for (BookingEntity bookingEntity : bookingEntities) {
+            String accountId = bookingEntity.getAccountId();
+            BankApi bankApi = bookingEntity.getBankApi();
+            ObjectHandle bookingsHandle = namingPolicy.handleForBookings(keyCredentials, accountId, bankApi);
+            UserBookingRecord userBookingRecord = bookingRecords.get(bookingsHandle.getName());
+            if(userBookingRecord==null){
+                userBookingRecord = objectPersistenceAdapter.load(bookingsHandle, UserBookingRecord.class, keyCredentials);
+                if(userBookingRecord==null){
+                    userBookingRecord = new UserBookingRecord();
+                }
+                bookingRecords.put(bookingsHandle.getName(), userBookingRecord);
+                bookingHandles.put(bookingsHandle.getName(), bookingsHandle);
+            }
+            addBooking(userBookingRecord, bookingEntity);
+        }
+        Set<Entry<String,UserBookingRecord>> entrySet = bookingRecords.entrySet();
+        for (Entry<String, UserBookingRecord> entry : entrySet) {
+            objectPersistenceAdapter.store(bookingHandles.get(entry.getKey()), entry.getValue(), keyCredentials);
+        }
+        return bookingEntities;
 	}
 
 	@Override

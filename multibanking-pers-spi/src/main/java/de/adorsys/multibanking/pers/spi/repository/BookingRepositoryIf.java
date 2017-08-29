@@ -18,8 +18,6 @@ public interface BookingRepositoryIf {
 
     Optional<BookingEntity> findByUserIdAndId(String userId, String bookingId);
 
-	void insert(List<BookingEntity> bookingEntities);
-
     List<BookingEntity> save(List<BookingEntity> bookingEntities);
 
     void deleteByAccountId(String id);
