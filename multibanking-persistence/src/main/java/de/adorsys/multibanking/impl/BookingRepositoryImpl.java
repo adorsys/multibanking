@@ -69,7 +69,7 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
                 .filter(bookingEntity -> bookingEntity.getId() != null)
                 .collect(Collectors.toList());
 
-		return bookingRepository.save(bookingEntities);
+		return bookingRepository.save(existingEntities);
 	}
 
 	@Override
