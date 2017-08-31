@@ -8,6 +8,9 @@ export class LogoService {
   constructor() {}
 
   getLogo(logoId: string) {
+    if (!logoId) {
+      `${AppConfig.api_url}/image/keinlogo_256`
+    }
     return `${AppConfig.api_url}/image/${logoId}`;
   }
 }
