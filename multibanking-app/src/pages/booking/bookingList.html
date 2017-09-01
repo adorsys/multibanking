@@ -19,7 +19,7 @@
   <ion-list>
     <ion-item *ngFor="let booking of bookings" (click)="itemSelected(booking)">
        <ion-thumbnail item-left>
-        <img *ngIf="booking.bookingCategory && booking.bookingCategory.contract && booking.bookingCategory.contract.logo" [src]="getLogo(booking.bookingCategory.contract.logo)" item-left/>
+        <img [src]="getLogo(booking?.bookingCategory?.contract?.logo)" item-left/>
       </ion-thumbnail>
       <h3>{{ booking.otherAccount !=null ? booking.otherAccount.owner : ""}}</h3>
       <h4 *ngIf="booking.bookingCategory">{{ booking.bookingCategory.mainCategory}}</h4>
