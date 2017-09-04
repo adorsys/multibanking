@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.impl;
 
-import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BookingEntity;
 import de.adorsys.multibanking.pers.spi.repository.BookingRepositoryIf;
 import de.adorsys.multibanking.repository.BookingRepositoryMongodb;

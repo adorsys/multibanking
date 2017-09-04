@@ -1,12 +1,9 @@
 package de.adorsys.multibanking.impl;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.multibanking.repository.BankRepositoryMongodb;
-import domain.Bank;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -14,8 +11,10 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @Profile({"mongo", "fongo"})
 @Service

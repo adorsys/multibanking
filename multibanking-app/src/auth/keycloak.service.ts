@@ -50,7 +50,7 @@ export class KeycloakService {
             resolve(<string>KeycloakService.auth.authz.token);
           })
           .error(() => {
-            reject('Failed to refresh token');
+            KeycloakService.auth.authz.login()
           });
       } else {
         reject('Not loggen in');
