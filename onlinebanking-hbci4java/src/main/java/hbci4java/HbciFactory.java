@@ -12,7 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by alexg on 08.02.17.
@@ -56,10 +58,10 @@ public final class HbciFactory {
             StandingOrder auftrag = new StandingOrder();
 
             if (line.firstdate != null) {
-                auftrag.setFirstBookingDate(line.firstdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                auftrag.setFirstExecutionDate(line.firstdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
             if (line.lastdate != null) {
-                auftrag.setLastBookingDate(line.lastdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                auftrag.setLastExecutionDate(line.lastdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
             auftrag.setAmount(line.value.getBigDecimalValue());
             auftrag.setOrderId(line.orderid);
@@ -67,8 +69,28 @@ public final class HbciFactory {
             auftrag.setUsage(getUsage(Arrays.asList(line.usage)));
             auftrag.setExecutionDay(line.execday);
 
-            StandingOrder.Cycle cycle = StandingOrder.Cycle.MONTHLY;
-            if ("W".equalsIgnoreCase(line.timeunit)) cycle = StandingOrder.Cycle.TWO_WEEKLY;
+            Cycle cycle = null;
+            if (!StringUtils.endsWithIgnoreCase("M", line.timeunit)) {
+                cycle = Cycle.WEEKLY;
+            } else {
+                switch (line.turnus) {
+                    case 1:
+                        cycle = Cycle.MONTHLY;
+                        break;
+                    case 2:
+                        cycle = Cycle.TWO_MONTHLY;
+                        break;
+                    case 3:
+                        cycle = Cycle.QUARTERLY;
+                        break;
+                    case 6:
+                        cycle = Cycle.HALF_YEARLY;
+                        break;
+                    case 12:
+                        cycle = Cycle.YEARLY;
+                        break;
+                }
+            }
             auftrag.setCycle(cycle);
 
             standingOrders.add(auftrag);

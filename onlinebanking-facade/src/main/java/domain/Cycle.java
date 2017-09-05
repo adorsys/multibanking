@@ -23,7 +23,7 @@ public enum Cycle {
     /**
      * every 6 months.
      */
-    HALFYEARLY,
+    HALF_YEARLY,
     /**
      * every 12 months.
      */

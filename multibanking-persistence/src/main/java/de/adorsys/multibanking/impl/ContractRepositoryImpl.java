@@ -16,7 +16,6 @@ public class ContractRepositoryImpl implements ContractRepositoryIf {
     @Autowired
     private ContractRepositoryMongodb contractRepositoryMongodb;
 
-
     @Override
     public List<ContractEntity> findByUserIdAndAccountId(String userId, String accountId) {
         return contractRepositoryMongodb.findByUserIdAndAccountId(userId, accountId);

@@ -2,6 +2,7 @@ package de.adorsys.onlinebanking.mock;
 
 import java.util.List;
 
+import domain.LoadBookingsResponse;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
@@ -57,8 +58,9 @@ public class MockBankingTest {
 		Assume.assumeNotNull(bankAccounts);
 		Assume.assumeFalse(bankAccounts.isEmpty());
 		BankAccount bankAccount = bankAccounts.iterator().next();
-		List<Booking> bookings = mockBanking.loadBookings(null, bankAccess, null, bankAccount, pin);
-		Assert.assertNotNull(bookings);
-		Assert.assertFalse(bookings.isEmpty());
+		LoadBookingsResponse response = mockBanking.loadBookings(null, bankAccess, null, bankAccount, pin);
+		Assert.assertNotNull(response);
+		Assert.assertNotNull(response.getBookings());
+		Assert.assertFalse(response.getBookings().isEmpty());
 	}
 }

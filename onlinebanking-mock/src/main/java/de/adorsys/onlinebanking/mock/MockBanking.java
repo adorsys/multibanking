@@ -1,16 +1,15 @@
 package de.adorsys.onlinebanking.mock;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
 import domain.*;
 import org.adorsys.envutils.EnvProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
-
 import spi.OnlineBankingService;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by alexg on 17.05.17.
@@ -20,14 +19,6 @@ public class MockBanking implements OnlineBankingService {
     private static final Logger LOG = LoggerFactory.getLogger(MockBanking.class);
 
     private String bearerToken;
-
-    public enum Status {
-        OK,
-        SYNC,
-        PIN,
-        TAN,
-        ERROR
-    }
 
     String mockConnectionUrl = null;
 
@@ -39,6 +30,11 @@ public class MockBanking implements OnlineBankingService {
     @Override
     public BankApi bankApi() {
         return BankApi.MOCK;
+    }
+
+    @Override
+    public boolean externalBankAccountRequired() {
+        return false;
     }
 
     @Override
@@ -87,10 +83,11 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
-        Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/{accountId}/bookings", Booking[].class, bankAccount.getIban());
-
-        return Arrays.asList(bookings);
+    public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+        Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/{accountId}/bookings", Booking[].class, bankCode);
+        return LoadBookingsResponse.builder()
+                .bookings(Arrays.asList(bookings))
+                .build();
     }
 
     private RestTemplate getRestTemplate() {

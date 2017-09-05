@@ -1,42 +1,29 @@
 package figo;
 
-import static utils.Utils.getSecureRandom;
-
-import me.figo.models.*;
-import org.adorsys.envutils.EnvProperties;
-import org.apache.commons.lang3.RandomStringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
 import domain.Bank;
-import domain.BankAccess;
-import domain.BankAccount;
-import domain.BankAccountBalance;
-import domain.BankApi;
-import domain.BankApiUser;
-import domain.BankLoginCredential;
-import domain.Booking;
+import domain.*;
 import exception.InvalidPinException;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
-import me.figo.internal.SyncTokenRequest;
-import me.figo.internal.TaskStatusRequest;
-import me.figo.internal.TaskStatusResponse;
-import me.figo.internal.TaskTokenResponse;
-import me.figo.internal.TokenResponse;
+import me.figo.internal.*;
+import me.figo.models.*;
+import me.figo.models.BankLoginSettings;
+import me.figo.models.StandingOrder;
+import org.adorsys.envutils.EnvProperties;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 import utils.Utils;
+
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static utils.Utils.getSecureRandom;
 
 /**
  * Created by alexg on 17.05.17.
@@ -95,6 +82,11 @@ public class FigoBanking implements OnlineBankingService {
     @Override
     public BankApi bankApi() {
         return bankApi;
+    }
+
+    @Override
+    public boolean externalBankAccountRequired() {
+        return true;
     }
 
     @Override
@@ -229,7 +221,7 @@ public class FigoBanking implements OnlineBankingService {
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX,
-                bankApiUser.getApiPassword());
+                    bankApiUser.getApiPassword());
             FigoSession session = createSession(tokenResponse.getAccessToken());
 
             session.removeAccount(bankAccount.getExternalIdMap().get(bankApi()));
@@ -239,7 +231,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+    public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
             FigoSession session = createSession(tokenResponse.getAccessToken());
@@ -269,42 +261,63 @@ public class FigoBanking implements OnlineBankingService {
                     .map(this::mapBooking)
                     .collect(Collectors.toList());
 
-            List<StandingOrder> standingOrders = session.getStandingOrders(bankAccount.getExternalIdMap().get(bankApi()));
-
-            bankAccount.setBankAccountBalance(getBalance(session, bankAccount.getExternalIdMap().get(bankApi())));
+            List<domain.StandingOrder> standingOrders = session.getStandingOrders(bankAccount.getExternalIdMap().get(bankApi()))
+                    .stream()
+                    .map(this::mapStandingOrder)
+                    .collect(Collectors.toList());
 
             bookings.forEach(booking ->
                     standingOrders
                             .stream()
                             .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
                                     Utils.inCycle(booking.getValutaDate(), so.getExecutionDay()) &&
-                                    Utils.usageContains(booking.getUsage(), so.getPurposeText())
+                                    Utils.usageContains(booking.getUsage(), so.getUsage())
                             )
                             .findFirst()
                             .ifPresent(standingOrder -> {
                                 booking.setStandingOrder(true);
                             }));
 
-            return bookings;
+            return LoadBookingsResponse.builder()
+                    .bookings(bookings)
+                    .standingOrders(standingOrders)
+                    .bankAccountBalance(getBalance(session, bankAccount.getExternalIdMap().get(bankApi())))
+                    .build();
 
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
+    private domain.StandingOrder mapStandingOrder(StandingOrder figoStandingOrder) {
+        domain.StandingOrder standingOrder = new domain.StandingOrder();
+        standingOrder.setOrderId(figoStandingOrder.getStandingOrderId());
+        standingOrder.setExecutionDay(figoStandingOrder.getExecutionDay());
+        standingOrder.setAmount(figoStandingOrder.getAmount());
+        standingOrder.setUsage(figoStandingOrder.getPurposeText());
+        standingOrder.setCycle(Cycle.valueOf(figoStandingOrder.getInterval().getInterval()));
+        standingOrder.setOtherAccount(new BankAccount()
+                .owner(figoStandingOrder.getName())
+                .numberHbciAccount(figoStandingOrder.getAccountNumber())
+                .blzHbciAccount(figoStandingOrder.getBankCode())
+                .currencyHbciAccount(figoStandingOrder.getCurrency())
+        );
+        return standingOrder;
+    }
+
     private BankAccount mapBankAccount(Account account) {
         return new BankAccount()
-            .externalId(bankApi(), account.getAccountId())
-            .owner(account.getOwner())
-            .numberHbciAccount(account.getAccountNumber())
-            .nameHbciAccount(account.getName())
-            .bankName(account.getBankName())
-            .bicHbciAccount(account.getBIC())
-            .blzHbciAccount(account.getBankCode())
-            .ibanHbciAccount(account.getIBAN())
-            .typeHbciAccount(account.getType())
-            .bankAccountBalance(new BankAccountBalance()
-                .readyHbciBalance(account.getBalance().getBalance()));
+                .externalId(bankApi(), account.getAccountId())
+                .owner(account.getOwner())
+                .numberHbciAccount(account.getAccountNumber())
+                .nameHbciAccount(account.getName())
+                .bankName(account.getBankName())
+                .bicHbciAccount(account.getBIC())
+                .blzHbciAccount(account.getBankCode())
+                .ibanHbciAccount(account.getIBAN())
+                .typeHbciAccount(account.getType())
+                .bankAccountBalance(new BankAccountBalance()
+                        .readyHbciBalance(account.getBalance().getBalance()));
     }
 
     private Booking mapBooking(Transaction transaction) {

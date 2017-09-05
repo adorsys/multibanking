@@ -2,6 +2,7 @@ package org.adorsys.psd2.hbci.service;
 
 import java.util.List;
 
+import domain.LoadBookingsResponse;
 import org.adorsys.psd2.common.spi.EncryptionService;
 import org.adorsys.psd2.hbci.domain.EncryptedHbciLoadAccountRequest;
 import org.adorsys.psd2.hbci.domain.EncryptedHbciLoadBookingsRequest;
@@ -50,9 +51,9 @@ public class HbciService {
 			@ApiResponse(code = 400, message = "Bad request", responseHeaders=@ResponseHeader(name="ERROR_KEY", description="BAD_REQUEST"))})
 	public EncryptedListOfHbciBookings loadPostings(@ApiParam(value="The encrypted bank access object") EncryptedHbciLoadBookingsRequest encryptedRequest) {
 		HbciLoadBookingsRequest request = encryptionService.decrypt(encryptedRequest.getJweString(), HbciLoadBookingsRequest.class);
-		List<Booking> bookingList = onlineBankingService.loadBookings(null, request.getBankAccess(), null, request.getBankAccount(), request.getPin());
+		LoadBookingsResponse response = onlineBankingService.loadBookings(null, request.getBankAccess(), null, request.getBankAccount().getAccountNumber(), request.getPin());
 
-		String encryptedJwe = encryptionService.encrypt(bookingList, request);
+		String encryptedJwe = encryptionService.encrypt(response.getBookings(), request);
 		EncryptedListOfHbciBookings resp = new EncryptedListOfHbciBookings();
 		resp.setJweString(encryptedJwe);
 		return resp;

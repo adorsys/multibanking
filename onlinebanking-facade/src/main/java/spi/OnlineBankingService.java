@@ -9,6 +9,8 @@ public interface OnlineBankingService {
 
     BankApi bankApi();
 
+    boolean externalBankAccountRequired();
+
     boolean userRegistrationRequired();
 
     BankApiUser registerUser(String uid);
@@ -21,7 +23,7 @@ public interface OnlineBankingService {
 
     void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
 
-    List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin);
+    LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String blz, BankAccount bankAccount, String pin);
 
     boolean bankSupported(String bankCode);
 

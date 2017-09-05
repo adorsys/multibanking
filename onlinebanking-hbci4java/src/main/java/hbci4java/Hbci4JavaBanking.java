@@ -3,7 +3,6 @@ package hbci4java;
 import domain.*;
 import exception.InvalidPinException;
 import org.apache.commons.lang3.StringUtils;
-import org.kapott.hbci.GV.GVDauerSEPAList;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
@@ -22,10 +21,7 @@ import spi.OnlineBankingService;
 import utils.Utils;
 
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Hbci4JavaBanking implements OnlineBankingService {
@@ -43,6 +39,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public BankApi bankApi() {
         return BankApi.HBCI;
+    }
+
+    @Override
+    public boolean externalBankAccountRequired() {
+        return false;
     }
 
     @Override
@@ -107,7 +108,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+    public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
         HbciPassport hbciPassport = createPassport(bankAccess, bankCode, pin);
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
         try {
@@ -131,7 +132,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             if (hbciPassport.getState().isPresent()) {
                 bankAccess.setHbciPassportState(hbciPassport.getState().get().toJson());
             }
-            bankAccount.setBankAccountBalance(HbciFactory.createBalance((GVRSaldoReq) balanceJob.getJobResult()));
 
             List<Booking> bookings = HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult());
 
@@ -146,19 +146,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 booking.setMandateReference(Utils.extractMandateReference(booking.getUsage()));
             });
 
-            bookingList.forEach(booking ->
-                    standingOrders
-                            .stream()
-                            .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
-                                    Utils.inCycle(booking.getValutaDate(), so.getExecutionDay()) &&
-                                    Utils.usageContains(booking.getUsage(), so.getUsage())
-                            )
-                            .findFirst()
-                            .ifPresent(standingOrder -> {
-                                booking.setStandingOrder(true);
-                            }));
-
-            return bookingList;
+            return LoadBookingsResponse.builder()
+                    .bookings(bookingList)
+                    .bankAccountBalance(HbciFactory.createBalance((GVRSaldoReq) balanceJob.getJobResult()))
+                    .standingOrders(standingOrders)
+                    .build();
         } catch (HBCI_Exception e) {
             handleHbciException(e);
             return null;

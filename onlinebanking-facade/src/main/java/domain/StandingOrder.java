@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 
 /**
  * Created by alexg on 18.08.17.
@@ -13,18 +14,12 @@ import java.time.LocalDate;
 @ApiModel(description = "Standing order", value = "StandingOrder")
 public class StandingOrder {
 
-    public enum Cycle {
-        TWO_WEEKLY,
-        MONTHLY
-    }
-
     private String orderId;
     private Cycle cycle;
     private int executionDay;
-    private LocalDate firstBookingDate;
-    private LocalDate lastBookingDate;
+    private LocalDate firstExecutionDate;
+    private LocalDate lastExecutionDate;
     private BigDecimal amount;
     private BankAccount otherAccount;
     private String usage;
-
 }

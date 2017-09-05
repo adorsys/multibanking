@@ -60,6 +60,11 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
+    public boolean externalBankAccountRequired() {
+        return true;
+    }
+
+    @Override
     public boolean userRegistrationRequired() {
         return true;
     }
@@ -159,7 +164,8 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<Booking> loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+    public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+        //TODO standing orders needed
         LOG.debug("load bookings for account [{}]", bankAccount.getAccountNumber());
         ApiClient apiClient = createUserApiClient();
         apiClient.setAccessToken(authorizeUser(bankApiUser));
@@ -175,8 +181,6 @@ public class FinapiBanking implements OnlineBankingService {
             InlineResponse200Accounts account = waitAccountSynced(bankAccount, apiClient);
             //wait finapi categorized bookings
             waitBookingsCategorized(bankAccess, apiClient);
-
-            bankAccount.bankAccountBalance(new BankAccountBalance().readyHbciBalance(account.getBalance()));
 
             while (nextPage == null || transactionsResponse.getPaging().getPage() < transactionsResponse.getPaging().getPageCount()) {
                 transactionsResponse = new TransactionsApi(apiClient).getAndSearchAllTransactions("bankView", null, null, null, accountIds, null, null, null, null, null, null, null, null, null, null, null, null, null, null, nextPage, null, order);
@@ -211,7 +215,11 @@ public class FinapiBanking implements OnlineBankingService {
                 ).collect(Collectors.toList()));
             }
             LOG.info("loaded [{}] bookings for account [{}]", bookingList.size(), bankAccount.getAccountNumber());
-            return bookingList;
+
+            return LoadBookingsResponse.builder()
+                    .bankAccountBalance(new BankAccountBalance().readyHbciBalance(account.getBalance()))
+                    .bookings(bookingList)
+                    .build();
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
