@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,6 +23,8 @@ public class BankAccess {
     private String bankLogin2;
     @ApiModelProperty(value = "Bank code", required = true, example = "76070024")
     private String bankCode;
+    @ApiModelProperty(value = "Supported tan transport types", example = "iTAN")
+    List<TanTransportType> tanTransportTypes;
     @ApiModelProperty(hidden = true)
     private String hbciPassportState;
     @ApiModelProperty(hidden = true)

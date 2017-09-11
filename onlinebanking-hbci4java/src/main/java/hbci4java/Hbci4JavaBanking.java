@@ -90,6 +90,18 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             if (hbciPassport.getState().isPresent()) {
                 bankAccess.setHbciPassportState(hbciPassport.getState().get().toJson());
             }
+
+            bankAccess.setTanTransportTypes(new ArrayList<>());
+            hbciPassport.getAllowedTwostepMechanisms().forEach(id -> {
+                Properties properties = hbciPassport.getTwostepMechanisms().get(id);
+                bankAccess.getTanTransportTypes().add(
+                        TanTransportType.builder()
+                                .id(id)
+                                .name(properties.getProperty("name"))
+                                .build()
+                );
+            });
+
             handle.close();
             return hbciAccounts;
         } catch (HBCI_Exception e) {
