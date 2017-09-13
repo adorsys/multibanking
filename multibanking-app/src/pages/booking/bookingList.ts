@@ -6,7 +6,6 @@ import { AnalyticsPage } from "../analytics/analytics";
 import { ContractsComponent } from "../contracts/contracts.component";
 import { BankAccess } from "../../api/BankAccess";
 import { Booking } from "../../api/Booking";
-import { AppConfig } from "../../app/app.config";
 import { LogoService } from '../../services/LogoService';
 
 @Component({

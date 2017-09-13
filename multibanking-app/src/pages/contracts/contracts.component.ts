@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 import { NavParams } from "ionic-angular";
 
-import { Contract } from './contract.model';
 import { ContractService } from "./contract.service";
 import { LogoService } from '../../services/LogoService';
 
