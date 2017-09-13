@@ -60,8 +60,12 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 		Query where = Query.query(Criteria.where("id").is(accountId));
 
 		where.fields().include("syncStatus");
+        BankAccountEntity bankAccountEntity = mongoTemplate.findOne(where, BankAccountEntity.class);
+        if (bankAccountEntity != null) {
+            return bankAccountEntity.getSyncStatus();
+        }
 
-		return mongoTemplate.findOne(where, BankAccountEntity.class).getSyncStatus();
+        return null;
 	}
 
 	@Override

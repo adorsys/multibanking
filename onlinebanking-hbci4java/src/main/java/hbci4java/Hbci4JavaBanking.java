@@ -82,7 +82,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             bankAccess.setBankName(hbciPassport.getInstName());
             List<BankAccount> hbciAccounts = new ArrayList<>();
             for (Konto konto : hbciPassport.getAccounts()) {
-                BankAccount bankAccount = HbciFactory.toBankAccount(konto);
+                BankAccount bankAccount = HbciMapping.toBankAccount(konto);
                 bankAccount.externalId(bankApi(), UUID.randomUUID().toString());
                 bankAccount.bankName(bankAccess.getBankName());
                 hbciAccounts.add(bankAccount);
@@ -91,16 +91,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 bankAccess.setHbciPassportState(hbciPassport.getState().get().toJson());
             }
 
-            bankAccess.setTanTransportTypes(new ArrayList<>());
-            hbciPassport.getAllowedTwostepMechanisms().forEach(id -> {
-                Properties properties = hbciPassport.getTwostepMechanisms().get(id);
-                bankAccess.getTanTransportTypes().add(
-                        TanTransportType.builder()
-                                .id(id)
-                                .name(properties.getProperty("name"))
-                                .build()
-                );
-            });
+            updateTanTransportTypes(bankAccess, hbciPassport);
 
             handle.close();
             return hbciAccounts;
@@ -125,7 +116,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         HBCIHandler handle = new HBCIHandler(hbciPassport.getHBCIVersion(), hbciPassport);
         try {
             Konto account = hbciPassport.getAccount(bankAccount.getAccountNumber());
-            HBCIJob balanceJob = handle.newJob("SaldoReq");
+
+            HBCIJob balanceJob = handle.newJob( "SaldoReq");
             balanceJob.setParam("my", account);
             balanceJob.addToQueue();
             HBCIJob bookingsJob = handle.newJob("KUmsAll");
@@ -145,9 +137,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 bankAccess.setHbciPassportState(hbciPassport.getState().get().toJson());
             }
 
-            List<Booking> bookings = HbciFactory.createBookings((GVRKUms) bookingsJob.getJobResult());
+            List<Booking> bookings = HbciMapping.createBookings((GVRKUms) bookingsJob.getJobResult());
 
-            List<StandingOrder> standingOrders = HbciFactory.createStandingOrders((GVRDauerList) standingOrdersJob.getJobResult());
+            List<StandingOrder> standingOrders = HbciMapping.createStandingOrders((GVRDauerList) standingOrdersJob.getJobResult());
 
             ArrayList<Booking> bookingList = bookings.stream()
                     .collect(Collectors.collectingAndThen(Collectors.toCollection(
@@ -158,9 +150,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 booking.setMandateReference(Utils.extractMandateReference(booking.getUsage()));
             });
 
+            updateTanTransportTypes(bankAccess, hbciPassport);
+
             return LoadBookingsResponse.builder()
                     .bookings(bookingList)
-                    .bankAccountBalance(HbciFactory.createBalance((GVRSaldoReq) balanceJob.getJobResult()))
+                    .bankAccountBalance(HbciMapping.createBalance((GVRSaldoReq) balanceJob.getJobResult()))
                     .standingOrders(standingOrders)
                     .build();
         } catch (HBCI_Exception e) {
@@ -180,6 +174,21 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return true;
     }
 
+    private void updateTanTransportTypes(BankAccess bankAccess, HbciPassport hbciPassport) {
+        bankAccess.setTanTransportTypes(new ArrayList<>());
+        hbciPassport.getAllowedTwostepMechanisms().forEach(id -> {
+            Properties properties = hbciPassport.getTwostepMechanisms().get(id);
+
+            bankAccess.getTanTransportTypes().add(
+                    TanTransportType.builder()
+                            .id(id)
+                            .name(properties.getProperty("name"))
+                            .medium(hbciPassport.getUPD().getProperty("tanmedia.names"))
+                            .build()
+            );
+        });
+    }
+
     private HbciPassport createPassport(BankAccess bankAccess, String bankCode, String pin) {
         Properties properties = new Properties();
         properties.put("kernel.rewriter", "InvalidSegment,WrongStatusSegOrder,WrongSequenceNumbers,MissingMsgRef,HBCIVersion,SigIdLeadingZero,InvalidSuppHBCIVersion,SecTypeTAN,KUmsDelimiters,KUmsEmptyBDateSets");
@@ -187,6 +196,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         properties.put("default.hbciversion", "FinTS3");
         properties.put("client.passport.PinTan.checkcert", "1");
         properties.put("client.passport.PinTan.init", "1");
+        properties.put("client.errors.ignoreJobNotSupported", "yes");
 
         properties.put("client.passport.country", "DE");
         properties.put("client.passport.blz", bankCode != null ? bankCode : bankAccess.getBankCode());

@@ -3,6 +3,7 @@ package hbci4java;
 
 import domain.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
@@ -19,9 +20,9 @@ import java.util.List;
 /**
  * Created by alexg on 08.02.17.
  */
-public final class HbciFactory {
+public final class HbciMapping {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HbciFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HbciMapping.class);
 
     public static BankAccountBalance createBalance(GVRSaldoReq gvSaldoReq) {
         BankAccountBalance result = new BankAccountBalance();
@@ -157,14 +158,15 @@ public final class HbciFactory {
 
     public static BankAccount toBankAccount(Konto konto) {
         BankAccount bankAccount = new BankAccount();
-        bankAccount.numberHbciAccount(konto.number);
-        bankAccount.bicHbciAccount(konto.bic);
-        bankAccount.blzHbciAccount(konto.blz);
-        bankAccount.countryHbciAccount(konto.country);
-        bankAccount.currencyHbciAccount(konto.curr);
-        bankAccount.ibanHbciAccount(konto.iban);
+        bankAccount.accountNumber(konto.number);
+        bankAccount.bic(konto.bic);
+        bankAccount.blz(konto.blz);
+        bankAccount.country(konto.country);
+        bankAccount.currency(konto.curr);
+        bankAccount.iban(konto.iban);
         bankAccount.owner((konto.name + " " + (konto.name2 != null ? konto.name2 : "")).trim());
-        bankAccount.typeHbciAccount(konto.type);
+        bankAccount.name(konto.type);
+        bankAccount.type(BankAccountType.fromHbciType(NumberUtils.toInt(konto.acctype)));
         return bankAccount;
     }
 

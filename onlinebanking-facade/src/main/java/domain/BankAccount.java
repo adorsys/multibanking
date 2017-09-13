@@ -39,9 +39,9 @@ public class BankAccount {
     @ApiModelProperty(value = "Account number", example="430254900")
     private String accountNumber;
 	
-    @ApiModelProperty(value = "Type of this bank account", example="Current Account")
-    private String type;
-	
+    @ApiModelProperty(value = "Type of this bank account", example="GIRO")
+    private BankAccountType type;
+
     @ApiModelProperty(value = "Currency of this bank account", example="EURO")
     private String currency;
 	
@@ -62,33 +62,33 @@ public class BankAccount {
         return this;
     }
 
-    public BankAccount countryHbciAccount(String countryHbciAccount) {
-        this.country = countryHbciAccount;
+    public BankAccount country(String country) {
+        this.country = country;
         return this;
     }
 
-    public BankAccount blzHbciAccount(String blzHbciAccount) {
-        this.blz = blzHbciAccount;
+    public BankAccount blz(String blz) {
+        this.blz = blz;
         return this;
     }
 
-    public BankAccount numberHbciAccount(String numberHbciAccount) {
-        this.accountNumber = numberHbciAccount;
+    public BankAccount accountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
         return this;
     }
 
-    public BankAccount typeHbciAccount(String typeHbciAccount) {
-        this.type = typeHbciAccount;
+    public BankAccount type(BankAccountType type) {
+        this.type = type;
         return this;
     }
 
-    public BankAccount currencyHbciAccount(String currencyHbciAccount) {
-        this.currency = currencyHbciAccount;
+    public BankAccount currency(String currency) {
+        this.currency = currency;
         return this;
     }
 
-    public BankAccount nameHbciAccount(String nameHbciAccount) {
-        this.name = nameHbciAccount;
+    public BankAccount name(String name) {
+        this.name = name;
         return this;
     }
 
@@ -97,13 +97,13 @@ public class BankAccount {
         return this;
     }
 
-    public BankAccount bicHbciAccount(String bicHbciAccount) {
-        this.bic = bicHbciAccount;
+    public BankAccount bic(String bic) {
+        this.bic = bic;
         return this;
     }
 
-    public BankAccount ibanHbciAccount(String ibanHbciAccount) {
-        this.iban = ibanHbciAccount;
+    public BankAccount iban(String iban) {
+        this.iban = iban;
         return this;
     }
 

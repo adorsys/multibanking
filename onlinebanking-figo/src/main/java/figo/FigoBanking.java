@@ -1,25 +1,22 @@
 package figo;
 
-import domain.Bank;
 import domain.*;
 import exception.InvalidPinException;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
 import me.figo.internal.*;
-import me.figo.models.*;
+import me.figo.models.Account;
+import me.figo.models.AccountBalance;
 import me.figo.models.BankLoginSettings;
-import me.figo.models.StandingOrder;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
-import utils.Utils;
 
 import java.io.IOException;
 import java.security.SecureRandom;
-import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -199,8 +196,10 @@ public class FigoBanking implements OnlineBankingService {
                 Thread.sleep(1000);
             }
 
+            updateTanTransportTypes(bankAccess, session.getAccounts());
+
             return session.getAccounts().stream()
-                    .map(this::mapBankAccount)
+                    .map(FigoMapping::mapBankAccount)
                     .collect(Collectors.toList());
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -258,25 +257,15 @@ public class FigoBanking implements OnlineBankingService {
 
             List<Booking> bookings = session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
                     .stream()
-                    .map(this::mapBooking)
+                    .map(FigoMapping::mapBooking)
                     .collect(Collectors.toList());
 
             List<domain.StandingOrder> standingOrders = session.getStandingOrders(bankAccount.getExternalIdMap().get(bankApi()))
                     .stream()
-                    .map(this::mapStandingOrder)
+                    .map(FigoMapping::mapStandingOrder)
                     .collect(Collectors.toList());
 
-            bookings.forEach(booking ->
-                    standingOrders
-                            .stream()
-                            .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
-                                    Utils.inCycle(booking.getValutaDate(), so.getExecutionDay()) &&
-                                    Utils.usageContains(booking.getUsage(), so.getUsage())
-                            )
-                            .findFirst()
-                            .ifPresent(standingOrder -> {
-                                booking.setStandingOrder(true);
-                            }));
+            updateTanTransportTypes(bankAccess, session.getAccounts());
 
             return LoadBookingsResponse.builder()
                     .bookings(bookings)
@@ -289,61 +278,14 @@ public class FigoBanking implements OnlineBankingService {
         }
     }
 
-    private domain.StandingOrder mapStandingOrder(StandingOrder figoStandingOrder) {
-        domain.StandingOrder standingOrder = new domain.StandingOrder();
-        standingOrder.setOrderId(figoStandingOrder.getStandingOrderId());
-        standingOrder.setExecutionDay(figoStandingOrder.getExecutionDay());
-        standingOrder.setAmount(figoStandingOrder.getAmount());
-        standingOrder.setUsage(figoStandingOrder.getPurposeText());
-        standingOrder.setCycle(Cycle.valueOf(figoStandingOrder.getInterval().getInterval()));
-        standingOrder.setOtherAccount(new BankAccount()
-                .owner(figoStandingOrder.getName())
-                .numberHbciAccount(figoStandingOrder.getAccountNumber())
-                .blzHbciAccount(figoStandingOrder.getBankCode())
-                .currencyHbciAccount(figoStandingOrder.getCurrency())
-        );
-        return standingOrder;
-    }
-
-    private BankAccount mapBankAccount(Account account) {
-        return new BankAccount()
-                .externalId(bankApi(), account.getAccountId())
-                .owner(account.getOwner())
-                .numberHbciAccount(account.getAccountNumber())
-                .nameHbciAccount(account.getName())
-                .bankName(account.getBankName())
-                .bicHbciAccount(account.getBIC())
-                .blzHbciAccount(account.getBankCode())
-                .ibanHbciAccount(account.getIBAN())
-                .typeHbciAccount(account.getType())
-                .bankAccountBalance(new BankAccountBalance()
-                        .readyHbciBalance(account.getBalance().getBalance()));
-    }
-
-    private Booking mapBooking(Transaction transaction) {
-        Booking booking = new Booking();
-        booking.setExternalId(transaction.getTransactionId());
-        booking.setBankApi(bankApi());
-        booking.setBookingDate(transaction.getBookingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        booking.setValutaDate(transaction.getValueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-        booking.setAmount(transaction.getAmount());
-        booking.setUsage(transaction.getPurposeText());
-        booking.setText(transaction.getBookingText());
-        booking.setTransactionCode(transaction.getTransactionCode());
-        booking.setOtherAccount(mapBookingAccount(transaction));
-        booking.setCreditorId(Utils.extractCreditorId(transaction.getPurposeText()));
-        booking.setMandateReference(Utils.extractMandateReference(transaction.getPurposeText()));
-        return booking;
-    }
-
-    private BankAccount mapBookingAccount(Transaction transaction) {
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setName(transaction.getName());
-        bankAccount.setBankName(transaction.getBankName());
-        bankAccount.setCurrency(transaction.getCurrency());
-        bankAccount.setAccountNumber(transaction.getAccountNumber());
-        bankAccount.setBlz(transaction.getBankCode());
-        return bankAccount;
+    private void updateTanTransportTypes(BankAccess bankAccess, List<Account> accounts) throws FigoException, IOException {
+        List<TanTransportType> tanTransportTypes = accounts
+                .stream()
+                .map(Account::getSupportedTanSchemes)
+                .flatMap(listContainer -> listContainer.stream())
+                .map(FigoMapping::mapTanTransportTypes)
+                .collect(Collectors.toList());
+        bankAccess.setTanTransportTypes(tanTransportTypes);
     }
 
     private Status waitForFinish(FigoSession session, String taskToken, String pin) throws IOException, FigoException, InterruptedException {
