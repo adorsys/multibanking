@@ -2,6 +2,7 @@ package de.adorsys.onlinebanking.mock;
 
 import domain.*;
 import org.adorsys.envutils.EnvProperties;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
@@ -39,7 +40,7 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public boolean bankSupported(String bankCode) {
-        return true;
+        return StringUtils.endsWith(bankCode,"000000");
     }
 
     @Override
@@ -69,7 +70,7 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
-        BankAccount[] bankAccounts = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/", BankAccount[].class);
+        BankAccount[] bankAccounts = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts", BankAccount[].class,bankCode);
         for (BankAccount bankAccount : bankAccounts) {
             bankAccount.bankName(bankAccess.getBankName());
             bankAccount.externalId(bankApi(), UUID.randomUUID().toString());
@@ -79,12 +80,12 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
-
+              getRestTemplate().delete(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}",bankAccount.getBlz(),bankAccount.getIban());
     }
 
     @Override
     public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
-        Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/accounts/{accountId}/bookings", Booking[].class, bankCode);
+        Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/bookings", Booking[].class, bankCode,bankAccount.getIban());
         return LoadBookingsResponse.builder()
                 .bookings(Arrays.asList(bookings))
                 .build();
