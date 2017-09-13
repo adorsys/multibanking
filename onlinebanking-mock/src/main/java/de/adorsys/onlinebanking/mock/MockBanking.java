@@ -40,7 +40,7 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public boolean bankSupported(String bankCode) {
-        return StringUtils.endsWith(bankCode,"000000");
+        return true ;
     }
 
     @Override
