@@ -164,7 +164,7 @@ public final class HbciMapping {
         bankAccount.country(konto.country);
         bankAccount.currency(konto.curr);
         bankAccount.iban(konto.iban);
-        bankAccount.owner((konto.name + " " + (konto.name2 != null ? konto.name2 : "")).trim());
+        bankAccount.owner((konto.name + (konto.name2 != null ? konto.name2 : "")).trim());
         bankAccount.name(konto.type);
         bankAccount.type(BankAccountType.fromHbciType(NumberUtils.toInt(konto.acctype)));
         return bankAccount;
