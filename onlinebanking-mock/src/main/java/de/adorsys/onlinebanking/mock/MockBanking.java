@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 import spi.OnlineBankingService;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -70,7 +71,7 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
-        BankAccount[] bankAccounts = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts", BankAccount[].class,bankCode);
+        BankAccount[] bankAccounts = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts",BankAccount[].class,bankCode);
         for (BankAccount bankAccount : bankAccounts) {
             bankAccount.bankName(bankAccess.getBankName());
             bankAccount.externalId(bankApi(), UUID.randomUUID().toString());
@@ -80,15 +81,39 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
-              getRestTemplate().delete(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}",bankAccount.getBlz(),bankAccount.getIban());
+             getRestTemplate().delete(mockConnectionUrl+"/bankaccesses/{bankcode}/accounts/{iban}",bankAccount.getBlz(),bankAccount.getIban());
     }
 
     @Override
     public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
-        Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/bookings", Booking[].class, bankCode,bankAccount.getIban());
+
+        Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/bookings",
+        		Booking[].class,
+        		bankCode,
+        		bankAccount.getIban());
+
         return LoadBookingsResponse.builder()
                 .bookings(Arrays.asList(bookings))
+                .standingOrders(getStandingOders(bankCode,bankAccount.getIban()))
+                .bankAccountBalance(getBalance(bankCode,bankAccount.getIban()))
                 .build();
+    }
+
+    private List<StandingOrder> getStandingOders(String bankCode ,String iban){
+
+        StandingOrder[] standingOrders = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/standingorders",
+                StandingOrder[].class,
+                bankCode,
+                iban);
+        return Arrays.asList(standingOrders) ;
+    }
+
+    private BankAccountBalance getBalance(String bankCode ,String iban ){
+        BankAccount account = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}",
+                BankAccount.class,
+                bankCode,
+                iban);
+           return new BankAccountBalance().readyHbciBalance(account.getBankAccountBalance().getReadyHbciBalance());
     }
 
     private RestTemplate getRestTemplate() {
