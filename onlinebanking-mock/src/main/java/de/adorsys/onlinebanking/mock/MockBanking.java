@@ -1,17 +1,26 @@
 package de.adorsys.onlinebanking.mock;
 
-import domain.*;
-import org.adorsys.envutils.EnvProperties;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.web.client.RestTemplate;
-import spi.OnlineBankingService;
-
-import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import org.adorsys.envutils.EnvProperties;
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
+
+import domain.Bank;
+import domain.BankAccess;
+import domain.BankAccount;
+import domain.BankAccountBalance;
+import domain.BankApi;
+import domain.BankApiUser;
+import domain.Booking;
+import domain.LoadBookingsResponse;
+import domain.StandingOrder;
+import spi.OnlineBankingService;
 
 /**
  * Created by alexg on 17.05.17.
@@ -71,7 +80,8 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
-        BankAccount[] bankAccounts = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts",BankAccount[].class,bankCode);
+        BankAccount[] bankAccounts = getRestTemplate(bankAccess.getBankLogin(),bankCode,pin)
+        		.getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts",BankAccount[].class,bankCode);
         for (BankAccount bankAccount : bankAccounts) {
             bankAccount.bankName(bankAccess.getBankName());
             bankAccount.externalId(bankApi(), UUID.randomUUID().toString());
@@ -81,44 +91,46 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
-             getRestTemplate().delete(mockConnectionUrl+"/bankaccesses/{bankcode}/accounts/{iban}",bankAccount.getBlz(),bankAccount.getIban());
+          // getRestTemplate(bankApiUser.getApiUserId()).delete(mockConnectionUrl+"/bankaccesses/{bankcode}/accounts/{iban}",bankAccount.getBlz(),bankAccount.getIban());
     }
 
     @Override
     public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
 
-        Booking[] bookings = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/bookings",
+        Booking[] bookings = getRestTemplate(bankAccess.getBankLogin(),bankCode,pin).getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/bookings",
         		Booking[].class,
         		bankCode,
         		bankAccount.getIban());
-
         return LoadBookingsResponse.builder()
                 .bookings(Arrays.asList(bookings))
-                .standingOrders(getStandingOders(bankCode,bankAccount.getIban()))
-                .bankAccountBalance(getBalance(bankCode,bankAccount.getIban()))
+                .standingOrders(getStandingOders(bankAccess,pin,bankAccount.getIban()))
+                .bankAccountBalance(getBalance(bankAccess,pin,bankAccount.getIban()))
                 .build();
     }
 
-    private List<StandingOrder> getStandingOders(String bankCode ,String iban){
+    private List<StandingOrder> getStandingOders(BankAccess ba, String pin ,String iban){
 
-        StandingOrder[] standingOrders = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/standingorders",
+        StandingOrder[] standingOrders = getRestTemplate(ba.getBankLogin(),ba.getBankCode(),pin)
+        		.getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/standingorders",
                 StandingOrder[].class,
-                bankCode,
+                ba.getBankCode(),
                 iban);
         return Arrays.asList(standingOrders) ;
     }
 
-    private BankAccountBalance getBalance(String bankCode ,String iban ){
-        BankAccount account = getRestTemplate().getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}",
+    private BankAccountBalance getBalance(BankAccess ba, String pin ,String iban ){
+        BankAccount account = getRestTemplate(ba.getBankLogin(),ba.getBankCode(),pin)
+        		.getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}",
                 BankAccount.class,
-                bankCode,
+                ba.getBankCode(),
                 iban);
            return new BankAccountBalance().readyHbciBalance(account.getBankAccountBalance().getReadyHbciBalance());
     }
 
-    private RestTemplate getRestTemplate() {
+    private RestTemplate getRestTemplate(String bankLogin , String bankCode , String pin) {
+    	String basicToken = new Base64().encodeAsString((bankLogin+"_"+bankCode+":"+pin).getBytes(Charset.forName("UTF-8")));
         RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getInterceptors().add(new BearerTokenAuthorizationInterceptor(bearerToken));
+        restTemplate.getInterceptors().add(new BasicAuthorizationInterceptor(basicToken));
         return restTemplate;
     }
 }
