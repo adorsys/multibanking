@@ -23,7 +23,7 @@ import java.util.Optional;
         @CompoundIndex(name = "booking_index", def = "{'userId': 1, 'accountId': 1}"),
         @CompoundIndex(name = "booking_unique_index", def = "{'externalId': 1, 'accountId': 1}", unique = true)
 })
-@Encrypted(exclude = {"_id", "accountId", "externalId", "userId", "valutaDate", "bookingDate", "bankApi", "bookingCategory.contract.interval"})
+@Encrypted(exclude = {"_id", "accountId", "externalId", "userId", "valutaDate", "bookingDate", "bankApi"})
 public class BookingEntity extends Booking {
 
     @Id

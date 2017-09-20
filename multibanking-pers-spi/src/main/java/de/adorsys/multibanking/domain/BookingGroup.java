@@ -16,12 +16,12 @@ import java.util.List;
 @Builder
 public class BookingGroup {
 
-    boolean variable;
-    String mainCategory;
-    String subCategory;
-    String specification;
-    String otherAccount;
+    private boolean variable;
+    private String mainCategory;
+    private String subCategory;
+    private String specification;
+    private String otherAccount;
     private BigDecimal amount;
     private LocalDate nextExecutionDate;
-    Contract contract;
+    private Contract contract;
 }
