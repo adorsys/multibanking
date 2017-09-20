@@ -25,6 +25,7 @@ import { KEYCLOAK_HTTP_PROVIDER } from '../auth/keycloak.http';
 import { KeycloakService } from '../auth/keycloak.service';
 import { LogoService } from '../services/LogoService';
 import { MyApp } from './app.component';
+import { TabsPage } from '../pages/tabs/tabs';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { MyApp } from './app.component';
     BookingGroupPage,
     BookingListPage,
     ContractsComponent,
+    TabsPage,
     CyclePipe,
     MyApp,
   ],
@@ -55,6 +57,7 @@ import { MyApp } from './app.component';
     BookingGroupPage,
     BookingListPage,
     ContractsComponent,
+    TabsPage,
     MyApp,
   ],
   providers: [

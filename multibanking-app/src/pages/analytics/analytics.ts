@@ -54,6 +54,10 @@ export class AnalyticsPage {
       })
   }
 
+  getCompanyLogoUrl(bookingGroup: BookingGroup) {
+    return AppConfig.api_url + "/image/"+bookingGroup.contract.logo;
+  }
+
   syncBookingsPromptPin() {
     let alert = this.alertCtrl.create({
       title: 'Pin',
@@ -80,10 +84,6 @@ export class AnalyticsPage {
       ]
     });
     alert.present();
-  }
-
-  getCompanyLogoUrl(bookingGroup: BookingGroup) {
-    return AppConfig.api_url + "/image/"+bookingGroup.contract.logo;
   }
 
   syncBookings(pin) {

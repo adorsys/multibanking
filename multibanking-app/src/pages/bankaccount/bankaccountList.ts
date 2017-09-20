@@ -1,9 +1,9 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccountService";
-import { BookingListPage } from "../booking/bookingList";
 import { BankAccess } from "../../api/BankAccess";
 import { BankAccount } from "../../api/BankAccount";
+import { TabsPage } from "../tabs/tabs";
 
 @Component({
   selector: 'page-bankaccountList',
@@ -36,7 +36,7 @@ export class BankAccountListPage {
   }
 
   itemSelected(bankAccount) {
-    this.navCtrl.push(BookingListPage, {
+    this.navCtrl.push(TabsPage, {
       bankAccess: this.bankAccess,
       bankAccountId: bankAccount.id,
     })

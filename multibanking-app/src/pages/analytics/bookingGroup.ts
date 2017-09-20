@@ -17,14 +17,25 @@ export class BookingGroupPage {
     this.bookingGroups = this.sortBookingGroups(navparams.data.bookingGroups);
   }
 
-  sortBookingGroups (bookingGroups: Array<BookingGroup>): Array<BookingGroup> {
+  sortBookingGroups(bookingGroups: Array<BookingGroup>): Array<BookingGroup> {
     return bookingGroups.sort((group1: BookingGroup, group2: BookingGroup) => {
-      if (group1.nextExecutionDate > group2.nextExecutionDate) {
+      if (group1.variable == true) {
         return 1;
       }
 
-       if (group1.nextExecutionDate < group2.nextExecutionDate) {
+      if (group2.variable == true) {
         return -1;
+      }
+
+      let group1Date = new Date(group1.nextExecutionDate[0], group1.nextExecutionDate[1] - 1, group1.nextExecutionDate[2]);
+      let group2Date = new Date(group2.nextExecutionDate[0], group2.nextExecutionDate[1] - 1, group2.nextExecutionDate[2]);
+
+      if (group1Date > group2Date) {
+        return -1;
+      }
+
+      if (group1Date < group2Date) {
+        return 1;
       }
 
       return 0;
