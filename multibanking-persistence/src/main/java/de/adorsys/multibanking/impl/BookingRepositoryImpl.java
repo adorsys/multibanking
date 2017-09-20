@@ -33,20 +33,6 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 	}
 
 	@Override
-	public List<BookingEntity> findContracts(String userId, String bankAccountId, BankApi bankApi) {
-        Query query = Query.query(Criteria.where("userId")
-                .is(userId)
-                .and("accountId")
-                .is(bankAccountId)
-                .and("bankApi")
-                .is(bankApi)
-                .and("bookingCategory.contract.interval")
-                .ne(null));
-
-        return mongoTemplate.find(query, BookingEntity.class);
-	}
-
-	@Override
 	public Optional<BookingEntity> findByUserIdAndId(String userId, String bookingId) {
 		return bookingRepository.findByUserIdAndId(userId, bookingId);
 	}
