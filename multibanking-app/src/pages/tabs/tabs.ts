@@ -3,7 +3,6 @@ import { BookingListPage } from '../booking/bookingList';
 import { ContractsComponent } from '../contracts/contracts.component';
 import { AnalyticsPage } from '../analytics/analytics';
 import { NavParams } from 'ionic-angular';
-import { BankAccess } from '../../api/BankAccess';
 
 @Component({
   templateUrl: 'tabs.html'
