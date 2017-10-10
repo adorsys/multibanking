@@ -41,8 +41,6 @@ public enum BankAccountType {
             return BUIILDINGSAVING;
         } else if (hbciAccountType < 90) {
             return INSURANCE;
-        } else if (hbciAccountType < 100) {
-            return UNKNOWN;
         }
 
         return UNKNOWN;

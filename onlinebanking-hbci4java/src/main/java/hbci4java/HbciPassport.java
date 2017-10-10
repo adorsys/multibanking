@@ -18,8 +18,6 @@ import java.util.*;
  */
 public class HbciPassport extends HBCIPassportPinTanNoFile {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HbciPassport.class);
-
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private State state;
