@@ -247,12 +247,9 @@ public class FigoBanking implements OnlineBankingService {
                     ),
                     "POST", TaskTokenResponse.class);
 
-            Status status = waitForFinish(session, response.getTaskToken(), pin);
+            Status status = waitForFinish(session, response.getTaskToken());
             if (status == Status.PIN) {
-                TaskStatusRequest request = new TaskStatusRequest(response.getTaskToken());
-                request.setPin(pin);
-                session.queryApi("/task/progress?id=" + response.getTaskToken(), request, "POST", TaskStatusResponse.class);
-                waitForFinish(session, response.getTaskToken(), pin);
+                sendPin(response.getTaskToken(), pin, session);
             }
 
             List<Booking> bookings = session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
@@ -278,17 +275,26 @@ public class FigoBanking implements OnlineBankingService {
         }
     }
 
+    private void sendPin(String taskToken, String pin, FigoSession session) throws FigoException, InterruptedException, IOException {
+        session.queryApi("/task/progress?id=" + taskToken, new TaskStatusRequest(taskToken, pin), "POST", TaskStatusResponse.class);
+        Status status = waitForFinish(session, taskToken);
+
+        if (status != Status.OK) {
+            throw new InvalidPinException();
+        }
+    }
+
     private void updateTanTransportTypes(BankAccess bankAccess, List<Account> accounts) throws FigoException, IOException {
         List<TanTransportType> tanTransportTypes = accounts
                 .stream()
                 .map(Account::getSupportedTanSchemes)
-                .flatMap(listContainer -> listContainer.stream())
+                .flatMap(Collection::stream)
                 .map(FigoMapping::mapTanTransportTypes)
                 .collect(Collectors.toList());
         bankAccess.setTanTransportTypes(tanTransportTypes);
     }
 
-    private Status waitForFinish(FigoSession session, String taskToken, String pin) throws IOException, FigoException, InterruptedException {
+    private Status waitForFinish(FigoSession session, String taskToken) throws IOException, FigoException, InterruptedException {
         Status status;
         while ((status = checkState(session, taskToken)) == Status.SYNC) {
             Thread.sleep(1000);
