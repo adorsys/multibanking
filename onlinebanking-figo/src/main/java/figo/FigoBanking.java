@@ -199,7 +199,7 @@ public class FigoBanking implements OnlineBankingService {
             updateTanTransportTypes(bankAccess, session.getAccounts());
 
             return session.getAccounts().stream()
-                    .map(FigoMapping::mapBankAccount)
+                    .map(account -> FigoMapping.mapBankAccount(account, bankApi))
                     .collect(Collectors.toList());
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -254,7 +254,7 @@ public class FigoBanking implements OnlineBankingService {
 
             List<Booking> bookings = session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
                     .stream()
-                    .map(FigoMapping::mapBooking)
+                    .map(transaction -> FigoMapping.mapBooking(transaction, bankApi))
                     .collect(Collectors.toList());
 
             List<domain.StandingOrder> standingOrders = session.getStandingOrders(bankAccount.getExternalIdMap().get(bankApi()))

@@ -8,7 +8,6 @@ import me.figo.models.Transaction;
 import utils.Utils;
 
 import java.time.ZoneId;
-import java.util.List;
 
 /**
  * Created by alexg on 13.09.17.
@@ -31,9 +30,9 @@ public class FigoMapping {
         return standingOrder;
     }
 
-    public static BankAccount mapBankAccount(Account account) {
+    public static BankAccount mapBankAccount(Account account, BankApi bankApi) {
         return new BankAccount()
-                .externalId(BankApi.FIGO, account.getAccountId())
+                .externalId(bankApi, account.getAccountId())
                 .owner(account.getOwner())
                 .accountNumber(account.getAccountNumber())
                 .name(account.getName())
@@ -46,10 +45,10 @@ public class FigoMapping {
                         .readyHbciBalance(account.getBalance().getBalance()));
     }
 
-    public static Booking mapBooking(Transaction transaction) {
+    public static Booking mapBooking(Transaction transaction, BankApi bankApi) {
         Booking booking = new Booking();
         booking.setExternalId(transaction.getTransactionId());
-        booking.setBankApi(BankApi.FIGO);
+        booking.setBankApi(bankApi);
         booking.setBookingDate(transaction.getBookingDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         booking.setValutaDate(transaction.getValueDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
         booking.setAmount(transaction.getAmount());
