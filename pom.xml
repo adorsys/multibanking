@@ -4,7 +4,7 @@
 
 	<groupId>de.adorsys.multibanking</groupId>
 	<artifactId>multibanking</artifactId>
-	<version>1.3.29-SNAPSHOT</version>
+	<version>1.3.29</version>
 	<packaging>pom</packaging>
 	<name>Multibanking</name>
 	<url>https://github.com/adorsys/multibanking</url>
@@ -286,7 +286,7 @@
 		<connection>scm:git@github.com:adorsys/multibanking.git</connection>
 		<developerConnection>scm:git:git@github.com:adorsys/multibanking.git</developerConnection>
 		<url>git@github.com:adorsys/multibanking.git</url>
-		<tag>HEAD</tag>
+		<tag>multibanking-1.3.29</tag>
 	</scm>
 	<profiles>
 		<profile>
