@@ -179,13 +179,17 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         hbciPassport.getAllowedTwostepMechanisms().forEach(id -> {
             Properties properties = hbciPassport.getTwostepMechanisms().get(id);
 
-            bankAccess.getTanTransportTypes().add(
-                    TanTransportType.builder()
-                            .id(id)
-                            .name(properties.getProperty("name"))
-                            .medium(hbciPassport.getUPD().getProperty("tanmedia.names"))
-                            .build()
-            );
+            if (properties != null) {
+                bankAccess.getTanTransportTypes().add(
+                        TanTransportType.builder()
+                                .id(id)
+                                .name(properties.getProperty("name") != null ? properties.getProperty("name") : null)
+                                .medium(hbciPassport.getUPD().getProperty("tanmedia.names"))
+                                .build()
+                );
+            } else {
+                LOG.warn("unable find transport type {} for bank code {}", id, bankAccess.getBankCode());
+            }
         });
     }
 
