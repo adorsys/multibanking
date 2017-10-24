@@ -3,6 +3,7 @@ package spi;
 
 import domain.*;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface OnlineBankingService {
@@ -28,5 +29,9 @@ public interface OnlineBankingService {
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
+
+    void createPayment(BankApiUser bankApiUser, String accountId, String pin, Payment payment);
+
+    void submitPayment(Payment payment, String tan);
 
 }

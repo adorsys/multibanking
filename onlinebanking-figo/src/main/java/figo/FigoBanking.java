@@ -2,6 +2,7 @@ package figo;
 
 import domain.*;
 import exception.InvalidPinException;
+import exception.InvalidTanException;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -16,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -249,7 +253,7 @@ public class FigoBanking implements OnlineBankingService {
 
             Status status = waitForFinish(session, response.getTaskToken());
             if (status == Status.PIN) {
-                sendPin(response.getTaskToken(), pin, session);
+                submitPin(response.getTaskToken(), pin, session);
             }
 
             List<Booking> bookings = session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
@@ -275,12 +279,60 @@ public class FigoBanking implements OnlineBankingService {
         }
     }
 
-    private void sendPin(String taskToken, String pin, FigoSession session) throws FigoException, InterruptedException, IOException {
+    @Override
+    public void createPayment(BankApiUser bankApiUser, String accountId, String pin, Payment payment) {
+        try {
+            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
+            FigoSession session = createSession(tokenResponse.getAccessToken());
+
+            me.figo.models.Payment figoPayment = session.addPayment(FigoMapping.mapToFigoPayment(accountId, payment));
+
+            String taskTokenLink = session.submitPayment(figoPayment, null, RandomStringUtils.randomAlphanumeric(5));
+            String taskToken = extractTaskToken(new URL(taskTokenLink));
+
+            Status status = waitForFinish(session, taskToken);
+            if (status == Status.PIN) {
+                submitPin(taskToken, pin, session);
+            } else if (status == Status.TAN) {
+                payment.setAccessToken(tokenResponse.getAccessToken());
+                payment.setTaskToken(taskToken);
+            }
+
+            throw new RuntimeException("invalid figo payment status " + status);
+        } catch (IOException | FigoException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void submitPayment(Payment payment, String tan) {
+        try {
+            FigoSession session = new FigoSession(payment.getAccessToken(), 10000, figoConnection.getApiEndpoint());
+
+            submitTan(payment.getTaskToken(), tan, session);
+        } catch (IOException | FigoException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void submitPin(String taskToken, String pin, FigoSession session) throws FigoException, InterruptedException, IOException {
         session.queryApi("/task/progress?id=" + taskToken, new TaskStatusRequest(taskToken, pin), "POST", TaskStatusResponse.class);
         Status status = waitForFinish(session, taskToken);
 
         if (status != Status.OK) {
             throw new InvalidPinException();
+        }
+    }
+
+    private void submitTan(String taskToken, String tan, FigoSession session) throws FigoException, InterruptedException, IOException {
+        TaskStatusRequest taskStatusRequest = new TaskStatusRequest(taskToken);
+        taskStatusRequest.setResponse(tan);
+
+        session.queryApi("/task/progress?id=" + taskToken, taskStatusRequest, "POST", TaskStatusResponse.class);
+        Status status = waitForFinish(session, taskToken);
+
+        if (status != Status.OK) {
+            throw new InvalidTanException();
         }
     }
 
@@ -337,6 +389,18 @@ public class FigoBanking implements OnlineBankingService {
         }
 
         return Status.OK;
+    }
+
+    String extractTaskToken(URL url) throws UnsupportedEncodingException {
+        String query = url.getQuery();
+        String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            if (pair.startsWith("id=")) {
+                String id = pair.substring(3);
+                return URLDecoder.decode(id, "UTF-8");
+            }
+        }
+        return null;
     }
 
     /**

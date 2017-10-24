@@ -1,18 +1,38 @@
 package figo;
 
 import domain.*;
-import me.figo.models.Account;
+import domain.Payment;
+import me.figo.models.*;
 import me.figo.models.StandingOrder;
-import me.figo.models.TanScheme;
-import me.figo.models.Transaction;
+import org.apache.commons.lang3.StringUtils;
 import utils.Utils;
 
 import java.time.ZoneId;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by alexg on 13.09.17.
  */
 public class FigoMapping {
+
+    private static final Map<Cycle, String> FIGO_CYCLE = new HashMap<>();
+    private static final Map<Payment.PaymentType, String> FIGO_TRANSFER = new HashMap<>();
+
+    static {
+        FIGO_CYCLE.put(Cycle.WEEKLY,    "weekly");
+        FIGO_CYCLE.put(Cycle.MONTHLY,     "monthly");
+        FIGO_CYCLE.put(Cycle.TWO_MONTHLY,   "two monthly");
+        FIGO_CYCLE.put(Cycle.QUARTERLY,   "quarterly");
+        FIGO_CYCLE.put(Cycle.HALF_YEARLY,  "half yearly");
+        FIGO_CYCLE.put(Cycle.YEARLY, "yearly");
+
+        FIGO_TRANSFER.put(Payment.PaymentType.TRANSFER, "Transfer");
+        FIGO_TRANSFER.put(Payment.PaymentType.SEPA_TRANSFER, "SEPA transfer");
+        FIGO_TRANSFER.put(Payment.PaymentType.STANDING_ORDER, "SEPA standing order");
+    }
+
 
     public static domain.StandingOrder mapStandingOrder(StandingOrder figoStandingOrder) {
         domain.StandingOrder standingOrder = new domain.StandingOrder();
@@ -77,5 +97,44 @@ public class FigoMapping {
                 .name(tanScheme.getName())
                 .medium(tanScheme.getMedium_name())
                 .build();
+    }
+
+    public static me.figo.models.Payment mapToFigoPayment(String accountId, Payment payment) {
+        me.figo.models.Payment figoPayment = new me.figo.models.Payment();
+        figoPayment.setAccountId(accountId);
+
+        if (!StringUtils.isEmpty(payment.getReceiverIban())) {
+            figoPayment.setIban(payment.getReceiverIban());
+        } else {
+            figoPayment.setBankCode(payment.getReceiverBankCode());
+            figoPayment.setAccountNumber(payment.getReceiverAccountNumber());
+        }
+
+        figoPayment.setAmount(payment.getAmount());
+        figoPayment.setCurrency("EUR");
+        figoPayment.setType(FIGO_TRANSFER.get(payment.getPaymentType()));
+        figoPayment.setName(payment.getReceiver());
+        figoPayment.setPurpose(payment.getPurpose());
+
+        // Mögliche Dauerauftragsattribute
+        if (payment.getExecutionDay() > -1) {
+            figoPayment.setExecution_day(payment.getExecutionDay());
+        }
+
+        if (payment.getFirstExecutionDate() != null) {
+            figoPayment.setFirst_execution_date(Date.from(
+                    payment.getFirstExecutionDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+        }
+
+        if (payment.getLastExecutionDate() != null) {
+            figoPayment.setLast_execution_date(Date.from(
+                    payment.getLastExecutionDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+        }
+
+        if (payment.getCycle() != null) {
+            figoPayment.setInterval(FIGO_CYCLE.get(payment.getCycle()));
+        }
+
+        return figoPayment;
     }
 }

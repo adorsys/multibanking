@@ -225,6 +225,14 @@ public class FinapiBanking implements OnlineBankingService {
         }
     }
 
+    @Override
+    public void createPayment(BankApiUser bankApiUser, String accountId, String pin, Payment payment) {
+    }
+
+    @Override
+    public void submitPayment(Payment payment, String tan) {
+    }
+
     private InlineResponse200Accounts waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {
         InlineResponse200Accounts account = new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
         while (account.getStatus() == InlineResponse200Accounts.StatusEnum.DOWNLOAD_IN_PROGRESS) {

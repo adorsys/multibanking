@@ -5,21 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import domain.*;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
-import domain.Bank;
-import domain.BankAccess;
-import domain.BankAccount;
-import domain.BankAccountBalance;
-import domain.BankApi;
-import domain.BankApiUser;
-import domain.Booking;
-import domain.LoadBookingsResponse;
-import domain.StandingOrder;
 import spi.OnlineBankingService;
 
 /**
@@ -125,6 +117,14 @@ public class MockBanking implements OnlineBankingService {
                 ba.getBankCode(),
                 iban);
            return new BankAccountBalance().readyHbciBalance(account.getBankAccountBalance().getReadyHbciBalance());
+    }
+
+    @Override
+    public void createPayment(BankApiUser bankApiUser, String accountId, String pin, Payment payment) {
+    }
+
+    @Override
+    public void submitPayment(Payment payment, String tan) {
     }
 
     private RestTemplate getRestTemplate(String bankLogin , String bankCode , String pin) {

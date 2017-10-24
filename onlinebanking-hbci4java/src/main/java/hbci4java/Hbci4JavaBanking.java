@@ -2,6 +2,7 @@ package hbci4java;
 
 import domain.*;
 import exception.InvalidPinException;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.HBCIJob;
 import org.kapott.hbci.GV_Result.GVRDauerList;
@@ -20,7 +21,9 @@ import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 import utils.Utils;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -163,6 +166,14 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         } finally {
             handle.close();
         }
+    }
+
+    @Override
+    public void createPayment(BankApiUser bankApiUser, String accountId, String pin, Payment payment) {
+    }
+
+    @Override
+    public void submitPayment(Payment payment, String tan) {
     }
 
     @Override
