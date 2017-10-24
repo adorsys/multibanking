@@ -189,11 +189,14 @@ public final class HbciMapping {
         for (String line : lines) {
             int wordIndex = 0;
             String[] words = StringUtils.split(line, null, 0);
-            for (String word : words) {
-                verwendungszweck += word;
-                verwendungszweck += wordIndex + 1 < words.length ? " " : "";
-                wordIndex++;
+            if (words != null && words.length > 0) {
+                for (String word : words) {
+                    verwendungszweck += word;
+                    verwendungszweck += wordIndex + 1 < words.length ? " " : "";
+                    wordIndex++;
+                }
             }
+
             verwendungszweck += lineIndex == 0 ? " " : "";
             lineIndex++;
         }
