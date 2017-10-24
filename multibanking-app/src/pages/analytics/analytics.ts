@@ -1,5 +1,5 @@
-import { Component } from "@angular/core";
-import { AlertController, ToastController, NavParams, LoadingController, NavController } from "ionic-angular";
+import { Component, ViewChild } from "@angular/core";
+import { AlertController, ToastController, NavParams, LoadingController, NavController, Navbar } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccountService";
 import { AnalyticsService } from "../../services/analyticsService";
 import { BankAccess } from "../../api/BankAccess";
@@ -17,6 +17,8 @@ export class AnalyticsPage {
   analytics: AccountAnalytics;
   bankAccess: BankAccess;
   bankAccountId: string;
+
+  @ViewChild(Navbar) navBar: Navbar;
 
   constructor(
     public navCtrl: NavController,
@@ -36,6 +38,12 @@ export class AnalyticsPage {
       this.loadAnalytics();
     })
     this.loadAnalytics();
+  }
+
+  ionViewDidLoad() {
+    this.navBar.backButtonClick = (e: UIEvent) => {
+      this.navCtrl.parent.viewCtrl.dismiss();
+    };
   }
 
   loadAnalytics() {

@@ -1,5 +1,5 @@
-import { Component } from "@angular/core";
-import { NavParams, AlertController, ToastController, LoadingController } from "ionic-angular";
+import { Component, ViewChild } from "@angular/core";
+import { NavParams, AlertController, ToastController, LoadingController, Navbar, NavController } from "ionic-angular";
 
 import { ContractService } from "./contract.service";
 import { LogoService } from '../../services/LogoService';
@@ -17,7 +17,10 @@ export class ContractsComponent {
   getLogo: Function;
   contracts;
 
+  @ViewChild(Navbar) navBar: Navbar;
+
   constructor(
+    public navCtrl: NavController,
     private navParams: NavParams,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
@@ -36,6 +39,12 @@ export class ContractsComponent {
       this.loadContracts();
     })
     this.loadContracts();
+  }
+
+  ionViewDidLoad() {
+    this.navBar.backButtonClick = (e: UIEvent) => {
+      this.navCtrl.parent.viewCtrl.dismiss();
+    };
   }
 
   loadContracts() {

@@ -1,5 +1,5 @@
-import { Component } from "@angular/core";
-import { NavController, AlertController, ToastController, NavParams, LoadingController } from "ionic-angular";
+import { Component, ViewChild } from "@angular/core";
+import { NavController, AlertController, ToastController, NavParams, LoadingController, Navbar } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccountService";
 import { BookingService } from "../../services/bookingService";
 import { BankAccess } from "../../api/BankAccess";
@@ -16,6 +16,8 @@ export class BookingListPage {
   bankAccountId: string;
   getLogo: Function;
   bookings: Array<Booking>;
+
+  @ViewChild(Navbar) navBar: Navbar;
 
   constructor(
     public navCtrl: NavController,
@@ -46,6 +48,12 @@ export class BookingListPage {
           }).present();
         }
       })
+  }
+
+  ionViewDidLoad() {
+    this.navBar.backButtonClick = (e: UIEvent) => {
+      this.navCtrl.parent.viewCtrl.dismiss();
+    };
   }
 
   syncBookingsPromptPin() {
