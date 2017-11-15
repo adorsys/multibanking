@@ -187,21 +187,26 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     private void updateTanTransportTypes(BankAccess bankAccess, HbciPassport hbciPassport) {
         bankAccess.setTanTransportTypes(new ArrayList<>());
-        hbciPassport.getAllowedTwostepMechanisms().forEach(id -> {
-            Properties properties = hbciPassport.getTwostepMechanisms().get(id);
+        if (hbciPassport.getUPD() != null) {
+            hbciPassport.getAllowedTwostepMechanisms().forEach(id -> {
+                Properties properties = hbciPassport.getTwostepMechanisms().get(id);
 
-            if (properties != null) {
-                bankAccess.getTanTransportTypes().add(
-                        TanTransportType.builder()
-                                .id(id)
-                                .name(properties.getProperty("name") != null ? properties.getProperty("name") : null)
-                                .medium(hbciPassport.getUPD().getProperty("tanmedia.names"))
-                                .build()
-                );
-            } else {
-                LOG.warn("unable find transport type {} for bank code {}", id, bankAccess.getBankCode());
-            }
-        });
+                if (properties != null) {
+                    bankAccess.getTanTransportTypes().add(
+                            TanTransportType.builder()
+                                    .id(id)
+                                    .name(properties.getProperty("name") != null ? properties.getProperty("name") : null)
+                                    .medium(hbciPassport.getUPD().getProperty("tanmedia.names"))
+                                    .build()
+                    );
+                } else {
+                    LOG.warn("unable find tan transport type {} for bank code {}", id, bankAccess.getBankCode());
+                }
+            });
+        } else {
+            LOG.warn("missing passport upd, unable find transport types or bank code {}", bankAccess.getBankCode());
+        }
+
     }
 
     private HbciPassport createPassport(BankAccess bankAccess, String bankCode, String pin) {
@@ -263,6 +268,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
 
         return false;
+    }
+
+    public static void main(String[] args) {
+        new Properties().getProperty("asdf");
     }
 
 }
