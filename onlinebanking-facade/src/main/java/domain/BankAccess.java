@@ -24,7 +24,7 @@ public class BankAccess {
     @ApiModelProperty(value = "Bank code", required = true, example = "76070024")
     private String bankCode;
     @ApiModelProperty(value = "Supported tan transport types", example = "iTAN")
-    List<TanTransportType> tanTransportTypes;
+    private Map<BankApi,  List<TanTransportType>> tanTransportTypes = new HashMap<>();
     @ApiModelProperty(hidden = true)
     private String hbciPassportState;
     @ApiModelProperty(hidden = true)

@@ -1,30 +1,19 @@
 package de.adorsys.onlinebanking.mock;
 
-import java.util.List;
-
+import domain.BankAccess;
+import domain.BankAccount;
 import domain.LoadBookingsResponse;
-import org.junit.Assert;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import domain.BankAccess;
-import domain.BankAccount;
-import domain.Booking;
+import java.util.List;
 
 @Ignore
-// TODO Fix add bearer token
 public class MockBankingTest {
 	private String pin = "password";
 	private BankAccess bankAccess;
 	MockBanking mockBanking;
-	
-	// TODO inject bearerToken
-	String bearerToken;
 	
 	@BeforeClass
 	public static void beforeClass(){
@@ -42,7 +31,7 @@ public class MockBankingTest {
 	public void before(){
 		bankAccess = new BankAccess();
 		bankAccess.setBankLogin("login");
-		mockBanking = new MockBanking(bearerToken);
+		mockBanking = new MockBanking();
 	}
 	
 	@Test

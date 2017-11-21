@@ -7,8 +7,6 @@ import org.kapott.hbci.manager.HBCIUtilsInternal;
 import org.kapott.hbci.manager.LogFilter;
 import org.kapott.hbci.passport.HBCIPassportPinTanNoFile;
 import org.kapott.hbci.security.Sig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
@@ -20,19 +18,24 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private State state;
+    private Optional<State> state = Optional.empty();
 
-    public HbciPassport(String passportState, Properties properties, Object initObject) {
-        super(properties, new HbciCallback(), initObject);
+    //needed for jackson
+    public HbciPassport() {
+        super(null, null, null);
+    }
+
+    public HbciPassport(String passportState, Properties properties, HbciCallback hbciCallback, Object initObject) {
+        super(properties, hbciCallback != null ? hbciCallback : new HbciCallback(), initObject);
 
         if (passportState != null) {
-            state = HbciPassport.State.readJson(passportState);
-            state.apply(this);
+            state = Optional.of(HbciPassport.State.readJson(passportState));
+            state.get().apply(this);
         }
     }
 
     public Optional<State> getState() {
-        return Optional.ofNullable(state);
+        return state;
     }
 
     @Override
@@ -48,7 +51,7 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
             if (getPIN() == null) {
                 StringBuffer s = new StringBuffer();
 
-                HBCIUtilsInternal.getCallback().callback(this,
+                callback.callback(this,
                         HbciCallback.NEED_PT_PIN,
                         HBCIUtilsInternal.getLocMsg("CALLB_NEED_PTPIN"),
                         HbciCallback.TYPE_SECRET, s);
@@ -88,24 +91,23 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
 
                     if (info.equals("J")) {
                         // für dieses segment wird eine tan benötigt
-                        HBCIUtils.log("the job with the code " + code
-                                + " needs a TAN", HBCIUtils.LOG_DEBUG);
+                        HBCIUtils.log("the job with the code " + code + " needs a TAN", HBCIUtils.LOG_DEBUG);
 
                         if (tan.length() == 0) {
                             // noch keine tan bekannt --> callback
 
-                            StringBuffer s = new StringBuffer();
-                            HBCIUtilsInternal.getCallback().callback(
+                            StringBuffer callbackReturn = new StringBuffer();
+                            getCallback().callback(
                                     this,
                                     HbciCallback.NEED_PT_TAN,
                                     HBCIUtilsInternal
                                             .getLocMsg("CALLB_NEED_PTTAN"),
-                                    HbciCallback.TYPE_TEXT, s);
-                            if (s.length() == 0) {
+                                    HbciCallback.TYPE_TEXT, callbackReturn);
+                            if (callbackReturn.length() == 0) {
                                 throw new HBCI_Exception(
                                         HBCIUtilsInternal.getLocMsg("EXCMSG_TANZERO"));
                             }
-                            tan = s.toString();
+                            tan = callbackReturn.toString();
                         } else {
                             HBCIUtils.log("there should be only one job that needs a TAN!",
                                     HBCIUtils.LOG_WARN);
@@ -146,7 +148,7 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
                     // es gibt eine challenge, also damit tan ermitteln
 
                     StringBuffer s = new StringBuffer();
-                    HBCIUtilsInternal.getCallback().callback(
+                    callback.callback(
                             this,
                             HbciCallback.NEED_PT_TAN,
                             secmechInfo.getProperty("name") + " "
@@ -204,7 +206,29 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
 
     @Override
     public void saveChanges() {
-        state = new State(this, state);
+        state = Optional.of(new State(this, getState()));
+    }
+
+    public HbciPassport clone() {
+        HbciPassport passport = new HbciPassport(null, getProperties(), null, null);
+        passport.setCountry(this.getCountry());
+        passport.setHost(this.getHost());
+        passport.setPort(this.getPort());
+        passport.setUserId(this.getUserId());
+        passport.setSysId(this.getSysId());
+        passport.setBPD(this.getBPD());
+        passport.setUPD(this.getUPD());
+        passport.setHBCIVersion(this.getHBCIVersion());
+        passport.setCustomerId(this.getCustomerId());
+        passport.setFilterType(this.getFilterType());
+        passport.setAllowedTwostepMechanisms(this.getAllowedTwostepMechanisms());
+        passport.setCurrentTANMethod(this.getCurrentTANMethod(false));
+        passport.setPIN(this.getPIN());
+        passport.setPersistentData(this.getPersistentData());
+
+        passport.unsetComm();
+        passport.setCallback(null);
+        return passport;
     }
 
     /**
@@ -239,19 +263,22 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
         /**
          * Creates a new State snapshot of the supplied passport. If oldState is non-null, its properties are used as fallback. This is useful so that the meta info of the UPD does not need to be refetched.
          */
-        public State(HbciPassport passport, State oldState) {
+        public State(HbciPassport passport, Optional<State> optionalOldState) {
             country = passport.getCountry();
             host = passport.getHost();
             port = passport.getPort();
             userId = passport.getUserId();
             sysId = passport.getSysId();
-            bpd = mergeProperties(oldState == null ? null : oldState.bpd, passport.getBPD());
-            upd = mergeProperties(oldState == null ? null : oldState.upd, passport.getUPD());
             hbciVersion = passport.getHBCIVersion();
             customerId = passport.getCustomerId();
             filterType = passport.getFilterType();
             allowedTwostepMechanisms = passport.getAllowedTwostepMechanisms();
             currentTANMethod = passport.getCurrentTANMethod(false);
+
+            optionalOldState.ifPresent(oldState -> {
+                bpd = mergeProperties(oldState.bpd, passport.getBPD());
+                upd = mergeProperties(oldState.upd, passport.getUPD());
+            });
         }
 
         private static Properties mergeProperties(Properties oldP, Properties newP) {

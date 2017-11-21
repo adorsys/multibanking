@@ -2,7 +2,7 @@ package figo;
 
 import domain.*;
 import exception.InvalidPinException;
-import exception.InvalidTanException;
+import exception.PaymentException;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -280,25 +280,30 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createPayment(BankApiUser bankApiUser, String accountId, String pin, Payment payment) {
+    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
             FigoSession session = createSession(tokenResponse.getAccessToken());
 
-            me.figo.models.Payment figoPayment = session.addPayment(FigoMapping.mapToFigoPayment(accountId, payment));
+            me.figo.models.Payment figoPayment = session.addPayment(FigoMapping.mapToFigoPayment(bankAccount.getExternalIdMap().get(bankApi()), payment));
 
-            String taskTokenLink = session.submitPayment(figoPayment, null, RandomStringUtils.randomAlphanumeric(5));
+            TanTransportType tanTransportType = bankAccess.getTanTransportTypes().get(bankApi()).get(0);
+            String taskTokenLink = session.submitPayment(figoPayment, tanTransportType.getId(), RandomStringUtils.randomAlphanumeric(5));
             String taskToken = extractTaskToken(new URL(taskTokenLink));
 
             Status status = waitForFinish(session, taskToken);
             if (status == Status.PIN) {
-                submitPin(taskToken, pin, session);
-            } else if (status == Status.TAN) {
-                payment.setAccessToken(tokenResponse.getAccessToken());
-                payment.setTaskToken(taskToken);
-            }
+                TaskStatusResponse taskStatusResponse = submitPin(taskToken, pin, session);
 
-            throw new RuntimeException("invalid figo payment status " + status);
+                payment.setTanSubmitExternal(FigoTanSubmit.builder()
+                        .accessToken(tokenResponse.getAccessToken())
+                        .taskToken(taskToken)
+                        .build());
+
+                payment.setPaymentChallenge(FigoMapping.mapToChallenge(taskStatusResponse.getChallenge()));
+            } else {
+                throw new RuntimeException("invalid figo payment status " + status);
+            }
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -307,21 +312,23 @@ public class FigoBanking implements OnlineBankingService {
     @Override
     public void submitPayment(Payment payment, String tan) {
         try {
-            FigoSession session = new FigoSession(payment.getAccessToken(), 10000, figoConnection.getApiEndpoint());
+            FigoTanSubmit tanSubmit = (FigoTanSubmit)payment.getTanSubmitExternal();
+            FigoSession session = new FigoSession(tanSubmit.getAccessToken(), 10000, figoConnection.getApiEndpoint());
 
-            submitTan(payment.getTaskToken(), tan, session);
+            submitTan(tanSubmit.getTaskToken(), tan, session);
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void submitPin(String taskToken, String pin, FigoSession session) throws FigoException, InterruptedException, IOException {
-        session.queryApi("/task/progress?id=" + taskToken, new TaskStatusRequest(taskToken, pin), "POST", TaskStatusResponse.class);
+    private TaskStatusResponse submitPin(String taskToken, String pin, FigoSession session) throws FigoException, InterruptedException, IOException {
+        TaskStatusResponse response = session.queryApi("/task/progress?id=" + taskToken, new TaskStatusRequest(taskToken, pin), "POST", TaskStatusResponse.class);
         Status status = waitForFinish(session, taskToken);
 
-        if (status != Status.OK) {
+        if (status != Status.OK && status != Status.TAN) {
             throw new InvalidPinException();
         }
+        return response;
     }
 
     private void submitTan(String taskToken, String tan, FigoSession session) throws FigoException, InterruptedException, IOException {
@@ -332,7 +339,7 @@ public class FigoBanking implements OnlineBankingService {
         Status status = waitForFinish(session, taskToken);
 
         if (status != Status.OK) {
-            throw new InvalidTanException();
+            throw new PaymentException("figo tan error");
         }
     }
 
@@ -343,7 +350,11 @@ public class FigoBanking implements OnlineBankingService {
                 .flatMap(Collection::stream)
                 .map(FigoMapping::mapTanTransportTypes)
                 .collect(Collectors.toList());
-        bankAccess.setTanTransportTypes(tanTransportTypes);
+        if (bankAccess.getTanTransportTypes() == null) {
+            bankAccess.setTanTransportTypes(new HashMap<>());
+        }
+
+        bankAccess.getTanTransportTypes().put(bankApi(), tanTransportTypes);
     }
 
     private Status waitForFinish(FigoSession session, String taskToken) throws IOException, FigoException, InterruptedException {

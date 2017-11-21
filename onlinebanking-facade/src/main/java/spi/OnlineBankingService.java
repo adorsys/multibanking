@@ -24,13 +24,13 @@ public interface OnlineBankingService {
 
     void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
 
-    LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String blz, BankAccount bankAccount, String pin);
+    LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin);
 
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
 
-    void createPayment(BankApiUser bankApiUser, String accountId, String pin, Payment payment);
+    void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment);
 
     void submitPayment(Payment payment, String tan);
 

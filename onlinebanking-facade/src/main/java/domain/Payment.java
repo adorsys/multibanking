@@ -4,6 +4,8 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by alexg on 19.10.17.
@@ -17,11 +19,11 @@ public class Payment {
         STANDING_ORDER
     }
 
-    private String accessToken;
-    private String taskToken;
+    private PaymentChallenge paymentChallenge;
 
     private PaymentType paymentType;
     private String receiver;
+    private String receiverBic;
     private String receiverIban;
     private String receiverBankCode;
     private String receiverAccountNumber;
@@ -31,6 +33,10 @@ public class Payment {
     private LocalDate firstExecutionDate;
     private LocalDate lastExecutionDate;
     private Cycle cycle;
+
+    private Object tanSubmitExternal;
+
+
 
 
 }

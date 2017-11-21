@@ -21,11 +21,11 @@ public class FigoMapping {
     private static final Map<Payment.PaymentType, String> FIGO_TRANSFER = new HashMap<>();
 
     static {
-        FIGO_CYCLE.put(Cycle.WEEKLY,    "weekly");
-        FIGO_CYCLE.put(Cycle.MONTHLY,     "monthly");
-        FIGO_CYCLE.put(Cycle.TWO_MONTHLY,   "two monthly");
-        FIGO_CYCLE.put(Cycle.QUARTERLY,   "quarterly");
-        FIGO_CYCLE.put(Cycle.HALF_YEARLY,  "half yearly");
+        FIGO_CYCLE.put(Cycle.WEEKLY, "weekly");
+        FIGO_CYCLE.put(Cycle.MONTHLY, "monthly");
+        FIGO_CYCLE.put(Cycle.TWO_MONTHLY, "two monthly");
+        FIGO_CYCLE.put(Cycle.QUARTERLY, "quarterly");
+        FIGO_CYCLE.put(Cycle.HALF_YEARLY, "half yearly");
         FIGO_CYCLE.put(Cycle.YEARLY, "yearly");
 
         FIGO_TRANSFER.put(Payment.PaymentType.TRANSFER, "Transfer");
@@ -136,5 +136,14 @@ public class FigoMapping {
         }
 
         return figoPayment;
+    }
+
+    public static PaymentChallenge mapToChallenge(Challenge challenge) {
+        return PaymentChallenge.builder()
+                .data(challenge.getData())
+                .format(challenge.getFormat())
+                .label(challenge.getLabel())
+                .title(challenge.getTitle())
+                .build();
     }
 }

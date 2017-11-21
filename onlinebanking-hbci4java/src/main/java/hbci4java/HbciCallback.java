@@ -1,5 +1,7 @@
 package hbci4java;
 
+import exception.InvalidPinException;
+import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.passport.HBCIPassport;
@@ -82,14 +84,44 @@ public class HbciCallback implements HBCICallback {
     @Override
     public void callback(HBCIPassport passport, int reason, String msg, int datatype, StringBuffer retData) {
         switch (reason) {
-            case NEED_PT_SECMECH:
-                LOG.warn("Callback: reason: {}, message: {}", reason, msg);
-                // Copied this handler over from old Callback version. TODO when does this happen? For Wüstenrot? Is blindly picking the first entry really correct?
-                // get the first one
+            case HBCICallback.NEED_PT_PHOTOTAN: {
+                String hhduc = retData.toString();
+                break;
+            }
+            case HBCICallback.NEED_PT_TAN: {
+                String flicker = retData.toString();
+                if (flicker != null && flicker.length() > 0) {
+                    // Wir haben einen Flicker-Code. Also zeigen wir den Flicker-Dialog statt
+                    // dem normalen TAN-Dialog an
+
+                } else  {
+
+                }
+                break;
+            }
+            case HBCICallback.NEED_PT_TANMEDIA: {
+                // Wenn wir eine Medienbezeichnung von HBCI4Java gekriegt haben und das genau
+                // eine einzige ist. Dann uebernehmen wir diese ohne Rueckfrage. Der User
+                // hat hier sonst eh keine andere Wahl.
+                String media = retData.toString();
+                if (media.length() > 0 && !media.contains("|")) {
+                    LOG.info("having exactly one TAN media name (provided by institute) - automatically using this: " + media);
+                } else {
+                    String tanMedias = retData.toString();
+                }
+                break;
+            }
+            // BUGZILLA 200
+            case HBCICallback.NEED_PT_SECMECH: {
                 String firstTanMethod = retData.toString().substring(0, retData.toString().indexOf(':'));
                 retData.setLength(0);
                 retData.insert(0, firstTanMethod);
                 break;
+            }
+
+            case HBCICallback.WRONG_PIN: {
+                throw new InvalidPinException();
+            }
 
             // No need to tell when we may open or close our internet connection
             case HBCICallback.NEED_CONNECTION:
@@ -102,13 +134,18 @@ public class HbciCallback implements HBCICallback {
     }
 
     @Override
+    public boolean tanCallback(HBCIPassport passport, GVTAN2Step hktan) {
+        return false;
+    }
+
+    @Override
     public void status(HBCIPassport passport, int statusTag, Object[] o) {
         LOG.debug("Status: {} {}, objects: {}", statusTag, statusToString(statusTag), o);
     }
 
     @Override
     public void status(HBCIPassport passport, int statusTag, Object o) {
-        status(passport, statusTag, new Object[] { o });
+        status(passport, statusTag, new Object[]{o});
     }
 
     @Override

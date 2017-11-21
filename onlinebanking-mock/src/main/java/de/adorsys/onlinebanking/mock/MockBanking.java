@@ -1,18 +1,17 @@
 package de.adorsys.onlinebanking.mock;
 
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
 import domain.*;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
-
 import spi.OnlineBankingService;
+
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by alexg on 17.05.17.
@@ -21,13 +20,10 @@ public class MockBanking implements OnlineBankingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MockBanking.class);
 
-    private String bearerToken;
+    private String mockConnectionUrl = null;
 
-    String mockConnectionUrl = null;
-
-    public MockBanking(String bearerToken) {
+    public MockBanking() {
         mockConnectionUrl = EnvProperties.getEnvOrSysProp("mockConnectionUrl", "http://localhost:10010");
-        this.bearerToken = bearerToken;
     }
 
     @Override
@@ -120,7 +116,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createPayment(BankApiUser bankApiUser, String accountId, String pin, Payment payment) {
+    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment) {
     }
 
     @Override

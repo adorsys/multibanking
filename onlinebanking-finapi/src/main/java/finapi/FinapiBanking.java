@@ -1,7 +1,7 @@
 package finapi;
 
-import domain.*;
 import domain.Bank;
+import domain.*;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.*;
@@ -226,7 +226,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createPayment(BankApiUser bankApiUser, String accountId, String pin, Payment payment) {
+    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment) {
     }
 
     @Override
