@@ -31,6 +31,7 @@ import utils.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -134,9 +135,14 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             HBCIJob balanceJob = hbciHandler.newJob("SaldoReq");
             balanceJob.setParam("my", account);
             balanceJob.addToQueue();
+
             HBCIJob bookingsJob = hbciHandler.newJob("KUmsAll");
             bookingsJob.setParam("my", account);
+            if (bankAccount.getLastSync() != null) {
+                bookingsJob.setParam("startdate", Date.from(bankAccount.getLastSync().atZone(ZoneId.systemDefault()).toInstant()));
+            }
             bookingsJob.addToQueue();
+
             HBCIJob standingOrdersJob = hbciHandler.newJob("DauerSEPAList");
             standingOrdersJob.setParam("src", account);
             standingOrdersJob.addToQueue();
@@ -187,22 +193,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             @Override
             public boolean tanCallback(HBCIPassport passport, GVTAN2Step hktan) {
-                try {
-                    hbciTanSubmit.setGvTanSubmit(HbciGVTanSubmit.builder()
-                            .properties(OBJECT_MAPPER.writeValueAsString(hktan.getLowlevelParams()))
-                            .build());
-
-                    hbciTanSubmit.setHbciPassport(OBJECT_MAPPER.writeValueAsString(((HbciPassport) passport).clone()));
-
-                    Object pintan_challenge = ((HbciPassport) passport).getPersistentData("pintan_challenge");
-                    if (pintan_challenge != null) {
-                        payment.setPaymentChallenge(PaymentChallenge.builder().title(pintan_challenge.toString()).build());
-                    }
-
-                    return true;
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
+                return updateTanSubmit((HbciPassport) passport, hktan, hbciTanSubmit, payment);
             }
 
         }, pin);
@@ -242,6 +233,25 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             handleHbciException(e);
         } finally {
             hbciHandler.close();
+        }
+    }
+
+    private boolean updateTanSubmit(HbciPassport passport, GVTAN2Step hktan, HbciTanSubmit hbciTanSubmit, Payment payment) {
+        try {
+            hbciTanSubmit.setGvTanSubmit(HbciGVTanSubmit.builder()
+                    .properties(OBJECT_MAPPER.writeValueAsString(hktan.getLowlevelParams()))
+                    .build());
+
+            hbciTanSubmit.setHbciPassport(OBJECT_MAPPER.writeValueAsString(passport.clone()));
+
+            Object pintan_challenge = passport.getPersistentData("pintan_challenge");
+            if (pintan_challenge != null) {
+                payment.setPaymentChallenge(PaymentChallenge.builder().title(pintan_challenge.toString()).build());
+            }
+
+            return true;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -368,5 +378,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
         throw new RuntimeException(e);
     }
+
 
 }

@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +57,9 @@ public class BankAccount {
 
 	@ApiModelProperty(value = "Synchronisation status", example="PENDING")
 	private SyncStatus syncStatus;
+
+    @ApiModelProperty(value = "Last Synchronisation date", example="2017-12-01")
+    private LocalDateTime lastSync;
 
     public BankAccount bankAccountBalance(BankAccountBalance bankAccountBalance) {
         this.bankAccountBalance = bankAccountBalance;
