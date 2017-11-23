@@ -27,5 +27,6 @@ public enum Cycle {
     /**
      * every 12 months.
      */
-    YEARLY
+    YEARLY,
+    INVALID
 }
