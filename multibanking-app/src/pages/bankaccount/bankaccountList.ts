@@ -38,7 +38,7 @@ export class BankAccountListPage {
   itemSelected(bankAccount) {
     this.navCtrl.push(TabsPage, {
       bankAccess: this.bankAccess,
-      bankAccountId: bankAccount.id,
+      bankAccount: bankAccount,
     })
   }
 }

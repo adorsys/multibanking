@@ -10,6 +10,11 @@
 </ion-header>
 
 <ion-content class="bookingList-content" padding>
+    <ion-fab top right edge>
+        <button ion-fab mini (click)="createPayment()">
+          <ion-icon name="paper-plane"></ion-icon>
+        </button>
+      </ion-fab>
   <ion-list>
     <ion-item *ngFor="let booking of bookings" (click)="itemSelected(booking)">
        <ion-thumbnail item-left>

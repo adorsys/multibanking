@@ -31,19 +31,16 @@ export class BankAccountService {
       .catch(this.handleError);
   }
 
-  handleError(error): Observable<any> {
+  handleError(error) {
     console.error(error);
     let errorJson = error.json();
     if (errorJson) {
-      if (errorJson.message == "SYNC_IN_PROGRESS") {
-        return Observable.throw(errorJson.message);
-      } else {
-        return Observable.throw(errorJson || 'Server error');
-      }
+      return Observable.throw(errorJson || 'Server error');
     } else {
       return Observable.throw(error || 'Server error');
     }
   }
+
 
 
 }

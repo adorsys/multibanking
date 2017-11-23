@@ -26,6 +26,8 @@ import { KeycloakService } from '../auth/keycloak.service';
 import { LogoService } from '../services/LogoService';
 import { MyApp } from './app.component';
 import { TabsPage } from '../pages/tabs/tabs';
+import { PaymentCreatePage } from '../pages/payment/paymentCreate';
+import { PaymentService } from '../services/PaymentService';
 
 @NgModule({
   declarations: [
@@ -36,6 +38,7 @@ import { TabsPage } from '../pages/tabs/tabs';
     BankAccountListPage,
     BookingGroupPage,
     BookingListPage,
+    PaymentCreatePage,
     ContractsComponent,
     TabsPage,
     CyclePipe,
@@ -56,6 +59,7 @@ import { TabsPage } from '../pages/tabs/tabs';
     BankAccountListPage,
     BookingGroupPage,
     BookingListPage,
+    PaymentCreatePage,
     ContractsComponent,
     TabsPage,
     MyApp,
@@ -70,6 +74,7 @@ import { TabsPage } from '../pages/tabs/tabs';
     KEYCLOAK_HTTP_PROVIDER,
     KeycloakService,
     LogoService,
+    PaymentService,
     SplashScreen,
     StatusBar,
     { provide: ErrorHandler, useClass: IonicErrorHandler },

@@ -92,25 +92,28 @@ export class BankAccessCreatePage {
       },
       error => {
         loading.dismiss();
-        if (error && error.message) {
-          if (error.message == "BANK_ACCESS_ALREADY_EXIST") {
-            this.alertCtrl.create({
-              message: 'Bank connection already exists',
-              buttons: ['OK']
-            }).present();
-          }
-          else if (error.message == "INVALID_BANK_ACCESS") {
-            this.alertCtrl.create({
-              message: 'Bank not supported',
-              buttons: ['OK']
-            }).present();
-          }
-          else if (error.message == "INVALID_PIN") {
-            this.alertCtrl.create({
-              message: 'Invalid pin',
-              buttons: ['OK']
-            }).present();
-          }
+        if (error && error.messages) {
+          error.messages.forEach(message => {
+            if (message.key == "BANK_ACCESS_ALREADY_EXIST") {
+              this.alertCtrl.create({
+                message: 'Bank connection already exists',
+                buttons: ['OK']
+              }).present();
+            }
+            else if (message.key == "INVALID_BANK_ACCESS") {
+              this.alertCtrl.create({
+                message: 'Bank not supported',
+                buttons: ['OK']
+              }).present();
+            }
+            else if (message.key == "INVALID_PIN") {
+              this.alertCtrl.create({
+                message: 'Invalid pin',
+                buttons: ['OK']
+              }).present();
+            }
+          });
+        
         }
       })
   }

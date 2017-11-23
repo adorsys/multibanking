@@ -5,6 +5,8 @@ import { BookingService } from "../../services/bookingService";
 import { BankAccess } from "../../api/BankAccess";
 import { Booking } from "../../api/Booking";
 import { LogoService } from '../../services/LogoService';
+import { PaymentCreatePage } from "../payment/paymentCreate";
+import { BankAccount } from "../../api/BankAccount";
 
 @Component({
   selector: 'page-bookingList',
@@ -13,7 +15,7 @@ import { LogoService } from '../../services/LogoService';
 export class BookingListPage {
 
   bankAccess: BankAccess;
-  bankAccountId: string;
+  bankAccount: BankAccount;
   getLogo: Function;
   bookings: Array<Booking>;
 
@@ -30,12 +32,12 @@ export class BookingListPage {
     private logoService: LogoService
   ) {
     this.bankAccess = navparams.data.bankAccess;
-    this.bankAccountId = navparams.data.bankAccountId;
+    this.bankAccount = navparams.data.bankAccount;
     this.getLogo = logoService.getLogo;
   }
 
   ngOnInit() {
-    this.bookingService.getBookings(this.bankAccess.id, this.bankAccountId).subscribe(
+    this.bookingService.getBookings(this.bankAccess.id, this.bankAccount.id).subscribe(
       response => {
         this.bookings = response;
       },
@@ -94,29 +96,40 @@ export class BookingListPage {
     });
     loading.present();
 
-    this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccountId, pin).subscribe(
+    this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccount.id, pin).subscribe(
       response => {
         this.bookings = response;
         loading.dismiss();
       },
       error => {
-        if (error == "SYNC_IN_PROGRESS") {
-          this.toastCtrl.create({
-            message: 'Account sync in progress',
-            showCloseButton: true,
-            position: 'top'
-          }).present();
+        if (error && error.messages) {
+          error.messages.forEach(message => {
+            if (message.key == "SYNC_IN_PROGRESS") {
+              this.toastCtrl.create({
+                message: 'Account sync in progress',
+                showCloseButton: true,
+                position: 'top'
+              }).present();
+            }
+            else if (message.key == "INVALID_PIN") {
+              this.alertCtrl.create({
+                message: 'Invalid pin',
+                buttons: ['OK']
+              }).present();
+            }
+          })
         }
-        else if (error.message == "INVALID_PIN") {
-            this.alertCtrl.create({
-              message: 'Invalid pin',
-              buttons: ['OK']
-            }).present();
-          }
       })
   }
 
   itemSelected(booking) {
     console.log(booking)
+  }
+
+  createPayment() {
+    this.navCtrl.push(PaymentCreatePage, {
+      bankAccount: this.bankAccount,
+      bankAccess: this.bankAccess
+    });
   }
 }

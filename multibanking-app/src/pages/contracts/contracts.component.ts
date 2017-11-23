@@ -30,7 +30,7 @@ export class ContractsComponent {
     private logoService: LogoService
   ) {
     this.bankAccess = navParams.data.bankAccess;
-    this.bankAccountId = navParams.data.bankAccountId;
+    this.bankAccountId = navParams.data.bankAccount.id;
     this.getLogo = logoService.getLogo;
   }
 
@@ -104,20 +104,25 @@ export class ContractsComponent {
         loading.dismiss();
       },
       error => {
-        if (error == "SYNC_IN_PROGRESS") {
-          this.toastCtrl.create({
-            message: 'Account sync in progress',
-            showCloseButton: true,
-            position: 'top'
-          }).present();
-        }
-        else if (error.message == "INVALID_PIN") {
-          this.alertCtrl.create({
-            message: 'Invalid pin',
-            buttons: ['OK']
-          }).present();
-        }
-      })
-  }
+        if (error && error.messages) {
+          error.messages.forEach(message => {
 
+            if (message.key == "SYNC_IN_PROGRESS") {
+              this.toastCtrl.create({
+                message: 'Account sync in progress',
+                showCloseButton: true,
+                position: 'top'
+              }).present();
+            }
+            else if (message.key == "INVALID_PIN") {
+              this.alertCtrl.create({
+                message: 'Invalid pin',
+                buttons: ['OK']
+              }).present();
+            }
+          })
+        }
+      }
+    )
+  }
 }

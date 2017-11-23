@@ -30,7 +30,7 @@ export class AnalyticsPage {
     private analyticsService: AnalyticsService) {
 
     this.bankAccess = navparams.data.bankAccess;
-    this.bankAccountId = navparams.data.bankAccountId;
+    this.bankAccountId = navparams.data.bankAccount.id;
   }
 
   ngOnInit() {
@@ -63,7 +63,7 @@ export class AnalyticsPage {
   }
 
   getCompanyLogoUrl(bookingGroup: BookingGroup) {
-    return AppConfig.api_url + "/image/"+bookingGroup.contract.logo;
+    return AppConfig.api_url + "/image/" + bookingGroup.contract.logo;
   }
 
   syncBookingsPromptPin() {
@@ -109,24 +109,29 @@ export class AnalyticsPage {
         loading.dismiss();
       },
       error => {
-        if (error == "SYNC_IN_PROGRESS") {
-          this.toastCtrl.create({
-            message: 'Account sync in progress',
-            showCloseButton: true,
-            position: 'top'
-          }).present();
+        if (error && error.messages) {
+          error.messages.forEach(message => {
+            if (message.key == "SYNC_IN_PROGRESS") {
+              this.toastCtrl.create({
+                message: 'Account sync in progress',
+                showCloseButton: true,
+                position: 'top'
+              }).present();
+            }
+            else if (message.key == "INVALID_PIN") {
+              this.alertCtrl.create({
+                message: 'Invalid pin',
+                buttons: ['OK']
+              }).present();
+            }
+          })
         }
-        else if (error.message == "INVALID_PIN") {
-            this.alertCtrl.create({
-              message: 'Invalid pin',
-              buttons: ['OK']
-            }).present();
-          }
+        
       })
   }
 
   itemSelected(label: string, bookingGroups: Array<BookingGroup>) {
-    this.navCtrl.push(BookingGroupPage, {label: label, bookingGroups: bookingGroups})
+    this.navCtrl.push(BookingGroupPage, { label: label, bookingGroups: bookingGroups })
   }
 
 }
