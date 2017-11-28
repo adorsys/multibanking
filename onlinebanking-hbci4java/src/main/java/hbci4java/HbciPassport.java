@@ -3,7 +3,7 @@ package hbci4java;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIUtils;
-import org.kapott.hbci.manager.HBCIUtilsInternal;
+import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.manager.LogFilter;
 import org.kapott.hbci.passport.HBCIPassportPinTanNoFile;
 import org.kapott.hbci.security.Sig;
@@ -53,11 +53,11 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
 
                 callback.callback(this,
                         HbciCallback.NEED_PT_PIN,
-                        HBCIUtilsInternal.getLocMsg("CALLB_NEED_PTPIN"),
+                        HBCIUtils.getLocMsg("CALLB_NEED_PTPIN"),
                         HbciCallback.TYPE_SECRET, s);
                 if (s.length() == 0) {
                     throw new HBCI_Exception(
-                            HBCIUtilsInternal.getLocMsg("EXCMSG_PINZERO"));
+                            HBCIUtils.getLocMsg("EXCMSG_PINZERO"));
                 }
                 setPIN(s.toString());
                 LogFilter.getInstance().addSecretData(getPIN(), "X",
@@ -100,12 +100,12 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
                             getCallback().callback(
                                     this,
                                     HbciCallback.NEED_PT_TAN,
-                                    HBCIUtilsInternal
+                                    HBCIUtils
                                             .getLocMsg("CALLB_NEED_PTTAN"),
                                     HbciCallback.TYPE_TEXT, callbackReturn);
                             if (callbackReturn.length() == 0) {
                                 throw new HBCI_Exception(
-                                        HBCIUtilsInternal.getLocMsg("EXCMSG_TANZERO"));
+                                        HBCIUtils.getLocMsg("EXCMSG_TANZERO"));
                             }
                             tan = callbackReturn.toString();
                         } else {
@@ -157,7 +157,7 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
                             s);
                     if (s.length() == 0) {
                         throw new HBCI_Exception(
-                                HBCIUtilsInternal.getLocMsg("EXCMSG_TANZERO"));
+                                HBCIUtils.getLocMsg("EXCMSG_TANZERO"));
                     }
                     tan = s.toString();
                 }

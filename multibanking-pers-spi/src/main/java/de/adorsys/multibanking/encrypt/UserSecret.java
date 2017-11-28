@@ -7,10 +7,10 @@ package de.adorsys.multibanking.encrypt;
  *
  */
 public class UserSecret {
+
 	public String secret;
 	
 	public UserSecret(String secret) {
-		super();
 		this.secret = secret;
 	}
 
@@ -18,7 +18,4 @@ public class UserSecret {
 		return secret;
 	}
 
-	public void setSecret(String secret) {
-		this.secret = secret;
-	}
 }

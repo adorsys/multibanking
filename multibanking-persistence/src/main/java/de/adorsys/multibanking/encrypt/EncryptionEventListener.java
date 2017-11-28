@@ -4,6 +4,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.util.JSON;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
@@ -29,7 +31,9 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
     private static final String ENCRYPTION_FIELD = "encrypted";
 
     @Value("${db_secret}")
-    String databaseSecret;
+    private String databaseSecret;
+    @Autowired
+    private UserSecret userSecret;
 
     @Override
     public void onBeforeSave(BeforeSaveEvent<Object> event) {
@@ -145,6 +149,18 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
     }
 
     private SecretKey secretKey() {
-        return new SecretKeySpec(databaseSecret.getBytes(), ENCRYPTION_METHOD);
+        return new SecretKeySpec(getUserSecret().getBytes(), ENCRYPTION_METHOD);
+    }
+
+    private String getUserSecret() {
+        try {
+            if (userSecret.getSecret() == null) {
+                return databaseSecret;
+            }
+            return userSecret.getSecret();
+            //user secret not available outside request scopes
+        } catch (BeanCreationException e) {
+            return databaseSecret;
+        }
     }
 }
