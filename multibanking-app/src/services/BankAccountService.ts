@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { AppConfig } from '../app/app.config';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
 import { Subject } from "rxjs";
 import { BankAccount } from "../api/BankAccount";
 import { Booking } from "../api/Booking";

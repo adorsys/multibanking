@@ -15,7 +15,7 @@ export class TabsPage {
   tab2Root = AnalyticsPage;
   tab3Root = ContractsComponent;
 
-  constructor(private navparams: NavParams) {
+  constructor(public navparams: NavParams) {
     this.navParams = navparams.data;
   }
 }

@@ -22,7 +22,7 @@ export class AnalyticsPage {
 
   constructor(
     public navCtrl: NavController,
-    private navparams: NavParams,
+    public navparams: NavParams,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,

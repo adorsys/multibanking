@@ -31,6 +31,11 @@
       </ion-item>
 
       <ion-item>
+        <ion-label>Save anonymized Bookings</ion-label>
+        <ion-toggle [(ngModel)]="bankAccess.storeAnonymizedBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
         <ion-label>Save Analytics</ion-label>
         <ion-toggle [(ngModel)]="bankAccess.storeAnalytics" [ngModelOptions]="{standalone: true}"></ion-toggle>
       </ion-item>

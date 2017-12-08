@@ -6,5 +6,6 @@ export interface BookingCategory {
     "specification"?: string;
     "subCategory"?: string;
     "variable"?: boolean;
+    "rules"?: string[];
 }
 

@@ -28,6 +28,8 @@ import { MyApp } from './app.component';
 import { TabsPage } from '../pages/tabs/tabs';
 import { PaymentCreatePage } from '../pages/payment/paymentCreate';
 import { PaymentService } from '../services/PaymentService';
+import { BookingDetailPage } from '../pages/booking-detail/bookingDetail';
+import { BookingEditPage } from '../pages/booking-edit/bookingEdit';
 
 @NgModule({
   declarations: [
@@ -38,6 +40,8 @@ import { PaymentService } from '../services/PaymentService';
     BankAccountListPage,
     BookingGroupPage,
     BookingListPage,
+    BookingDetailPage,
+    BookingEditPage,
     PaymentCreatePage,
     ContractsComponent,
     TabsPage,
@@ -59,6 +63,8 @@ import { PaymentService } from '../services/PaymentService';
     BankAccountListPage,
     BookingGroupPage,
     BookingListPage,
+    BookingDetailPage,
+    BookingEditPage,
     PaymentCreatePage,
     ContractsComponent,
     TabsPage,

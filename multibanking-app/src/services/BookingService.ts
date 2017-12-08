@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { AppConfig } from '../app/app.config';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
 import { Booking } from "../api/Booking";
 
 @Injectable()
@@ -13,6 +12,12 @@ export class BookingService {
 
   getBookings(accessId, accountId): Observable<Array<Booking>> {
     return this.http.get(`${AppConfig.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings`)
+      .map((res: Response) => res.json()._embedded != null ? res.json()._embedded.bookingEntityList : [])
+      .catch(this.handleError);
+  }
+
+  getBooking(accessId, accountId, bookingId): Observable<Booking> {
+    return this.http.get(`${AppConfig.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/${bookingId}`)
       .map((res: Response) => res.json()._embedded != null ? res.json()._embedded.bookingEntityList : [])
       .catch(this.handleError);
   }

@@ -15,17 +15,17 @@ module.exports = [
         "runs": true
     },
     {
-        "file": "plugins/cordova-plugin-statusbar/www/statusbar.js",
-        "id": "cordova-plugin-statusbar.statusbar",
-        "pluginId": "cordova-plugin-statusbar",
+        "file": "plugins/cordova-plugin-splashscreen/www/splashscreen.js",
+        "id": "cordova-plugin-splashscreen.SplashScreen",
+        "pluginId": "cordova-plugin-splashscreen",
         "clobbers": [
-            "window.StatusBar"
+            "navigator.splashscreen"
         ]
     },
     {
-        "file": "plugins/cordova-plugin-statusbar/src/browser/StatusBarProxy.js",
-        "id": "cordova-plugin-statusbar.StatusBarProxy",
-        "pluginId": "cordova-plugin-statusbar",
+        "file": "plugins/cordova-plugin-splashscreen/src/browser/SplashScreenProxy.js",
+        "id": "cordova-plugin-splashscreen.SplashScreenProxy",
+        "pluginId": "cordova-plugin-splashscreen",
         "runs": true
     },
     {
@@ -41,9 +41,9 @@ module.exports = [
 module.exports.metadata = 
 // TOP OF METADATA
 {
-    "cordova-plugin-console": "1.0.5",
     "cordova-plugin-device": "1.1.4",
-    "cordova-plugin-statusbar": "2.2.2",
+    "cordova-plugin-ionic-webview": "1.1.16",
+    "cordova-plugin-splashscreen": "4.0.3",
     "cordova-plugin-whitelist": "1.3.1",
     "ionic-plugin-keyboard": "2.2.1"
 }

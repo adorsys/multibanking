@@ -7,6 +7,7 @@ import { Booking } from "../../api/Booking";
 import { LogoService } from '../../services/LogoService';
 import { PaymentCreatePage } from "../payment/paymentCreate";
 import { BankAccount } from "../../api/BankAccount";
+import { BookingDetailPage } from "../booking-detail/bookingDetail";
 
 @Component({
   selector: 'page-bookingList',
@@ -23,13 +24,13 @@ export class BookingListPage {
 
   constructor(
     public navCtrl: NavController,
-    private navparams: NavParams,
+    public navparams: NavParams,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
     private bankAccountService: BankAccountService,
     private bookingService: BookingService,
-    private logoService: LogoService
+    public logoService: LogoService
   ) {
     this.bankAccess = navparams.data.bankAccess;
     this.bankAccount = navparams.data.bankAccount;
@@ -123,7 +124,9 @@ export class BookingListPage {
   }
 
   itemSelected(booking) {
-    console.log(booking)
+    this.navCtrl.push(BookingDetailPage, {
+      booking: booking
+    });
   }
 
   createPayment() {

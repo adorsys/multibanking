@@ -20,6 +20,7 @@ export interface BankAccess {
     "pin"?: string;
     "pin2"?: string;
     "storeAnalytics"?: boolean;
+    "storeAnonymizedBookings"?: boolean;
     "storeBookings"?: boolean;
     "storePin"?: boolean;
     "temporary"?: boolean;

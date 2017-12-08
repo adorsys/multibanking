@@ -5,7 +5,6 @@ import { Observable } from 'rxjs/Observable';
 import { PaymentCreate } from '../api/PaymentCreate';
 import { PaymentSubmit } from '../api/PaymentSubmit';
 import { Payment } from '../api/Payment';
-import 'rxjs/Rx';
 
 @Injectable()
 export class PaymentService {

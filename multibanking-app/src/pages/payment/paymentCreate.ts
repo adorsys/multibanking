@@ -16,7 +16,7 @@ export class PaymentCreatePage {
   payment: Payment = { receiver: "", purpose: "", amount: undefined };
 
   constructor(public navCtrl: NavController,
-    private navparams: NavParams,
+    public navparams: NavParams,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
     private alertCtrl: AlertController,

@@ -15,8 +15,8 @@ export class BankAccountListPage {
   bankAccounts: Array<BankAccount>;
 
   constructor(public navCtrl: NavController,
-    private navparams: NavParams,
-    private bankAccountService: BankAccountService) {
+    public navparams: NavParams,
+    public bankAccountService: BankAccountService) {
 
     this.bankAccess = navparams.data.bankAccess; 
   }

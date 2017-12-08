@@ -21,13 +21,13 @@ export class ContractsComponent {
 
   constructor(
     public navCtrl: NavController,
-    private navParams: NavParams,
+    public navParams: NavParams,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
     private contractService: ContractService,
     private bankAccountService: BankAccountService,
-    private logoService: LogoService
+    public logoService: LogoService
   ) {
     this.bankAccess = navParams.data.bankAccess;
     this.bankAccountId = navParams.data.bankAccount.id;

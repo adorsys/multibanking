@@ -2,13 +2,25 @@ import { Injectable } from "@angular/core";
 import { AppConfig } from "../app/app.config";
 import { Http, Response } from "@angular/http";
 import { Observable } from "rxjs/Observable";
-import "rxjs/Rx";
 import { AccountAnalytics } from "../api/AccountAnalytics";
+import { RuleCategory } from "../api/RuleCategory";
+import { Rule } from "../api/Rule";
 
 @Injectable()
 export class AnalyticsService {
 
   constructor(private http: Http) {
+  }
+
+  getAvailableCategories(): Observable<Array<RuleCategory>> {
+    return this.http.get(AppConfig.api_url + "/analytics/categories")
+      .map((res: Response) => res.json()._embedded.ruleCategoryList)
+      .catch(this.handleError);
+  }
+
+  createRule(rule: Rule): Observable<Array<RuleCategory>> {
+    return this.http.post(AppConfig.api_url + "/analytics/rules", rule)
+      .catch(this.handleError);
   }
 
   getAnalytics(accessId: string, accountId: string): Observable<AccountAnalytics> {

@@ -1,6 +1,6 @@
-import {Component} from "@angular/core";
-import {NavController, NavParams, LoadingController} from "ionic-angular";
-import {BankAccessService} from "../../services/bankAccessService";
+import { Component } from "@angular/core";
+import { NavController, NavParams, LoadingController } from "ionic-angular";
+import { BankAccessService } from "../../services/bankAccessService";
 import { BankAccess } from "../../api/BankAccess";
 
 @Component({
@@ -13,9 +13,9 @@ export class BankAccessUpdatePage {
   parent;
 
   constructor(public navCtrl: NavController,
-              private navparams: NavParams,
-              private loadingCtrl: LoadingController,
-              private bankAccessService: BankAccessService) {
+    public navparams: NavParams,
+    private loadingCtrl: LoadingController,
+    private bankAccessService: BankAccessService) {
 
     this.bankAccess = navparams.data.bankAccess;
     this.parent = navparams.data.parent;

@@ -12,7 +12,7 @@ export class BookingGroupPage {
   label: string;
   bookingGroups: Array<BookingGroup>
 
-  constructor(private navparams: NavParams) {
+  constructor(public navparams: NavParams) {
     this.label = navparams.data.label;
     this.bookingGroups = this.sortBookingGroups(navparams.data.bookingGroups);
   }

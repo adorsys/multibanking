@@ -1,10 +1,9 @@
-import {Component} from '@angular/core';
-import {NavController} from 'ionic-angular';
-import {BankAccountService} from "../../services/bankAccountService";
-import {BankAccountListPage} from "../bankaccount/bankaccountList";
-import {BankAccessCreatePage} from "./bankAccessCreate";
-import {BankAccessService} from "../../services/bankAccessService";
-import {BankAccessUpdatePage} from "./bankAccessUpdate";
+import { Component } from '@angular/core';
+import { NavController } from 'ionic-angular';
+import { BankAccountListPage } from "../bankaccount/bankaccountList";
+import { BankAccessCreatePage } from "./bankAccessCreate";
+import { BankAccessService } from "../../services/bankAccessService";
+import { BankAccessUpdatePage } from "./bankAccessUpdate";
 import { BankAccess } from "../../api/BankAccess";
 
 @Component({
@@ -15,14 +14,15 @@ export class BankAccessListPage {
 
   bankaccesses: Array<BankAccess>;
 
-  constructor(public navCtrl: NavController, private bankAccountService: BankAccountService, private bankAccessService: BankAccessService) {
+  constructor(public navCtrl: NavController,
+    private bankAccessService: BankAccessService) {
   }
 
   ngOnInit() {
     this.bankAccessService.getBankAccesses().subscribe(
-        response => {
-          this.bankaccesses = response
-        });
+      response => {
+        this.bankaccesses = response
+      });
   }
 
   itemSelected(bankAccess) {
@@ -32,7 +32,7 @@ export class BankAccessListPage {
   }
 
   createBankAccess() {
-    this.navCtrl.push(BankAccessCreatePage, {parent: this});
+    this.navCtrl.push(BankAccessCreatePage, { parent: this });
   }
 
   bankAccessesChanged() {
@@ -43,7 +43,7 @@ export class BankAccessListPage {
 
   editBankAccess($event, bankAccess) {
     $event.stopPropagation();
-    this.navCtrl.push(BankAccessUpdatePage, {bankAccess: bankAccess, parent: this});
+    this.navCtrl.push(BankAccessUpdatePage, { bankAccess: bankAccess, parent: this });
   }
 
   deleteBankAccess($event, bankAccess) {

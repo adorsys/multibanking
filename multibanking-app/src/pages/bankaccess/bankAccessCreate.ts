@@ -1,7 +1,6 @@
 import { Component, ViewChild } from "@angular/core";
 import { NavController, NavParams, LoadingController, AlertController } from "ionic-angular";
 import { BankAccessService } from "../../services/bankAccessService";
-import { BankAutoCompleteService } from "../../services/bankAutoCompleteService";
 import { AutoCompleteComponent } from "ionic2-auto-complete";
 import { BankAccess } from "../../api/BankAccess";
 import { Bank } from "../../api/Bank";
@@ -32,11 +31,10 @@ export class BankAccessCreatePage {
   parent;
 
   constructor(public navCtrl: NavController,
-    private navparams: NavParams,
+    public navparams: NavParams,
     private loadingCtrl: LoadingController,
     private alertCtrl: AlertController,
-    private bankAccessService: BankAccessService,
-    private bankAutoCompleteService: BankAutoCompleteService) {
+    private bankAccessService: BankAccessService) {
 
     this.userId = navparams.data.userId;
     this.bankAccess.userId = navparams.data.userId;
