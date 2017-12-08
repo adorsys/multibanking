@@ -4,6 +4,7 @@ import { BankAccessService } from "../../services/bankAccessService";
 import { AutoCompleteComponent } from "ionic2-auto-complete";
 import { BankAccess } from "../../api/BankAccess";
 import { Bank } from "../../api/Bank";
+import { BankAutoCompleteService } from "../../services/bankAutoCompleteService";
 
 @Component({
   selector: 'page-bankaccess-create',
@@ -32,6 +33,7 @@ export class BankAccessCreatePage {
 
   constructor(public navCtrl: NavController,
     public navparams: NavParams,
+    public bankAutoCompleteService: BankAutoCompleteService,
     private loadingCtrl: LoadingController,
     private alertCtrl: AlertController,
     private bankAccessService: BankAccessService) {
