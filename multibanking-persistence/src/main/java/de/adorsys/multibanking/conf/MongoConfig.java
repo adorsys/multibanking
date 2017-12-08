@@ -76,47 +76,6 @@ public class MongoConfig extends AbstractMongoConfiguration {
     public MongoDbFactory mongoDbFactory() throws UnknownHostException {
         return new SimpleMongoDbFactory(mongoClient(), env.getProperty("mongo.databaseName"));
     }
-
-    private class ContinueOnBatchErrorTemplate extends MongoTemplate {
-
-        private static final String ID_FIELD = "_id";
-
-        public ContinueOnBatchErrorTemplate(MongoDbFactory mongoDbFactory) {
-            super(mongoDbFactory);
-        }
-
-        protected List<ObjectId> insertDBObjectList(final String collectionName, final List<DBObject> dbDocList) {
-            if (dbDocList.isEmpty()) {
-                return Collections.emptyList();
-            }
-
-            execute(collectionName, new CollectionCallback<Void>() {
-                public Void doInCollection(DBCollection collection) throws MongoException, DataAccessException {
-                    MongoAction mongoAction = new MongoAction(null, MongoActionOperation.INSERT_LIST, collectionName, null,
-                            null, null);
-                    WriteConcern writeConcernToUse = prepareWriteConcern(mongoAction);
-                    //TODO remove this bullshit when springframework data supports InsertOptions
-                    InsertOptions insertOptions = (new InsertOptions()).writeConcern(writeConcernToUse).continueOnError(collectionName.equals("booking"));
-
-                    WriteResult writeResult = collection.insert(dbDocList, insertOptions);
-                    handleAnyWriteResultErrors(writeResult, null, MongoActionOperation.INSERT_LIST);
-                    return null;
-                }
-            });
-
-            List<ObjectId> ids = new ArrayList<>();
-            for (DBObject dbo : dbDocList) {
-                Object id = dbo.get(ID_FIELD);
-                if (id instanceof ObjectId) {
-                    ids.add((ObjectId) id);
-                } else {
-                    // no id was generated
-                    ids.add(null);
-                }
-            }
-            return ids;
-        }
-    }
 }
 
 
