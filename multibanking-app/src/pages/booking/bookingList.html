@@ -10,14 +10,14 @@
 </ion-header>
 
 <ion-content class="bookingList-content" padding>
-    <ion-fab bottom right>
-        <button ion-fab mini (click)="createPayment()">
-          <ion-icon name="paper-plane"></ion-icon>
-        </button>
-      </ion-fab>
+  <ion-fab bottom right>
+    <button ion-fab mini (click)="createPayment()">
+      <ion-icon name="paper-plane"></ion-icon>
+    </button>
+  </ion-fab>
   <ion-list>
-    <ion-item *ngFor="let booking of bookings" (click)="itemSelected(booking)">
-       <ion-thumbnail item-left>
+    <ion-item *ngFor="let booking of bookings" (click)="itemSelected(booking)" [ngStyle]="{'background-color':!booking?.bookingCategory?.mainCategory ? 'chocolate' : '' }">
+      <ion-thumbnail item-left>
         <img [src]="getLogo(booking?.bookingCategory?.contract?.logo)" item-left/>
       </ion-thumbnail>
       <h3>{{ booking.otherAccount !=null ? booking.otherAccount.owner : ""}}</h3>

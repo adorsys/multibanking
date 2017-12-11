@@ -37,7 +37,7 @@
       <ion-toggle [(ngModel)]="taxRelevant"></ion-toggle>
     </ion-item>
   </ion-list>
-  <button block icon-start ion-button color="primary" type="submit" (click)="submit()" [disabled]="!mainCategory">
+  <button block icon-start ion-button color="primary" type="submit" (click)="submit()" [disabled]="!mainCategory || (!expression && !booking.creditorId)">
     Speichern
   </button>
 </ion-content>
