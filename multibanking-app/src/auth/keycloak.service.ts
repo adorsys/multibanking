@@ -89,7 +89,7 @@ export class KeycloakService {
   }
 
   getRoles(): string[] {
-    if (!keycloak.tokenParsed) {
+    if (!keycloak.tokenParsed || !keycloak.tokenParsed.realm_access) {
       return [];
     }
     return keycloak.tokenParsed.realm_access.roles;
