@@ -1,11 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { RulesService } from '../../services/RulesService';
 import { Rule } from '../../api/Rule';
-import { RulesAutoCompleteService } from '../../services/RulesAutoCompleteService';
-import { AutoCompleteComponent } from 'ionic2-auto-complete';
 import { RuleEditPage } from '../rule-edit/ruleEdit';
-
 
 @Component({
   selector: 'page-rules-custom',
