@@ -25,14 +25,21 @@ import { KEYCLOAK_HTTP_PROVIDER } from '../auth/keycloak.http';
 import { KeycloakService } from '../auth/keycloak.service';
 import { LogoService } from '../services/LogoService';
 import { MyApp } from './app.component';
-import { TabsPage } from '../pages/tabs/tabs';
 import { PaymentCreatePage } from '../pages/payment/paymentCreate';
 import { PaymentService } from '../services/PaymentService';
 import { BookingDetailPage } from '../pages/booking-detail/bookingDetail';
-import { BookingEditPage } from '../pages/booking-edit/bookingEdit';
+import { RulesService } from '../services/RulesService';
+import { RulesAutoCompleteService } from '../services/RulesAutoCompleteService';
+import { RuleEditPage } from '../pages/rule-edit/ruleEdit';
+import { BookingTabsPage } from '../pages/booking-tabs/booking-tabs';
+import { RulesTabsPage } from '../pages/rules-tabs/rules-tabs';
+import { RulesCustomPage } from '../pages/rules-custom/rulesCustom';
+import { RulesStaticPage } from '../pages/rules-static/rulesStatic';
+import { ListActionDirective } from '../directives/list-action-directive';
 
 @NgModule({
   declarations: [
+    ListActionDirective,
     AnalyticsPage,
     BankAccessCreatePage,
     BankAccessListPage,
@@ -41,10 +48,13 @@ import { BookingEditPage } from '../pages/booking-edit/bookingEdit';
     BookingGroupPage,
     BookingListPage,
     BookingDetailPage,
-    BookingEditPage,
+    RuleEditPage,
     PaymentCreatePage,
+    RulesStaticPage,
+    RulesCustomPage,
     ContractsComponent,
-    TabsPage,
+    BookingTabsPage,
+    RulesTabsPage,
     CyclePipe,
     MyApp,
   ],
@@ -64,17 +74,22 @@ import { BookingEditPage } from '../pages/booking-edit/bookingEdit';
     BookingGroupPage,
     BookingListPage,
     BookingDetailPage,
-    BookingEditPage,
+    RuleEditPage,
     PaymentCreatePage,
+    RulesStaticPage,
+    RulesCustomPage,
     ContractsComponent,
-    TabsPage,
+    BookingTabsPage,
+    RulesTabsPage,
     MyApp,
   ],
   providers: [
     AnalyticsService,
+    RulesService,
     BankAccessService,
     BankAccountService,
     BankAutoCompleteService,
+    RulesAutoCompleteService,
     BookingService,
     ContractService,
     KEYCLOAK_HTTP_PROVIDER,
@@ -86,4 +101,4 @@ import { BookingEditPage } from '../pages/booking-edit/bookingEdit';
     { provide: ErrorHandler, useClass: IonicErrorHandler },
   ]
 })
-export class AppModule {}
+export class AppModule { }

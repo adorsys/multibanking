@@ -1,64 +1,103 @@
-import {Injectable} from '@angular/core';
-
+import { Injectable } from '@angular/core';
+import * as Keycloak from 'keycloak-js';
 import { AppConfig } from '../app/app.config';
 
-declare var Keycloak: any;
+const keycloak = Keycloak({
+  url: AppConfig.auth_url,
+  realm: 'multibanking',
+  clientId: 'multibanking-client'
+})
 
 @Injectable()
 export class KeycloakService {
-  static auth: any = {};
 
-  static init(): Promise<any> {
-    const keycloakAuth: any = Keycloak({
-      url: AppConfig.auth_url,
-      realm: 'multibanking',
-      clientId: 'multibanking-client',
-    });
-
-    KeycloakService.auth.loggedIn = false;
+  static init(options?: any): Promise<any> {
 
     return new Promise((resolve, reject) => {
-      keycloakAuth.init({ onLoad: 'login-required' })
+      keycloak.init(options)
         .success(() => {
-          KeycloakService.auth.loggedIn = true;
-          KeycloakService.auth.authz = keycloakAuth;
-          KeycloakService.auth.logoutUrl = keycloakAuth.authServerUrl
-            + '/realms/multibanking/protocol/openid-connect/logout?redirect_uri='
-            + document.baseURI;
           resolve();
         })
-        .error(() => {
-          reject();
+        .error((errorData: any) => {
+          reject(errorData);
         });
     });
   }
 
-  logout() {
-    console.log('*** LOGOUT');
-    KeycloakService.auth.loggedIn = false;
-    KeycloakService.auth.authz = null;
+  authenticated(): boolean {
+    return keycloak.authenticated;
+  }
 
-    window.location.href = KeycloakService.auth.logoutUrl;
+  login(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      keycloak.login()
+        .success(() => {
+          resolve();
+        })
+        .error((errorData: any) => {
+          reject(errorData);
+        });
+    })
+  }
+
+  logout(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      keycloak.logout()
+        .success(() => {
+          resolve();
+        })
+        .error((errorData: any) => {
+          reject(errorData);
+        });
+    })
+  }
+
+  account() {
+    keycloak.accountManagement();
+  }
+
+  register() {
+    keycloak.register();
+  }
+
+  profile(): Promise<any> {
+    return new Promise((resolve, reject) => {
+      keycloak.loadUserProfile()
+        .success((profile: any) => {
+          resolve(profile);
+        })
+        .error((errorData: any) => {
+          reject(errorData);
+        });
+    })
   }
 
   getToken(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      if (KeycloakService.auth.authz.token) {
-        KeycloakService.auth.authz
-          .updateToken(5)
+      if (keycloak.token) {
+        keycloak.updateToken(5)
           .success(() => {
-            resolve(<string>KeycloakService.auth.authz.token);
+            resolve(<string>keycloak.token);
           })
           .error(() => {
-            KeycloakService.auth.authz.login()
+            reject('Failed to refresh token');
           });
       } else {
-        reject('Not loggen in');
+        this.login();
       }
     });
   }
 
-  getUsername(): Promise<string> {
-    return KeycloakService.auth.authz.tokenParsed.sub;
+  getRoles(): string[] {
+    if (!keycloak.tokenParsed) {
+      return [];
+    }
+    return keycloak.tokenParsed.realm_access.roles;
   }
+
+  getUsername(): string {
+    return keycloak.tokenParsed.sub;
+  }
+
+
 }

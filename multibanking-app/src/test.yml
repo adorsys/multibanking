@@ -1,0 +1,119 @@
+version: '3.1'
+services:
+  postgres-master:
+    image: 'sameersbn/postgresql:9.6-2'
+    container_name: postgres-master
+    restart: always
+    environment:
+      - DB_USER=keycloak
+      - DB_PASS=keycloak
+      - REPLICATION_USER=repluser
+      - REPLICATION_PASS=replpass
+      - PG_TRUST_LOCALNET=true
+      - 'DB_EXTENSION=unaccent,pg_trgm'
+    volumes:
+      - /var/lib/postgresql
+  postgres-slave:
+    restart: always
+    image: 'sameersbn/postgresql:9.6-2'
+    target_num_containers: 2
+    environment:
+      - REPLICATION_MODE=slave
+      - REPLICATION_SSLMODE=prefer
+      - REPLICATION_HOST=postgres-master
+      - REPLICATION_PORT=5432
+      - REPLICATION_USER=repluser
+      - REPLICATION_PASS=replpass
+      - PG_TRUST_LOCALNET=true
+      - 'DB_EXTENSION=unaccent,pg_trgm'
+    volumes:
+      - /var/lib/postgresql
+  lb_postgres:
+    image: 'dockercloud/haproxy:1.6.7'
+    links:
+      - postgres-slave
+    ports:
+      - '5432:5432'
+  # keycloak_a:
+  #   image: 'tb-keycloak:latest'
+  #   environment:
+  #     KEYCLOAK_PASSWORD: admin123
+  #     KEYCLOAK_USER: admin
+  #     POSTGRES_USER: keycloak
+  #     POSTGRES_PASSWORD: keycloak
+  #     POSTGRES_PORT_5432_TCP_ADDR: lb_postgres
+  #   ports:
+  #     - '8080:8080'
+  #     - '8787:8787'
+  #   volumes:
+  #     - './keycloak-setup/data:/data'
+  #     - >-
+  #       /Users/alexg/git/keycloak-provider-extension/keycloak-health-check/target/keycloak-health-check-1.1.0.jar:/opt/jboss/keycloak/providers/keycloak-health-check-1.1.0.jar
+  #     - >-
+  #       /Users/alexg/git/keycloak-provider-extension/keycloak-theme-provider/target/keycloak-theme-provider-1.1.1.jar:/opt/jboss/keycloak/providers/keycloak-theme-provider-1.1.0.jar
+  #     - >-
+  #       /Users/alexg/git/keycloak-provider-extension/keycloak-authentication-filter/target/keycloak-authentication-filter-1.1.1.jar:/opt/jboss/keycloak/providers/keycloak-authentication-filter-1.1.0.jar
+  #     - >-
+  #       /Users/alexg/git/keycloak-provider-extension/keycloak-eca-storageprovider/target/keycloak-eca-storageprovider-1.1.1.jar:/opt/jboss/keycloak/providers/keycloak-eca-storageprovider-1.1.0.jar
+  #   command: '${KEYCLOAK_PARAMS}'
+  # keycloak_b:
+  #   image: 'tb-keycloak:latest'
+  #   environment:
+  #     KEYCLOAK_PASSWORD: admin123
+  #     KEYCLOAK_USER: admin
+  #     POSTGRES_USER: keycloak
+  #     POSTGRES_PASSWORD: keycloak
+  #     POSTGRES_PORT_5432_TCP_ADDR: postgres
+  #   ports:
+  #     - '8081:8080'
+  #     - '8788:8787'
+  #   volumes:
+  #     - './keycloak-setup/data:/data'
+  #     - >-
+  #       /Users/alexg/git/keycloak-provider-extension/keycloak-health-check/target/keycloak-health-check-1.1.0.jar:/opt/jboss/keycloak/providers/keycloak-health-check-1.1.0.jar
+  #     - >-
+  #       /Users/alexg/git/keycloak-provider-extension/keycloak-theme-provider/target/keycloak-theme-provider-1.1.1.jar:/opt/jboss/keycloak/providers/keycloak-theme-provider-1.1.0.jar
+  #     - >-
+  #       /Users/alexg/git/keycloak-provider-extension/keycloak-authentication-filter/target/keycloak-authentication-filter-1.1.1.jar:/opt/jboss/keycloak/providers/keycloak-authentication-filter-1.1.0.jar
+  #     - >-
+  #       /Users/alexg/git/keycloak-provider-extension/keycloak-eca-storageprovider/target/keycloak-eca-storageprovider-1.1.1.jar:/opt/jboss/keycloak/providers/keycloak-eca-storageprovider-1.1.0.jar
+  #   command: '${KEYCLOAK_PARAMS}'
+  # openladap_a:
+  #   image: 'openshift/openldap-2441-centos7:latest'
+  #   environment:
+  #     OPENLDAP_ROOT_DN_RREFIX: cn=Manager
+  #     OPENLDAP_ROOT_DN_SUFFIX: 'dc=easycredit,dc=intern'
+  #     OPENLDAP_ROOT_PASSWORD: admin
+  #   ports:
+  #     - '389:389'
+  #     - '636:636'
+  #   volumes:
+  #     - 'openldap_var_lib_a:/var/lib/ldap'
+  #     - 'openldap_etc_a:/etc/openldap'
+  #     - './base.ldif:/usr/local/etc/openldap/base.ldif'
+  # openladap_b:
+  #   image: 'openshift/openldap-2441-centos7:latest'
+  #   environment:
+  #     OPENLDAP_ROOT_DN_RREFIX: cn=Manager
+  #     OPENLDAP_ROOT_DN_SUFFIX: 'dc=easycredit,dc=intern'
+  #     OPENLDAP_ROOT_PASSWORD: admin
+  #   ports:
+  #     - '390:389'
+  #     - '637:636'
+  #   volumes:
+  #     - 'openldap_var_lib_b:/var/lib/ldap'
+  #     - 'openldap_etc_b:/etc/openldap'
+  #     - './base.ldif:/usr/local/etc/openldap/base.ldif'
+volumes:
+  openldap_etc_a:
+    driver: local
+  openldap_etc_b:
+    driver: local
+  openldap_var_lib_a:
+    driver: local
+  openldap_var_lib_b:
+    driver: local
+  postges_data_a:
+    driver: local
+  postges_data_b:
+    driver: local

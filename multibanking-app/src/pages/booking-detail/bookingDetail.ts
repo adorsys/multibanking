@@ -1,7 +1,9 @@
 import { Component } from "@angular/core";
 import { NavParams, NavController } from "ionic-angular";
 import { Booking } from "../../api/Booking";
-import { BookingEditPage } from "../booking-edit/bookingEdit";
+import { RuleEditPage } from "../rule-edit/ruleEdit";
+import { RulesService } from "../../services/RulesService";
+import { Rule } from "../../api/Rule";
 
 @Component({
   selector: 'page-bookingDetail',
@@ -13,15 +15,32 @@ export class BookingDetailPage {
 
   constructor(
     public navCtrl: NavController,
-    public navparams: NavParams
+    public navparams: NavParams,
+    private rulesService: RulesService
   ) {
     this.booking = navparams.data.booking;
   }
 
-  editCategory() {
-    this.navCtrl.push(BookingEditPage, {
-      booking: this.booking
-    });
+  editRule() {
+    if (this.booking.bookingCategory && this.booking.bookingCategory.rules) {
+      this.rulesService.getRule(this.booking.bookingCategory.rules[0]).subscribe(rule => {
+        this.navCtrl.push(RuleEditPage, {
+          rule: rule
+        });
+      })
+    } else {
+      let rule: Rule = {
+        creditorId: this.booking.creditorId,
+        receiver: this.booking.otherAccount? this.booking.otherAccount.owner : undefined
+      };
+      this.navCtrl.push(RuleEditPage, {
+        rule: rule
+      });
+    }
+
+
+
+
   }
 
 }

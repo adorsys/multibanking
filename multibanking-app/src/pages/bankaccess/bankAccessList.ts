@@ -5,6 +5,8 @@ import { BankAccessCreatePage } from "./bankAccessCreate";
 import { BankAccessService } from "../../services/bankAccessService";
 import { BankAccessUpdatePage } from "./bankAccessUpdate";
 import { BankAccess } from "../../api/BankAccess";
+import { KeycloakService } from '../../auth/keycloak.service';
+import { RulesTabsPage } from '../rules-tabs/rules-tabs';
 
 @Component({
   selector: 'page-bankaccessList',
@@ -13,12 +15,16 @@ import { BankAccess } from "../../api/BankAccess";
 export class BankAccessListPage {
 
   bankaccesses: Array<BankAccess>;
+  rulesAdmin: boolean;
 
   constructor(public navCtrl: NavController,
-    private bankAccessService: BankAccessService) {
+    private bankAccessService: BankAccessService,
+    private keycloakService: KeycloakService) {
   }
 
   ngOnInit() {
+    this.rulesAdmin = this.keycloakService.getRoles().filter(role => role == 'rules_admin').length > 0;
+  
     this.bankAccessService.getBankAccesses().subscribe(
       response => {
         this.bankaccesses = response
@@ -51,6 +57,10 @@ export class BankAccessListPage {
     this.bankAccessService.deleteBankAccess(bankAccess.id).subscribe(response => {
       this.bankAccessesChanged();
     });
+  }
+
+  editRules() {
+    this.navCtrl.push(RulesTabsPage);
   }
 
 }

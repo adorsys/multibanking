@@ -141,7 +141,6 @@ public class FigoBanking implements OnlineBankingService {
         }
     }
 
-    @Override
     public Bank getBankLoginSettings(String bankCode) {
         FigoSession figoSession = loginTechUser();
 

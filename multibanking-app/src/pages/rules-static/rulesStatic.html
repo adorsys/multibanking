@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Rules</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+  <ion-auto-complete [dataProvider]="rulesAutoCompleteService" [options]="{placeholder : 'Name or creditor id'}" #autocomplete></ion-auto-complete>
+  <ion-grid *ngIf="selectedRule">
+    <ion-item>
+      <ion-row>
+        <ion-col col-12 col-lg-6>
+          <ion-row>
+            <ion-col col-4>Rule id:</ion-col>
+            <ion-col col-8>{{ selectedRule.ruleId }}</ion-col>
+            <ion-col col-4>Receiver:</ion-col>
+            <ion-col col-8>{{ selectedRule.receiver }}</ion-col>
+            <ion-col col-4>Creditor id:</ion-col>
+            <ion-col col-8>{{ selectedRule.creditorId }}</ion-col>
+          </ion-row>
+        </ion-col>
+        <ion-col col-12 col-lg-6>
+          <ion-row>
+            <ion-col col-4>Maincategory:</ion-col>
+            <ion-col col-8>{{ selectedRule.mainCategory }}</ion-col>
+            <ion-col col-4>Subcategory:</ion-col>
+            <ion-col col-8>{{ selectedRule.subCategory }}</ion-col>
+            <ion-col col-4>Specification:</ion-col>
+            <ion-col col-8>{{ selectedRule.specification }}</ion-col>
+          </ion-row>
+        </ion-col>
+        <ion-col col-12>
+          <ion-row>
+            <ion-col col-2>Expression:</ion-col>
+            <ion-col col-10>
+              <p style="white-space: normal;">{{ selectedRule.expression }}</p>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+      <button ion-button outline item-end (click)="editRule()">
+        <ion-icon name="settings"></ion-icon>
+        Edit
+      </button>
+      <button ion-button outline item-end (click)="deleteRule()">
+        <ion-icon name="trash"></ion-icon>
+        Delete
+      </button>
+    </ion-item>
+  </ion-grid>
+</ion-content>

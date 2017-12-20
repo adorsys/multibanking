@@ -18,8 +18,6 @@ public interface OnlineBankingService {
 
     void removeUser(BankApiUser bankApiUser);
 
-    Bank getBankLoginSettings(String bankCode);
-
     List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin);
 
     void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);

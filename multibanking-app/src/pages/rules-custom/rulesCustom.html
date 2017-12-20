@@ -1,0 +1,57 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Rules</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+  <ion-list>
+    <ion-item *ngFor="let rule of rules">
+      <ion-grid>
+        <ion-row>
+          <ion-col col-12 col-lg-6>
+            <ion-row>
+              <ion-col col-4>Rule id:</ion-col>
+              <ion-col col-8>{{ rule.ruleId }}</ion-col>
+              <ion-col col-4>Receiver:</ion-col>
+              <ion-col col-8>{{ rule.receiver }}</ion-col>
+              <ion-col col-4>Creditor id:</ion-col>
+              <ion-col col-8>{{ rule.creditorId }}</ion-col>
+            </ion-row>
+          </ion-col>
+          <ion-col col-12 col-lg-6>
+            <ion-row>
+              <ion-col col-4>Maincategory:</ion-col>
+              <ion-col col-8>{{ rule.mainCategory }}</ion-col>
+              <ion-col col-4>Subcategory:</ion-col>
+              <ion-col col-8>{{ rule.subCategory }}</ion-col>
+              <ion-col col-4>Specification:</ion-col>
+              <ion-col col-8>{{ rule.specification }}</ion-col>
+            </ion-row>
+          </ion-col>
+          <ion-col col-12>
+            <ion-row>
+              <ion-col col-4 col-lg-2>Expression:</ion-col>
+              <ion-col col-8 col-lg-10>
+                <p style="white-space: normal;">{{ rule.expression }}</p>
+              </ion-col>
+            </ion-row>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <button ion-button outline item-end (click)="releaseRule(rule)">
+        <ion-icon name="checkmark"></ion-icon>
+        Release
+      </button>
+      <button ion-button outline item-end (click)="editRule(rule)">
+        <ion-icon name="settings"></ion-icon>
+        Edit
+      </button>
+      <button ion-button outline item-end (click)="deleteRule(rule)">
+        <ion-icon name="trash"></ion-icon>
+        Delete
+      </button>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -3,7 +3,8 @@ import { NavController, NavParams } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccountService";
 import { BankAccess } from "../../api/BankAccess";
 import { BankAccount } from "../../api/BankAccount";
-import { TabsPage } from "../tabs/tabs";
+import { BookingTabsPage } from "../booking-tabs/booking-tabs";
+
 
 @Component({
   selector: 'page-bankaccountList',
@@ -36,7 +37,7 @@ export class BankAccountListPage {
   }
 
   itemSelected(bankAccount) {
-    this.navCtrl.push(TabsPage, {
+    this.navCtrl.push(BookingTabsPage, {
       bankAccess: this.bankAccess,
       bankAccount: bankAccount,
     })

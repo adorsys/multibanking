@@ -1,1 +1,2139 @@
-webpackJsonp([0],{198:function(l,n){function u(l){return Promise.resolve().then(function(){throw new Error("Cannot find module '"+l+"'.")})}u.keys=function(){return[]},u.resolve=u,l.exports=u,u.id=198},321:function(l,n){function u(l){return Promise.resolve().then(function(){throw new Error("Cannot find module '"+l+"'.")})}u.keys=function(){return[]},u.resolve=u,l.exports=u,u.id=321},350:function(l,n,u){"use strict";function t(l,n,u){return new El(l,n,u)}function a(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"ion-nav",[],null,null,null,Gl.b,Gl.a)),ll._17(6144,null,Xl.a,null,[Kl.a]),ll.Y(2,4374528,null,0,Kl.a,[[2,Hl.a],[2,Wl.a],Jl.a,Ql.a,ln.a,ll.j,ll.u,ll.z,ll.i,nn.l,un.a,[2,tn.a],an.a,ll.k],{root:[0,"root"]},null),(l()(),ll._20(-1,null,["\n"]))],function(l,n){l(n,2,0,n.component.rootPage)},null)}function e(l){return ll._22(0,[ll._14(0,sn.e,[ll.r]),ll._14(0,sn.c,[ll.r]),ll._18(402653184,1,{navBar:0}),(l()(),ll.Z(3,0,null,null,20,"ion-header",[],null,null,null,null,null)),ll.Y(4,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(6,0,null,null,16,"ion-navbar",[["class","force-back-button toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(7,49152,[[1,4]],0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(9,0,null,3,3,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(10,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(11,0,["Analytics ",""])),ll._16(12,1),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(14,0,null,2,7,"ion-buttons",[["end",""]],null,null,null,null,null)),ll.Y(15,16384,null,1,pn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),ll._18(603979776,2,{_buttons:1}),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(18,0,null,null,2,"button",[["ion-button",""]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.syncBookings()&&t}return t},hn.b,hn.a)),ll.Y(19,1097728,[[2,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,0,["\n        Reload\n      "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(25,0,null,null,131,"ion-content",[["class","bookingList-content"],["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(26,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(28,0,null,1,67,"ion-item-group",[],null,null,null,null,null)),ll.Y(29,16384,null,0,Cn.a,[],null,null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(31,0,null,null,7,"ion-item-divider",[["class","item item-divider"],["color","light"]],null,null,null,vn.b,vn.a)),ll.Y(32,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],{color:[0,"color"]},null),ll._18(335544320,3,{contentLabel:0}),ll._18(603979776,4,{_buttons:1}),ll._18(603979776,5,{_icons:1}),ll.Y(36,16384,null,0,In.a,[Ql.a,ll.j,ll.z],{color:[0,"color"]},null),(l()(),ll._20(37,2,["Balance end of month: ",""])),ll._16(38,3),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(40,0,null,null,6,"ion-item-divider",[["class","item item-divider"],["color","light"]],null,null,null,vn.b,vn.a)),ll.Y(41,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],{color:[0,"color"]},null),ll._18(335544320,6,{contentLabel:0}),ll._18(603979776,7,{_buttons:1}),ll._18(603979776,8,{_icons:1}),ll.Y(45,16384,null,0,In.a,[Ql.a,ll.j,ll.z],{color:[0,"color"]},null),(l()(),ll._20(-1,2,["Income"])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(48,0,null,null,7,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(49,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,9,{contentLabel:0}),ll._18(603979776,10,{_buttons:1}),ll._18(603979776,11,{_icons:1}),ll.Y(53,16384,null,0,An.a,[],null,null),(l()(),ll._20(54,2,["Total: ",""])),ll._16(55,3),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(57,0,null,null,11,"ion-item",[["class","item item-block"]],null,[[null,"click"]],function(l,n,u){var t=!0,a=l.component;if("click"===n){t=!1!==a.itemSelected("Fix income",null==a.analytics?null:a.analytics.incomeFixBookings)&&t}return t},vn.b,vn.a)),ll.Y(58,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,12,{contentLabel:0}),ll._18(603979776,13,{_buttons:1}),ll._18(603979776,14,{_icons:1}),ll.Y(62,16384,null,0,An.a,[],null,null),(l()(),ll._20(63,2,["Fix: ","\n      "])),ll._16(64,3),(l()(),ll.Z(65,0,null,4,2,"button",[["clear",""],["ion-button",""],["item-end",""]],null,null,null,hn.b,hn.a)),ll.Y(66,1097728,[[13,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{clear:[0,"clear"]},null),(l()(),ll._20(-1,0,["View"])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(70,0,null,null,11,"ion-item",[["class","item item-block"]],null,[[null,"click"]],function(l,n,u){var t=!0,a=l.component;if("click"===n){t=!1!==a.itemSelected("Variable income",null==a.analytics?null:a.analytics.incomeVariableBookings)&&t}return t},vn.b,vn.a)),ll.Y(71,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,15,{contentLabel:0}),ll._18(603979776,16,{_buttons:1}),ll._18(603979776,17,{_icons:1}),ll.Y(75,16384,null,0,An.a,[],null,null),(l()(),ll._20(76,2,["Variable: ","\n      "])),ll._16(77,3),(l()(),ll.Z(78,0,null,4,2,"button",[["clear",""],["ion-button",""],["item-end",""]],null,null,null,hn.b,hn.a)),ll.Y(79,1097728,[[16,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{clear:[0,"clear"]},null),(l()(),ll._20(-1,0,["View"])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(83,0,null,null,11,"ion-item",[["class","item item-block"]],null,[[null,"click"]],function(l,n,u){var t=!0,a=l.component;if("click"===n){t=!1!==a.itemSelected("Next income",null==a.analytics?null:a.analytics.incomeNextBookings)&&t}return t},vn.b,vn.a)),ll.Y(84,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,18,{contentLabel:0}),ll._18(603979776,19,{_buttons:1}),ll._18(603979776,20,{_icons:1}),ll.Y(88,16384,null,0,An.a,[],null,null),(l()(),ll._20(89,2,["Next: ","\n      "])),ll._16(90,3),(l()(),ll.Z(91,0,null,4,2,"button",[["clear",""],["ion-button",""],["item-end",""]],null,null,null,hn.b,hn.a)),ll.Y(92,1097728,[[19,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{clear:[0,"clear"]},null),(l()(),ll._20(-1,0,["View"])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(97,0,null,1,58,"ion-item-group",[],null,null,null,null,null)),ll.Y(98,16384,null,0,Cn.a,[],null,null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(100,0,null,null,6,"ion-item-divider",[["class","item item-divider"],["color","light"]],null,null,null,vn.b,vn.a)),ll.Y(101,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],{color:[0,"color"]},null),ll._18(335544320,21,{contentLabel:0}),ll._18(603979776,22,{_buttons:1}),ll._18(603979776,23,{_icons:1}),ll.Y(105,16384,null,0,In.a,[Ql.a,ll.j,ll.z],{color:[0,"color"]},null),(l()(),ll._20(-1,2,["Expenses"])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(108,0,null,null,7,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(109,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,24,{contentLabel:0}),ll._18(603979776,25,{_buttons:1}),ll._18(603979776,26,{_icons:1}),ll.Y(113,16384,null,0,An.a,[],null,null),(l()(),ll._20(114,2,["Total: ",""])),ll._16(115,3),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(117,0,null,null,11,"ion-item",[["class","item item-block"]],null,[[null,"click"]],function(l,n,u){var t=!0,a=l.component;if("click"===n){t=!1!==a.itemSelected("Fix expenses",null==a.analytics?null:a.analytics.expensesFixBookings)&&t}return t},vn.b,vn.a)),ll.Y(118,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,27,{contentLabel:0}),ll._18(603979776,28,{_buttons:1}),ll._18(603979776,29,{_icons:1}),ll.Y(122,16384,null,0,An.a,[],null,null),(l()(),ll._20(123,2,["Fix: ","\n      "])),ll._16(124,3),(l()(),ll.Z(125,0,null,4,2,"button",[["clear",""],["ion-button",""],["item-end",""]],null,null,null,hn.b,hn.a)),ll.Y(126,1097728,[[28,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{clear:[0,"clear"]},null),(l()(),ll._20(-1,0,["View"])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(130,0,null,null,11,"ion-item",[["class","item item-block"]],null,[[null,"click"]],function(l,n,u){var t=!0,a=l.component;if("click"===n){t=!1!==a.itemSelected("Variable expenses",null==a.analytics?null:a.analytics.expensesVariableBookings)&&t}return t},vn.b,vn.a)),ll.Y(131,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,30,{contentLabel:0}),ll._18(603979776,31,{_buttons:1}),ll._18(603979776,32,{_icons:1}),ll.Y(135,16384,null,0,An.a,[],null,null),(l()(),ll._20(136,2,["Variable: ","\n      "])),ll._16(137,3),(l()(),ll.Z(138,0,null,4,2,"button",[["clear",""],["ion-button",""],["item-end",""]],null,null,null,hn.b,hn.a)),ll.Y(139,1097728,[[31,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{clear:[0,"clear"]},null),(l()(),ll._20(-1,0,["View"])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(143,0,null,null,11,"ion-item",[["class","item item-block"]],null,[[null,"click"]],function(l,n,u){var t=!0,a=l.component;if("click"===n){t=!1!==a.itemSelected("Next expenses",null==a.analytics?null:a.analytics.expensesNextBookings)&&t}return t},vn.b,vn.a)),ll.Y(144,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,33,{contentLabel:0}),ll._18(603979776,34,{_buttons:1}),ll._18(603979776,35,{_icons:1}),ll.Y(148,16384,null,0,An.a,[],null,null),(l()(),ll._20(149,2,["Next: ","\n      "])),ll._16(150,3),(l()(),ll.Z(151,0,null,4,2,"button",[["clear",""],["ion-button",""],["item-end",""]],null,null,null,hn.b,hn.a)),ll.Y(152,1097728,[[34,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{clear:[0,"clear"]},null),(l()(),ll._20(-1,0,["View"])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){l(n,32,0,"light");l(n,36,0,"light");l(n,41,0,"light");l(n,45,0,"light");l(n,66,0,"");l(n,79,0,"");l(n,92,0,"");l(n,101,0,"light");l(n,105,0,"light");l(n,126,0,"");l(n,139,0,"");l(n,152,0,"")},function(l,n){var u=n.component;l(n,6,0,ll._13(n,7)._hidden,ll._13(n,7)._sbPadding);l(n,11,0,ll._21(n,11,0,l(n,12,0,ll._13(n,0),null==u.analytics?null:u.analytics.analyticsDate)));l(n,25,0,ll._13(n,26).statusbarPadding,ll._13(n,26)._hasRefresher);l(n,37,0,ll._21(n,37,0,l(n,38,0,ll._13(n,1),null==u.analytics?null:u.analytics.balanceCalculated,"EUR",!0)));l(n,54,0,ll._21(n,54,0,l(n,55,0,ll._13(n,1),null==u.analytics?null:u.analytics.incomeTotal,"EUR",!0)));l(n,63,0,ll._21(n,63,0,l(n,64,0,ll._13(n,1),null==u.analytics?null:u.analytics.incomeFix,"EUR",!0)));l(n,76,0,ll._21(n,76,0,l(n,77,0,ll._13(n,1),null==u.analytics?null:u.analytics.incomeVariable,"EUR",!0)));l(n,89,0,ll._21(n,89,0,l(n,90,0,ll._13(n,1),null==u.analytics?null:u.analytics.incomeNext,"EUR",!0)));l(n,114,0,ll._21(n,114,0,l(n,115,0,ll._13(n,1),null==u.analytics?null:u.analytics.expensesTotal,"EUR",!0)));l(n,123,0,ll._21(n,123,0,l(n,124,0,ll._13(n,1),null==u.analytics?null:u.analytics.expensesFix,"EUR",!0)));l(n,136,0,ll._21(n,136,0,l(n,137,0,ll._13(n,1),null==u.analytics?null:u.analytics.expensesVariable,"EUR",!0)));l(n,149,0,ll._21(n,149,0,l(n,150,0,ll._13(n,1),null==u.analytics?null:u.analytics.expensesNext,"EUR",!0)))})}function i(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(1,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,5,{contentLabel:0}),ll._18(603979776,6,{_buttons:1}),ll._18(603979776,7,{_icons:1}),ll.Y(5,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(7,0,null,1,2,"ion-label",[["floating",""]],null,null,null,null,null)),ll.Y(8,16384,[[5,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,""],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(9,null,["",""])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(11,0,null,3,6,"ion-input",[["name","bankLogin"],["required",""]],[[1,"required",0],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"]],function(l,n,u){var t=!0;if("ngModelChange"===n){t=!1!==(l.context.$implicit.input=u)&&t}return t},Un.b,Un.a)),ll.Y(12,16384,null,0,Rn.n,[],{required:[0,"required"]},null),ll._17(1024,null,Rn.f,function(l){return[l]},[Rn.n]),ll.Y(14,671744,null,0,Rn.l,[[2,Rn.b],[2,Rn.f],[8,null],[8,null]],{name:[0,"name"],model:[1,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(16,16384,null,0,Rn.i,[Rn.h],null,null),ll.Y(17,5423104,null,0,wn.a,[Ql.a,ln.a,Zn.a,Jl.a,ll.j,ll.z,[2,kn.a],[2,Yn.a],[2,Rn.h],an.a],{type:[0,"type"]},null),(l()(),ll._20(-1,2,["\n      "]))],function(l,n){l(n,12,0,"");l(n,14,0,"bankLogin",n.context.$implicit.input);l(n,17,0,ll._2(1,"",n.context.$implicit.masked?"password":"text",""))},function(l,n){l(n,9,0,n.context.$implicit.label);l(n,11,0,ll._13(n,12).required?"":null,ll._13(n,16).ngClassUntouched,ll._13(n,16).ngClassTouched,ll._13(n,16).ngClassPristine,ll._13(n,16).ngClassDirty,ll._13(n,16).ngClassValid,ll._13(n,16).ngClassInvalid,ll._13(n,16).ngClassPending)})}function o(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,136,"form",[["novalidate",""]],[[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngSubmit"],[null,"submit"],[null,"reset"]],function(l,n,u){var t=!0,a=l.component;if("submit"===n){t=!1!==ll._13(l,2).onSubmit(u)&&t}if("reset"===n){t=!1!==ll._13(l,2).onReset()&&t}if("ngSubmit"===n){t=!1!==a.createBankAccess()&&t}return t},null,null)),ll.Y(1,16384,null,0,Rn.p,[],null,null),ll.Y(2,4210688,[["createForm",4]],0,Rn.k,[[8,null],[8,null]],null,{ngSubmit:"ngSubmit"}),ll._17(2048,null,Rn.b,null,[Rn.k]),ll.Y(4,16384,null,0,Rn.j,[Rn.b],null,null),(l()(),ll._20(-1,null,["\n\n    "])),(l()(),ll.Z(6,0,null,null,13,"ion-item-group",[],null,null,null,null,null)),ll.Y(7,16384,null,0,Cn.a,[],null,null),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(9,0,null,null,6,"ion-item-divider",[["class","item item-divider"],["color","light"]],null,null,null,vn.b,vn.a)),ll.Y(10,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],{color:[0,"color"]},null),ll._18(335544320,2,{contentLabel:0}),ll._18(603979776,3,{_buttons:1}),ll._18(603979776,4,{_icons:1}),ll.Y(14,16384,null,0,In.a,[Ql.a,ll.j,ll.z],{color:[0,"color"]},null),(l()(),ll._20(15,2,["",""])),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.U(16777216,null,null,1,null,i)),ll.Y(18,802816,null,0,sn.j,[ll.I,ll.F,ll.p],{ngForOf:[0,"ngForOf"]},null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(21,0,null,null,110,"ion-item-group",[],null,null,null,null,null)),ll.Y(22,16384,null,0,Cn.a,[],null,null),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(24,0,null,null,6,"ion-item-divider",[["class","item item-divider"],["color","light"]],null,null,null,vn.b,vn.a)),ll.Y(25,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],{color:[0,"color"]},null),ll._18(335544320,8,{contentLabel:0}),ll._18(603979776,9,{_buttons:1}),ll._18(603979776,10,{_icons:1}),ll.Y(29,16384,null,0,In.a,[Ql.a,ll.j,ll.z],{color:[0,"color"]},null),(l()(),ll._20(-1,2,["Bank settings"])),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(32,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(33,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,11,{contentLabel:0}),ll._18(603979776,12,{_buttons:1}),ll._18(603979776,13,{_icons:1}),ll.Y(37,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(39,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(40,16384,[[11,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Save Pin"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(43,0,null,4,6,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,44)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.bankAccess.storePin=u)&&t}return t},Mn.b,Mn.a)),ll.Y(44,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(46,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"],options:[1,"options"]},{update:"ngModelChange"}),ll._15(47,{standalone:0}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(49,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n\n      "])),(l()(),ll.Z(52,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(53,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,14,{contentLabel:0}),ll._18(603979776,15,{_buttons:1}),ll._18(603979776,16,{_icons:1}),ll.Y(57,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(59,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(60,16384,[[14,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Save Bookings"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(63,0,null,4,6,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,64)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.bankAccess.storeBookings=u)&&t}return t},Mn.b,Mn.a)),ll.Y(64,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(66,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"],options:[1,"options"]},{update:"ngModelChange"}),ll._15(67,{standalone:0}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(69,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n\n      "])),(l()(),ll.Z(72,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(73,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,17,{contentLabel:0}),ll._18(603979776,18,{_buttons:1}),ll._18(603979776,19,{_icons:1}),ll.Y(77,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(79,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(80,16384,[[17,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Categorize Bookings"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(83,0,null,4,6,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,84)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.bankAccess.categorizeBookings=u)&&t}return t},Mn.b,Mn.a)),ll.Y(84,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(86,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"],options:[1,"options"]},{update:"ngModelChange"}),ll._15(87,{standalone:0}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(89,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n\n      "])),(l()(),ll.Z(92,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(93,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,20,{contentLabel:0}),ll._18(603979776,21,{_buttons:1}),ll._18(603979776,22,{_icons:1}),ll.Y(97,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(99,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(100,16384,[[20,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Save anonymized Bookings"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(103,0,null,4,6,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,104)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.bankAccess.storeAnonymizedBookings=u)&&t}return t},Mn.b,Mn.a)),ll.Y(104,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(106,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"],options:[1,"options"]},{update:"ngModelChange"}),ll._15(107,{standalone:0}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(109,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n\n      "])),(l()(),ll.Z(112,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(113,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,23,{contentLabel:0}),ll._18(603979776,24,{_buttons:1}),ll._18(603979776,25,{_icons:1}),ll.Y(117,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(119,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(120,16384,[[23,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Save Analytics"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(123,0,null,4,6,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,124)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.bankAccess.storeAnalytics=u)&&t}return t},Mn.b,Mn.a)),ll.Y(124,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(126,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"],options:[1,"options"]},{update:"ngModelChange"}),ll._15(127,{standalone:0}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(129,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(133,0,null,null,2,"button",[["block",""],["color","primary"],["ion-button",""],["type","submit"]],[[8,"disabled",0]],null,null,hn.b,hn.a)),ll.Y(134,1097728,null,0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{color:[0,"color"],block:[1,"block"]},null),(l()(),ll._20(-1,0,["Submit"])),(l()(),ll._20(-1,null,["\n\n  "]))],function(l,n){var u=n.component;l(n,10,0,"light");l(n,14,0,"light");l(n,18,0,u.selectedBank.loginSettings.credentials);l(n,25,0,"light");l(n,29,0,"light");l(n,46,0,u.bankAccess.storePin,l(n,47,0,!0));l(n,66,0,u.bankAccess.storeBookings,l(n,67,0,!0));l(n,86,0,u.bankAccess.categorizeBookings,l(n,87,0,!0));l(n,106,0,u.bankAccess.storeAnonymizedBookings,l(n,107,0,!0));l(n,126,0,u.bankAccess.storeAnalytics,l(n,127,0,!0));l(n,134,0,"primary","")},function(l,n){var u=n.component;l(n,0,0,ll._13(n,4).ngClassUntouched,ll._13(n,4).ngClassTouched,ll._13(n,4).ngClassPristine,ll._13(n,4).ngClassDirty,ll._13(n,4).ngClassValid,ll._13(n,4).ngClassInvalid,ll._13(n,4).ngClassPending);l(n,15,0,u.selectedBank.loginSettings.advice?u.selectedBank.loginSettings.advice:"Bank login data");l(n,43,0,ll._13(n,44)._disabled,ll._13(n,44)._value,ll._13(n,44)._activated,ll._13(n,49).ngClassUntouched,ll._13(n,49).ngClassTouched,ll._13(n,49).ngClassPristine,ll._13(n,49).ngClassDirty,ll._13(n,49).ngClassValid,ll._13(n,49).ngClassInvalid,ll._13(n,49).ngClassPending);l(n,63,0,ll._13(n,64)._disabled,ll._13(n,64)._value,ll._13(n,64)._activated,ll._13(n,69).ngClassUntouched,ll._13(n,69).ngClassTouched,ll._13(n,69).ngClassPristine,ll._13(n,69).ngClassDirty,ll._13(n,69).ngClassValid,ll._13(n,69).ngClassInvalid,ll._13(n,69).ngClassPending);l(n,83,0,ll._13(n,84)._disabled,ll._13(n,84)._value,ll._13(n,84)._activated,ll._13(n,89).ngClassUntouched,ll._13(n,89).ngClassTouched,ll._13(n,89).ngClassPristine,ll._13(n,89).ngClassDirty,ll._13(n,89).ngClassValid,ll._13(n,89).ngClassInvalid,ll._13(n,89).ngClassPending);l(n,103,0,ll._13(n,104)._disabled,ll._13(n,104)._value,ll._13(n,104)._activated,ll._13(n,109).ngClassUntouched,ll._13(n,109).ngClassTouched,ll._13(n,109).ngClassPristine,ll._13(n,109).ngClassDirty,ll._13(n,109).ngClassValid,ll._13(n,109).ngClassInvalid,ll._13(n,109).ngClassPending);l(n,123,0,ll._13(n,124)._disabled,ll._13(n,124)._value,ll._13(n,124)._activated,ll._13(n,129).ngClassUntouched,ll._13(n,129).ngClassTouched,ll._13(n,129).ngClassPristine,ll._13(n,129).ngClassDirty,ll._13(n,129).ngClassValid,ll._13(n,129).ngClassInvalid,ll._13(n,129).ngClassPending);l(n,133,0,!ll._13(n,2).form.valid)})}function s(l){return ll._22(0,[ll._18(402653184,1,{autocomplete:0}),(l()(),ll.Z(1,0,null,null,10,"ion-header",[],null,null,null,null,null)),ll.Y(2,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(4,0,null,null,6,"ion-navbar",[["class","toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(5,49152,null,0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(7,0,null,3,2,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(8,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(-1,0,["New Bank Connection"])),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(13,0,null,null,10,"ion-content",[["class","bankaccess-create-content"],["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(14,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(16,0,null,1,3,"ion-auto-complete",[],null,[["document","click"]],function(l,n,u){var t=!0;if("document:click"===n){t=!1!==ll._13(l,18).documentClickHandler(u)&&t}return t},On.b,On.a)),ll._17(5120,null,Rn.g,function(l){return[l]},[tl.a]),ll.Y(18,8437760,[[1,4],["autocomplete",4]],0,tl.a,[],{dataProvider:[0,"dataProvider"],options:[1,"options"]},null),ll._15(19,{placeholder:0}),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.U(16777216,null,1,1,null,o)),ll.Y(22,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){var u=n.component;l(n,18,0,u.bankAutoCompleteService,l(n,19,0,"Bank name or bank code"));l(n,22,0,u.selectedBank)},function(l,n){l(n,4,0,ll._13(n,5)._hidden,ll._13(n,5)._sbPadding);l(n,13,0,ll._13(n,14).statusbarPadding,ll._13(n,14)._hasRefresher)})}function c(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,26,"ion-item",[["class","item item-block"]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.itemSelected(l.context.$implicit)&&t}return t},vn.b,vn.a)),ll.Y(1,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,3,{contentLabel:0}),ll._18(603979776,4,{_buttons:1}),ll._18(603979776,5,{_icons:1}),ll.Y(5,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(7,0,null,2,1,"h3",[],null,null,null,null,null)),(l()(),ll._20(8,null,["",""])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(10,0,null,2,1,"h2",[],null,null,null,null,null)),(l()(),ll._20(11,null,["",""])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(13,0,null,4,5,"button",[["ion-button",""],["item-end",""],["outline",""]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.editBankAccess(u,l.context.$implicit)&&t}return t},hn.b,hn.a)),ll.Y(14,1097728,[[4,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{outline:[0,"outline"]},null),(l()(),ll._20(-1,0,["\n        "])),(l()(),ll.Z(16,0,null,0,1,"ion-icon",[["name","settings"],["role","img"]],[[2,"hide",null]],null,null,null,null)),ll.Y(17,147456,null,0,Tn.a,[Ql.a,ll.j,ll.z],{name:[0,"name"]},null),(l()(),ll._20(-1,0,["\n        Edit\n      "])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(20,0,null,4,5,"button",[["ion-button",""],["item-end",""],["outline",""]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.deleteBankAccess(u,l.context.$implicit)&&t}return t},hn.b,hn.a)),ll.Y(21,1097728,[[4,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{outline:[0,"outline"]},null),(l()(),ll._20(-1,0,["\n        "])),(l()(),ll.Z(23,0,null,0,1,"ion-icon",[["name","trash"],["role","img"]],[[2,"hide",null]],null,null,null,null)),ll.Y(24,147456,null,0,Tn.a,[Ql.a,ll.j,ll.z],{name:[0,"name"]},null),(l()(),ll._20(-1,0,["\n        Delete\n      "])),(l()(),ll._20(-1,2,["\n    "]))],function(l,n){l(n,14,0,"");l(n,17,0,"settings");l(n,21,0,"");l(n,24,0,"trash")},function(l,n){l(n,8,0,n.context.$implicit.bankCode);l(n,11,0,n.context.$implicit.bankName);l(n,16,0,ll._13(n,17)._hidden);l(n,23,0,ll._13(n,24)._hidden)})}function r(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,10,"ion-header",[],null,null,null,null,null)),ll.Y(1,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(3,0,null,null,6,"ion-navbar",[["class","toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(4,49152,null,0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(6,0,null,3,2,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(7,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(-1,0,["Bank Connections"])),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(12,0,null,null,20,"ion-content",[["class","bankaccessList-content"],["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(13,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(15,0,null,0,9,"ion-fab",[["edge",""],["right",""],["top",""]],null,null,null,Nn.b,Nn.a)),ll.Y(16,1228800,null,2,qn.a,[ln.a],null,null),ll._18(335544320,1,{_mainButton:0}),ll._18(603979776,2,{_fabLists:1}),(l()(),ll._20(-1,0,["\n    "])),(l()(),ll.Z(20,0,null,0,3,"button",[["ion-fab",""],["mini",""]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.createBankAccess()&&t}return t},Gn.b,Gn.a)),ll.Y(21,49152,[[1,4]],0,Xn.a,[Ql.a,ll.j,ll.z],null,null),(l()(),ll.Z(22,0,null,0,1,"ion-icon",[["name","add"],["role","img"]],[[2,"hide",null]],null,null,null,null)),ll.Y(23,147456,null,0,Tn.a,[Ql.a,ll.j,ll.z],{name:[0,"name"]},null),(l()(),ll._20(-1,0,["\n  "])),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(26,0,null,1,5,"ion-list",[],null,null,null,null,null)),ll.Y(27,16384,null,0,Kn.a,[Ql.a,ll.j,ll.z,ln.a,nn.l,an.a],null,null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.U(16777216,null,null,1,null,c)),ll.Y(30,802816,null,0,sn.j,[ll.I,ll.F,ll.p],{ngForOf:[0,"ngForOf"]},null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){var u=n.component;l(n,23,0,"add");l(n,30,0,u.bankaccesses)},function(l,n){l(n,3,0,ll._13(n,4)._hidden,ll._13(n,4)._sbPadding);l(n,12,0,ll._13(n,13).statusbarPadding,ll._13(n,13)._hasRefresher);l(n,22,0,ll._13(n,23)._hidden)})}function _(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,16,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(1,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,4,{contentLabel:0}),ll._18(603979776,5,{_buttons:1}),ll._18(603979776,6,{_icons:1}),ll.Y(5,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,[">\n        "])),(l()(),ll.Z(7,0,null,1,2,"ion-label",[["floating",""]],null,null,null,null,null)),ll.Y(8,16384,[[4,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,""],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Pin"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(11,0,null,3,4,"ion-input",[["name","pin"],["type","password"]],[[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"]],function(l,n,u){var t=!0;if("ngModelChange"===n){t=!1!==(l.component.bankAccess.pin=u)&&t}return t},Un.b,Un.a)),ll.Y(12,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[8,null]],{name:[0,"name"],model:[1,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(14,16384,null,0,Rn.i,[Rn.h],null,null),ll.Y(15,5423104,null,0,wn.a,[Ql.a,ln.a,Zn.a,Jl.a,ll.j,ll.z,[2,kn.a],[2,Yn.a],[2,Rn.h],an.a],{type:[0,"type"]},null),(l()(),ll._20(-1,2,["\n      "]))],function(l,n){l(n,12,0,"pin",n.component.bankAccess.pin);l(n,15,0,"password")},function(l,n){l(n,11,0,ll._13(n,14).ngClassUntouched,ll._13(n,14).ngClassTouched,ll._13(n,14).ngClassPristine,ll._13(n,14).ngClassDirty,ll._13(n,14).ngClassValid,ll._13(n,14).ngClassInvalid,ll._13(n,14).ngClassPending)})}function g(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,10,"ion-header",[],null,null,null,null,null)),ll.Y(1,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(3,0,null,null,6,"ion-navbar",[["class","toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(4,49152,null,0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(6,0,null,3,2,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(7,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(8,0,["Edit bank connection ",""])),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(12,0,null,null,140,"ion-content",[["class","bankaccess-create-content"],["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(13,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(15,0,null,1,136,"form",[["novalidate",""]],[[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngSubmit"],[null,"submit"],[null,"reset"]],function(l,n,u){var t=!0,a=l.component;if("submit"===n){t=!1!==ll._13(l,17).onSubmit(u)&&t}if("reset"===n){t=!1!==ll._13(l,17).onReset()&&t}if("ngSubmit"===n){t=!1!==a.updateBankAccess()&&t}return t},null,null)),ll.Y(16,16384,null,0,Rn.p,[],null,null),ll.Y(17,4210688,[["createForm",4]],0,Rn.k,[[8,null],[8,null]],null,{ngSubmit:"ngSubmit"}),ll._17(2048,null,Rn.b,null,[Rn.k]),ll.Y(19,16384,null,0,Rn.j,[Rn.b],null,null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(21,0,null,null,13,"ion-item-group",[],null,null,null,null,null)),ll.Y(22,16384,null,0,Cn.a,[],null,null),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(24,0,null,null,6,"ion-item-divider",[["class","item item-divider"],["color","light"]],null,null,null,vn.b,vn.a)),ll.Y(25,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],{color:[0,"color"]},null),ll._18(335544320,1,{contentLabel:0}),ll._18(603979776,2,{_buttons:1}),ll._18(603979776,3,{_icons:1}),ll.Y(29,16384,null,0,In.a,[Ql.a,ll.j,ll.z],{color:[0,"color"]},null),(l()(),ll._20(-1,2,["Bank login data"])),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.U(16777216,null,null,1,null,_)),ll.Y(33,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(36,0,null,null,110,"ion-item-group",[],null,null,null,null,null)),ll.Y(37,16384,null,0,Cn.a,[],null,null),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(39,0,null,null,6,"ion-item-divider",[["class","item item-divider"],["color","light"]],null,null,null,vn.b,vn.a)),ll.Y(40,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],{color:[0,"color"]},null),ll._18(335544320,7,{contentLabel:0}),ll._18(603979776,8,{_buttons:1}),ll._18(603979776,9,{_icons:1}),ll.Y(44,16384,null,0,In.a,[Ql.a,ll.j,ll.z],{color:[0,"color"]},null),(l()(),ll._20(-1,2,["Bank settings"])),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(47,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(48,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,10,{contentLabel:0}),ll._18(603979776,11,{_buttons:1}),ll._18(603979776,12,{_icons:1}),ll.Y(52,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(54,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(55,16384,[[10,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Save Pin"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(58,0,null,4,6,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,59)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.bankAccess.storePin=u)&&t}return t},Mn.b,Mn.a)),ll.Y(59,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(61,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"],options:[1,"options"]},{update:"ngModelChange"}),ll._15(62,{standalone:0}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(64,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n\n      "])),(l()(),ll.Z(67,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(68,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,13,{contentLabel:0}),ll._18(603979776,14,{_buttons:1}),ll._18(603979776,15,{_icons:1}),ll.Y(72,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(74,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(75,16384,[[13,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Save Bookings"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(78,0,null,4,6,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,79)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.bankAccess.storeBookings=u)&&t}return t},Mn.b,Mn.a)),ll.Y(79,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(81,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"],options:[1,"options"]},{update:"ngModelChange"}),ll._15(82,{standalone:0}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(84,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n\n      "])),(l()(),ll.Z(87,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(88,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,16,{contentLabel:0}),ll._18(603979776,17,{_buttons:1}),ll._18(603979776,18,{_icons:1}),ll.Y(92,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(94,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(95,16384,[[16,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Categorize Bookings"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(98,0,null,4,6,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,99)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.bankAccess.categorizeBookings=u)&&t}return t},Mn.b,Mn.a)),ll.Y(99,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(101,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"],options:[1,"options"]},{update:"ngModelChange"}),ll._15(102,{standalone:0}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(104,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n\n      "])),(l()(),ll.Z(107,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(108,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,19,{contentLabel:0}),ll._18(603979776,20,{_buttons:1}),ll._18(603979776,21,{_icons:1}),ll.Y(112,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(114,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(115,16384,[[19,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Save anonymized Bookings"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(118,0,null,4,6,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,119)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.bankAccess.storeAnonymizedBookings=u)&&t}return t},Mn.b,Mn.a)),ll.Y(119,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(121,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"],options:[1,"options"]},{update:"ngModelChange"}),ll._15(122,{standalone:0}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(124,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n\n      "])),(l()(),ll.Z(127,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(128,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,22,{contentLabel:0}),ll._18(603979776,23,{_buttons:1}),ll._18(603979776,24,{_icons:1}),ll.Y(132,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(134,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(135,16384,[[22,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Save Analytics"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(138,0,null,4,6,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,139)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.bankAccess.storeAnalytics=u)&&t}return t},Mn.b,Mn.a)),ll.Y(139,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(141,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"],options:[1,"options"]},{update:"ngModelChange"}),ll._15(142,{standalone:0}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(144,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll._20(-1,null,["\n\n    "])),(l()(),ll.Z(148,0,null,null,2,"button",[["block",""],["color","primary"],["ion-button",""],["type","submit"]],null,null,null,hn.b,hn.a)),ll.Y(149,1097728,null,0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{color:[0,"color"],block:[1,"block"]},null),(l()(),ll._20(-1,0,["Submit"])),(l()(),ll._20(-1,null,["\n\n  "])),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){var u=n.component;l(n,25,0,"light");l(n,29,0,"light");l(n,33,0,u.bankAccess.storePin);l(n,40,0,"light");l(n,44,0,"light");l(n,61,0,u.bankAccess.storePin,l(n,62,0,!0));l(n,81,0,u.bankAccess.storeBookings,l(n,82,0,!0));l(n,101,0,u.bankAccess.categorizeBookings,l(n,102,0,!0));l(n,121,0,u.bankAccess.storeAnonymizedBookings,l(n,122,0,!0));l(n,141,0,u.bankAccess.storeAnalytics,l(n,142,0,!0));l(n,149,0,"primary","")},function(l,n){var u=n.component;l(n,3,0,ll._13(n,4)._hidden,ll._13(n,4)._sbPadding);l(n,8,0,u.bankAccess.bankName);l(n,12,0,ll._13(n,13).statusbarPadding,ll._13(n,13)._hasRefresher);l(n,15,0,ll._13(n,19).ngClassUntouched,ll._13(n,19).ngClassTouched,ll._13(n,19).ngClassPristine,ll._13(n,19).ngClassDirty,ll._13(n,19).ngClassValid,ll._13(n,19).ngClassInvalid,ll._13(n,19).ngClassPending);l(n,58,0,ll._13(n,59)._disabled,ll._13(n,59)._value,ll._13(n,59)._activated,ll._13(n,64).ngClassUntouched,ll._13(n,64).ngClassTouched,ll._13(n,64).ngClassPristine,ll._13(n,64).ngClassDirty,ll._13(n,64).ngClassValid,ll._13(n,64).ngClassInvalid,ll._13(n,64).ngClassPending);l(n,78,0,ll._13(n,79)._disabled,ll._13(n,79)._value,ll._13(n,79)._activated,ll._13(n,84).ngClassUntouched,ll._13(n,84).ngClassTouched,ll._13(n,84).ngClassPristine,ll._13(n,84).ngClassDirty,ll._13(n,84).ngClassValid,ll._13(n,84).ngClassInvalid,ll._13(n,84).ngClassPending);l(n,98,0,ll._13(n,99)._disabled,ll._13(n,99)._value,ll._13(n,99)._activated,ll._13(n,104).ngClassUntouched,ll._13(n,104).ngClassTouched,ll._13(n,104).ngClassPristine,ll._13(n,104).ngClassDirty,ll._13(n,104).ngClassValid,ll._13(n,104).ngClassInvalid,ll._13(n,104).ngClassPending);l(n,118,0,ll._13(n,119)._disabled,ll._13(n,119)._value,ll._13(n,119)._activated,ll._13(n,124).ngClassUntouched,ll._13(n,124).ngClassTouched,ll._13(n,124).ngClassPristine,ll._13(n,124).ngClassDirty,ll._13(n,124).ngClassValid,ll._13(n,124).ngClassInvalid,ll._13(n,124).ngClassPending);l(n,138,0,ll._13(n,139)._disabled,ll._13(n,139)._value,ll._13(n,139)._activated,ll._13(n,144).ngClassUntouched,ll._13(n,144).ngClassTouched,ll._13(n,144).ngClassPristine,ll._13(n,144).ngClassDirty,ll._13(n,144).ngClassValid,ll._13(n,144).ngClassInvalid,ll._13(n,144).ngClassPending)})}function d(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"h2",[["item-right",""]],null,null,null,null,null)),(l()(),ll._20(1,null,["",""])),ll._16(2,3)],null,function(l,n){l(n,1,0,ll._21(n,1,0,l(n,2,0,ll._13(n.parent.parent,0),n.parent.context.$implicit.bankAccountBalance.readyHbciBalance,"EUR",!0)))})}function b(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,15,"button",[["class","item item-block"],["ion-item",""]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.itemSelected(l.context.$implicit)&&t}return t},vn.b,vn.a)),ll.Y(1,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,1,{contentLabel:0}),ll._18(603979776,2,{_buttons:1}),ll._18(603979776,3,{_icons:1}),ll.Y(5,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(7,0,null,2,1,"h3",[],null,null,null,null,null)),(l()(),ll._20(8,null,["",""])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(10,0,null,2,1,"h2",[],null,null,null,null,null)),(l()(),ll._20(11,null,["",""])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.U(16777216,null,4,1,null,d)),ll.Y(14,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n    "]))],function(l,n){l(n,14,0,n.context.$implicit.bankAccountBalance)},function(l,n){l(n,8,0,n.context.$implicit.accountNumber);l(n,11,0,n.context.$implicit.type)})}function p(l){return ll._22(0,[ll._14(0,sn.c,[ll.r]),(l()(),ll.Z(1,0,null,null,10,"ion-header",[],null,null,null,null,null)),ll.Y(2,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(4,0,null,null,6,"ion-navbar",[["class","toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(5,49152,null,0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(7,0,null,3,2,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(8,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(-1,0,["Bank Accounts"])),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(13,0,null,null,9,"ion-content",[["class","bankaccountList-content"],["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(14,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(16,0,null,1,5,"ion-list",[],null,null,null,null,null)),ll.Y(17,16384,null,0,Kn.a,[Ql.a,ll.j,ll.z,ln.a,nn.l,an.a],null,null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.U(16777216,null,null,1,null,b)),ll.Y(20,802816,null,0,sn.j,[ll.I,ll.F,ll.p],{ngForOf:[0,"ngForOf"]},null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){l(n,20,0,n.component.bankAccounts)},function(l,n){l(n,4,0,ll._13(n,5)._hidden,ll._13(n,5)._sbPadding);l(n,13,0,ll._13(n,14).statusbarPadding,ll._13(n,14)._hasRefresher)})}function h(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,0,"img",[["item-left",""]],[[8,"src",4]],null,null,null,null))],null,function(l,n){l(n,0,0,n.component.getCompanyLogoUrl(n.parent.context.$implicit))})}function m(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.otherAccount)})}function f(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.mainCategory)})}function k(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.subCategory)})}function y(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.specification)})}function C(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,36,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(1,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,1,{contentLabel:0}),ll._18(603979776,2,{_buttons:1}),ll._18(603979776,3,{_icons:1}),ll.Y(5,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll.Z(7,0,null,0,5,"ion-thumbnail",[["item-left",""]],null,null,null,null,null)),ll.Y(8,16384,null,0,uu.a,[],null,null),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.U(16777216,null,null,1,null,h)),ll.Y(11,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll.U(16777216,null,2,1,null,m)),ll.Y(15,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll.U(16777216,null,2,1,null,f)),ll.Y(18,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll.U(16777216,null,2,1,null,k)),ll.Y(21,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll.U(16777216,null,2,1,null,y)),ll.Y(24,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll.Z(26,0,null,4,9,"div",[["item-right",""]],null,null,null,null,null)),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(28,0,null,null,2,"h4",[],null,null,null,null,null)),(l()(),ll._20(29,null,["",""])),ll._16(30,1),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(32,0,null,null,2,"h2",[],null,null,null,null,null)),(l()(),ll._20(33,null,["",""])),ll._16(34,3),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll._20(-1,2,["\n  "]))],function(l,n){l(n,11,0,n.context.$implicit.contract.logo);l(n,15,0,n.context.$implicit.otherAccount);l(n,18,0,n.context.$implicit.mainCategory);l(n,21,0,n.context.$implicit.subCategory);l(n,24,0,n.context.$implicit.specification)},function(l,n){l(n,29,0,ll._21(n,29,0,l(n,30,0,ll._13(n.parent,0),n.context.$implicit.nextExecutionDate)));l(n,33,0,ll._21(n,33,0,l(n,34,0,ll._13(n.parent,1),n.context.$implicit.amount,"EUR",!0)))})}function v(l){return ll._22(0,[ll._14(0,sn.e,[ll.r]),ll._14(0,sn.c,[ll.r]),(l()(),ll.Z(2,0,null,null,10,"ion-header",[],null,null,null,null,null)),ll.Y(3,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(5,0,null,null,6,"ion-navbar",[["class","toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(6,49152,null,0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(8,0,null,3,2,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(9,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(10,0,["",""])),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(14,0,null,null,5,"ion-content",[["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(15,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.U(16777216,null,1,1,null,C)),ll.Y(18,802816,null,0,sn.j,[ll.I,ll.F,ll.p],{ngForOf:[0,"ngForOf"]},null),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){l(n,18,0,n.component.bookingGroups)},function(l,n){var u=n.component;l(n,5,0,ll._13(n,6)._hidden,ll._13(n,6)._sbPadding);l(n,10,0,u.label);l(n,14,0,ll._13(n,15).statusbarPadding,ll._13(n,15)._hasRefresher)})}function Y(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.bookingCategory.mainCategory)})}function Z(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.bookingCategory.subCategory)})}function j(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.bookingCategory.specification)})}function I(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,37,"ion-item",[["class","item item-block"]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.itemSelected(l.context.$implicit)&&t}return t},vn.b,vn.a)),ll.Y(1,278528,null,0,sn.n,[ll.q,ll.j,ll.A],{ngStyle:[0,"ngStyle"]},null),ll._15(2,{"background-color":0}),ll.Y(3,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,5,{contentLabel:0}),ll._18(603979776,6,{_buttons:1}),ll._18(603979776,7,{_icons:1}),ll.Y(7,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(9,0,null,0,4,"ion-thumbnail",[["item-left",""]],null,null,null,null,null)),ll.Y(10,16384,null,0,uu.a,[],null,null),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.Z(12,0,null,null,0,"img",[["item-left",""]],[[8,"src",4]],null,null,null,null)),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(15,0,null,2,1,"h3",[],null,null,null,null,null)),(l()(),ll._20(16,null,["",""])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.U(16777216,null,2,1,null,Y)),ll.Y(19,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.U(16777216,null,2,1,null,Z)),ll.Y(22,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.U(16777216,null,2,1,null,j)),ll.Y(25,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(27,0,null,4,9,"div",[["item-right",""]],null,null,null,null,null)),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.Z(29,0,null,null,2,"h4",[],null,null,null,null,null)),(l()(),ll._20(30,null,["",""])),ll._16(31,1),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.Z(33,0,null,null,2,"h2",[],null,null,null,null,null)),(l()(),ll._20(34,null,["",""])),ll._16(35,3),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll._20(-1,2,["\n    "]))],function(l,n){l(n,1,0,l(n,2,0,null!=n.context.$implicit&&null!=n.context.$implicit.bookingCategory&&n.context.$implicit.bookingCategory.mainCategory?"":"chocolate"));l(n,19,0,n.context.$implicit.bookingCategory);l(n,22,0,n.context.$implicit.bookingCategory);l(n,25,0,n.context.$implicit.bookingCategory)},function(l,n){l(n,12,0,n.component.getLogo(null==n.context.$implicit?null:null==n.context.$implicit.bookingCategory?null:null==n.context.$implicit.bookingCategory.contract?null:n.context.$implicit.bookingCategory.contract.logo));l(n,16,0,null!=n.context.$implicit.otherAccount?n.context.$implicit.otherAccount.owner:"");l(n,30,0,ll._21(n,30,0,l(n,31,0,ll._13(n.parent,0),n.context.$implicit.bookingDate)));l(n,34,0,ll._21(n,34,0,l(n,35,0,ll._13(n.parent,1),n.context.$implicit.amount,"EUR",!0)))})}function A(l){return ll._22(0,[ll._14(0,sn.e,[ll.r]),ll._14(0,sn.c,[ll.r]),ll._18(402653184,1,{navBar:0}),(l()(),ll.Z(3,0,null,null,19,"ion-header",[],null,null,null,null,null)),ll.Y(4,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(6,0,null,null,15,"ion-navbar",[["class","force-back-button toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(7,49152,[[1,4]],0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(9,0,null,3,2,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(10,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(-1,0,["Bookings"])),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(13,0,null,2,7,"ion-buttons",[["end",""]],null,null,null,null,null)),ll.Y(14,16384,null,1,pn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),ll._18(603979776,2,{_buttons:1}),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(17,0,null,null,2,"button",[["ion-button",""]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.syncBookings()&&t}return t},hn.b,hn.a)),ll.Y(18,1097728,[[2,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,0,["\n        Reload\n      "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(24,0,null,null,22,"ion-content",[["class","bookingList-content"],["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(25,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(27,0,null,0,11,"ion-fab",[["bottom",""],["right",""]],null,null,null,Nn.b,Nn.a)),ll.Y(28,1228800,null,2,qn.a,[ln.a],null,null),ll._18(335544320,3,{_mainButton:0}),ll._18(603979776,4,{_fabLists:1}),(l()(),ll._20(-1,0,["\n    "])),(l()(),ll.Z(32,0,null,0,5,"button",[["ion-fab",""],["mini",""]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.createPayment()&&t}return t},Gn.b,Gn.a)),ll.Y(33,49152,[[3,4]],0,Xn.a,[Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,0,["\n      "])),(l()(),ll.Z(35,0,null,0,1,"ion-icon",[["name","paper-plane"],["role","img"]],[[2,"hide",null]],null,null,null,null)),ll.Y(36,147456,null,0,Tn.a,[Ql.a,ll.j,ll.z],{name:[0,"name"]},null),(l()(),ll._20(-1,0,["\n    "])),(l()(),ll._20(-1,0,["\n  "])),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(40,0,null,1,5,"ion-list",[],null,null,null,null,null)),ll.Y(41,16384,null,0,Kn.a,[Ql.a,ll.j,ll.z,ln.a,nn.l,an.a],null,null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.U(16777216,null,null,1,null,I)),ll.Y(44,802816,null,0,sn.j,[ll.I,ll.F,ll.p],{ngForOf:[0,"ngForOf"]},null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){var u=n.component;l(n,36,0,"paper-plane");l(n,44,0,u.bookings)},function(l,n){l(n,6,0,ll._13(n,7)._hidden,ll._13(n,7)._sbPadding);l(n,24,0,ll._13(n,25).statusbarPadding,ll._13(n,25)._hasRefresher);l(n,35,0,ll._13(n,36)._hidden)})}function z(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(1,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Receiver:"]))],null,null)}function P(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(1,16384,null,0,ou.a,[],null,null),(l()(),ll._20(2,null,["",""]))],null,function(l,n){l(n,2,0,n.component.booking.otherAccount.owner)})}function x(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(1,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Creditor ID:"]))],null,null)}function S(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(1,16384,null,0,ou.a,[],null,null),(l()(),ll._20(2,null,["",""]))],null,function(l,n){l(n,2,0,n.component.booking.creditorId)})}function B(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(1,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Mandate reference:"]))],null,null)}function L(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(1,16384,null,0,ou.a,[],null,null),(l()(),ll._20(2,null,["",""]))],null,function(l,n){l(n,2,0,n.component.booking.mandateReference)})}function E(l){return ll._22(0,[ll._14(0,sn.e,[ll.r]),ll._14(0,sn.c,[ll.r]),(l()(),ll.Z(2,0,null,null,12,"ion-header",[],null,null,null,null,null)),ll.Y(3,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(5,0,null,null,8,"ion-navbar",[["class","force-back-button toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(6,49152,null,0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(8,0,null,3,4,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(9,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(10,0,[""," ",""])),ll._16(11,1),ll._16(12,3),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(16,0,null,null,168,"ion-content",[["class","bookingDetail-content"],["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(17,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(19,0,null,0,11,"ion-fab",[["bottom",""],["right",""]],null,null,null,Nn.b,Nn.a)),ll.Y(20,1228800,null,2,qn.a,[ln.a],null,null),ll._18(335544320,1,{_mainButton:0}),ll._18(603979776,2,{_fabLists:1}),(l()(),ll._20(-1,0,["\n    "])),(l()(),ll.Z(24,0,null,0,5,"button",[["ion-fab",""],["mini",""]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.editCategory()&&t}return t},Gn.b,Gn.a)),ll.Y(25,49152,[[1,4]],0,Xn.a,[Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,0,["\n      "])),(l()(),ll.Z(27,0,null,0,1,"ion-icon",[["name","create"],["role","img"]],[[2,"hide",null]],null,null,null,null)),ll.Y(28,147456,null,0,Tn.a,[Ql.a,ll.j,ll.z],{name:[0,"name"]},null),(l()(),ll._20(-1,0,["\n    "])),(l()(),ll._20(-1,0,["\n  "])),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(32,0,null,1,151,"ion-grid",[["class","grid"]],null,null,null,null,null)),ll.Y(33,16384,null,0,su.a,[],null,null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(35,0,null,null,95,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(36,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,3,{contentLabel:0}),ll._18(603979776,4,{_buttons:1}),ll._18(603979776,5,{_icons:1}),ll.Y(40,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(42,0,null,2,87,"ion-row",[["class","row"]],null,null,null,null,null)),ll.Y(43,16384,null,0,cu.a,[],null,null),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.Z(45,0,null,null,38,"ion-col",[["class","col"],["col-12",""],["col-lg-6",""]],null,null,null,null,null)),ll.Y(46,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["\n          "])),(l()(),ll.Z(48,0,null,null,34,"ion-row",[["class","row"]],null,null,null,null,null)),ll.Y(49,16384,null,0,cu.a,[],null,null),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(51,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(52,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Booking date:"])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(55,0,null,null,3,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(56,16384,null,0,ou.a,[],null,null),(l()(),ll._20(57,null,["",""])),ll._16(58,1),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(60,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(61,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Amount:"])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(64,0,null,null,3,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(65,16384,null,0,ou.a,[],null,null),(l()(),ll._20(66,null,["",""])),ll._16(67,3),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.U(16777216,null,null,1,null,z)),ll.Y(70,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.U(16777216,null,null,1,null,P)),ll.Y(73,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(75,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(76,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Standing order:"])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(79,0,null,null,2,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(80,16384,null,0,ou.a,[],null,null),(l()(),ll._20(81,null,["",""])),(l()(),ll._20(-1,null,["\n          "])),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.Z(85,0,null,null,26,"ion-col",[["class","col"],["col-12",""],["col-lg-6",""]],null,null,null,null,null)),ll.Y(86,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["\n          "])),(l()(),ll.Z(88,0,null,null,22,"ion-row",[["class","row"]],null,null,null,null,null)),ll.Y(89,16384,null,0,cu.a,[],null,null),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.U(16777216,null,null,1,null,x)),ll.Y(92,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.U(16777216,null,null,1,null,S)),ll.Y(95,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.U(16777216,null,null,1,null,B)),ll.Y(98,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.U(16777216,null,null,1,null,L)),ll.Y(101,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(103,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(104,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Bank API:"])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(107,0,null,null,2,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(108,16384,null,0,ou.a,[],null,null),(l()(),ll._20(109,null,["",""])),(l()(),ll._20(-1,null,["\n          "])),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.Z(113,0,null,null,15,"ion-col",[["class","col"],["col-12",""]],null,null,null,null,null)),ll.Y(114,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["\n          "])),(l()(),ll.Z(116,0,null,null,11,"ion-row",[["class","row"]],null,null,null,null,null)),ll.Y(117,16384,null,0,cu.a,[],null,null),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(119,0,null,null,2,"ion-col",[["class","col"],["col-2",""]],null,null,null,null,null)),ll.Y(120,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Purpose:"])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(123,0,null,null,3,"ion-col",[["class","col"],["col-10",""]],null,null,null,null,null)),ll.Y(124,16384,null,0,ou.a,[],null,null),(l()(),ll.Z(125,0,null,null,1,"p",[["style","white-space: normal;"]],null,null,null,null,null)),(l()(),ll._20(126,null,["",""])),(l()(),ll._20(-1,null,["\n          "])),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(132,0,null,null,50,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(133,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,6,{contentLabel:0}),ll._18(603979776,7,{_buttons:1}),ll._18(603979776,8,{_icons:1}),ll.Y(137,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(139,0,null,2,42,"ion-row",[["class","row"]],null,null,null,null,null)),ll.Y(140,16384,null,0,cu.a,[],null,null),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.Z(142,0,null,null,38,"ion-col",[["class","col"],["col-12",""],["col-lg-6",""]],null,null,null,null,null)),ll.Y(143,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["\n          "])),(l()(),ll.Z(145,0,null,null,34,"ion-row",[["class","row"]],null,null,null,null,null)),ll.Y(146,16384,null,0,cu.a,[],null,null),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(148,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(149,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Rules:"])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(152,0,null,null,2,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(153,16384,null,0,ou.a,[],null,null),(l()(),ll._20(154,null,["",""])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(156,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(157,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Main category:"])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(160,0,null,null,2,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(161,16384,null,0,ou.a,[],null,null),(l()(),ll._20(162,null,["",""])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(164,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(165,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Subcategory:"])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(168,0,null,null,2,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(169,16384,null,0,ou.a,[],null,null),(l()(),ll._20(170,null,["",""])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(172,0,null,null,2,"ion-col",[["class","col"],["col-4",""]],null,null,null,null,null)),ll.Y(173,16384,null,0,ou.a,[],null,null),(l()(),ll._20(-1,null,["Specification:"])),(l()(),ll._20(-1,null,["\n            "])),(l()(),ll.Z(176,0,null,null,2,"ion-col",[["class","col"],["col-8",""]],null,null,null,null,null)),ll.Y(177,16384,null,0,ou.a,[],null,null),(l()(),ll._20(178,null,["",""])),(l()(),ll._20(-1,null,["\n          "])),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){var u=n.component;l(n,28,0,"create");l(n,70,0,u.booking.otherAccount);l(n,73,0,u.booking.otherAccount);l(n,92,0,u.booking.creditorId);l(n,95,0,u.booking.creditorId);l(n,98,0,u.booking.mandateReference);l(n,101,0,u.booking.mandateReference)},function(l,n){var u=n.component;l(n,5,0,ll._13(n,6)._hidden,ll._13(n,6)._sbPadding);l(n,10,0,ll._21(n,10,0,l(n,11,0,ll._13(n,0),u.booking.bookingDate)),ll._21(n,10,1,l(n,12,0,ll._13(n,1),u.booking.amount,"EUR",!0)));l(n,16,0,ll._13(n,17).statusbarPadding,ll._13(n,17)._hasRefresher);l(n,27,0,ll._13(n,28)._hidden);l(n,57,0,ll._21(n,57,0,l(n,58,0,ll._13(n,0),u.booking.bookingDate)));l(n,66,0,ll._21(n,66,0,l(n,67,0,ll._13(n,1),u.booking.amount,"EUR",!0)));l(n,81,0,u.booking.standingOrder);l(n,109,0,u.booking.bankApi);l(n,126,0,u.booking.usage);l(n,154,0,null==u.booking.bookingCategory?null:u.booking.bookingCategory.rules);l(n,162,0,null==u.booking.bookingCategory?null:u.booking.bookingCategory.mainCategory);l(n,170,0,null==u.booking.bookingCategory?null:u.booking.bookingCategory.subCategory);l(n,178,0,null==u.booking.bookingCategory?null:u.booking.bookingCategory.specification)})}function U(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"ion-option",[],null,null,null,null,null)),ll.Y(1,16384,[[10,4]],0,gu.a,[ll.j],{value:[0,"value"]},null),(l()(),ll._20(2,null,["",""]))],function(l,n){l(n,1,0,ll._2(1,"",n.context.$implicit.id,""))},function(l,n){l(n,2,0,n.context.$implicit.name)})}function R(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"ion-option",[],null,null,null,null,null)),ll.Y(1,16384,[[14,4]],0,gu.a,[ll.j],{value:[0,"value"]},null),(l()(),ll._20(2,null,["",""]))],function(l,n){l(n,1,0,ll._2(1,"",n.context.$implicit.id,""))},function(l,n){l(n,2,0,n.context.$implicit.name)})}function w(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,2,"ion-option",[],null,null,null,null,null)),ll.Y(1,16384,[[18,4]],0,gu.a,[ll.j],{value:[0,"value"]},null),(l()(),ll._20(2,null,["",""]))],function(l,n){l(n,1,0,ll._2(1,"",n.context.$implicit.id,""))},function(l,n){l(n,2,0,n.context.$implicit.name)})}function M(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,10,"ion-header",[],null,null,null,null,null)),ll.Y(1,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(3,0,null,null,6,"ion-navbar",[["class","force-back-button toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(4,49152,null,0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(6,0,null,3,2,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(7,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(-1,0,["Categorize Booking"])),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(12,0,null,null,137,"ion-content",[["class","bookingEdit-content"],["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(13,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(15,0,null,1,129,"ion-list",[],null,null,null,null,null)),ll.Y(16,16384,null,0,Kn.a,[Ql.a,ll.j,ll.z,ln.a,nn.l,an.a],null,null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(18,0,null,null,16,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(19,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,1,{contentLabel:0}),ll._18(603979776,2,{_buttons:1}),ll._18(603979776,3,{_icons:1}),ll.Y(23,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(25,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(26,16384,[[1,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Receiver"])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(29,0,null,3,4,"ion-input",[["name","receiver"],["type","text"]],[[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"]],function(l,n,u){var t=!0;if("ngModelChange"===n){t=!1!==(l.component.receiver=u)&&t}return t},Un.b,Un.a)),ll.Y(30,671744,null,0,Rn.l,[[8,null],[8,null],[8,null],[8,null]],{name:[0,"name"],model:[1,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(32,16384,null,0,Rn.i,[Rn.h],null,null),ll.Y(33,5423104,null,0,wn.a,[Ql.a,ln.a,Zn.a,Jl.a,ll.j,ll.z,[2,kn.a],[2,Yn.a],[2,Rn.h],an.a],{type:[0,"type"]},null),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(36,0,null,null,16,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(37,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,4,{contentLabel:0}),ll._18(603979776,5,{_buttons:1}),ll._18(603979776,6,{_icons:1}),ll.Y(41,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(43,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(44,16384,[[4,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Expression"])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(47,0,null,3,4,"ion-input",[["name","expression"],["type","text"]],[[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"]],function(l,n,u){var t=!0;if("ngModelChange"===n){t=!1!==(l.component.expression=u)&&t}return t},Un.b,Un.a)),ll.Y(48,671744,null,0,Rn.l,[[8,null],[8,null],[8,null],[8,null]],{name:[0,"name"],model:[1,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(50,16384,null,0,Rn.i,[Rn.h],null,null),ll.Y(51,5423104,null,0,wn.a,[Ql.a,ln.a,Zn.a,Jl.a,ll.j,ll.z,[2,kn.a],[2,Yn.a],[2,Rn.h],an.a],{type:[0,"type"]},null),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(54,0,null,null,22,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(55,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,7,{contentLabel:0}),ll._18(603979776,8,{_buttons:1}),ll._18(603979776,9,{_icons:1}),ll.Y(59,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(61,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(62,16384,[[7,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Main category"])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(65,0,null,3,10,"ion-select",[],[[2,"select-disabled",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"ionChange"],[null,"click"],[null,"keyup.space"]],function(l,n,u){var t=!0,a=l.component;if("click"===n){t=!1!==ll._13(l,66)._click(u)&&t}if("keyup.space"===n){t=!1!==ll._13(l,66)._keyup()&&t}if("ngModelChange"===n){t=!1!==(a.mainCategoryId=u)&&t}if("ionChange"===n){t=!1!==a.mainCategoryChanged(u)&&t}return t},du.b,du.a)),ll.Y(66,1228800,null,1,bu.a,[Jl.a,Zn.a,Ql.a,ll.j,ll.z,[2,Yn.a],tn.a],null,{ionChange:"ionChange"}),ll._18(603979776,10,{options:1}),ll._17(1024,null,Rn.g,function(l){return[l]},[bu.a]),ll.Y(69,671744,null,0,Rn.l,[[8,null],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(71,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.U(16777216,null,null,1,null,U)),ll.Y(74,802816,null,0,sn.j,[ll.I,ll.F,ll.p],{ngForOf:[0,"ngForOf"]},null),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(78,0,null,null,22,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(79,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,11,{contentLabel:0}),ll._18(603979776,12,{_buttons:1}),ll._18(603979776,13,{_icons:1}),ll.Y(83,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(85,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(86,16384,[[11,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Subcategory"])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(89,0,null,3,10,"ion-select",[],[[2,"select-disabled",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"ionChange"],[null,"click"],[null,"keyup.space"]],function(l,n,u){var t=!0,a=l.component;if("click"===n){t=!1!==ll._13(l,90)._click(u)&&t}if("keyup.space"===n){t=!1!==ll._13(l,90)._keyup()&&t}if("ngModelChange"===n){t=!1!==(a.subCategoryId=u)&&t}if("ionChange"===n){t=!1!==a.subCategoryChanged(u)&&t}return t},du.b,du.a)),ll.Y(90,1228800,null,1,bu.a,[Jl.a,Zn.a,Ql.a,ll.j,ll.z,[2,Yn.a],tn.a],null,{ionChange:"ionChange"}),ll._18(603979776,14,{options:1}),ll._17(1024,null,Rn.g,function(l){return[l]},[bu.a]),ll.Y(93,671744,null,0,Rn.l,[[8,null],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(95,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.U(16777216,null,null,1,null,R)),ll.Y(98,802816,null,0,sn.j,[ll.I,ll.F,ll.p],{ngForOf:[0,"ngForOf"]},null),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(102,0,null,null,22,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(103,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,15,{contentLabel:0}),ll._18(603979776,16,{_buttons:1}),ll._18(603979776,17,{_icons:1}),ll.Y(107,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(109,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(110,16384,[[15,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Specification"])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(113,0,null,3,10,"ion-select",[],[[2,"select-disabled",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"ionChange"],[null,"click"],[null,"keyup.space"]],function(l,n,u){var t=!0,a=l.component;if("click"===n){t=!1!==ll._13(l,114)._click(u)&&t}if("keyup.space"===n){t=!1!==ll._13(l,114)._keyup()&&t}if("ngModelChange"===n){t=!1!==(a.specificationId=u)&&t}if("ionChange"===n){t=!1!==a.specificationChanged(u)&&t}return t},du.b,du.a)),ll.Y(114,1228800,null,1,bu.a,[Jl.a,Zn.a,Ql.a,ll.j,ll.z,[2,Yn.a],tn.a],null,{ionChange:"ionChange"}),ll._18(603979776,18,{options:1}),ll._17(1024,null,Rn.g,function(l){return[l]},[bu.a]),ll.Y(117,671744,null,0,Rn.l,[[8,null],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(119,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.U(16777216,null,null,1,null,w)),ll.Y(122,802816,null,0,sn.j,[ll.I,ll.F,ll.p],{ngForOf:[0,"ngForOf"]},null),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(126,0,null,null,17,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(127,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,19,{contentLabel:0}),ll._18(603979776,20,{_buttons:1}),ll._18(603979776,21,{_icons:1}),ll.Y(131,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(133,0,null,1,2,"ion-label",[],null,null,null,null,null)),ll.Y(134,16384,[[19,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,null],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Tax relevant"])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(137,0,null,4,5,"ion-toggle",[],[[2,"toggle-disabled",null],[2,"toggle-checked",null],[2,"toggle-activated",null],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"],[null,"keyup"]],function(l,n,u){var t=!0,a=l.component;if("keyup"===n){t=!1!==ll._13(l,138)._keyup(u)&&t}if("ngModelChange"===n){t=!1!==(a.taxRelevant=u)&&t}return t},Mn.b,Mn.a)),ll.Y(138,1228800,null,0,$n.a,[Zn.a,Ql.a,ln.a,ll.j,ll.z,Fn.a,[2,Yn.a],nn.l,an.a,ll.u],null,null),ll._17(1024,null,Rn.g,function(l){return[l]},[$n.a]),ll.Y(140,671744,null,0,Rn.l,[[8,null],[8,null],[8,null],[2,Rn.g]],{model:[0,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(142,16384,null,0,Rn.i,[Rn.h],null,null),(l()(),ll._20(-1,2,["\n    "])),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(146,0,null,1,2,"button",[["block",""],["color","primary"],["icon-start",""],["ion-button",""],["type","submit"]],[[8,"disabled",0]],[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.submit()&&t}return t},hn.b,hn.a)),ll.Y(147,1097728,null,0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{color:[0,"color"],block:[1,"block"]},null),(l()(),ll._20(-1,0,["\n    Speichern\n  "])),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){var u=n.component;l(n,30,0,"receiver",u.receiver);l(n,33,0,"text");l(n,48,0,"expression",u.expression);l(n,51,0,"text");l(n,69,0,u.mainCategoryId);l(n,74,0,u.categories);l(n,93,0,u.subCategoryId);l(n,98,0,null==u.mainCategory?null:u.mainCategory.subcategories);l(n,117,0,u.specificationId);l(n,122,0,null==u.subCategory?null:u.subCategory.specifications);l(n,140,0,u.taxRelevant);l(n,147,0,"primary","")},function(l,n){var u=n.component;l(n,3,0,ll._13(n,4)._hidden,ll._13(n,4)._sbPadding);l(n,12,0,ll._13(n,13).statusbarPadding,ll._13(n,13)._hasRefresher);l(n,29,0,ll._13(n,32).ngClassUntouched,ll._13(n,32).ngClassTouched,ll._13(n,32).ngClassPristine,ll._13(n,32).ngClassDirty,ll._13(n,32).ngClassValid,ll._13(n,32).ngClassInvalid,ll._13(n,32).ngClassPending);l(n,47,0,ll._13(n,50).ngClassUntouched,ll._13(n,50).ngClassTouched,ll._13(n,50).ngClassPristine,ll._13(n,50).ngClassDirty,ll._13(n,50).ngClassValid,ll._13(n,50).ngClassInvalid,ll._13(n,50).ngClassPending);l(n,65,0,ll._13(n,66)._disabled,ll._13(n,71).ngClassUntouched,ll._13(n,71).ngClassTouched,ll._13(n,71).ngClassPristine,ll._13(n,71).ngClassDirty,ll._13(n,71).ngClassValid,ll._13(n,71).ngClassInvalid,ll._13(n,71).ngClassPending);l(n,89,0,ll._13(n,90)._disabled,ll._13(n,95).ngClassUntouched,ll._13(n,95).ngClassTouched,ll._13(n,95).ngClassPristine,ll._13(n,95).ngClassDirty,ll._13(n,95).ngClassValid,ll._13(n,95).ngClassInvalid,ll._13(n,95).ngClassPending);l(n,113,0,ll._13(n,114)._disabled,ll._13(n,119).ngClassUntouched,ll._13(n,119).ngClassTouched,ll._13(n,119).ngClassPristine,ll._13(n,119).ngClassDirty,ll._13(n,119).ngClassValid,ll._13(n,119).ngClassInvalid,ll._13(n,119).ngClassPending);l(n,137,0,ll._13(n,138)._disabled,ll._13(n,138)._value,ll._13(n,138)._activated,ll._13(n,142).ngClassUntouched,ll._13(n,142).ngClassTouched,ll._13(n,142).ngClassPristine,ll._13(n,142).ngClassDirty,ll._13(n,142).ngClassValid,ll._13(n,142).ngClassInvalid,ll._13(n,142).ngClassPending);l(n,146,0,!u.mainCategory||!u.expression&&!u.booking.creditorId)})}function $(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,10,"ion-header",[],null,null,null,null,null)),ll.Y(1,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(3,0,null,null,6,"ion-navbar",[["class","toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(4,49152,null,0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(6,0,null,3,2,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(7,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(-1,0,["New SEPA Transfer"])),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(12,0,null,null,103,"ion-content",[["class","payment-create-content"],["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(13,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n\n  "])),(l()(),ll.Z(15,0,null,1,99,"form",[["novalidate",""]],[[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngSubmit"],[null,"submit"],[null,"reset"]],function(l,n,u){var t=!0,a=l.component;if("submit"===n){t=!1!==ll._13(l,17).onSubmit(u)&&t}if("reset"===n){t=!1!==ll._13(l,17).onReset()&&t}if("ngSubmit"===n){t=!1!==a.createPayment()&&t}return t},null,null)),ll.Y(16,16384,null,0,Rn.p,[],null,null),ll.Y(17,4210688,[["createForm",4]],0,Rn.k,[[8,null],[8,null]],null,{ngSubmit:"ngSubmit"}),ll._17(2048,null,Rn.b,null,[Rn.k]),ll.Y(19,16384,null,0,Rn.j,[Rn.b],null,null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(21,0,null,null,88,"ion-item-group",[],null,null,null,null,null)),ll.Y(22,16384,null,0,Cn.a,[],null,null),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.Z(24,0,null,null,6,"ion-item-divider",[["class","item item-divider"],["color","light"]],null,null,null,vn.b,vn.a)),ll.Y(25,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],{color:[0,"color"]},null),ll._18(335544320,1,{contentLabel:0}),ll._18(603979776,2,{_buttons:1}),ll._18(603979776,3,{_icons:1}),ll.Y(29,16384,null,0,In.a,[Ql.a,ll.j,ll.z],{color:[0,"color"]},null),(l()(),ll._20(30,2,["Debit Account "," ",""])),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(32,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(33,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,4,{contentLabel:0}),ll._18(603979776,5,{_buttons:1}),ll._18(603979776,6,{_icons:1}),ll.Y(37,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(39,0,null,1,2,"ion-label",[["floating",""]],null,null,null,null,null)),ll.Y(40,16384,[[4,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,""],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Receiver Name"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(43,0,null,3,6,"ion-input",[["name","receiver"],["required",""],["type","text"]],[[1,"required",0],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"]],function(l,n,u){var t=!0;if("ngModelChange"===n){t=!1!==(l.component.payment.receiver=u)&&t}return t},Un.b,Un.a)),ll.Y(44,16384,null,0,Rn.n,[],{required:[0,"required"]},null),ll._17(1024,null,Rn.f,function(l){return[l]},[Rn.n]),ll.Y(46,671744,null,0,Rn.l,[[2,Rn.b],[2,Rn.f],[8,null],[8,null]],{name:[0,"name"],model:[1,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(48,16384,null,0,Rn.i,[Rn.h],null,null),ll.Y(49,5423104,null,0,wn.a,[Ql.a,ln.a,Zn.a,Jl.a,ll.j,ll.z,[2,kn.a],[2,Yn.a],[2,Rn.h],an.a],{type:[0,"type"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(52,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(53,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,7,{contentLabel:0}),ll._18(603979776,8,{_buttons:1}),ll._18(603979776,9,{_icons:1}),ll.Y(57,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(59,0,null,1,2,"ion-label",[["floating",""]],null,null,null,null,null)),ll.Y(60,16384,[[7,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,""],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Receiver IBAN"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(63,0,null,3,6,"ion-input",[["name","receiverIban"],["required",""],["type","text"]],[[1,"required",0],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"]],function(l,n,u){var t=!0;if("ngModelChange"===n){t=!1!==(l.component.payment.receiverIban=u)&&t}return t},Un.b,Un.a)),ll.Y(64,16384,null,0,Rn.n,[],{required:[0,"required"]},null),ll._17(1024,null,Rn.f,function(l){return[l]},[Rn.n]),ll.Y(66,671744,null,0,Rn.l,[[2,Rn.b],[2,Rn.f],[8,null],[8,null]],{name:[0,"name"],model:[1,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(68,16384,null,0,Rn.i,[Rn.h],null,null),ll.Y(69,5423104,null,0,wn.a,[Ql.a,ln.a,Zn.a,Jl.a,ll.j,ll.z,[2,kn.a],[2,Yn.a],[2,Rn.h],an.a],{type:[0,"type"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(72,0,null,null,18,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(73,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,10,{contentLabel:0}),ll._18(603979776,11,{_buttons:1}),ll._18(603979776,12,{_icons:1}),ll.Y(77,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(79,0,null,1,2,"ion-label",[["floating",""]],null,null,null,null,null)),ll.Y(80,16384,[[10,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,""],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Amount"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(83,0,null,3,6,"ion-input",[["name","amount"],["required",""],["type","number"]],[[1,"required",0],[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"]],function(l,n,u){var t=!0;if("ngModelChange"===n){t=!1!==(l.component.payment.amount=u)&&t}return t},Un.b,Un.a)),ll.Y(84,16384,null,0,Rn.n,[],{required:[0,"required"]},null),ll._17(1024,null,Rn.f,function(l){return[l]},[Rn.n]),ll.Y(86,671744,null,0,Rn.l,[[2,Rn.b],[2,Rn.f],[8,null],[8,null]],{name:[0,"name"],model:[1,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(88,16384,null,0,Rn.i,[Rn.h],null,null),ll.Y(89,5423104,null,0,wn.a,[Ql.a,ln.a,Zn.a,Jl.a,ll.j,ll.z,[2,kn.a],[2,Yn.a],[2,Rn.h],an.a],{type:[0,"type"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(92,0,null,null,16,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(93,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,13,{contentLabel:0}),ll._18(603979776,14,{_buttons:1}),ll._18(603979776,15,{_icons:1}),ll.Y(97,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(99,0,null,1,2,"ion-label",[["floating",""]],null,null,null,null,null)),ll.Y(100,16384,[[13,4]],0,En.a,[Ql.a,ll.j,ll.z,[8,""],[8,null],[8,null],[8,null]],null,null),(l()(),ll._20(-1,null,["Purpose"])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(103,0,null,3,4,"ion-input",[["name","purpose"],["type","text"]],[[2,"ng-untouched",null],[2,"ng-touched",null],[2,"ng-pristine",null],[2,"ng-dirty",null],[2,"ng-valid",null],[2,"ng-invalid",null],[2,"ng-pending",null]],[[null,"ngModelChange"]],function(l,n,u){var t=!0;if("ngModelChange"===n){t=!1!==(l.component.payment.purpose=u)&&t}return t},Un.b,Un.a)),ll.Y(104,671744,null,0,Rn.l,[[2,Rn.b],[8,null],[8,null],[8,null]],{name:[0,"name"],model:[1,"model"]},{update:"ngModelChange"}),ll._17(2048,null,Rn.h,null,[Rn.l]),ll.Y(106,16384,null,0,Rn.i,[Rn.h],null,null),ll.Y(107,5423104,null,0,wn.a,[Ql.a,ln.a,Zn.a,Jl.a,ll.j,ll.z,[2,kn.a],[2,Yn.a],[2,Rn.h],an.a],{type:[0,"type"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(111,0,null,null,2,"button",[["block",""],["color","primary"],["ion-button",""],["type","submit"]],[[8,"disabled",0]],null,null,hn.b,hn.a)),ll.Y(112,1097728,null,0,mn.a,[[8,""],Ql.a,ll.j,ll.z],{color:[0,"color"],block:[1,"block"]},null),(l()(),ll._20(-1,0,["Submit"])),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){var u=n.component;l(n,25,0,"light");l(n,29,0,"light");l(n,44,0,"");l(n,46,0,"receiver",u.payment.receiver);l(n,49,0,"text");l(n,64,0,"");l(n,66,0,"receiverIban",u.payment.receiverIban);l(n,69,0,"text");l(n,84,0,"");l(n,86,0,"amount",u.payment.amount);l(n,89,0,"number");l(n,104,0,"purpose",u.payment.purpose);l(n,107,0,"text");l(n,112,0,"primary","")},function(l,n){var u=n.component;l(n,3,0,ll._13(n,4)._hidden,ll._13(n,4)._sbPadding);l(n,12,0,ll._13(n,13).statusbarPadding,ll._13(n,13)._hasRefresher);l(n,15,0,ll._13(n,19).ngClassUntouched,ll._13(n,19).ngClassTouched,ll._13(n,19).ngClassPristine,ll._13(n,19).ngClassDirty,ll._13(n,19).ngClassValid,ll._13(n,19).ngClassInvalid,ll._13(n,19).ngClassPending);l(n,30,0,u.bankAccount.bankName,u.bankAccount.accountNumber);l(n,43,0,ll._13(n,44).required?"":null,ll._13(n,48).ngClassUntouched,ll._13(n,48).ngClassTouched,ll._13(n,48).ngClassPristine,ll._13(n,48).ngClassDirty,ll._13(n,48).ngClassValid,ll._13(n,48).ngClassInvalid,ll._13(n,48).ngClassPending);l(n,63,0,ll._13(n,64).required?"":null,ll._13(n,68).ngClassUntouched,ll._13(n,68).ngClassTouched,ll._13(n,68).ngClassPristine,ll._13(n,68).ngClassDirty,ll._13(n,68).ngClassValid,ll._13(n,68).ngClassInvalid,ll._13(n,68).ngClassPending);l(n,83,0,ll._13(n,84).required?"":null,ll._13(n,88).ngClassUntouched,ll._13(n,88).ngClassTouched,ll._13(n,88).ngClassPristine,ll._13(n,88).ngClassDirty,ll._13(n,88).ngClassValid,ll._13(n,88).ngClassInvalid,ll._13(n,88).ngClassPending);l(n,103,0,ll._13(n,106).ngClassUntouched,ll._13(n,106).ngClassTouched,ll._13(n,106).ngClassPristine,ll._13(n,106).ngClassDirty,ll._13(n,106).ngClassValid,ll._13(n,106).ngClassInvalid,ll._13(n,106).ngClassPending);l(n,111,0,!ll._13(n,17).form.valid)})}function F(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,0,"img",[["item-left",""]],[[8,"src",4]],null,null,null,null))],null,function(l,n){l(n,0,0,n.component.getLogo(n.parent.context.$implicit.logo))})}function O(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.provider)})}function V(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.mainCategory)})}function D(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.subCategory)})}function T(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.specification)})}function N(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,33,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(1,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,3,{contentLabel:0}),ll._18(603979776,4,{_buttons:1}),ll._18(603979776,5,{_icons:1}),ll.Y(5,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(7,0,null,0,5,"ion-thumbnail",[["item-left",""]],null,null,null,null,null)),ll.Y(8,16384,null,0,uu.a,[],null,null),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.U(16777216,null,null,1,null,F)),ll.Y(11,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.U(16777216,null,2,1,null,O)),ll.Y(15,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.U(16777216,null,2,1,null,V)),ll.Y(18,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.U(16777216,null,2,1,null,D)),ll.Y(21,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.U(16777216,null,2,1,null,T)),ll.Y(24,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n      "])),(l()(),ll.Z(26,0,null,4,6,"div",[["item-right",""]],null,null,null,null,null)),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll.Z(28,0,null,null,3,"h2",[],null,null,null,null,null)),(l()(),ll._20(29,null,[""," ",""])),ll._16(30,3),ll._16(31,1),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll._20(-1,2,["\n    "]))],function(l,n){l(n,11,0,n.context.$implicit.logo);l(n,15,0,n.context.$implicit.provider);l(n,18,0,n.context.$implicit.mainCategory);l(n,21,0,n.context.$implicit.subCategory);l(n,24,0,n.context.$implicit.specification)},function(l,n){l(n,29,0,ll._21(n,29,0,l(n,30,0,ll._13(n.parent,0),n.context.$implicit.amount,"EUR",!0)),ll._21(n,29,1,l(n,31,0,ll._13(n.parent,1),n.context.$implicit.cycle)))})}function q(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,0,"img",[["item-left",""]],[[8,"src",4]],null,null,null,null))],null,function(l,n){l(n,0,0,n.component.getLogo(n.parent.context.$implicit.logo))})}function G(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.provider)})}function X(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.mainCategory)})}function K(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.subCategory)})}function H(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"h4",[],null,null,null,null,null)),(l()(),ll._20(1,null,["",""]))],null,function(l,n){l(n,1,0,n.parent.context.$implicit.specification)})}function W(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,33,"ion-item",[["class","item item-block"]],null,null,null,vn.b,vn.a)),ll.Y(1,1097728,null,3,Yn.a,[Zn.a,Ql.a,ll.j,ll.z,[2,jn.a]],null,null),ll._18(335544320,6,{contentLabel:0}),ll._18(603979776,7,{_buttons:1}),ll._18(603979776,8,{_icons:1}),ll.Y(5,16384,null,0,An.a,[],null,null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(7,0,null,0,5,"ion-thumbnail",[["item-left",""]],null,null,null,null,null)),ll.Y(8,16384,null,0,uu.a,[],null,null),(l()(),ll._20(-1,null,["\n          "])),(l()(),ll.U(16777216,null,null,1,null,q)),ll.Y(11,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.U(16777216,null,2,1,null,G)),ll.Y(15,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.U(16777216,null,2,1,null,X)),ll.Y(18,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.U(16777216,null,2,1,null,K)),ll.Y(21,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.U(16777216,null,2,1,null,H)),ll.Y(24,16384,null,0,sn.k,[ll.I,ll.F],{ngIf:[0,"ngIf"]},null),(l()(),ll._20(-1,2,["\n        "])),(l()(),ll.Z(26,0,null,4,6,"div",[["item-right",""]],null,null,null,null,null)),(l()(),ll._20(-1,null,["\n          "])),(l()(),ll.Z(28,0,null,null,3,"h2",[],null,null,null,null,null)),(l()(),ll._20(29,null,[""," ",""])),ll._16(30,3),ll._16(31,1),(l()(),ll._20(-1,null,["\n        "])),(l()(),ll._20(-1,2,["\n      "]))],function(l,n){l(n,11,0,n.context.$implicit.logo);l(n,15,0,n.context.$implicit.provider);l(n,18,0,n.context.$implicit.mainCategory);l(n,21,0,n.context.$implicit.subCategory);l(n,24,0,n.context.$implicit.specification)},function(l,n){l(n,29,0,ll._21(n,29,0,l(n,30,0,ll._13(n.parent,0),n.context.$implicit.amount,"EUR",!0)),ll._21(n,29,1,l(n,31,0,ll._13(n.parent,1),n.context.$implicit.cycle)))})}function J(l){return ll._22(0,[ll._14(0,sn.c,[ll.r]),ll._14(0,Bl,[]),ll._18(402653184,1,{navBar:0}),(l()(),ll.Z(3,0,null,null,19,"ion-header",[],null,null,null,null,null)),ll.Y(4,16384,null,0,cn.a,[Ql.a,ll.j,ll.z,[2,Hl.a]],null,null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll.Z(6,0,null,null,15,"ion-navbar",[["class","force-back-button toolbar"]],[[8,"hidden",0],[2,"statusbar-padding",null]],null,null,rn.b,rn.a)),ll.Y(7,49152,[[1,4]],0,_n.a,[Jl.a,[2,Hl.a],[2,Wl.a],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(9,0,null,3,2,"ion-title",[],null,null,null,gn.b,gn.a)),ll.Y(10,49152,null,0,dn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),(l()(),ll._20(-1,0,["Contracts"])),(l()(),ll._20(-1,3,["\n    "])),(l()(),ll.Z(13,0,null,2,7,"ion-buttons",[["end",""]],null,null,null,null,null)),ll.Y(14,16384,null,1,pn.a,[Ql.a,ll.j,ll.z,[2,bn.a],[2,_n.a]],null,null),ll._18(603979776,2,{_buttons:1}),(l()(),ll._20(-1,null,["\n      "])),(l()(),ll.Z(17,0,null,null,2,"button",[["ion-button",""]],null,[[null,"click"]],function(l,n,u){var t=!0;if("click"===n){t=!1!==l.component.syncBookings()&&t}return t},hn.b,hn.a)),ll.Y(18,1097728,[[2,4]],0,mn.a,[[8,""],Ql.a,ll.j,ll.z],null,null),(l()(),ll._20(-1,0,["\n        Reload\n      "])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll._20(-1,3,["\n  "])),(l()(),ll._20(-1,null,["\n"])),(l()(),ll._20(-1,null,["\n\n"])),(l()(),ll.Z(24,0,null,null,18,"ion-content",[["class","contracts"],["padding",""]],[[2,"statusbar-padding",null],[2,"has-refresher",null]],null,null,fn.b,fn.a)),ll.Y(25,4374528,null,0,kn.a,[Ql.a,ln.a,an.a,ll.j,ll.z,Jl.a,yn.a,ll.u,[2,Hl.a],[2,Wl.a]],null,null),(l()(),ll._20(-1,1,["\n  "])),(l()(),ll.Z(27,0,null,1,14,"ion-list",[],null,null,null,null,null)),ll.Y(28,16384,null,0,Kn.a,[Ql.a,ll.j,ll.z,ln.a,nn.l,an.a],null,null),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.Z(30,0,null,null,1,"h3",[["class","type"]],null,null,null,null,null)),(l()(),ll._20(-1,null,["Income"])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.U(16777216,null,null,1,null,N)),ll.Y(34,802816,null,0,sn.j,[ll.I,ll.F,ll.p],{ngForOf:[0,"ngForOf"]},null),(l()(),ll._20(-1,null,["\n\n    "])),(l()(),ll.Z(36,0,null,null,1,"h3",[["class","type"]],null,null,null,null,null)),(l()(),ll._20(-1,null,["Expenses"])),(l()(),ll._20(-1,null,["\n    "])),(l()(),ll.U(16777216,null,null,1,null,W)),ll.Y(40,802816,null,0,sn.j,[ll.I,ll.F,ll.p],{ngForOf:[0,"ngForOf"]},null),(l()(),ll._20(-1,null,["\n  "])),(l()(),ll._20(-1,1,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){var u=n.component;l(n,34,0,u.contracts.income);l(n,40,0,u.contracts.expenses)},function(l,n){l(n,6,0,ll._13(n,7)._hidden,ll._13(n,7)._sbPadding);l(n,24,0,ll._13(n,25).statusbarPadding,ll._13(n,25)._hasRefresher)})}function Q(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,12,"ion-tabs",[],null,null,null,Cu.b,Cu.a)),ll._17(6144,null,Xl.a,null,[vu.a]),ll.Y(2,4374528,null,0,vu.a,[[2,Wl.a],[2,Hl.a],Jl.a,Ql.a,ll.j,ln.a,ll.z,tn.a,yn.a],null,null),(l()(),ll._20(-1,0,["\n  "])),(l()(),ll.Z(4,0,null,0,1,"ion-tab",[["role","tabpanel"],["tabIcon","cash"],["tabTitle","Bookings"]],[[1,"id",0],[1,"aria-labelledby",0]],null,null,Yu.b,Yu.a)),ll.Y(5,245760,null,0,Zu.a,[vu.a,Jl.a,Ql.a,ln.a,ll.j,ll.u,ll.z,ll.i,ll.g,nn.l,un.a,[2,tn.a],an.a,ll.k],{root:[0,"root"],rootParams:[1,"rootParams"],tabTitle:[2,"tabTitle"],tabIcon:[3,"tabIcon"]},null),(l()(),ll._20(-1,0,["\n  "])),(l()(),ll.Z(7,0,null,0,1,"ion-tab",[["role","tabpanel"],["tabIcon","analytics"],["tabTitle","Analytics"]],[[1,"id",0],[1,"aria-labelledby",0]],null,null,Yu.b,Yu.a)),ll.Y(8,245760,null,0,Zu.a,[vu.a,Jl.a,Ql.a,ln.a,ll.j,ll.u,ll.z,ll.i,ll.g,nn.l,un.a,[2,tn.a],an.a,ll.k],{root:[0,"root"],rootParams:[1,"rootParams"],tabTitle:[2,"tabTitle"],tabIcon:[3,"tabIcon"]},null),(l()(),ll._20(-1,0,["\n  "])),(l()(),ll.Z(10,0,null,0,1,"ion-tab",[["role","tabpanel"],["tabIcon","contract"],["tabTitle","Contracts"]],[[1,"id",0],[1,"aria-labelledby",0]],null,null,Yu.b,Yu.a)),ll.Y(11,245760,null,0,Zu.a,[vu.a,Jl.a,Ql.a,ln.a,ll.j,ll.u,ll.z,ll.i,ll.g,nn.l,un.a,[2,tn.a],an.a,ll.k],{root:[0,"root"],rootParams:[1,"rootParams"],tabTitle:[2,"tabTitle"],tabIcon:[3,"tabIcon"]},null),(l()(),ll._20(-1,0,["\n"])),(l()(),ll._20(-1,null,["\n"]))],function(l,n){var u=n.component;l(n,5,0,u.tab1Root,u.navParams,"Bookings","cash");l(n,8,0,u.tab2Root,u.navParams,"Analytics","analytics");l(n,11,0,u.tab3Root,u.navParams,"Contracts","contract")},function(l,n){l(n,4,0,ll._13(n,5)._tabId,ll._13(n,5)._btnId);l(n,7,0,ll._13(n,8)._tabId,ll._13(n,8)._btnId);l(n,10,0,ll._13(n,11)._tabId,ll._13(n,11)._btnId)})}Object.defineProperty(n,"__esModule",{value:!0});var ll=u(0),nl=u(58),ul=u(1),tl=u(78),al=u(49),el=(u(35),u(129)),il=u(130),ol=!1,sl="https://multibanking-keycloak.dev.adorsys.de/auth",cl="https://multibanking-service.dev.adorsys.de/api/v1",rl=u(2),_l=u(203),gl=function(){function l(l){this.http=l,this.bookingsChangedObservable=new _l.Subject}return l.prototype.getBankAccounts=function(l){return this.http.get(cl+"/bankaccesses/"+l+"/accounts").map(function(l){return l.json()._embedded.bankAccountEntityList}).catch(this.handleError)},l.prototype.syncBookings=function(l,n,u){var t=this;return this.http.put(cl+"/bankaccesses/"+l+"/accounts/"+n+"/sync",u).map(function(l){return t.bookingsChangedObservable.next(!0),null!=l.json()._embedded?l.json()._embedded.bookingEntityList:[]}).catch(this.handleError)},l.prototype.handleError=function(l){console.error(l);var n=l.json();return rl.Observable.throw(n?n||"Server error":l||"Server error")},l}(),dl=function(){function l(l){this.http=l}return l.prototype.getAvailableCategories=function(){return this.http.get(cl+"/analytics/categories").map(function(l){return l.json()._embedded.ruleCategoryList}).catch(this.handleError)},l.prototype.createRule=function(l){return this.http.post(cl+"/analytics/rules",l).catch(this.handleError)},l.prototype.getAnalytics=function(l,n){return this.http.get(cl+"/bankaccesses/"+l+"/accounts/"+n+"/analytics").map(function(l){return null!=l.json()?l.json():{}}).catch(this.handleError)},l.prototype.handleError=function(l){console.error(l);var n=l.json();return n?"RESCOURCE_NOT_FOUND"==n.message?rl.Observable.of({}):rl.Observable.throw("SYNC_IN_PROGRESS"==n.message?n.message:n||"Server error"):rl.Observable.throw(l||"Server error")},l}(),bl=function(){function l(l){this.navparams=l,this.label=l.data.label,this.bookingGroups=this.sortBookingGroups(l.data.bookingGroups)}return l.prototype.sortBookingGroups=function(l){return l.sort(function(l,n){if(1==l.variable)return 1;if(1==n.variable)return-1;var u=new Date(l.nextExecutionDate[0],l.nextExecutionDate[1]-1,l.nextExecutionDate[2]),t=new Date(n.nextExecutionDate[0],n.nextExecutionDate[1]-1,n.nextExecutionDate[2]);return u>t?-1:u<t?1:0})},l.prototype.getCompanyLogoUrl=function(l){return cl+"/image/"+l.contract.logo},l}(),pl=function(){function l(l,n,u,t,a,e,i){this.navCtrl=l,this.navparams=n,this.alertCtrl=u,this.toastCtrl=t,this.loadingCtrl=a,this.bankAccountService=e,this.analyticsService=i,this.bankAccess=n.data.bankAccess,this.bankAccountId=n.data.bankAccount.id}return l.prototype.ngOnInit=function(){var l=this;this.bankAccountService.bookingsChangedObservable.subscribe(function(n){l.loadAnalytics()}),this.loadAnalytics()},l.prototype.ionViewDidLoad=function(){var l=this;this.navBar.backButtonClick=function(n){l.navCtrl.parent.viewCtrl.dismiss()}},l.prototype.loadAnalytics=function(){var l=this;this.analyticsService.getAnalytics(this.bankAccess.id,this.bankAccountId).subscribe(function(n){l.analytics=n},function(n){"SYNC_IN_PROGRESS"==n&&l.toastCtrl.create({message:"Account sync in progress",showCloseButton:!0,position:"top"}).present()})},l.prototype.getCompanyLogoUrl=function(l){return cl+"/image/"+l.contract.logo},l.prototype.syncBookingsPromptPin=function(){var l=this;this.alertCtrl.create({title:"Pin",inputs:[{name:"pin",placeholder:"Bank Account Pin",type:"password"}],buttons:[{text:"Cancel",role:"cancel"},{text:"Submit",handler:function(n){n.pin.length>0&&l.syncBookings(n.pin)}}]}).present()},l.prototype.syncBookings=function(l){var n=this;if(!l&&!this.bankAccess.storePin)return this.syncBookingsPromptPin();var u=this.loadingCtrl.create({content:"Please wait..."});u.present(),this.bankAccountService.syncBookings(this.bankAccess.id,this.bankAccountId,l).subscribe(function(l){u.dismiss()},function(l){l&&l.messages&&l.messages.forEach(function(l){"SYNC_IN_PROGRESS"==l.key?n.toastCtrl.create({message:"Account sync in progress",showCloseButton:!0,position:"top"}).present():"INVALID_PIN"==l.key&&n.alertCtrl.create({message:"Invalid pin",buttons:["OK"]}).present()})})},l.prototype.itemSelected=function(l,n){this.navCtrl.push(bl,{label:l,bookingGroups:n})},l}(),hl=function(){function l(l){this.http=l}return l.prototype.getBankAccesses=function(){return this.http.get(cl+"/bankaccesses").map(function(l){return null!=l.json()._embedded?l.json()._embedded.bankAccessEntityList:[]}).catch(this.handleError)},l.prototype.createBankAcccess=function(l){return this.http.post(cl+"/bankaccesses",l).catch(this.handleError)},l.prototype.updateBankAcccess=function(l){return this.http.put(cl+"/bankaccesses/"+l.id,l).catch(this.handleError)},l.prototype.deleteBankAccess=function(l){return this.http.delete(cl+"/bankaccesses/"+l).catch(this.handleError)},l.prototype.handleError=function(l){console.error(l);var n=l.json();return rl.Observable.throw(n?n||"Server error":l||"Server error")},l}(),ml=function(){function l(l){this.http=l,this.labelAttribute="name"}return l.prototype.getResults=function(l){return this.http.get(cl+"/bank?query="+l).map(function(l){return null!=l.json()._embedded?l.json()._embedded.bankEntityList:[]}).catch(this.handleError)},l.prototype.handleError=function(l){console.error(l);var n=l.json();return rl.Observable.throw(n?n||"Server error":l||"Server error")},l}(),fl=function(){function l(l,n,u,t,a,e){this.navCtrl=l,this.navparams=n,this.bankAutoCompleteService=u,this.loadingCtrl=t,this.alertCtrl=a,this.bankAccessService=e,this.bankAccess={bankCode:"",bankLogin:"",bankLogin2:"",pin:"",userId:"",storePin:!0,storeBookings:!0,categorizeBookings:!0,storeAnalytics:!0},this.userId=n.data.userId,this.bankAccess.userId=n.data.userId,this.parent=n.data.parent}return l.prototype.ngOnInit=function(){var l=this;this.autocomplete.itemSelected.subscribe(function(n){n.loginSettings||(n.loginSettings={advice:"Bank login data",credentials:[{label:"customer id",masked:!1},{label:"pin",masked:!0}]}),l.selectedBank=n}),this.autocomplete.searchbarElem.ionClear.subscribe(function(){l.selectedBank=void 0})},l.prototype.createBankAccess=function(){var l=this,n=this.loadingCtrl.create({content:"Please wait..."});n.present(),this.bankAccess.bankCode=this.selectedBank.bankCode;for(var u=0;u<this.selectedBank.loginSettings.credentials.length;u++)0==u?this.bankAccess.bankLogin=this.selectedBank.loginSettings.credentials[u].input:1==u?this.selectedBank.loginSettings.credentials[u].masked?this.bankAccess.pin=this.selectedBank.loginSettings.credentials[u].input:this.bankAccess.bankLogin2=this.selectedBank.loginSettings.credentials[u].input:2==u&&(this.bankAccess.pin=this.selectedBank.loginSettings.credentials[u].input);this.bankAccessService.createBankAcccess(this.bankAccess).subscribe(function(u){n.dismiss(),l.parent.bankAccessesChanged(),l.navCtrl.pop()},function(u){n.dismiss(),u&&u.messages&&u.messages.forEach(function(n){"BANK_ACCESS_ALREADY_EXIST"==n.key?l.alertCtrl.create({message:"Bank connection already exists",buttons:["OK"]}).present():"INVALID_BANK_ACCESS"==n.key?l.alertCtrl.create({message:"Bank not supported",buttons:["OK"]}).present():"INVALID_PIN"==n.key&&l.alertCtrl.create({message:"Invalid pin",buttons:["OK"]}).present()})})},l}(),kl=function(){function l(l){this.http=l}return l.prototype.getBookings=function(l,n){return this.http.get(cl+"/bankaccesses/"+l+"/accounts/"+n+"/bookings").map(function(l){return null!=l.json()._embedded?l.json()._embedded.bookingEntityList:[]}).catch(this.handleError)},l.prototype.getBooking=function(l,n,u){return this.http.get(cl+"/bankaccesses/"+l+"/accounts/"+n+"/bookings/"+u).map(function(l){return null!=l.json()._embedded?l.json()._embedded.bookingEntityList:[]}).catch(this.handleError)},l.prototype.handleError=function(l){console.error(l);var n=l.json();return rl.Observable.throw(n?"SYNC_IN_PROGRESS"==n.message?n.message:n||"Server error":l||"Server error")},l}(),yl=function(){function l(){}return l.prototype.getLogo=function(l){return cl+"/image/"+l},l}(),Cl=function(){function l(l){this.http=l}return l.prototype.getPayment=function(l){return this.http.get(l).map(function(l){return l.json()}).catch(this.handleError)},l.prototype.createPayment=function(l,n,u){return this.http.post(cl+"/bankaccesses/"+l+"/accounts/"+n+"/payments",u).map(function(l){return l.headers.get("Location")}).catch(this.handleError)},l.prototype.submitPayment=function(l,n,u,t){return this.http.post(cl+"/bankaccesses/"+l+"/accounts/"+n+"/payments/"+u+"/submit",t).catch(this.handleError)},l.prototype.handleError=function(l){console.error(l);var n=l.json();return rl.Observable.throw(n?n||"Server error":l||"Server error")},l}(),vl=function(){function l(l,n,u,t,a,e){this.navCtrl=l,this.navparams=n,this.loadingCtrl=u,this.toastCtrl=t,this.alertCtrl=a,this.paymentService=e,this.payment={receiver:"",purpose:"",amount:void 0},this.bankAccount=n.data.bankAccount,this.bankAccess=n.data.bankAccess}return l.prototype.ngOnInit=function(){},l.prototype.createPayment=function(l){var n=this;if(!l&&!this.bankAccess.storePin)return this.createPaymentPromptPin();var u=this.loadingCtrl.create({content:"Please wait..."});u.present(),this.paymentService.createPayment(this.bankAccess.id,this.bankAccount.id,{payment:this.payment,pin:l}).subscribe(function(l){u.dismiss(),n.askForTan(l)},function(l){l&&l.messages&&l.messages.forEach(function(l){"ERROR_PAYMENT"==l.key?n.alertCtrl.create({message:"Payment Error",buttons:["OK"]}).present():"INVALID_PIN"==l.key&&n.alertCtrl.create({message:"Invalid pin",buttons:["OK"]}).present()})})},l.prototype.createPaymentPromptPin=function(){var l=this;this.alertCtrl.create({title:"Pin",inputs:[{name:"pin",placeholder:"Bank Account Pin",type:"password"}],buttons:[{text:"Cancel",role:"cancel"},{text:"Submit",handler:function(n){n.pin.length>0&&l.createPayment(n.pin)}}]}).present()},l.prototype.askForTan=function(l){var n=this;this.paymentService.getPayment(l).subscribe(function(l){n.alertCtrl.create({title:l.paymentChallenge.title,inputs:[{name:"tan",placeholder:"Tan",type:"text"}],buttons:[{text:"Cancel",role:"cancel"},{text:"Submit",handler:function(u){u.tan.length>0&&n.submitPayment(l,u.tan)}}]}).present()})},l.prototype.submitPayment=function(l,n){var u=this;this.paymentService.submitPayment(this.bankAccess.id,this.bankAccount.id,l.id,{tan:n}).subscribe(function(l){u.toastCtrl.create({message:"Payment successful",showCloseButton:!0,position:"top"}).present()})},l}(),Yl=function(){function l(l,n,u){this.navCtrl=l,this.analyticsService=u,this.booking=n.data.booking}return l.prototype.ngOnInit=function(){var l=this;this.analyticsService.getAvailableCategories().subscribe(function(n){l.categories=n,l.booking.bookingCategory&&l.booking.bookingCategory.mainCategory&&(l.mainCategoryChanged(l.booking.bookingCategory.mainCategory),l.booking.bookingCategory.subCategory&&l.subCategoryChanged(l.booking.bookingCategory.subCategory),l.booking.bookingCategory.specification&&l.specificationChanged(l.booking.bookingCategory.specification))})},l.prototype.mainCategoryChanged=function(l){this.mainCategoryId=l,this.mainCategory=this.categories.filter(function(n){return n.id==l})[0],this.subCategories=this.mainCategory.subcategories},l.prototype.subCategoryChanged=function(l){this.subCategoryId=l,this.subCategory=this.subCategories.filter(function(n){return n.id==l})[0],this.specifications=this.subCategory.specifications},l.prototype.specificationChanged=function(l){this.specificationId=l,this.specification=this.specifications.filter(function(n){return n.id==l})[0]},l.prototype.submit=function(){var l=this,n={ruleId:this.booking.bookingCategory?this.booking.bookingCategory.rules.reverse()[0]:null,creditorId:this.booking.creditorId,receiver:this.receiver,expression:this.expression,mainCategory:this.mainCategory.id,subCategory:this.subCategory?this.subCategory.id:null,specification:this.specification?this.specification.id:null,incoming:this.booking.amount>0,taxRelevant:this.taxRelevant};this.analyticsService.createRule(n).subscribe(function(n){l.navCtrl.pop()})},l}(),Zl=function(){function l(l,n){this.navCtrl=l,this.navparams=n,this.booking=n.data.booking}return l.prototype.editCategory=function(){this.navCtrl.push(Yl,{booking:this.booking})},l}(),jl=function(){function l(l,n,u,t,a,e,i,o){this.navCtrl=l,this.navparams=n,this.alertCtrl=u,this.toastCtrl=t,this.loadingCtrl=a,this.bankAccountService=e,this.bookingService=i,this.logoService=o,this.bankAccess=n.data.bankAccess,this.bankAccount=n.data.bankAccount,this.getLogo=o.getLogo}return l.prototype.ngOnInit=function(){var l=this;this.bookingService.getBookings(this.bankAccess.id,this.bankAccount.id).subscribe(function(n){l.bookings=n},function(n){"SYNC_IN_PROGRESS"==n&&l.toastCtrl.create({message:"Account sync in progress",showCloseButton:!0,position:"top"}).present()})},l.prototype.ionViewDidLoad=function(){var l=this;this.navBar.backButtonClick=function(n){l.navCtrl.parent.viewCtrl.dismiss()}},l.prototype.syncBookingsPromptPin=function(){var l=this;this.alertCtrl.create({title:"Pin",inputs:[{name:"pin",placeholder:"Bank Account Pin",type:"password"}],buttons:[{text:"Cancel",role:"cancel"},{text:"Submit",handler:function(n){n.pin.length>0&&l.syncBookings(n.pin)}}]}).present()},l.prototype.syncBookings=function(l){var n=this;if(!l&&!this.bankAccess.storePin)return this.syncBookingsPromptPin();var u=this.loadingCtrl.create({content:"Please wait..."});u.present(),this.bankAccountService.syncBookings(this.bankAccess.id,this.bankAccount.id,l).subscribe(function(l){n.bookings=l,u.dismiss()},function(l){l&&l.messages&&l.messages.forEach(function(l){"SYNC_IN_PROGRESS"==l.key?n.toastCtrl.create({message:"Account sync in progress",showCloseButton:!0,position:"top"}).present():"INVALID_PIN"==l.key&&n.alertCtrl.create({message:"Invalid pin",buttons:["OK"]}).present()})})},l.prototype.itemSelected=function(l){this.navCtrl.push(Zl,{booking:l})},l.prototype.createPayment=function(){this.navCtrl.push(vl,{bankAccount:this.bankAccount,bankAccess:this.bankAccess})},l}(),Il=function(){function l(l){this.http=l}return l.prototype.getContracts=function(l,n){return this.http.get(cl+"/bankaccesses/"+l+"/accounts/"+n+"/contracts").map(function(l){return l.json()._embedded.contractEntityList}).catch(this.handleError)},l.prototype.handleError=function(l){var n=l.json();return rl.Observable.throw(n?"SYNC_IN_PROGRESS"==n.message?n.message:n||"Server error":l||"Server error")},l}(),Al=function(){function l(l,n,u,t,a,e,i,o){this.navCtrl=l,this.navParams=n,this.alertCtrl=u,this.toastCtrl=t,this.loadingCtrl=a,this.contractService=e,this.bankAccountService=i,this.logoService=o,this.bankAccess=n.data.bankAccess,this.bankAccountId=n.data.bankAccount.id,this.getLogo=o.getLogo}return l.prototype.ngOnInit=function(){var l=this;this.bankAccountService.bookingsChangedObservable.subscribe(function(n){l.loadContracts()}),this.loadContracts()},l.prototype.ionViewDidLoad=function(){var l=this;this.navBar.backButtonClick=function(n){l.navCtrl.parent.viewCtrl.dismiss()}},l.prototype.loadContracts=function(){var l=this;this.contracts={income:[],expenses:[]},this.contractService.getContracts(this.bankAccess.id,this.bankAccountId).subscribe(function(n){n.reduce(function(l,n){return n.amount>0?l.income.push(n):l.expenses.push(n),l},l.contracts)})},l.prototype.syncBookingsPromptPin=function(){var l=this;this.alertCtrl.create({title:"Pin",inputs:[{name:"pin",placeholder:"Bank Account Pin",type:"password"}],buttons:[{text:"Cancel",role:"cancel"},{text:"Submit",handler:function(n){n.pin.length>0&&l.syncBookings(n.pin)}}]}).present()},l.prototype.syncBookings=function(l){var n=this;if(!l&&!this.bankAccess.storePin)return this.syncBookingsPromptPin();var u=this.loadingCtrl.create({content:"Please wait..."});u.present(),this.bankAccountService.syncBookings(this.bankAccess.id,this.bankAccountId,l).subscribe(function(l){u.dismiss()},function(l){l&&l.messages&&l.messages.forEach(function(l){"SYNC_IN_PROGRESS"==l.key?n.toastCtrl.create({message:"Account sync in progress",showCloseButton:!0,position:"top"}).present():"INVALID_PIN"==l.key&&n.alertCtrl.create({message:"Invalid pin",buttons:["OK"]}).present()})})},l}(),zl=function(){return function(l){this.navparams=l,this.tab1Root=jl,this.tab2Root=pl,this.tab3Root=Al,this.navParams=l.data}}(),Pl=function(){function l(l,n,u){this.navCtrl=l,this.navparams=n,this.bankAccountService=u,this.bankAccess=n.data.bankAccess}return l.prototype.ngOnInit=function(){var l=this;this.loadBankAccounts(),this.bankAccountService.bookingsChangedObservable.subscribe(function(n){l.loadBankAccounts()})},l.prototype.loadBankAccounts=function(){var l=this;this.bankAccountService.getBankAccounts(this.bankAccess.id).subscribe(function(n){l.bankAccounts=n})},l.prototype.itemSelected=function(l){this.navCtrl.push(zl,{bankAccess:this.bankAccess,bankAccount:l})},l}(),xl=function(){function l(l,n,u,t){this.navCtrl=l,this.navparams=n,this.loadingCtrl=u,this.bankAccessService=t,this.bankAccess=n.data.bankAccess,this.parent=n.data.parent}return l.prototype.updateBankAccess=function(){var l=this,n=this.loadingCtrl.create({content:"Please wait..."});n.present(),this.bankAccessService.updateBankAcccess(this.bankAccess).subscribe(function(u){n.dismiss(),l.parent.bankAccessesChanged(),l.navCtrl.pop()})},l}(),Sl=function(){function l(l,n){this.navCtrl=l,this.bankAccessService=n}return l.prototype.ngOnInit=function(){var l=this;this.bankAccessService.getBankAccesses().subscribe(function(n){l.bankaccesses=n})},l.prototype.itemSelected=function(l){this.navCtrl.push(Pl,{bankAccess:l})},l.prototype.createBankAccess=function(){this.navCtrl.push(fl,{parent:this})},l.prototype.bankAccessesChanged=function(){var l=this;this.bankAccessService.getBankAccesses().subscribe(function(n){l.bankaccesses=n})},l.prototype.editBankAccess=function(l,n){l.stopPropagation(),this.navCtrl.push(xl,{bankAccess:n,parent:this})},l.prototype.deleteBankAccess=function(l,n){var u=this;l.stopPropagation(),this.bankAccessService.deleteBankAccess(n.id).subscribe(function(l){u.bankAccessesChanged()})},l}(),Bl=function(){function l(){}return l.prototype.transform=function(l){switch(l){case"WEEKLY":return"weekly";case"MONTHLY":return"monthly";case"TWO_MONTHLY":return"bimonthly";case"QUARTERLY":return"quarterly";case"HALFYEARLY":return"half-yearly";case"YEARLY":return"yearly";default:return l}},l}(),Ll=function(){function l(){}return n=l,l.init=function(){var l=Keycloak({url:sl,realm:"multibanking",clientId:"multibanking-client"});return n.auth.loggedIn=!1,new Promise(function(u,t){l.init({onLoad:"login-required"}).success(function(){n.auth.loggedIn=!0,n.auth.authz=l,n.auth.logoutUrl=l.authServerUrl+"/realms/multibanking/protocol/openid-connect/logout?redirect_uri="+document.baseURI,u()}).error(function(){t()})})},l.prototype.logout=function(){console.log("*** LOGOUT"),n.auth.loggedIn=!1,n.auth.authz=null,window.location.href=n.auth.logoutUrl},l.prototype.getToken=function(){return new Promise(function(l,u){n.auth.authz.token?n.auth.authz.updateToken(5).success(function(){l(n.auth.authz.token)}).error(function(){n.auth.authz.login()}):u("Not loggen in")})},l.prototype.getUsername=function(){return n.auth.authz.tokenParsed.sub},l.auth={},l;var n}(),El=function(l){function n(n,u,t){var a=l.call(this,n,u)||this;return a._keycloakService=t,a}return Object(ul.__extends)(n,l),n.prototype.request=function(n,u){var t=this,a=this._keycloakService.getToken(),e=rl.Observable.fromPromise(a);return"string"==typeof n?e.map(function(l){var n=new al.h({headers:new al.d({Authorization:"Bearer "+l})});return(new al.h).merge(u).merge(n)}).concatMap(function(u){return l.prototype.request.call(t,n,u)}):n instanceof al.g?e.map(function(l){return n.headers.set("Authorization","Bearer "+l),n}).concatMap(function(n){return l.prototype.request.call(t,n)}):void 0},n}(al.e),Ul=function(){return function(l,n,u){this.rootPage=Sl,l.ready().then(function(){n.styleDefault(),u.hide()})}}(),Rl=function(){return function(){}}(),wl=u(86),Ml=u(341),$l=u(342),Fl=u(343),Ol=u(344),Vl=u(345),Dl=u(346),Tl=u(347),Nl=u(348),ql=u(349),Gl=u(638),Xl=u(55),Kl=u(90),Hl=u(6),Wl=u(19),Jl=u(8),Ql=u(3),ln=u(5),nn=u(10),un=u(48),tn=u(24),an=u(9),en=ll.X({encapsulation:2,styles:[],data:{}}),on=ll.V("ng-component",Ul,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"ng-component",[],null,null,null,a,en)),ll.Y(1,49152,null,0,Ul,[ln.a,il.a,el.a],null,null)],null,null)},{},{},[]),sn=u(14),cn=u(39),rn=u(44),_n=u(27),gn=u(45),dn=u(38),bn=u(33),pn=u(92),hn=u(28),mn=u(20),fn=u(46),kn=u(22),yn=u(25),Cn=u(72),vn=u(42),Yn=u(17),Zn=u(16),jn=u(32),In=u(71),An=u(37),zn=u(15),Pn=u(62),xn=u(68),Sn=u(54),Bn=ll.X({encapsulation:2,styles:[],data:{}}),Ln=ll.V("page-analytics",pl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"page-analytics",[],null,null,null,e,Bn)),ll.Y(1,114688,null,0,pl,[Wl.a,zn.a,Pn.a,xn.a,Sn.a,gl,dl],null,null)],function(l,n){l(n,1,0)},null)},{},{},[]),En=u(52),Un=u(94),Rn=u(21),wn=u(65),Mn=u(183),$n=u(75),Fn=u(41),On=u(639),Vn=ll.X({encapsulation:2,styles:[],data:{}}),Dn=ll.V("page-bankaccess-create",fl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"page-bankaccess-create",[],null,null,null,s,Vn)),ll.Y(1,114688,null,0,fl,[Wl.a,zn.a,ml,Sn.a,Pn.a,hl],null,null)],function(l,n){l(n,1,0)},null)},{},{},[]),Tn=u(40),Nn=u(184),qn=u(70),Gn=u(185),Xn=u(64),Kn=u(53),Hn=ll.X({encapsulation:2,styles:[],data:{}}),Wn=ll.V("page-bankaccessList",Sl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"page-bankaccessList",[],null,null,null,r,Hn)),ll.Y(1,114688,null,0,Sl,[Wl.a,hl],null,null)],function(l,n){l(n,1,0)},null)},{},{},[]),Jn=ll.X({encapsulation:2,styles:[],data:{}}),Qn=ll.V("page-bankaccess-update",xl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"page-bankaccess-update",[],null,null,null,g,Jn)),ll.Y(1,49152,null,0,xl,[Wl.a,zn.a,Sn.a,hl],null,null)],null,null)},{},{},[]),lu=ll.X({encapsulation:2,styles:[],data:{}}),nu=ll.V("page-bankaccountList",Pl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"page-bankaccountList",[],null,null,null,p,lu)),ll.Y(1,114688,null,0,Pl,[Wl.a,zn.a,gl],null,null)],function(l,n){l(n,1,0)},null)},{},{},[]),uu=u(93),tu=ll.X({encapsulation:2,styles:[],data:{}}),au=ll.V("page-bookingGroup",bl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"page-bookingGroup",[],null,null,null,v,tu)),ll.Y(1,49152,null,0,bl,[zn.a],null,null)],null,null)},{},{},[]),eu=ll.X({encapsulation:2,styles:[],data:{}}),iu=ll.V("page-bookingList",jl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"page-bookingList",[],null,null,null,A,eu)),ll.Y(1,114688,null,0,jl,[Wl.a,zn.a,Pn.a,xn.a,Sn.a,gl,kl,yl],null,null)],function(l,n){l(n,1,0)},null)},{},{},[]),ou=u(158),su=u(159),cu=u(160),ru=ll.X({encapsulation:2,styles:[],data:{}}),_u=ll.V("page-bookingDetail",Zl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"page-bookingDetail",[],null,null,null,E,ru)),ll.Y(1,49152,null,0,Zl,[Wl.a,zn.a],null,null)],null,null)},{},{},[]),gu=u(118),du=u(640),bu=u(122),pu=ll.X({encapsulation:2,styles:[],data:{}}),hu=ll.V("page-bookingEdit",Yl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"page-bookingEdit",[],null,null,null,M,pu)),ll.Y(1,114688,null,0,Yl,[Wl.a,zn.a,dl],null,null)],function(l,n){l(n,1,0)},null)},{},{},[]),mu=ll.X({encapsulation:2,styles:[],data:{}}),fu=ll.V("page-payment-create",vl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"page-payment-create",[],null,null,null,$,mu)),ll.Y(1,114688,null,0,vl,[Wl.a,zn.a,Sn.a,xn.a,Pn.a,Cl],null,null)],function(l,n){l(n,1,0)},null)},{},{},[]),ku=ll.X({encapsulation:2,styles:[],data:{}}),yu=ll.V("contracts",Al,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"contracts",[],null,null,null,J,ku)),ll.Y(1,114688,null,0,Al,[Wl.a,zn.a,Pn.a,xn.a,Sn.a,Il,gl,yl],null,null)],function(l,n){l(n,1,0)},null)},{},{},[]),Cu=u(641),vu=u(74),Yu=u(642),Zu=u(125),ju=ll.X({encapsulation:2,styles:[],data:{}}),Iu=ll.V("ng-component",zl,function(l){return ll._22(0,[(l()(),ll.Z(0,0,null,null,1,"ng-component",[],null,null,null,Q,ju)),ll.Y(1,49152,null,0,zl,[zn.a],null,null)],null,null)},{},{},[]),Au=u(181),zu=u(154),Pu=u(178),xu=u(182),Su=u(88),Bu=u(73),Lu=u(165),Eu=u(113),Uu=u(169),Ru=u(177),wu=u(338),Mu=u(179),$u=u(60),Fu=u(164),Ou=u(180),Vu=ll.W(Rl,[wl.b],function(l){return ll._10([ll._11(512,ll.i,ll.S,[[8,[Ml.a,$l.a,Fl.a,Ol.a,Vl.a,Dl.a,Tl.a,Nl.a,ql.a,on,Ln,Dn,Wn,Qn,nu,au,iu,_u,hu,fu,yu,Iu]],[3,ll.i],ll.s]),ll._11(5120,ll.r,ll._9,[[3,ll.r]]),ll._11(4608,sn.m,sn.l,[ll.r,[2,sn.v]]),ll._11(4608,Rn.q,Rn.q,[]),ll._11(4608,Rn.d,Rn.d,[]),ll._11(5120,ll.b,ll._0,[]),ll._11(5120,ll.p,ll._6,[]),ll._11(5120,ll.q,ll._7,[]),ll._11(4608,nl.c,nl.q,[sn.d]),ll._11(6144,ll.D,null,[nl.c]),ll._11(4608,nl.f,Au.a,[]),ll._11(5120,nl.d,function(l,n,u,t,a){return[new nl.k(l,n),new nl.o(u),new nl.n(t,a)]},[sn.d,ll.u,sn.d,sn.d,nl.f]),ll._11(4608,nl.e,nl.e,[nl.d,ll.u]),ll._11(135680,nl.m,nl.m,[sn.d]),ll._11(4608,nl.l,nl.l,[nl.e,nl.m]),ll._11(6144,ll.B,null,[nl.l]),ll._11(6144,nl.p,null,[nl.m]),ll._11(4608,ll.G,ll.G,[ll.u]),ll._11(4608,nl.h,nl.h,[sn.d]),ll._11(4608,nl.i,nl.i,[sn.d]),ll._11(4608,al.c,al.c,[]),ll._11(4608,al.i,al.b,[]),ll._11(5120,al.k,al.l,[]),ll._11(4608,al.j,al.j,[al.c,al.i,al.k]),ll._11(4608,al.h,al.a,[]),ll._11(4608,Ll,Ll,[]),ll._11(5120,al.e,t,[al.j,al.h,Ll]),ll._11(4608,zu.a,zu.a,[Jl.a,Ql.a]),ll._11(4608,Pn.a,Pn.a,[Jl.a,Ql.a]),ll._11(4608,Pu.a,Pu.a,[]),ll._11(4608,Zn.a,Zn.a,[]),ll._11(4608,Fn.a,Fn.a,[ln.a]),ll._11(4608,yn.a,yn.a,[Ql.a,ln.a,ll.u,an.a]),ll._11(4608,Sn.a,Sn.a,[Jl.a,Ql.a]),ll._11(5120,sn.h,xu.b,[sn.t,[2,sn.a],Ql.a]),ll._11(4608,sn.g,sn.g,[sn.h]),ll._11(5120,Su.b,Su.d,[Jl.a,Su.a]),ll._11(5120,tn.a,tn.b,[Jl.a,Su.b,sn.g,Bu.b,ll.i]),ll._11(4608,Lu.a,Lu.a,[Jl.a,Ql.a,tn.a]),ll._11(4608,Eu.a,Eu.a,[Jl.a,Ql.a]),ll._11(4608,Uu.a,Uu.a,[Jl.a,Ql.a,tn.a]),ll._11(4608,Ru.a,Ru.a,[Ql.a,ln.a,an.a,Jl.a,nn.l]),ll._11(4608,xn.a,xn.a,[Jl.a,Ql.a]),ll._11(4608,un.a,un.a,[ln.a,Ql.a]),ll._11(4608,dl,dl,[al.e]),ll._11(4608,hl,hl,[al.e]),ll._11(4608,gl,gl,[al.e]),ll._11(4608,ml,ml,[al.e]),ll._11(4608,kl,kl,[al.e]),ll._11(4608,Il,Il,[al.e]),ll._11(4608,yl,yl,[]),ll._11(4608,Cl,Cl,[al.e]),ll._11(4608,el.a,el.a,[]),ll._11(4608,il.a,il.a,[]),ll._11(512,sn.b,sn.b,[]),ll._11(512,Rn.o,Rn.o,[]),ll._11(512,Rn.e,Rn.e,[]),ll._11(512,Rn.m,Rn.m,[]),ll._11(512,xu.a,xu.a,[]),ll._11(512,tl.b,tl.b,[]),ll._11(512,ll.k,wu.a,[]),ll._11(256,Ql.b,{},[]),ll._11(1024,Mu.a,Mu.b,[]),ll._11(1024,ln.a,ln.b,[nl.b,Mu.a,ll.u]),ll._11(1024,Ql.a,Ql.c,[Ql.b,ln.a]),ll._11(512,an.a,an.a,[ln.a]),ll._11(512,$u.a,$u.a,[]),ll._11(512,Jl.a,Jl.a,[Ql.a,ln.a,[2,$u.a]]),ll._11(512,nn.l,nn.l,[Jl.a]),ll._11(256,Su.a,{links:[]},[]),ll._11(512,ll.h,ll.h,[]),ll._11(512,Fu.a,Fu.a,[ll.h]),ll._11(1024,Bu.b,Bu.c,[Fu.a,ll.o]),ll._11(1024,ll.c,function(l,n,u,t,a,e,i,o,s,c,r,_,g){return[nl.s(l),Ou.a(n),Pu.b(u,t),Ru.b(a,e,i,o,s),Bu.d(c,r,_,g)]},[[2,ll.t],Ql.a,ln.a,an.a,Ql.a,ln.a,an.a,Jl.a,nn.l,Ql.a,Su.a,Bu.b,ll.u]),ll._11(512,ll.d,ll.d,[[2,ll.c]]),ll._11(131584,ll.f,ll.f,[ll.u,ll.T,ll.o,ll.k,ll.i,ll.d]),ll._11(512,ll.e,ll.e,[ll.f]),ll._11(512,nl.a,nl.a,[[3,nl.a]]),ll._11(512,al.f,al.f,[]),ll._11(512,Rl,Rl,[]),ll._11(256,wl.a,Ul,[]),ll._11(256,sn.a,"/",[])])});ol&&Object(ll.M)(),Ll.init().then(function(){return Object(nl.j)().bootstrapModuleFactory(Vu)}).catch(function(l){console.log(l),window.location.reload()})}},[350]);
+webpackJsonp([0],{
+
+/***/ 151:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AnalyticsService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_app_config__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var AnalyticsService = /** @class */ (function () {
+    function AnalyticsService(http) {
+        this.http = http;
+    }
+    AnalyticsService.prototype.getAvailableCategories = function () {
+        return this.http.get(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/analytics/categories")
+            .map(function (res) { return res.json()._embedded.ruleCategoryList; })
+            .catch(this.handleError);
+    };
+    AnalyticsService.prototype.createRule = function (rule) {
+        return this.http.post(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/analytics/rules", rule)
+            .catch(this.handleError);
+    };
+    AnalyticsService.prototype.getAnalytics = function (accessId, accountId) {
+        return this.http.get(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/analytics")
+            .map(function (res) { return res.json() != null ? res.json() : {}; })
+            .catch(this.handleError);
+    };
+    AnalyticsService.prototype.handleError = function (error) {
+        console.error(error);
+        var errorJson = error.json();
+        if (errorJson) {
+            if (errorJson.message == "RESCOURCE_NOT_FOUND") {
+                return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].of({});
+            }
+            else if (errorJson.message == "SYNC_IN_PROGRESS") {
+                return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(errorJson.message);
+            }
+            else {
+                return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(errorJson || 'Server error');
+            }
+        }
+        else {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(error || 'Server error');
+        }
+    };
+    AnalyticsService = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2__angular_http__["c" /* Http */]])
+    ], AnalyticsService);
+    return AnalyticsService;
+}());
+
+//# sourceMappingURL=analyticsService.js.map
+
+/***/ }),
+
+/***/ 152:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return LogoService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_app_config__ = __webpack_require__(23);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+var LogoService = /** @class */ (function () {
+    function LogoService() {
+    }
+    LogoService.prototype.getLogo = function (logoId) {
+        if (!logoId) {
+            __WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/image/keinlogo_256";
+        }
+        return __WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/image/" + logoId;
+    };
+    LogoService = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
+        __metadata("design:paramtypes", [])
+    ], LogoService);
+    return LogoService;
+}());
+
+//# sourceMappingURL=LogoService.js.map
+
+/***/ }),
+
+/***/ 153:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return KeycloakService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_app_config__ = __webpack_require__(23);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+
+var KeycloakService = /** @class */ (function () {
+    function KeycloakService() {
+    }
+    KeycloakService_1 = KeycloakService;
+    KeycloakService.init = function () {
+        var keycloakAuth = Keycloak({
+            url: __WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].auth_url,
+            realm: 'multibanking',
+            clientId: 'multibanking-client',
+        });
+        KeycloakService_1.auth.loggedIn = false;
+        return new Promise(function (resolve, reject) {
+            keycloakAuth.init({ onLoad: 'login-required' })
+                .success(function () {
+                KeycloakService_1.auth.loggedIn = true;
+                KeycloakService_1.auth.authz = keycloakAuth;
+                KeycloakService_1.auth.logoutUrl = keycloakAuth.authServerUrl
+                    + '/realms/multibanking/protocol/openid-connect/logout?redirect_uri='
+                    + document.baseURI;
+                resolve();
+            })
+                .error(function () {
+                reject();
+            });
+        });
+    };
+    KeycloakService.prototype.logout = function () {
+        console.log('*** LOGOUT');
+        KeycloakService_1.auth.loggedIn = false;
+        KeycloakService_1.auth.authz = null;
+        window.location.href = KeycloakService_1.auth.logoutUrl;
+    };
+    KeycloakService.prototype.getToken = function () {
+        return new Promise(function (resolve, reject) {
+            if (KeycloakService_1.auth.authz.token) {
+                KeycloakService_1.auth.authz
+                    .updateToken(5)
+                    .success(function () {
+                    resolve(KeycloakService_1.auth.authz.token);
+                })
+                    .error(function () {
+                    KeycloakService_1.auth.authz.login();
+                });
+            }
+            else {
+                reject('Not loggen in');
+            }
+        });
+    };
+    KeycloakService.prototype.getUsername = function () {
+        return KeycloakService_1.auth.authz.tokenParsed.sub;
+    };
+    KeycloakService.auth = {};
+    KeycloakService = KeycloakService_1 = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])()
+    ], KeycloakService);
+    return KeycloakService;
+    var KeycloakService_1;
+}());
+
+//# sourceMappingURL=keycloak.service.js.map
+
+/***/ }),
+
+/***/ 166:
+/***/ (function(module, exports) {
+
+function webpackEmptyAsyncContext(req) {
+	// Here Promise.resolve().then() is used instead of new Promise() to prevent
+	// uncatched exception popping up in devtools
+	return Promise.resolve().then(function() {
+		throw new Error("Cannot find module '" + req + "'.");
+	});
+}
+webpackEmptyAsyncContext.keys = function() { return []; };
+webpackEmptyAsyncContext.resolve = webpackEmptyAsyncContext;
+module.exports = webpackEmptyAsyncContext;
+webpackEmptyAsyncContext.id = 166;
+
+/***/ }),
+
+/***/ 23:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppConfig; });
+var AppConfig = {
+    production: false,
+    // Openshift
+    // auth_url: 'https://multibanking-keycloak.dev.adorsys.de/auth',
+    // api_url: 'https://multibanking-service.dev.adorsys.de/api/v1'
+    // multibanking service running from docker container
+    // auth_url: 'http://keycloak:8080/auth',
+    // api_url: 'http://localhost:8081/api/v1'
+    // multibanking service running from ide
+    auth_url: 'http://localhost:8080/auth',
+    api_url: 'http://localhost:8081/api/v1'
+};
+//# sourceMappingURL=app.config.js.map
+
+/***/ }),
+
+/***/ 305:
+/***/ (function(module, exports) {
+
+function webpackEmptyAsyncContext(req) {
+	// Here Promise.resolve().then() is used instead of new Promise() to prevent
+	// uncatched exception popping up in devtools
+	return Promise.resolve().then(function() {
+		throw new Error("Cannot find module '" + req + "'.");
+	});
+}
+webpackEmptyAsyncContext.keys = function() { return []; };
+webpackEmptyAsyncContext.resolve = webpackEmptyAsyncContext;
+module.exports = webpackEmptyAsyncContext;
+webpackEmptyAsyncContext.id = 305;
+
+/***/ }),
+
+/***/ 349:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AnalyticsPage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_bankAccountService__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_analyticsService__ = __webpack_require__(151);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__app_app_config__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__bookingGroup__ = __webpack_require__(350);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+
+var AnalyticsPage = /** @class */ (function () {
+    function AnalyticsPage(navCtrl, navparams, alertCtrl, toastCtrl, loadingCtrl, bankAccountService, analyticsService) {
+        this.navCtrl = navCtrl;
+        this.navparams = navparams;
+        this.alertCtrl = alertCtrl;
+        this.toastCtrl = toastCtrl;
+        this.loadingCtrl = loadingCtrl;
+        this.bankAccountService = bankAccountService;
+        this.analyticsService = analyticsService;
+        this.bankAccess = navparams.data.bankAccess;
+        this.bankAccountId = navparams.data.bankAccount.id;
+    }
+    AnalyticsPage.prototype.ngOnInit = function () {
+        var _this = this;
+        this.bankAccountService.bookingsChangedObservable.subscribe(function (changed) {
+            _this.loadAnalytics();
+        });
+        this.loadAnalytics();
+    };
+    AnalyticsPage.prototype.ionViewDidLoad = function () {
+        var _this = this;
+        this.navBar.backButtonClick = function (e) {
+            _this.navCtrl.parent.viewCtrl.dismiss();
+        };
+    };
+    AnalyticsPage.prototype.loadAnalytics = function () {
+        var _this = this;
+        this.analyticsService.getAnalytics(this.bankAccess.id, this.bankAccountId).subscribe(function (response) {
+            _this.analytics = response;
+        }, function (error) {
+            if (error == "SYNC_IN_PROGRESS") {
+                _this.toastCtrl.create({
+                    message: 'Account sync in progress',
+                    showCloseButton: true,
+                    position: 'top'
+                }).present();
+            }
+        });
+    };
+    AnalyticsPage.prototype.getCompanyLogoUrl = function (bookingGroup) {
+        return __WEBPACK_IMPORTED_MODULE_4__app_app_config__["a" /* AppConfig */].api_url + "/image/" + bookingGroup.contract.logo;
+    };
+    AnalyticsPage.prototype.syncBookingsPromptPin = function () {
+        var _this = this;
+        var alert = this.alertCtrl.create({
+            title: 'Pin',
+            inputs: [
+                {
+                    name: 'pin',
+                    placeholder: 'Bank Account Pin',
+                    type: 'password'
+                }
+            ],
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel'
+                },
+                {
+                    text: 'Submit',
+                    handler: function (data) {
+                        if (data.pin.length > 0) {
+                            _this.syncBookings(data.pin);
+                        }
+                    }
+                }
+            ]
+        });
+        alert.present();
+    };
+    AnalyticsPage.prototype.syncBookings = function (pin) {
+        var _this = this;
+        if (!pin && !this.bankAccess.storePin) {
+            return this.syncBookingsPromptPin();
+        }
+        var loading = this.loadingCtrl.create({
+            content: 'Please wait...'
+        });
+        loading.present();
+        this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccountId, pin).subscribe(function (response) {
+            loading.dismiss();
+        }, function (error) {
+            if (error && error.messages) {
+                error.messages.forEach(function (message) {
+                    if (message.key == "SYNC_IN_PROGRESS") {
+                        _this.toastCtrl.create({
+                            message: 'Account sync in progress',
+                            showCloseButton: true,
+                            position: 'top'
+                        }).present();
+                    }
+                    else if (message.key == "INVALID_PIN") {
+                        _this.alertCtrl.create({
+                            message: 'Invalid pin',
+                            buttons: ['OK']
+                        }).present();
+                    }
+                });
+            }
+        });
+    };
+    AnalyticsPage.prototype.itemSelected = function (label, bookingGroups) {
+        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_5__bookingGroup__["a" /* BookingGroupPage */], { label: label, bookingGroups: bookingGroups });
+    };
+    __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_8" /* ViewChild */])(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* Navbar */]),
+        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* Navbar */])
+    ], AnalyticsPage.prototype, "navBar", void 0);
+    AnalyticsPage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-analytics',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/analytics/analytics.html"*/'<ion-header>\n  <ion-navbar class="force-back-button">\n    <ion-title>Analytics {{ analytics?.analyticsDate | date }}</ion-title>\n    <ion-buttons end>\n      <button ion-button (click)="syncBookings()">\n        Reload\n      </button>\n    </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="bookingList-content" padding>\n  <ion-item-group>\n    <ion-item-divider color="light">Balance end of month: {{analytics?.balanceCalculated | currency:\'EUR\':true}}</ion-item-divider>\n    <ion-item-divider color="light">Income</ion-item-divider>\n    <ion-item>Total: {{analytics?.incomeTotal | currency:\'EUR\':true}}</ion-item>\n    <ion-item (click)="itemSelected(\'Fix income\', analytics?.incomeFixBookings)">Fix: {{analytics?.incomeFix | currency:\'EUR\':true}}\n      <button ion-button clear item-end>View</button>\n    </ion-item>\n    <ion-item (click)="itemSelected(\'Variable income\', analytics?.incomeVariableBookings)">Variable: {{analytics?.incomeVariable | currency:\'EUR\':true}}\n      <button ion-button clear item-end>View</button>\n    </ion-item>\n    <ion-item (click)="itemSelected(\'Next income\', analytics?.incomeNextBookings)">Next: {{analytics?.incomeNext | currency:\'EUR\':true}}\n      <button ion-button clear item-end>View</button>\n    </ion-item>\n  </ion-item-group>\n  <ion-item-group>\n    <ion-item-divider color="light">Expenses</ion-item-divider>\n    <ion-item>Total: {{analytics?.expensesTotal | currency:\'EUR\':true}}</ion-item>\n    <ion-item (click)="itemSelected(\'Fix expenses\', analytics?.expensesFixBookings)">Fix: {{analytics?.expensesFix | currency:\'EUR\':true}}\n      <button ion-button clear item-end>View</button>\n    </ion-item>\n    <ion-item (click)="itemSelected(\'Variable expenses\', analytics?.expensesVariableBookings)">Variable: {{analytics?.expensesVariable | currency:\'EUR\':true}}\n      <button ion-button clear item-end>View</button>\n    </ion-item>\n    <ion-item (click)="itemSelected(\'Next expenses\', analytics?.expensesNextBookings)">Next: {{analytics?.expensesNext | currency:\'EUR\':true}}\n      <button ion-button clear item-end>View</button>\n    </ion-item>\n  </ion-item-group>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/analytics/analytics.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* LoadingController */],
+            __WEBPACK_IMPORTED_MODULE_2__services_bankAccountService__["a" /* BankAccountService */],
+            __WEBPACK_IMPORTED_MODULE_3__services_analyticsService__["a" /* AnalyticsService */]])
+    ], AnalyticsPage);
+    return AnalyticsPage;
+}());
+
+//# sourceMappingURL=analytics.js.map
+
+/***/ }),
+
+/***/ 350:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BookingGroupPage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_app_config__ = __webpack_require__(23);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var BookingGroupPage = /** @class */ (function () {
+    function BookingGroupPage(navparams) {
+        this.navparams = navparams;
+        this.label = navparams.data.label;
+        this.bookingGroups = this.sortBookingGroups(navparams.data.bookingGroups);
+    }
+    BookingGroupPage.prototype.sortBookingGroups = function (bookingGroups) {
+        return bookingGroups.sort(function (group1, group2) {
+            if (group1.variable == true) {
+                return 1;
+            }
+            if (group2.variable == true) {
+                return -1;
+            }
+            var group1Date = new Date(group1.nextExecutionDate[0], group1.nextExecutionDate[1] - 1, group1.nextExecutionDate[2]);
+            var group2Date = new Date(group2.nextExecutionDate[0], group2.nextExecutionDate[1] - 1, group2.nextExecutionDate[2]);
+            if (group1Date > group2Date) {
+                return -1;
+            }
+            if (group1Date < group2Date) {
+                return 1;
+            }
+            return 0;
+        });
+    };
+    BookingGroupPage.prototype.getCompanyLogoUrl = function (bookingGroup) {
+        return __WEBPACK_IMPORTED_MODULE_2__app_app_config__["a" /* AppConfig */].api_url + "/image/" + bookingGroup.contract.logo;
+    };
+    BookingGroupPage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-bookingGroup',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/analytics/bookingGroup.html"*/'<ion-header>\n  <ion-navbar>\n    <ion-title>{{ label }}</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content padding>\n  <ion-item *ngFor="let bookingGroup of bookingGroups">\n    <ion-thumbnail item-left>\n      <img [src]="getCompanyLogoUrl(bookingGroup)" *ngIf="bookingGroup.contract.logo" item-left/>\n    </ion-thumbnail>\n    <h4 *ngIf="bookingGroup.otherAccount">{{bookingGroup.otherAccount}}</h4>\n    <h4 *ngIf="bookingGroup.mainCategory">{{bookingGroup.mainCategory}}</h4>\n    <h4 *ngIf="bookingGroup.subCategory">{{bookingGroup.subCategory}}</h4>\n    <h4 *ngIf="bookingGroup.specification">{{bookingGroup.specification}}</h4>\n    <div item-right>\n      <h4>{{ bookingGroup.nextExecutionDate | date }}</h4>\n      <h2>{{ bookingGroup.amount | currency:\'EUR\':true }}</h2>\n    </div>\n  </ion-item>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/analytics/bookingGroup.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */]])
+    ], BookingGroupPage);
+    return BookingGroupPage;
+}());
+
+//# sourceMappingURL=bookingGroup.js.map
+
+/***/ }),
+
+/***/ 351:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BankAccessCreatePage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_bankAccessService__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_ionic2_auto_complete__ = __webpack_require__(167);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_bankAutoCompleteService__ = __webpack_require__(352);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+var BankAccessCreatePage = /** @class */ (function () {
+    function BankAccessCreatePage(navCtrl, navparams, bankAutoCompleteService, loadingCtrl, alertCtrl, bankAccessService) {
+        this.navCtrl = navCtrl;
+        this.navparams = navparams;
+        this.bankAutoCompleteService = bankAutoCompleteService;
+        this.loadingCtrl = loadingCtrl;
+        this.alertCtrl = alertCtrl;
+        this.bankAccessService = bankAccessService;
+        this.bankAccess = {
+            bankCode: '',
+            bankLogin: '',
+            bankLogin2: '',
+            pin: '',
+            userId: '',
+            storePin: true,
+            storeBookings: true,
+            categorizeBookings: true,
+            storeAnalytics: true
+        };
+        this.userId = navparams.data.userId;
+        this.bankAccess.userId = navparams.data.userId;
+        this.parent = navparams.data.parent;
+    }
+    BankAccessCreatePage.prototype.ngOnInit = function () {
+        var _this = this;
+        this.autocomplete.itemSelected.subscribe(function (bank) {
+            if (!bank.loginSettings) {
+                bank.loginSettings = {
+                    advice: "Bank login data",
+                    credentials: [{ label: "customer id", masked: false }, { label: "pin", masked: true }]
+                };
+            }
+            _this.selectedBank = bank;
+        });
+        this.autocomplete.searchbarElem.ionClear.subscribe(function () {
+            _this.selectedBank = undefined;
+        });
+    };
+    BankAccessCreatePage.prototype.createBankAccess = function () {
+        var _this = this;
+        var loading = this.loadingCtrl.create({
+            content: 'Please wait...'
+        });
+        loading.present();
+        this.bankAccess.bankCode = this.selectedBank.bankCode;
+        for (var i = 0; i < this.selectedBank.loginSettings.credentials.length; i++) {
+            if (i == 0) {
+                this.bankAccess.bankLogin = this.selectedBank.loginSettings.credentials[i].input;
+            }
+            else if (i == 1) {
+                if (!this.selectedBank.loginSettings.credentials[i].masked) {
+                    this.bankAccess.bankLogin2 = this.selectedBank.loginSettings.credentials[i].input;
+                }
+                else {
+                    this.bankAccess.pin = this.selectedBank.loginSettings.credentials[i].input;
+                }
+            }
+            else if (i == 2) {
+                this.bankAccess.pin = this.selectedBank.loginSettings.credentials[i].input;
+            }
+        }
+        this.bankAccessService.createBankAcccess(this.bankAccess).subscribe(function (response) {
+            loading.dismiss();
+            _this.parent.bankAccessesChanged();
+            _this.navCtrl.pop();
+        }, function (error) {
+            loading.dismiss();
+            if (error && error.messages) {
+                error.messages.forEach(function (message) {
+                    if (message.key == "BANK_ACCESS_ALREADY_EXIST") {
+                        _this.alertCtrl.create({
+                            message: 'Bank connection already exists',
+                            buttons: ['OK']
+                        }).present();
+                    }
+                    else if (message.key == "INVALID_BANK_ACCESS") {
+                        _this.alertCtrl.create({
+                            message: 'Bank not supported',
+                            buttons: ['OK']
+                        }).present();
+                    }
+                    else if (message.key == "INVALID_PIN") {
+                        _this.alertCtrl.create({
+                            message: 'Invalid pin',
+                            buttons: ['OK']
+                        }).present();
+                    }
+                });
+            }
+        });
+    };
+    __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_8" /* ViewChild */])('autocomplete'),
+        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_3_ionic2_auto_complete__["a" /* AutoCompleteComponent */])
+    ], BankAccessCreatePage.prototype, "autocomplete", void 0);
+    BankAccessCreatePage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-bankaccess-create',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/bankaccess/bankAccessCreate.html"*/'<ion-header>\n  <ion-navbar>\n    <ion-title>New Bank Connection</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="bankaccess-create-content" padding>\n  <ion-auto-complete [dataProvider]="bankAutoCompleteService" [options]="{placeholder : \'Bank name or bank code\'}" #autocomplete></ion-auto-complete>\n  <form (ngSubmit)="createBankAccess()" #createForm="ngForm" *ngIf="selectedBank">\n\n    <ion-item-group>\n      <ion-item-divider color="light">{{selectedBank.loginSettings.advice ? selectedBank.loginSettings.advice :\'Bank login data\'}}</ion-item-divider>\n      <ion-item *ngFor="let item of selectedBank.loginSettings.credentials">\n        <ion-label floating>{{item.label}}</ion-label>\n        <ion-input type="{{item.masked ? \'password\' : \'text\'}}" name="bankLogin" [(ngModel)]="item.input" required></ion-input>\n      </ion-item>\n    </ion-item-group>\n    <ion-item-group>\n      <ion-item-divider color="light">Bank settings</ion-item-divider>\n      <ion-item>\n        <ion-label>Save Pin</ion-label>\n        <ion-toggle [(ngModel)]="bankAccess.storePin" [ngModelOptions]="{standalone: true}"></ion-toggle>\n      </ion-item>\n\n      <ion-item>\n        <ion-label>Save Bookings</ion-label>\n        <ion-toggle [(ngModel)]="bankAccess.storeBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>\n      </ion-item>\n\n      <ion-item>\n        <ion-label>Categorize Bookings</ion-label>\n        <ion-toggle [(ngModel)]="bankAccess.categorizeBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>\n      </ion-item>\n\n      <ion-item>\n        <ion-label>Save anonymized Bookings</ion-label>\n        <ion-toggle [(ngModel)]="bankAccess.storeAnonymizedBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>\n      </ion-item>\n\n      <ion-item>\n        <ion-label>Save Analytics</ion-label>\n        <ion-toggle [(ngModel)]="bankAccess.storeAnalytics" [ngModelOptions]="{standalone: true}"></ion-toggle>\n      </ion-item>\n\n    </ion-item-group>\n    <button ion-button color="primary" block type="submit" [disabled]="!createForm.form.valid">Submit</button>\n\n  </form>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/bankaccess/bankAccessCreate.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_4__services_bankAutoCompleteService__["a" /* BankAutoCompleteService */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* LoadingController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */],
+            __WEBPACK_IMPORTED_MODULE_2__services_bankAccessService__["a" /* BankAccessService */]])
+    ], BankAccessCreatePage);
+    return BankAccessCreatePage;
+}());
+
+//# sourceMappingURL=bankAccessCreate.js.map
+
+/***/ }),
+
+/***/ 352:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BankAutoCompleteService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_app_config__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var BankAutoCompleteService = /** @class */ (function () {
+    function BankAutoCompleteService(http) {
+        this.http = http;
+        this.labelAttribute = "name";
+    }
+    BankAutoCompleteService.prototype.getResults = function (keyword) {
+        return this.http.get(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bank?query=" + keyword)
+            .map(function (res) {
+            return res.json()._embedded != null ? res.json()._embedded.bankEntityList : [];
+        })
+            .catch(this.handleError);
+    };
+    BankAutoCompleteService.prototype.handleError = function (error) {
+        console.error(error);
+        var errorJson = error.json();
+        if (errorJson) {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(errorJson || 'Server error');
+        }
+        else {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(error || 'Server error');
+        }
+    };
+    BankAutoCompleteService = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2__angular_http__["c" /* Http */]])
+    ], BankAutoCompleteService);
+    return BankAutoCompleteService;
+}());
+
+//# sourceMappingURL=bankAutoCompleteService.js.map
+
+/***/ }),
+
+/***/ 353:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BankAccessListPage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__bankaccount_bankaccountList__ = __webpack_require__(354);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__bankAccessCreate__ = __webpack_require__(351);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_bankAccessService__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__bankAccessUpdate__ = __webpack_require__(364);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+
+var BankAccessListPage = /** @class */ (function () {
+    function BankAccessListPage(navCtrl, bankAccessService) {
+        this.navCtrl = navCtrl;
+        this.bankAccessService = bankAccessService;
+    }
+    BankAccessListPage.prototype.ngOnInit = function () {
+        var _this = this;
+        this.bankAccessService.getBankAccesses().subscribe(function (response) {
+            _this.bankaccesses = response;
+        });
+    };
+    BankAccessListPage.prototype.itemSelected = function (bankAccess) {
+        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_2__bankaccount_bankaccountList__["a" /* BankAccountListPage */], {
+            bankAccess: bankAccess,
+        });
+    };
+    BankAccessListPage.prototype.createBankAccess = function () {
+        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_3__bankAccessCreate__["a" /* BankAccessCreatePage */], { parent: this });
+    };
+    BankAccessListPage.prototype.bankAccessesChanged = function () {
+        var _this = this;
+        this.bankAccessService.getBankAccesses().subscribe(function (response) {
+            _this.bankaccesses = response;
+        });
+    };
+    BankAccessListPage.prototype.editBankAccess = function ($event, bankAccess) {
+        $event.stopPropagation();
+        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_5__bankAccessUpdate__["a" /* BankAccessUpdatePage */], { bankAccess: bankAccess, parent: this });
+    };
+    BankAccessListPage.prototype.deleteBankAccess = function ($event, bankAccess) {
+        var _this = this;
+        $event.stopPropagation();
+        this.bankAccessService.deleteBankAccess(bankAccess.id).subscribe(function (response) {
+            _this.bankAccessesChanged();
+        });
+    };
+    BankAccessListPage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-bankaccessList',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/bankaccess/bankAccessList.html"*/'<ion-header>\n  <ion-navbar>\n    <ion-title>Bank Connections</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="bankaccessList-content" padding>\n  <ion-fab top right edge>\n    <button ion-fab mini (click)="createBankAccess()"><ion-icon name="add"></ion-icon></button>\n  </ion-fab>\n  <ion-list>\n    <ion-item *ngFor="let bankaccess of bankaccesses" (click)="itemSelected(bankaccess)">\n      <h3>{{ bankaccess.bankCode }}</h3>\n      <h2>{{ bankaccess.bankName }}</h2>\n      <button ion-button outline item-end (click)="editBankAccess($event, bankaccess)">\n        <ion-icon name="settings"></ion-icon>\n        Edit\n      </button>\n      <button ion-button outline item-end (click)="deleteBankAccess($event, bankaccess)">\n        <ion-icon name="trash"></ion-icon>\n        Delete\n      </button>\n    </ion-item>\n  </ion-list>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/bankaccess/bankAccessList.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_4__services_bankAccessService__["a" /* BankAccessService */]])
+    ], BankAccessListPage);
+    return BankAccessListPage;
+}());
+
+//# sourceMappingURL=bankAccessList.js.map
+
+/***/ }),
+
+/***/ 354:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BankAccountListPage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_bankAccountService__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__tabs_tabs__ = __webpack_require__(355);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var BankAccountListPage = /** @class */ (function () {
+    function BankAccountListPage(navCtrl, navparams, bankAccountService) {
+        this.navCtrl = navCtrl;
+        this.navparams = navparams;
+        this.bankAccountService = bankAccountService;
+        this.bankAccess = navparams.data.bankAccess;
+    }
+    BankAccountListPage.prototype.ngOnInit = function () {
+        var _this = this;
+        this.loadBankAccounts();
+        this.bankAccountService.bookingsChangedObservable.subscribe(function (changed) {
+            _this.loadBankAccounts();
+        });
+    };
+    BankAccountListPage.prototype.loadBankAccounts = function () {
+        var _this = this;
+        this.bankAccountService.getBankAccounts(this.bankAccess.id).subscribe(function (response) {
+            _this.bankAccounts = response;
+        });
+    };
+    BankAccountListPage.prototype.itemSelected = function (bankAccount) {
+        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_3__tabs_tabs__["a" /* TabsPage */], {
+            bankAccess: this.bankAccess,
+            bankAccount: bankAccount,
+        });
+    };
+    BankAccountListPage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-bankaccountList',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/bankaccount/bankaccountList.html"*/'<ion-header>\n  <ion-navbar>\n    <ion-title>Bank Accounts</ion-title>\n  </ion-navbar>\n\n</ion-header>\n\n<ion-content class="bankaccountList-content" padding>\n  <ion-list>\n    <button ion-item *ngFor="let bankAccount of bankAccounts" (click)="itemSelected(bankAccount)">\n      <h3>{{ bankAccount.accountNumber }}</h3>\n      <h2>{{ bankAccount.type }}</h2>\n      <h2 *ngIf="bankAccount.bankAccountBalance" item-right>{{ bankAccount.bankAccountBalance.readyHbciBalance | currency:\'EUR\':true }}</h2>\n    </button>\n  </ion-list>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/bankaccount/bankaccountList.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_2__services_bankAccountService__["a" /* BankAccountService */]])
+    ], BankAccountListPage);
+    return BankAccountListPage;
+}());
+
+//# sourceMappingURL=bankaccountList.js.map
+
+/***/ }),
+
+/***/ 355:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TabsPage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__booking_bookingList__ = __webpack_require__(356);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__contracts_contracts_component__ = __webpack_require__(362);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__analytics_analytics__ = __webpack_require__(349);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_ionic_angular__ = __webpack_require__(20);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+var TabsPage = /** @class */ (function () {
+    function TabsPage(navparams) {
+        this.navparams = navparams;
+        this.tab1Root = __WEBPACK_IMPORTED_MODULE_1__booking_bookingList__["a" /* BookingListPage */];
+        this.tab2Root = __WEBPACK_IMPORTED_MODULE_3__analytics_analytics__["a" /* AnalyticsPage */];
+        this.tab3Root = __WEBPACK_IMPORTED_MODULE_2__contracts_contracts_component__["a" /* ContractsComponent */];
+        this.navParams = navparams.data;
+    }
+    TabsPage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/tabs/tabs.html"*/'<ion-tabs>\n  <ion-tab [root]="tab1Root" [rootParams]="navParams" tabTitle="Bookings" tabIcon="cash"></ion-tab>\n  <ion-tab [root]="tab2Root" [rootParams]="navParams" tabTitle="Analytics" tabIcon="analytics"></ion-tab>\n  <ion-tab [root]="tab3Root" [rootParams]="navParams" tabTitle="Contracts" tabIcon="contract"></ion-tab>\n</ion-tabs>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/tabs/tabs.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_4_ionic_angular__["g" /* NavParams */]])
+    ], TabsPage);
+    return TabsPage;
+}());
+
+//# sourceMappingURL=tabs.js.map
+
+/***/ }),
+
+/***/ 356:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BookingListPage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_bankAccountService__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_bookingService__ = __webpack_require__(357);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_LogoService__ = __webpack_require__(152);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__payment_paymentCreate__ = __webpack_require__(358);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__booking_detail_bookingDetail__ = __webpack_require__(360);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+
+
+var BookingListPage = /** @class */ (function () {
+    function BookingListPage(navCtrl, navparams, alertCtrl, toastCtrl, loadingCtrl, bankAccountService, bookingService, logoService) {
+        this.navCtrl = navCtrl;
+        this.navparams = navparams;
+        this.alertCtrl = alertCtrl;
+        this.toastCtrl = toastCtrl;
+        this.loadingCtrl = loadingCtrl;
+        this.bankAccountService = bankAccountService;
+        this.bookingService = bookingService;
+        this.logoService = logoService;
+        this.bankAccess = navparams.data.bankAccess;
+        this.bankAccount = navparams.data.bankAccount;
+        this.getLogo = logoService.getLogo;
+    }
+    BookingListPage.prototype.ngOnInit = function () {
+        var _this = this;
+        this.bookingService.getBookings(this.bankAccess.id, this.bankAccount.id).subscribe(function (response) {
+            _this.bookings = response;
+        }, function (error) {
+            if (error == "SYNC_IN_PROGRESS") {
+                _this.toastCtrl.create({
+                    message: 'Account sync in progress',
+                    showCloseButton: true,
+                    position: 'top'
+                }).present();
+            }
+        });
+    };
+    BookingListPage.prototype.ionViewDidLoad = function () {
+        var _this = this;
+        this.navBar.backButtonClick = function (e) {
+            _this.navCtrl.parent.viewCtrl.dismiss();
+        };
+    };
+    BookingListPage.prototype.syncBookingsPromptPin = function () {
+        var _this = this;
+        var alert = this.alertCtrl.create({
+            title: 'Pin',
+            inputs: [
+                {
+                    name: 'pin',
+                    placeholder: 'Bank Account Pin',
+                    type: 'password'
+                }
+            ],
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel'
+                },
+                {
+                    text: 'Submit',
+                    handler: function (data) {
+                        if (data.pin.length > 0) {
+                            _this.syncBookings(data.pin);
+                        }
+                    }
+                }
+            ]
+        });
+        alert.present();
+    };
+    BookingListPage.prototype.syncBookings = function (pin) {
+        var _this = this;
+        if (!pin && !this.bankAccess.storePin) {
+            return this.syncBookingsPromptPin();
+        }
+        var loading = this.loadingCtrl.create({
+            content: 'Please wait...'
+        });
+        loading.present();
+        this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccount.id, pin).subscribe(function (response) {
+            _this.bookings = response;
+            loading.dismiss();
+        }, function (error) {
+            if (error && error.messages) {
+                error.messages.forEach(function (message) {
+                    if (message.key == "SYNC_IN_PROGRESS") {
+                        _this.toastCtrl.create({
+                            message: 'Account sync in progress',
+                            showCloseButton: true,
+                            position: 'top'
+                        }).present();
+                    }
+                    else if (message.key == "INVALID_PIN") {
+                        _this.alertCtrl.create({
+                            message: 'Invalid pin',
+                            buttons: ['OK']
+                        }).present();
+                    }
+                });
+            }
+        });
+    };
+    BookingListPage.prototype.itemSelected = function (booking) {
+        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_6__booking_detail_bookingDetail__["a" /* BookingDetailPage */], {
+            booking: booking
+        });
+    };
+    BookingListPage.prototype.createPayment = function () {
+        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_5__payment_paymentCreate__["a" /* PaymentCreatePage */], {
+            bankAccount: this.bankAccount,
+            bankAccess: this.bankAccess
+        });
+    };
+    __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_8" /* ViewChild */])(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* Navbar */]),
+        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* Navbar */])
+    ], BookingListPage.prototype, "navBar", void 0);
+    BookingListPage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-bookingList',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/booking/bookingList.html"*/'<ion-header>\n  <ion-navbar class="force-back-button">\n    <ion-title>Bookings</ion-title>\n    <ion-buttons end>\n      <button ion-button (click)="syncBookings()">\n        Reload\n      </button>\n    </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="bookingList-content" padding>\n  <ion-fab bottom right>\n    <button ion-fab mini (click)="createPayment()">\n      <ion-icon name="paper-plane"></ion-icon>\n    </button>\n  </ion-fab>\n  <ion-list>\n    <ion-item *ngFor="let booking of bookings" (click)="itemSelected(booking)" [ngStyle]="{\'background-color\':!booking?.bookingCategory?.mainCategory ? \'chocolate\' : \'\' }">\n      <ion-thumbnail item-left>\n        <img [src]="getLogo(booking?.bookingCategory?.contract?.logo)" item-left/>\n      </ion-thumbnail>\n      <h3>{{ booking.otherAccount !=null ? booking.otherAccount.owner : ""}}</h3>\n      <h4 *ngIf="booking.bookingCategory">{{ booking.bookingCategory.mainCategory}}</h4>\n      <h4 *ngIf="booking.bookingCategory">{{ booking.bookingCategory.subCategory}}</h4>\n      <h4 *ngIf="booking.bookingCategory">{{ booking.bookingCategory.specification}}</h4>\n      <div item-right>\n        <h4>{{ booking.bookingDate | date }}</h4>\n        <h2>{{ booking.amount | currency:\'EUR\':true }}</h2>\n      </div>\n    </ion-item>\n  </ion-list>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/booking/bookingList.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* LoadingController */],
+            __WEBPACK_IMPORTED_MODULE_2__services_bankAccountService__["a" /* BankAccountService */],
+            __WEBPACK_IMPORTED_MODULE_3__services_bookingService__["a" /* BookingService */],
+            __WEBPACK_IMPORTED_MODULE_4__services_LogoService__["a" /* LogoService */]])
+    ], BookingListPage);
+    return BookingListPage;
+}());
+
+//# sourceMappingURL=bookingList.js.map
+
+/***/ }),
+
+/***/ 357:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BookingService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_app_config__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var BookingService = /** @class */ (function () {
+    function BookingService(http) {
+        this.http = http;
+    }
+    BookingService.prototype.getBookings = function (accessId, accountId) {
+        return this.http.get(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/bookings")
+            .map(function (res) { return res.json()._embedded != null ? res.json()._embedded.bookingEntityList : []; })
+            .catch(this.handleError);
+    };
+    BookingService.prototype.getBooking = function (accessId, accountId, bookingId) {
+        return this.http.get(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/bookings/" + bookingId)
+            .map(function (res) { return res.json()._embedded != null ? res.json()._embedded.bookingEntityList : []; })
+            .catch(this.handleError);
+    };
+    BookingService.prototype.handleError = function (error) {
+        console.error(error);
+        var errorJson = error.json();
+        if (errorJson) {
+            if (errorJson.message == "SYNC_IN_PROGRESS") {
+                return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(errorJson.message);
+            }
+            else {
+                return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(errorJson || 'Server error');
+            }
+        }
+        else {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(error || 'Server error');
+        }
+    };
+    BookingService = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2__angular_http__["c" /* Http */]])
+    ], BookingService);
+    return BookingService;
+}());
+
+//# sourceMappingURL=bookingService.js.map
+
+/***/ }),
+
+/***/ 358:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return PaymentCreatePage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_PaymentService__ = __webpack_require__(359);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var PaymentCreatePage = /** @class */ (function () {
+    function PaymentCreatePage(navCtrl, navparams, loadingCtrl, toastCtrl, alertCtrl, paymentService) {
+        this.navCtrl = navCtrl;
+        this.navparams = navparams;
+        this.loadingCtrl = loadingCtrl;
+        this.toastCtrl = toastCtrl;
+        this.alertCtrl = alertCtrl;
+        this.paymentService = paymentService;
+        this.payment = { receiver: "", purpose: "", amount: undefined };
+        this.bankAccount = navparams.data.bankAccount;
+        this.bankAccess = navparams.data.bankAccess;
+    }
+    PaymentCreatePage.prototype.ngOnInit = function () {
+    };
+    PaymentCreatePage.prototype.createPayment = function (pin) {
+        var _this = this;
+        if (!pin && !this.bankAccess.storePin) {
+            return this.createPaymentPromptPin();
+        }
+        var loading = this.loadingCtrl.create({
+            content: 'Please wait...'
+        });
+        loading.present();
+        this.paymentService.createPayment(this.bankAccess.id, this.bankAccount.id, { payment: this.payment, pin: pin }).subscribe(function (paymentLocation) {
+            loading.dismiss();
+            _this.askForTan(paymentLocation);
+        }, function (error) {
+            if (error && error.messages) {
+                error.messages.forEach(function (message) {
+                    if (message.key == "ERROR_PAYMENT") {
+                        _this.alertCtrl.create({
+                            message: 'Payment Error',
+                            buttons: ['OK']
+                        }).present();
+                    }
+                    else if (message.key == "INVALID_PIN") {
+                        _this.alertCtrl.create({
+                            message: 'Invalid pin',
+                            buttons: ['OK']
+                        }).present();
+                    }
+                });
+            }
+        });
+    };
+    PaymentCreatePage.prototype.createPaymentPromptPin = function () {
+        var _this = this;
+        var alert = this.alertCtrl.create({
+            title: 'Pin',
+            inputs: [
+                {
+                    name: 'pin',
+                    placeholder: 'Bank Account Pin',
+                    type: 'password'
+                }
+            ],
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel'
+                },
+                {
+                    text: 'Submit',
+                    handler: function (data) {
+                        if (data.pin.length > 0) {
+                            _this.createPayment(data.pin);
+                        }
+                    }
+                }
+            ]
+        });
+        alert.present();
+    };
+    PaymentCreatePage.prototype.askForTan = function (paymentLocation) {
+        var _this = this;
+        this.paymentService.getPayment(paymentLocation).subscribe(function (payment) {
+            var alert = _this.alertCtrl.create({
+                title: payment.paymentChallenge.title,
+                inputs: [
+                    {
+                        name: 'tan',
+                        placeholder: 'Tan',
+                        type: 'text'
+                    }
+                ],
+                buttons: [
+                    {
+                        text: 'Cancel',
+                        role: 'cancel'
+                    },
+                    {
+                        text: 'Submit',
+                        handler: function (data) {
+                            if (data.tan.length > 0) {
+                                _this.submitPayment(payment, data.tan);
+                            }
+                        }
+                    }
+                ]
+            });
+            alert.present();
+        });
+    };
+    PaymentCreatePage.prototype.submitPayment = function (payment, tan) {
+        var _this = this;
+        this.paymentService.submitPayment(this.bankAccess.id, this.bankAccount.id, payment.id, { tan: tan }).subscribe(function (response) {
+            _this.toastCtrl.create({
+                message: 'Payment successful',
+                showCloseButton: true,
+                position: 'top'
+            }).present();
+        });
+    };
+    PaymentCreatePage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-payment-create',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/payment/paymentCreate.html"*/'<ion-header>\n  <ion-navbar>\n    <ion-title>New SEPA Transfer</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="payment-create-content" padding>\n\n  <form (ngSubmit)="createPayment()" #createForm="ngForm">\n    <ion-item-group>\n        <ion-item-divider color="light">Debit Account {{bankAccount.bankName}} {{bankAccount.accountNumber}}</ion-item-divider>\n      <ion-item>\n        <ion-label floating>Receiver Name</ion-label>\n        <ion-input type="text" name="receiver" [(ngModel)]="payment.receiver" required></ion-input>\n      </ion-item>\n      <ion-item>\n        <ion-label floating>Receiver IBAN</ion-label>\n        <ion-input type="text" name="receiverIban" [(ngModel)]="payment.receiverIban" required></ion-input>\n      </ion-item>\n      <ion-item>\n        <ion-label floating>Amount</ion-label>\n        <ion-input type="number" name="amount" [(ngModel)]="payment.amount" required></ion-input>\n      </ion-item>\n      <ion-item>\n        <ion-label floating>Purpose</ion-label>\n        <ion-input type="text" name="purpose" [(ngModel)]="payment.purpose"></ion-input>\n      </ion-item>\n    </ion-item-group>\n    <button ion-button color="primary" block type="submit" [disabled]="!createForm.form.valid">Submit</button>\n  </form>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/payment/paymentCreate.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* LoadingController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */],
+            __WEBPACK_IMPORTED_MODULE_2__services_PaymentService__["a" /* PaymentService */]])
+    ], PaymentCreatePage);
+    return PaymentCreatePage;
+}());
+
+//# sourceMappingURL=paymentCreate.js.map
+
+/***/ }),
+
+/***/ 359:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return PaymentService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_app_config__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var PaymentService = /** @class */ (function () {
+    function PaymentService(http) {
+        this.http = http;
+    }
+    PaymentService.prototype.getPayment = function (location) {
+        return this.http.get(location)
+            .map(function (res) { return res.json(); })
+            .catch(this.handleError);
+    };
+    PaymentService.prototype.createPayment = function (accessId, accountId, paymentCreate) {
+        return this.http.post(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/payments", paymentCreate)
+            .map(function (res) { return res.headers.get("Location"); })
+            .catch(this.handleError);
+    };
+    PaymentService.prototype.submitPayment = function (accessId, accountId, paymentId, paymentSubmit) {
+        return this.http.post(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/payments/" + paymentId + "/submit", paymentSubmit)
+            .catch(this.handleError);
+    };
+    PaymentService.prototype.handleError = function (error) {
+        console.error(error);
+        var errorJson = error.json();
+        if (errorJson) {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(errorJson || 'Server error');
+        }
+        else {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(error || 'Server error');
+        }
+    };
+    PaymentService = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2__angular_http__["c" /* Http */]])
+    ], PaymentService);
+    return PaymentService;
+}());
+
+//# sourceMappingURL=PaymentService.js.map
+
+/***/ }),
+
+/***/ 360:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BookingDetailPage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__booking_edit_bookingEdit__ = __webpack_require__(361);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var BookingDetailPage = /** @class */ (function () {
+    function BookingDetailPage(navCtrl, navparams) {
+        this.navCtrl = navCtrl;
+        this.navparams = navparams;
+        this.booking = navparams.data.booking;
+    }
+    BookingDetailPage.prototype.editCategory = function () {
+        this.navCtrl.push(__WEBPACK_IMPORTED_MODULE_2__booking_edit_bookingEdit__["a" /* BookingEditPage */], {
+            booking: this.booking
+        });
+    };
+    BookingDetailPage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-bookingDetail',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/booking-detail/bookingDetail.html"*/'<ion-header>\n  <ion-navbar class="force-back-button">\n    <ion-title>{{ booking.bookingDate | date }} {{ booking.amount | currency:\'EUR\':true }}</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="bookingDetail-content" padding>\n  <ion-fab bottom right>\n    <button ion-fab mini (click)="editCategory()">\n      <ion-icon name="create"></ion-icon>\n    </button>\n  </ion-fab>\n  <ion-grid>\n    <ion-item>\n      <ion-row>\n        <ion-col col-12 col-lg-6>\n          <ion-row>\n            <ion-col col-4>Booking date:</ion-col>\n            <ion-col col-8>{{ booking.bookingDate | date }}</ion-col>\n            <ion-col col-4>Amount:</ion-col>\n            <ion-col col-8>{{ booking.amount | currency:\'EUR\':true }}</ion-col>\n            <ion-col col-4 *ngIf="booking.otherAccount">Receiver:</ion-col>\n            <ion-col col-8 *ngIf="booking.otherAccount">{{ booking.otherAccount.owner }}</ion-col>\n            <ion-col col-4>Standing order:</ion-col>\n            <ion-col col-8>{{ booking.standingOrder }}</ion-col>\n          </ion-row>\n        </ion-col>\n        <ion-col col-12 col-lg-6>\n          <ion-row>\n            <ion-col col-4 *ngIf="booking.creditorId">Creditor ID:</ion-col>\n            <ion-col col-8 *ngIf="booking.creditorId">{{ booking.creditorId }}</ion-col>\n            <ion-col col-4 *ngIf="booking.mandateReference">Mandate reference:</ion-col>\n            <ion-col col-8 *ngIf="booking.mandateReference">{{ booking.mandateReference }}</ion-col>\n            <ion-col col-4>Bank API:</ion-col>\n            <ion-col col-8>{{ booking.bankApi }}</ion-col>\n          </ion-row>\n        </ion-col>\n        <ion-col col-12>\n          <ion-row>\n            <ion-col col-2>Purpose:</ion-col>\n            <ion-col col-10><p style="white-space: normal;">{{ booking.usage }}</p></ion-col>\n          </ion-row>\n        </ion-col>\n      </ion-row>\n    </ion-item>\n    <ion-item>\n      <ion-row>\n        <ion-col col-12 col-lg-6>\n          <ion-row>\n            <ion-col col-4>Rules:</ion-col>\n            <ion-col col-8>{{ booking.bookingCategory?.rules }}</ion-col>\n            <ion-col col-4>Main category:</ion-col>\n            <ion-col col-8>{{ booking.bookingCategory?.mainCategory }}</ion-col>\n            <ion-col col-4>Subcategory:</ion-col>\n            <ion-col col-8>{{ booking.bookingCategory?.subCategory }}</ion-col>\n            <ion-col col-4>Specification:</ion-col>\n            <ion-col col-8>{{ booking.bookingCategory?.specification }}</ion-col>\n          </ion-row>\n        </ion-col>\n      </ion-row>\n    </ion-item>\n  </ion-grid>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/booking-detail/bookingDetail.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */]])
+    ], BookingDetailPage);
+    return BookingDetailPage;
+}());
+
+//# sourceMappingURL=bookingDetail.js.map
+
+/***/ }),
+
+/***/ 361:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BookingEditPage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_analyticsService__ = __webpack_require__(151);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var BookingEditPage = /** @class */ (function () {
+    function BookingEditPage(navCtrl, navparams, analyticsService) {
+        this.navCtrl = navCtrl;
+        this.analyticsService = analyticsService;
+        this.booking = navparams.data.booking;
+    }
+    BookingEditPage.prototype.ngOnInit = function () {
+        var _this = this;
+        this.analyticsService.getAvailableCategories().subscribe(function (response) {
+            _this.categories = response;
+            if (_this.booking.bookingCategory && _this.booking.bookingCategory.mainCategory) {
+                _this.mainCategoryChanged(_this.booking.bookingCategory.mainCategory);
+                if (_this.booking.bookingCategory.subCategory) {
+                    _this.subCategoryChanged(_this.booking.bookingCategory.subCategory);
+                }
+                if (_this.booking.bookingCategory.specification) {
+                    _this.specificationChanged(_this.booking.bookingCategory.specification);
+                }
+            }
+        });
+    };
+    BookingEditPage.prototype.mainCategoryChanged = function (catId) {
+        this.mainCategoryId = catId;
+        this.mainCategory = this.categories.filter(function (element) { return element.id == catId; })[0];
+        this.subCategories = this.mainCategory.subcategories;
+    };
+    BookingEditPage.prototype.subCategoryChanged = function (catId) {
+        this.subCategoryId = catId;
+        this.subCategory = this.subCategories.filter(function (element) { return element.id == catId; })[0];
+        this.specifications = this.subCategory.specifications;
+    };
+    BookingEditPage.prototype.specificationChanged = function (catId) {
+        this.specificationId = catId;
+        this.specification = this.specifications.filter(function (element) { return element.id == catId; })[0];
+    };
+    BookingEditPage.prototype.submit = function () {
+        var _this = this;
+        var rule = {
+            ruleId: this.booking.bookingCategory ? this.booking.bookingCategory.rules.reverse()[0] : null,
+            creditorId: this.booking.creditorId,
+            receiver: this.receiver,
+            expression: this.expression,
+            mainCategory: this.mainCategory.id,
+            subCategory: this.subCategory ? this.subCategory.id : null,
+            specification: this.specification ? this.specification.id : null,
+            incoming: this.booking.amount > 0,
+            taxRelevant: this.taxRelevant
+        };
+        this.analyticsService.createRule(rule).subscribe(function (response) {
+            _this.navCtrl.pop();
+        });
+    };
+    BookingEditPage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-bookingEdit',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/booking-edit/bookingEdit.html"*/'<ion-header>\n  <ion-navbar class="force-back-button">\n    <ion-title>Categorize Booking</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="bookingEdit-content" padding>\n  <ion-list>\n    <ion-item>\n      <ion-label>Receiver</ion-label>\n      <ion-input type="text" name="receiver" [(ngModel)]="receiver"></ion-input>\n    </ion-item>\n    <ion-item>\n      <ion-label>Expression</ion-label>\n      <ion-input type="text" name="expression" [(ngModel)]="expression"></ion-input>\n    </ion-item>\n    <ion-item>\n      <ion-label>Main category</ion-label>\n      <ion-select [(ngModel)]="mainCategoryId" (ionChange)="mainCategoryChanged($event)">\n        <ion-option *ngFor="let category of categories" value="{{category.id}}">{{category.name}}</ion-option>\n      </ion-select>\n    </ion-item>\n    <ion-item>\n      <ion-label>Subcategory</ion-label>\n      <ion-select [(ngModel)]="subCategoryId" (ionChange)="subCategoryChanged($event)">\n        <ion-option *ngFor="let category of mainCategory?.subcategories" value="{{category.id}}">{{category.name}}</ion-option>\n      </ion-select>\n    </ion-item>\n    <ion-item>\n      <ion-label>Specification</ion-label>\n      <ion-select [(ngModel)]="specificationId" (ionChange)="specificationChanged($event)">\n        <ion-option *ngFor="let category of subCategory?.specifications" value="{{category.id}}">{{category.name}}</ion-option>\n      </ion-select>\n    </ion-item>\n    <ion-item>\n      <ion-label>Tax relevant</ion-label>\n      <ion-toggle [(ngModel)]="taxRelevant"></ion-toggle>\n    </ion-item>\n  </ion-list>\n  <button block icon-start ion-button color="primary" type="submit" (click)="submit()" [disabled]="!mainCategory || (!expression && !booking.creditorId)">\n    Speichern\n  </button>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/booking-edit/bookingEdit.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_2__services_analyticsService__["a" /* AnalyticsService */]])
+    ], BookingEditPage);
+    return BookingEditPage;
+}());
+
+//# sourceMappingURL=bookingEdit.js.map
+
+/***/ }),
+
+/***/ 362:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ContractsComponent; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__contract_service__ = __webpack_require__(363);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__services_LogoService__ = __webpack_require__(152);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__services_bankAccountService__ = __webpack_require__(62);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+var ContractsComponent = /** @class */ (function () {
+    function ContractsComponent(navCtrl, navParams, alertCtrl, toastCtrl, loadingCtrl, contractService, bankAccountService, logoService) {
+        this.navCtrl = navCtrl;
+        this.navParams = navParams;
+        this.alertCtrl = alertCtrl;
+        this.toastCtrl = toastCtrl;
+        this.loadingCtrl = loadingCtrl;
+        this.contractService = contractService;
+        this.bankAccountService = bankAccountService;
+        this.logoService = logoService;
+        this.bankAccess = navParams.data.bankAccess;
+        this.bankAccountId = navParams.data.bankAccount.id;
+        this.getLogo = logoService.getLogo;
+    }
+    ContractsComponent.prototype.ngOnInit = function () {
+        var _this = this;
+        this.bankAccountService.bookingsChangedObservable.subscribe(function (changed) {
+            _this.loadContracts();
+        });
+        this.loadContracts();
+    };
+    ContractsComponent.prototype.ionViewDidLoad = function () {
+        var _this = this;
+        this.navBar.backButtonClick = function (e) {
+            _this.navCtrl.parent.viewCtrl.dismiss();
+        };
+    };
+    ContractsComponent.prototype.loadContracts = function () {
+        var _this = this;
+        this.contracts = {
+            income: [],
+            expenses: []
+        };
+        this.contractService.getContracts(this.bankAccess.id, this.bankAccountId)
+            .subscribe(function (contracts) {
+            contracts.reduce(function (acc, contract) {
+                contract.amount > 0 ? acc.income.push(contract) : acc.expenses.push(contract);
+                return acc;
+            }, _this.contracts);
+        });
+    };
+    ContractsComponent.prototype.syncBookingsPromptPin = function () {
+        var _this = this;
+        var alert = this.alertCtrl.create({
+            title: 'Pin',
+            inputs: [
+                {
+                    name: 'pin',
+                    placeholder: 'Bank Account Pin',
+                    type: 'password'
+                }
+            ],
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel'
+                },
+                {
+                    text: 'Submit',
+                    handler: function (data) {
+                        if (data.pin.length > 0) {
+                            _this.syncBookings(data.pin);
+                        }
+                    }
+                }
+            ]
+        });
+        alert.present();
+    };
+    ContractsComponent.prototype.syncBookings = function (pin) {
+        var _this = this;
+        if (!pin && !this.bankAccess.storePin) {
+            return this.syncBookingsPromptPin();
+        }
+        var loading = this.loadingCtrl.create({
+            content: 'Please wait...'
+        });
+        loading.present();
+        this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccountId, pin).subscribe(function (response) {
+            loading.dismiss();
+        }, function (error) {
+            if (error && error.messages) {
+                error.messages.forEach(function (message) {
+                    if (message.key == "SYNC_IN_PROGRESS") {
+                        _this.toastCtrl.create({
+                            message: 'Account sync in progress',
+                            showCloseButton: true,
+                            position: 'top'
+                        }).present();
+                    }
+                    else if (message.key == "INVALID_PIN") {
+                        _this.alertCtrl.create({
+                            message: 'Invalid pin',
+                            buttons: ['OK']
+                        }).present();
+                    }
+                });
+            }
+        });
+    };
+    __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_8" /* ViewChild */])(__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* Navbar */]),
+        __metadata("design:type", __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["h" /* Navbar */])
+    ], ContractsComponent.prototype, "navBar", void 0);
+    ContractsComponent = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'contracts',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/contracts/contracts.component.html"*/'<ion-header>\n  <ion-navbar class="force-back-button">\n    <ion-title>Contracts</ion-title>\n    <ion-buttons end>\n      <button ion-button (click)="syncBookings()">\n        Reload\n      </button>\n    </ion-buttons>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="contracts" padding>\n  <ion-list>\n    <h3 class="type">Income</h3>\n    <ion-item *ngFor="let contract of contracts.income">\n      <ion-thumbnail item-left>\n        <img *ngIf="contract.logo" [src]="getLogo(contract.logo)" item-left/>\n      </ion-thumbnail>\n      <h4 *ngIf="contract.provider">{{contract.provider}}</h4>\n      <h4 *ngIf="contract.mainCategory">{{contract.mainCategory}}</h4>\n      <h4 *ngIf="contract.subCategory">{{contract.subCategory}}</h4>\n      <h4 *ngIf="contract.specification">{{contract.specification}}</h4>\n      <div item-right>\n        <h2>{{contract.amount | currency:\'EUR\':true}} {{contract.cycle | cycle}}</h2>\n      </div>\n    </ion-item>\n\n    <h3 class="type">Expenses</h3>\n    <ion-item *ngFor="let contract of contracts.expenses">\n        <ion-thumbnail item-left>\n          <img *ngIf="contract.logo" [src]="getLogo(contract.logo)" item-left/>\n        </ion-thumbnail>\n        <h4 *ngIf="contract.provider">{{contract.provider}}</h4>\n        <h4 *ngIf="contract.mainCategory">{{contract.mainCategory}}</h4>\n        <h4 *ngIf="contract.subCategory">{{contract.subCategory}}</h4>\n        <h4 *ngIf="contract.specification">{{contract.specification}}</h4>\n        <div item-right>\n          <h2>{{contract.amount | currency:\'EUR\':true}} {{contract.cycle | cycle}}</h2>\n        </div>\n      </ion-item>\n  </ion-list>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/contracts/contracts.component.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* AlertController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["j" /* ToastController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* LoadingController */],
+            __WEBPACK_IMPORTED_MODULE_2__contract_service__["a" /* ContractService */],
+            __WEBPACK_IMPORTED_MODULE_4__services_bankAccountService__["a" /* BankAccountService */],
+            __WEBPACK_IMPORTED_MODULE_3__services_LogoService__["a" /* LogoService */]])
+    ], ContractsComponent);
+    return ContractsComponent;
+}());
+
+//# sourceMappingURL=contracts.component.js.map
+
+/***/ }),
+
+/***/ 363:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ContractService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_app_config__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var ContractService = /** @class */ (function () {
+    function ContractService(http) {
+        this.http = http;
+    }
+    ContractService.prototype.getContracts = function (accessId, accountId) {
+        return this.http.get(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/contracts")
+            .map(function (res) { return res.json()._embedded.contractEntityList; })
+            .catch(this.handleError);
+    };
+    ContractService.prototype.handleError = function (error) {
+        var errorJson = error.json();
+        if (errorJson) {
+            if (errorJson.message == "SYNC_IN_PROGRESS") {
+                return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(errorJson.message);
+            }
+            else {
+                return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(errorJson || 'Server error');
+            }
+        }
+        else {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(error || 'Server error');
+        }
+    };
+    ContractService = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2__angular_http__["c" /* Http */]])
+    ], ContractService);
+    return ContractService;
+}());
+
+//# sourceMappingURL=contract.service.js.map
+
+/***/ }),
+
+/***/ 364:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BankAccessUpdatePage; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__services_bankAccessService__ = __webpack_require__(86);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var BankAccessUpdatePage = /** @class */ (function () {
+    function BankAccessUpdatePage(navCtrl, navparams, loadingCtrl, bankAccessService) {
+        this.navCtrl = navCtrl;
+        this.navparams = navparams;
+        this.loadingCtrl = loadingCtrl;
+        this.bankAccessService = bankAccessService;
+        this.bankAccess = navparams.data.bankAccess;
+        this.parent = navparams.data.parent;
+    }
+    BankAccessUpdatePage.prototype.updateBankAccess = function () {
+        var _this = this;
+        var loading = this.loadingCtrl.create({
+            content: 'Please wait...'
+        });
+        loading.present();
+        this.bankAccessService.updateBankAcccess(this.bankAccess).subscribe(function (response) {
+            loading.dismiss();
+            _this.parent.bankAccessesChanged();
+            _this.navCtrl.pop();
+        });
+    };
+    BankAccessUpdatePage = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
+            selector: 'page-bankaccess-update',template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/pages/bankaccess/bankAccessUpdate.html"*/'<ion-header>\n  <ion-navbar>\n    <ion-title>Edit bank connection {{bankAccess.bankName}}</ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content class="bankaccess-create-content" padding>\n  <form (ngSubmit)="updateBankAccess()" #createForm="ngForm">\n    <ion-item-group>\n      <ion-item-divider color="light">Bank login data</ion-item-divider>\n      <ion-item *ngIf="bankAccess.storePin">>\n        <ion-label floating>Pin</ion-label>\n        <ion-input type="password" name="pin" [(ngModel)]="bankAccess.pin"></ion-input>\n      </ion-item>\n    </ion-item-group>\n    <ion-item-group>\n      <ion-item-divider color="light">Bank settings</ion-item-divider>\n      <ion-item>\n        <ion-label>Save Pin</ion-label>\n        <ion-toggle [(ngModel)]="bankAccess.storePin" [ngModelOptions]="{standalone: true}"></ion-toggle>\n      </ion-item>\n\n      <ion-item>\n        <ion-label>Save Bookings</ion-label>\n        <ion-toggle [(ngModel)]="bankAccess.storeBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>\n      </ion-item>\n\n      <ion-item>\n        <ion-label>Categorize Bookings</ion-label>\n        <ion-toggle [(ngModel)]="bankAccess.categorizeBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>\n      </ion-item>\n\n      <ion-item>\n        <ion-label>Save anonymized Bookings</ion-label>\n        <ion-toggle [(ngModel)]="bankAccess.storeAnonymizedBookings" [ngModelOptions]="{standalone: true}"></ion-toggle>\n      </ion-item>\n\n      <ion-item>\n        <ion-label>Save Analytics</ion-label>\n        <ion-toggle [(ngModel)]="bankAccess.storeAnalytics" [ngModelOptions]="{standalone: true}"></ion-toggle>\n      </ion-item>\n    </ion-item-group>\n\n    <button ion-button color="primary" block type="submit">Submit</button>\n\n  </form>\n</ion-content>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/pages/bankaccess/bankAccessUpdate.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* NavParams */],
+            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["e" /* LoadingController */],
+            __WEBPACK_IMPORTED_MODULE_2__services_bankAccessService__["a" /* BankAccessService */]])
+    ], BankAccessUpdatePage);
+    return BankAccessUpdatePage;
+}());
+
+//# sourceMappingURL=bankAccessUpdate.js.map
+
+/***/ }),
+
+/***/ 365:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__ = __webpack_require__(368);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__app_module__ = __webpack_require__(370);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__app_config__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__auth_keycloak_service__ = __webpack_require__(153);
+
+
+
+
+
+if (__WEBPACK_IMPORTED_MODULE_3__app_config__["a" /* AppConfig */].production) {
+    Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["_14" /* enableProdMode */])();
+}
+__WEBPACK_IMPORTED_MODULE_4__auth_keycloak_service__["a" /* KeycloakService */].init()
+    .then(function () { return Object(__WEBPACK_IMPORTED_MODULE_1__angular_platform_browser_dynamic__["a" /* platformBrowserDynamic */])().bootstrapModule(__WEBPACK_IMPORTED_MODULE_2__app_module__["a" /* AppModule */]); })
+    .catch(function (e) {
+    console.log(e);
+    window.location.reload();
+});
+//# sourceMappingURL=main.js.map
+
+/***/ }),
+
+/***/ 370:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AppModule; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_ionic2_auto_complete__ = __webpack_require__(167);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__angular_http__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__ionic_native_splash_screen__ = __webpack_require__(345);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__ionic_native_status_bar__ = __webpack_require__(348);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__pages_analytics_analytics__ = __webpack_require__(349);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__services_analyticsService__ = __webpack_require__(151);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__pages_bankaccess_bankAccessCreate__ = __webpack_require__(351);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__pages_bankaccess_bankAccessList__ = __webpack_require__(353);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__services_bankAccessService__ = __webpack_require__(86);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__pages_bankaccess_bankAccessUpdate__ = __webpack_require__(364);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__pages_bankaccount_bankaccountList__ = __webpack_require__(354);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__services_bankAccountService__ = __webpack_require__(62);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__services_bankAutoCompleteService__ = __webpack_require__(352);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__pages_analytics_bookingGroup__ = __webpack_require__(350);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__pages_booking_bookingList__ = __webpack_require__(356);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_18__services_bookingService__ = __webpack_require__(357);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_19__pages_contracts_contract_service__ = __webpack_require__(363);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_20__pages_contracts_contracts_component__ = __webpack_require__(362);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_21__pages_contracts_cycle_pipe__ = __webpack_require__(693);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_22__auth_keycloak_http__ = __webpack_require__(694);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_23__auth_keycloak_service__ = __webpack_require__(153);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_24__services_LogoService__ = __webpack_require__(152);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_25__app_component__ = __webpack_require__(695);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_26__pages_tabs_tabs__ = __webpack_require__(355);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_27__pages_payment_paymentCreate__ = __webpack_require__(358);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_28__services_PaymentService__ = __webpack_require__(359);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_29__pages_booking_detail_bookingDetail__ = __webpack_require__(360);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_30__pages_booking_edit_bookingEdit__ = __webpack_require__(361);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var AppModule = /** @class */ (function () {
+    function AppModule() {
+    }
+    AppModule = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_2__angular_core__["I" /* NgModule */])({
+            declarations: [
+                __WEBPACK_IMPORTED_MODULE_7__pages_analytics_analytics__["a" /* AnalyticsPage */],
+                __WEBPACK_IMPORTED_MODULE_9__pages_bankaccess_bankAccessCreate__["a" /* BankAccessCreatePage */],
+                __WEBPACK_IMPORTED_MODULE_10__pages_bankaccess_bankAccessList__["a" /* BankAccessListPage */],
+                __WEBPACK_IMPORTED_MODULE_12__pages_bankaccess_bankAccessUpdate__["a" /* BankAccessUpdatePage */],
+                __WEBPACK_IMPORTED_MODULE_13__pages_bankaccount_bankaccountList__["a" /* BankAccountListPage */],
+                __WEBPACK_IMPORTED_MODULE_16__pages_analytics_bookingGroup__["a" /* BookingGroupPage */],
+                __WEBPACK_IMPORTED_MODULE_17__pages_booking_bookingList__["a" /* BookingListPage */],
+                __WEBPACK_IMPORTED_MODULE_29__pages_booking_detail_bookingDetail__["a" /* BookingDetailPage */],
+                __WEBPACK_IMPORTED_MODULE_30__pages_booking_edit_bookingEdit__["a" /* BookingEditPage */],
+                __WEBPACK_IMPORTED_MODULE_27__pages_payment_paymentCreate__["a" /* PaymentCreatePage */],
+                __WEBPACK_IMPORTED_MODULE_20__pages_contracts_contracts_component__["a" /* ContractsComponent */],
+                __WEBPACK_IMPORTED_MODULE_26__pages_tabs_tabs__["a" /* TabsPage */],
+                __WEBPACK_IMPORTED_MODULE_21__pages_contracts_cycle_pipe__["a" /* CyclePipe */],
+                __WEBPACK_IMPORTED_MODULE_25__app_component__["a" /* MyApp */],
+            ],
+            imports: [
+                __WEBPACK_IMPORTED_MODULE_0_ionic2_auto_complete__["b" /* AutoCompleteModule */],
+                __WEBPACK_IMPORTED_MODULE_1__angular_platform_browser__["a" /* BrowserModule */],
+                __WEBPACK_IMPORTED_MODULE_3__angular_http__["d" /* HttpModule */],
+                __WEBPACK_IMPORTED_MODULE_4_ionic_angular__["d" /* IonicModule */].forRoot(__WEBPACK_IMPORTED_MODULE_25__app_component__["a" /* MyApp */], {}, {
+                    links: []
+                }),
+            ],
+            bootstrap: [__WEBPACK_IMPORTED_MODULE_4_ionic_angular__["b" /* IonicApp */]],
+            entryComponents: [
+                __WEBPACK_IMPORTED_MODULE_7__pages_analytics_analytics__["a" /* AnalyticsPage */],
+                __WEBPACK_IMPORTED_MODULE_9__pages_bankaccess_bankAccessCreate__["a" /* BankAccessCreatePage */],
+                __WEBPACK_IMPORTED_MODULE_10__pages_bankaccess_bankAccessList__["a" /* BankAccessListPage */],
+                __WEBPACK_IMPORTED_MODULE_12__pages_bankaccess_bankAccessUpdate__["a" /* BankAccessUpdatePage */],
+                __WEBPACK_IMPORTED_MODULE_13__pages_bankaccount_bankaccountList__["a" /* BankAccountListPage */],
+                __WEBPACK_IMPORTED_MODULE_16__pages_analytics_bookingGroup__["a" /* BookingGroupPage */],
+                __WEBPACK_IMPORTED_MODULE_17__pages_booking_bookingList__["a" /* BookingListPage */],
+                __WEBPACK_IMPORTED_MODULE_29__pages_booking_detail_bookingDetail__["a" /* BookingDetailPage */],
+                __WEBPACK_IMPORTED_MODULE_30__pages_booking_edit_bookingEdit__["a" /* BookingEditPage */],
+                __WEBPACK_IMPORTED_MODULE_27__pages_payment_paymentCreate__["a" /* PaymentCreatePage */],
+                __WEBPACK_IMPORTED_MODULE_20__pages_contracts_contracts_component__["a" /* ContractsComponent */],
+                __WEBPACK_IMPORTED_MODULE_26__pages_tabs_tabs__["a" /* TabsPage */],
+                __WEBPACK_IMPORTED_MODULE_25__app_component__["a" /* MyApp */],
+            ],
+            providers: [
+                __WEBPACK_IMPORTED_MODULE_8__services_analyticsService__["a" /* AnalyticsService */],
+                __WEBPACK_IMPORTED_MODULE_11__services_bankAccessService__["a" /* BankAccessService */],
+                __WEBPACK_IMPORTED_MODULE_14__services_bankAccountService__["a" /* BankAccountService */],
+                __WEBPACK_IMPORTED_MODULE_15__services_bankAutoCompleteService__["a" /* BankAutoCompleteService */],
+                __WEBPACK_IMPORTED_MODULE_18__services_bookingService__["a" /* BookingService */],
+                __WEBPACK_IMPORTED_MODULE_19__pages_contracts_contract_service__["a" /* ContractService */],
+                __WEBPACK_IMPORTED_MODULE_22__auth_keycloak_http__["a" /* KEYCLOAK_HTTP_PROVIDER */],
+                __WEBPACK_IMPORTED_MODULE_23__auth_keycloak_service__["a" /* KeycloakService */],
+                __WEBPACK_IMPORTED_MODULE_24__services_LogoService__["a" /* LogoService */],
+                __WEBPACK_IMPORTED_MODULE_28__services_PaymentService__["a" /* PaymentService */],
+                __WEBPACK_IMPORTED_MODULE_5__ionic_native_splash_screen__["a" /* SplashScreen */],
+                __WEBPACK_IMPORTED_MODULE_6__ionic_native_status_bar__["a" /* StatusBar */],
+                { provide: __WEBPACK_IMPORTED_MODULE_2__angular_core__["u" /* ErrorHandler */], useClass: __WEBPACK_IMPORTED_MODULE_4_ionic_angular__["c" /* IonicErrorHandler */] },
+            ]
+        })
+    ], AppModule);
+    return AppModule;
+}());
+
+//# sourceMappingURL=app.module.js.map
+
+/***/ }),
+
+/***/ 62:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BankAccountService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_app_config__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs__ = __webpack_require__(172);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4_rxjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4_rxjs__);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+var BankAccountService = /** @class */ (function () {
+    function BankAccountService(http) {
+        this.http = http;
+        this.bookingsChangedObservable = new __WEBPACK_IMPORTED_MODULE_4_rxjs__["Subject"]();
+    }
+    BankAccountService.prototype.getBankAccounts = function (accessId) {
+        return this.http.get(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses/" + accessId + "/accounts")
+            .map(function (res) { return res.json()._embedded.bankAccountEntityList; })
+            .catch(this.handleError);
+    };
+    BankAccountService.prototype.syncBookings = function (accessId, accountId, pin) {
+        var _this = this;
+        return this.http.put(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/sync", pin)
+            .map(function (res) {
+            _this.bookingsChangedObservable.next(true);
+            return res.json()._embedded != null ? res.json()._embedded.bookingEntityList : [];
+        })
+            .catch(this.handleError);
+    };
+    BankAccountService.prototype.handleError = function (error) {
+        console.error(error);
+        var errorJson = error.json();
+        if (errorJson) {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(errorJson || 'Server error');
+        }
+        else {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(error || 'Server error');
+        }
+    };
+    BankAccountService = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2__angular_http__["c" /* Http */]])
+    ], BankAccountService);
+    return BankAccountService;
+}());
+
+//# sourceMappingURL=bankAccountService.js.map
+
+/***/ }),
+
+/***/ 693:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return CyclePipe; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+var CyclePipe = /** @class */ (function () {
+    function CyclePipe() {
+    }
+    CyclePipe.prototype.transform = function (value) {
+        switch (value) {
+            case 'WEEKLY':
+                return "weekly";
+            case 'MONTHLY':
+                return 'monthly';
+            case 'TWO_MONTHLY':
+                return 'bimonthly';
+            case 'QUARTERLY':
+                return 'quarterly';
+            case 'HALFYEARLY':
+                return 'half-yearly';
+            case 'YEARLY':
+                return 'yearly';
+            default:
+                return value;
+        }
+    };
+    CyclePipe = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["S" /* Pipe */])({
+            name: 'cycle'
+        })
+    ], CyclePipe);
+    return CyclePipe;
+}());
+
+//# sourceMappingURL=cycle.pipe.js.map
+
+/***/ }),
+
+/***/ 694:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* unused harmony export KeycloakHttp */
+/* unused harmony export keycloakHttpFactory */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return KEYCLOAK_HTTP_PROVIDER; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__angular_http__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__keycloak_service__ = __webpack_require__(153);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+/**
+ * This provides a wrapper over the ng2 Http class that insures tokens are refreshed on each request.
+ */
+var KeycloakHttp = /** @class */ (function (_super) {
+    __extends(KeycloakHttp, _super);
+    function KeycloakHttp(_backend, _defaultOptions, _keycloakService) {
+        var _this = _super.call(this, _backend, _defaultOptions) || this;
+        _this._keycloakService = _keycloakService;
+        return _this;
+    }
+    KeycloakHttp.prototype.request = function (url, options) {
+        var _this = this;
+        var tokenPromise = this._keycloakService.getToken();
+        var tokenObservable = __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].fromPromise(tokenPromise);
+        if (typeof url === 'string') {
+            return tokenObservable.map(function (token) {
+                var authOptions = new __WEBPACK_IMPORTED_MODULE_1__angular_http__["f" /* RequestOptions */]({ headers: new __WEBPACK_IMPORTED_MODULE_1__angular_http__["b" /* Headers */]({ 'Authorization': 'Bearer ' + token }) });
+                return new __WEBPACK_IMPORTED_MODULE_1__angular_http__["f" /* RequestOptions */]().merge(options).merge(authOptions);
+            }).concatMap(function (opts) { return _super.prototype.request.call(_this, url, opts); });
+        }
+        else if (url instanceof __WEBPACK_IMPORTED_MODULE_1__angular_http__["e" /* Request */]) {
+            return tokenObservable.map(function (token) {
+                url.headers.set('Authorization', 'Bearer ' + token);
+                return url;
+            }).concatMap(function (request) { return _super.prototype.request.call(_this, request); });
+        }
+    };
+    KeycloakHttp = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1__angular_http__["a" /* ConnectionBackend */], __WEBPACK_IMPORTED_MODULE_1__angular_http__["f" /* RequestOptions */], __WEBPACK_IMPORTED_MODULE_2__keycloak_service__["a" /* KeycloakService */]])
+    ], KeycloakHttp);
+    return KeycloakHttp;
+}(__WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */]));
+
+function keycloakHttpFactory(backend, defaultOptions, keycloakService) {
+    return new KeycloakHttp(backend, defaultOptions, keycloakService);
+}
+var KEYCLOAK_HTTP_PROVIDER = {
+    provide: __WEBPACK_IMPORTED_MODULE_1__angular_http__["c" /* Http */],
+    useFactory: keycloakHttpFactory,
+    deps: [__WEBPACK_IMPORTED_MODULE_1__angular_http__["g" /* XHRBackend */], __WEBPACK_IMPORTED_MODULE_1__angular_http__["f" /* RequestOptions */], __WEBPACK_IMPORTED_MODULE_2__keycloak_service__["a" /* KeycloakService */]]
+};
+//# sourceMappingURL=keycloak.http.js.map
+
+/***/ }),
+
+/***/ 695:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return MyApp; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_ionic_angular__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__ = __webpack_require__(348);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__ = __webpack_require__(345);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__pages_bankaccess_bankAccessList__ = __webpack_require__(353);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+
+var MyApp = /** @class */ (function () {
+    function MyApp(platform, statusBar, splashScreen) {
+        this.rootPage = __WEBPACK_IMPORTED_MODULE_4__pages_bankaccess_bankAccessList__["a" /* BankAccessListPage */];
+        platform.ready().then(function () {
+            // Okay, so the platform is ready and our plugins are available.
+            // Here you can do any higher level native things you might need.
+            statusBar.styleDefault();
+            splashScreen.hide();
+        });
+    }
+    MyApp = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({template:/*ion-inline-start:"/Users/alexg/git/multibanking/multibanking-app/src/app/app.html"*/'<ion-nav [root]="rootPage"></ion-nav>\n'/*ion-inline-end:"/Users/alexg/git/multibanking/multibanking-app/src/app/app.html"*/
+        }),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["i" /* Platform */], __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__["a" /* StatusBar */], __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__["a" /* SplashScreen */]])
+    ], MyApp);
+    return MyApp;
+}());
+
+//# sourceMappingURL=app.component.js.map
+
+/***/ }),
+
+/***/ 86:
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BankAccessService; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__angular_core__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app_app_config__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__angular_http__ = __webpack_require__(33);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__);
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+
+var BankAccessService = /** @class */ (function () {
+    function BankAccessService(http) {
+        this.http = http;
+    }
+    BankAccessService.prototype.getBankAccesses = function () {
+        return this.http.get(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses")
+            .map(function (res) {
+            return res.json()._embedded != null ? res.json()._embedded.bankAccessEntityList : [];
+        })
+            .catch(this.handleError);
+    };
+    BankAccessService.prototype.createBankAcccess = function (bankaccess) {
+        return this.http.post(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses", bankaccess)
+            .catch(this.handleError);
+    };
+    BankAccessService.prototype.updateBankAcccess = function (bankaccess) {
+        return this.http.put(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses/" + bankaccess.id, bankaccess)
+            .catch(this.handleError);
+    };
+    BankAccessService.prototype.deleteBankAccess = function (accessId) {
+        return this.http.delete(__WEBPACK_IMPORTED_MODULE_1__app_app_config__["a" /* AppConfig */].api_url + "/bankaccesses/" + accessId)
+            .catch(this.handleError);
+    };
+    BankAccessService.prototype.handleError = function (error) {
+        console.error(error);
+        var errorJson = error.json();
+        if (errorJson) {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(errorJson || 'Server error');
+        }
+        else {
+            return __WEBPACK_IMPORTED_MODULE_3_rxjs_Observable__["Observable"].throw(error || 'Server error');
+        }
+    };
+    BankAccessService = __decorate([
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["A" /* Injectable */])(),
+        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_2__angular_http__["c" /* Http */]])
+    ], BankAccessService);
+    return BankAccessService;
+}());
+
+//# sourceMappingURL=bankAccessService.js.map
+
+/***/ })
+
+},[365]);
+//# sourceMappingURL=main.js.map
