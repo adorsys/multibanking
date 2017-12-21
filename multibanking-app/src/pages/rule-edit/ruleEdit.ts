@@ -64,7 +64,7 @@ export class RuleEditPage {
   }
 
   submit() {
-    if (this.rule.receiver.length == 0) {
+    if (this.rule.receiver && this.rule.receiver.length == 0) {
       this.rule.receiver = undefined;
     }
     if (this.rule.id) {
