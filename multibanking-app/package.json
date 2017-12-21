@@ -33,7 +33,7 @@
     "ionic-plugin-keyboard": "^2.2.1",
     "ionic2-auto-complete": "1.6.0-alpha",
     "ionicons": "3.0.0",
-    "keycloak-js": "^3.4.1-cr.1",
+    "keycloak-js": "3.4.1",
     "rxjs": "5.5.2",
     "sw-toolbox": "3.6.0",
     "zone.js": "0.8.18"

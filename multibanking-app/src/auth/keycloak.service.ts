@@ -12,13 +12,13 @@ const keycloak = Keycloak({
 export class KeycloakService {
 
   static init(options?: any): Promise<any> {
-
     return new Promise((resolve, reject) => {
       keycloak.init(options)
         .success(() => {
           resolve();
         })
         .error((errorData: any) => {
+          console.log(errorData);
           reject(errorData);
         });
     });

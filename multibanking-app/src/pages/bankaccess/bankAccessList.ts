@@ -23,12 +23,21 @@ export class BankAccessListPage {
   }
 
   ngOnInit() {
-    this.rulesAdmin = this.keycloakService.getRoles().filter(role => role == 'rules_admin').length > 0;
-  
-    this.bankAccessService.getBankAccesses().subscribe(
-      response => {
-        this.bankaccesses = response
-      });
+    console.log("init Keycloak");
+    KeycloakService.init({ onLoad: 'check-sso', checkLoginIframe: false, adapter: 'default' }).then(() => {
+      console.log("Keycloak initialized, authenticated: " + this.keycloakService.authenticated());
+      if (this.keycloakService.authenticated()) {
+        this.rulesAdmin = this.keycloakService.getRoles().filter(role => role == 'rules_admin').length > 0;
+
+        this.bankAccessService.getBankAccesses().subscribe(
+          response => {
+            this.bankaccesses = response
+          });
+      } else {
+        this.keycloakService.login();
+      }
+    });
+
   }
 
   itemSelected(bankAccess) {
