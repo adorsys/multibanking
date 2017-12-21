@@ -6,6 +6,11 @@
 
 
 <ion-content padding>
+  <ion-fab top right edge>
+    <button ion-fab mini (click)="createRule()">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
   <ion-list>
     <ion-item *ngFor="let rule of rules">
       <ion-grid>

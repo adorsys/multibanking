@@ -4,9 +4,12 @@ import { Http, Response } from "@angular/http";
 import { Observable } from "rxjs/Observable";
 import { RuleCategory } from "../api/RuleCategory";
 import { Rule } from "../api/Rule";
+import { Subject } from "rxjs";
 
 @Injectable()
 export class RulesService {
+
+  public rulesChangedObservable = new Subject<Rule>();
 
   constructor(private http: Http) {
   }
@@ -19,12 +22,18 @@ export class RulesService {
 
   createRule(rule: Rule): Observable<Array<RuleCategory>> {
     return this.http.post(`${AppConfig.api_url}/analytics/rules`, rule)
-      .catch(this.handleError);
+      .catch(this.handleError)
+      .finally(() => {
+          this.rulesChangedObservable.next(rule) 
+      })
   }
 
   updateRule(rule: Rule): Observable<Array<RuleCategory>> {
     return this.http.put(`${AppConfig.api_url}/analytics/rules/${rule.id}`, rule)
-      .catch(this.handleError);
+      .catch(this.handleError)
+      .finally(() => {
+        this.rulesChangedObservable.next(rule) 
+    })
   }
 
   getRules(custom: boolean): Observable<Array<Rule>> {
@@ -40,7 +49,7 @@ export class RulesService {
   }
 
   deleteRule(id, custom): Observable<any> {
-    return this.http.delete(`${AppConfig.api_url}/analytics/rules/${id}`+ "?custom=" + custom)
+    return this.http.delete(`${AppConfig.api_url}/analytics/rules/${id}`+ "?customRule=" + custom)
       .catch(this.handleError);
   }
 

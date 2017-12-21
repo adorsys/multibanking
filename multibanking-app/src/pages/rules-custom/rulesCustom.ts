@@ -17,6 +17,12 @@ export class RulesCustomPage {
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     public rulesService: RulesService) {
+
+    rulesService.rulesChangedObservable.subscribe(rule => {
+      if (!rule.released) {
+        this.loadRules();
+      }
+    })
   }
 
   ngOnInit() {
@@ -36,8 +42,12 @@ export class RulesCustomPage {
     })
   }
 
+  createRule() {
+    this.navCtrl.push(RuleEditPage, { rule: {} });
+  }
+
   editRule(rule: Rule) {
-    this.navCtrl.push(RuleEditPage, {rule: rule});
+    this.navCtrl.push(RuleEditPage, { rule: rule });
   }
 
   deleteRule(rule: Rule) {
