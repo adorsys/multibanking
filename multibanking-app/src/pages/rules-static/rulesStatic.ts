@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { RulesService } from '../../services/RulesService';
 import { Rule } from '../../api/Rule';
 import { RulesAutoCompleteService } from '../../services/RulesAutoCompleteService';
@@ -19,6 +19,7 @@ export class RulesStaticPage {
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
+    private alertCtrl: AlertController,
     public rulesAutoCompleteService: RulesAutoCompleteService,
     public rulesService: RulesService) {
   }
@@ -41,5 +42,30 @@ export class RulesStaticPage {
     this.rulesService.deleteRule(this.selectedRule.id, true).subscribe(rules => {
       this.selectedRule = undefined;
     })
+  }
+
+  downloadRules() {
+    this.rulesService.downloadRules(false).subscribe(data => {
+      window.open(window.URL.createObjectURL(data));
+    })
+  }
+
+  uploadRules(input) {
+    let file: File = input.target.files[0];
+    this.rulesService.uploadRules(false, file).subscribe(
+      data => {
+      },
+      error => {
+        if (error && error.messages) {
+          error.messages.forEach(message => {
+            if (message.key == "INVALID_RULES") {
+              this.alertCtrl.create({
+                message: message.paramsMap.message,
+                buttons: ['OK']
+              }).present();
+            }
+          })
+        }
+      })
   }
 }

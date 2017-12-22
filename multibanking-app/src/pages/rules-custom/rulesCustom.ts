@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, AlertController } from 'ionic-angular';
 import { RulesService } from '../../services/RulesService';
 import { Rule } from '../../api/Rule';
 import { RuleEditPage } from '../rule-edit/ruleEdit';
@@ -16,6 +16,7 @@ export class RulesCustomPage {
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
+    private alertCtrl: AlertController,
     public rulesService: RulesService) {
 
     rulesService.rulesChangedObservable.subscribe(rule => {
@@ -56,4 +57,29 @@ export class RulesCustomPage {
     })
   }
 
+  downloadRules() {
+    this.rulesService.downloadRules(true).subscribe(data => {
+      window.open(window.URL.createObjectURL(data));
+    })
+  }
+
+  uploadRules(input) {
+    let file: File = input.target.files[0];
+    this.rulesService.uploadRules(true, file).subscribe(
+      data => {
+        this.loadRules();
+      },
+      error => {
+        if (error && error.messages) {
+          error.messages.forEach(message => {
+            if (message.key == "INVALID_RULES") {
+              this.alertCtrl.create({
+                message: message.paramsMap.message,
+                buttons: ['OK']
+              }).present();
+            }
+          })
+        }
+      })
+  }
 }

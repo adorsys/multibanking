@@ -28,4 +28,6 @@ public interface BookingRuleRepositoryIf {
     void deleteCustomRule(String id);
 
     void deleteRule(String id);
+
+    void replacesRules(List<? extends RuleEntity> rules, boolean custom);
 }

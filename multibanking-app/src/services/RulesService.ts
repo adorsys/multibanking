@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { AppConfig } from "../app/app.config";
-import { Http, Response } from "@angular/http";
+import { Http, Response, ResponseContentType } from "@angular/http";
 import { Observable } from "rxjs/Observable";
 import { RuleCategory } from "../api/RuleCategory";
 import { Rule } from "../api/Rule";
@@ -24,7 +24,7 @@ export class RulesService {
     return this.http.post(`${AppConfig.api_url}/analytics/rules`, rule)
       .catch(this.handleError)
       .finally(() => {
-          this.rulesChangedObservable.next(rule) 
+        this.rulesChangedObservable.next(rule)
       })
   }
 
@@ -32,12 +32,12 @@ export class RulesService {
     return this.http.put(`${AppConfig.api_url}/analytics/rules/${rule.id}`, rule)
       .catch(this.handleError)
       .finally(() => {
-        this.rulesChangedObservable.next(rule) 
-    })
+        this.rulesChangedObservable.next(rule)
+      })
   }
 
   getRules(custom: boolean): Observable<Array<Rule>> {
-    return this.http.get(`${AppConfig.api_url}/analytics/rules` + "?custom=" + custom)
+    return this.http.get(`${AppConfig.api_url}/analytics/rules?custom=` + custom)
       .map((res: Response) => res.json()._embedded ? res.json()._embedded.customRuleEntityList : [])
       .catch(this.handleError);
   }
@@ -49,7 +49,24 @@ export class RulesService {
   }
 
   deleteRule(id, custom): Observable<any> {
-    return this.http.delete(`${AppConfig.api_url}/analytics/rules/${id}`+ "?customRule=" + custom)
+    return this.http.delete(`${AppConfig.api_url}/analytics/rules/${id}?custom=` + custom)
+      .catch(this.handleError);
+  }
+
+  downloadRules(custom): Observable<any> {
+    return this.http.get(`${AppConfig.api_url}/analytics/rules/download?custom=` + custom,
+      { responseType: ResponseContentType.Blob })
+      .map(res => {
+        return new Blob([res.blob()], { type: 'application/yaml' })
+      })
+      .catch(this.handleError);
+  }
+
+  uploadRules(custom: boolean, file: File): Observable<any> {
+    let formData: FormData = new FormData();
+    formData.append('rules', file, 'rules.yml');
+
+    return this.http.post(`${AppConfig.api_url}/analytics/rules/upload?custom=` + custom, formData)
       .catch(this.handleError);
   }
 
@@ -59,7 +76,7 @@ export class RulesService {
     if (errorJson) {
       if (errorJson.message == "RESCOURCE_NOT_FOUND") {
         return Observable.of({});
-      } else if (errorJson.message == "SYNC_IN_PROGRESS") {
+      } else if (errorJson.message == "INVALID_RULES") {
         return Observable.throw(errorJson.message);
       } else {
         return Observable.throw(errorJson || 'Server error');

@@ -92,4 +92,15 @@ public class BookingRuleRepositoryImpl implements BookingRuleRepositoryIf {
         ruleRepository.delete(id);
     }
 
+    @Override
+    public void replacesRules(List<? extends RuleEntity> rules, boolean custom) {
+        if (custom) {
+            mongoTemplate.remove(new Query(), CustomRuleEntity.class);
+            customRuleRepository.save((List<CustomRuleEntity>) rules);
+        } else {
+            mongoTemplate.remove(new Query(), RuleEntity.class);
+            ruleRepository.save(rules);
+        }
+    }
+
 }
