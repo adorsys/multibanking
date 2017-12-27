@@ -1,8 +1,8 @@
 import { Component, ViewChild } from '@angular/core';
-import { NavController, NavParams, AlertController } from 'ionic-angular';
+import { NavController, NavParams, AlertController, Navbar } from 'ionic-angular';
 import { RulesService } from '../../services/RulesService';
 import { Rule } from '../../api/Rule';
-import { RulesAutoCompleteService } from '../../services/RulesAutoCompleteService';
+import { RulesStaticAutoCompleteService } from '../../services/RulesStaticAutoCompleteService';
 import { AutoCompleteComponent } from 'ionic2-auto-complete';
 import { RuleEditPage } from '../rule-edit/ruleEdit';
 
@@ -13,34 +13,57 @@ import { RuleEditPage } from '../rule-edit/ruleEdit';
 })
 export class RulesStaticPage {
 
-  @ViewChild('autocomplete')
-  autocomplete: AutoCompleteComponent;
+  @ViewChild(AutoCompleteComponent) autocomplete: AutoCompleteComponent;
+  @ViewChild(Navbar) navBar: Navbar;
   selectedRule: Rule;
+  rules: Rule[];
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
     private alertCtrl: AlertController,
-    public rulesAutoCompleteService: RulesAutoCompleteService,
+    public rulesAutoCompleteService: RulesStaticAutoCompleteService,
     public rulesService: RulesService) {
+
+    rulesService.rulesChangedObservable.subscribe(rule => {
+      if (rule.released) {
+        this.loadRules();
+      }
+    })
   }
 
   ngOnInit() {
     this.autocomplete.itemSelected.subscribe(rule => {
-      this.selectedRule = rule;
+      this.rules = [rule];
     });
 
     this.autocomplete.searchbarElem.ionClear.subscribe(() => {
       this.selectedRule = undefined;
+      this.loadRules();
     });
+
+    this.loadRules();
   }
 
-  editRule() {
-    this.navCtrl.push(RuleEditPage, {rule: this.selectedRule});
+  ionViewDidLoad() {
+    this.navBar.backButtonClick = (e: UIEvent) => {
+      this.navCtrl.parent.viewCtrl.dismiss();
+    };
   }
 
-  deleteRule() {
-    this.rulesService.deleteRule(this.selectedRule.id, true).subscribe(rules => {
+  loadRules() {
+    this.rulesService.getRules(false).subscribe(rules => {
+      this.rules = rules;
       this.selectedRule = undefined;
+    })
+  }
+
+  editRule(rule: Rule) {
+    this.navCtrl.push(RuleEditPage, { rule: rule });
+  }
+
+  deleteRule(rule: Rule) {
+    this.rulesService.deleteRule(rule.id, true).subscribe(rules => {
+      this.loadRules();
     })
   }
 
@@ -54,6 +77,7 @@ export class RulesStaticPage {
     let file: File = input.target.files[0];
     this.rulesService.uploadRules(false, file).subscribe(
       data => {
+        this.loadRules();
       },
       error => {
         if (error && error.messages) {

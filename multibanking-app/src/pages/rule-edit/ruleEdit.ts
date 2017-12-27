@@ -24,12 +24,10 @@ export class RuleEditPage {
 
   constructor(
     public navCtrl: NavController,
-    navparams: NavParams,
+    public navparams: NavParams,
     private rulesService: RulesService
   ) {
-    if (navparams.data.rule) {
-      this.rule = navparams.data.rule;
-    }
+    this.rule = navparams.data.rule;
   }
 
   ngOnInit() {

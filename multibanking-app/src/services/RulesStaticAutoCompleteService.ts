@@ -5,15 +5,16 @@ import { Observable } from 'rxjs/Observable';
 import { AutoCompleteService } from "ionic2-auto-complete";
 
 @Injectable()
-export class RulesAutoCompleteService implements AutoCompleteService {
+export class RulesStaticAutoCompleteService implements AutoCompleteService {
 
   labelAttribute = "receiver";
+  customRules: boolean = false;
 
   constructor(private http: Http) {
   }
 
   getResults(keyword: string) {
-    return this.http.get(AppConfig.api_url + "/analytics/rules/search?query=" + keyword)
+    return this.http.get(`${AppConfig.api_url}/analytics/rules/search?query=` + keyword + '&custom=' + this.customRules)
       .map((res: Response) => {
         return res.json()._embedded != null ? res.json()._embedded.customRuleEntityList : [];
       })

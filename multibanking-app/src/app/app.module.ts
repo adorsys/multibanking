@@ -29,13 +29,14 @@ import { PaymentCreatePage } from '../pages/payment/paymentCreate';
 import { PaymentService } from '../services/PaymentService';
 import { BookingDetailPage } from '../pages/booking-detail/bookingDetail';
 import { RulesService } from '../services/RulesService';
-import { RulesAutoCompleteService } from '../services/RulesAutoCompleteService';
 import { RuleEditPage } from '../pages/rule-edit/ruleEdit';
 import { BookingTabsPage } from '../pages/booking-tabs/booking-tabs';
 import { RulesTabsPage } from '../pages/rules-tabs/rules-tabs';
 import { RulesCustomPage } from '../pages/rules-custom/rulesCustom';
 import { RulesStaticPage } from '../pages/rules-static/rulesStatic';
 import { ListActionDirective } from '../directives/list-action-directive';
+import { RulesCustomAutoCompleteService } from '../services/RulesCustomAutoCompleteService';
+import { RulesStaticAutoCompleteService } from '../services/RulesStaticAutoCompleteService';
 
 @NgModule({
   declarations: [
@@ -89,7 +90,8 @@ import { ListActionDirective } from '../directives/list-action-directive';
     BankAccessService,
     BankAccountService,
     BankAutoCompleteService,
-    RulesAutoCompleteService,
+    RulesCustomAutoCompleteService,
+    RulesStaticAutoCompleteService,
     BookingService,
     ContractService,
     KEYCLOAK_HTTP_PROVIDER,
