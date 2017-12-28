@@ -20,7 +20,7 @@
       </button>
     </ion-fab-list>
   </ion-fab>
-  <ion-auto-complete [dataProvider]="rulesAutoCompleteService" [options]="{placeholder : 'Name or creditor id'}" #autocomplete></ion-auto-complete>
+  <ion-auto-complete [dataProvider]="rulesStaticAutoCompleteService" [options]="{placeholder : 'Name or creditor id'}" #autocomplete></ion-auto-complete>
   <ion-list>
     <ion-item *ngFor="let rule of rules">
       <ion-grid>
