@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import { BankAccountListPage } from "../bankaccount/bankaccountList";
-import { BankAccessCreatePage } from "./bankAccessCreate";
-import { BankAccessService } from "../../services/bankAccessService";
-import { BankAccessUpdatePage } from "./bankAccessUpdate";
+import { BankAccountListPage } from "../bankaccount/bankaccountList.component";
+import { BankAccessCreatePage } from "./bankAccessCreate.component";
+import { BankAccessService } from "../../services/bankAccess.service";
+import { BankAccessUpdatePage } from "./bankAccessUpdate.component";
 import { BankAccess } from "../../api/BankAccess";
 import { KeycloakService } from '../../auth/keycloak.service';
-import { RulesTabsPage } from '../rules-tabs/rules-tabs';
+import { RulesTabsPage } from '../rules-tabs/rules-tabs.component';
 
 @Component({
   selector: 'page-bankaccessList',
-  templateUrl: 'bankAccessList.html'
+  templateUrl: 'bankAccessList.component.html'
 })
 export class BankAccessListPage {
 
@@ -37,7 +37,6 @@ export class BankAccessListPage {
         this.keycloakService.login();
       }
     });
-
   }
 
   itemSelected(bankAccess) {

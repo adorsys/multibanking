@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { AppConfig } from '../../app/app.config';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
-import { Contract } from './contract.model';
+import { Contract } from './contract';
 
 @Injectable()
 export class ContractService {

@@ -25,9 +25,9 @@ export class BankAutoCompleteService implements AutoCompleteService {
     let errorJson = error.json();
     if (errorJson) {
       return Observable.throw(errorJson || 'Server error');
-    } else {
-      return Observable.throw(error || 'Server error');
     }
+
+    return Observable.throw(error || 'Server error');
   }
 
 }

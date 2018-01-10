@@ -1,11 +1,11 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams, LoadingController } from "ionic-angular";
-import { BankAccessService } from "../../services/bankAccessService";
+import { BankAccessService } from "../../services/bankAccess.service";
 import { BankAccess } from "../../api/BankAccess";
 
 @Component({
   selector: 'page-bankaccess-update',
-  templateUrl: 'bankAccessUpdate.html'
+  templateUrl: 'bankAccessUpdate.component.html'
 })
 export class BankAccessUpdatePage {
 
@@ -32,7 +32,7 @@ export class BankAccessUpdatePage {
 
       this.parent.bankAccessesChanged();
       this.navCtrl.pop();
-    })
+    });
   }
 
 

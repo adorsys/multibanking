@@ -5,12 +5,12 @@ import { AppConfig } from "../../app/app.config";
 
 @Component({
   selector: 'page-bookingGroup',
-  templateUrl: 'bookingGroup.html'
+  templateUrl: 'bookingGroup.component.html'
 })
 export class BookingGroupPage {
 
   label: string;
-  bookingGroups: Array<BookingGroup>
+  bookingGroups: Array<BookingGroup>;
 
   constructor(public navparams: NavParams) {
     this.label = navparams.data.label;
@@ -39,7 +39,7 @@ export class BookingGroupPage {
       }
 
       return 0;
-    })
+    });
   }
 
   getCompanyLogoUrl(bookingGroup: BookingGroup) {

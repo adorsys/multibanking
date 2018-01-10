@@ -1,13 +1,13 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams, LoadingController, AlertController, ToastController } from "ionic-angular";
-import { PaymentService } from "../../services/PaymentService";
+import { PaymentService } from "../../services/payment.service";
 import { Payment } from "../../api/Payment";
 import { BankAccount } from "../../api/BankAccount";
 import { BankAccess } from "../../api/BankAccess";
 
 @Component({
   selector: 'page-payment-create',
-  templateUrl: 'paymentCreate.html'
+  templateUrl: 'paymentCreate.component.html'
 })
 export class PaymentCreatePage {
 
@@ -24,10 +24,6 @@ export class PaymentCreatePage {
 
     this.bankAccount = navparams.data.bankAccount;
     this.bankAccess = navparams.data.bankAccess;
-  }
-
-  ngOnInit() {
-
   }
 
   createPayment(pin: string) {
@@ -62,7 +58,7 @@ export class PaymentCreatePage {
             }
           })
         }
-      })
+      });
   }
 
   createPaymentPromptPin() {
@@ -135,7 +131,7 @@ export class PaymentCreatePage {
           position: 'top'
         }).present();
       }
-    )
+    );
   }
 
 }

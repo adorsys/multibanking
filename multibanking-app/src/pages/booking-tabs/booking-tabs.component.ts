@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { BookingListPage } from '../booking/bookingList';
+import { BookingListPage } from '../booking/bookingList.component';
 import { ContractsComponent } from '../contracts/contracts.component';
-import { AnalyticsPage } from '../analytics/analytics';
+import { AnalyticsPage } from '../analytics/analytics.component';
 import { NavParams } from 'ionic-angular';
 
 @Component({
-  templateUrl: 'booking-tabs.html'
+  templateUrl: 'booking-tabs.component.html'
 })
 export class BookingTabsPage {
 

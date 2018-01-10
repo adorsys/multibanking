@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 import { NavParams } from 'ionic-angular';
-import { RulesCustomPage } from '../rules-custom/rulesCustom';
-import { RulesStaticPage } from '../rules-static/rulesStatic';
+import { RulesCustomPage } from '../rules-custom/rulesCustom.component';
+import { RulesStaticPage } from '../rules-static/rulesStatic.component';
 
 @Component({
-  templateUrl: 'rules-tabs.html'
+  templateUrl: 'rules-tabs.component.html'
 })
 export class RulesTabsPage {
 

@@ -28,12 +28,10 @@ export class BookingService {
     if (errorJson) {
       if (errorJson.message == "SYNC_IN_PROGRESS") {
         return Observable.throw(errorJson.message);
-      } else {
-        return Observable.throw(errorJson || 'Server error');
       }
-    } else {
-      return Observable.throw(error || 'Server error');
+      return Observable.throw(errorJson || 'Server error');
     }
+    return Observable.throw(error || 'Server error');
   }
 
 

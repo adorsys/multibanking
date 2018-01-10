@@ -96,12 +96,10 @@ export class RulesService {
         return Observable.of({});
       } else if (errorJson.message == "INVALID_RULES") {
         return Observable.throw(errorJson.message);
-      } else {
-        return Observable.throw(errorJson || 'Server error');
       }
-    } else {
-      return Observable.throw(error || 'Server error');
+      return Observable.throw(errorJson || 'Server error');
     }
+    return Observable.throw(error || 'Server error');
   }
 
 }

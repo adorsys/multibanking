@@ -1,16 +1,16 @@
 import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, AlertController, Navbar } from 'ionic-angular';
-import { RulesService } from '../../services/RulesService';
+import { RulesService } from '../../services/rules.service';
 import { Rule } from '../../api/Rule';
-import { RulesCustomAutoCompleteService } from '../../services/RulesCustomAutoCompleteService';
+import { RulesCustomAutoCompleteService } from '../../services/rulesCustomAutoComplete.service';
 import { AutoCompleteComponent } from 'ionic2-auto-complete';
-import { RulesStaticPage } from '../rules-static/rulesStatic';
-import { RulesStaticAutoCompleteService } from '../../services/RulesStaticAutoCompleteService';
-import { RuleEditPage } from '../rule-edit/ruleEdit';
+import { RulesStaticPage } from '../rules-static/rulesStatic.component';
+import { RulesStaticAutoCompleteService } from '../../services/rulesStaticAutoComplete.service';
+import { RuleEditPage } from '../rule-edit/ruleEdit.component';
 
 @Component({
   selector: 'page-rules-custom',
-  templateUrl: 'rulesCustom.html',
+  templateUrl: 'rulesCustom.component.html',
 })
 export class RulesCustomPage extends RulesStaticPage {
 
@@ -35,19 +35,19 @@ export class RulesCustomPage extends RulesStaticPage {
       if (!rule.released) {
         this.loadRules();
       }
-    })
+    });
   }
 
   releaseRule(rule: Rule) {
     rule.released = true;
     this.rulesService.updateRule(rule).subscribe(rules => {
       this.loadRules();
-    })
+    });
   }
 
   createRule() {
     this.navCtrl.push(RuleEditPage, { rule: {} });
   }
 
-  
+
 }

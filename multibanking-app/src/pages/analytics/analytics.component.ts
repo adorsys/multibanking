@@ -1,24 +1,22 @@
 import { Component, ViewChild } from "@angular/core";
-import { NavController, AlertController, ToastController, NavParams, LoadingController, Navbar } from "ionic-angular";
-import { BankAccountService } from "../../services/bankAccountService";
-import { BookingService } from "../../services/bookingService";
+import { AlertController, ToastController, NavParams, LoadingController, NavController, Navbar } from "ionic-angular";
+import { BankAccountService } from "../../services/bankAccount.service";
+import { AnalyticsService } from "../../services/analytics.service";
 import { BankAccess } from "../../api/BankAccess";
-import { Booking } from "../../api/Booking";
-import { LogoService } from '../../services/LogoService';
-import { PaymentCreatePage } from "../payment/paymentCreate";
-import { BankAccount } from "../../api/BankAccount";
-import { BookingDetailPage } from "../booking-detail/bookingDetail";
+import { AccountAnalytics } from "../../api/AccountAnalytics";
+import { BookingGroup } from "../../api/BookingGroup";
+import { AppConfig } from "../../app/app.config";
+import { BookingGroupPage } from "./bookingGroup.component";
 
 @Component({
-  selector: 'page-bookingList',
-  templateUrl: 'bookingList.html'
+  selector: 'page-analytics',
+  templateUrl: 'analytics.component.html'
 })
-export class BookingListPage {
+export class AnalyticsPage {
 
+  analytics: AccountAnalytics;
   bankAccess: BankAccess;
-  bankAccount: BankAccount;
-  getLogo: Function;
-  bookings: Array<Booking>;
+  bankAccountId: string;
 
   @ViewChild(Navbar) navBar: Navbar;
 
@@ -29,18 +27,29 @@ export class BookingListPage {
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
     private bankAccountService: BankAccountService,
-    private bookingService: BookingService,
-    public logoService: LogoService
+    private analyticsService: AnalyticsService
   ) {
     this.bankAccess = navparams.data.bankAccess;
-    this.bankAccount = navparams.data.bankAccount;
-    this.getLogo = logoService.getLogo;
+    this.bankAccountId = navparams.data.bankAccount.id;
   }
 
   ngOnInit() {
-    this.bookingService.getBookings(this.bankAccess.id, this.bankAccount.id).subscribe(
+    this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
+      this.loadAnalytics();
+    });
+    this.loadAnalytics();
+  }
+
+  ionViewDidLoad() {
+    this.navBar.backButtonClick = (e: UIEvent) => {
+      this.navCtrl.parent.viewCtrl.dismiss();
+    };
+  }
+
+  loadAnalytics() {
+    this.analyticsService.getAnalytics(this.bankAccess.id, this.bankAccountId).subscribe(
       response => {
-        this.bookings = response;
+        this.analytics = response;
       },
       error => {
         if (error == "SYNC_IN_PROGRESS") {
@@ -50,13 +59,11 @@ export class BookingListPage {
             position: 'top'
           }).present();
         }
-      })
+      });
   }
 
-  ionViewDidLoad() {
-    this.navBar.backButtonClick = (e: UIEvent) => {
-      this.navCtrl.parent.viewCtrl.dismiss();
-    };
+  getCompanyLogoUrl(bookingGroup: BookingGroup) {
+    return AppConfig.api_url + "/image/" + bookingGroup.contract.logo;
   }
 
   syncBookingsPromptPin() {
@@ -97,9 +104,8 @@ export class BookingListPage {
     });
     loading.present();
 
-    this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccount.id, pin).subscribe(
+    this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccountId, pin).subscribe(
       response => {
-        this.bookings = response;
         loading.dismiss();
       },
       error => {
@@ -120,19 +126,12 @@ export class BookingListPage {
             }
           })
         }
+
       })
   }
 
-  itemSelected(booking) {
-    this.navCtrl.push(BookingDetailPage, {
-      booking: booking
-    });
+  itemSelected(label: string, bookingGroups: Array<BookingGroup>) {
+    this.navCtrl.push(BookingGroupPage, { label: label, bookingGroups: bookingGroups })
   }
 
-  createPayment() {
-    this.navCtrl.push(PaymentCreatePage, {
-      bankAccount: this.bankAccount,
-      bankAccess: this.bankAccess
-    });
-  }
 }

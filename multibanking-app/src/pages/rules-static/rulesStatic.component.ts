@@ -1,17 +1,17 @@
 import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, AlertController, Navbar } from 'ionic-angular';
-import { RulesService } from '../../services/RulesService';
+import { RulesService } from '../../services/rules.service';
 import { Rule } from '../../api/Rule';
-import { RulesStaticAutoCompleteService } from '../../services/RulesStaticAutoCompleteService';
+import { RulesStaticAutoCompleteService } from '../../services/rulesStaticAutoComplete.service';
 import { AutoCompleteComponent } from 'ionic2-auto-complete';
-import { RuleEditPage } from '../rule-edit/ruleEdit';
-import { RulesCustomAutoCompleteService } from '../../services/RulesCustomAutoCompleteService';
+import { RuleEditPage } from '../rule-edit/ruleEdit.component';
+import { RulesCustomAutoCompleteService } from '../../services/rulesCustomAutoComplete.service';
 import { PageableRules } from '../../api/PageableRules';
 
 
 @Component({
   selector: 'page-rules-static',
-  templateUrl: 'rulesStatic.html',
+  templateUrl: 'rulesStatic.component.html',
 })
 export class RulesStaticPage {
 
@@ -56,7 +56,7 @@ export class RulesStaticPage {
       if (rule.released) {
         this.loadRules();
       }
-    })
+    });
   }
 
   loadRules() {
@@ -69,7 +69,7 @@ export class RulesStaticPage {
       }
       
       this.selectedRule = undefined;
-    })
+    });
   }
 
   loadNextRules(infiniteScroll) {
@@ -100,19 +100,19 @@ export class RulesStaticPage {
   deleteRule(rule: Rule) {
     this.rulesService.deleteRule(rule.id, this.type == 'custom').subscribe(rules => {
       this.loadRules();
-    })
+    });
   }
 
   downloadRules() {
     this.rulesService.downloadRules(this.type == 'custom').subscribe(data => {
       this.showFile(data);
-    })
+    });
   }
 
   showFile(blob) {
     // It is necessary to create a new blob object with mime-type explicitly set
     // otherwise only Chrome works like it should
-    var newBlob = new Blob([blob], { type: "application/pdf" })
+    let newBlob = new Blob([blob], { type: "application/pdf" })
 
     // IE doesn't allow using a blob object directly as link href
     // instead it is necessary to use msSaveOrOpenBlob
@@ -121,10 +121,10 @@ export class RulesStaticPage {
       return;
     }
 
-    // For other browsers: 
+    // For other browsers:
     // Create a link pointing to the ObjectURL containing the blob.
     const data = window.URL.createObjectURL(newBlob);
-    var link = document.createElement('a');
+    let link = document.createElement('a');
     link.href = data;
     link.download = "rules.yaml";
     link.click();
@@ -150,6 +150,6 @@ export class RulesStaticPage {
             }
           })
         }
-      })
+      });
   }
 }

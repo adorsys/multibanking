@@ -1,22 +1,24 @@
 import { Component, ViewChild } from "@angular/core";
-import { AlertController, ToastController, NavParams, LoadingController, NavController, Navbar } from "ionic-angular";
-import { BankAccountService } from "../../services/bankAccountService";
-import { AnalyticsService } from "../../services/analyticsService";
+import { NavController, AlertController, ToastController, NavParams, LoadingController, Navbar } from "ionic-angular";
+import { BankAccountService } from "../../services/bankAccount.service";
+import { BookingService } from "../../services/booking.service";
 import { BankAccess } from "../../api/BankAccess";
-import { AccountAnalytics } from "../../api/AccountAnalytics";
-import { BookingGroup } from "../../api/BookingGroup";
-import { AppConfig } from "../../app/app.config";
-import { BookingGroupPage } from "./bookingGroup";
+import { Booking } from "../../api/Booking";
+import { LogoService } from '../../services/logo.service';
+import { PaymentCreatePage } from "../payment/paymentCreate.component";
+import { BankAccount } from "../../api/BankAccount";
+import { BookingDetailPage } from "../booking-detail/bookingDetail.component";
 
 @Component({
-  selector: 'page-analytics',
-  templateUrl: 'analytics.html'
+  selector: 'page-bookingList',
+  templateUrl: 'bookingList.component.html'
 })
-export class AnalyticsPage {
+export class BookingListPage {
 
-  analytics: AccountAnalytics;
   bankAccess: BankAccess;
-  bankAccountId: string;
+  bankAccount: BankAccount;
+  getLogo: Function;
+  bookings: Array<Booking>;
 
   @ViewChild(Navbar) navBar: Navbar;
 
@@ -27,29 +29,18 @@ export class AnalyticsPage {
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
     private bankAccountService: BankAccountService,
-    private analyticsService: AnalyticsService) {
-
+    private bookingService: BookingService,
+    public logoService: LogoService
+  ) {
     this.bankAccess = navparams.data.bankAccess;
-    this.bankAccountId = navparams.data.bankAccount.id;
+    this.bankAccount = navparams.data.bankAccount;
+    this.getLogo = logoService.getLogo;
   }
 
   ngOnInit() {
-    this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
-      this.loadAnalytics();
-    })
-    this.loadAnalytics();
-  }
-
-  ionViewDidLoad() {
-    this.navBar.backButtonClick = (e: UIEvent) => {
-      this.navCtrl.parent.viewCtrl.dismiss();
-    };
-  }
-
-  loadAnalytics() {
-    this.analyticsService.getAnalytics(this.bankAccess.id, this.bankAccountId).subscribe(
+    this.bookingService.getBookings(this.bankAccess.id, this.bankAccount.id).subscribe(
       response => {
-        this.analytics = response;
+        this.bookings = response;
       },
       error => {
         if (error == "SYNC_IN_PROGRESS") {
@@ -59,11 +50,13 @@ export class AnalyticsPage {
             position: 'top'
           }).present();
         }
-      })
+      });
   }
 
-  getCompanyLogoUrl(bookingGroup: BookingGroup) {
-    return AppConfig.api_url + "/image/" + bookingGroup.contract.logo;
+  ionViewDidLoad() {
+    this.navBar.backButtonClick = (e: UIEvent) => {
+      this.navCtrl.parent.viewCtrl.dismiss();
+    };
   }
 
   syncBookingsPromptPin() {
@@ -104,8 +97,9 @@ export class AnalyticsPage {
     });
     loading.present();
 
-    this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccountId, pin).subscribe(
+    this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccount.id, pin).subscribe(
       response => {
+        this.bookings = response;
         loading.dismiss();
       },
       error => {
@@ -126,12 +120,19 @@ export class AnalyticsPage {
             }
           })
         }
-        
-      })
+      });
   }
 
-  itemSelected(label: string, bookingGroups: Array<BookingGroup>) {
-    this.navCtrl.push(BookingGroupPage, { label: label, bookingGroups: bookingGroups })
+  itemSelected(booking) {
+    this.navCtrl.push(BookingDetailPage, {
+      booking: booking
+    });
   }
 
+  createPayment() {
+    this.navCtrl.push(PaymentCreatePage, {
+      bankAccount: this.bankAccount,
+      bankAccess: this.bankAccess
+    });
+  }
 }

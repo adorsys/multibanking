@@ -1,13 +1,13 @@
 import { Component } from "@angular/core";
 import { NavParams, NavController } from "ionic-angular";
 import { Booking } from "../../api/Booking";
-import { RuleEditPage } from "../rule-edit/ruleEdit";
-import { RulesService } from "../../services/RulesService";
+import { RuleEditPage } from "../rule-edit/ruleEdit.component";
+import { RulesService } from "../../services/rules.service";
 import { Rule } from "../../api/Rule";
 
 @Component({
   selector: 'page-bookingDetail',
-  templateUrl: 'bookingDetail.html'
+  templateUrl: 'bookingDetail.component.html'
 })
 export class BookingDetailPage {
 
@@ -27,7 +27,7 @@ export class BookingDetailPage {
         this.navCtrl.push(RuleEditPage, {
           rule: rule
         });
-      })
+      });
     } else {
       let rule: Rule = {
         creditorId: this.booking.creditorId,

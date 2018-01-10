@@ -2,11 +2,11 @@ import { Component } from "@angular/core";
 import { NavParams, NavController } from "ionic-angular";
 import { RuleCategory } from "../../api/RuleCategory";
 import { Rule } from "../../api/Rule";
-import { RulesService } from "../../services/RulesService";
+import { RulesService } from "../../services/rules.service";
 
 @Component({
   selector: 'page-ruleEdit',
-  templateUrl: 'ruleEdit.html'
+  templateUrl: 'ruleEdit.component.html'
 })
 export class RuleEditPage {
 
@@ -43,7 +43,7 @@ export class RuleEditPage {
             this.specificationChanged(this.rule.specification);
           }
         }
-      })
+      });
   }
 
   mainCategoryChanged(catId) {
@@ -69,12 +69,12 @@ export class RuleEditPage {
       this.rulesService.updateRule(this.rule).subscribe(
         response => {
           this.navCtrl.pop();
-        })
+        });
     } else {
       this.rulesService.createRule(this.rule).subscribe(
         response => {
           this.navCtrl.pop();
-        })
+        });
     }
 
   }

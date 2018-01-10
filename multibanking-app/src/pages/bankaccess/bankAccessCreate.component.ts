@@ -1,14 +1,14 @@
 import { Component, ViewChild } from "@angular/core";
 import { NavController, NavParams, LoadingController, AlertController } from "ionic-angular";
-import { BankAccessService } from "../../services/bankAccessService";
+import { BankAccessService } from "../../services/bankAccess.service";
 import { AutoCompleteComponent } from "ionic2-auto-complete";
 import { BankAccess } from "../../api/BankAccess";
 import { Bank } from "../../api/Bank";
-import { BankAutoCompleteService } from "../../services/bankAutoCompleteService";
+import { BankAutoCompleteService } from "../../services/bankAutoComplete.service";
 
 @Component({
   selector: 'page-bankaccess-create',
-  templateUrl: 'bankAccessCreate.html'
+  templateUrl: 'bankAccessCreate.component.html'
 })
 export class BankAccessCreatePage {
 
@@ -67,7 +67,7 @@ export class BankAccessCreatePage {
 
     this.bankAccess.bankCode = this.selectedBank.bankCode;
 
-    for (var i = 0; i < this.selectedBank.loginSettings.credentials.length; i++) {
+    for (let i = 0; i < this.selectedBank.loginSettings.credentials.length; i++) {
       if (i == 0) {
         this.bankAccess.bankLogin = this.selectedBank.loginSettings.credentials[i].input;
       }
@@ -113,8 +113,8 @@ export class BankAccessCreatePage {
               }).present();
             }
           });
-        
+
         }
-      })
+      });
   }
 }
