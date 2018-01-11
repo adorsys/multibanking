@@ -1,2 +1,30 @@
 page-bookingList {
+
+  .booking-list {
+
+    &__item {
+      margin: 5px 0;
+      padding: 0;
+      position: relative;
+
+      .item-inner {
+
+        ion-label.label-md {
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .item__alert {
+    color: #CC3300;
+  }
+
+  .amount--negative {
+    color: #CC3300;
+  }
+
+  .amount--positive {
+    color: #2d872e;
+  }
 }
