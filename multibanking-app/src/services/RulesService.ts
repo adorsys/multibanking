@@ -38,8 +38,19 @@ export class RulesService {
 
   getRules(custom: boolean): Observable<Array<Rule>> {
     return this.http.get(`${AppConfig.api_url}/analytics/rules?custom=` + custom)
-      .map((res: Response) => res.json()._embedded ? res.json()._embedded.customRuleEntityList : [])
+      .map((res: Response) => this.mapRulesResponse(res, custom))
       .catch(this.handleError);
+  }
+
+  mapRulesResponse(res: Response, custom: boolean) {
+    let json = res.json();
+    if (json._embedded && json._embedded.customRuleEntityList) {
+      return json._embedded.customRuleEntityList;
+    } else if (json._embedded && json._embedded.ruleEntityList) {
+      return json._embedded.ruleEntityList;
+    }
+    return [];
+
   }
 
   getRule(id: string): Observable<Rule> {
