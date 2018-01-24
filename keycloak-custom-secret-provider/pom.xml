@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>keycloak-custom-secret-provider</artifactId>
     <groupId>de.adorsys.keycloak</groupId>
-    <version>1.4.3</version>
+    <version>1.1.0</version>
 
     <properties>
         <keycloak.version>3.4.3.Final</keycloak.version>
