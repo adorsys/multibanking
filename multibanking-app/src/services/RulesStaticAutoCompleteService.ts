@@ -14,9 +14,14 @@ export class RulesStaticAutoCompleteService implements AutoCompleteService {
   }
 
   getResults(keyword: string) {
-    return this.http.get(`${AppConfig.api_url}/analytics/rules/search?query=` + keyword + '&custom=' + this.customRules)
+    return this.http.get(`${AppConfig.api_url}/analytics/rules/search?query=${keyword}&custom=${this.customRules}`)
       .map((res: Response) => {
-        return res.json()._embedded != null ? res.json()._embedded.customRuleEntityList : [];
+        if (this.customRules) {
+          return res.json()._embedded != null ? res.json()._embedded.customRuleEntityList : [];
+        } else {
+          return res.json()._embedded != null ? res.json()._embedded.ruleEntityList : [];
+        }
+        
       })
       .catch(this.handleError);
   }

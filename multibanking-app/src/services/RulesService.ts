@@ -5,6 +5,7 @@ import { Observable } from "rxjs/Observable";
 import { RuleCategory } from "../api/RuleCategory";
 import { Rule } from "../api/Rule";
 import { Subject } from "rxjs";
+import { PageableRules } from "../api/PageableRules";
 
 @Injectable()
 export class RulesService {
@@ -36,9 +37,15 @@ export class RulesService {
       })
   }
 
-  getRules(custom: boolean): Observable<Array<Rule>> {
-    return this.http.get(`${AppConfig.api_url}/analytics/rules?custom=` + custom)
-      .map((res: Response) => this.mapRulesResponse(res, custom))
+  getRules(type: string): Observable<PageableRules> {
+    return this.http.get(`${AppConfig.api_url}/analytics/rules/${type}`)
+      .map(response => response.json())
+      .catch(this.handleError);
+  }
+
+  getNextRules(url: string): Observable<PageableRules> {
+    return this.http.get(url)
+      .map(response => response.json())
       .catch(this.handleError);
   }
 

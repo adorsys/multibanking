@@ -18,7 +18,7 @@ export class RulesCustomPage extends RulesStaticPage {
   @ViewChild(Navbar) navBar: Navbar;
   selectedRule: Rule;
   rules: Rule[];
-  customRules: boolean = true;
+  type: string = "custom";
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,

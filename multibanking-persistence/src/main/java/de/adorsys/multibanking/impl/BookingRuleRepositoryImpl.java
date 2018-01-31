@@ -8,6 +8,8 @@ import de.adorsys.multibanking.repository.CustomRuleRepositoryMongodb;
 import de.adorsys.multibanking.repository.RuleRepositoryMongodb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -37,6 +39,14 @@ public class BookingRuleRepositoryImpl implements BookingRuleRepositoryIf {
 
     public List<CustomRuleEntity> findByUserIdAndIncomingCustomRules(String userId, boolean incoming) {
         return customRuleRepository.findByIncoming(incoming);
+    }
+
+    public Page<? extends RuleEntity> findAllPageable(Pageable pageable, boolean custom) {
+        if (custom) {
+            return customRuleRepository.findAll(pageable);
+        } else {
+            return ruleRepository.findAll(pageable);
+        }
     }
 
     public List<? extends RuleEntity> findAll(boolean custom) {
