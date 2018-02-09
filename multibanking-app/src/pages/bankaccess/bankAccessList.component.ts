@@ -6,7 +6,6 @@ import { BankAccessService } from "../../services/bankAccess.service";
 import { BankAccessUpdatePage } from "./bankAccessUpdate.component";
 import { BankAccess } from "../../api/BankAccess";
 import { KeycloakService } from '../../auth/keycloak.service';
-import { RulesTabsPage } from '../rules-tabs/rules-tabs.component';
 
 @Component({
   selector: 'page-bankaccessList',
@@ -65,10 +64,6 @@ export class BankAccessListPage {
     this.bankAccessService.deleteBankAccess(bankAccess.id).subscribe(response => {
       this.bankAccessesChanged();
     });
-  }
-
-  editRules() {
-    this.navCtrl.push(RulesTabsPage);
   }
 
 }

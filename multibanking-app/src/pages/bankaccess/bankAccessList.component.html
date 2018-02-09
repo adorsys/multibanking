@@ -11,9 +11,6 @@
   <ion-fab top right edge>
     <button ion-fab mini (click)="createBankAccess()"><ion-icon name="add"></ion-icon></button>
   </ion-fab>
-  <ion-fab *ngIf="rulesAdmin" bottom right>
-    <button ion-fab mini (click)="editRules()"><ion-icon name="cog"></ion-icon></button>
-  </ion-fab>
   <ion-list>
     <ion-item *ngFor="let bankaccess of bankaccesses" (click)="itemSelected(bankaccess)">
       <h3>{{ bankaccess.bankCode }}</h3>
