@@ -11,9 +11,17 @@
 
 <ion-content class="bookingList-content" padding>
   <ion-fab bottom right>
-    <button ion-fab mini (click)="createPayment()">
-      <ion-icon name="paper-plane"></ion-icon>
+    <button ion-fab mini>
+      <ion-icon name="arrow-dropleft"></ion-icon>
     </button>
+    <ion-fab-list side="left">
+      <button ion-fab mini (click)="createPayment()">
+        <ion-icon name="paper-plane"></ion-icon>
+      </button>
+      <button ion-fab mini (click)="downloadBookings()">
+        <ion-icon name="download"></ion-icon>
+      </button>
+    </ion-fab-list>
   </ion-fab>
   <ion-list>
     <ion-item class="booking-list__item"

@@ -4,7 +4,7 @@
       <button ion-item (click)="openPage(rootPage)" menuToggle>
         Bank Connections
       </button>
-      <button ion-item (click)="openPage(rulesPage)" menuToggle>
+      <button ion-item (click)="openPage(rulesPage)" menuToggle *ngIf="rulesAdmin">
         Rules
       </button>
       <button ion-item (click)="logout()" menuToggle>

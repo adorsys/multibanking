@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AppConfig } from '../app/app.config';
-import { Http, Response } from '@angular/http';
+import { Http, Response, ResponseContentType } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Booking } from "../api/Booking";
 
@@ -19,6 +19,15 @@ export class BookingService {
   getBooking(accessId, accountId, bookingId): Observable<Booking> {
     return this.http.get(`${AppConfig.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/${bookingId}`)
       .map((res: Response) => res.json()._embedded != null ? res.json()._embedded.bookingEntityList : [])
+      .catch(this.handleError);
+  }
+
+  downloadBookings(accessId, accountId): Observable<any> {
+    return this.http.get(`${AppConfig.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/download`,
+      { responseType: ResponseContentType.Blob })
+      .map(res => {
+        return new Blob([res.blob()], { type: 'application/csv' })
+      })
       .catch(this.handleError);
   }
 

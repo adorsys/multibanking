@@ -112,7 +112,7 @@ export class RulesStaticPage {
   showFile(blob) {
     // It is necessary to create a new blob object with mime-type explicitly set
     // otherwise only Chrome works like it should
-    let newBlob = new Blob([blob], { type: "application/pdf" })
+    let newBlob = new Blob([blob], { type: "application/x-yaml" })
 
     // IE doesn't allow using a blob object directly as link href
     // instead it is necessary to use msSaveOrOpenBlob

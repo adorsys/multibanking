@@ -1,26 +1,3846 @@
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a62704fc69d0001791c7c"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "05565ed6-7926-49b4-b906-e10790fd6bee", "mainCategory" : "LEBENSHALTUNG", "subCategory" : "LEBENSMITTEL", "specification" : "GETRAENKEMARKT", "creditorId" : "De83zzz00001091859", "expression" : "RFN LIKE 'FRAENKY%'", "receiver" : "Fränky", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a678f4fc69d0001791cb5"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "8850162b-4912-4f92-bff4-8c6ef7c2b393", "ruleId" : "6876635c-6fd1-41bc-a83a-77cedd2e7b1d", "mainCategory" : "FREIZEIT", "subCategory" : "SHOPPING", "specification" : "BEKLEIDUNG", "creditorId" : "de25zzz00000069068", "receiver" : "Engelbert Strauss GmbH", "incoming": false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a68474fc69d0001791cd8"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "8850162b-4912-4f92-bff4-8c6ef7c2b393", "ruleId" : "cc2d9fe6-314e-423e-94e6-9b7da2c5d4b9", "mainCategory" : "FREIZEIT", "subCategory" : "SHOPPING", "specification" : "SONSTIGES", "creditorId" : "de11zzz00000009471", "receiver" : "VEDES GmbH", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a68c04fc69d0001791d02"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "8850162b-4912-4f92-bff4-8c6ef7c2b393", "ruleId" : "fd31f646-d3c9-4bb8-9956-6adba82c36e5", "mainCategory" : "LEBENSHALTUNG", "subCategory" : "LEBENSMITTEL", "specification" : "SUPERMARKT", "creditorId" : "de41zzz00001861922", "receiver" : "EDEKA", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a69084fc69d0001791d2a"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "8850162b-4912-4f92-bff4-8c6ef7c2b393", "ruleId" : "e4b225fc-4fce-472a-8aaf-e0e83f2496c8", "mainCategory" : "LEBENSHALTUNG", "subCategory" : "GESUNDHEIT", "specification" : "APOTHEKE", "creditorId" : "de76zzz00001687080", "receiver" : "Medicon", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a695f4fc69d0001791d2b"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "8850162b-4912-4f92-bff4-8c6ef7c2b393", "ruleId" : "0476c433-046b-4cb5-b834-7871c51cb5c0", "mainCategory" : "LEBENSHALTUNG", "subCategory" : "SONSTIGES", "creditorId" : "de72zzz00001798120", "receiver" : "Martini Schmuckzeit", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a69e64fc69d0001791d53"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "8850162b-4912-4f92-bff4-8c6ef7c2b393", "ruleId" : "9b5adf08-c0b2-495e-bc13-ae388ac797c6", "mainCategory" : "VERKEHR_MOBILITAET", "subCategory" : "TANKSTELLE", "creditorId" : "de29zzz00000030390", "receiver" : "HEM Tankstelle", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a6a644fc69d0001791da3"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "8850162b-4912-4f92-bff4-8c6ef7c2b393", "ruleId" : "custom-custom-O1620", "mainCategory" : "LEBENSHALTUNG", "subCategory" : "SONSTIGES", "creditorId" : "de06zzz00000171648", "receiver" : "Freier Kindergarten Schwabach e.V.", "incoming" : false, "taxRelevant" : false})
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a6aa24fc69d0001791dcb"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "8850162b-4912-4f92-bff4-8c6ef7c2b393", "ruleId" : "47a25ef5-98c1-454b-b3bc-737d69277e87", "mainCategory" : "FREIZEIT", "subCategory" : "SHOPPING", "specification" : "SONSTIGES", "creditorId" : "de76zzz00000967243", "receiver" : "Blumen Meckert", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a71804fc69d0001791e1a"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "custom-O1512", "mainCategory" : "WOHNEN", "subCategory" : "NEBENKOSTEN", "specification" : "WASSER", "expression" : "VWZ LIKE '%ABSCHLAG%ABWA%'", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a8c3584043f8335aa957b"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "custom-O1512", "mainCategory" : "WOHNEN", "subCategory" : "NEBENKOSTEN", "specification" : "ABFALL", "expression" : "VWZ LIKE '%ABFALL%'", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2a8c4784043f8335aa957c"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "custom-O1512", "mainCategory" : "WOHNEN", "subCategory" : "NEBENKOSTEN", "specification" : "GRUNDSTEUER", "expression" : "VWZ LIKE '%GRST%'", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2aaae0270f3c00016d1177"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "ef4dd751-4f3a-4693-9d45-5f63456b0b3b", "ruleId" : "custom-custom-O1512", "mainCategory" : "FREIZEIT", "subCategory" : "MEDIEN", "specification" : "PAY_TV", "creditorId" : "de4800100000348790", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2aab0f270f3c00016d1178"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "ef4dd751-4f3a-4693-9d45-5f63456b0b3b", "ruleId" : "custom-custom-O1512", "mainCategory" : "FINANZEN", "subCategory" : "SPAREN_VORSORGE", "specification" : "ALTERSVORSORGE", "creditorId" : "de27zzz00000024315", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2aab30270f3c00016d1179"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "ef4dd751-4f3a-4693-9d45-5f63456b0b3b", "ruleId" : "custom-custom-O1512", "mainCategory" : "FINANZEN", "subCategory" : "VERSICHERUNGEN", "specification" : "HAFTPFLICHTVERSICHERUNG", "creditorId" : "de25edl00000041714", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2aab55270f3c00016d117a"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "ef4dd751-4f3a-4693-9d45-5f63456b0b3b", "ruleId" : "custom-custom-O1512", "mainCategory" : "FINANZEN", "subCategory" : "VERSICHERUNGEN", "specification" : "LEBENSVERSICHERUNG", "creditorId" : "de27zzz00000028680", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2aac62270f3c00016d1180"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "ef4dd751-4f3a-4693-9d45-5f63456b0b3b", "ruleId" : "custom-custom-O1512", "mainCategory" : "WOHNEN", "subCategory" : "TELEKOMMUNIKATION", "specification" : "TELEFON_INTERNET", "creditorId" : "de04ccb00019318208", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2aac72270f3c00016d1181"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "ef4dd751-4f3a-4693-9d45-5f63456b0b3b", "ruleId" : "custom-custom-O1512", "mainCategory" : "WOHNEN", "subCategory" : "TELEKOMMUNIKATION", "specification" : "TELEFON_INTERNET", "creditorId" : "de30zzz00000246391", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2e5d09ced7c7000108a9ab"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "85788cd4-2664-49a2-9d1a-0441c48ecd2a", "mainCategory" : "WOHNEN", "subCategory" : "TELEKOMMUNIKATION", "specification" : "RUNDFUNKGEBUEHR", "creditorId" : "De3000100000001272", "expression" : "VWZ LIKE '%RUNDFUNKBEITRAG%'", "receiver" : "ARD ZDF DRadio Beitragsservice", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2e5dd3ced7c7000108a9be"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "2d538dce-7d4c-44ef-8491-bdfc0d761876", "mainCategory" : "LEBENSHALTUNG", "subCategory" : "LEBENSMITTEL", "specification" : "SUPERMARKT", "creditorId" : "De61zzz00000018368", "expression" : "VWZ LIKE '%NETTO%MARKE%'", "receiver" : "Netto Marken-Discount", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2e5f18ced7c7000108a9f3"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "2eb5c206-e6b4-4579-be51-b05980e545f3", "mainCategory" : "PRIVAT", "subCategory" : "EINZAHLUNG", "expression" : "VWZ LIKE '%INHABERSCHECK%'", "incoming" : true, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2e5f54ced7c7000108aa05"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "a5e30fce-888c-48c6-86ec-a0a38993590e", "mainCategory" : "VERKEHR_MOBILITAET", "subCategory" : "TANKSTELLE", "creditorId" : "De52zzz00000126879", "expression" : "RFN LIKE 'AVIA%'", "receiver" : "AVIA", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2e5e91ced7c7000108a9d0"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "25e6cd11-186d-4a46-b1ae-7995dc25f39e", "mainCategory" : "FREIZEIT", "subCategory" : "SONSTIGES", "expression" : "VWZ LIKE '%WENDELSTEINBAHN%'", "receiver" : "Wendelsteinbahn GmbH", "incoming" : false, "taxRelevant": false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2e6aac51de4800015ff624"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "bb621302-ce79-4b78-a746-7256946b4cc3", "mainCategory" : "WOHNEN", "subCategory" : "EINRICHTUNG_GARTEN", "specification" : "MOEBELHAUS", "creditorId" : "De76zzz00000061166", "expression" : "RFN LIKE 'BDSK%HANDEL%'","receiver" : "XXXLutz", "incoming" : false, "taxRelevant" : false })
-db.customRuleEntity.insert({ "_id" : ObjectId("5a2e6ae451de4800015ff636"), "_class" : "de.adorsys.multibanking.domain.CustomRuleEntity", "creator" : "2bf36b9c-9fd8-46a0-8bba-957568ff8967", "ruleId" : "d4a2e246-f3e8-42a0-b237-503e3ebe0e38", "mainCategory" : "EINKUENFTE", "subCategory" : "SONSTIGES", "specification" : "PAYBACK", "expression" : "RFN LIKE 'SHOOP%'", "incoming" : true, "taxRelevant" : false })
-
+{
+  "_embedded": {
+    "bookingEntityList": [{
+      "externalId": "210499d5-eabc-4b0f-b2e7-13c912efa0db",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2018, 2, 2],
+      "bookingDate": [2018, 2, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288dee",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288dee"
+        }
+      }
+    }, {
+      "externalId": "220ddd60-182f-42d1-83bb-0d3b21b7fd58",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2018, 1, 2],
+      "bookingDate": [2018, 1, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288df0",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288df0"
+        }
+      }
+    }, {
+      "externalId": "b646a63c-ec30-4476-a9f1-660479f19772",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 12, 2],
+      "bookingDate": [2017, 12, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e37",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e37"
+        }
+      }
+    }, {
+      "externalId": "0f644710-c9b6-4fd9-8156-216ef9775d57",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 11, 2],
+      "bookingDate": [2017, 11, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288de6",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288de6"
+        }
+      }
+    }, {
+      "externalId": "b6bc3bee-7a3c-4910-93c5-e0160a012315",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 10, 2],
+      "bookingDate": [2017, 10, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e38",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e38"
+        }
+      }
+    }, {
+      "externalId": "3bd06bac-c436-4923-9058-a2c35f3cffc5",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 9, 2],
+      "bookingDate": [2017, 9, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288dfe",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288dfe"
+        }
+      }
+    }, {
+      "externalId": "f168038f-48d4-4da4-a480-b1cc2e43af0b",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 8, 2],
+      "bookingDate": [2017, 8, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e4a",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e4a"
+        }
+      }
+    }, {
+      "externalId": "30b09417-7f63-4654-a71c-51940be55143",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 7, 2],
+      "bookingDate": [2017, 7, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288dfb",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288dfb"
+        }
+      }
+    }, {
+      "externalId": "f4e7611a-23fe-4826-b99d-792b01b92a7a",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 6, 2],
+      "bookingDate": [2017, 6, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e4c",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e4c"
+        }
+      }
+    }, {
+      "externalId": "9cc74a88-338e-4f10-82e9-13e6adc45d15",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 5, 2],
+      "bookingDate": [2017, 5, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e2a",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e2a"
+        }
+      }
+    }, {
+      "externalId": "8140ecbc-ce41-4aef-ad9a-00de357ac0d3",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 4, 2],
+      "bookingDate": [2017, 4, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e1f",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e1f"
+        }
+      }
+    }, {
+      "externalId": "44de0e3e-326d-468e-99b6-f3921bf47138",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 3, 2],
+      "bookingDate": [2017, 3, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e01",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e01"
+        }
+      }
+    }, {
+      "externalId": "496b02fc-74f0-4abc-a193-47a7ce8fb042",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 2, 2],
+      "bookingDate": [2017, 2, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e04",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e04"
+        }
+      }
+    }, {
+      "externalId": "1809a99d-14b7-4ea2-a209-a145eec13c5e",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2017, 1, 2],
+      "bookingDate": [2017, 1, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288de8",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288de8"
+        }
+      }
+    }, {
+      "externalId": "4bd5a098-0dd6-4db7-965c-1c1e5a634037",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 12, 2],
+      "bookingDate": [2016, 12, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e05",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e05"
+        }
+      }
+    }, {
+      "externalId": "4cc35f5b-a826-4771-a02c-32dd371a8319",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 11, 2],
+      "bookingDate": [2016, 11, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e06",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e06"
+        }
+      }
+    }, {
+      "externalId": "871fe330-2290-43dc-9e4f-cccfd2b6ff70",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 10, 2],
+      "bookingDate": [2016, 10, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e22",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e22"
+        }
+      }
+    }, {
+      "externalId": "534d1747-a9df-40d8-9dbe-d3fc7c2af870",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 9, 2],
+      "bookingDate": [2016, 9, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e09",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e09"
+        }
+      }
+    }, {
+      "externalId": "82e24392-dbdd-4019-aebf-8873bf6b9d09",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 8, 2],
+      "bookingDate": [2016, 8, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e20",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e20"
+        }
+      }
+    }, {
+      "externalId": "a8a03702-ab0f-4182-86ac-d18fe899f459",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 7, 2],
+      "bookingDate": [2016, 7, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e30",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e30"
+        }
+      }
+    }, {
+      "externalId": "fed6b118-69b1-4054-9524-2951bbc7cba3",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 6, 2],
+      "bookingDate": [2016, 6, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e53",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e53"
+        }
+      }
+    }, {
+      "externalId": "29cdd9b7-b9a3-46c1-b8f7-53499436d3c3",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "REWE Markt GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "REWE Markt GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 31],
+      "bookingDate": [2016, 5, 27],
+      "amount": -30.75,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "REWE Markt GmbH",
+      "creditorId": "DE58ZZZ00000257236 ",
+      "mandateReference": "5603601592851801161738",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288df6",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288df6"
+        }
+      }
+    }, {
+      "externalId": "ab8f28b2-e5f7-49f1-8ad0-d3f40d8b3e42",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "REWE Markt GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "REWE Markt GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 29],
+      "bookingDate": [2016, 5, 18],
+      "amount": -30.75,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "REWE SAGT DANKE. 46400765 ",
+      "creditorId": "DE58ZZZ00000257236 ",
+      "mandateReference": "5603601592851801161738 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e32",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e32"
+        }
+      }
+    }, {
+      "externalId": "66bf066d-0eb1-4a38-ad28-ea465c9e0636",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "NSCT2922220008890000000000000000001 ",
+        "bankName": "NOTPROVIDED ",
+        "name": "NSCT2922220008890000000000000000001 ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 27],
+      "bookingDate": [2016, 5, 26],
+      "amount": 1794.029999999999972715158946812152862548828125,
+      "balance": 0,
+      "customerRef": "6317801149-0002091LG0000 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "LOHN / GEHALT 05/16",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e0e",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e0e"
+        }
+      }
+    }, {
+      "externalId": "5d454b9f-dc6f-4b0b-b159-ed725ab156f7",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "OMV Brettergartenstraße",
+        "bankName": "NOTPROVIDED ",
+        "name": "OMV Brettergartenstraße",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 20],
+      "bookingDate": [2016, 5, 18],
+      "amount": -53.5499999999999971578290569595992565155029296875,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "Kartenzahlung",
+      "usage": "OMV Brettergartenstraße",
+      "creditorId": "DE58OMV00000257865",
+      "mandateReference": "2302301692851801161591",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e0a",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e0a"
+        }
+      }
+    }, {
+      "externalId": "1e563ef6-ffa0-4d77-bd39-ff9dcc8efe19",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "DM FIL.1022 H:65299//NUERNBERG/DE",
+        "bankName": "NOTPROVIDED ",
+        "name": "DM FIL.1022 H:65299//NUERNBERG/DE",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 16],
+      "bookingDate": [2016, 5, 13],
+      "amount": -15.8900000000000005684341886080801486968994140625,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "2016-05-21T15:58:48 KFN 3 VJ 2012 \"",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288dec",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288dec"
+        }
+      }
+    }, {
+      "externalId": "2d6cdf5b-69c7-438c-81e4-01e2f5979a5e",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Foto-Seitz GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "Foto-Seitz GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 16],
+      "bookingDate": [2016, 5, 13],
+      "amount": -44,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "2016-05-21T14:31:12 KFN 3 VJ 2012 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288df8",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288df8"
+        }
+      }
+    }, {
+      "externalId": "e37073ff-d1b8-4174-827f-a24bb6fc0aad",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "THALIA-BUCHHANDLUNG//HAGEN/DE",
+        "bankName": "NOTPROVIDED ",
+        "name": "THALIA-BUCHHANDLUNG//HAGEN/DE",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 16],
+      "bookingDate": [2016, 5, 13],
+      "amount": 0,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "2016-05-21T16:53:14 KFN 3 VJ 2012 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e45",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e45"
+        }
+      }
+    }, {
+      "externalId": "eae6aa5b-a560-43a1-8a8f-54029aa532bc",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Rituals Cosmetics//Nurnberg/DE/0",
+        "bankName": "NOTPROVIDED ",
+        "name": "Rituals Cosmetics//Nurnberg/DE/0",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 16],
+      "bookingDate": [2016, 5, 13],
+      "amount": -35.8900000000000005684341886080801486968994140625,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "2016-05-21T16:12:11 KFN 3 VJ 2012 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e49",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e49"
+        }
+      }
+    }, {
+      "externalId": "1b7dc2e9-abaa-4aec-884c-1f7b1640713f",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Enchilada Nürnberg Gaststättenbetriebs GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "Enchilada Nürnberg Gaststättenbetriebs GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 15],
+      "bookingDate": [2016, 5, 13],
+      "amount": -25,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "2016-05-21T20:21:11 KFN 3 VJ 2012 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288dea",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288dea"
+        }
+      }
+    }, {
+      "externalId": "928eefeb-1d02-4194-803a-54d6476546b3",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "OMV Brettergartenstraße",
+        "bankName": "NOTPROVIDED ",
+        "name": "OMV Brettergartenstraße",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 13],
+      "bookingDate": [2016, 5, 11],
+      "amount": -53.5499999999999971578290569595992565155029296875,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "OMV Brettergartenstraße",
+      "creditorId": "DE58OMV00000257865",
+      "mandateReference": "2302301692851801161591",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e26",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e26"
+        }
+      }
+    }, {
+      "externalId": "6eb707b7-19c0-4646-88fd-82f7703e3c11",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "INTERLLOYD VERSICHE. ",
+        "bankName": "NOTPROVIDED ",
+        "name": "INTERLLOYD VERSICHE. ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 12],
+      "bookingDate": [2016, 5, 11],
+      "amount": -5.55999999999999960920149533194489777088165283203125,
+      "balance": 0,
+      "customerRef": "0002008535 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend ",
+      "usage": "INTERL VS.000613504 PRIVA Hausrat",
+      "creditorId": "DE98ZZZ00000008196 ",
+      "mandateReference": "DEM90000000278940 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e12",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e12"
+        }
+      }
+    }, {
+      "externalId": "8f979ec9-d3e6-4c55-b8b7-dad4a08e5c42",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Berufsunfähigkeitsversicherung\nDialog Lebensversicherungs-Aktienge  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "Berufsunfähigkeitsversicherung\nDialog Lebensversicherungs-Aktienge  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 12],
+      "bookingDate": [2016, 5, 11],
+      "amount": -16.719999999999998863131622783839702606201171875,
+      "balance": 0,
+      "customerRef": "011344939083 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend ",
+      "usage": "Dialog Lebensversicherung LV-Nr.: 7 091811 Folgebeitrag ",
+      "creditorId": "DE95ZZZ00000029008 ",
+      "mandateReference": "7GMFREF000000000528995 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e24",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e24"
+        }
+      }
+    }, {
+      "externalId": "ce1e7c75-6f9a-4646-8fe0-22fae58dd27a",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "AXA Schadenversicherung",
+        "bankName": "NOTPROVIDED ",
+        "name": "AXA Schadenversicherung",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 12],
+      "bookingDate": [2016, 5, 11],
+      "amount": -80.340000000000003410605131648480892181396484375,
+      "balance": 0,
+      "customerRef": "033344939083 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend",
+      "usage": "Autoversicherungspolice\n041234 Beitrag ",
+      "creditorId": "DE95ZZZ00000025332",
+      "mandateReference": "7GMFREF000000000528995 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e3f",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e3f"
+        }
+      }
+    }, {
+      "externalId": "e6bf1c5f-94d0-4e4a-b66c-2dbd3234ff81",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "INTERLLOYD VERSICHE. ",
+        "bankName": "NOTPROVIDED ",
+        "name": "INTERLLOYD VERSICHE. ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 12],
+      "bookingDate": [2016, 5, 11],
+      "amount": -9.230000000000000426325641456060111522674560546875,
+      "balance": 0,
+      "customerRef": "0002008535 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend ",
+      "usage": "INTERL VS.000613504 PRIVA",
+      "creditorId": "DE98ZZZ00000008196 ",
+      "mandateReference": "DEM90000000278940 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e46",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e46"
+        }
+      }
+    }, {
+      "externalId": "2e3ed26c-69a3-4b39-bdc5-91d9784d814d",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "REWE Markt GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "REWE Markt GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 9],
+      "bookingDate": [2016, 5, 7],
+      "amount": -30.75,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "160117380103703201256036015 REWE SAGT DANKE. 46400765 ",
+      "creditorId": "DE58ZZZ00000257236",
+      "mandateReference": "5603601592851801161738 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288dfa",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288dfa"
+        }
+      }
+    }, {
+      "externalId": "fd429b88-3fb8-4de6-ad42-76b1d71df473",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "ver.di",
+        "bankName": "NOTPROVIDED ",
+        "name": "ver.di",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 6],
+      "bookingDate": [2016, 5, 5],
+      "amount": -8.3333333333333303727386009995825588703155517578125,
+      "balance": 0,
+      "customerRef": "34022295324580001333134753005RCUR",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "ver.di",
+      "creditorId": "DE9800000000122452 ",
+      "mandateReference": "T0010003B000000030745454",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e51",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e51"
+        }
+      }
+    }, {
+      "externalId": "a87b7675-6adc-455a-8f77-1b962749c06b",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "McFIT Global Group GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "McFIT Global Group GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 5],
+      "bookingDate": [2016, 5, 5],
+      "amount": -19.89999999999999857891452847979962825775146484375,
+      "balance": 0,
+      "customerRef": "3402529824580001666199753005RCUR ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "Kd-Nr.:21235447",
+      "creditorId": "DE9700000000142462 ",
+      "mandateReference": "T0010003B000000030748373 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e2e",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e2e"
+        }
+      }
+    }, {
+      "externalId": "7fb29b53-bc4f-43f6-a15f-43f1562e0106",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Telefonica Germany GmbH + Co. OHG  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "Telefonica Germany GmbH + Co. OHG  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 5, 3],
+      "bookingDate": [2016, 5, 2],
+      "amount": -19.989999999999998436805981327779591083526611328125,
+      "balance": 0,
+      "customerRef": "3402529824580001666199753005RCUR ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "Kd-Nr.:32735393,\nRg-Nr.:1777155752/5\nMehr Infos unter:Ihre Mobilfunkrechnung. \n",
+      "creditorId": "DE9700000000142462 ",
+      "mandateReference": "T0010003B000000030748373 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e1d",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e1d"
+        }
+      }
+    }, {
+      "externalId": "1de56231-7158-4249-a753-b94cda4f0e0f",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 5, 2],
+      "bookingDate": [2016, 5, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288deb",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288deb"
+        }
+      }
+    }, {
+      "externalId": "7e934fbe-de6f-49ab-977c-bb96ac3ca736",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 5, 2],
+      "bookingDate": [2016, 5, 2],
+      "amount": -50,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "DAUERAUFTRAG",
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e1c",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e1c"
+        }
+      }
+    }, {
+      "externalId": "c1b607d8-012c-4994-93e0-809017b82d45",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Petra Klausen",
+        "bankName": "NOTPROVIDED ",
+        "name": "Petra Klausen",
+        "bic": "COBADEFFXXX",
+        "iban": "DE91540400310712347100 "
+      },
+      "valutaDate": [2016, 5, 2],
+      "bookingDate": [2016, 5, 2],
+      "amount": -350,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "DAUERAUFTRAG",
+      "usage": "MIETE + Nebenkosten WG Elsterstraße",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e3b",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e3b"
+        }
+      }
+    }, {
+      "externalId": "b2e48d62-e8aa-4d9d-8109-236749f5d7b4",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Areva GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "Areva GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 29],
+      "bookingDate": [2016, 4, 28],
+      "amount": 1794.029999999999972715158946812152862548828125,
+      "balance": 0,
+      "customerRef": "NSCT2922220008890000000000000000001 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "LOHN / GEHALT 04/16",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e35",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e35"
+        }
+      }
+    }, {
+      "externalId": "0484bac5-546b-414a-be43-e0d33ab75193",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "REWE Markt GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "REWE Markt GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 21],
+      "bookingDate": [2016, 4, 19],
+      "amount": -123.5,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "160117380103703201256036015 REWE SAGT DANKE. 46400765 ",
+      "creditorId": "DE58ZZZ00000257236 ",
+      "mandateReference": "5603601592851801161738 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288de0",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288de0"
+        }
+      }
+    }, {
+      "externalId": "0849c425-ed84-4520-a7b9-26d307b82d0b",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Berufsunfähigkeitsversicherung\nDialog Lebensversicherungs-Aktienge  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "Berufsunfähigkeitsversicherung\nDialog Lebensversicherungs-Aktienge  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 12],
+      "bookingDate": [2016, 4, 11],
+      "amount": -16.719999999999998863131622783839702606201171875,
+      "balance": 0,
+      "customerRef": "011344939083 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend ",
+      "usage": "Dialog Lebensversicherung LV-Nr.: 7 091811 Folgebeitrag ",
+      "creditorId": "DE95ZZZ00000029008 ",
+      "mandateReference": "7GMFREF000000000528995 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288de3",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288de3"
+        }
+      }
+    }, {
+      "externalId": "2632bd77-d3ed-4e14-8fe3-ef84198b12e5",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "AXA Schadenversicherung",
+        "bankName": "NOTPROVIDED ",
+        "name": "AXA Schadenversicherung",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 12],
+      "bookingDate": [2016, 4, 11],
+      "amount": -80.340000000000003410605131648480892181396484375,
+      "balance": 0,
+      "customerRef": "033344939083 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend",
+      "usage": "Autoversicherungspolice\n041234 Beitrag ",
+      "creditorId": "DE95ZZZ00000025332",
+      "mandateReference": "7GMFREF000000000528995 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288df3",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288df3"
+        }
+      }
+    }, {
+      "externalId": "3c512880-e850-434b-8e51-4cbc5ebec902",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "INTERLLOYD VERSICHE.",
+        "bankName": "NOTPROVIDED ",
+        "name": "INTERLLOYD VERSICHE.",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 12],
+      "bookingDate": [2016, 4, 11],
+      "amount": -9.230000000000000426325641456060111522674560546875,
+      "balance": 0,
+      "customerRef": "0002008535 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "INTERL VS.000613504 PRIVA",
+      "creditorId": "DE98ZZZ00000008196 ",
+      "mandateReference": "DEM90000000278940 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288dff",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288dff"
+        }
+      }
+    }, {
+      "externalId": "9b27f453-15da-4268-840c-ab121f68bf66",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "INTERLLOYD VERSICHE.",
+        "bankName": "NOTPROVIDED ",
+        "name": "INTERLLOYD VERSICHE.",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 12],
+      "bookingDate": [2016, 4, 11],
+      "amount": -5.55999999999999960920149533194489777088165283203125,
+      "balance": 0,
+      "customerRef": "0002008535 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "INTERL VS.000613504 PRIVA Hausrat\n",
+      "creditorId": "DE98ZZZ00000008196 ",
+      "mandateReference": "DEM90000000278940 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e29",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e29"
+        }
+      }
+    }, {
+      "externalId": "082ff94f-aab5-4fc6-a223-6bcbe4331718",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "ver.di",
+        "bankName": "NOTPROVIDED ",
+        "name": "ver.di",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 6],
+      "bookingDate": [2016, 4, 5],
+      "amount": -8.3333333333333303727386009995825588703155517578125,
+      "balance": 0,
+      "customerRef": "34022295324580001333134753005RCUR",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "ver.di",
+      "creditorId": "DE9800000000122452 ",
+      "mandateReference": "T0010003B000000030745454",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288de2",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288de2"
+        }
+      }
+    }, {
+      "externalId": "b77c9646-8bd8-4cc8-9e54-af000da41179",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "REWE Markt GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "REWE Markt GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 6],
+      "bookingDate": [2016, 4, 5],
+      "amount": -53.82000000000000028421709430404007434844970703125,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "REWE SAGT DANKE. 46400765 ",
+      "creditorId": "DE58ZZZ00000257236 ",
+      "mandateReference": "5603601592851801161738 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e39",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e39"
+        }
+      }
+    }, {
+      "externalId": "976f06c2-ab98-4dce-9b2a-0cbc81c1b2d1",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Telefonica Germany GmbH + Co. OHG  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "Telefonica Germany GmbH + Co. OHG  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 5],
+      "bookingDate": [2016, 4, 4],
+      "amount": -19.989999999999998436805981327779591083526611328125,
+      "balance": 0,
+      "customerRef": "3402529824580001666199753005RCUR ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "Kd-Nr.:32735393,\nRg-Nr.:1777155752/4\nMehr Infos unter:Ihre Mobilfunkrechnung. \n",
+      "creditorId": "DE9700000000142462 ",
+      "mandateReference": "T0010003B000000030748373 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e27",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e27"
+        }
+      }
+    }, {
+      "externalId": "e31d1e5d-64cf-4619-8688-e8dcb16c5697",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "McFIT Global Group GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "McFIT Global Group GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 5],
+      "bookingDate": [2016, 4, 5],
+      "amount": -19.89999999999999857891452847979962825775146484375,
+      "balance": 0,
+      "customerRef": "3402529824580001666199753005RCUR ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "Kd-Nr.:21235447",
+      "creditorId": "DE9700000000142462 ",
+      "mandateReference": "T0010003B000000030748373 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e44",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e44"
+        }
+      }
+    }, {
+      "externalId": "3e285421-2d2e-4484-a852-8c2771d5a17a",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 4, 4],
+      "bookingDate": [2016, 4, 2],
+      "amount": -50,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "DAUERAUFTRAG",
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e00",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e00"
+        }
+      }
+    }, {
+      "externalId": "6b96bbc9-0460-4186-bc9b-94137c45d998",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 4, 2],
+      "bookingDate": [2016, 4, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e10",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e10"
+        }
+      }
+    }, {
+      "externalId": "07596f60-ead0-4b46-b78b-cf28a442284e",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Areva GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "Areva GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 4, 1],
+      "bookingDate": [2016, 3, 31],
+      "amount": 1794.029999999999972715158946812152862548828125,
+      "balance": 0,
+      "customerRef": "NSCT2922220008890000000000000000001 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "LOHN / GEHALT 03/16",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288de1",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288de1"
+        }
+      }
+    }, {
+      "externalId": "ea40c5de-9a34-4ebb-9449-4f5b918123cd",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Petra Klausen",
+        "bankName": "NOTPROVIDED ",
+        "name": "Petra Klausen",
+        "bic": "COBADEFFXXX",
+        "iban": "DE91540400310712347100 "
+      },
+      "valutaDate": [2016, 4, 1],
+      "bookingDate": [2016, 4, 1],
+      "amount": -350,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "DAUERAUFTRAG",
+      "usage": "MIETE + Nebenkosten WG Elsterstraße",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e48",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e48"
+        }
+      }
+    }, {
+      "externalId": "1613303b-f83a-480b-915b-031765d3e89f",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "OMV Brettergartenstraße",
+        "bankName": "NOTPROVIDED ",
+        "name": "OMV Brettergartenstraße",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 15],
+      "bookingDate": [2016, 3, 11],
+      "amount": -53.5499999999999971578290569595992565155029296875,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "OMV Brettergartenstraße",
+      "creditorId": "DE58OMV00000257865",
+      "mandateReference": "2302301692851801161591",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288de7",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288de7"
+        }
+      }
+    }, {
+      "externalId": "50556bd6-0362-4316-a7c9-828f2775a920",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "INTERLLOYD VERSICHE.",
+        "bankName": "NOTPROVIDED ",
+        "name": "INTERLLOYD VERSICHE.",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 15],
+      "bookingDate": [2016, 3, 11],
+      "amount": -5.55999999999999960920149533194489777088165283203125,
+      "balance": 0,
+      "customerRef": "0002008535 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "INTERL VS.000613504 PRIVA Hausrat",
+      "creditorId": "DE98ZZZ00000008196 ",
+      "mandateReference": "DEM90000000278940 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e08",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e08"
+        }
+      }
+    }, {
+      "externalId": "6103e0a3-2aaf-4821-b086-2787fa919b62",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Berufsunfähigkeitsversicherung\nDialog Lebensversicherungs-Aktienge  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "Berufsunfähigkeitsversicherung\nDialog Lebensversicherungs-Aktienge  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 15],
+      "bookingDate": [2016, 3, 11],
+      "amount": -16.719999999999998863131622783839702606201171875,
+      "balance": 0,
+      "customerRef": "011344939083 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend ",
+      "usage": "Dialog Lebensversicherung LV-Nr.: 7 091811 Folgebeitrag ",
+      "creditorId": "DE95ZZZ00000029008 ",
+      "mandateReference": "7GMFREF000000000528995 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e0c",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e0c"
+        }
+      }
+    }, {
+      "externalId": "6ca77e1f-8ac6-40c4-9425-058ac2234b27",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "AXA Schadenversicherung",
+        "bankName": "NOTPROVIDED ",
+        "name": "AXA Schadenversicherung",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 15],
+      "bookingDate": [2016, 3, 11],
+      "amount": -80.340000000000003410605131648480892181396484375,
+      "balance": 0,
+      "customerRef": "033344939083 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend",
+      "usage": "Autoversicherungspolice\n041234 Beitrag ",
+      "creditorId": "DE95ZZZ00000025332",
+      "mandateReference": "7GMFREF000000000528995 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e11",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e11"
+        }
+      }
+    }, {
+      "externalId": "a1c5de43-7788-4a47-a9ce-32dc556293d3",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+        "bankName": "NOTPROVIDED ",
+        "name": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 15],
+      "bookingDate": [2016, 3, 15],
+      "amount": -150,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "BARAUSZAHLUNG",
+      "usage": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e2c",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e2c"
+        }
+      }
+    }, {
+      "externalId": "fa733865-41b4-4147-8edf-11621404d989",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "INTERLLOYD VERSICHE.",
+        "bankName": "NOTPROVIDED ",
+        "name": "INTERLLOYD VERSICHE.",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 15],
+      "bookingDate": [2016, 3, 11],
+      "amount": -9.230000000000000426325641456060111522674560546875,
+      "balance": 0,
+      "customerRef": "0002008535 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "INTERL VS.000613504 PRIVA",
+      "creditorId": "DE98ZZZ00000008196 ",
+      "mandateReference": "DEM90000000278940 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e50",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e50"
+        }
+      }
+    }, {
+      "externalId": "734ec01a-b4a7-48ac-a66b-189dbeed51bb",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+        "bankName": "NOTPROVIDED ",
+        "name": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 11],
+      "bookingDate": [2016, 3, 11],
+      "amount": -100,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "BARAUSZAHLUNG",
+      "usage": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e14",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e14"
+        }
+      }
+    }, {
+      "externalId": "88b14dc1-b90a-4e68-ae3a-d80af588843b",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "ver.di",
+        "bankName": "NOTPROVIDED ",
+        "name": "ver.di",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 7],
+      "bookingDate": [2016, 3, 4],
+      "amount": -8.3333333333333303727386009995825588703155517578125,
+      "balance": 0,
+      "customerRef": "34022295324580001333134753005RCUR",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "ver.di",
+      "creditorId": "DE9800000000122452 ",
+      "mandateReference": "T0010003B000000030745454",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e23",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e23"
+        }
+      }
+    }, {
+      "externalId": "cb6df4ff-b97f-440c-be12-12a6fd6ca466",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "McFIT Global Group GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "McFIT Global Group GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 7],
+      "bookingDate": [2016, 3, 7],
+      "amount": -19.89999999999999857891452847979962825775146484375,
+      "balance": 0,
+      "customerRef": "3402529824580001666199753005RCUR ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "Kd-Nr.:21235447",
+      "creditorId": "DE9700000000142462 ",
+      "mandateReference": "T0010003B000000030748373 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e3e",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e3e"
+        }
+      }
+    }, {
+      "externalId": "263ff2a2-844e-4961-858c-9fdf8feab124",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Telefonica Germany GmbH + Co. OHG  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "Telefonica Germany GmbH + Co. OHG  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 3],
+      "bookingDate": [2016, 3, 2],
+      "amount": -19.989999999999998436805981327779591083526611328125,
+      "balance": 0,
+      "customerRef": "3402529824580001666199753005RCUR ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "Kd-Nr.:32735393,\nRg-Nr.:1777155752/3\nMehr Infos unter:Ihre Mobilfunkrechnung. \n",
+      "creditorId": "DE9700000000142462 ",
+      "mandateReference": "T0010003B000000030748373 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288df4",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288df4"
+        }
+      }
+    }, {
+      "externalId": "fa53455f-4cc0-42f8-886c-a3dbd2918930",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 3, 2],
+      "bookingDate": [2016, 3, 2],
+      "amount": -50,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "DAUERAUFTRAG",
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e4f",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e4f"
+        }
+      }
+    }, {
+      "externalId": "fd4a522a-f0db-4319-af6f-a060ec5935b6",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 3, 2],
+      "bookingDate": [2016, 3, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e52",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e52"
+        }
+      }
+    }, {
+      "externalId": "7d95df56-b571-4a7f-9e94-7b4e4a284760",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "H+M 798 SAGT VIELEN DANK  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "H+M 798 SAGT VIELEN DANK  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 3, 1],
+      "bookingDate": [2016, 2, 25],
+      "amount": -78.1099999999999994315658113919198513031005859375,
+      "balance": 0,
+      "customerRef": "66021795213528091217124048 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "ELV66021795 09.12 12.40 ME3",
+      "creditorId": "DE95ZZZ00001678202 ",
+      "mandateReference": "6602179514001712091240",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e1a",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e1a"
+        }
+      }
+    }, {
+      "externalId": "f4fb5f0c-bebd-4bd3-b19c-e09caaa9b30e",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Petra Klausen",
+        "bankName": "NOTPROVIDED ",
+        "name": "Petra Klausen",
+        "bic": "COBADEFFXXX",
+        "iban": "DE91540400310712347100 "
+      },
+      "valutaDate": [2016, 3, 1],
+      "bookingDate": [2016, 3, 1],
+      "amount": -350,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "DAUERAUFTRAG",
+      "usage": "MIETE + Nebenkosten WG Elsterstraße",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e4d",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e4d"
+        }
+      }
+    }, {
+      "externalId": "2ddb2c2d-30b7-4356-a58a-3bdbcb8ca0b4",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "KARSTADT LEBENSM. SAGT DANK//Nuernb",
+        "bankName": "NOTPROVIDED ",
+        "name": "KARSTADT LEBENSM. SAGT DANK//Nuernb",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 29],
+      "bookingDate": [2016, 2, 25],
+      "amount": -20.21000000000000085265128291212022304534912109375,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "2016-02-25T18:04:42 KFN 3 VJ 2012 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288df9",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288df9"
+        }
+      }
+    }, {
+      "externalId": "76cf5d06-8dfc-48e1-b4fc-98b23df9f86b",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "KARSTADT WARENHAUS GMBH  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "KARSTADT WARENHAUS GMBH  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 29],
+      "bookingDate": [2016, 2, 25],
+      "amount": -9.9900000000000002131628207280300557613372802734375,
+      "balance": 0,
+      "customerRef": "60211189115177021217161015 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "021216103011189201201176006 \nKARSTADT BEDANKT SICH ",
+      "creditorId": "DE65ZZZ00000258565 ",
+      "mandateReference": "6021118957311712021610",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e17",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e17"
+        }
+      }
+    }, {
+      "externalId": "b3f45fd2-21c5-4a83-8423-6ba1878a2c5b",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Areva GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "Areva GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 26],
+      "bookingDate": [2016, 2, 25],
+      "amount": 1794.029999999999972715158946812152862548828125,
+      "balance": 0,
+      "customerRef": "NSCT2922220008890000000000000000001 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "LOHN / GEHALT 02/16",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e36",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e36"
+        }
+      }
+    }, {
+      "externalId": "2af44cae-d471-4e3b-bc77-a6cf18916785",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Berufsunfähigkeitsversicherung\nDialog Lebensversicherungs-Aktienge  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "Berufsunfähigkeitsversicherung\nDialog Lebensversicherungs-Aktienge  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 12],
+      "bookingDate": [2016, 2, 11],
+      "amount": -16.719999999999998863131622783839702606201171875,
+      "balance": 0,
+      "customerRef": "011344939083 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend ",
+      "usage": "Dialog Lebensversicherung LV-Nr.: 7 091811 Folgebeitrag ",
+      "creditorId": "DE95ZZZ00000029008 ",
+      "mandateReference": "7GMFREF000000000528995 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288df7",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288df7"
+        }
+      }
+    }, {
+      "externalId": "44fb32ae-13b5-428a-b07e-2cb430f651b4",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "INTERLLOYD VERSICHE.",
+        "bankName": "NOTPROVIDED ",
+        "name": "INTERLLOYD VERSICHE.",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 12],
+      "bookingDate": [2016, 2, 11],
+      "amount": -5.55999999999999960920149533194489777088165283203125,
+      "balance": 0,
+      "customerRef": "0002008535 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "INTERL VS.000613504 PRIVA Hausrat",
+      "creditorId": "DE98ZZZ00000008196 ",
+      "mandateReference": "DEM90000000278940 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e02",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e02"
+        }
+      }
+    }, {
+      "externalId": "486650f0-0b0b-4569-911e-941a40fe2dab",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "AXA Schadenversicherung",
+        "bankName": "NOTPROVIDED ",
+        "name": "AXA Schadenversicherung",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 12],
+      "bookingDate": [2016, 2, 11],
+      "amount": -80.340000000000003410605131648480892181396484375,
+      "balance": 0,
+      "customerRef": "033344939083 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend",
+      "usage": "Autoversicherungspolice\n041234 Beitrag ",
+      "creditorId": "DE95ZZZ00000025332",
+      "mandateReference": "7GMFREF000000000528995 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e03",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e03"
+        }
+      }
+    }, {
+      "externalId": "c8496000-6ec7-460f-8804-2425ad5a5748",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+        "bankName": "NOTPROVIDED ",
+        "name": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 12],
+      "bookingDate": [2016, 2, 11],
+      "amount": -50,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "BARAUSZAHLUNG",
+      "usage": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e3c",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e3c"
+        }
+      }
+    }, {
+      "externalId": "fa072269-057b-482c-ad59-3e0603645ae2",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "INTERLLOYD VERSICHE.",
+        "bankName": "NOTPROVIDED ",
+        "name": "INTERLLOYD VERSICHE.",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 12],
+      "bookingDate": [2016, 2, 11],
+      "amount": -9.230000000000000426325641456060111522674560546875,
+      "balance": 0,
+      "customerRef": "0002008535 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "INTERL VS.000613504 PRIVA",
+      "creditorId": "DE98ZZZ00000008196 ",
+      "mandateReference": "DEM90000000278940 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e4e",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e4e"
+        }
+      }
+    }, {
+      "externalId": "69458d88-59d3-4571-bac3-3169a97f6895",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "ver.di",
+        "bankName": "NOTPROVIDED ",
+        "name": "ver.di",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 8],
+      "bookingDate": [2016, 2, 5],
+      "amount": -8.3333333333333303727386009995825588703155517578125,
+      "balance": 0,
+      "customerRef": "34022295324580001333134753005RCUR",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "ver.di",
+      "creditorId": "DE9800000000122452 ",
+      "mandateReference": "T0010003B000000030745454",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e0f",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e0f"
+        }
+      }
+    }, {
+      "externalId": "b8347209-6dc7-4fe0-b86b-cb723e644f90",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "McFIT Global Group GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "McFIT Global Group GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 8],
+      "bookingDate": [2016, 2, 5],
+      "amount": -19.89999999999999857891452847979962825775146484375,
+      "balance": 0,
+      "customerRef": "3402529824580001666199753005RCUR ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "Kd-Nr.:21235447",
+      "creditorId": "DE9700000000142462 ",
+      "mandateReference": "T0010003B000000030748373 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e3a",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e3a"
+        }
+      }
+    }, {
+      "externalId": "20e891a9-9922-429d-961a-c4cd6f6e7b33",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+        "bankName": "NOTPROVIDED ",
+        "name": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 5],
+      "bookingDate": [2016, 2, 5],
+      "amount": -200,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "BARAUSZAHLUNG",
+      "usage": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288ded",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288ded"
+        }
+      }
+    }, {
+      "externalId": "a64ec46a-afc7-4895-8d05-1af4cbb6365d",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Hartmut Sapotzki",
+        "bankName": "NOTPROVIDED ",
+        "name": "Hartmut Sapotzki",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 5],
+      "bookingDate": [2016, 2, 3],
+      "amount": 100,
+      "balance": 0,
+      "customerRef": "NSCT1922280005360000000000000000015 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "WERTSTELLUNG",
+      "usage": "denon stereo anlage DRA-102 mit boxen \n",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e2d",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e2d"
+        }
+      }
+    }, {
+      "externalId": "79a0ca56-8d6d-4f92-9e0e-73173bb00c2f",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Telefonica Germany GmbH + Co. OHG  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "Telefonica Germany GmbH + Co. OHG  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 2, 3],
+      "bookingDate": [2016, 2, 2],
+      "amount": -19.989999999999998436805981327779591083526611328125,
+      "balance": 0,
+      "customerRef": "3402529824580001666199753005RCUR ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "Kd-Nr.:32735393,\nRg-Nr.:1777155752/2\nMehr Infos unter:Ihre Mobilfunkrechnung. \n",
+      "creditorId": "DE9700000000142462 ",
+      "mandateReference": "T0010003B000000030748373 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e18",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e18"
+        }
+      }
+    }, {
+      "externalId": "dc59a684-d2d4-4b81-9d8a-e567dabf10f9",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 2, 2],
+      "bookingDate": [2016, 2, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e41",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e41"
+        }
+      }
+    }, {
+      "externalId": "7e88322d-d1cc-4274-895f-36ea83d5984f",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Petra Klausen",
+        "bankName": "NOTPROVIDED ",
+        "name": "Petra Klausen",
+        "bic": "COBADEFFXXX",
+        "iban": "DE91540400310712347100 "
+      },
+      "valutaDate": [2016, 2, 1],
+      "bookingDate": [2016, 2, 1],
+      "amount": -350,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "DAUERAUFTRAG",
+      "usage": "MIETE + Nebenkosten WG Elsterstraße",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e1b",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e1b"
+        }
+      }
+    }, {
+      "externalId": "80693c00-42b2-47e3-a0cf-682825e0eb97",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 2, 1],
+      "bookingDate": [2016, 2, 1],
+      "amount": -50,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "DAUERAUFTRAG",
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e1e",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e1e"
+        }
+      }
+    }, {
+      "externalId": "270731c0-8a57-42c3-ad07-19bd1e292c88",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Areva GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "Areva GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 29],
+      "bookingDate": [2016, 1, 28],
+      "amount": 1794.029999999999972715158946812152862548828125,
+      "balance": 0,
+      "customerRef": "NSCT2922220008890000000000000000001 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "LOHN / GEHALT 01/16",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288df5",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288df5"
+        }
+      }
+    }, {
+      "externalId": "3ab4b3ae-758a-4430-a887-d09e2b2f114c",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "REWE Markt GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "REWE Markt GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 26],
+      "bookingDate": [2016, 2, 22],
+      "amount": -15.4399999999999995026200849679298698902130126953125,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "REWE SAGT DANKE. 46400765 ",
+      "creditorId": "DE58ZZZ00000257236 ",
+      "mandateReference": "5603601592851801161738 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288dfd",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288dfd"
+        }
+      }
+    }, {
+      "externalId": "5d9e511d-cc76-458d-bbf3-9ae39dcc1082",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Umweltstiftung \nWWF Deutschland",
+        "bankName": "NOTPROVIDED ",
+        "name": "Umweltstiftung \nWWF Deutschland",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 25],
+      "bookingDate": [2016, 2, 22],
+      "amount": -120,
+      "balance": 0,
+      "customerRef": "5226801149-0002091LG1111",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend",
+      "usage": "Danke für Ihre Spende! \nWWFT2411110008890000000000000000001 ",
+      "creditorId": "creditor",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e0b",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e0b"
+        }
+      }
+    }, {
+      "externalId": "2476b22f-f163-4c2e-bdac-f7f8aaec777d",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "REWE Markt GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "REWE Markt GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 21],
+      "bookingDate": [2016, 1, 18],
+      "amount": -35.22999999999999687361196265555918216705322265625,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "REWE SAGT DANKE. 46400765 ",
+      "creditorId": "DE58ZZZ00000257236 ",
+      "mandateReference": "5603601592851801161738 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288df1",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288df1"
+        }
+      }
+    }, {
+      "externalId": "0b076d21-bd62-4576-b951-5f7d0cea351b",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "1. FCN Handball e.V.",
+        "bankName": "NOTPROVIDED ",
+        "name": "1. FCN Handball e.V.",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 20],
+      "bookingDate": [2016, 1, 20],
+      "amount": -70,
+      "balance": 0,
+      "customerRef": "1802215480103203201256033012 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "Mitgliedsbeitrag 2016",
+      "creditorId": "FC34FCN00000252345",
+      "mandateReference": "5603601592832501161489",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288de4",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288de4"
+        }
+      }
+    }, {
+      "externalId": "1b248489-6a96-4c53-83c5-f611fb22d4c4",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "OMV Brettergartenstraße",
+        "bankName": "NOTPROVIDED ",
+        "name": "OMV Brettergartenstraße",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 20],
+      "bookingDate": [2016, 1, 18],
+      "amount": -53.5499999999999971578290569595992565155029296875,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "OMV Brettergartenstraße",
+      "creditorId": " DE58OMV00000257865",
+      "mandateReference": "2302301692851801161591",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288de9",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288de9"
+        }
+      }
+    }, {
+      "externalId": "370f9922-cdb0-40e6-9424-7e0a4838cfd3",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "PayPal (Europe) S.a.r.l. et Cie., S.C.A",
+        "bankName": "NOTPROVIDED ",
+        "name": "PayPal (Europe) S.a.r.l. et Cie., S.C.A",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 19],
+      "bookingDate": [2016, 1, 19],
+      "amount": -49.9500000000000028421709430404007434844970703125,
+      "balance": 0,
+      "customerRef": "1002212320993 PP.1371.PP PAYPAL ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "WERTSTELLUNG",
+      "usage": "PP.1371.PP . ZALANDOSE, Ihr Einkauf \nbei ZALANDOSE ",
+      "creditorId": "LU96ZZZ0000000000000000058 ",
+      "mandateReference": "4CL2224PVVQGE ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288dfc",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288dfc"
+        }
+      }
+    }, {
+      "externalId": "a894ccd7-1e3c-4e42-a587-18f739bc8327",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "SkiverleihBrixental",
+        "bankName": "NOTPROVIDED ",
+        "name": "SkiverleihBrixental",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 19],
+      "bookingDate": [2016, 1, 15],
+      "amount": -55,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "2016-01-05T18:30:00",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e2f",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e2f"
+        }
+      }
+    }, {
+      "externalId": "b2c1853f-4701-4c65-a591-e30e444d8b54",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "BP Tankstelle Innsbrucker Straße 5 Going ",
+        "bankName": "NOTPROVIDED ",
+        "name": "BP Tankstelle Innsbrucker Straße 5 Going ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 19],
+      "bookingDate": [2016, 1, 17],
+      "amount": -45.469999999999998863131622783839702606201171875,
+      "balance": 0,
+      "customerRef": "2311175601037032023456036601",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "BP Tankstelle Innsbrucker Straße 5 Going ",
+      "creditorId": "AT58OBP00000253361",
+      "mandateReference": "3302300967851801161862",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e34",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e34"
+        }
+      }
+    }, {
+      "externalId": "9d567fa6-6690-40dd-8d17-6b206fc4fb8f",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Inntaler Raststätten GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "Inntaler Raststätten GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 18],
+      "bookingDate": [2016, 1, 15],
+      "amount": -13.199999999999999289457264239899814128875732421875,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "2016-01-05T16:58:12 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e2b",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e2b"
+        }
+      }
+    }, {
+      "externalId": "af0c8545-be06-45bd-91d6-10aca44d265c",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "SkiWelt Wilder Kaiser-BrixentalTalsation Ellmau",
+        "bankName": "NOTPROVIDED ",
+        "name": "SkiWelt Wilder Kaiser-BrixentalTalsation Ellmau",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 18],
+      "bookingDate": [2016, 1, 16],
+      "amount": -79,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "2016-01-05T08:21:11",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e33",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e33"
+        }
+      }
+    }, {
+      "externalId": "c87d2889-7234-4eda-a047-f6af38dfcc09",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+        "bankName": "NOTPROVIDED ",
+        "name": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 15],
+      "bookingDate": [2016, 1, 15],
+      "amount": -200,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "BARAUSZAHLUNG",
+      "usage": "HypoVereinsbank Nürnberg Friedrich-Ebert-Platz",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e3d",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e3d"
+        }
+      }
+    }, {
+      "externalId": "dda5c63c-09c9-45c5-af8a-a1fd742cd6ca",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "DM FIL.1022 H:65299//NUERNBERG/DE",
+        "bankName": "NOTPROVIDED ",
+        "name": "DM FIL.1022 H:65299//NUERNBERG/DE",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 15],
+      "bookingDate": [2016, 1, 12],
+      "amount": -20.21000000000000085265128291212022304534912109375,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "2016-01-04T18:03:15 KFN 3 VJ 2012 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e42",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e42"
+        }
+      }
+    }, {
+      "externalId": "0deb869b-1226-4a05-8d2a-4e5c26daecd2",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "INTERLLOYD VERSICHE.",
+        "bankName": "NOTPROVIDED ",
+        "name": "INTERLLOYD VERSICHE.",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 12],
+      "bookingDate": [2016, 1, 11],
+      "amount": -9.230000000000000426325641456060111522674560546875,
+      "balance": 0,
+      "customerRef": "0002008535 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "INTERL VS.000613504 PRIVA",
+      "creditorId": "DE98ZZZ00000008196 ",
+      "mandateReference": "DEM90000000278940 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288de5",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288de5"
+        }
+      }
+    }, {
+      "externalId": "21b7b633-5420-42ca-9d00-4b9d856b490a",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Berufsunfähigkeitsversicherung\nDialog Lebensversicherungs-Aktienge  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "Berufsunfähigkeitsversicherung\nDialog Lebensversicherungs-Aktienge  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 12],
+      "bookingDate": [2016, 1, 11],
+      "amount": -16.719999999999998863131622783839702606201171875,
+      "balance": 0,
+      "customerRef": "011344939083 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend ",
+      "usage": "Dialog Lebensversicherung LV-Nr.: 7 091811 Folgebeitrag ",
+      "creditorId": "DE95ZZZ00000029008 ",
+      "mandateReference": "7GMFREF000000000528995 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288def",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288def"
+        }
+      }
+    }, {
+      "externalId": "24dc721b-6ee1-426d-86fa-2a85d9347c4d",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "AXA Schadenversicherung",
+        "bankName": "NOTPROVIDED ",
+        "name": "AXA Schadenversicherung",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 12],
+      "bookingDate": [2016, 1, 11],
+      "amount": -80.340000000000003410605131648480892181396484375,
+      "balance": 0,
+      "customerRef": "033344939083 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT wiederholend",
+      "usage": "Autoversicherungspolice\n041234 Beitrag ",
+      "creditorId": "DE95ZZZ00000025332",
+      "mandateReference": "7GMFREF000000000528995 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288df2",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288df2"
+        }
+      }
+    }, {
+      "externalId": "aa9f9284-435b-4fe6-afc2-2cd4db32ebaf",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "INTERLLOYD VERSICHE.",
+        "bankName": "NOTPROVIDED ",
+        "name": "INTERLLOYD VERSICHE.",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 12],
+      "bookingDate": [2016, 1, 11],
+      "amount": -5.55999999999999960920149533194489777088165283203125,
+      "balance": 0,
+      "customerRef": "0002008535 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "INTERL VS.000613504 PRIVA Hausrat",
+      "creditorId": "DE98ZZZ00000008196 ",
+      "mandateReference": "DEM90000000278940 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e31",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e31"
+        }
+      }
+    }, {
+      "externalId": "74356df4-5992-4aa3-9f89-ce181d274636",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "McFIT Global Group GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "McFIT Global Group GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 5],
+      "bookingDate": [2016, 1, 5],
+      "amount": -19.89999999999999857891452847979962825775146484375,
+      "balance": 0,
+      "customerRef": "3402529824580001666199753005RCUR ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "Kd-Nr.:21235447",
+      "creditorId": "DE9700000000142462 ",
+      "mandateReference": "T0010003B000000030748373 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e15",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e15"
+        }
+      }
+    }, {
+      "externalId": "d7e524ae-eed8-4d0e-a573-05faa67f1d29",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "OMV Brettergartenstraße",
+        "bankName": "NOTPROVIDED ",
+        "name": "OMV Brettergartenstraße",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 5],
+      "bookingDate": [2016, 1, 2],
+      "amount": -54.88000000000000255795384873636066913604736328125,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "OMV Brettergartenstraße",
+      "creditorId": "DE58OMV00000257865",
+      "mandateReference": "2302301692851801161591",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e40",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e40"
+        }
+      }
+    }, {
+      "externalId": "f1f0b4c5-b8be-49d2-934c-96c0bcb5d76e",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "ver.di",
+        "bankName": "NOTPROVIDED ",
+        "name": "ver.di",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 5],
+      "bookingDate": [2016, 1, 5],
+      "amount": -8.3333333333333303727386009995825588703155517578125,
+      "balance": 0,
+      "customerRef": "34022295324580001333134753005RCUR",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "ver.di",
+      "creditorId": "DE9800000000122452 ",
+      "mandateReference": "T0010003B000000030745454",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e4b",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e4b"
+        }
+      }
+    }, {
+      "externalId": "907bd270-7b5e-4dd2-bd46-5798583e1314",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Telefonica Germany GmbH + Co. OHG  ",
+        "bankName": "NOTPROVIDED ",
+        "name": "Telefonica Germany GmbH + Co. OHG  ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 4],
+      "bookingDate": [2016, 1, 2],
+      "amount": -19.989999999999998436805981327779591083526611328125,
+      "balance": 0,
+      "customerRef": "3402529824580001666199753005RCUR ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "Kd-Nr.:32735393,\nRg-Nr.:1777155752/1\nMehr Infos unter:Ihre Mobilfunkrechnung. \n",
+      "creditorId": "DE9700000000142462 ",
+      "mandateReference": "T0010003B000000030748373 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e25",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e25"
+        }
+      }
+    }, {
+      "externalId": "df5e3f03-fa22-4d36-8483-f64e342847c0",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "REWE Markt GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "REWE Markt GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 4],
+      "bookingDate": [2016, 1, 2],
+      "amount": -30.75,
+      "balance": 0,
+      "customerRef": "160117380103703201256036015",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "SEPA-BASISLASTSCHRIFT einmalig ",
+      "usage": "REWE SAGT DANKE. 46400765 ",
+      "creditorId": "DE58ZZZ00000257236 ",
+      "mandateReference": "5603601592851801161738 ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e43",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e43"
+        }
+      }
+    }, {
+      "externalId": "4e76633e-cdc5-46c4-9644-03c1e4a120c1",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "recipient",
+        "bankName": "NOTPROVIDED ",
+        "name": "recipient",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801151"
+      },
+      "valutaDate": [2016, 1, 2],
+      "bookingDate": [2016, 1, 2],
+      "amount": 300,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "Reisen Umbuchung",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e07",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e07"
+        }
+      }
+    }, {
+      "externalId": "65f0b6ef-0a68-4012-ae6f-f75103ed245d",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 1, 2],
+      "bookingDate": [2016, 1, 2],
+      "amount": -50,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "DAUERAUFTRAG",
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e0d",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e0d"
+        }
+      }
+    }, {
+      "externalId": "709f901f-9422-4a6f-b574-075f3b1ea8d7",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Petra Klausen",
+        "bankName": "NOTPROVIDED ",
+        "name": "Petra Klausen",
+        "bic": "COBADEFFXXX",
+        "iban": "DE91540400310712347100 "
+      },
+      "valutaDate": [2016, 1, 2],
+      "bookingDate": [2016, 1, 1],
+      "amount": -350,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "DAUERAUFTRAG",
+      "usage": "MIETE + Nebenkosten WG Elsterstraße",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e13",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e13"
+        }
+      }
+    }, {
+      "externalId": "75449617-2a9e-4357-b920-c4ebd7acc8e9",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Jennifer Petrus",
+        "bankName": "NOTPROVIDED ",
+        "name": "Jennifer Petrus",
+        "bic": "COBADEFFXXX",
+        "iban": "DE73754400220166335700  "
+      },
+      "valutaDate": [2016, 1, 2],
+      "bookingDate": [2016, 1, 2],
+      "amount": -100,
+      "balance": 0,
+      "customerRef": "CCB.41.UE.155885 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "Skifoan ",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e16",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e16"
+        }
+      }
+    }, {
+      "externalId": "7d678a77-41e7-404e-ad52-7c6ff01c1a66",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "NOTPROVIDED ",
+        "bankName": "NOTPROVIDED ",
+        "name": "NOTPROVIDED ",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 2],
+      "bookingDate": [2016, 1, 2],
+      "amount": 0,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "WERTSTELLUNG",
+      "usage": "Bankgebühren",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e19",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e19"
+        }
+      }
+    }, {
+      "externalId": "86b900ce-2e6a-48ff-93a0-1ae0e5b94859",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Gerhard Schäfer",
+        "bankName": "NOTPROVIDED ",
+        "name": "Gerhard Schäfer",
+        "bic": "HYVEDEMM530",
+        "iban": "DE36380500900000702223"
+      },
+      "valutaDate": [2016, 1, 2],
+      "bookingDate": [2016, 1, 2],
+      "amount": 150,
+      "balance": 0,
+      "customerRef": "NOTPROVIDED ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "WERTSTELLUNG",
+      "usage": "VielSpaß Skifahren",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e21",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e21"
+        }
+      }
+    }, {
+      "externalId": "98373a38-f742-4c89-9a0d-5ef8c939c202",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Unterkonto",
+        "country": "DE",
+        "blz": "76020070",
+        "bankName": "UniCredit Bank-HypoVereinbk",
+        "accountNumber": "0000801152",
+        "bic": "HYVEDEMM460",
+        "iban": "DE72760200700000801152"
+      },
+      "valutaDate": [2016, 1, 2],
+      "bookingDate": [2016, 1, 2],
+      "amount": 50,
+      "usage": "Sparen",
+      "bankApi": "MOCK",
+      "id": "5a829d2e2a3b2e0001288e28",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": false,
+      "standingOrder": true,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e28"
+        }
+      }
+    }, {
+      "externalId": "e7c25c03-abb6-43e4-a7a8-34cc07c09539",
+      "otherAccount": {
+        "externalIdMap": {},
+        "owner": "Areva GmbH",
+        "bankName": "NOTPROVIDED ",
+        "name": "Areva GmbH",
+        "bic": "NOTPROVIDED ",
+        "iban": "DE00000000000000000000"
+      },
+      "valutaDate": [2016, 1, 2],
+      "bookingDate": [2015, 12, 30],
+      "amount": 1794.029999999999972715158946812152862548828125,
+      "balance": 0,
+      "customerRef": "NSCT2922220008890000000000000000001 ",
+      "origValue": 0,
+      "chargeValue": 0,
+      "text": "ÜBERTRAG",
+      "usage": "LOHN / GEHALT 12/15",
+      "bankApi": "MOCK",
+      "transactionCode": "0.0",
+      "id": "5a829d2e2a3b2e0001288e47",
+      "accountId": "5a829a6b2a3b2e0001288da4",
+      "userId": "8c79c398-a0a5-41da-b8a3-aece31618b92",
+      "contract": false,
+      "reversal": false,
+      "sepa": true,
+      "standingOrder": false,
+      "_links": {
+        "self": {
+          "href": "https://multibanking-datev.cloud.adorsys.de/api/v1/bankaccesses/5a829a6b2a3b2e0001288da3/accounts/5a829a6b2a3b2e0001288da4/bookings/5a829d2e2a3b2e0001288e47"
+        }
+      }
+    }]
+  }
+}

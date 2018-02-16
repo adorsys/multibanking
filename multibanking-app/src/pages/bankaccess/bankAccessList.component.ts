@@ -14,7 +14,6 @@ import { KeycloakService } from '../../auth/keycloak.service';
 export class BankAccessListPage {
 
   bankaccesses: Array<BankAccess>;
-  rulesAdmin: boolean;
 
   constructor(public navCtrl: NavController,
     private bankAccessService: BankAccessService,
@@ -26,8 +25,6 @@ export class BankAccessListPage {
     KeycloakService.init({ onLoad: 'check-sso', checkLoginIframe: false, adapter: 'default' }).then(() => {
       console.log("Keycloak initialized, authenticated: " + this.keycloakService.authenticated());
       if (this.keycloakService.authenticated()) {
-        this.rulesAdmin = this.keycloakService.getRoles().filter(role => role == 'rules_admin').length > 0;
-
         this.bankAccessService.getBankAccesses().subscribe(
           response => {
             this.bankaccesses = response

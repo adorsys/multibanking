@@ -15,6 +15,7 @@ export class MyApp {
 
   rootPage: any = BankAccessListPage;
   rulesPage: any = RulesTabsPage;
+  rulesAdmin: boolean;
 
   constructor(
     platform: Platform,
@@ -27,6 +28,8 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
+
+      this.rulesAdmin = this.keycloak.getRoles().filter(role => role == 'rules_admin').length > 0;
     });
   }
 
