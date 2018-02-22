@@ -15,23 +15,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookingCategory {
-	
+
 	private Set<String> rules;
 
-    private String mainCategory;
+	private String mainCategory;
 
-    private String mainCategoryName;
+	private String mainCategoryName;
 
-    private String subCategory;
+	private String subCategory;
 
-    private String subCategoryName;
+	private String subCategoryName;
 
-    private String specification;
+	private String specification;
 
-    private String specificationName;
+	private String specificationName;
 
-    private boolean variable;
+	private boolean variable;
 
-    private Contract contract;
+	private Contract contract;
 
 }
