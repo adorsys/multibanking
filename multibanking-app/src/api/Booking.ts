@@ -3,7 +3,6 @@ import { BookingCategory } from "./BookingCategory";
 import { BankApi } from "./BankApi";
 
 export interface Booking {
-
     "id"?: string;
     "accountId"?: string;
     "additional"?: string;

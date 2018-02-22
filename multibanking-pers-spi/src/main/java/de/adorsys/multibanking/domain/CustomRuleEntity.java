@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.domain;
 
 import lombok.Data;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -10,6 +11,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class CustomRuleEntity extends RuleEntity {
 
-    private String creator;
+    @Indexed
+    private String userId;
+    private boolean userRule;
+    private boolean released;
 
 }

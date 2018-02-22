@@ -1,1 +1,17 @@
-<ion-nav [root]="rootPage"></ion-nav>
+<ion-menu persistent="true" [content]="content">
+  <ion-content>
+    <ion-list>
+      <button ion-item (click)="openPage(rootPage)" menuToggle>
+        Bank Connections
+      </button>
+      <button ion-item (click)="openPage(rulesPage)" menuToggle *ngIf="isRulesAdmin()">
+        Rules
+      </button>
+      <button ion-item (click)="logout()" menuToggle>
+        Logout
+      </button>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<ion-nav #content [root]="rootPage"></ion-nav>

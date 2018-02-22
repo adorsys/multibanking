@@ -1,5 +1,4 @@
 export interface BankAccountBalance {
-
      "readyHbciBalance"?: number;
      "unreadyHbciBalance"?: number;
      "creditHbciBalance"?: number;

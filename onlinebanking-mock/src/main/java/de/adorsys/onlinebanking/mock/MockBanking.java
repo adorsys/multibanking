@@ -62,11 +62,6 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public Bank getBankLoginSettings(String bankCode) {
-        return null;
-    }
-
-    @Override
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
         BankAccount[] bankAccounts = getRestTemplate(bankAccess.getBankLogin(),bankCode,pin)
         		.getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts",BankAccount[].class,bankCode);

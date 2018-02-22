@@ -1,13 +1,14 @@
 export interface Rule {
-
-    "ruleId": string;
+    "id"?: string;
+    "ruleId"?: string;
     "creditorId": string;
-    "expression"?: string;
     "receiver"?: string;
-    "mainCategory": string;
+    "expression"?: string
+    "mainCategory"?: string;
     "subCategory"?: string;
     "specification"?: string;
     "taxRelevant"?: boolean;
     "incoming"?: boolean;
-    
+    "released"?: boolean;
+
 }

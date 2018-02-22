@@ -2,7 +2,6 @@ import { PaymentType } from "./PaymentType";
 import { PaymentChallenge } from "./PaymentChallenge";
 
 export interface Payment {
-
     "id"?: string;
     "paymentType"?: PaymentType;
     "paymentChallenge"?: PaymentChallenge;
