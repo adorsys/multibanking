@@ -23,7 +23,7 @@ public class MockBanking implements OnlineBankingService {
     private String mockConnectionUrl = null;
 
     public MockBanking() {
-        mockConnectionUrl = EnvProperties.getEnvOrSysProp("mockConnectionUrl", "http://localhost:10010");
+        mockConnectionUrl = EnvProperties.getEnvOrSysProp("mockConnectionUrl", "https://multibanking-datev-mock.cloud.adorsys.de");
     }
 
     @Override
@@ -118,7 +118,7 @@ public class MockBanking implements OnlineBankingService {
     public void submitPayment(Payment payment, String tan) {
     }
 
-    private RestTemplate getRestTemplate(String bankLogin , String bankCode , String pin) {
+    private RestTemplate getRestTemplate(String bankLogin, String bankCode , String pin) {
     	String basicToken = new Base64().encodeAsString((bankLogin+"_"+bankCode+":"+pin).getBytes(Charset.forName("UTF-8")));
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add(new BasicAuthorizationInterceptor(basicToken));

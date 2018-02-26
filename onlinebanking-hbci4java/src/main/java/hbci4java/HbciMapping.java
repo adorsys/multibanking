@@ -53,16 +53,17 @@ public final class HbciMapping {
         GVRDauerList.Dauer[] lines = gvrDauerList.getEntries();
         List<StandingOrder> standingOrders = new ArrayList<>();
 
-
         for (int i = 0; i < lines.length; ++i) {
             GVRDauerList.Dauer line = lines[i];
             StandingOrder auftrag = new StandingOrder();
 
             if (line.firstdate != null) {
-                auftrag.setFirstExecutionDate(line.firstdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                auftrag.setFirstExecutionDate(
+                        line.firstdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
             if (line.lastdate != null) {
-                auftrag.setLastExecutionDate(line.lastdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                auftrag.setLastExecutionDate(
+                        line.lastdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
             auftrag.setAmount(line.value.getBigDecimalValue());
             auftrag.setOrderId(line.orderid);
@@ -147,7 +148,8 @@ public final class HbciMapping {
                 // die Bank liefert keine strukturierten Verwendungszwecke (gvcode=999).
                 // Daher verwenden wir den gesamten "additional"-Block und zerlegen ihn
                 // in 27-Zeichen lange Haeppchen
-                booking.setUsage(getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line.additional, 27)));
+                booking.setUsage(
+                        getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line.additional, 27)));
 
                 bookings.add(0, booking);
             }
@@ -171,42 +173,19 @@ public final class HbciMapping {
     }
 
     private static String getUsage(List<String> lines) {
-        // BUGZILLA 146
-        // Aus einer Mail von Stefan Palme
-        //    Es geht noch besser. Wenn in "umsline.gvcode" nicht der Wert "999"
-        //    drinsteht, sind die Variablen "text", "primanota", "usage", "other"
-        //    und "addkey" irgendwie sinnvoll gef�llt.  Steht in "gvcode" der Wert
-        //    "999" drin, dann sind diese Variablen alle null, und der ungeparste
-        //    Inhalt des Feldes :86: steht komplett in "additional".
-
-        // Es gibt eine erste Bank, die 40 Zeichen lange Verwendungszwecke lieferte.
-        // Siehe Mail von Frank vom 06.02.2014
-        lines = rewrap(35, lines);
-
-        String verwendungszweck = "";
-
+        StringBuilder sb = new StringBuilder();
         int lineIndex = 0;
         for (String line : lines) {
-            int wordIndex = 0;
-            String[] words = StringUtils.split(line, null, 0);
-            if (words != null && words.length > 0) {
-                for (String word : words) {
-                    verwendungszweck += word;
-                    verwendungszweck += wordIndex + 1 < words.length ? " " : "";
-                    wordIndex++;
-                }
-            }
-
-            verwendungszweck += lineIndex == 0 ? " " : "";
+            sb.append(StringUtils.chomp(line));
+            sb.append(line.length() < 27 ? " " : "");
             lineIndex++;
         }
-
-        return WordUtils.capitalizeFully(verwendungszweck.trim(), ' ', '/');
+        return WordUtils.capitalizeFully(sb.toString().trim(), ' ', '/');
     }
 
     /**
-     * Bereinigt die Verwendungszweck-Zeilen.
-     * Hierbei werden leere Zeilen oder NULL-Elemente entfernt.
+     * sb
+     * Bereinigt die Verwendungszweck-Zeilen. Hierbei werden leere Zeilen oder NULL-Elemente entfernt.
      * Ausserdem werden alle Zeilen getrimt.
      *
      * @param trim  wenn die Zeilen-Enden getrimmt werden sollen.
@@ -215,17 +194,21 @@ public final class HbciMapping {
      */
     private static List<String> clean(boolean trim, List<String> lines) {
         List<String> result = new ArrayList<>();
-        if (lines == null || lines.size() == 0)
+        if (lines == null || lines.size() == 0) {
             return result;
+        }
 
         for (String line : lines) {
-            if (line == null)
+            if (line == null) {
                 continue;
+            }
 
-            if (trim)
+            if (trim) {
                 line = line.trim();
-            if (line.length() > 0)
+            }
+            if (line.length() > 0) {
                 result.add(line);
+            }
         }
 
         return result;
@@ -250,8 +233,9 @@ public final class HbciMapping {
 //    }
 
     public static List<String> splitEqually(String text, int size) {
-        if (text == null || text.length() == 0)
+        if (text == null || text.length() == 0) {
             return new ArrayList<>();
+        }
 
         // Give the list the right capacity to start with. You could use an array
         // instead if you wanted.
@@ -264,17 +248,17 @@ public final class HbciMapping {
     }
 
     /**
-     * Bricht die Verwendungszweck-Zeilen auf $limit Zeichen lange Haeppchen neu um.
-     * Jedoch nur, wenn wirklich Zeilen enthalten sind, die laenger sind.
-     * Andernfalls wird nichts umgebrochen.
+     * Bricht die Verwendungszweck-Zeilen auf $limit Zeichen lange Haeppchen neu um. Jedoch nur, wenn
+     * wirklich Zeilen enthalten sind, die laenger sind. Andernfalls wird nichts umgebrochen.
      *
      * @param limit das Zeichen-Limit pro Zeile.
      * @param lines die Zeilen.
      * @return die neu umgebrochenen Zeilen.
      */
     private static List<String> rewrap(int limit, List<String> lines) {
-        if (lines == null || lines.size() == 0)
+        if (lines == null || lines.size() == 0) {
             return lines;
+        }
 
         boolean found = false;
         for (String s : lines) {
@@ -283,8 +267,9 @@ public final class HbciMapping {
                 break;
             }
         }
-        if (!found)
+        if (!found) {
             return lines;
+        }
 
         List<String> l = clean(true, lines);
 

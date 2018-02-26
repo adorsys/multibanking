@@ -40,33 +40,4 @@ public class BookingEntity extends Booking {
     return Optional.of(this).map(BookingEntity::getBookingCategory)
         .map(BookingCategory::getContract).map(Contract::getInterval).isPresent();
   }
-
-  public BookingEntity fillCategoryName(List<RuleCategory> categoriesTree) {
-    BookingCategory bookingCategory = this.getBookingCategory();
-    if (bookingCategory != null) {
-      categoriesTree.forEach(category -> {
-        if (category.getId().equals(bookingCategory.getMainCategory())) {
-          bookingCategory.setMainCategoryName(category.getName());
-          if (!StringUtils.isEmpty(bookingCategory.getSubCategory())
-              && category.getSubcategories() != null) {
-            category.getSubcategories().forEach(subCategory -> {
-              if (subCategory.getId().equals(bookingCategory.getSubCategory())) {
-                bookingCategory.setSubCategoryName(subCategory.getName());
-                if (!StringUtils.isEmpty(bookingCategory.getSpecification())
-                    && subCategory.getSpecifications() != null) {
-                  subCategory.getSpecifications().forEach(specification -> {
-                    if (specification.getId().equals(bookingCategory.getSpecification())) {
-                      bookingCategory.setSpecificationName(specification.getName());
-                    }
-                  });
-                }
-              }
-            });
-          }
-        }
-      });
-      this.setBookingCategory(bookingCategory);
-    }
-    return this;
-  }
 }
