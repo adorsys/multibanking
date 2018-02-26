@@ -8,5 +8,5 @@ export interface Contract {
   hotline?: string;
   logo?: string;
   provider?: string;
-  cycle?: string;
+  interval?: string;
 }
