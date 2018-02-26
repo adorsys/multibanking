@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.impl;
 
-import com.google.common.collect.Sets;
 import de.adorsys.multibanking.domain.CustomRuleEntity;
 import de.adorsys.multibanking.domain.RuleEntity;
 import de.adorsys.multibanking.pers.spi.repository.BookingRuleRepositoryIf;
@@ -15,10 +14,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Profile({"mongo", "fongo"})
 @Service
@@ -71,7 +67,7 @@ public class BookingRuleRepositoryImpl implements BookingRuleRepositoryIf {
 
     @Override
     public List<? extends RuleEntity> search(boolean customRules, String text) {
-        Collection<String> terms = Sets.newHashSet(Arrays.asList(text.split(" ")));
+        Collection<String> terms = new HashSet(Arrays.asList(text.split(" ")));
 
         Criteria[] criterias = terms
                 .stream()
