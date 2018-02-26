@@ -371,7 +371,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             throw (InvalidPinException) processException.getCause();
         }
 
-        throw new RuntimeException(e);
+        throw e;
     }
 
 
