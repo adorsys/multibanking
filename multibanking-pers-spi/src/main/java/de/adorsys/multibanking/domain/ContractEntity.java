@@ -32,8 +32,11 @@ public class ContractEntity extends Contract {
     private String accountId;
     private BigDecimal amount;
     private String mainCategory;
+    private String mainCategoryName;
     private String subCategory;
+    private String subCategoryName;
     private String specification;
+    private String specificationName;
     private String provider;
 
 }
