@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Created by alexg on 07.02.17.
  */
-@Profile({"mongo", "fongo"})
+@Profile({"mongo", "fongo", "mongo-gridfs"})
 public interface BankAccessRepositoryMongodb extends MongoRepository<BankAccessEntity, String> {
 
     Optional<BankAccessEntity> findByUserIdAndId(String userId, String id);

@@ -24,7 +24,7 @@ import java.util.List;
  */
 @Configuration
 @PropertySource(value = "${mongo.properties.url}", ignoreResourceNotFound = true)
-@Profile({"mongo"})
+@Profile({"mongo", "mongo-gridfs"})
 public class MongoConfig extends AbstractMongoConfiguration {
 
     @Autowired

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-@Profile({"mongo", "fongo"})
+@Profile({"mongo", "fongo", "mongo-gridfs"})
 @Service
 public class KeyStoreRepositoryImpl implements KeyStoreRepositoryIf {
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Profile({"mongo", "fongo"})
+@Profile({"mongo", "fongo", "mongo-gridfs"})
 @Service
 public class AnalyticsRepositoryImpl implements AnalyticsRepositoryIf {
 

@@ -12,7 +12,7 @@ import java.util.Optional;
  * Created by alexg on 07.02.17.
  */
 @Repository
-@Profile({"mongo", "fongo"})
+@Profile({"mongo", "fongo", "mongo-gridfs"})
 public interface AnalyticsRepositoryMongodb extends MongoRepository<AccountAnalyticsEntity, String> {
 
     Optional<AccountAnalyticsEntity> findLastByUserIdAndAccountId(String userId, String bankAccountId);

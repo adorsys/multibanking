@@ -12,7 +12,7 @@ import java.util.Optional;
 /**
  * Created by alexg on 07.02.17.
  */
-@Profile({"mongo", "fongo"})
+@Profile({"mongo", "fongo", "mongo-gridfs"})
 public interface RuleRepositoryMongodb extends MongoRepository<RuleEntity, String> {
 
     Page<RuleEntity> findAll(Pageable pageable);
