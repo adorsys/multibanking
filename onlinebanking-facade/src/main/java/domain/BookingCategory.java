@@ -2,7 +2,6 @@ package domain;
 
 import java.util.Set;
 
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
