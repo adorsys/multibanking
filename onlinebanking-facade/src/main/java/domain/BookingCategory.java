@@ -1,6 +1,8 @@
 package domain;
 
 import java.util.Set;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,6 +25,7 @@ public class BookingCategory {
   private String specification;
   private String specificationName;
   private boolean variable;
+  @ApiModelProperty(value = "Contract", example="false")
   private Contract contract;
 
 }
