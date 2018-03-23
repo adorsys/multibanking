@@ -25,19 +25,19 @@ public class BankAccount {
     @ApiModelProperty(value = "Bank account balance", example="2.000,00")
     private BankAccountBalance bankAccountBalance;
 	
-    @ApiModelProperty(value = "Name of the account owner", example="Max Mustermann")
+    @ApiModelProperty(value = "Name of the account owner", example="EDEKA")
     private String owner;
 
     @ApiModelProperty(value = "ISO-2 country of this bank account", example="DE")
     private String country;
 	
-    @ApiModelProperty(value = "Bank code", example="76070024")
+    @ApiModelProperty(value = "Bank code", example="29999999")
     private String blz;
 
-    @ApiModelProperty(value = "Bank name", example="Deutsche Bank")
+    @ApiModelProperty(value = "Bank name", example="Mock Bank")
     private String bankName;
 
-    @ApiModelProperty(value = "Account number", example="430254900")
+    @ApiModelProperty(value = "Account number", example="1234567890")
     private String accountNumber;
 	
     @ApiModelProperty(value = "Type of this bank account", example="GIRO")
@@ -49,10 +49,10 @@ public class BankAccount {
     @ApiModelProperty(value = "Name of this bank account")
     private String name;
 	
-    @ApiModelProperty(value = "Bank identification code", example="DEUTNL2A")
+    @ApiModelProperty(value = "Bank identification code", example="EDEKDEHHXXX")
     private String bic;
 	
-    @ApiModelProperty(value = "International bank account number", example="DE41124500000009254912", required=true)
+    @ApiModelProperty(value = "International bank account number", example="DE50200907003443582071", required=true)
     private String iban;
 
 	@ApiModelProperty(value = "Synchronisation status", example="PENDING")
