@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Profile({"mongo", "fongo"})
+@Profile({"mongo", "fongo", "mongo-gridfs"})
 @Service
 public class BankRepositoryImpl implements BankRepositoryIf {
 

@@ -11,7 +11,7 @@ import java.util.Optional;
  * Created by alexg on 07.02.17.
  */
 @Repository
-@Profile({"mongo", "fongo"})
+@Profile({"mongo", "fongo", "mongo-gridfs"})
 public interface BankRepositoryMongodb extends MongoRepository<BankEntity, String> {
 
     Optional<BankEntity> findByBankCode(String bankCode);

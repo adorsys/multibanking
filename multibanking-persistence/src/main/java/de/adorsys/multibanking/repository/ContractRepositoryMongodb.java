@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by alexg on 07.02.17.
  */
-@Profile({"mongo", "fongo"})
+@Profile({"mongo", "fongo", "mongo-gridfs"})
 public interface ContractRepositoryMongodb extends MongoRepository<ContractEntity, String> {
 
     List<ContractEntity> findByUserIdAndAccountId(String userId, String accountId);

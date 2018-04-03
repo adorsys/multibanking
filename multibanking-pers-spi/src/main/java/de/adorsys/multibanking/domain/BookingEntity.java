@@ -1,17 +1,17 @@
 package de.adorsys.multibanking.domain;
 
-import java.util.List;
 import java.util.Optional;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.util.StringUtils;
 import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.Booking;
 import domain.BookingCategory;
 import domain.Contract;
-import domain.RuleCategory;
 import lombok.Data;
 
 /**
@@ -24,6 +24,7 @@ import lombok.Data;
         unique = true)})
 @Encrypted(
     exclude = {"_id", "accountId", "externalId", "userId", "valutaDate", "bookingDate", "bankApi"})
+@EqualsAndHashCode(of = "id")
 public class BookingEntity extends Booking {
 
   @Id
@@ -35,7 +36,8 @@ public class BookingEntity extends Booking {
     this.id = id;
     return this;
   }
-
+    
+  @JsonIgnore  
   public boolean isContract() {
     return Optional.of(this).map(BookingEntity::getBookingCategory)
         .map(BookingCategory::getContract).map(Contract::getInterval).isPresent();
