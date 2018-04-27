@@ -30,5 +30,5 @@ public interface BankAccountRepositoryIf {
 
     List<BankAccountEntity> deleteByBankAccess(String accessId);
 
-    BankAccountEntity findOne(String accountId);
+	Optional<BankAccountEntity> findOne(String accountId);
 }

@@ -1,15 +1,14 @@
 package de.adorsys.multibanking.conf;
 
-import com.mongodb.*;
-import org.bson.types.ObjectId;
-import org.springframework.dao.DataAccessException;
+import com.mongodb.WriteConcern;
+import com.mongodb.client.model.InsertManyOptions;
+import org.bson.Document;
 import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.core.CollectionCallback;
 import org.springframework.data.mongodb.core.MongoAction;
 import org.springframework.data.mongodb.core.MongoActionOperation;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.util.StreamUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -26,35 +25,31 @@ public class ContinueOnBatchErrorTemplate extends MongoTemplate {
         super(mongoDbFactory);
     }
 
-    protected List<ObjectId> insertDBObjectList(final String collectionName, final List<DBObject> dbDocList) {
-        if (dbDocList.isEmpty()) {
+    protected List<Object> insertDocumentList(final String collectionName, final List<Document> documents) {
+
+        if (documents.isEmpty()) {
             return Collections.emptyList();
         }
 
-        execute(collectionName, new CollectionCallback<Void>() {
-            public Void doInCollection(DBCollection collection) throws MongoException, DataAccessException {
-                MongoAction mongoAction = new MongoAction(null, MongoActionOperation.INSERT_LIST, collectionName, null,
-                        null, null);
-                WriteConcern writeConcernToUse = prepareWriteConcern(mongoAction);
-                //TODO remove this bullshit when springframework data supports InsertOptions
-                InsertOptions insertOptions = (new InsertOptions()).writeConcern(writeConcernToUse).continueOnError(continueOnErrorCollections.contains(collectionName));
+        execute(collectionName, collection -> {
 
-                WriteResult writeResult = collection.insert(dbDocList, insertOptions);
-                handleAnyWriteResultErrors(writeResult, null, MongoActionOperation.INSERT_LIST);
-                return null;
+            MongoAction mongoAction = new MongoAction(null, MongoActionOperation.INSERT_LIST, collectionName, null,
+                    null, null);
+            WriteConcern writeConcernToUse = prepareWriteConcern(mongoAction);
+            //TODO remove this bullshit when springframework data supports InsertOptions
+            InsertManyOptions insertOptions = (new InsertManyOptions()).ordered(!continueOnErrorCollections.contains(collectionName));
+
+            if (writeConcernToUse == null) {
+                collection.insertMany(documents, insertOptions);
+            } else {
+                collection.withWriteConcern(writeConcernToUse).insertMany(documents, insertOptions);
             }
+
+            return null;
         });
 
-        List<ObjectId> ids = new ArrayList<>();
-        for (DBObject dbo : dbDocList) {
-            Object id = dbo.get(ID_FIELD);
-            if (id instanceof ObjectId) {
-                ids.add((ObjectId) id);
-            } else {
-                // no id was generated
-                ids.add(null);
-            }
-        }
-        return ids;
+        return documents.stream()//
+                .map(it -> it.get(ID_FIELD))//
+                .collect(StreamUtils.toUnmodifiableList());
     }
 }

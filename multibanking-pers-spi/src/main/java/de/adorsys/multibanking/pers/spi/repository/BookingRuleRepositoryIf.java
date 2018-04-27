@@ -15,7 +15,7 @@ public interface BookingRuleRepositoryIf {
 
     List<RuleEntity> findByIncoming(boolean incoming);
 
-    List<CustomRuleEntity> findByUserIdAndIncomingCustomRules(String userId, boolean incoming);
+    List<CustomRuleEntity> findByUserId(String userId);
 
     Page<? extends RuleEntity> findAllPageable(Pageable pageable, boolean custom);
 

@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>2.2.4-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>finapi-adapter</artifactId>
@@ -13,7 +13,6 @@
     <properties>
         <swagger-core-version>1.5.12</swagger-core-version>
         <okhttp-version>2.7.5</okhttp-version>
-        <gson-version>2.6.2</gson-version>
         <jodatime-version>2.9.3</jodatime-version>
         <junit-version>4.12</junit-version>
     </properties>
@@ -37,7 +36,6 @@
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>${gson-version}</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>

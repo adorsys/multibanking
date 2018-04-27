@@ -1,7 +1,7 @@
 package de.adorsys.multibanking.conf;
 
 import com.github.fakemongo.Fongo;
-import com.mongodb.Mongo;
+import com.mongodb.MongoClient;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
@@ -25,7 +25,7 @@ public class FongoConfig extends AbstractMongoConfiguration {
 
     @Override
     @Bean
-    public Mongo mongo() {
+    public MongoClient mongoClient() {
         return new Fongo("multibanking").getMongo();
     }
 }

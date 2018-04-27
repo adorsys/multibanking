@@ -28,6 +28,6 @@ public class PaymentRepositoryImpl implements PaymentRepositoryIf {
 
     @Override
     public void delete(String id) {
-        paymentRepository.delete(id);
+        paymentRepository.deleteById(id);
     }
 }
