@@ -45,7 +45,7 @@ public class UserRepositoryImpl implements UserRepositoryIf {
 
     @Override
     public boolean exists(String userId) {
-        return userRepository.exists(userId);
+        return userRepository.existsById(userId);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class UserRepositoryImpl implements UserRepositoryIf {
 
     @Override
     public void delete(String userId) {
-        userRepository.delete(userId);
+        userRepository.deleteById(userId);
     }
 
 }

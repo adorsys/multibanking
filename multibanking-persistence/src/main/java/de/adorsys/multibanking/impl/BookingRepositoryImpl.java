@@ -8,9 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,8 +20,6 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 
 	@Autowired
     private BookingRepositoryMongodb bookingRepository;
-	@Autowired
-	private MongoTemplate mongoTemplate;
 
 	@Override
 	public List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId,
@@ -54,7 +49,7 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
                 .filter(bookingEntity -> bookingEntity.getId() != null)
                 .collect(Collectors.toList());
 
-		return bookingRepository.save(existingEntities);
+		return bookingRepository.saveAll(existingEntities);
 	}
 
 	@Override

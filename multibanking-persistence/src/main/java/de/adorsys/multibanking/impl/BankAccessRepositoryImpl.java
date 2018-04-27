@@ -29,8 +29,8 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     }
 
     @Override
-    public BankAccessEntity findOne(String id) {
-        return bankAccessRepository.findOne(id);
+    public Optional<BankAccessEntity> findOne(String id) {
+        return bankAccessRepository.findById(id);
     }
 
     @Override
@@ -53,13 +53,13 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 
     @Override
     public boolean exists(String accessId) {
-        return bankAccessRepository.exists(accessId);
+        return bankAccessRepository.existsById(accessId);
     }
 
     @Override
     public boolean deleteByUserIdAndBankAccessId(String userId, String bankAccessId) {
         Query where = Query.query(Criteria.where("id").is(bankAccessId).and("userId").is(userId));
-        return mongoTemplate.remove(where, BankAccessEntity.class).getN() > 0;
+        return mongoTemplate.remove(where, BankAccessEntity.class).getDeletedCount() > 0;
     }
 
 }

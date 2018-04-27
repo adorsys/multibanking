@@ -9,15 +9,14 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Created by alexg on 07.02.17.
- */
 @Profile({"mongo", "fongo"})
 public interface CustomRuleRepositoryMongodb extends MongoRepository<CustomRuleEntity, String> {
 
     Page<CustomRuleEntity> findAll(Pageable pageable);
 
     List<CustomRuleEntity> findByIncoming(boolean incoming);
+
+    List<CustomRuleEntity> findByUserId(String userId);
 
     Optional<CustomRuleEntity> getRuleById(String ruleId);
 }

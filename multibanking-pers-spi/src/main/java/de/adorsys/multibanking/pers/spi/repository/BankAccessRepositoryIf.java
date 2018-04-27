@@ -11,7 +11,7 @@ import de.adorsys.multibanking.domain.BankAccessEntity;
  */
 public interface BankAccessRepositoryIf {
 
-    BankAccessEntity findOne(String id);
+    Optional<BankAccessEntity> findOne(String id);
 
     Optional<BankAccessEntity> findByUserIdAndId(String userId, String id);
 

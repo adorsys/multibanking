@@ -4,20 +4,19 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Map;
+import java.util.Date;
 
 @Data
 @Document
-public class KeyStoreEntity {
+public class LockEntity {
 
     @Id
     private String id;
 
     private String name;
 
-    private String type;
+    private String value;
 
-    private byte[] keystore;
+    private Date expires;
 
-    private Map<String, KeyEntryAttributesEntity> entries;
 }

@@ -33,8 +33,8 @@ public class BookingRuleRepositoryImpl implements BookingRuleRepositoryIf {
         return ruleRepository.findByIncoming(incoming);
     }
 
-    public List<CustomRuleEntity> findByUserIdAndIncomingCustomRules(String userId, boolean incoming) {
-        return customRuleRepository.findByIncoming(incoming);
+    public List<CustomRuleEntity> findByUserId(String userId) {
+        return customRuleRepository.findByUserId(userId);
     }
 
     public Page<? extends RuleEntity> findAllPageable(Pageable pageable, boolean custom) {
@@ -90,22 +90,22 @@ public class BookingRuleRepositoryImpl implements BookingRuleRepositoryIf {
 
     @Override
     public void deleteCustomRule(String id) {
-        customRuleRepository.delete(id);
+        customRuleRepository.deleteById(id);
     }
 
     @Override
     public void deleteRule(String id) {
-        ruleRepository.delete(id);
+        ruleRepository.deleteById(id);
     }
 
     @Override
     public void replacesRules(List<? extends RuleEntity> rules, boolean custom) {
         if (custom) {
             mongoTemplate.remove(new Query(), CustomRuleEntity.class);
-            customRuleRepository.save((List<CustomRuleEntity>) rules);
+            customRuleRepository.saveAll((List<CustomRuleEntity>) rules);
         } else {
             mongoTemplate.remove(new Query(), RuleEntity.class);
-            ruleRepository.save(rules);
+            ruleRepository.saveAll(rules);
         }
     }
 

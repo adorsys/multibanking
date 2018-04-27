@@ -20,6 +20,6 @@ public class AnonymizedBookingRepositoryImpl implements AnonymizedBookingReposit
 
 	@Override
 	public List<AnonymizedBookingEntity> save(List<AnonymizedBookingEntity> bookingEntities) {
-		return anonymizdBookingRepository.save(bookingEntities);
+		return anonymizdBookingRepository.saveAll(bookingEntities);
 	}
 }

@@ -8,21 +8,21 @@ import lombok.Data;
 @Data
 public class Rule {
 
-    String ruleId;
-    String mainCategory;
-    String subCategory;
-    String specification;
+    private String ruleId;
+    private String mainCategory;
+    private String subCategory;
+    private String specification;
 
-    String creditorId;
-    String expression;
-    String receiver;
-    String ruleType;
+    private String creditorId;
+    private String expression;
+    private String receiver;
+    private String ruleType;
 
-    String logo;
-    String hotline;
-    String homepage;
-    String email;
+    private String logo;
+    private String hotline;
+    private String homepage;
+    private String email;
 
-    boolean incoming;
-    boolean taxRelevant;
+    private boolean incoming;
+
 }

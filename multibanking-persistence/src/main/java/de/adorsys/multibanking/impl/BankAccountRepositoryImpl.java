@@ -42,12 +42,12 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 
 	@Override
 	public boolean exists(String accountId) {
-		return bankAccountRepository.exists(accountId);
+		return bankAccountRepository.existsById(accountId);
 	}
 
 	@Override
 	public void save(List<BankAccountEntity> bankAccounts) {
-		bankAccountRepository.save(bankAccounts);
+		bankAccountRepository.saveAll(bankAccounts);
 	}
 
 	@Override
@@ -81,8 +81,8 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 	}
 
 	@Override
-	public BankAccountEntity findOne(String accountId) {
-		return bankAccountRepository.findOne(accountId);
+	public Optional<BankAccountEntity> findOne(String accountId) {
+		return bankAccountRepository.findById(accountId);
 	}
 
 }

@@ -36,7 +36,7 @@ public class AccountAnalyticsEntity {
     private BigDecimal incomeFix = new BigDecimal(0);
     private List<BookingGroup> incomeFixBookings = new ArrayList<>();
     private BigDecimal incomeVariable = new BigDecimal(0);
-    private List<BookingGroup> incomeVariableBookings  = new ArrayList<>();
+    private List<BookingGroup> incomeVariableBookings = new ArrayList<>();
     private BigDecimal incomeNext = new BigDecimal(0);
     private List<BookingGroup> incomeNextBookings = new ArrayList<>();
 
