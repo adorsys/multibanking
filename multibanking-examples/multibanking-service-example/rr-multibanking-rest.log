@@ -1,0 +1,544 @@
+2018/04/28 19:40:10,795 [main] [INFO ] [FileSystemParamParser         ] parse:                                                                                               
+2018/04/28 19:40:11,279 [main] [INFO ] [MultibankingApplication       ] Starting MultibankingApplication on Franciss-MacBook-Pro.local with PID 15298 (/Users/fpo/dev/multibanking-develop/multibanking-examples/multibanking-service-example/target/classes started by fpo in /Users/fpo/dev/multibanking-develop/multibanking-examples/multibanking-service-example) 
+2018/04/28 19:40:11,279 [main] [INFO ] [MultibankingApplication       ] No active profile set, falling back to default profiles: default                                     
+2018/04/28 19:40:11,329 [main] [INFO ] [AnnotationConfigServletWebServerApplicationContext] Refreshing org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4b520ea8: startup date [Sat Apr 28 19:40:11 CEST 2018]; root of context hierarchy 
+2018/04/28 19:40:11,962 [main] [INFO ] [DefaultListableBeanFactory    ] Overriding bean definition for bean 'analyticsService' with a different definition: replacing [Generic bean: class [de.adorsys.multibanking.service.analytics.AnalyticsService]; scope=singleton; abstract=false; lazyInit=false; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in URL [jar:file:/Users/fpo/.m2/repository/de/adorsys/multibanking/multibanking-rest/3.0.0-SNAPSHOT/multibanking-rest-3.0.0-SNAPSHOT.jar!/de/adorsys/multibanking/service/analytics/AnalyticsService.class]] with [Root bean: class [null]; scope=; abstract=false; lazyInit=false; autowireMode=3; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=analyticsServiceConfig; factoryMethodName=analyticsService; initMethodName=null; destroyMethodName=(inferred); defined in class path resource [de/adorsys/mbs/service/example/config/AnalyticsServiceConfig.class]] 
+2018/04/28 19:40:12,570 [main] [INFO ] [PostProcessorRegistrationDelegate$BeanPostProcessorChecker] Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration$$EnhancerBySpringCGLIB$$1c7cfdc8] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying) 
+2018/04/28 19:40:12,579 [main] [INFO ] [PostProcessorRegistrationDelegate$BeanPostProcessorChecker] Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying) 
+2018/04/28 19:40:12,581 [main] [INFO ] [PostProcessorRegistrationDelegate$BeanPostProcessorChecker] Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@38830ea' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying) 
+2018/04/28 19:40:12,584 [main] [INFO ] [PostProcessorRegistrationDelegate$BeanPostProcessorChecker] Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration$$EnhancerBySpringCGLIB$$4151a07a] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying) 
+2018/04/28 19:40:12,592 [main] [INFO ] [PostProcessorRegistrationDelegate$BeanPostProcessorChecker] Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying) 
+2018/04/28 19:40:12,926 [main] [INFO ] [TomcatWebServer               ] Tomcat initialized with port(s): 8080 (http)                                                         
+2018/04/28 19:40:12,940 [main] [INFO ] [Http11NioProtocol             ] Initializing ProtocolHandler ["http-nio-8080"]                                                       
+2018/04/28 19:40:12,949 [main] [INFO ] [StandardService               ] Starting service [Tomcat]                                                                            
+2018/04/28 19:40:12,949 [main] [INFO ] [StandardEngine                ] Starting Servlet Engine: Apache Tomcat/8.5.29                                                        
+2018/04/28 19:40:12,958 [localhost-startStop-1] [INFO ] [AprLifecycleListener          ] The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/Users/fpo/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.] 
+2018/04/28 19:40:13,057 [localhost-startStop-1] [INFO ] [[/]                           ] Initializing Spring embedded WebApplicationContext                                                   
+2018/04/28 19:40:13,057 [localhost-startStop-1] [INFO ] [ContextLoader                 ] Root WebApplicationContext: initialization completed in 1730 ms                                      
+2018/04/28 19:40:13,655 [localhost-startStop-1] [INFO ] [FilterRegistrationBean        ] Mapping filter: 'characterEncodingFilter' to: [/*]                                                   
+2018/04/28 19:40:13,656 [localhost-startStop-1] [INFO ] [FilterRegistrationBean        ] Mapping filter: 'hiddenHttpMethodFilter' to: [/*]                                                    
+2018/04/28 19:40:13,656 [localhost-startStop-1] [INFO ] [FilterRegistrationBean        ] Mapping filter: 'httpPutFormContentFilter' to: [/*]                                                  
+2018/04/28 19:40:13,656 [localhost-startStop-1] [INFO ] [FilterRegistrationBean        ] Mapping filter: 'requestContextFilter' to: [/*]                                                      
+2018/04/28 19:40:13,656 [localhost-startStop-1] [INFO ] [DelegatingFilterProxyRegistrationBean] Mapping filter: 'springSecurityFilterChain' to: [/*]                                                 
+2018/04/28 19:40:13,656 [localhost-startStop-1] [INFO ] [FilterRegistrationBean        ] Mapping filter: 'httpTraceFilter' to: [/*]                                                           
+2018/04/28 19:40:13,656 [localhost-startStop-1] [INFO ] [FilterRegistrationBean        ] Mapping filter: 'webMvcMetricsFilter' to: [/*]                                                       
+2018/04/28 19:40:13,657 [localhost-startStop-1] [INFO ] [ServletRegistrationBean       ] Servlet dispatcherServlet mapped to [/]                                                              
+2018/04/28 19:40:14,014 [main] [INFO ] [ExtendedStoreConnectionFactory] 
+***************************************
+*                                     *
+*  USE FILE SYSTEM                    *
+*  basedir: target/filesystemstorage  *
+*                                     *
+***************************************
+ 
+2018/04/28 19:40:14,074 [main] [INFO ] [BucketServiceImpl             ] start check bucket exsits BucketDirectory{path=BucketPath{bp-multibanking-service-example-auth - null}} 
+2018/04/28 19:40:14,076 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory does not existstarget/filesystemstorage/bp-multibanking-service-example-auth               
+2018/04/28 19:40:14,076 [main] [INFO ] [BucketServiceImpl             ] finished check bucket exsits BucketDirectory{path=BucketPath{bp-multibanking-service-example-auth - null}} -> false 
+2018/04/28 19:40:14,076 [main] [INFO ] [DocumentSafeServiceImpl       ] start create user for UserIDAuth{UserID{'multibanking-service-example-auth'}, ReadKeyPassword{'mu***rd'}} 
+2018/04/28 19:40:14,076 [main] [INFO ] [BucketServiceImpl             ] start check bucket exsits BucketDirectory{path=BucketPath{bp-multibanking-service-example-auth - null}} 
+2018/04/28 19:40:14,076 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory does not existstarget/filesystemstorage/bp-multibanking-service-example-auth               
+2018/04/28 19:40:14,076 [main] [INFO ] [BucketServiceImpl             ] finished check bucket exsits BucketDirectory{path=BucketPath{bp-multibanking-service-example-auth - null}} -> false 
+2018/04/28 19:40:14,078 [main] [INFO ] [FileSystemExtendedStorageConnection] created folder target/filesystemstorage/bp-multibanking-service-example-auth                         
+2018/04/28 19:40:14,082 [main] [INFO ] [KeyStoreServiceImpl           ] start create keystore BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:14,082 [main] [DEBUG] [FileSystemExtendedStorageConnection] file does not exist target/filesystemstorage/bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth.zip 
+2018/04/28 19:40:14,083 [main] [INFO ] [KeyStoreServiceImpl           ] keystoreid = 2E6B657973746F72652F4B532D6D756C746962616E6B696E672D736572766963652D6578616D706C652D61757468 
+2018/04/28 19:40:14,083 [main] [INFO ] [KeyStoreServiceImpl           ] meaning of keystoreid = .keystore/KS-multibanking-service-example-auth                               
+2018/04/28 19:40:17,035 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:17,037 [main] [DEBUG] [ZipFileHelper                 ] write temporary zip file to target/filesystemstorage/bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth.zip.78aa2892-d661-4fc7-8a30-77aa705ed1bc 
+2018/04/28 19:40:17,044 [main] [DEBUG] [ZipFileHelper                 ] WRITE metadata {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth",
+  "userMetaData": {
+    "map": {
+      "INTERNAL_BLOB_STORE_KEYSTORE_PERSISTENCE_TYPE_KEY": "UBER"
+    }
+  }
+} with charset UTF-8 
+2018/04/28 19:40:17,050 [main] [INFO ] [KeyStoreServiceImpl           ] finished create keystore BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:17,050 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory already exists:target/filesystemstorage/bp-multibanking-service-example-auth               
+2018/04/28 19:40:17,051 [main] [DEBUG] [DocumentSafeServiceImpl       ] start create new guard for BucketDirectory{path=BucketPath{bp-multibanking-service-example-auth - home}} 
+2018/04/28 19:40:17,053 [main] [INFO ] [DocumentGuardServiceImpl      ] start create document guard for DocumentKeyIDWithKeyAndAccessType{documentKeyIDWithKey=DocumentKeyIDWithKey{DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'}, DocumentKey{B3C5....3492}}, accessType=WRITE} at BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:17,057 [main] [INFO ] [KeyStore2KeySourceHelper      ] get keysource for secret key of BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:17,057 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:17,060 [main] [DEBUG] [ZipFileHelper                 ] READ metadata string {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth",
+  "userMetaData": {
+    "map": {
+      "INTERNAL_BLOB_STORE_KEYSTORE_PERSISTENCE_TYPE_KEY": "UBER"
+    }
+  }
+}with UTF-8 
+2018/04/28 19:40:17,142 [main] [DEBUG] [GuardKeyForSecretKeyHelper    ] Guard created with symmetric KeyID :GuardKeyID{'2E6B657973746F72652F4B532D6D756C746962616E6B696E672D736572766963652D6578616D706C652D61757468UBRC1'} 
+2018/04/28 19:40:17,143 [main] [INFO ] [DocumentGuardServiceImpl      ] start persist document guard for DocumentKeyIDWithKeyAndAccessType{documentKeyIDWithKey=DocumentKeyIDWithKey{DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'}, DocumentKey{B3C5....3492}}, accessType=WRITE} at BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:17,143 [main] [INFO ] [BucketServiceImpl             ] start file exists BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea} 
+2018/04/28 19:40:17,144 [main] [DEBUG] [FileSystemExtendedStorageConnection] file does not exist target/filesystemstorage/bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea.zip 
+2018/04/28 19:40:17,144 [main] [INFO ] [BucketServiceImpl             ] finished file exists BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea} 
+2018/04/28 19:40:17,222 [main] [INFO ] [EncryptedPersistenceServiceImpl] ENCRYPT BYTES WITH KeyID{'2E6B657973746F72652F4B532D6D756C746962616E6B696E672D736572766963652D6578616D706C652D61757468UBRC1'} 
+2018/04/28 19:40:17,223 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:17,223 [main] [DEBUG] [ZipFileHelper                 ] WRITE metadata string {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea",
+  "userMetaData": {
+    "map": {
+      "KeyStoreType": "UBER",
+      "serilizer_id": "dgs01",
+      "EncryptedPersistenceServiceImpl.ENCRYPTION_SERVICE": "class org.adorsys.encobject.service.impl.JWEncryptionStreamServiceImpl",
+      "AccessType": "WRITE",
+      "EncryptedPersistenceServiceImpl.ENCRYPTION_KEY_ID": "2E6B657973746F72652F4B532D6D756C746962616E6B696E672D736572766963652D6578616D706C652D61757468UBRC1"
+    }
+  }
+}with UTF-8 
+2018/04/28 19:40:17,223 [main] [DEBUG] [ZipFileHelper                 ] write temporary zip file to target/filesystemstorage/bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea.zip.2d21ac0b-b0dd-4291-8440-9894f5de1fb0 
+2018/04/28 19:40:17,224 [main] [INFO ] [DocumentGuardServiceImpl      ] finished persist document guard for DocumentKeyIDWithKeyAndAccessType{documentKeyIDWithKey=DocumentKeyIDWithKey{DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'}, DocumentKey{B3C5....3492}}, accessType=WRITE} at BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:17,225 [main] [INFO ] [DocumentGuardServiceImpl      ] finished create document guard for DocumentKeyIDWithKeyAndAccessType{documentKeyIDWithKey=DocumentKeyIDWithKey{DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'}, DocumentKey{B3C5....3492}}, accessType=WRITE} at BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:17,226 [main] [INFO ] [BucketServiceImpl             ] start create plain file BucketPath{bp-multibanking-service-example-auth - .keystore/bp-multibanking-service-example-auth/home.bucketGuardKey} 
+2018/04/28 19:40:17,227 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:17,227 [main] [DEBUG] [ZipFileHelper                 ] write temporary zip file to target/filesystemstorage/bp-multibanking-service-example-auth/.keystore/bp-multibanking-service-example-auth/home.bucketGuardKey.zip.3b4a17eb-9845-47a7-bdcf-8839581f70ce 
+2018/04/28 19:40:17,227 [main] [DEBUG] [ZipFileHelper                 ] WRITE metadata {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/.keystore/bp-multibanking-service-example-auth/home.bucketGuardKey",
+  "userMetaData": {
+    "map": {}
+  }
+} with charset UTF-8 
+2018/04/28 19:40:17,228 [main] [INFO ] [BucketServiceImpl             ] finished create plain file BucketPath{bp-multibanking-service-example-auth - .keystore/bp-multibanking-service-example-auth/home.bucketGuardKey} 
+2018/04/28 19:40:17,228 [main] [DEBUG] [DocumentSafeServiceImpl       ] finished create new guard for BucketDirectory{path=BucketPath{bp-multibanking-service-example-auth - home}} 
+2018/04/28 19:40:17,229 [main] [INFO ] [DocumentSafeServiceImpl       ] start storeDocument for UserIDAuth{UserID{'multibanking-service-example-auth'}, ReadKeyPassword{'mu***rd'}} DocumentFQN{'README.txt'} 
+2018/04/28 19:40:17,229 [main] [DEBUG] [DocumentSafeServiceImpl       ] search key for BucketDirectory{path=BucketPath{bp-multibanking-service-example-auth - home}}         
+2018/04/28 19:40:17,229 [main] [INFO ] [BucketServiceImpl             ] start file exists BucketPath{bp-multibanking-service-example-auth - .keystore/bp-multibanking-service-example-auth/home.bucketGuardKey} 
+2018/04/28 19:40:17,229 [main] [DEBUG] [FileSystemExtendedStorageConnection] file does exist target/filesystemstorage/bp-multibanking-service-example-auth/.keystore/bp-multibanking-service-example-auth/home.bucketGuardKey.zip 
+2018/04/28 19:40:17,230 [main] [INFO ] [BucketServiceImpl             ] finished file exists BucketPath{bp-multibanking-service-example-auth - .keystore/bp-multibanking-service-example-auth/home.bucketGuardKey} 
+2018/04/28 19:40:17,230 [main] [INFO ] [BucketServiceImpl             ] start read plain file BucketPath{bp-multibanking-service-example-auth - .keystore/bp-multibanking-service-example-auth/home.bucketGuardKey} 
+2018/04/28 19:40:17,230 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:17,230 [main] [DEBUG] [ZipFileHelper                 ] READ metadata string {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/.keystore/bp-multibanking-service-example-auth/home.bucketGuardKey",
+  "userMetaData": {
+    "map": {}
+  }
+}with UTF-8 
+2018/04/28 19:40:17,230 [main] [INFO ] [BucketServiceImpl             ] finished read plain file BucketPath{bp-multibanking-service-example-auth - .keystore/bp-multibanking-service-example-auth/home.bucketGuardKey} 
+2018/04/28 19:40:17,230 [main] [INFO ] [DocumentGuardServiceImpl      ] start load DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'} from document guard at BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:17,231 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:17,231 [main] [DEBUG] [ZipFileHelper                 ] READ metadata string {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth",
+  "userMetaData": {
+    "map": {
+      "INTERNAL_BLOB_STORE_KEYSTORE_PERSISTENCE_TYPE_KEY": "UBER"
+    }
+  }
+}with UTF-8 
+2018/04/28 19:40:17,235 [main] [INFO ] [BucketServiceImpl             ] start file exists BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea} 
+2018/04/28 19:40:17,235 [main] [DEBUG] [FileSystemExtendedStorageConnection] file does exist target/filesystemstorage/bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea.zip 
+2018/04/28 19:40:17,235 [main] [INFO ] [BucketServiceImpl             ] finished file exists BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea} 
+2018/04/28 19:40:17,236 [main] [DEBUG] [DocumentGuardServiceImpl      ] loadDocumentKey for BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea} 
+2018/04/28 19:40:17,236 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:17,236 [main] [DEBUG] [ZipFileHelper                 ] READ metadata string {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea",
+  "userMetaData": {
+    "map": {
+      "KeyStoreType": "UBER",
+      "serilizer_id": "dgs01",
+      "EncryptedPersistenceServiceImpl.ENCRYPTION_SERVICE": "class org.adorsys.encobject.service.impl.JWEncryptionStreamServiceImpl",
+      "AccessType": "WRITE",
+      "EncryptedPersistenceServiceImpl.ENCRYPTION_KEY_ID": "2E6B657973746F72652F4B532D6D756C746962616E6B696E672D736572766963652D6578616D706C652D61757468UBRC1"
+    }
+  }
+}with UTF-8 
+2018/04/28 19:40:17,236 [main] [INFO ] [EncryptedPersistenceServiceImpl] DECRYPT BYTES WITH KeyID{'2E6B657973746F72652F4B532D6D756C746962616E6B696E672D736572766963652D6578616D706C652D61757468UBRC1'} 
+2018/04/28 19:40:17,249 [main] [INFO ] [DocumentGuardServiceImpl      ] finished load DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'} from document guard at BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:17,249 [main] [DEBUG] [DocumentSafeServiceImpl       ] found DocumentKeyIDWithKeyAndAccessType{documentKeyIDWithKey=DocumentKeyIDWithKey{DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'}, DocumentKey{B3C5....3492}}, accessType=WRITE} for BucketDirectory{path=BucketPath{bp-multibanking-service-example-auth - home}} 
+2018/04/28 19:40:17,249 [main] [INFO ] [DocumentPersistenceServiceImpl] start persist BucketPath{bp-multibanking-service-example-auth - home/README.txt}                     
+2018/04/28 19:40:17,250 [main] [DEBUG] [DocumentPersistenceServiceImpl] Document wird verschlüsselt mit DocumentKeyIDWithKey{DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'}, DocumentKey{B3C5....3492}} 
+2018/04/28 19:40:17,254 [main] [INFO ] [EncryptedPersistenceServiceImpl] ENCRYPT BYTES WITH KeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'}                                   
+2018/04/28 19:40:17,255 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:17,255 [main] [DEBUG] [ZipFileHelper                 ] WRITE metadata string {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/home/README.txt",
+  "userMetaData": {
+    "map": {
+      "EncryptedPersistenceServiceImpl.ENCRYPTION_SERVICE": "class org.adorsys.encobject.service.impl.AESEncryptionStreamServiceImpl",
+      "EncryptedPersistenceServiceImpl.ENCRYPTION_KEY_ID": "DK5769fb3c-089f-4e27-8799-43953d79b4ea"
+    }
+  },
+  "size": 28
+}with UTF-8 
+2018/04/28 19:40:17,255 [main] [DEBUG] [ZipFileHelper                 ] write temporary zip file to target/filesystemstorage/bp-multibanking-service-example-auth/home/README.txt.zip.b080310e-e671-4e6f-89de-3e31e3c4603e 
+2018/04/28 19:40:17,256 [main] [INFO ] [DocumentPersistenceServiceImpl] finished persist BucketPath{bp-multibanking-service-example-auth - home/README.txt}                  
+2018/04/28 19:40:17,257 [main] [INFO ] [DocumentSafeServiceImpl       ] finished storeDocument for UserIDAuth{UserID{'multibanking-service-example-auth'}, ReadKeyPassword{'mu***rd'}} DocumentFQN{'README.txt'} 
+2018/04/28 19:40:17,257 [main] [INFO ] [DocumentSafeServiceImpl       ] finished create user for UserIDAuth{UserID{'multibanking-service-example-auth'}, ReadKeyPassword{'mu***rd'}} 
+2018/04/28 19:40:17,603 [main] [WARN ] [FigoBanking                   ] missing env properties FIGO_CLIENT_ID and/or FIGO_SECRET                                             
+2018/04/28 19:40:17,603 [main] [WARN ] [FigoBanking                   ] missing env properties FIGO_TECH_USER and/or FIGO_TECH_USER_CREDENTIAL                               
+2018/04/28 19:40:17,603 [main] [WARN ] [FigoBankingAlternative        ] missing env properties FIGO_CLIENT_ID and/or FIGO_SECRET                                             
+2018/04/28 19:40:17,604 [main] [WARN ] [FigoBankingAlternative        ] missing env properties FIGO_TECH_USER and/or FIGO_TECH_USER_CREDENTIAL                               
+2018/04/28 19:40:17,606 [main] [WARN ] [FinapiBanking                 ] missing env properties FINAPI_CLIENT_ID and/or FINAPI_SECRET                                         
+2018/04/28 19:40:18,010 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/],methods=[GET],produces=[application/json]}" onto public org.springframework.hateoas.Resource<java.lang.Object> de.adorsys.mbs.service.example.web.ServerInfoController.info() 
+2018/04/28 19:40:18,013 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/bankaccesses/{accessId}],methods=[DELETE]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.account.BankAccessController.deleteBankAccess(java.lang.String) 
+2018/04/28 19:40:18,014 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/bankaccesses],methods=[POST],consumes=[application/json;charset=UTF-8]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.account.BankAccessController.createBankaccess(de.adorsys.multibanking.domain.BankAccessEntity) 
+2018/04/28 19:40:18,014 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/bankaccesses/{accessId}/accounts/{accountId}/sync],methods=[PUT]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.account.BankAccountController.syncBookings(java.lang.String,java.lang.String,java.lang.String) 
+2018/04/28 19:40:18,016 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/bankaccesses/{accessId}/accounts/{accountId}/bookings],methods=[GET],params=[period],produces=[application/json;charset=UTF-8]}" onto public org.springframework.http.ResponseEntity<org.springframework.core.io.ByteArrayResource> de.adorsys.multibanking.web.account.BookingController.getBookings(java.lang.String,java.lang.String,java.lang.String) 
+2018/04/28 19:40:18,017 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/bankaccesses/{accessId}/accounts/{accountId}/analytics],methods=[GET]}" onto public org.springframework.http.ResponseEntity<org.springframework.core.io.ByteArrayResource> de.adorsys.multibanking.web.analytics.AccountAnalyticsController.getAccountAnalytics(java.lang.String,java.lang.String) 
+2018/04/28 19:40:18,020 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories],methods=[POST]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingCategoryController.createCategory(de.adorsys.multibanking.domain.CustomCategoryEntity) 
+2018/04/28 19:40:18,021 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/custom],methods=[GET]}" onto public org.springframework.http.ResponseEntity<org.springframework.core.io.ByteArrayResource> de.adorsys.multibanking.web.analytics.BookingCategoryController.getCustomCategories() 
+2018/04/28 19:40:18,021 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/static],methods=[GET]}" onto public org.springframework.http.ResponseEntity<org.springframework.core.io.ByteArrayResource> de.adorsys.multibanking.web.analytics.BookingCategoryController.getStaticCategories() 
+2018/04/28 19:40:18,021 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/custom/{categoryId}],methods=[PUT]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingCategoryController.updateCustomCategory(java.lang.String,de.adorsys.multibanking.domain.CustomCategoryEntity) 
+2018/04/28 19:40:18,022 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/static/{categoryId}],methods=[PUT]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingCategoryController.updateCategory(java.lang.String,de.adorsys.multibanking.domain.CategoryEntity) 
+2018/04/28 19:40:18,022 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/custom],methods=[PUT]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingCategoryController.createOrUpdateCustomCategories(java.util.List<de.adorsys.multibanking.domain.CustomCategoryEntity>) 
+2018/04/28 19:40:18,023 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/static],methods=[PUT]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingCategoryController.createOrUpdateStaticCategories(java.util.List<de.adorsys.multibanking.domain.CategoryEntity>) 
+2018/04/28 19:40:18,023 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/custom/upload],methods=[PUT],consumes=[application/octet-stream]}" onto public org.springframework.http.HttpEntity<?> de.adorsys.multibanking.web.analytics.BookingCategoryController.uploadReplaceCustomCategories(org.springframework.web.multipart.MultipartFile) 
+2018/04/28 19:40:18,023 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/static/upload],methods=[PUT],consumes=[application/octet-stream]}" onto public org.springframework.http.HttpEntity<?> de.adorsys.multibanking.web.analytics.BookingCategoryController.uploadReplaceStaticCategories(org.springframework.web.multipart.MultipartFile) 
+2018/04/28 19:40:18,024 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/custom/{categoryId}],methods=[DELETE]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingCategoryController.deleteCustomCategory(java.lang.String) 
+2018/04/28 19:40:18,024 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/static/{categoryId}],methods=[DELETE]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingCategoryController.deleteStaticCategory(java.lang.String) 
+2018/04/28 19:40:18,024 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/custom],methods=[DELETE]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingCategoryController.deleteCustomCategories(java.util.List<java.lang.String>) 
+2018/04/28 19:40:18,024 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/categories/static],methods=[DELETE]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingCategoryController.deleteStaticCategories(java.util.List<java.lang.String>) 
+2018/04/28 19:40:18,026 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules],methods=[POST]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingRuleController.createRule(de.adorsys.multibanking.domain.CustomRuleEntity) 
+2018/04/28 19:40:18,027 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/custom],methods=[GET]}" onto public org.springframework.http.ResponseEntity<org.springframework.core.io.ByteArrayResource> de.adorsys.multibanking.web.analytics.BookingRuleController.getCustomRules() 
+2018/04/28 19:40:18,027 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/static],methods=[GET]}" onto public org.springframework.http.ResponseEntity<org.springframework.core.io.ByteArrayResource> de.adorsys.multibanking.web.analytics.BookingRuleController.getStaticRules() 
+2018/04/28 19:40:18,027 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/custom/{ruleId}],methods=[PUT]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingRuleController.updateCustomRule(java.lang.String,de.adorsys.multibanking.domain.CustomRuleEntity) 
+2018/04/28 19:40:18,028 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/static/{ruleId}],methods=[PUT]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingRuleController.updateRule(java.lang.String,de.adorsys.multibanking.domain.RuleEntity) 
+2018/04/28 19:40:18,028 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/custom],methods=[PUT]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingRuleController.createOrUpdateCustomRules(java.util.List<de.adorsys.multibanking.domain.CustomRuleEntity>) 
+2018/04/28 19:40:18,028 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/static],methods=[PUT]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingRuleController.createOrUpdateStaticRules(java.util.List<de.adorsys.multibanking.domain.RuleEntity>) 
+2018/04/28 19:40:18,029 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/custom/upload],methods=[PUT],consumes=[application/octet-stream]}" onto public org.springframework.http.HttpEntity<?> de.adorsys.multibanking.web.analytics.BookingRuleController.uploadReplaceCustomRules(org.springframework.web.multipart.MultipartFile) 
+2018/04/28 19:40:18,029 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/static/upload],methods=[PUT],consumes=[application/octet-stream]}" onto public org.springframework.http.HttpEntity<?> de.adorsys.multibanking.web.analytics.BookingRuleController.uploadReplaceStaticRules(org.springframework.web.multipart.MultipartFile) 
+2018/04/28 19:40:18,029 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/custom/{ruleId}],methods=[DELETE]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingRuleController.deleteCustomRule(java.lang.String) 
+2018/04/28 19:40:18,030 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/static/{ruleId}],methods=[DELETE]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingRuleController.deleteStaticRule(java.lang.String) 
+2018/04/28 19:40:18,030 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/custom],methods=[DELETE]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingRuleController.deleteCustomRules(java.util.List<java.lang.String>) 
+2018/04/28 19:40:18,030 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/analytics/rules/static],methods=[DELETE]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.analytics.BookingRuleController.deleteStaticRules(java.util.List<java.lang.String>) 
+2018/04/28 19:40:18,031 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/image/{imageName}],methods=[GET],produces=[image/png]}" onto public org.springframework.http.ResponseEntity<org.springframework.core.io.ByteArrayResource> de.adorsys.multibanking.web.analytics.ImageController.getImage(java.lang.String) throws java.io.IOException 
+2018/04/28 19:40:18,031 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/image/{imageName}],methods=[PUT],consumes=[image/png]}" onto public org.springframework.http.HttpEntity<?> de.adorsys.multibanking.web.analytics.ImageController.putImage(java.lang.String,org.springframework.web.multipart.MultipartFile) 
+2018/04/28 19:40:18,032 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/image/{imageName}/release],methods=[POST]}" onto public org.springframework.http.HttpEntity<?> de.adorsys.multibanking.web.analytics.ImageController.patchImage(java.lang.String) 
+2018/04/28 19:40:18,032 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/bank],methods=[GET],produces=[application/json;charset=UTF-8]}" onto public org.springframework.http.ResponseEntity<org.springframework.core.io.ByteArrayResource> de.adorsys.multibanking.web.banks.BankController.loadBanks() 
+2018/04/28 19:40:18,033 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/bankaccesses/{accessId}/accounts/{accountId}/payments],methods=[POST]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.payment.PaymentController.createPayment(java.lang.String,java.lang.String,de.adorsys.multibanking.web.payment.PaymentController$CreatePaymentRequest) 
+2018/04/28 19:40:18,033 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/bankaccesses/{accessId}/accounts/{accountId}/payments/{paymentId}/submit],methods=[POST]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.payment.PaymentController.submitPayment(java.lang.String,java.lang.String,java.lang.String,de.adorsys.multibanking.web.payment.PaymentController$SubmitPaymentRequest) 
+2018/04/28 19:40:18,033 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/bankaccesses/{accessId}/accounts/{accountId}/payments/{paymentId}],methods=[GET]}" onto public org.springframework.hateoas.Resource<de.adorsys.multibanking.domain.PaymentEntity> de.adorsys.multibanking.web.payment.PaymentController.getPayment(java.lang.String,java.lang.String,java.lang.String) 
+2018/04/28 19:40:18,034 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/useragents/{userAgentId}],methods=[GET],produces=[application/json;charset=UTF-8]}" onto public org.springframework.http.ResponseEntity<de.adorsys.multibanking.domain.UserAgentCredentials> de.adorsys.multibanking.web.user.UserAgentCredentialsController.getUserAgentCredentials(java.lang.String) 
+2018/04/28 19:40:18,035 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1/useragents/{userAgentId}],methods=[PUT],consumes=[application/json;charset=UTF-8]}" onto public org.springframework.http.HttpEntity<java.lang.Void> de.adorsys.multibanking.web.user.UserAgentCredentialsController.postUserAgentCredentials(java.lang.String,de.adorsys.multibanking.domain.UserAgentCredentials) 
+2018/04/28 19:40:18,035 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/api/v1],methods=[GET],produces=[application/json;charset=UTF-8]}" onto public org.springframework.http.ResponseEntity<org.springframework.core.io.ByteArrayResource> de.adorsys.multibanking.web.user.UserDataController.loadUserData() 
+2018/04/28 19:40:18,036 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/pop],methods=[GET],produces=[application/json]}" onto public org.springframework.http.ResponseEntity<java.lang.String> de.adorsys.sts.pop.PopController.getPublicKeys() 
+2018/04/28 19:40:18,040 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/swagger-resources]}" onto public org.springframework.http.ResponseEntity<java.util.List<springfox.documentation.swagger.web.SwaggerResource>> springfox.documentation.swagger.web.ApiResourceController.swaggerResources() 
+2018/04/28 19:40:18,040 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/swagger-resources/configuration/security]}" onto public org.springframework.http.ResponseEntity<springfox.documentation.swagger.web.SecurityConfiguration> springfox.documentation.swagger.web.ApiResourceController.securityConfiguration() 
+2018/04/28 19:40:18,041 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/swagger-resources/configuration/ui]}" onto public org.springframework.http.ResponseEntity<springfox.documentation.swagger.web.UiConfiguration> springfox.documentation.swagger.web.ApiResourceController.uiConfiguration() 
+2018/04/28 19:40:18,044 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/error]}" onto public org.springframework.http.ResponseEntity<java.util.Map<java.lang.String, java.lang.Object>> org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.error(javax.servlet.http.HttpServletRequest) 
+2018/04/28 19:40:18,044 [main] [INFO ] [RequestMappingHandlerMapping  ] Mapped "{[/error],produces=[text/html]}" onto public org.springframework.web.servlet.ModelAndView org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController.errorHtml(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse) 
+2018/04/28 19:40:18,127 [main] [INFO ] [EndpointLinksResolver         ] Exposing 2 endpoint(s) beneath base path '/actuator'                                                 
+2018/04/28 19:40:18,136 [main] [INFO ] [WebMvcEndpointHandlerMapping  ] Mapped "{[/actuator/health],methods=[GET],produces=[application/vnd.spring-boot.actuator.v2+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.web.servlet.AbstractWebMvcEndpointHandlerMapping$OperationHandler.handle(javax.servlet.http.HttpServletRequest,java.util.Map<java.lang.String, java.lang.String>) 
+2018/04/28 19:40:18,137 [main] [INFO ] [WebMvcEndpointHandlerMapping  ] Mapped "{[/actuator/info],methods=[GET],produces=[application/vnd.spring-boot.actuator.v2+json || application/json]}" onto public java.lang.Object org.springframework.boot.actuate.endpoint.web.servlet.AbstractWebMvcEndpointHandlerMapping$OperationHandler.handle(javax.servlet.http.HttpServletRequest,java.util.Map<java.lang.String, java.lang.String>) 
+2018/04/28 19:40:18,137 [main] [INFO ] [WebMvcEndpointHandlerMapping  ] Mapped "{[/actuator],methods=[GET],produces=[application/vnd.spring-boot.actuator.v2+json || application/json]}" onto protected java.util.Map<java.lang.String, java.util.Map<java.lang.String, org.springframework.boot.actuate.endpoint.web.Link>> org.springframework.boot.actuate.endpoint.web.servlet.WebMvcEndpointHandlerMapping.links(javax.servlet.http.HttpServletRequest,javax.servlet.http.HttpServletResponse) 
+2018/04/28 19:40:18,303 [main] [INFO ] [PropertySourcedRequestMappingHandlerMapping] Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)] 
+2018/04/28 19:40:18,410 [main] [INFO ] [UserDetailsServiceAutoConfiguration] 
+
+Using generated security password: 1927f966-65d3-4d21-ac19-296d863d41dc
+                           
+2018/04/28 19:40:18,522 [main] [INFO ] [DefaultSecurityFilterChain    ] Creating filter chain: org.springframework.security.web.util.matcher.AnyRequestMatcher@1, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@8f589d7, org.springframework.security.web.context.SecurityContextPersistenceFilter@126ff1a1, org.springframework.security.web.header.HeaderWriterFilter@4fc256ec, org.springframework.web.filter.CorsFilter@65da1cbe, org.springframework.security.web.authentication.logout.LogoutFilter@4c1b4e07, de.adorsys.sts.filter.JWTAuthenticationFilter@1a914a00, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@6ba08a09, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@18f27a81, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@1d67348a, org.springframework.security.web.session.SessionManagementFilter@6074d638, org.springframework.security.web.access.ExceptionTranslationFilter@27d5eb00, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@34d11c92] 
+2018/04/28 19:40:18,596 [main] [INFO ] [SimpleUrlHandlerMapping       ] Mapped URL path [/**/favicon.ico] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler] 
+2018/04/28 19:40:18,696 [main] [INFO ] [RequestMappingHandlerAdapter  ] Looking for @ControllerAdvice: org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4b520ea8: startup date [Sat Apr 28 19:40:11 CEST 2018]; root of context hierarchy 
+2018/04/28 19:40:18,770 [main] [INFO ] [SimpleUrlHandlerMapping       ] Mapped URL path [/webjars/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler] 
+2018/04/28 19:40:18,770 [main] [INFO ] [SimpleUrlHandlerMapping       ] Mapped URL path [/**] onto handler of type [class org.springframework.web.servlet.resource.ResourceHttpRequestHandler] 
+2018/04/28 19:40:18,791 [main] [INFO ] [ExceptionHandlerExceptionResolver] Detected @ExceptionHandler methods in exceptionHandlerAdvice                                         
+2018/04/28 19:40:19,105 [main] [INFO ] [AnnotationMBeanExporter       ] Registering beans for JMX exposure on startup                                                        
+2018/04/28 19:40:19,117 [main] [INFO ] [DefaultLifecycleProcessor     ] Starting beans in phase 2147483647                                                                   
+2018/04/28 19:40:19,118 [main] [INFO ] [DocumentationPluginsBootstrapper] Context refreshed                                                                                    
+2018/04/28 19:40:19,139 [main] [INFO ] [DocumentationPluginsBootstrapper] Found 1 custom documentation plugin(s)                                                               
+2018/04/28 19:40:19,199 [main] [INFO ] [ApiListingReferenceScanner    ] Scanning for api listing references                                                                  
+2018/04/28 19:40:19,584 [main] [INFO ] [ScheduledAnnotationBeanPostProcessor] No TaskScheduler/ScheduledExecutorService bean found for scheduled processing                        
+2018/04/28 19:40:19,590 [main] [INFO ] [Http11NioProtocol             ] Starting ProtocolHandler ["http-nio-8080"]                                                           
+2018/04/28 19:40:19,604 [main] [INFO ] [NioSelectorPool               ] Using a shared selector for servlet write/read                                                       
+2018/04/28 19:40:19,613 [main] [INFO ] [TomcatWebServer               ] Tomcat started on port(s): 8080 (http) with context path ''                                          
+2018/04/28 19:40:19,617 [main] [INFO ] [MultibankingApplication       ] Started MultibankingApplication in 8.626 seconds (JVM running for 9.955)                             
+2018/04/28 19:40:19,628 [main] [INFO ] [KeyStoreInitializationRunner  ] Check if keys for keystore are needed to be initialized...                                           
+2018/04/28 19:40:19,628 [main] [WARN ] [DocumentSafeServiceImpl       ] ACHTUNG, ES WIRD NICHT GEPRÜFT, OB DER BENUTZER UserID{'multibanking-service-example-auth'} AUCH DAS KORREKTE PASSWORD BENUTZT 
+2018/04/28 19:40:19,629 [main] [INFO ] [BucketServiceImpl             ] start file exists BucketPath{bp-multibanking-service-example-auth - home/multibanking-service-example-keystore} 
+2018/04/28 19:40:19,629 [main] [DEBUG] [FileSystemExtendedStorageConnection] file does not exist target/filesystemstorage/bp-multibanking-service-example-auth/home/multibanking-service-example-keystore.zip 
+2018/04/28 19:40:19,629 [main] [INFO ] [BucketServiceImpl             ] finished file exists BucketPath{bp-multibanking-service-example-auth - home/multibanking-service-example-keystore} 
+2018/04/28 19:40:20,644 [main] [INFO ] [DocumentSafeServiceImpl       ] start storeDocument for UserIDAuth{UserID{'multibanking-service-example-auth'}, ReadKeyPassword{'mu***rd'}} DocumentFQN{'multibanking-service-example-keystore'} 
+2018/04/28 19:40:20,645 [main] [DEBUG] [DocumentSafeServiceImpl       ] search key for BucketDirectory{path=BucketPath{bp-multibanking-service-example-auth - home}}         
+2018/04/28 19:40:20,645 [main] [INFO ] [BucketServiceImpl             ] start file exists BucketPath{bp-multibanking-service-example-auth - .keystore/bp-multibanking-service-example-auth/home.bucketGuardKey} 
+2018/04/28 19:40:20,645 [main] [DEBUG] [FileSystemExtendedStorageConnection] file does exist target/filesystemstorage/bp-multibanking-service-example-auth/.keystore/bp-multibanking-service-example-auth/home.bucketGuardKey.zip 
+2018/04/28 19:40:20,645 [main] [INFO ] [BucketServiceImpl             ] finished file exists BucketPath{bp-multibanking-service-example-auth - .keystore/bp-multibanking-service-example-auth/home.bucketGuardKey} 
+2018/04/28 19:40:20,645 [main] [INFO ] [BucketServiceImpl             ] start read plain file BucketPath{bp-multibanking-service-example-auth - .keystore/bp-multibanking-service-example-auth/home.bucketGuardKey} 
+2018/04/28 19:40:20,645 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:20,645 [main] [DEBUG] [ZipFileHelper                 ] READ metadata string {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/.keystore/bp-multibanking-service-example-auth/home.bucketGuardKey",
+  "userMetaData": {
+    "map": {}
+  }
+}with UTF-8 
+2018/04/28 19:40:20,645 [main] [INFO ] [BucketServiceImpl             ] finished read plain file BucketPath{bp-multibanking-service-example-auth - .keystore/bp-multibanking-service-example-auth/home.bucketGuardKey} 
+2018/04/28 19:40:20,646 [main] [INFO ] [DocumentGuardServiceImpl      ] start load DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'} from document guard at BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:20,646 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:20,646 [main] [DEBUG] [ZipFileHelper                 ] READ metadata string {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth",
+  "userMetaData": {
+    "map": {
+      "INTERNAL_BLOB_STORE_KEYSTORE_PERSISTENCE_TYPE_KEY": "UBER"
+    }
+  }
+}with UTF-8 
+2018/04/28 19:40:20,650 [main] [INFO ] [BucketServiceImpl             ] start file exists BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea} 
+2018/04/28 19:40:20,650 [main] [DEBUG] [FileSystemExtendedStorageConnection] file does exist target/filesystemstorage/bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea.zip 
+2018/04/28 19:40:20,650 [main] [INFO ] [BucketServiceImpl             ] finished file exists BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea} 
+2018/04/28 19:40:20,650 [main] [DEBUG] [DocumentGuardServiceImpl      ] loadDocumentKey for BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea} 
+2018/04/28 19:40:20,650 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:20,651 [main] [DEBUG] [ZipFileHelper                 ] READ metadata string {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/.keystore/KS-multibanking-service-example-auth.DK5769fb3c-089f-4e27-8799-43953d79b4ea",
+  "userMetaData": {
+    "map": {
+      "KeyStoreType": "UBER",
+      "serilizer_id": "dgs01",
+      "EncryptedPersistenceServiceImpl.ENCRYPTION_SERVICE": "class org.adorsys.encobject.service.impl.JWEncryptionStreamServiceImpl",
+      "AccessType": "WRITE",
+      "EncryptedPersistenceServiceImpl.ENCRYPTION_KEY_ID": "2E6B657973746F72652F4B532D6D756C746962616E6B696E672D736572766963652D6578616D706C652D61757468UBRC1"
+    }
+  }
+}with UTF-8 
+2018/04/28 19:40:20,651 [main] [INFO ] [EncryptedPersistenceServiceImpl] DECRYPT BYTES WITH KeyID{'2E6B657973746F72652F4B532D6D756C746962616E6B696E672D736572766963652D6578616D706C652D61757468UBRC1'} 
+2018/04/28 19:40:20,657 [main] [INFO ] [DocumentGuardServiceImpl      ] finished load DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'} from document guard at BucketPath{bp-multibanking-service-example-auth - .keystore/KS-multibanking-service-example-auth} 
+2018/04/28 19:40:20,657 [main] [DEBUG] [DocumentSafeServiceImpl       ] found DocumentKeyIDWithKeyAndAccessType{documentKeyIDWithKey=DocumentKeyIDWithKey{DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'}, DocumentKey{B3C5....3492}}, accessType=WRITE} for BucketDirectory{path=BucketPath{bp-multibanking-service-example-auth - home}} 
+2018/04/28 19:40:20,658 [main] [INFO ] [DocumentPersistenceServiceImpl] start persist BucketPath{bp-multibanking-service-example-auth - home/multibanking-service-example-keystore} 
+2018/04/28 19:40:20,658 [main] [DEBUG] [DocumentPersistenceServiceImpl] Document wird verschlüsselt mit DocumentKeyIDWithKey{DocumentKeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'}, DocumentKey{B3C5....3492}} 
+2018/04/28 19:40:20,658 [main] [INFO ] [EncryptedPersistenceServiceImpl] ENCRYPT BYTES WITH KeyID{'DK5769fb3c-089f-4e27-8799-43953d79b4ea'}                                   
+2018/04/28 19:40:20,658 [main] [DEBUG] [FileSystemExtendedStorageConnection] directory exists:target/filesystemstorage/bp-multibanking-service-example-auth                       
+2018/04/28 19:40:20,658 [main] [DEBUG] [ZipFileHelper                 ] WRITE metadata string {
+  "storageType": "BLOB",
+  "name": "bp-multibanking-service-example-auth/home/multibanking-service-example-keystore",
+  "userMetaData": {
+    "map": {
+      "multibanking-service-example-HCZIK": "{\"createdAt\":\"2018-04-28T17:40:20.226Z\",\"notBefore\":\"2018-04-28T17:40:20.226Z\",\"notAfter\":\"2018-04-28T18:40:20.226Z\",\"expireAt\":\"2018-04-29T17:40:20.226Z\",\"validityInterval\":3600000,\"legacyInterval\":86400000,\"state\":\"VALID\",\"keyUsage\":\"Encryption\"}",
+      "INTERNAL_SERVER_KEYSTORE_PERSISTENCE_TYPE_KEY": "UBER",
+      "multibanking-service-example-LS5BF": "{\"createdAt\":\"2018-04-28T17:40:20.607Z\",\"notBefore\":\"2018-04-28T18:40:20.226Z\",\"notAfter\":null,\"expireAt\":null,\"validityInterval\":3600000,\"legacyInterval\":86400000,\"state\":\"CREATED\",\"keyUsage\":\"Encryption\"}",
+      "multibanking-service-example-YZEGP": "{\"createdAt\":\"2018-04-28T17:40:20.607Z\",\"notBefore\":\"2018-04-28T18:40:20.607Z\",\"notAfter\":null,\"expireAt\":null,\"validityInterval\":3600000,\"legacyInterval\":86400000,\"state\":\"CREATED\",\"keyUsage\":\"SecretKey\"}",
+      "multibanking-service-example-7BLDA": "{\"createdAt\":\"2018-04-28T17:40:20.607Z\",\"notBefore\":\"2018-04-28T17:40:20.607Z\",\"notAfter\":\"2018-04-28T18:40:20.607Z\",\"expireAt\":\"2018-04-29T17:40:20.607Z\",\"validityInterval\":3600000,\"legacyInterval\":86400000,\"state\":\"VALID\",\"keyUsage\":\"SecretKey\"}",
+      "multibanking-service-example-667b4974-2f2e-48cb-8d43-0e7e08c7f7e3": "{\"createdAt\":\"2018-04-28T17:40:20.003Z\",\"notBefore\":\"2018-04-28T18:40:19.841Z\",\"notAfter\":null,\"expireAt\":null,\"validityInterval\":3600000,\"legacyInterval\":86400000,\"state\":\"CREATED\",\"keyUsage\":\"Signature\"}",
+      "EncryptedPersistenceServiceImpl.ENCRYPTION_SERVICE": "class org.adorsys.encobject.service.impl.AESEncryptionStreamServiceImpl",
+      "multibanking-service-example-0b8e2bda-caff-4ccc-88c2-6f78aa3233b0": "{\"createdAt\":\"2018-04-28T17:40:19.841Z\",\"notBefore\":\"2018-04-28T17:40:19.841Z\",\"notAfter\":\"2018-04-28T18:40:19.841Z\",\"expireAt\":\"2018-04-29T17:40:19.841Z\",\"validityInterval\":3600000,\"legacyInterval\":86400000,\"state\":\"VALID\",\"keyUsage\":\"Signature\"}",
+      "EncryptedPersistenceServiceImpl.ENCRYPTION_KEY_ID": "DK5769fb3c-089f-4e27-8799-43953d79b4ea"
+    }
+  },
+  "size": 8992
+}with UTF-8 
+2018/04/28 19:40:20,659 [main] [DEBUG] [ZipFileHelper                 ] write temporary zip file to target/filesystemstorage/bp-multibanking-service-example-auth/home/multibanking-service-example-keystore.zip.8a34a2ae-3dcb-4338-ab7a-2222cd39958d 
+2018/04/28 19:40:20,664 [main] [INFO ] [DocumentPersistenceServiceImpl] finished persist BucketPath{bp-multibanking-service-example-auth - home/multibanking-service-example-keystore} 
+2018/04/28 19:40:20,664 [main] [INFO ] [DocumentSafeServiceImpl       ] finished storeDocument for UserIDAuth{UserID{'multibanking-service-example-auth'}, ReadKeyPassword{'mu***rd'}} DocumentFQN{'multibanking-service-example-keystore'} 
+2018/04/28 19:40:20,664 [main] [INFO ] [KeyStoreInitializationRunner  ] Key initialization completed.                                                                        
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] PID.......................... : 15298                                                                
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] awt.toolkit.................. : sun.lwawt.macosx.LWCToolkit                                          
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] catalina.base................ : /private/var/folders/k3/2bvnnk5x5c37qjprl547hw180000gn/T/tomcat.7006748755766021892.8080 
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] catalina.home................ : /private/var/folders/k3/2bvnnk5x5c37qjprl547hw180000gn/T/tomcat.7006748755766021892.8080 
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] catalina.useNaming........... : false                                                                
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] file.encoding................ : UTF-8                                                                
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] file.encoding.pkg............ : sun.io                                                               
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] file.separator............... : /                                                                    
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] ftp.nonProxyHosts............ : local|*.local|169.254/16|*.169.254/16                                
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] gopherProxySet............... : false                                                                
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] http.nonProxyHosts........... : local|*.local|169.254/16|*.169.254/16                                
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] info.project.version......... : 2.2.3                                                                
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] java.awt.graphicsenv......... : sun.awt.CGraphicsEnvironment                                         
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] java.awt.headless............ : true                                                                 
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] java.awt.printerjob.......... : sun.lwawt.macosx.CPrinterJob                                         
+2018/04/28 19:40:20,667 [main] [INFO ] [ShowProperties                ] java.class.path.............. : /Users/fpo/dev/multibanking-develop/multibanking-examples/multibanking-service-example/target/classes 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-starter-web/2.0.1.RELEASE/spring-boot-starter-web-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-starter/2.0.1.RELEASE/spring-boot-starter-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot/2.0.1.RELEASE/spring-boot-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/2.0.1.RELEASE/spring-boot-autoconfigure-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-starter-logging/2.0.1.RELEASE/spring-boot-starter-logging-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/slf4j/jul-to-slf4j/1.7.25/jul-to-slf4j-1.7.25.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/javax/annotation/javax.annotation-api/1.3.2/javax.annotation-api-1.3.2.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/yaml/snakeyaml/1.19/snakeyaml-1.19.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-starter-json/2.0.1.RELEASE/spring-boot-starter-json-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.9.5/jackson-datatype-jdk8-2.9.5.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/2.0.1.RELEASE/spring-boot-starter-tomcat-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/8.5.29/tomcat-embed-core-8.5.29.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/8.5.29/tomcat-embed-el-8.5.29.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/8.5.29/tomcat-embed-websocket-8.5.29.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/hibernate/validator/hibernate-validator/6.0.9.Final/hibernate-validator-6.0.9.Final.jar 
+2018/04/28 19:40:20,668 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/javax/validation/validation-api/2.0.1.Final/validation-api-2.0.1.Final.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/jboss/logging/jboss-logging/3.3.2.Final/jboss-logging-3.3.2.Final.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/spring-web/5.0.5.RELEASE/spring-web-5.0.5.RELEASE.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/spring-beans/5.0.5.RELEASE/spring-beans-5.0.5.RELEASE.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/spring-webmvc/5.0.5.RELEASE/spring-webmvc-5.0.5.RELEASE.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/spring-context/5.0.5.RELEASE/spring-context-5.0.5.RELEASE.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/spring-expression/5.0.5.RELEASE/spring-expression-5.0.5.RELEASE.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/slf4j/log4j-over-slf4j/1.7.25/log4j-over-slf4j-1.7.25.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/multibanking/multibanking-rest/3.0.0-SNAPSHOT/multibanking-rest-3.0.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/multibanking/onlinebanking-figo/3.0.0-SNAPSHOT/onlinebanking-figo-3.0.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/me/figo/sdk/1.5.1/sdk-1.5.1.jar            
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/commons-codec/commons-codec/1.11/commons-codec-1.11.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/multibanking/onlinebanking-finapi/3.0.0-SNAPSHOT/onlinebanking-finapi-3.0.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/multibanking/finapi-adapter/3.0.0-SNAPSHOT/finapi-adapter-3.0.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/squareup/okhttp/okhttp/2.7.5/okhttp-2.7.5.jar 
+2018/04/28 19:40:20,669 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/squareup/okhttp/logging-interceptor/2.7.5/logging-interceptor-2.7.5.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/joda-time/joda-time/2.9.9/joda-time-2.9.9.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/multibanking/onlinebanking-hbci4java/3.0.0-SNAPSHOT/onlinebanking-hbci4java-3.0.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/hbci4j-adorsys/3.0.18/hbci4j-adorsys-3.0.18.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/cryptoutils/encobject/0.18.4-SNAPSHOT/encobject-0.18.4-SNAPSHOT.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/cryptoutils/storeconnection-api/0.18.4-SNAPSHOT/storeconnection-api-0.18.4-SNAPSHOT.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/cryptoutils/jjwk/0.18.4-SNAPSHOT/jjwk-0.18.4-SNAPSHOT.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/nimbusds/nimbus-jose-jwt/4.34.1/nimbus-jose-jwt-4.34.1.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/github/stephenc/jcip/jcip-annotations/1.0-1/jcip-annotations-1.0-1.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/cryptoutils/jkeyutils/0.18.4-SNAPSHOT/jkeyutils-0.18.4-SNAPSHOT.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.9.5/jackson-databind-2.9.5.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.9.0/jackson-annotations-2.9.0.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.9.5/jackson-core-2.9.5.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.9.5/jackson-datatype-jsr310-2.9.5.jar 
+2018/04/28 19:40:20,670 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.9.5/jackson-module-parameter-names-2.9.5.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.9.5/jackson-dataformat-yaml-2.9.5.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/sts/sts-spring/0.24.0-SNAPSHOT/sts-spring-0.24.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/sts/sts-common/0.24.0-SNAPSHOT/sts-common-0.24.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/sts/sts-keymanagement/0.24.0-SNAPSHOT/sts-keymanagement-0.24.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/sts/sts-pop/0.24.0-SNAPSHOT/sts-pop-0.24.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/sts/sts-token/0.24.0-SNAPSHOT/sts-token-0.24.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/sts/sts-token-auth/0.24.0-SNAPSHOT/sts-token-auth-0.24.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/sts/sts-persistence-docusafe/0.24.0-SNAPSHOT/sts-persistence-docusafe-0.24.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/sts/sts-resource-server/0.24.0-SNAPSHOT/sts-resource-server-0.24.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/cryptoutils/filesystemstoreconnection/0.18.2-SNAPSHOT/filesystemstoreconnection-0.18.2-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/google/code/gson/gson/2.8.2/gson-2.8.2.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/cryptoutils/storeconnectionfactory/0.18.4-SNAPSHOT/storeconnectionfactory-0.18.4-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/cryptoutils/mongodbstoreconnection/0.18.4-SNAPSHOT/mongodbstoreconnection-0.18.4-SNAPSHOT.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/mongodb/mongodb-driver/3.6.3/mongodb-driver-3.6.3.jar 
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/mongodb/bson/3.6.3/bson-3.6.3.jar      
+2018/04/28 19:40:20,671 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/mongodb/mongodb-driver-core/3.6.3/mongodb-driver-core-3.6.3.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/cryptoutils/miniostoreconnection/0.18.4-SNAPSHOT/miniostoreconnection-0.18.4-SNAPSHOT.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/minio/minio/3.0.12/minio-3.0.12.jar     
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/google/http-client/google-http-client-xml/1.20.0/google-http-client-xml-1.20.0.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/google/http-client/google-http-client/1.20.0/google-http-client-1.20.0.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/apache/httpcomponents/httpclient/4.5.5/httpclient-4.5.5.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/apache/httpcomponents/httpcore/4.4.9/httpcore-4.4.9.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/xpp3/xpp3/1.1.4c/xpp3-1.1.4c.jar           
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/squareup/okhttp3/okhttp/3.7.0/okhttp-3.7.0.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/squareup/okio/okio/1.12.0/okio-1.12.0.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/google/code/findbugs/annotations/3.0.1/annotations-3.0.1.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/net/jcip/jcip-annotations/1.0/jcip-annotations-1.0.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/google/code/findbugs/jsr305/3.0.1/jsr305-3.0.1.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/commons-io/commons-io/2.5/commons-io-2.5.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/apache/logging/log4j/log4j-slf4j-impl/2.10.0/log4j-slf4j-impl-2.10.0.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/apache/logging/log4j/log4j-core/2.10.0/log4j-core-2.10.0.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/multibanking/onlinebanking-mock/3.0.0-SNAPSHOT/onlinebanking-mock-3.0.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,672 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/multibanking/onlinebanking-facade/3.0.0-SNAPSHOT/onlinebanking-facade-3.0.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/security/spring-security-core/5.0.4.RELEASE/spring-security-core-5.0.4.RELEASE.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/envutils/envutils4j/0.2/envutils4j-0.2.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/multibanking/multibanking-analytics-api/3.0.0-SNAPSHOT/multibanking-analytics-api-3.0.0-SNAPSHOT.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/docusafe-business/0.3.4-SNAPSHOT/docusafe-business-0.3.4-SNAPSHOT.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/cryptoutils/basetypes/0.18.3-SNAPSHOT/basetypes-0.18.3-SNAPSHOT.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/docusafe-service/0.3.4-SNAPSHOT/docusafe-service-0.3.4-SNAPSHOT.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/bouncycastle/bcprov-jdk15on/1.57/bcprov-jdk15on-1.57.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/bouncycastle/bcpkix-jdk15on/1.57/bcpkix-jdk15on-1.57.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/apache/logging/log4j/log4j-api/2.10.0/log4j-api-2.10.0.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/projectlombok/lombok/1.16.20/lombok-1.16.20.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-starter-actuator/2.0.1.RELEASE/spring-boot-starter-actuator-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-actuator-autoconfigure/2.0.1.RELEASE/spring-boot-actuator-autoconfigure-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-actuator/2.0.1.RELEASE/spring-boot-actuator-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/micrometer/micrometer-core/1.0.3/micrometer-core-1.0.3.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/hdrhistogram/HdrHistogram/2.1.10/HdrHistogram-2.1.10.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-starter-hateoas/2.0.1.RELEASE/spring-boot-starter-hateoas-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,673 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/hateoas/spring-hateoas/0.24.0.RELEASE/spring-hateoas-0.24.0.RELEASE.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/plugin/spring-plugin-core/1.2.0.RELEASE/spring-plugin-core-1.2.0.RELEASE.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-configuration-processor/2.0.1.RELEASE/spring-boot-configuration-processor-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/boot/spring-boot-starter-security/2.0.1.RELEASE/spring-boot-starter-security-2.0.1.RELEASE.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/spring-aop/5.0.5.RELEASE/spring-aop-5.0.5.RELEASE.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/security/spring-security-config/5.0.4.RELEASE/spring-security-config-5.0.4.RELEASE.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/security/spring-security-web/5.0.4.RELEASE/spring-security-web-5.0.4.RELEASE.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/de/adorsys/lock-persistence/lock-persistence-core/0.2.0/lock-persistence-core-0.2.0.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/springfox/springfox-swagger2/2.8.0/springfox-swagger2-2.8.0.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/swagger/swagger-annotations/1.5.13/swagger-annotations-1.5.13.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/swagger/swagger-models/1.5.14/swagger-models-1.5.14.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/springfox/springfox-spi/2.8.0/springfox-spi-2.8.0.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/springfox/springfox-core/2.8.0/springfox-core-2.8.0.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/springfox/springfox-schema/2.8.0/springfox-schema-2.8.0.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/springfox/springfox-swagger-common/2.8.0/springfox-swagger-common-2.8.0.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/springfox/springfox-spring-web/2.8.0/springfox-spring-web-2.8.0.jar 
+2018/04/28 19:40:20,674 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/reflections/reflections/0.9.11/reflections-0.9.11.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/javassist/javassist/3.21.0-GA/javassist-3.21.0-GA.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/google/guava/guava/20.0/guava-20.0.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/com/fasterxml/classmate/1.3.4/classmate-1.3.4.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/plugin/spring-plugin-metadata/1.2.0.RELEASE/spring-plugin-metadata-1.2.0.RELEASE.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/mapstruct/mapstruct/1.2.0.Final/mapstruct-1.2.0.Final.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/io/springfox/springfox-swagger-ui/2.8.0/springfox-swagger-ui-2.8.0.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/net/minidev/json-smart/2.3/json-smart-2.3.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/net/minidev/accessors-smart/1.2/accessors-smart-1.2.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/ow2/asm/asm/5.0.4/asm-5.0.4.jar        
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/net/bytebuddy/byte-buddy/1.7.11/byte-buddy-1.7.11.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/spring-core/5.0.5.RELEASE/spring-core-5.0.5.RELEASE.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Users/fpo/.m2/repository/org/springframework/spring-jcl/5.0.5.RELEASE/spring-jcl-5.0.5.RELEASE.jar 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ] java.class.version........... : 52.0                                                                 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ] java.endorsed.dirs........... : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/endorsed 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ] java.ext.dirs................ : /Users/fpo/Library/Java/Extensions                                   
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/ext 
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Library/Java/Extensions                                             
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /Network/Library/Java/Extensions                                     
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /System/Library/Java/Extensions                                      
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ]                               : /usr/lib/java                                                        
+2018/04/28 19:40:20,675 [main] [INFO ] [ShowProperties                ] java.home.................... : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre 
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.io.tmpdir............... : /var/folders/k3/2bvnnk5x5c37qjprl547hw180000gn/T/                    
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.library.path............ : /Users/fpo/Library/Java/Extensions                                   
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ]                               : /Library/Java/Extensions                                             
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ]                               : /Network/Library/Java/Extensions                                     
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ]                               : /System/Library/Java/Extensions                                      
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ]                               : /usr/lib/java                                                        
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ]                               : .                                                                    
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.runtime.name............ : Java(TM) SE Runtime Environment                                      
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.runtime.version......... : 1.8.0_162-b12                                                        
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.specification.name...... : Java Platform API Specification                                      
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.specification.vendor.... : Oracle Corporation                                                   
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.specification.version... : 1.8                                                                  
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.vendor.................. : Oracle Corporation                                                   
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.vendor.url.............. : http://java.oracle.com/                                              
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.vendor.url.bug.......... : http://bugreport.sun.com/bugreport/                                  
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.version................. : 1.8.0_162                                                            
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.vm.info................. : mixed mode                                                           
+2018/04/28 19:40:20,676 [main] [INFO ] [ShowProperties                ] java.vm.name................. : Java HotSpot(TM) 64-Bit Server VM                                    
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] java.vm.specification.name... : Java Virtual Machine Specification                                   
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] java.vm.specification.vendor. : Oracle Corporation                                                   
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] java.vm.specification.version : 1.8                                                                  
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] java.vm.vendor............... : Oracle Corporation                                                   
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] java.vm.version.............. : 25.162-b12                                                           
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] line.separator............... : 
+                                                                    
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] os.arch...................... : x86_64                                                               
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] os.name...................... : Mac OS X                                                             
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] os.version................... : 10.11.6                                                              
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] path.separator............... : :                                                                    
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] socksNonProxyHosts........... : local|*.local|169.254/16|*.169.254/16                                
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] spring.beaninfo.ignore....... : true                                                                 
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] sun.arch.data.model.......... : 64                                                                   
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] sun.boot.class.path.......... : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/resources.jar 
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ]                               : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/rt.jar 
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ]                               : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/sunrsasign.jar 
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ]                               : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/jsse.jar 
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ]                               : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/jce.jar 
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ]                               : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/charsets.jar 
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ]                               : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib/jfr.jar 
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ]                               : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/classes 
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] sun.boot.library.path........ : /Library/Java/JavaVirtualMachines/jdk1.8.0_162.jdk/Contents/Home/jre/lib 
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] sun.cpu.endian............... : little                                                               
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] sun.cpu.isalist.............. :                                                                      
+2018/04/28 19:40:20,677 [main] [INFO ] [ShowProperties                ] sun.io.unicode.encoding...... : UnicodeBig                                                           
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] sun.java.command............. : de.adorsys.mbs.service.example.MultibankingApplication               
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] sun.java.launcher............ : SUN_STANDARD                                                         
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] sun.jnu.encoding............. : UTF-8                                                                
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] sun.management.compiler...... : HotSpot 64-Bit Tiered Compilers                                      
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] sun.os.patch.level........... : unknown                                                              
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] user.country................. : US                                                                   
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] user.dir..................... : /Users/fpo/dev/multibanking-develop/multibanking-examples/multibanking-service-example 
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] user.home.................... : /Users/fpo                                                           
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] user.language................ : en                                                                   
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] user.name.................... : fpo                                                                  
+2018/04/28 19:40:20,678 [main] [INFO ] [ShowProperties                ] user.timezone................ : Europe/Amsterdam                                                     
+2018/04/28 19:40:20,680 [main] [INFO ] [MultibankingApplication       ] 
+----------------------------------------------------------
+	Application 'null' is running! Access URLs:
+	Local: 		http://localhost:8080
+	External: 	http://172.16.121.124:8080
+	Profile(s): 	[]
+---------------------------------------------------------- 
+2018/04/28 19:41:01,434 [Thread-5] [INFO ] [AnnotationConfigServletWebServerApplicationContext] Closing org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext@4b520ea8: startup date [Sat Apr 28 19:40:11 CEST 2018]; root of context hierarchy 
+2018/04/28 19:41:01,437 [Thread-5] [INFO ] [DefaultLifecycleProcessor     ] Stopping beans in phase 2147483647                                                                   
+2018/04/28 19:41:01,442 [Thread-5] [INFO ] [AnnotationMBeanExporter       ] Unregistering JMX-exposed beans on shutdown                                                          
