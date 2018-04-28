@@ -1,18 +1,18 @@
 package de.adorsys.multibanking.impl;
 
 import de.adorsys.multibanking.domain.KeyStoreEntity;
-import de.adorsys.multibanking.pers.spi.repository.KeystoreRepositoryIf;
-import de.adorsys.multibanking.repository.KeystoreRepositoryMongodb;
+import de.adorsys.multibanking.pers.spi.repository.KeyStoreRepositoryIf;
+import de.adorsys.multibanking.repository.KeyStoreRepositoryMongodb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Profile({"mongo", "fongo"})
 @Service
-public class KeystoreRepositoryImpl implements KeystoreRepositoryIf {
+public class KeyStoreRepositoryImpl implements KeyStoreRepositoryIf {
 
     @Autowired
-    private KeystoreRepositoryMongodb keystoreRepositoryMongodb;
+    private KeyStoreRepositoryMongodb keystoreRepositoryMongodb;
 
     @Override
     public KeyStoreEntity findByName(String name) {

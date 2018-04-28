@@ -5,7 +5,7 @@ import de.adorsys.multibanking.domain.KeyStoreEntity;
 /**
  * @author alexg on 04.09.17
  */
-public interface KeystoreRepositoryIf {
+public interface KeyStoreRepositoryIf {
 
     KeyStoreEntity findByName(String name);
 

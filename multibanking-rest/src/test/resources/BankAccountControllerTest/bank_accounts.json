@@ -1,0 +1,25 @@
+[ {
+	"externalIdMap" : {},
+	"bankAccountBalance" : {
+		"readyHbciBalance" : null,
+		"unreadyHbciBalance" : null,
+		"creditHbciBalance" : null,
+		"availableHbciBalance" : 327.99,
+		"usedHbciBalance" : null
+	},
+	"owner" : "Anton Müller",
+	"country" : "DE",
+	"blz" : "19999999",
+	"bankName" : "Mock",
+	"accountNumber" : "0000801151",
+	"type" : "GIRO",
+	"currency" : "EUR",
+	"name" : null,
+	"bic" : "MOCKADDE001",
+	"iban" : "DE72199999990000801151",
+	"syncStatus" : null,
+    "lastSync": "2017-04-23T12:13:35",
+	"id" : "5a998c0c7077e800014ca673",
+	"bankAccessId" : "5a998c0c7077e800014ca672",
+	"userId" : "ae20daee-dfe7-496a-a92f-d5ad999792d9"
+} ]

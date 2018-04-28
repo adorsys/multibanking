@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Profile({"mongo", "fongo"})
 @Repository
-public interface KeystoreRepositoryMongodb extends MongoRepository<KeyStoreEntity, String> {
+public interface KeyStoreRepositoryMongodb extends MongoRepository<KeyStoreEntity, String> {
 
     KeyStoreEntity findByName(String name);
 
