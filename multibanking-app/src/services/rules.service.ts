@@ -16,13 +16,16 @@ export class RulesService {
   }
 
   getAvailableCategories(): Observable<Array<RuleCategory>> {
-    return this.http.get(`${AppConfig.api_url}/analytics/categories`)
+    return this.http.get(`${AppConfig.api_url}/analytics/rules/categories`)
       .map((res: Response) => res.json()._embedded.ruleCategoryList)
       .catch(this.handleError);
   }
 
-  createRule(rule: Rule): Observable<Array<RuleCategory>> {
-    return this.http.post(`${AppConfig.api_url}/analytics/rules`, rule)
+  createRule(rule: Rule, custom: boolean): Observable<Array<RuleCategory>> {
+    let url = custom ? `${AppConfig.api_url}/analytics/rules`
+      : `${AppConfig.smartanalytics_url}/rules`;
+
+    return this.http.post(url, rule)
       .catch(this.handleError)
       .finally(() => {
         this.rulesChangedObservable.next(rule)
@@ -30,15 +33,20 @@ export class RulesService {
   }
 
   updateRule(rule: Rule): Observable<Array<RuleCategory>> {
-    return this.http.put(`${AppConfig.api_url}/analytics/rules/${rule.id}`, rule)
+    let url = rule.released ? `${AppConfig.smartanalytics_url}/rules/${rule.id}`
+      : `${AppConfig.api_url}/analytics/rules/${rule.id}`;
+
+    return this.http.put(url, rule)
       .catch(this.handleError)
       .finally(() => {
         this.rulesChangedObservable.next(rule)
       })
   }
 
-  getRules(type: string): Observable<PageableRules> {
-    return this.http.get(`${AppConfig.api_url}/analytics/rules/${type}`)
+  getRules(custom: boolean): Observable<PageableRules> {
+    let url = custom ? `${AppConfig.api_url}/analytics/rules/` : `${AppConfig.smartanalytics_url}/rules/`;
+
+    return this.http.get(url)
       .map(response => response.json())
       .catch(this.handleError);
   }
@@ -61,13 +69,19 @@ export class RulesService {
   }
 
   getRule(id: string): Observable<Rule> {
-    return this.http.get(`${AppConfig.api_url}/analytics/rules/${id}`)
+    let url = id.startsWith("custom") ? `${AppConfig.api_url}/analytics/rules/${id}`
+      : `${AppConfig.smartanalytics_url}/rules/${id}`;
+
+    return this.http.get(url)
       .map((res: Response) => res.json() != null ? res.json() : {})
       .catch(this.handleError);
   }
 
   deleteRule(id, custom): Observable<any> {
-    return this.http.delete(`${AppConfig.api_url}/analytics/rules/${id}?custom=` + custom)
+    let url = custom ? `${AppConfig.api_url}/analytics/rules/${id}`
+      : `${AppConfig.smartanalytics_url}/rules/${id}`;
+
+    return this.http.delete(url)
       .catch(this.handleError);
   }
 
@@ -80,11 +94,11 @@ export class RulesService {
       .catch(this.handleError);
   }
 
-  uploadRules(custom: boolean, file: File): Observable<any> {
+  uploadRules(file: File): Observable<any> {
     let formData: FormData = new FormData();
-    formData.append('rules', file, 'rules.yml');
+    formData.append('rulesFile', file, 'rules.yml');
 
-    return this.http.post(`${AppConfig.api_url}/analytics/rules/upload?custom=` + custom, formData)
+    return this.http.post(`${AppConfig.smartanalytics_url}/rules/upload`, formData)
       .catch(this.handleError);
   }
 

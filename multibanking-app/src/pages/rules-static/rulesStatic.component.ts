@@ -20,7 +20,7 @@ export class RulesStaticPage {
   selectedRule: Rule;
   rules: Rule[];
   pageable: PageableRules;
-  type: string = "static";
+  custom: boolean = false;
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
@@ -60,13 +60,9 @@ export class RulesStaticPage {
   }
 
   loadRules() {
-    this.rulesService.getRules(this.type).subscribe(response => {
+    this.rulesService.getRules(this.custom).subscribe(response => {
       this.pageable = response;
-      if (this.type == 'custom') {
-        this.rules = response._embedded ? response._embedded.customRuleEntityList : [];
-      } else {
-        this.rules = response._embedded ? response._embedded.ruleEntityList : [];
-      }
+      this.rules = response._embedded ? response._embedded.ruleEntityList : [];
       
       this.selectedRule = undefined;
     });
@@ -76,7 +72,7 @@ export class RulesStaticPage {
     if (this.pageable._links.next) {
       this.rulesService.getNextRules(this.pageable._links.next.href).subscribe(response => {
         this.pageable = response;
-        if (this.type == 'custom') {
+        if (this.custom) {
           this.rules = this.rules.concat(response._embedded.customRuleEntityList);
         } else {
           this.rules = this.rules.concat(response._embedded.ruleEntityList);
@@ -98,13 +94,13 @@ export class RulesStaticPage {
   }
 
   deleteRule(rule: Rule) {
-    this.rulesService.deleteRule(rule.id, this.type == 'custom').subscribe(rules => {
+    this.rulesService.deleteRule(rule.id, this.custom).subscribe(rules => {
       this.loadRules();
     });
   }
 
   downloadRules() {
-    this.rulesService.downloadRules(this.type == 'custom').subscribe(data => {
+    this.rulesService.downloadRules(this.custom).subscribe(data => {
       this.showFile(data);
     });
   }
@@ -135,7 +131,7 @@ export class RulesStaticPage {
 
   uploadRules(input) {
     let file: File = input.target.files[0];
-    this.rulesService.uploadRules(this.type == 'custom', file).subscribe(
+    this.rulesService.uploadRules(file).subscribe(
       data => {
         this.loadRules();
       },
