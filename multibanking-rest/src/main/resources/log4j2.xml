@@ -46,6 +46,7 @@
 
     <Loggers>
         <Logger name="org.adorsys" level="debug"/>
+        <Logger name="de.adorsys" level="debug"/>
         <Root level="info">
             <AppenderRef ref="async"/>
             <AppenderRef ref="STDOUT"/>

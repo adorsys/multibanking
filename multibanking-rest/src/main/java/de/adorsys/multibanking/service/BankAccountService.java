@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -43,34 +44,35 @@ public class BankAccountService {
 
 	@Autowired
     private UserDataService uds;
-    
+
     @Autowired
     private OnlineBankingServiceProducer bankingServiceProducer;
     @Autowired
     private BankService bankService;
-	
+
     public void synchBankAccounts(BankAccessEntity bankAccess, BankAccessCredentials credentials){
     	List<BankAccountEntity> bankAccounts = loadFromBankingAPI(bankAccess, credentials, null);
-        
+
         if (bankAccounts.size() == 0) {
             throw new InvalidBankAccessException(bankAccess.getBankCode());
         }
         UserData userData = uds.load();
         BankAccessData bankAccessData = userData.bankAccessData(bankAccess.getId());
-        Map<String, BankAccountData> bankAccountDataMap = bankAccessData.getBankAccounts();
+        //Map<String, BankAccountData> bankAccountDataMap = bankAccessData.getBankAccounts();
+        List<BankAccountData> bankAccountData = bankAccessData.getBankAccounts();
         bankAccounts.forEach(account -> {
         	account.bankAccessId(bankAccess.getId());
-        	BankAccountData accountData = bankAccountDataMap.get(account.getId());
-        	if(accountData==null){
-        		accountData = new BankAccountData();
-        		bankAccountDataMap.put(account.getId(), accountData);
+        	Optional<BankAccountData> accountData = bankAccessData.getBankAccount(account.getId());
+        	if(!accountData.isPresent()){
+                accountData = Optional.of(new BankAccountData());
+        		bankAccountData.add(accountData.get());
         	}
-        	accountData.setBankAccount(account);
+        	accountData.get().setBankAccount(account);
         });
         uds.store(userData);
         log.info("[{}] accounts for connection [{}] created.", bankAccounts.size(), bankAccess.getId());
     }
-	
+
     public List<BankAccountEntity> loadFromBankingAPI(BankAccessEntity bankAccess, BankAccessCredentials credentials, BankApi bankApi) {
         OnlineBankingService onlineBankingService = bankApi != null
                 ? bankingServiceProducer.getBankingService(bankApi)
@@ -116,11 +118,11 @@ public class BankAccountService {
 		synchResult.setStatusTime(LocalDateTime.now());
 		uds.store(userData);
 	}
-	
+
 	/**
 	 * Saves an existing bank account. Will not add the bank account if absent.
 	 * Adding a bank account only occurs thru synch.
-	 * 
+	 *
 	 * @param in
 	 */
 	public void saveBankAccount(BankAccountEntity in){
@@ -136,20 +138,20 @@ public class BankAccountService {
 		}
 		uds.store(userData);
 	}
-	
+
 	public boolean exists(String accessId, String accountId) {
 		UserData userData = uds.load();
-		return userData.bankAccessData(accessId).getBankAccounts().containsKey(accountId);
+		return userData.bankAccessData(accessId).containsKey(accountId);
 	}
-	
+
 	public SyncStatus getSyncStatus(String accessId, String accountId) {
 		UserData userData = uds.load();
 		return userData.bankAccountData(accessId, accountId).getBankAccount().getSyncStatus();
 	}
-    
+
 	public AccountSynchPref loadAccountLevelSynchPref(String accessId, String accountId){
 		return uds.load().bankAccountData(accessId, accountId).getAccountSynchPref();
-	}	
+	}
 	public void storeAccountLevelSynchPref(String accessId, String accountId, AccountSynchPref pref){
 		UserData userData = uds.load();
 		userData.bankAccountData(accessId, accountId).setAccountSynchPref(pref);
@@ -158,7 +160,7 @@ public class BankAccountService {
 
 	public AccountSynchPref loadAccessLevelSynchPref(String accessId){
 		return uds.load().bankAccessData(accessId).getAccountSynchPref();
-	}	
+	}
 	public void storeAccessLevelSynchPref(String accessId, AccountSynchPref pref){
 		UserData userData = uds.load();
 		userData.bankAccessData(accessId).setAccountSynchPref(pref);
@@ -167,13 +169,13 @@ public class BankAccountService {
 
 	public AccountSynchPref loadUserLevelSynchPref(){
 		return uds.load().getAccountSynchPref();
-	}	
+	}
 	public void storeUserLevelSynchPref(AccountSynchPref pref){
 		UserData userData = uds.load();
 		userData.setAccountSynchPref(pref);
 		uds.store(userData);
 	}
-	
+
 	public AccountSynchResult loadAccountSynchResult(String accessId, String accountId) {
 		return uds.load().bankAccountData(accessId, accountId).getSynchResult();
 	}
@@ -182,29 +184,29 @@ public class BankAccountService {
 		userData.bankAccountData(accessId, accountId).setSynchResult(currentResult);
 		uds.store(userData);
 	}
-	
+
 	/**
 	 * Search the neares account synch preference for the given account
 	 * @param id
 	 * @param id2
-	 * @return 
+	 * @return
 	 */
 	public AccountSynchPref findAccountSynchPref(String accessId, String accountId) {
 		AccountSynchPref synchPref = loadAccountLevelSynchPref(accessId, accountId);
-		if(synchPref==null) 
+		if(synchPref==null)
 			synchPref = loadAccessLevelSynchPref(accessId);
-		if(synchPref==null) 
+		if(synchPref==null)
 			synchPref = loadUserLevelSynchPref();
-		if(synchPref==null) 
+		if(synchPref==null)
 			synchPref = new AccountSynchPref();
-		
+
 		return synchPref;
 	}
-	
+
 	/**
 	 * Store standing orders in the user data record. Uses the delivered orderId to identify
 	 * existing records and exchange them.
-	 * 
+	 *
 	 * @param bankAccount
 	 * @param standingOrders
 	 */
@@ -217,7 +219,7 @@ public class BankAccountService {
                 	if(StringUtils.isBlank(standingOrder.getOrderId())){
                 		standingOrder.setOrderId(Ids.uuid());
                 	}
-                	
+
                 	// Check existence of this standing order in the user data record.
                 	// Instantiate and add one if none.
                 	StandingOrderEntity target = standingOrdersMap.get(standingOrder.getOrderId());
@@ -228,18 +230,18 @@ public class BankAccountService {
                 		target.setAccountId(bankAccount.getId());
                 		target.setUserId(bankAccount.getUserId());
                 	}
-                	
+
                 	// Update the record.
                     BeanUtils.copyProperties(standingOrder, target);
                     return target;
                 });
         uds.store(userData);
     }
-	
-	
+
+
     private void filterAccounts(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService, List<BankAccount> bankAccounts) {
     	UserData userData = uds.load();
-    	Collection<BankAccountData> userBankAccounts = userData.bankAccessData(bankAccess.getId()).getBankAccounts().values();
+    	List<BankAccountData> userBankAccounts = userData.bankAccessData(bankAccess.getId()).getBankAccounts();
 //        List<BankAccountEntity> userBankAccounts = loadForBankAccess(bankAccess.getId());
 
         //filter out previous created accounts

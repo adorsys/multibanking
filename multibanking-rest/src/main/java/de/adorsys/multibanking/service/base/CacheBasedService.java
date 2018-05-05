@@ -19,16 +19,19 @@ import de.adorsys.multibanking.auth.CacheEntry;
 import de.adorsys.multibanking.auth.UserContext;
 import de.adorsys.multibanking.auth.UserContextCache;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base class for providing access to object thru cache.
- * 
+ *
  * Provides caching functionality when enabled.
- * 
+ *
  * @author fpo 2018-04-06 04:36
  *
  */
 public abstract class CacheBasedService extends DocumentBasedService {
+    private final static Logger LOGGER = LoggerFactory.getLogger(CacheBasedService.class);
 
 	private ObjectMapper objectMapper;
 	public CacheBasedService(ObjectMapper objectMapper) {
@@ -36,7 +39,7 @@ public abstract class CacheBasedService extends DocumentBasedService {
 	}
 
 	protected abstract UserContext user();
-	
+
 	public UserContextCache userContextCache() {
 		return new UserContextCache(user());
 	}
@@ -50,22 +53,23 @@ public abstract class CacheBasedService extends DocumentBasedService {
 	 * @return
 	 */
 	public <T> Optional<T> load(DocumentFQN documentFQN, TypeReference<T> valueType) {
+        LOGGER.debug("load " + documentFQN);
 		// Log request count
 		user().getRequestCounter().load(documentFQN);
-		
+
 		// Check cache.
 		Optional<CacheEntry<T>> cacheHit = userContextCache().cacheHit(documentFQN, valueType);
 		if (cacheHit.isPresent()) {
 			user().getRequestCounter().cacheHit(documentFQN);
 			return cacheHit.get().getEntry();
 		}
-		
+
 		// Return empty if base document does not exist.
-		if (!documentExists(documentFQN)) return Optional.empty(); 
+		if (!documentExists(documentFQN)) return Optional.empty();
 
 		try {
 			Optional<T> ot = Optional.of(objectMapper.readValue(loadDocument(documentFQN).getDocumentContent().getValue(), valueType));
-			
+
 			// Cache document.
 			userContextCache().cacheHit(documentFQN, valueType, ot, false);
 			return ot;
@@ -73,21 +77,22 @@ public abstract class CacheBasedService extends DocumentBasedService {
 			throw new BaseException(e);
 		}
 	}
-	
+
 	/**
 	 * Remove all Objects whose path start with the corresponding path.
-	 * 
+	 *
 	 * @param accessId
 	 */
 	public void clearCached(DocumentDirectoryFQN dir) {
+        LOGGER.debug("clearCached " + dir);
 		userContextCache().clearCached(dir);
-		
+
 	}
 
 	/**
-	 * Check existence of a document in the storage. Uses the valueType to locate 
+	 * Check existence of a document in the storage. Uses the valueType to locate
 	 * and check existence of a cached version.
-	 * 
+	 *
 	 * @param documentFQN
 	 * @param valueType
 	 * @return
@@ -105,17 +110,23 @@ public abstract class CacheBasedService extends DocumentBasedService {
 	 * @param entity
 	 */
 	public <T> void store(DocumentFQN documentFQN, TypeReference<T> valueType, T entity) {
+        LOGGER.debug("store " + documentFQN + " cache enabled:" + user().isCacheEnabled());
 		user().getRequestCounter().store(documentFQN);
 		boolean cacheHit = userContextCache().cacheHit(documentFQN, valueType, Optional.ofNullable(entity), true);
-		if (!cacheHit)flush(documentFQN, entity);
+		if (!cacheHit) {
+            LOGGER.debug("flush im store " + documentFQN);
+            flush(documentFQN, entity);
+        }
 	}
 
 	public ResourceNotFoundException resourceNotFound(Class<?> klass, String id) {
 		return new ResourceNotFoundException(klass, id);
 	}
-	
+
 	protected <T> void flush(DocumentFQN documentFQN, T entity) {
-		user().getRequestCounter().flush(documentFQN);
+        LOGGER.debug("flush " + documentFQN);
+
+        user().getRequestCounter().flush(documentFQN);
 		DocumentContent documentContent;
 		try {
 			documentContent = new DocumentContent(objectMapper.writeValueAsBytes(entity));
@@ -127,11 +138,14 @@ public abstract class CacheBasedService extends DocumentBasedService {
 	}
 
 	public void enableCaching() {
-		user().setCacheEnabled(true);
+        // TODO never cache
+        // user().setCacheEnabled(true);
+        LOGGER.warn("MUL-269 cacheing disabled for all and for ever");
 	}
 
 	public void flush() {
 		if (!user().isCacheEnabled())return;
+        LOGGER.debug("super flush begin");
 		Collection<Map<DocumentFQN, CacheEntry<?>>> values = user().getCache().values();
 		for (Map<DocumentFQN, CacheEntry<?>> map : values) {
 			Collection<CacheEntry<?>> collection = map.values();
@@ -145,6 +159,7 @@ public abstract class CacheBasedService extends DocumentBasedService {
 				}
 			}
 		}
+        LOGGER.debug("super flush end");
 	}
 
 }
