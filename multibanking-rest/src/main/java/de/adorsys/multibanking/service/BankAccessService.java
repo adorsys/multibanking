@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import spi.OnlineBankingService;
 
 /**
  * A user can have 0 to N bank accesses.
- * 
+ *
  * @author fpo 2018-04-06 05:47
  *
  */
@@ -36,7 +37,7 @@ public class BankAccessService  {
 
 	@Autowired
 	private BankAccessCredentialService credentialService;
-	
+
 	@Autowired
     private UserDataService uds;
 
@@ -45,12 +46,12 @@ public class BankAccessService  {
 
     @Autowired
     private BankAccountService bankAccountService;
-	
-    
+
+
     /**
      * Create a bank access
      * - load and store bank accounts
-     * 
+     *
      * @param bankAccess
      * @return
      */
@@ -78,7 +79,7 @@ public class BankAccessService  {
 
         // store bank access
     	storeBankAccess(bankAccess);
-    	
+
     	try {
 	    	// pull and store bank accounts
 	    	bankAccountService.synchBankAccounts(bankAccess, credentials);
@@ -89,14 +90,14 @@ public class BankAccessService  {
             }
             throw e;
     	}
-        
+
     	return bankAccess;
     }
 
     /**
      * Update the bank access object.
      * Credentials are reset but not updated. USe another interface for managing credentials.
-     * 
+     *
      * @param bankAccessEntity
      */
 	public void updateBankAccess(BankAccessEntity bankAccessEntity) {
@@ -105,7 +106,7 @@ public class BankAccessService  {
 
     public boolean deleteBankAccess(String accessId) {
     	UserData userData = uds.load();
-    	BankAccessData accessData = userData.getBankAccesses().remove(accessId);
+    	BankAccessData accessData = userData.remove(accessId);
 		if(accessData!=null){
 			uds.store(userData);
 			// TODO: for transactionality. Still check existence of these files.
@@ -119,17 +120,17 @@ public class BankAccessService  {
 
 	/**
 	 * Check existence by checking if the file containing the list of bank accounts exits.
-	 * 
+	 *
 	 * @param accessId
 	 * @return
 	 */
 	public boolean exists(String accessId){
 		UserData userData = uds.load();
-		return userData.getBankAccesses().containsKey(accessId);
+		return userData.containsKey(accessId);
 	}
 
     /*
-     * Clean bank access credential before storage. 
+     * Clean bank access credential before storage.
      * @param bankAccess
      */
 	private void storeBankAccess(BankAccessEntity bankAccess) {
@@ -143,7 +144,7 @@ public class BankAccessService  {
 		BankAccessData accessData = userData.getBankAccess(bankAccess.getId())
 				.orElseGet(() -> {
 					BankAccessData b = new BankAccessData();
-					userData.getBankAccesses().put(bankAccess.getId(), b);
+					userData.put(bankAccess.getId(), b);
 					return b;
 				});
 
@@ -153,13 +154,13 @@ public class BankAccessService  {
 
 	private void removeRemoteRegistrations(String accessId) {
 		UserData userData = uds.load();
-		if(!userData.getBankAccesses().containsKey(accessId)) return;
-		BankAccessData accessData = userData.getBankAccesses().get(accessId);
-		
+		if(!userData.containsKey(accessId)) return;
+		BankAccessData accessData = userData.get(accessId);
+
     	// Load bank Accounts
-		Collection<BankAccountData> bankAccountDataList = accessData.getBankAccounts().values();
+		List<BankAccountData> bankAccountDataList = accessData.getBankAccounts();
         UserEntity userEntity = userData.getUserEntity();
-        
+
 		bankAccountDataList.stream().forEach(bankAccountData -> {
 			BankAccountEntity bankAccountEntity = bankAccountData.getBankAccount();
 		   	bankAccountEntity.getExternalIdMap().keySet().forEach(bankApi -> {

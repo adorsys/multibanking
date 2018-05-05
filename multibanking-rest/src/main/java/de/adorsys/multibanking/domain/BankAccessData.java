@@ -11,7 +11,7 @@ import lombok.Data;
 
 /**
  * Holds Data associated with a bank access.
- * 
+ *
  * @author fpo
  *
  */
@@ -19,21 +19,34 @@ import lombok.Data;
 public class BankAccessData {
 
 	private BankAccessEntity bankAccess;
-	
-	private Map<String, BankAccountData> bankAccounts = new HashMap<>();
+
+	private List<BankAccountData> bankAccounts = new ArrayList<>();
 
 	private AccountSynchPref accountSynchPref;
 
 	public Optional<BankAccountData> getBankAccount(String accountId) {
-		return Optional.ofNullable(bankAccounts.get(accountId));
+        for (BankAccountData bankAccountData : bankAccounts) {
+            if (bankAccountData.getBankAccount().getId().equals(accountId)) {
+                return Optional.of(bankAccountData);
+            }
+        }
+		return Optional.empty();
 	}
-	
+
 	public List<BankAccountEntity> bankAccountEntityAsList(){
-		Collection<BankAccountData> values = bankAccounts.values();
 		List<BankAccountEntity> result = new ArrayList<>();
-		for (BankAccountData bankAccountData : values) {
+		for (BankAccountData bankAccountData : bankAccounts) {
 			result.add(bankAccountData.getBankAccount());
 		}
 		return result;
 	}
+
+    public boolean containsKey(String accountId) {
+        for (BankAccountData bankAccountData : bankAccounts) {
+            if (bankAccountData.getBankAccount().getId().equals(accountId)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
