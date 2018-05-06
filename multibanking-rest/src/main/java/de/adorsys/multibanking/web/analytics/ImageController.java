@@ -41,7 +41,7 @@ import io.swagger.annotations.Api;
 @Api(value = ImageController.BASE_PATH, 
 tags = "MB-008 - Analytics", description="Manages account and booking analytics.")
 public class ImageController extends BaseController {
-	public static final String BASE_PATH = "api/v1/image"; 
+	public static final String BASE_PATH = BaseController.BASE_PATH + "/image"; 
 
 	@Autowired
 	private CustomImageService customImageService;

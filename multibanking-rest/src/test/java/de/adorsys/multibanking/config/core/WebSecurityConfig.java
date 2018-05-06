@@ -38,6 +38,9 @@ import de.adorsys.multibanking.service.base.StorageUserService;
 import de.adorsys.multibanking.service.base.SystemObjectService;
 import de.adorsys.multibanking.service.base.UserObjectService;
 import de.adorsys.multibanking.service.crypto.SecretClaimDecryptionService;
+import de.adorsys.multibanking.web.analytics.ImageController;
+import de.adorsys.multibanking.web.banks.BankController;
+import de.adorsys.multibanking.web.common.BaseController;
 import de.adorsys.sts.filter.JWTAuthenticationFilter;
 import de.adorsys.sts.token.authentication.TokenAuthenticationService;
 import de.adorsys.sts.tokenauth.BearerToken;
@@ -76,12 +79,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/pop").permitAll()
                 .antMatchers("/api-docs/**").permitAll()
                 .antMatchers("/v2/api-docs/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/pop/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/v1/bank/**").permitAll()
-                .antMatchers("/api/v1/direct/**").permitAll()
-                .antMatchers("/api/v1/image/**").permitAll()
+                .antMatchers(HttpMethod.GET, BankController.BASE_PATH + "/**").permitAll()
+                .antMatchers(ImageController.BASE_PATH + "/**").permitAll()
                 .antMatchers("/token/password-grant").permitAll()
-                .antMatchers("/api/v1/**").authenticated()
+                .antMatchers(BaseController.BASE_PATH + "/**").authenticated()
                 .anyRequest().denyAll()
                 .and().cors();
        http

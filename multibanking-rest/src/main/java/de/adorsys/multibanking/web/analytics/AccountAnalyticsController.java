@@ -27,7 +27,7 @@ import io.swagger.annotations.Api;
 	tags = "MB-008 - Analytics", description="Manages account and booking analytics.")
 public class AccountAnalyticsController extends BaseController {
     private final static Logger LOGGER = LoggerFactory.getLogger(AccountAnalyticsController.class);
-	public static final String BASE_PATH = "api/v1/bankaccesses/{accessId}/accounts/{accountId}/analytics"; 
+	public static final String BASE_PATH = BaseController.BASE_PATH + "/bankaccesses/{accessId}/accounts/{accountId}/analytics"; 
     
     @Autowired
     private AnalyticsService analyticsService;

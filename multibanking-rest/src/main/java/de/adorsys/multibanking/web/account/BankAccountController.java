@@ -21,6 +21,7 @@ import de.adorsys.multibanking.exception.domain.MultibankingError;
 import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.web.annotation.UserResource;
 import de.adorsys.multibanking.web.common.BankAccountBasedController;
+import de.adorsys.multibanking.web.common.BaseController;
 import domain.BankApi;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +39,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = BankAccountController.BASE_PATH, 
 	tags = "MB-005 - Bank Accounts", description="Manages access to a single bank account. Does not allow reading a single bank account data. Bank account information are contained in the user data object.")
 public class BankAccountController extends BankAccountBasedController {
-	public static final String BASE_PATH = "/api/v1/bankaccesses/{accessId}/accounts"; 
+	public static final String BASE_PATH = BaseController.BASE_PATH + "/bankaccesses/{accessId}/accounts"; 
 
     @Autowired
     private BookingService bookingService;

@@ -19,6 +19,7 @@ import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.web.user.UserDataController;
 
 public abstract class BaseController {
+	public static final String BASE_PATH = "/api/v1";
 
 	@Autowired
 	private UserContext user;

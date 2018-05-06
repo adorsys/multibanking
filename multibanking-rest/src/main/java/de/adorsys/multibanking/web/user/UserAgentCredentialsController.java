@@ -38,7 +38,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = UserAgentCredentialsController.BASE_PATH, 
 	tags = "MB-002 - User Agent Credentials", description="User agent credentials are used to encryp user data stored locally on a user device. User agent credentials can only be stored or loaded when the user is logged into the application.")
 public class UserAgentCredentialsController extends BaseController {
-	public static final String BASE_PATH = "/api/v1/useragents/{userAgentId}"; 
+	public static final String BASE_PATH = BaseController.BASE_PATH + "/useragents/{userAgentId}"; 
 	
     private final static Logger LOGGER = LoggerFactory.getLogger(UserAgentCredentialsController.class);
     

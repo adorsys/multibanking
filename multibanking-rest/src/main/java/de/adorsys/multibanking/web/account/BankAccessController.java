@@ -22,6 +22,7 @@ import de.adorsys.multibanking.exception.domain.ErrorConstants;
 import de.adorsys.multibanking.exception.domain.MultibankingError;
 import de.adorsys.multibanking.web.annotation.UserResource;
 import de.adorsys.multibanking.web.common.BankAccessBasedController;
+import de.adorsys.multibanking.web.common.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -39,7 +40,7 @@ import io.swagger.annotations.ResponseHeader;
 @Api(value = BankAccessController.BASE_PATH, 
 	tags = "MB-004 - Bank Access", description="Manages information associating a user to an online banking account. Like bank code, bank login and corresponding password. A bank access is part of the user data object. So user the user data endpoint to load all bank accesses of this user.")
 public class BankAccessController extends BankAccessBasedController {
-	public static final String BASE_PATH = "/api/v1/bankaccesses"; 
+	public static final String BASE_PATH = BaseController.BASE_PATH + "/bankaccesses"; 
     private final static Logger LOGGER = LoggerFactory.getLogger(BankAccessController.class);
 
     @RequestMapping(method = RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_UTF8_VALUE)
