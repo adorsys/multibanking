@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import de.adorsys.multibanking.domain.CustomRuleEntity;
-import de.adorsys.multibanking.service.base.UserObjectService;
 import de.adorsys.multibanking.service.base.CacheBasedService;
+import de.adorsys.multibanking.service.base.UserObjectService;
 import de.adorsys.multibanking.service.helper.BookingRuleServiceTemplate;
 
 /**

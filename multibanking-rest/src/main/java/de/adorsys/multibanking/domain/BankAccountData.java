@@ -1,5 +1,7 @@
 package de.adorsys.multibanking.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
@@ -20,4 +22,8 @@ public class BankAccountData {
 	private AccountSynchPref accountSynchPref;
 	
 	private Map<String, StandingOrderEntity> standingOrders;
+	
+    private List<ContractEntity> contracts = new ArrayList<>();
+
+    private AccountAnalyticsEntity analytic;
 }

@@ -46,6 +46,7 @@
 		<de.adorsys.sts.version>0.24.0-SNAPSHOT</de.adorsys.sts.version>
 		<docusafe.version>0.3.4-SNAPSHOT</docusafe.version>
 		<crypt.version>0.18.4-SNAPSHOT</crypt.version>
+        <de.adorsys.smartanalytics.version>0.7.0-SNAPSHOT</de.adorsys.smartanalytics.version>
 
 		<scmBranch />
 		<start-class />
@@ -62,7 +63,6 @@
 		<module>multibanking-pers-spi</module>
 		<module>multibanking-app</module>
 		<module>multibanking-rest</module>
-		<module>multibanking-analytics-api</module>
 		<module>onlinebanking-xls-loader</module>
 		<module>multibanking-examples</module>
 	</modules>
@@ -136,6 +136,13 @@
 				<groupId>commons-beanutils</groupId>
 				<artifactId>commons-beanutils-core</artifactId>
 				<version>1.8.0</version>
+			</dependency>
+
+	        <!-- smartanalytics -->
+			<dependency>
+	            <groupId>de.adorsys.smartanalytics</groupId>
+	            <artifactId>smartanalytics-api</artifactId>
+	            <version>${de.adorsys.smartanalytics.version}</version>
 			</dependency>
 
 			<!-- Excel Parsing -->
