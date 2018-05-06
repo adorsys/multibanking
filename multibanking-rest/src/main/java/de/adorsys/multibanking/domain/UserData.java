@@ -1,12 +1,11 @@
 package de.adorsys.multibanking.domain;
 
-import de.adorsys.multibanking.exception.ResourceNotFoundException;
-import domain.BankAccess;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import lombok.Data;
 
 /**
  * This is the user data object. It is the unit of storage.
@@ -17,7 +16,6 @@ import java.util.Optional;
 public class UserData {
     private UserEntity userEntity;
     private List<BankAccessData> bankAccesses = new ArrayList<>();
-    private List<ContractEntity> contracts = new ArrayList<>();
 
     private AccountSynchPref accountSynchPref;
 

@@ -84,12 +84,11 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Smartanalytics API -->
-        <dependency>
-            <groupId>de.adorsys.multibanking</groupId>
-            <artifactId>multibanking-analytics-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!-- smartanalytics -->
+		<dependency>
+            <groupId>de.adorsys.smartanalytics</groupId>
+            <artifactId>smartanalytics-api</artifactId>
+		</dependency>
 
         <!-- Persistence -->
         <dependency>
