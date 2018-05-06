@@ -39,7 +39,7 @@ import lombok.Data;
 @Api(value = PaymentController.BASE_PATH, 
 	tags = "MB-007 - Payments", description="Initiates and manages payments on behalves of the user.")
 public class PaymentController extends BaseController {
-	public static final String BASE_PATH = "api/v1/bankaccesses/{accessId}/accounts/{accountId}/payments"; 
+	public static final String BASE_PATH = BaseController.BASE_PATH + "/bankaccesses/{accessId}/accounts/{accountId}/payments"; 
 
     @Autowired
     private BankAccountService bankAccountService;

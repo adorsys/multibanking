@@ -22,6 +22,7 @@ import de.adorsys.multibanking.exception.domain.MultibankingError;
 import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.web.annotation.UserResource;
 import de.adorsys.multibanking.web.common.BankAccountBasedController;
+import de.adorsys.multibanking.web.common.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -38,7 +39,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = BookingController.BASE_PATH, 
 tags = "MB-006 - Bookings", description="Enable the laoding of a booking files given the booking period. The list of available booking periods is contained in the user data object.")
 public class BookingController extends BankAccountBasedController {
-	public static final String BASE_PATH = "/api/v1/bankaccesses/{accessId}/accounts/{accountId}/bookings"; 
+	public static final String BASE_PATH = BaseController.BASE_PATH + "/bankaccesses/{accessId}/accounts/{accountId}/bookings"; 
 
     @Autowired
     private BookingService bookingService;

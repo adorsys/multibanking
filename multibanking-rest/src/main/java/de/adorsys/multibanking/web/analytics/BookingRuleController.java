@@ -43,7 +43,7 @@ import io.swagger.annotations.Api;
 @Api(value = BookingRuleController.BASE_PATH, 
 	tags = "MB-008 - Analytics", description="Manages account and booking analytics.")
 public class BookingRuleController extends BaseController {
-	public static final String BASE_PATH = "api/v1/analytics/rules"; 
+	public static final String BASE_PATH = BaseController.BASE_PATH + "/analytics/rules"; 
 
     private static final Logger log = LoggerFactory.getLogger(BookingRuleController.class);
     private static final ObjectMapper YAML_OBJECT_MAPPER = yamlObjectMapper();

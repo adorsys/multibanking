@@ -18,6 +18,7 @@ import de.adorsys.multibanking.exception.domain.MultibankingError;
 import de.adorsys.multibanking.service.UserDataService;
 import de.adorsys.multibanking.web.annotation.UserResource;
 import de.adorsys.multibanking.web.common.BankAccessBasedController;
+import de.adorsys.multibanking.web.common.BaseController;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -32,7 +33,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = UserDataController.BASE_PATH, 
 tags = "MB-001 - User Data", description="Manages information associated with the user. The user data object contains all banking information collected with the exception of bookings.")
 public class UserDataController extends BankAccessBasedController {
-	public static final String BASE_PATH = "/api/v1";
+	public static final String BASE_PATH = BaseController.BASE_PATH;
 	
 	@Autowired
 	private UserDataService uds;

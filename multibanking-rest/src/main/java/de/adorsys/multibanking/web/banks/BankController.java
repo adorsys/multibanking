@@ -31,7 +31,7 @@ import io.swagger.annotations.ApiResponses;
 @Api(value = BankController.BASE_PATH, 
 	tags = "MB-003 - Banks", description="Loads the list of banks supported by this application. Clients might user this to offer search.")
 public class BankController extends BaseController {
-	public static final String BASE_PATH = "/api/v1/bank"; 
+	public static final String BASE_PATH = BaseController.BASE_PATH + "/bank"; 
 
 	@Autowired
 	BankService bankService;
