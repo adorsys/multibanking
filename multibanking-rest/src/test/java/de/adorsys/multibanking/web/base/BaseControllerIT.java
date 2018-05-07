@@ -2,7 +2,6 @@ package de.adorsys.multibanking.web.base;
 
 import de.adorsys.multibanking.config.service.Tp;
 import de.adorsys.multibanking.service.old.TestConstants;
-import de.adorsys.multibanking.utils.Ids;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -34,10 +33,10 @@ public abstract class BaseControllerIT {
     public final static Logger LOGGER = LoggerFactory.getLogger(BaseControllerIT.class);
 
     @LocalServerPort
-    private int port;
+    public int port = 8080;
 
     @Autowired
-    protected TestRestTemplate testRestTemplate;
+    public TestRestTemplate testRestTemplate;
 
     @BeforeClass
     public static void beforeClass() {
@@ -58,6 +57,7 @@ public abstract class BaseControllerIT {
      * @return baseUri String
      */
     protected String getBaseUri() {
+        LOGGER.info("== Test Port ist " + port + "==");
         return "http://localhost:" + port;
     }
 
@@ -87,7 +87,7 @@ public abstract class BaseControllerIT {
         return path("/token/password-grant");
     }
 
-    protected final UriComponentsBuilder path(String path) {
+    public final UriComponentsBuilder path(String path) {
         return UriComponentsBuilder.fromUriString(getBaseUri()).path(path);
     }
 
@@ -129,7 +129,7 @@ public abstract class BaseControllerIT {
 
     private StatusCodeInterceptor i = null;
 
-    protected void setNextExpectedStatusCode(int ... statusCodes) {
+    public void setNextExpectedStatusCode(int ... statusCodes) {
         if (i == null) {
             i = new StatusCodeInterceptor(statusCodes);
             testRestTemplate.getRestTemplate().getInterceptors().add(i);
