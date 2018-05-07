@@ -8,7 +8,6 @@ import de.adorsys.multibanking.web.account.BankAccountController;
 import de.adorsys.multibanking.web.base.entity.BankAccessID;
 import de.adorsys.multibanking.web.base.entity.BankAccountID;
 import org.junit.Assert;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,7 @@ import java.util.List;
 public class MB_005_BankAccount extends MB_BaseTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(MB_005_BankAccount.class);
 
-    @Test
+    // @Test
     public void test_1() {
 
         URI location = MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
@@ -38,7 +37,7 @@ public class MB_005_BankAccount extends MB_BaseTest {
             LOGGER.info("found bank-AccountID:" + bankAccountID.toString());
             URI uri = bankAccountPath(this, bankAccessIDs.get(0)).pathSegment(bankAccountID.getValue()).pathSegment("sync").build().toUri();
             String pin = null;
-//            this.setNextExpectedStatusCode(102);
+            this.setNextExpectedStatusCode(102);
             LOGGER.info("PUT TO uri:" + uri);
             this.testRestTemplate.put(uri, pin);
         });
