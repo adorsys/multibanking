@@ -94,7 +94,7 @@ public abstract class CacheBasedService extends DocumentBasedService {
 		userContextCache().clearCached(dir);
 
 	}
-	
+
 	@Override
 	public void deleteDirectory(DocumentDirectoryFQN dirFQN) {
 		// First remove all cached object from this dir.
@@ -153,9 +153,7 @@ public abstract class CacheBasedService extends DocumentBasedService {
 	}
 
 	public void enableCaching() {
-        // TODO never cache
          user().setCacheEnabled(true);
-//        LOGGER.warn("MUL-269 cacheing disabled for all and for ever");
 	}
 
 	public void flush() {
@@ -177,7 +175,7 @@ public abstract class CacheBasedService extends DocumentBasedService {
 						deleteDocument(cacheEntry.getDocFqn());
 					}
 				} else {
-			        LOGGER.debug("Cache entry pre flush : clean. No file write : " + cacheEntry.getDocFqn());					
+			        LOGGER.debug("Cache entry pre flush : clean. No file write : " + cacheEntry.getDocFqn());
 				}
 			}
 		}

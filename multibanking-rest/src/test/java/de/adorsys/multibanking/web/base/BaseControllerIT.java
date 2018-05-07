@@ -61,11 +61,11 @@ public abstract class BaseControllerIT {
         return "http://localhost:" + port;
     }
 
-    protected PasswordGrantResponse auth(String userId, String password) {
+    protected PasswordGrantResponse auth(UserPasswordTuple userPasswordTuple) {
         URI uri = authPath()
         .queryParam("grant_type", "password")
-        .queryParam("username", userId)
-        .queryParam("password", password)
+        .queryParam("username", userPasswordTuple.getUser())
+        .queryParam("password", userPasswordTuple.getPassword())
         .queryParam("audience", "multibanking")
         .build().toUri();
 
@@ -81,16 +81,6 @@ public abstract class BaseControllerIT {
         }));
 
         return resp;
-    }
-
-    /**
-     * AuthenticateUser For FurtherRequests
-     *
-     * @param userName
-     * @return
-     */
-    protected void authenticateUserForFurtherRequests(String userName) {
-        auth(userName, Ids.uuid());
     }
 
     protected final UriComponentsBuilder authPath() {

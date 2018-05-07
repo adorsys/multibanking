@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.config.authserver;
 
+import de.adorsys.multibanking.web.base.UserPasswordTuple;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -15,7 +16,7 @@ public class PasswordGrantControllerTest extends BaseControllerIT {
 
     @Test
 	public void testAuth() throws Exception {
-    	PasswordGrantResponse resp = auth(Ids.uuid(), Ids.uuid());
+    	PasswordGrantResponse resp = auth(new UserPasswordTuple(Ids.uuid(), Ids.uuid()));
     	Assert.assertFalse(StringUtils.isEmpty(resp.getAccessToken()));
     	// TODO: check that bearer token contains user secret.
     	Assert.assertEquals("Bearer", resp.getTokenType());
