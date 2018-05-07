@@ -3,6 +3,7 @@ package de.adorsys.multibanking.web;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.service.BankService;
+import de.adorsys.multibanking.service.old.TestConstants;
 import de.adorsys.multibanking.web.account.BankAccessController;
 import de.adorsys.multibanking.web.base.BankLoginTuple;
 import de.adorsys.multibanking.web.base.BaseControllerIT;
@@ -14,6 +15,7 @@ import org.adorsys.encobject.service.api.ExtendedStoreConnection;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -31,7 +33,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.UUID;
 
 /**
  * https://wiki.adorsys.de/display/DOC/Multibanking-Rest+Tests
@@ -40,6 +41,7 @@ import java.util.UUID;
 public class MB_004_BankAccess extends BaseControllerIT {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(MB_004_BankAccess.class);
+
     @Autowired
     private BankService bankService;
     private UserPasswordTuple userPasswordTuple;
@@ -47,11 +49,12 @@ public class MB_004_BankAccess extends BaseControllerIT {
 
     @Before
     public void setup() throws Exception {
-        c.listAllBuckets().forEach(bucket -> c.deleteContainer(bucket));
-//        LOGGER.info("check filsystem ####################################################");
-//        Thread.currentThread().sleep(5000);
-
-        userPasswordTuple = new UserPasswordTuple("peter-" + UUID.randomUUID(), "allwaysTheSamePassword");
+        c.listAllBuckets().forEach(bucket -> {
+            if (! bucket.getObjectHandle().getContainer().equals("bp-system")) {
+                c.deleteContainer(bucket);
+            }
+        });
+        userPasswordTuple = new UserPasswordTuple("peter", "allwaysTheSamePassword");
         auth(userPasswordTuple);
 
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream("mock_bank.json");
