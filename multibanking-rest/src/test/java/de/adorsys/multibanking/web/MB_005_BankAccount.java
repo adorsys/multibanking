@@ -25,8 +25,8 @@ public class MB_005_BankAccount extends MB_BaseTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(MB_005_BankAccount.class);
 
     // @Test
+    // TODO läuft nicht wegen https://jira.adorsys.de/browse/MUL-272
     public void test_1() {
-
         URI location = MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
         UserDataStructure userDataStructure = MB_004_BankAccess.loadBankAccess(this, location);
         List<BankAccessID> bankAccessIDs = userDataStructure.getBankAccessIDs();
