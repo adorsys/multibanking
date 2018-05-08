@@ -1,25 +1,6 @@
 package de.adorsys.multibanking.service;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import org.adorsys.docusafe.business.types.complex.DSDocument;
-import org.adorsys.docusafe.business.types.complex.DocumentFQN;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import de.adorsys.multibanking.domain.AccountSynchPref;
 import de.adorsys.multibanking.domain.AccountSynchResult;
 import de.adorsys.multibanking.domain.BankAccessData;
@@ -44,8 +25,25 @@ import domain.BankApiUser;
 import domain.Booking;
 import domain.LoadBookingsResponse;
 import exception.InvalidPinException;
+import org.adorsys.docusafe.business.types.complex.DSDocument;
+import org.adorsys.docusafe.business.types.complex.DocumentFQN;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import spi.OnlineBankingService;
 import utils.Utils;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -54,6 +52,7 @@ import utils.Utils;
  */
 @Service
 public class BookingService {
+    private final static Logger LOGGER = LoggerFactory.getLogger(BookingService.class);
 
 	@Autowired
 	private UserObjectService uos;
@@ -126,10 +125,12 @@ public class BookingService {
 
             processBookings(bankAccess, bankAccount, response);
         } catch (Exception e) {
-            LoggerFactory.getLogger(getClass()).error("sync bookings failed", e);
+            // Hallo Francis, warum hier nicht standard ExceptionHandling?
+            LOGGER.error("sync bookings failed", e);
             throw e;
         } finally {
-            bankAccountService.updateSyncStatus(bankAccess.getId(), bankAccount.getId(), BankAccount.SyncStatus.PENDING);
+            LOGGER.info("Setze SyncStatus auf ready für " + bankAccount.getId());
+            bankAccountService.updateSyncStatus(bankAccess.getId(), bankAccount.getId(), BankAccount.SyncStatus.READY);
         }
     }
 
