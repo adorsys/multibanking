@@ -7,7 +7,7 @@ import org.springframework.format.datetime.standard.DateTimeFormatterFactory;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public enum BookingPeriod {
+public enum BookingFilePeriod {
 	
 	ALL(){
 		@Override
