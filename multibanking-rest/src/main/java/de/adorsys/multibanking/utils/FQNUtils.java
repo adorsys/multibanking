@@ -51,9 +51,9 @@ public class FQNUtils {
     	return bankAccountPeriodFQN(accessId, accountId, period).addName("bookings.aes");
 	}
 
-	public static DocumentFQN analyticsFQN(String accessId, String accountId) {
-    	return bankAccountDirFQN(accessId, accountId).addName("analytics.aes");
-	}
+//	public static DocumentFQN analyticsFQN(String accessId, String accountId) {
+//    	return bankAccountDirFQN(accessId, accountId).addName("analytics.aes");
+//	}
 	
 //	public static DocumentFQN contractsFQN(String accessId, String accountId) {
 //    	return bankAccountDirFQN(accessId, accountId).addName("contracts.aes");
@@ -82,8 +82,8 @@ public class FQNUtils {
     	return bankAccountDirFQN(accessId, accountId).addName("payments.aes");
 	}
 
-	public static DocumentFQN anonymizedBookingFQN(String accessId, String accountId) {
-    	return bankAccountDirFQN(accessId, accountId).addName("anonymizedBookings.aes");
+	public static DocumentFQN anonymizedBookingFQN(String accessId, String accountId, String period) {
+    	return bankAccountPeriodFQN(accessId, accountId, period).addName("anonymizedBookings.aes");
 	}
 
 	public static DocumentDirectoryFQN expireDirFQN() {
