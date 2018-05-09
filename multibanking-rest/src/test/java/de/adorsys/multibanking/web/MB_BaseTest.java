@@ -17,7 +17,7 @@ import java.util.Optional;
 /**
  * Created by peter on 07.05.18 at 17:34.
  */
-public class MB_BaseTest extends BaseControllerIT {
+public abstract class MB_BaseTest extends BaseControllerIT {
     @Autowired
     public BankService bankService;
     public UserPasswordTuple userPasswordTuple;
