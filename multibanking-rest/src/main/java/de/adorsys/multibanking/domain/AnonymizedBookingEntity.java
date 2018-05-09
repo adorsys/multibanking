@@ -7,10 +7,13 @@ import lombok.Data;
 
 /**
  * Created by alexg on 01.12.17.
+ * TODO fpo 2018-05-06 08:07 - Introduce Creditor IBAN
+ * 
  */
 @Data
 public class AnonymizedBookingEntity extends AbstractId {
     private String creditorId;
     private BigDecimal amount;
     private String purpose;
+    private String otherAccountIBAN;
 }

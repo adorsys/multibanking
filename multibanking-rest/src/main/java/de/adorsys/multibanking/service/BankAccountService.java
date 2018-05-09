@@ -2,7 +2,6 @@ package de.adorsys.multibanking.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +14,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import de.adorsys.multibanking.domain.AccountAnalyticsEntity;
 import de.adorsys.multibanking.domain.AccountSynchPref;
 import de.adorsys.multibanking.domain.AccountSynchResult;
 import de.adorsys.multibanking.domain.BankAccessCredentials;
@@ -23,6 +23,7 @@ import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BankEntity;
+import de.adorsys.multibanking.domain.ContractEntity;
 import de.adorsys.multibanking.domain.StandingOrderEntity;
 import de.adorsys.multibanking.domain.UserData;
 import de.adorsys.multibanking.exception.BankAccessAlreadyExistException;
@@ -238,6 +239,47 @@ public class BankAccountService {
         uds.store(userData);
     }
 
+	/**
+	 * Replace all contracts associated with the given bank account.
+	 * 
+	 * We assume to contracts given are associated with the bank account.
+	 *
+	 */
+	public void saveContracts(String accountId, List<ContractEntity> contractEntities){
+		UserData userData = uds.load();
+		BankAccountData bankAccountData = findBankAccountData(userData, accountId);
+		if(bankAccountData==null) throw new ResourceNotFoundException(BankAccountData.class, accountId);
+		// Set ids.
+		BankAccountEntity bankAccount = bankAccountData.getBankAccount();
+		contractEntities.stream().forEach(c -> {
+			c.setAccessId(bankAccount.getBankAccessId());
+			c.setUserId(bankAccount.getUserId());
+			c.setAccountId(bankAccount.getId());
+		});
+
+		bankAccountData.setContracts(new ArrayList<>(contractEntities));
+		uds.store(userData);
+	}
+
+	public void saveAccountAnalytics(String accountId, AccountAnalyticsEntity analytic){
+		UserData userData = uds.load();
+		BankAccountData bankAccountData = findBankAccountData(userData, accountId);
+		if(bankAccountData==null) throw new ResourceNotFoundException(BankAccountData.class, accountId);
+		BankAccountEntity bankAccount = bankAccountData.getBankAccount();
+		analytic.setUserId(bankAccount.getUserId());
+		analytic.setAccountId(bankAccount.getId());
+		bankAccountData.setAnalytic(analytic);
+		uds.store(userData);
+	}
+	
+	private BankAccountData findBankAccountData(UserData userData, String accountId){
+		List<BankAccessData> bankAccesses = userData.getBankAccesses();
+		for (BankAccessData b : bankAccesses) {
+			Optional<BankAccountData> bankAccount = b.getBankAccount(accountId);
+			if(bankAccount.isPresent()) return bankAccount.get();
+		}
+		return null;
+	}
 
     private void filterAccounts(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService, List<BankAccount> bankAccounts) {
     	UserData userData = uds.load();

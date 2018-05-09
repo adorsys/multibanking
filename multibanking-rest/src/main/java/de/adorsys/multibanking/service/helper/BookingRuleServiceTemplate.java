@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.service.helper;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public abstract class BookingRuleServiceTemplate<T extends RuleEntity>{
 	}
 	
 	public void createOrUpdateRules(List<T> ruleEntities) {
-		List<T> persList = cbs().load(RuleUtils.bookingRulesFQN, listType()).orElse(Collections.emptyList());
+		List<T> persList = cbs().load(RuleUtils.bookingRulesFQN, listType()).orElse(new ArrayList<>());
 		persList = ListUtils.updateList(RuleUtils.normalize(ruleEntities), persList);
 		cbs().store(RuleUtils.bookingRulesFQN, listType(), persList);
 	}
@@ -45,9 +46,13 @@ public abstract class BookingRuleServiceTemplate<T extends RuleEntity>{
 		return deleteRules(Collections.singletonList(ruleId));
 	}
 	public boolean deleteRules(List<String> ruleIds) {
-		List<T> persList = cbs().load(RuleUtils.bookingRulesFQN, listType()).orElse(Collections.emptyList());
+		List<T> persList = cbs().load(RuleUtils.bookingRulesFQN, listType()).orElse(new ArrayList<>());
 		List<T> newPersList = ListUtils.deleteListById(ruleIds, persList);
 		cbs().store(RuleUtils.bookingRulesFQN, listType(), newPersList);
 		return (newPersList.size() - persList.size()) !=0;
+	}
+	
+	public List<T> loadRules(){
+		return cbs().load(RuleUtils.bookingRulesFQN, listType()).orElse(new ArrayList<>());
 	}
 }
