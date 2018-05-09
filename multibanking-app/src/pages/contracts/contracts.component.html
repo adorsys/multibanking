@@ -21,7 +21,7 @@
       <h4 *ngIf="contract.subCategory">{{contract.subCategory}}</h4>
       <h4 *ngIf="contract.specification">{{contract.specification}}</h4>
       <div item-right>
-        <h2>{{contract.amount | currency:'EUR':true}}</h2>
+        <h2>{{contract.amount | currency:'EUR':'symbol'}}</h2>
         <h2>{{contract.interval | cycle}}</h2>
       </div>
     </ion-item>
@@ -36,7 +36,7 @@
       <h4 *ngIf="contract.subCategory">{{contract.subCategory}}</h4>
       <h4 *ngIf="contract.specification">{{contract.specification}}</h4>
       <div item-right>
-        <h2>{{contract.amount | currency:'EUR':true}}</h2>
+        <h2>{{contract.amount | currency:'EUR':'symbol'}}</h2>
         <h2>{{contract.interval | cycle}}</h2>
       </div>
     </ion-item>

@@ -18,7 +18,7 @@
             <ion-col col-4>Booking date:</ion-col>
             <ion-col col-8>{{ booking.bookingDate | date }}</ion-col>
             <ion-col col-4>Amount:</ion-col>
-            <ion-col col-8>{{ booking.amount | currency:'EUR':true }}</ion-col>
+            <ion-col col-8>{{ booking.amount | currency:'EUR':'symbol' }}</ion-col>
             <ion-col col-4 *ngIf="booking.otherAccount">Receiver:</ion-col>
             <ion-col col-8 *ngIf="booking.otherAccount">{{ booking.otherAccount.owner }}</ion-col>
             <ion-col col-4>Standing order:</ion-col>
