@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import de.adorsys.multibanking.domain.AccountAnalyticsEntity;
 import de.adorsys.multibanking.domain.AccountSynchPref;
-import de.adorsys.multibanking.domain.AccountSynchResult;
 import de.adorsys.multibanking.domain.BankAccessCredentials;
 import de.adorsys.multibanking.domain.BankAccessData;
 import de.adorsys.multibanking.domain.BankAccessEntity;
@@ -111,15 +110,6 @@ public class BankAccountService {
         return bankAccountEntities;
     }
 
-	public void updateSyncStatus(String accessId, String accountId, SyncStatus syncStatus) {
-		UserData userData = uds.load();
-		userData.bankAccountData(accessId, accountId).getBankAccount().setSyncStatus(syncStatus);
-		AccountSynchResult synchResult = userData.bankAccountData(accessId, accountId).getSynchResult();
-		synchResult.setSyncStatus(syncStatus);
-		synchResult.setStatusTime(LocalDateTime.now());
-		uds.store(userData);
-	}
-
 	/**
 	 * Saves an existing bank account. Will not add the bank account if absent.
 	 * Adding a bank account only occurs thru synch.
@@ -177,14 +167,14 @@ public class BankAccountService {
 		uds.store(userData);
 	}
 
-	public AccountSynchResult loadAccountSynchResult(String accessId, String accountId) {
-		return uds.load().bankAccountData(accessId, accountId).getSynchResult();
-	}
-	public void storeAccountSynchResult(String accessId, String accountId, AccountSynchResult currentResult) {
-		UserData userData = uds.load();
-		userData.bankAccountData(accessId, accountId).setSynchResult(currentResult);
-		uds.store(userData);
-	}
+//	public AccountSynchResult loadAccountSynchResult(String accessId, String accountId) {
+//		return uds.load().bankAccountData(accessId, accountId).getSynchResult();
+//	}
+//	public void storeAccountSynchResult(String accessId, String accountId, AccountSynchResult currentResult) {
+//		UserData userData = uds.load();
+//		userData.bankAccountData(accessId, accountId).setSynchResult(currentResult);
+//		uds.store(userData);
+//	}
 
 	/**
 	 * Search the neares account synch preference for the given account

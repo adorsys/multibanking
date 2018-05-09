@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import de.adorsys.multibanking.domain.AccountSynchPref;
-import de.adorsys.multibanking.domain.AccountSynchResult;
 import de.adorsys.multibanking.domain.AnonymizedBookingEntity;
 import de.adorsys.multibanking.domain.BankAccessData;
 import de.adorsys.multibanking.domain.BankAccessEntity;
@@ -96,9 +95,9 @@ public class BookingService {
      * @return
      */
     public DSDocument getBookings(String accessId, String accountId, String period) {
-    	AccountSynchResult accountSynchResult = bankAccountService.loadAccountSynchResult(accessId, accountId);
+    	BankAccountData bankAccountData = uds.load().bankAccountData(accessId, accountId);
     	DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId,accountId,period);
-    	if(!accountSynchResult.getBookingFiles().containsKey(period))
+    	if(!bankAccountData.getBookingFiles().containsKey(period))
     		throw new UnexistentBookingFileException(bookingFQN.getValue());
         return uos.loadDocument(bookingFQN);
     }
@@ -113,43 +112,34 @@ public class BookingService {
      * @param pin
      */
     public void syncBookings(String accessId, String accountId, BankApi bankApi, String pin) {
+    	UserData userData = uds.load();
+    	BankAccountData bankAccountData = userData.bankAccountData(accessId, accountId);
     	// Set the synch status and flush
-        bankAccountService.updateSyncStatus(accessId, accountId, BankAccount.SyncStatus.SYNC);
+    	bankAccountData.updateSyncStatus(BankAccount.SyncStatus.SYNC);
         uos.flush();
 
         // Reload
-        UserData userData = uds.load();
         BankAccessEntity bankAccess = userData.bankAccessData(accessId).getBankAccess();
-        BankAccountEntity bankAccount = userData.bankAccountData(accessId, accountId).getBankAccount();
-        try {
-            LoadBookingsResponse response = loadBookingsOnline(bankApi, bankAccess, bankAccount, pin);
+        BankAccountEntity bankAccount = bankAccountData.getBankAccount();
+        LoadBookingsResponse response = loadBookingsOnline(bankApi, bankAccess, bankAccount, pin);
 
-            bankAccount.setBankAccountBalance(response.getBankAccountBalance());
-            if (bankAccess.isStoreBookings()) {
-                bankAccount.setLastSync(LocalDateTime.now());
-                bankAccountService.saveBankAccount(bankAccount);
-            }
-
-            if (!bankAccess.isTemporary()) {
-                //update bankaccess, passportstate changed
-                bankAccessService.updateBankAccess(bankAccess);
-            }
-
-            processBookings(userData, bankAccess, bankAccount, response);
-        } catch (Exception e) {
-            // Hallo Francis, warum hier nicht standard ExceptionHandling?
-            LOGGER.error("sync bookings failed", e);
-            throw e;
-        } finally {
-            LOGGER.info("Setze SyncStatus auf ready für " + bankAccount.getId());
-            bankAccountService.updateSyncStatus(bankAccess.getId(), bankAccount.getId(), BankAccount.SyncStatus.READY);
+        bankAccount.setBankAccountBalance(response.getBankAccountBalance());
+        if (bankAccess.isStoreBookings()) {
+            bankAccount.setLastSync(LocalDateTime.now());
+            bankAccountService.saveBankAccount(bankAccount);
         }
+
+        if (!bankAccess.isTemporary()) {
+            //update bankaccess, passportstate changed
+            bankAccessService.updateBankAccess(bankAccess);
+        }
+
+        processBookings(userData, bankAccess, bankAccount, response);
     }
 
     private void processBookings(UserData userData, BankAccessEntity bankAccess,
     		BankAccountEntity bankAccount, LoadBookingsResponse response) {
 
-    	AccountSynchResult synchResult = bankAccountService.loadAccountSynchResult(bankAccess.getId(), bankAccount.getId());
     	AccountSynchPref accountSynchPref = bankAccountService.findAccountSynchPref(bankAccess.getId(), bankAccount.getId());
 
     	// Booking downloaded from the online banking system
@@ -160,7 +150,8 @@ public class BookingService {
         // I don't think we need to reload all bookings of a user for analytics.
         Map<String, List<BookingEntity>> processBookingPeriods = new HashMap<>();
         
-        Map<String, BookingFile> bookingFileMap = synchResult.getBookingFiles();
+        BankAccountData bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
+        Map<String, BookingFile> bookingFileMap = bankAccountData.getBookingFiles();
         Set<Entry<String,List<BookingEntity>>> entrySet = bookings.entrySet();
         for (Entry<String, List<BookingEntity>> entry : entrySet) {
         	List<BookingEntity> bookingEntities = entry.getValue();
@@ -191,10 +182,9 @@ public class BookingService {
             	bookingFile = new BookingFile();
             	bookingFile.setPeriod(period);
             	bookingFile.setLastUpdate(LocalDateTime.now());
-            	synchResult.update(Collections.singletonList(bookingFile));
+            	bankAccountData.update(Collections.singletonList(bookingFile));
             }
             bookingFile.setNumberOfRecords(bookingEntities.size());
-            bankAccountService.storeAccountSynchResult(bankAccess.getId(),bankAccount.getId(), synchResult);
 
             // Sort and store bookings
             Collections.sort(bookingEntities, (o1, o2) -> o2.getBookingDate().compareTo(o1.getBookingDate()));
@@ -205,7 +195,7 @@ public class BookingService {
 		}
         
         bankAccountService.saveStandingOrders(bankAccount, response.getStandingOrders());
-        bankAccountService.updateSyncStatus(bankAccount.getBankAccessId(), bankAccount.getId(), BankAccount.SyncStatus.READY);
+        bankAccountData.updateSyncStatus(BankAccount.SyncStatus.READY);
         uos.flush();
         
         if (bankAccess.isCategorizeBookings() || bankAccess.isStoreAnalytics()) {
@@ -239,7 +229,7 @@ public class BookingService {
 
 	private List<BookingEntity> loadAllBookings(UserData userData, BankAccessEntity bankAccess, BankAccountEntity bankAccount) {
         BankAccountData bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
-        Map<String, BookingFile> bookingFiles = bankAccountData.getSynchResult().getBookingFiles();
+        Map<String, BookingFile> bookingFiles = bankAccountData.getBookingFiles();
         List<BookingEntity> result = new ArrayList<>();
 		bookingFiles.values().forEach(bookingFile -> {
         	String period = bookingFile.getPeriod();
