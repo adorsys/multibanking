@@ -71,7 +71,7 @@ export class RuleEditPage {
           this.navCtrl.pop();
         });
     } else {
-      this.rulesService.createRule(this.rule).subscribe(
+      this.rulesService.createRule(this.rule, true).subscribe(
         response => {
           this.navCtrl.pop();
         });

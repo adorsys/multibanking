@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar class="force-back-button">
-    <ion-title>Analytics {{ analytics?.analyticsDate | date }}</ion-title>
+    <ion-title>Analytics created {{ analytics?.analyticsDate | date }}</ion-title>
     <ion-buttons end>
       <button ion-button (click)="syncBookings()">
         Reload
@@ -9,31 +9,35 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content class="bookingList-content" padding>
+<ion-content class="analytics-content" padding>
+  <ion-scroll scrollX="true" direction="x">
+    <ion-card *ngFor="let item of dates" [ngClass]="{'active': item == referenceDate }" (click)="newDateSelected(item)">
+      <ion-card-content>
+        <ion-card-title>
+          {{ item | amDateFormat:'MMM YYYY' }}
+        </ion-card-title>
+      </ion-card-content>
+    </ion-card>
+  </ion-scroll>
+
   <ion-item-group>
-    <ion-item-divider color="light">Balance end of month: {{analytics?.balanceCalculated | currency:'EUR':true}}</ion-item-divider>
     <ion-item-divider color="light">Income</ion-item-divider>
-    <ion-item>Total: {{analytics?.incomeTotal | currency:'EUR':true}}</ion-item>
-    <ion-item (click)="itemSelected('Fix income', analytics?.incomeFixBookings)">Fix: {{analytics?.incomeFix | currency:'EUR':true}}
+    <ion-item (click)="itemSelected('Income fix', incomeFix)">Fix: {{incomeFix?.amount | currency:'EUR':'symbol'}}
       <button ion-button clear item-end>View</button>
     </ion-item>
-    <ion-item (click)="itemSelected('Variable income', analytics?.incomeVariableBookings)">Variable: {{analytics?.incomeVariable | currency:'EUR':true}}
-      <button ion-button clear item-end>View</button>
-    </ion-item>
-    <ion-item (click)="itemSelected('Next income', analytics?.incomeNextBookings)">Next: {{analytics?.incomeNext | currency:'EUR':true}}
+    <ion-item (click)="itemSelected('Income other', incomeOther)">Other: {{incomeOther?.amount | currency:'EUR':'symbol'}}
       <button ion-button clear item-end>View</button>
     </ion-item>
   </ion-item-group>
   <ion-item-group>
     <ion-item-divider color="light">Expenses</ion-item-divider>
-    <ion-item>Total: {{analytics?.expensesTotal | currency:'EUR':true}}</ion-item>
-    <ion-item (click)="itemSelected('Fix expenses', analytics?.expensesFixBookings)">Fix: {{analytics?.expensesFix | currency:'EUR':true}}
+    <ion-item (click)="itemSelected('Expenses fix', expensesFix)">Fix: {{expensesFix?.amount | currency:'EUR':'symbol'}}
       <button ion-button clear item-end>View</button>
     </ion-item>
-    <ion-item (click)="itemSelected('Variable expenses', analytics?.expensesVariableBookings)">Variable: {{analytics?.expensesVariable | currency:'EUR':true}}
+    <ion-item (click)="itemSelected('Expenses variable', expensesVariable)">Variable: {{expensesVariable?.amount | currency:'EUR':'symbol'}}
       <button ion-button clear item-end>View</button>
     </ion-item>
-    <ion-item (click)="itemSelected('Next expenses', analytics?.expensesNextBookings)">Next: {{analytics?.expensesNext | currency:'EUR':true}}
+    <ion-item (click)="itemSelected('Expenses other', expensesOther)">Other: {{expensesOther?.amount | currency:'EUR':'symbol'}}
       <button ion-button clear item-end>View</button>
     </ion-item>
   </ion-item-group>

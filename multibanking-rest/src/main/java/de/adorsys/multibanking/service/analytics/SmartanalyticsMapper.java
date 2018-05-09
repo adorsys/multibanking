@@ -2,15 +2,13 @@ package de.adorsys.multibanking.service.analytics;
 
 import de.adorsys.multibanking.domain.BookingEntity;
 import de.adorsys.multibanking.domain.ContractEntity;
-import de.adorsys.smartanalytics.api.Booking;
-import de.adorsys.smartanalytics.api.BookingGroup;
-import de.adorsys.smartanalytics.api.AnalyticsResult;
-import de.adorsys.smartanalytics.api.WrappedBooking;
+import de.adorsys.smartanalytics.api.*;
 import domain.BookingCategory;
 import domain.Contract;
 import domain.Cycle;
 import domain.RuleCategory;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,9 +28,8 @@ public class SmartanalyticsMapper {
                     .accountNumber(booking.getOtherAccount() != null ? booking.getOtherAccount().getAccountNumber() : null)
                     .bankCode(booking.getOtherAccount() != null ? booking.getOtherAccount().getBlz() : null)
                     .amount(booking.getAmount())
-                    .executionDate(booking.getBookingDate())
-                    .orderDate(booking.getValutaDate())
-                    .type(booking.isStandingOrder() ? Booking.BookingType.STANDING_ORDER : null)
+                    .executionDate(booking.getValutaDate())
+                    .standingOrder(booking.isStandingOrder())
                     .mandateReference(booking.getMandateReference())
                     .build();
             if (booking.getOtherAccount() != null) {
@@ -53,21 +50,26 @@ public class SmartanalyticsMapper {
                     .filter(bookingEntity -> categorizedBooking.getBooking().getBookingId().equals(bookingEntity.getExternalId()))
                     .findFirst().ifPresent(bookingEntity -> {
                 //Überschreibe Gegegenkonto Inhaber mit einem besseren Namen aus Kategorisierung, statt z.b. '2631EDEKA HOFMANN CADOLZBU'
-                if (StringUtils.isNotBlank(categorizedBooking.getReceiver()) && bookingEntity.getOtherAccount() != null) {
-                    bookingEntity.getOtherAccount().setOwner(categorizedBooking.getReceiver());
+                if (StringUtils.isNotBlank(categorizedBooking.getOtherAccount()) && bookingEntity.getOtherAccount() != null) {
+                    bookingEntity.getOtherAccount().setOwner(categorizedBooking.getOtherAccount());
                 }
 
                 if (categorizedBooking.getMainCategory() != null) {
-                    BookingCategory category = mapToBookingcategory(categorizedBooking, categories);
-                    category.setVariable(categorizedBooking.isVariable());
-                    if (categorizedBooking.getCycle() != null) {
-                        category.getContract().setInterval(Cycle.valueOf(categorizedBooking.getCycle().name()));
-                    }
-                    bookingEntity.setBookingCategory(category);
+                    bookingEntity.setBookingCategory(mapToBookingcategory(categorizedBooking, categories));
                 }
             });
         });
     }
+
+    static BookingCategory mapToBookingcategory(WrappedBooking extendedBooking, List<RuleCategory> categories) {
+        return BookingCategory.builder()
+                .mainCategory(extendedBooking.getMainCategory())
+                .subCategory(extendedBooking.getSubCategory())
+                .specification(extendedBooking.getSpecification())
+                .rules(extendedBooking.getRuleIds())
+                .build();
+    }
+
 
     static ContractEntity toContract(String userId, String accountId, BookingGroup bookingGroup) {
         ContractEntity contractEntity = new ContractEntity();
@@ -84,51 +86,10 @@ public class SmartanalyticsMapper {
         contractEntity.setMainCategory(bookingGroup.getMainCategory());
         contractEntity.setSubCategory(bookingGroup.getSubCategory());
         contractEntity.setSpecification(bookingGroup.getSpecification());
-        contractEntity.setProvider(bookingGroup.getProvider());
+        contractEntity.setProvider(bookingGroup.getOtherAccount());
         contractEntity.setMandateReference(bookingGroup.getMandatreference());
 
         return contractEntity;
-    }
-
-    static BookingCategory mapToBookingcategory(WrappedBooking extendedBooking, List<RuleCategory> categories) {
-        BookingCategory bookingCategory = BookingCategory.builder()
-                .mainCategory(extendedBooking.getMainCategory())
-                .subCategory(extendedBooking.getSubCategory())
-                .specification(extendedBooking.getSpecification())
-                .rules(extendedBooking.getRuleIds())
-                .contract(Contract.builder()
-                        .email(extendedBooking.getEmail())
-                        .homepage(extendedBooking.getHomepage())
-                        .logo(extendedBooking.getLogo())
-                        .mandateReference(extendedBooking.getMandateReference())
-                        .hotline(extendedBooking.getHotline())
-                        .email(extendedBooking.getEmail())
-                        .build())
-                .build();
-
-        categories.forEach(category -> {
-            if (category.getId().equals(bookingCategory.getMainCategory())) {
-                bookingCategory.setMainCategoryName(category.getName());
-
-                if (!StringUtils.isEmpty(bookingCategory.getSubCategory()) && category.getSubcategories() != null) {
-                    category.getSubcategories().forEach(subCategory -> {
-                        if (subCategory.getId().equals(bookingCategory.getSubCategory())) {
-                            bookingCategory.setSubCategoryName(subCategory.getName());
-
-                            if (!StringUtils.isEmpty(bookingCategory.getSpecification()) && subCategory.getSpecifications() != null) {
-                                subCategory.getSpecifications().forEach(specification -> {
-                                    if (specification.getId().equals(bookingCategory.getSpecification())) {
-                                        bookingCategory.setSpecificationName(specification.getName());
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            }
-        });
-
-        return bookingCategory;
     }
 
     static List<de.adorsys.multibanking.domain.BookingGroup> mapBookingGroups(List<BookingGroup> bookingGroups) {
@@ -143,8 +104,8 @@ public class SmartanalyticsMapper {
                 .mainCategory(bookingsGroup.getMainCategory())
                 .subCategory(bookingsGroup.getSubCategory())
                 .specification(bookingsGroup.getSpecification())
-                .nextExecutionDate(bookingsGroup.getNextExecutionDate())
-                .variable(bookingsGroup.isVariable())
+                .bookingPeriods(mapBookingPeriods(bookingsGroup.getBookingPeriods()))
+                .type(de.adorsys.multibanking.domain.BookingGroup.Type.valueOf(bookingsGroup.getGroupType().toString()))
                 .contract(Contract.builder()
                         .email(bookingsGroup.getEmail())
                         .homepage(bookingsGroup.getHomepage())
@@ -157,13 +118,30 @@ public class SmartanalyticsMapper {
                 )
                 .build();
 
-        if (bookingsGroup.isVariable()) {
+        if (bookingsGroup.getGroupType() == Group.Type.CUSTOM || bookingsGroup.getGroupType() == Group.Type.OTHER_INCOME
+                || bookingsGroup.getGroupType() == Group.Type.OTHER_EXPENSES) {
             bookingGroup.setOtherAccount("");
         } else {
-            bookingGroup.setOtherAccount(bookingsGroup.getProvider());
+            bookingGroup.setOtherAccount(bookingsGroup.getOtherAccount());
         }
 
         return bookingGroup;
+    }
+
+    static List<de.adorsys.multibanking.domain.BookingPeriod> mapBookingPeriods(List<BookingPeriod> bookingPeriods) {
+        if (bookingPeriods == null) {
+            return null;
+        }
+
+        return bookingPeriods.stream()
+                .map(bookingPeriod -> toBookingPeriod(bookingPeriod))
+                .collect(Collectors.toList());
+    }
+
+    private static de.adorsys.multibanking.domain.BookingPeriod toBookingPeriod(BookingPeriod bookingPeriod) {
+        de.adorsys.multibanking.domain.BookingPeriod period = de.adorsys.multibanking.domain.BookingPeriod.builder().build();
+        BeanUtils.copyProperties(bookingPeriod, period);
+        return period;
     }
 
 

@@ -28,22 +28,6 @@ public class AnalyticsService {
         accountAnalyticsEntity.setAccountId(bankAccountEntity.getId());
         accountAnalyticsEntity.setAnalyticsDate(referenceDate);
 
-        accountAnalyticsEntity.setExpensesFix(categoryResult.getBudget().getExpensesFix());
-        accountAnalyticsEntity.setExpensesFixBookings(mapBookingGroups(categoryResult.getBudget().getExpensesFixBookings()));
-        accountAnalyticsEntity.setExpensesNext(categoryResult.getBudget().getExpensesNext());
-        accountAnalyticsEntity.setExpensesNextBookings(mapBookingGroups(categoryResult.getBudget().getExpensesNextBookings()));
-        accountAnalyticsEntity.setExpensesVariable(categoryResult.getBudget().getExpensesVariable());
-        accountAnalyticsEntity.setExpensesVariableBookings(mapBookingGroups(categoryResult.getBudget().getExpensesVariableBookings()));
-        accountAnalyticsEntity.setExpensesTotal(categoryResult.getBudget().getExpensesTotal());
-
-        accountAnalyticsEntity.setIncomeFix(categoryResult.getBudget().getIncomeFix());
-        accountAnalyticsEntity.setIncomeFixBookings(mapBookingGroups(categoryResult.getBudget().getIncomeFixBookings()));
-        accountAnalyticsEntity.setIncomeNext(categoryResult.getBudget().getIncomeNext());
-        accountAnalyticsEntity.setIncomeNextBookings(mapBookingGroups(categoryResult.getBudget().getIncomeNextBookings()));
-        accountAnalyticsEntity.setIncomeVariable(categoryResult.getBudget().getIncomeVariable());
-        accountAnalyticsEntity.setIncomeVariableBookings(mapBookingGroups(categoryResult.getBudget().getIncomeVariableBookings()));
-        accountAnalyticsEntity.setIncomeTotal(categoryResult.getBudget().getIncomeTotal());
-
         accountAnalyticsEntity.setBalanceCalculated(
                 bankAccountEntity.getBankAccountBalance().getReadyHbciBalance()
                         .add(accountAnalyticsEntity.getIncomeNext()).add(accountAnalyticsEntity.getExpensesNext()));

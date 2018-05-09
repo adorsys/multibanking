@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.domain;
+package domain;
 
 import lombok.Builder;
 import lombok.Data;

@@ -161,7 +161,6 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
             return userSecret.getSecret();
             //user secret not available outside request scopes
         } catch (BeanCreationException e) {
-            LOG.warn(e.getMessage(), e);
             return databaseSecret;
         }
     }

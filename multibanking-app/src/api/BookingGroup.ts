@@ -1,12 +1,14 @@
 import { Contract } from "./Contract";
+import { GroupType } from "./GroupType";
+import { BookingPeriod } from "./BookingPeriod";
 
 export interface BookingGroup {
-    "variable"?: boolean;
+    "type"?: GroupType;
     "mainCategory"?: string;
     "subCategory"?: string;
     "specification"?: string;
     "otherAccount"?: string;
     "amount"?: number;
-    "nextExecutionDate"?: Date;
+    "bookingPeriods"?: BookingPeriod[];
     "contract"?: Contract;
 }
