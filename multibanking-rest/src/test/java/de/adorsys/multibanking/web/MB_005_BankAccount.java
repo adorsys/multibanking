@@ -1,5 +1,16 @@
 package de.adorsys.multibanking.web;
 
+import java.net.URI;
+import java.util.List;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.util.UriComponentsBuilder;
+
 /**
  * Created by peter on 07.05.18 at 08:36.
  */
@@ -7,15 +18,6 @@ package de.adorsys.multibanking.web;
 import de.adorsys.multibanking.web.account.BankAccountController;
 import de.adorsys.multibanking.web.base.entity.BankAccessID;
 import de.adorsys.multibanking.web.base.entity.BankAccountID;
-import org.junit.Assert;
-import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import java.net.URI;
-import java.util.List;
 
 /**
  * https://wiki.adorsys.de/display/DOC/Multibanking-Rest+Tests
@@ -24,7 +26,7 @@ import java.util.List;
 public class MB_005_BankAccount extends MB_BaseTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(MB_005_BankAccount.class);
 
-    // @Test
+     @Test
     // TODO läuft nicht wegen https://jira.adorsys.de/browse/MUL-272
     public void test_1() {
         URI location = MB_004_BankAccess.createBankAccess(this, theBeckerTuple);

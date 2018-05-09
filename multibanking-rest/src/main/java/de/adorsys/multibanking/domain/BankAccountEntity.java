@@ -37,5 +37,7 @@ public class BankAccountEntity extends BankAccount implements IdentityIf {
 		return super.getLastSync();
 	}
     
-    
+    public void setSyncstatus(SyncStatus syncStatus){
+    	super.setSyncStatus(syncStatus);
+    }
 }
