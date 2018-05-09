@@ -31,9 +31,9 @@ public class AccountSynchPref extends AbstractId {
 	/*
 	 *  Default preference is per year.
 	 */
-	private BookingPeriod bookingPeriod = BookingPeriod.YEAR;
+	private BookingFilePeriod bookingPeriod = BookingFilePeriod.YEAR;
 	
-	public static final AccountSynchPref instance(BookingPeriod bookingPeriod){
+	public static final AccountSynchPref instance(BookingFilePeriod bookingPeriod){
 		AccountSynchPref pref = new AccountSynchPref();
 		pref.setBookingPeriod(bookingPeriod);
 		return pref;

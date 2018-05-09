@@ -1,12 +1,9 @@
-package de.adorsys.multibanking.domain;
+package domain;
 
-import domain.Contract;
-import domain.Cycle;
 import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -16,12 +13,16 @@ import java.util.List;
 @Builder
 public class BookingGroup {
 
-    private boolean variable;
+    public enum Type {
+        STANDING_ORDER, RECURRENT_INCOME, RECURRENT_SEPA, RECURRENT_NONSEPA, CUSTOM, OTHER_INCOME, OTHER_EXPENSES
+    }
+
+    private Type type;
     private String mainCategory;
     private String subCategory;
     private String specification;
     private String otherAccount;
     private BigDecimal amount;
-    private LocalDate nextExecutionDate;
+    private List<BookingPeriod> bookingPeriods;
     private Contract contract;
 }

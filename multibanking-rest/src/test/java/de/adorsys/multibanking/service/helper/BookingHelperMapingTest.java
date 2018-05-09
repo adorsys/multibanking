@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.junit.Assert;
@@ -15,7 +13,7 @@ import de.adorsys.multibanking.domain.AccountSynchPref;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BookingEntity;
-import de.adorsys.multibanking.domain.BookingPeriod;
+import de.adorsys.multibanking.domain.BookingFilePeriod;
 import de.adorsys.multibanking.service.old.TestUtil;
 import de.adorsys.multibanking.service.testutils.RandomDate;
 import de.adorsys.multibanking.utils.Ids;
@@ -27,35 +25,35 @@ public class BookingHelperMapingTest {
 
 	@Test
 	public void testMap400BookingsOnWeeks() {
-		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingPeriod.WEEK));
+		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingFilePeriod.WEEK));
 		Assert.assertTrue(mapBookings.size() <= 53);
 	}
 
 	@Test
 	public void testMap400BookingsOnMonths() {
-		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingPeriod.MONTH));
+		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingFilePeriod.MONTH));
 		Assert.assertTrue(mapBookings.size() <= 12);
 	}
 
 	@Test
 	public void testMap400BookingsOnQuarters() {
-		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingPeriod.QUATER));
+		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingFilePeriod.QUATER));
 		Assert.assertTrue(mapBookings.size() <= 4);
 	}
 	@Test
 	public void testMap400BookingsOnSemesters() {
-		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingPeriod.SEMESTER));
+		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingFilePeriod.SEMESTER));
 		Assert.assertTrue(mapBookings.size() <= 2);
 	}
 	@Test
 	public void testMap400BookingsOnYears() {
-		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingPeriod.YEAR));
+		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingFilePeriod.YEAR));
 		Assert.assertTrue(mapBookings.size() <= 1);
 	}
 
 	@Test
 	public void testMap400BookingsOnAll() {
-		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingPeriod.ALL));
+		Map<String, List<BookingEntity>> mapBookings = bookings(400, 2012, AccountSynchPref.instance(BookingFilePeriod.ALL));
 		Assert.assertTrue(mapBookings.size() <= 1);
 	}
 	

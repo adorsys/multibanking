@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
-import de.adorsys.multibanking.domain.CustomRuleEntity;
 import de.adorsys.multibanking.domain.RuleEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,25 +12,17 @@ import java.util.Optional;
  */
 public interface BookingRuleRepositoryIf {
 
-    List<RuleEntity> findByIncoming(boolean incoming);
+    List<RuleEntity> findByUserId(String userId);
 
-    List<CustomRuleEntity> findByUserId(String userId);
+    Page<RuleEntity> findAllPageable(Pageable pageable);
 
-    Page<? extends RuleEntity> findAllPageable(Pageable pageable, boolean custom);
-
-    List<? extends RuleEntity> findAll(boolean custom);
-
-    RuleEntity createOrUpdateCustomRule(CustomRuleEntity ruleEntity);
+    List<RuleEntity> findAll();
 
     RuleEntity createOrUpdateRule(RuleEntity ruleEntity);
 
-    List<? extends RuleEntity> search(boolean customRules, String query);
+    List<RuleEntity> search(String query);
 
-    Optional<? extends RuleEntity> getRuleById(boolean customRule, String ruleId);
-
-    void deleteCustomRule(String id);
+    Optional<RuleEntity> getRuleById(String ruleId);
 
     void deleteRule(String id);
-
-    void replacesRules(List<? extends RuleEntity> rules, boolean custom);
 }

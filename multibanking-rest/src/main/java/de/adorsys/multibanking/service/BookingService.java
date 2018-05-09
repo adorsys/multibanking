@@ -203,7 +203,7 @@ public class BookingService {
             LocalDate analyticsDate = LocalDate.now();
             // TODO. I don't like this smartanalytic that takes all booking.
             // Check for an API for incremental loading of bookings.
-            AnalyticsResult analyticsResult = smartAnalyticsService.analyzeBookings(bankAccess.getUserId(), bookingEntities, analyticsDate);
+            AnalyticsResult analyticsResult = smartAnalyticsService.analyzeBookings(bankAccess.getUserId(), bookingEntities);
             if (analyticsResult != null) {
                 if (!response.getOnlineBankingService().bookingsCategorized()) {
                     SmartanalyticsMapper.applyCategories(bookingEntities, analyticsResult, categoriesProvider.getCategoriesTree());

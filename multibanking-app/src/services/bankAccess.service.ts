@@ -3,9 +3,12 @@ import { AppConfig } from '../app/app.config';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { BankAccess } from "../api/BankAccess";
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class BankAccessService {
+
+  public bankAccessDeletedObservable = new Subject();
 
   constructor(private http: Http) {
   }
@@ -30,7 +33,8 @@ export class BankAccessService {
 
   deleteBankAccess(accessId): Observable<any> {
     return this.http.delete(AppConfig.api_url + "/bankaccesses/" + accessId)
-      .catch(this.handleError);
+      .catch(this.handleError)
+      .finally(() => this.bankAccessDeletedObservable.next(accessId));
   }
 
   handleError(error) {
