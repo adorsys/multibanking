@@ -1,21 +1,21 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.web.account.BookingController;
-import de.adorsys.multibanking.web.base.entity.BankAccessID;
-import de.adorsys.multibanking.web.base.entity.BankAccountID;
+import java.net.URI;
+import java.util.List;
+
 import org.junit.Assert;
-import org.junit.Test;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
-import java.util.List;
+import de.adorsys.multibanking.web.account.BookingController;
+import de.adorsys.multibanking.web.base.entity.BankAccessID;
+import de.adorsys.multibanking.web.base.entity.BankAccountID;
 
 /**
  * Created by peter on 08.05.18 at 15:49.
  */
 public class MB_006_Bookings extends MB_BaseTest {
-    // @Test
+//     @Test
     // TODO läuft nicht wegen https://jira.adorsys.de/browse/MUL-272
 
     public void test_1() {
