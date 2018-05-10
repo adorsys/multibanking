@@ -41,17 +41,11 @@ public class BankAccountEntity extends BankAccount implements IdentityIf {
 		return super.getLastSync();
 	}
     
-    public void setSyncStatus(SyncStatus s) {
-        if (s!=null && getSyncStatus() != null) {
-            if (s.equals(getSyncStatus())) {
-                return;
-            }
-        }
-        LOGGER.info("setSyncStatus von " + getSyncStatus() + " auf " + s);
-        try {
-            throw new BaseException("setSyncStatus von " + getSyncStatus() + " auf " + s);
-        } catch (Exception e) {
-        }
-    	super.setSyncStatus(s);
-    }    
+    
+    public SyncStatus getSyncStatus() {
+    	if(super.getSyncStatus() == null) {
+    		return SyncStatus.READY;
+    	}
+    	return super.getSyncStatus();
+    }
 }

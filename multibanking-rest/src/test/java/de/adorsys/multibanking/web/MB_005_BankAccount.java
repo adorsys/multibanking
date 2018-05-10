@@ -26,7 +26,7 @@ import de.adorsys.multibanking.web.base.entity.BankAccountID;
 public class MB_005_BankAccount extends MB_BaseTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(MB_005_BankAccount.class);
 
-//     @Test
+    @Test
     // TODO läuft nicht wegen https://jira.adorsys.de/browse/MUL-272
     public void test_1() {
         URI location = MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
@@ -39,7 +39,9 @@ public class MB_005_BankAccount extends MB_BaseTest {
             LOGGER.info("found bank-AccountID:" + bankAccountID.toString());
             URI uri = bankAccountPath(this, bankAccessIDs.get(0)).pathSegment(bankAccountID.getValue()).pathSegment("sync").build().toUri();
             String pin = null;
-            this.setNextExpectedStatusCode(102);
+            // Hello Peter, this synch is working. Then we must expect 204. 102 only happens when we
+            // Send a ynch while anotherone is still working.
+            this.setNextExpectedStatusCode(204);
             LOGGER.info("PUT TO uri:" + uri);
             this.testRestTemplate.put(uri, pin);
         });

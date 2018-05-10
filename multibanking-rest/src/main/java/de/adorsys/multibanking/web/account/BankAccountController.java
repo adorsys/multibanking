@@ -45,7 +45,8 @@ public class BankAccountController extends BankAccountBasedController {
     private BookingService bookingService;
 
     @RequestMapping(path = "/{accountId}/sync", method = RequestMethod.PUT)
-    @ApiOperation(value="Synchronize bookings", notes= "Synchronize the user booking with the remote bank account. Generally load all new booking since the last synch. Uses the booking date to splitt and store bookings into configured booking periods files e.g. yearly, quaterly.")
+    @ApiOperation(value="Synchronize bookings", notes= "Synchronize the user booking with the remote bank account. Generally load all new booking since the last synch. Uses the booking date to splitt and store bookings into configured booking periods files e.g. yearly, quaterly."
+    		+ " Will generally return a 204 for a sucessful request. Will return a 102 if another synch is in progress.")
     @ApiResponses(value = { @ApiResponse(code = HttpServletResponse.SC_NO_CONTENT, 
     		message = "Bank account with provided id successfuly setup for synchronization"),
             @ApiResponse(code = HttpServletResponse.SC_UNAUTHORIZED, message = ErrorConstants.ERR_HTTP_CODE_UNAUTHENTICATED_DOC, response = MultibankingError.class),
