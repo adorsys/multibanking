@@ -44,8 +44,8 @@
 		<maven.build-timestamp>${maven.build.timestamp}</maven.build-timestamp>
 
 		<de.adorsys.sts.version>0.24.0-SNAPSHOT</de.adorsys.sts.version>
-		<docusafe.version>0.3.4-SNAPSHOT</docusafe.version>
-		<crypt.version>0.18.4-SNAPSHOT</crypt.version>
+		<docusafe.version>0.3.4-1</docusafe.version>
+		<crypt.version>0.18.4</crypt.version>
         <de.adorsys.smartanalytics.version>0.7.0</de.adorsys.smartanalytics.version>
 
 		<scmBranch />
