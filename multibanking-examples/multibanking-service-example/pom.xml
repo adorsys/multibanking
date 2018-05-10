@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>de.adorsys.multibanking</groupId>
 		<artifactId>multibanking-examples</artifactId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.0.9-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>multibanking-service-example</artifactId>
@@ -62,23 +62,16 @@
 			<version>${crypt.version}</version>
 		</dependency>
 
-		<!-- banking <dependency> <groupId>de.adorsys.multibanking</groupId> <artifactId>onlinebanking-figo</artifactId> 
-			<version>${project.version}</version> </dependency> <dependency> <groupId>de.adorsys.multibanking</groupId> 
-			<artifactId>onlinebanking-finapi</artifactId> <version>${project.version}</version> 
-			</dependency> <dependency> <groupId>de.adorsys.multibanking</groupId> <artifactId>onlinebanking-hbci4java</artifactId> 
-			<version>${project.version}</version> <exclusions> <exclusion> <groupId>ch.qos.logback</groupId> 
-			<artifactId>logback-classic</artifactId> </exclusion> </exclusions> </dependency> -->
 		<dependency>
 			<groupId>de.adorsys.multibanking</groupId>
 			<artifactId>onlinebanking-mock</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
-		<!-- Smartanalytics API -->
+        <!-- smartanalytics -->
 		<dependency>
-			<groupId>de.adorsys.multibanking</groupId>
-			<artifactId>multibanking-analytics-api</artifactId>
-			<version>${project.version}</version>
+            <groupId>de.adorsys.smartanalytics</groupId>
+            <artifactId>smartanalytics-api</artifactId>
 		</dependency>
 
 		<!-- Persistence -->
@@ -87,9 +80,6 @@
 			<artifactId>docusafe-business</artifactId>
 			<version>${docusafe.version}</version>
 		</dependency>
-		<!-- <dependency> <groupId>de.adorsys.cryptoutils</groupId> <artifactId>encobject</artifactId> 
-			</dependency> <dependency> <groupId>de.adorsys.cryptoutils</groupId> <artifactId>jjwk</artifactId> 
-			</dependency> -->
 
 		<!-- Lombok -->
 		<dependency>

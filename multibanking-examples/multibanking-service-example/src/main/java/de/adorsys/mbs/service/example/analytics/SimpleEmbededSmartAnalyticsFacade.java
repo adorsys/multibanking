@@ -42,7 +42,7 @@ public class SimpleEmbededSmartAnalyticsFacade implements SmartAnalyticsFacade {
 					wrappedBooking.setMainCategory(rule.getMainCategory());
 					wrappedBooking.setSubCategory(rule.getSubCategory());
 					wrappedBooking.setSpecification(rule.getSpecification());
-					wrappedBooking.setReceiver(rule.getReceiver());
+//					wrappedBooking.setReceiver(rule.getReceiver());
 					wrappedBooking.setLogo(rule.getLogo());
 					wrappedBooking.setHomepage(rule.getHomepage());
 					wrappedBooking.setHotline(rule.getHotline());
