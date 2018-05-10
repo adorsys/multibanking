@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.web;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.adorsys.docusafe.business.types.complex.DSDocument;
@@ -20,6 +21,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import de.adorsys.multibanking.config.mock.SimpleMockBanking;
 import de.adorsys.multibanking.config.web.WebMvcUnitTest;
+import de.adorsys.multibanking.domain.BankAccountData;
+import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.service.BankAccessService;
 import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;
@@ -30,6 +33,7 @@ import domain.BankAccess;
 import domain.BankAccount;
 import domain.Booking;
 import domain.LoadBookingsResponse;
+import domain.BankAccount.SyncStatus;
 
 @WebMvcUnitTest(controllers = BookingController.class)
 public class BookingControllerTest extends BaseControllerUnitTest {
@@ -76,7 +80,11 @@ public class BookingControllerTest extends BaseControllerUnitTest {
 	public void testGetBookings200() throws Exception {
 		BDDMockito.when(bankAccessService.exists(bankAccessId)).thenReturn(true);
 		BDDMockito.when(bankAccountService.exists(bankAccessId, accountId)).thenReturn(true);
-		BDDMockito.when(bankAccountService.getSyncStatus(bankAccessId, accountId)).thenReturn(BankAccount.SyncStatus.READY);
+		BankAccountData bankAccountData = new BankAccountData();
+		bankAccountData.setSynchStatusTime(LocalDateTime.now());
+		bankAccountData.setBankAccount(new BankAccountEntity());
+		bankAccountData.getBankAccount().setSyncStatus(SyncStatus.READY);
+		BDDMockito.when(bankAccountService.loadBankAccount(bankAccessId, accountId)).thenReturn(bankAccountData);
 		BDDMockito.when(bookingService.getBookings(bankAccessId, accountId, period)).thenReturn(dsDocument);
 
         mockMvc.perform(MockMvcRequestBuilders.get(query, bankAccessId, accountId)
@@ -109,8 +117,11 @@ public class BookingControllerTest extends BaseControllerUnitTest {
 	public void testGetBookings102OngoingSynch() throws Exception {
 		BDDMockito.when(bankAccessService.exists(bankAccessId)).thenReturn(true);
 		BDDMockito.when(bankAccountService.exists(bankAccessId, accountId)).thenReturn(true);
-		BDDMockito.when(bankAccountService.getSyncStatus(bankAccessId, accountId)).thenReturn(BankAccount.SyncStatus.SYNC);
-
+		BankAccountData bankAccountData = new BankAccountData();
+		bankAccountData.setSynchStatusTime(LocalDateTime.now());
+		bankAccountData.setBankAccount(new BankAccountEntity());
+		bankAccountData.getBankAccount().setSyncStatus(SyncStatus.SYNC);
+		BDDMockito.when(bankAccountService.loadBankAccount(bankAccessId, accountId)).thenReturn(bankAccountData);
         mockMvc.perform(MockMvcRequestBuilders.get(query, bankAccessId, accountId)
         		.contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON_VALUE)).andExpect(MockMvcResultMatchers.status().isProcessing());

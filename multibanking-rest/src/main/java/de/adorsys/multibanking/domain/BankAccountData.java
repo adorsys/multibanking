@@ -9,7 +9,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import domain.BankAccount.SyncStatus;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -33,6 +36,10 @@ public class BankAccountData {
 
     private AccountAnalyticsEntity analytic;
     
+    @ApiModelProperty(value = "Time of last Synchronisation status", example="2017-12-01T12:25:44")
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime synchStatusTime;    
+    
 	public void update(Collection<BookingFile> newEntries) {
 		bookingFiles.putAll(bookingPeriodsMap(newEntries));
 	}
@@ -44,8 +51,8 @@ public class BankAccountData {
 	public void updateSyncStatus(SyncStatus syncStatus) {
 		LocalDateTime now = LocalDateTime.now();
 		bankAccount.setSyncStatus(syncStatus);
-		if(SyncStatus.READY==syncStatus){
-			bankAccount.setLastSync(now);
-		}
+		synchStatusTime = now;
+		// Set status if status is being set to ready.
+		if(SyncStatus.READY==syncStatus)bankAccount.setLastSync(now);
 	}
 }

@@ -40,11 +40,13 @@ import io.swagger.annotations.ApiResponses;
 	tags = "MB-005 - Bank Accounts", description="Manages access to a single bank account. Does not allow reading a single bank account data. Bank account information are contained in the user data object.")
 public class BankAccountController extends BankAccountBasedController {
 	public static final String BASE_PATH = BaseController.BASE_PATH + "/bankaccesses/{accessId}/accounts"; 
+	private static final String SYNC_SEGMENT = "/{accountId}/sync"; 
+	public static final String SYNC_PATH = BankAccountController.BASE_PATH + SYNC_SEGMENT; 
 
     @Autowired
     private BookingService bookingService;
 
-    @RequestMapping(path = "/{accountId}/sync", method = RequestMethod.PUT)
+    @RequestMapping(path = SYNC_SEGMENT, method = RequestMethod.PUT)
     @ApiOperation(value="Synchronize bookings", notes= "Synchronize the user booking with the remote bank account. Generally load all new booking since the last synch. Uses the booking date to splitt and store bookings into configured booking periods files e.g. yearly, quaterly."
     		+ " Will generally return a 204 for a sucessful request. Will return a 102 if another synch is in progress.")
     @ApiResponses(value = { @ApiResponse(code = HttpServletResponse.SC_NO_CONTENT, 

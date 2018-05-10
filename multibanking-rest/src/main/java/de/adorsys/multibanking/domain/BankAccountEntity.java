@@ -1,9 +1,6 @@
 package de.adorsys.multibanking.domain;
 
 import java.time.LocalDateTime;
-import java.util.logging.Logger;
-
-import org.adorsys.cryptoutils.exceptions.BaseException;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -16,7 +13,6 @@ import lombok.Data;
  */
 @Data
 public class BankAccountEntity extends BankAccount implements IdentityIf {
-    private final static Logger LOGGER = Logger.getLogger(BankAccount.class.getName());
     private String id;
     private String bankAccessId;
     private String userId;
@@ -40,12 +36,4 @@ public class BankAccountEntity extends BankAccount implements IdentityIf {
 	public LocalDateTime getLastSync() {
 		return super.getLastSync();
 	}
-    
-    
-    public SyncStatus getSyncStatus() {
-    	if(super.getSyncStatus() == null) {
-    		return SyncStatus.READY;
-    	}
-    	return super.getSyncStatus();
-    }
 }

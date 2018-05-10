@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -110,6 +109,11 @@ public class BankAccountService {
         return bankAccountEntities;
     }
 
+	public BankAccountData loadBankAccount(String accessId, String accountId) {
+		UserData userData = uds.load();
+		return userData.bankAccountData(accessId, accountId);
+	}
+    
 	/**
 	 * Saves an existing bank account. Will not add the bank account if absent.
 	 * Adding a bank account only occurs thru synch.
@@ -135,10 +139,10 @@ public class BankAccountService {
 		return userData.bankAccessData(accessId).containsKey(accountId);
 	}
 
-	public SyncStatus getSyncStatus(String accessId, String accountId) {
-		UserData userData = uds.load();
-		return userData.bankAccountData(accessId, accountId).getBankAccount().getSyncStatus();
-	}
+//	public SyncStatus getSyncStatus(String accessId, String accountId) {
+//		UserData userData = uds.load();
+//		return userData.bankAccountData(accessId, accountId).getBankAccount().getSyncStatus();
+//	}
 
 	public AccountSynchPref loadAccountLevelSynchPref(String accessId, String accountId){
 		return uds.load().bankAccountData(accessId, accountId).getAccountSynchPref();
