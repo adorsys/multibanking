@@ -1,10 +1,13 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.BankEntity;
+import de.adorsys.multibanking.domain.UserData;
 import de.adorsys.multibanking.service.BankService;
 import de.adorsys.multibanking.web.base.BankLoginTuple;
 import de.adorsys.multibanking.web.base.BaseControllerIT;
 import de.adorsys.multibanking.web.base.UserPasswordTuple;
+import de.adorsys.multibanking.web.user.UserDataController;
+
 import org.adorsys.cryptoutils.storeconnectionfactory.ExtendedStoreConnectionFactory;
 import org.adorsys.encobject.service.api.ExtendedStoreConnection;
 import org.junit.Assume;
@@ -40,4 +43,7 @@ public abstract class MB_BaseTest extends BaseControllerIT {
         Assume.assumeTrue(bankEntity.isPresent());
     }
 
+    public static UserData loadUserData(MB_BaseTest base){
+    	return base.testRestTemplate.getForEntity(base.path(UserDataController.BASE_PATH).build().toUri(), UserData.class).getBody();
+    }
 }

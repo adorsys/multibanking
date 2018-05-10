@@ -21,8 +21,8 @@ public class BankAccessEntity extends BankAccess implements IdentityIf {
     private boolean temporary;
     @ApiModelProperty(value = "States whether the PIN shall be stored for asynchronous access to the user's online banking account. Will be stored separately and not returned with user data", example = "true")
     private boolean storePin;
-    @ApiModelProperty(value = "States whether bookings loaded from the user's online banking account shall be stored.", example = "false")
-    private boolean storeBookings;
+    @ApiModelProperty(value = "States whether bookings loaded from the user's online banking account shall be stored.", example = "true")
+    private boolean storeBookings = true;
     @ApiModelProperty(value = "States whether bookings loaded from the user's online banking account shall be sent to category service.", example = "true")
     private boolean categorizeBookings;
     @ApiModelProperty(value = "States whether analytics result shall be stored.", example = "true")
