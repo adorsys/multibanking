@@ -1,6 +1,9 @@
 package de.adorsys.multibanking.domain;
 
 import java.time.LocalDateTime;
+import java.util.logging.Logger;
+
+import org.adorsys.cryptoutils.exceptions.BaseException;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -13,6 +16,7 @@ import lombok.Data;
  */
 @Data
 public class BankAccountEntity extends BankAccount implements IdentityIf {
+    private final static Logger LOGGER = Logger.getLogger(BankAccount.class.getName());
     private String id;
     private String bankAccessId;
     private String userId;
@@ -37,7 +41,17 @@ public class BankAccountEntity extends BankAccount implements IdentityIf {
 		return super.getLastSync();
 	}
     
-    public void setSyncstatus(SyncStatus syncStatus){
-    	super.setSyncStatus(syncStatus);
-    }
+    public void setSyncStatus(SyncStatus s) {
+        if (s!=null && getSyncStatus() != null) {
+            if (s.equals(getSyncStatus())) {
+                return;
+            }
+        }
+        LOGGER.info("setSyncStatus von " + getSyncStatus() + " auf " + s);
+        try {
+            throw new BaseException("setSyncStatus von " + getSyncStatus() + " auf " + s);
+        } catch (Exception e) {
+        }
+    	super.setSyncStatus(s);
+    }    
 }
