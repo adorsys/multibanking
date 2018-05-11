@@ -49,6 +49,7 @@ import domain.BankApi;
 import domain.BankApiUser;
 import domain.Booking;
 import domain.LoadBookingsResponse;
+import domain.StandingOrder;
 import exception.InvalidPinException;
 import spi.OnlineBankingService;
 import utils.Utils;
@@ -148,57 +149,58 @@ public class BookingService {
         // Processed booking periods. Used for anonymization
         // Check with alex if we can use this for analytics. 
         // I don't think we need to reload all bookings of a user for analytics.
-        Map<String, List<BookingEntity>> processBookingPeriods = new HashMap<>();
-        
         BankAccountData bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
-        Map<String, BookingFile> bookingFileMap = bankAccountData.getBookingFiles();
-        Set<Entry<String,List<BookingEntity>>> entrySet = bookings.entrySet();
-        for (Entry<String, List<BookingEntity>> entry : entrySet) {
-        	List<BookingEntity> bookingEntities = entry.getValue();
-        	// Process standing orders
-            bookingEntities.forEach(booking ->
-            	response.getStandingOrders()
-                    .stream()
-                    .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
-                            Utils.inCycle(booking.getValutaDate(), so.getExecutionDay()) &&
-                            Utils.usageContains(booking.getUsage(), so.getUsage())
-                    )
-                    .findFirst()
-                    .ifPresent(standingOrder -> {
-                        booking.setOtherAccount(standingOrder.getOtherAccount());
-                        booking.setStandingOrder(true);
-                    }));
-            
-            // Merge booking files per period
-            String period = entry.getKey();
-			DocumentFQN bookingFQN = FQNUtils.bookingFQN(bankAccess.getId(),bankAccount.getId(),period);
-			List<BookingEntity> existingBookings = uos.load(bookingFQN, listType())
-					.orElse(new ArrayList<>());
-            bookingEntities = mergeBookings(existingBookings,bookingEntities);
-
-            // Store meta data
-            BookingFile bookingFile = bookingFileMap.get(period);
-            if(bookingFile==null){
-            	bookingFile = new BookingFile();
-            	bookingFile.setPeriod(period);
-            	bookingFile.setLastUpdate(LocalDateTime.now());
-            	bankAccountData.update(Collections.singletonList(bookingFile));
-            }
-            bookingFile.setNumberOfRecords(bookingEntities.size());
-
-            // Sort and store bookings
-            Collections.sort(bookingEntities, (o1, o2) -> o2.getBookingDate().compareTo(o1.getBookingDate()));
-            if (bankAccess.isStoreBookings()) {
-            	processBookingPeriods.put(period, bookingEntities);
-            	uos.store(bookingFQN, listType(), bookingEntities);
-            }
-		}
+        Map<String, List<BookingEntity>> processBookingPeriods = storeBookings(bankAccountData, response.getStandingOrders(), bankAccess.isStoreBookings(), bookings);
+        
+//        Map<String, BookingFile> bookingFileMap = bankAccountData.getBookingFiles();
+//        Set<Entry<String,List<BookingEntity>>> entrySet = bookings.entrySet();
+//        for (Entry<String, List<BookingEntity>> entry : entrySet) {
+//        	List<BookingEntity> bookingEntities = entry.getValue();
+//        	// Process standing orders
+//            bookingEntities.forEach(booking ->
+//            	response.getStandingOrders()
+//                    .stream()
+//                    .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
+//                            Utils.inCycle(booking.getValutaDate(), so.getExecutionDay()) &&
+//                            Utils.usageContains(booking.getUsage(), so.getUsage())
+//                    )
+//                    .findFirst()
+//                    .ifPresent(standingOrder -> {
+//                        booking.setOtherAccount(standingOrder.getOtherAccount());
+//                        booking.setStandingOrder(true);
+//                    }));
+//            
+//            // Merge booking files per period
+//            String period = entry.getKey();
+//			DocumentFQN bookingFQN = FQNUtils.bookingFQN(bankAccess.getId(),bankAccount.getId(),period);
+//			List<BookingEntity> existingBookings = uos.load(bookingFQN, listType())
+//					.orElse(new ArrayList<>());
+//            bookingEntities = mergeBookings(existingBookings,bookingEntities);
+//
+//            // Store meta data
+//            BookingFile bookingFile = bookingFileMap.get(period);
+//            if(bookingFile==null){
+//            	bookingFile = new BookingFile();
+//            	bookingFile.setPeriod(period);
+//            	bookingFile.setLastUpdate(LocalDateTime.now());
+//            	bankAccountData.update(Collections.singletonList(bookingFile));
+//            }
+//            bookingFile.setNumberOfRecords(bookingEntities.size());
+//
+//            // Sort and store bookings
+//            Collections.sort(bookingEntities, (o1, o2) -> o2.getBookingDate().compareTo(o1.getBookingDate()));
+//            if (bankAccess.isStoreBookings()) {
+//            	processBookingPeriods.put(period, bookingEntities);
+//            	uos.store(bookingFQN, listType(), bookingEntities);
+//            }
+//		}
         
         bankAccountService.saveStandingOrders(bankAccount, response.getStandingOrders());
         bankAccountData.updateSyncStatus(BankAccount.SyncStatus.READY);
         uos.flush();
         
         if (bankAccess.isCategorizeBookings() || bankAccess.isStoreAnalytics()) {
+            bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
         	List<BookingEntity> bookingEntities = loadAllBookings(userData, bankAccess, bankAccount);
             LocalDate analyticsDate = LocalDate.now();
             // TODO. I don't like this smartanalytic that takes all booking.
@@ -209,6 +211,8 @@ public class BookingService {
                     SmartanalyticsMapper.applyCategories(bookingEntities, analyticsResult, categoriesProvider.getCategoriesTree());
                 }
                 if (bankAccess.isStoreAnalytics()) {
+                	Map<String, List<BookingEntity>> mapBookings = BookingHelper.reMapBookings(bookingEntities);
+                    processBookingPeriods = storeBookings(bankAccountData, response.getStandingOrders(), bankAccess.isStoreBookings(), bookings);                	
                     analyticsService.saveAccountAnalytics(bankAccount, analyticsResult, analyticsDate);
                     analyticsService.identifyAndStoreContracts(bankAccount.getUserId(), bankAccount.getId(), analyticsResult);
                 }
@@ -305,6 +309,56 @@ public class BookingService {
             uds.store(userData);
         }
 
+    }
+    
+    private Map<String, List<BookingEntity>> storeBookings(final BankAccountData bankAccountData, List<StandingOrder> standingOrders, boolean persist, Map<String,List<BookingEntity>> bookings){
+    	Map<String, List<BookingEntity>> processBookingPeriods = new HashMap<>();
+    	String accessId = bankAccountData.getBankAccount().getBankAccessId();
+    	String accountId = bankAccountData.getBankAccount().getId();
+        Map<String, BookingFile> bookingFileMap = bankAccountData.getBookingFiles();
+        Set<Entry<String,List<BookingEntity>>> entrySet = bookings.entrySet();
+        for (Entry<String, List<BookingEntity>> entry : entrySet) {
+        	List<BookingEntity> bookingEntities = entry.getValue();
+        	// Process standing orders
+            bookingEntities.forEach(booking ->
+            		standingOrders
+                    .stream()
+                    .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
+                            Utils.inCycle(booking.getValutaDate(), so.getExecutionDay()) &&
+                            Utils.usageContains(booking.getUsage(), so.getUsage())
+                    )
+                    .findFirst()
+                    .ifPresent(standingOrder -> {
+                        booking.setOtherAccount(standingOrder.getOtherAccount());
+                        booking.setStandingOrder(true);
+                    }));
+            
+            // Merge booking files per period
+            String period = entry.getKey();
+			DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId,accountId,period);
+			List<BookingEntity> existingBookings = uos.load(bookingFQN, listType())
+					.orElse(new ArrayList<>());
+            bookingEntities = mergeBookings(existingBookings,bookingEntities);
+
+            // Store meta data
+            BookingFile bookingFile = bookingFileMap.get(period);
+            if(bookingFile==null){
+            	bookingFile = new BookingFile();
+            	bookingFile.setPeriod(period);
+            	bookingFile.setLastUpdate(LocalDateTime.now());
+            	bankAccountData.update(Collections.singletonList(bookingFile));
+            }
+            bookingFile.setNumberOfRecords(bookingEntities.size());
+
+            // Sort and store bookings
+            Collections.sort(bookingEntities, (o1, o2) -> o2.getBookingDate().compareTo(o1.getBookingDate()));
+            processBookingPeriods.put(period, bookingEntities);
+            if (persist) {
+            	uos.store(bookingFQN, listType(), bookingEntities);
+            }
+		}
+        return processBookingPeriods;
+    	
     }
 
 	private static TypeReference<List<BookingEntity>> listType(){
