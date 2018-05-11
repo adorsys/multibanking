@@ -10,33 +10,35 @@ $ git remote show origin
   Push  URL: git@github.com:adorsys/multibanking.git
 ...
 ```
-* Get your OSS Nexus Account [here](https://issues.sonatype.org/secure/Signup!default.jspa)
-* Contact Your repository Administrator to get release rights
-* Setup your Maven repository in your settings.xml:
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.1.0 http://maven.apache.org/xsd/settings-1.1.0.xsd">
-	<servers>
-		<server>
-			<id>sonatype</id>
-			<username>my-sonatype-username</username>
-			<password>{my-sonatype-maven-encrypted-password}</password>
-		</server>
-	</servers>
-</settings>
 
+* Change to latest state of `develop`-branch:
+
+```bash
+$ git checkout develop && git pull
 ```
-### Release
-* Checkout and update develop branch: ``$ git checkout develop && git pull``
-* Re-build project: ``$ mvn clean install``
-* Check for javadoc errors: ``$ mvn javadoc:javadoc``
-* Cleanup from possible previous releases ``$ mvn release:clean``
-* Set release versions and tags with ``$ mvn release:prepare``
-* Perform upload to Nexus with ``$ mvn release:perform``
-* Open OSS Nexus and follow [instruction](http://central.sonatype.org/pages/releasing-the-deployment.html):
-    * login
-    * find your staging repository
-    * close your staging repository
-    * release and drop your staging repository
-* Open Github und make PR from develop to master, to fix the code state on release (tag is already created with release:prepare)
+
+* Run the release-script:
+
+```bash
+$ ./release-script/release ${RELEASE_VERSION} ${NEXT_VERSION}
+```
+
+For example, if you want to release version `3.2.1` and want the next SNAPTSHOT version in your pom set to `3.3.0-SNAPSHOT`, you have to run following command:
+
+```bash
+$ ./release-script/release 3.2.1 3.3.0
+```
+
+Consider [release-scripts documentation](https://github.com/borisskert/release-scripts).
+The release-script will NOT push anything into remote automatically but it will perform some commits, merges and will create a git tag.
+
+* The release-script will inform you about how to push the changes into the remote. The command looks like the following:
+
+```bash
+$ git push --atomic ${REMOTE_REPO} ${MASTER_BRANCH} ${DEVELOP_BRANCH} --follow-tags
+```
+
+* Travis will perform the artifact build and upload to oss.sonatype.org automatically. Have a look at the progress here: [multibanking on travis](https://travis-ci.org/adorsys/multibanking)
+
+* The java-artifacts should be accessible in maven central after some minutes (maybe hours, if oss.sonatype.org has a bad day).
+ 
