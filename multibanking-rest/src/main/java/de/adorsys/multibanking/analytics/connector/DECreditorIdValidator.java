@@ -46,6 +46,7 @@ public class DECreditorIdValidator implements CreditorIdValidator {
 
 	@Override
 	public boolean isValid(String creditorId) {
+		if(creditorId==null) return false;
 		if(creditorId.length()!=18) return false;
 		if(StringUtils.startsWithIgnoreCase(creditorId, "de")) return false;
 		if("0".equals(creditorId.charAt(7))) return false;
