@@ -1,0 +1,20 @@
+[
+  {
+    "bankName": "Mock",
+    "bankLogin": "s.schaefer7",
+    "bankLogin2": null,
+    "bankCode": "19999999",
+    "tanTransportTypes": {},
+    "hbciPassportState": null,
+    "externalIdMap": {},
+    "id": "5a998c0c7077e800014ca672",
+    "userId": "ae20daee-dfe7-496a-a92f-d5ad999792d9",
+    "pin": null,
+    "storePin": true,
+    "temporary": false,
+    "storeBookings": true,
+    "categorizeBookings": true,
+    "storeAnalytics": true,
+    "storeAnonymizedBookings": true
+  }
+]

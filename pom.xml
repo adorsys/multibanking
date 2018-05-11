@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.adorsys.multibanking</groupId>
@@ -41,6 +42,12 @@
 
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZZ</maven.build.timestamp.format>
 		<maven.build-timestamp>${maven.build.timestamp}</maven.build-timestamp>
+
+		<de.adorsys.sts.version>0.24.0</de.adorsys.sts.version>
+		<docusafe.version>0.3.4-1</docusafe.version>
+		<crypt.version>0.18.4</crypt.version>
+        <de.adorsys.smartanalytics.version>0.7.0</de.adorsys.smartanalytics.version>
+
 		<scmBranch />
 		<start-class />
 	</properties>
@@ -55,6 +62,9 @@
 		<module>onlinebanking-mock</module>
 		<module>multibanking-pers-spi</module>
 		<module>multibanking-app</module>
+		<module>multibanking-rest</module>
+		<module>onlinebanking-xls-loader</module>
+		<module>multibanking-examples</module>
 	</modules>
 
 	<dependencyManagement>
@@ -86,6 +96,67 @@
 				<groupId>de.adorsys.envutils</groupId>
 				<artifactId>envutils4j</artifactId>
 				<version>0.2</version>
+			</dependency>
+			<dependency>
+				<groupId>de.adorsys.cryptoutils</groupId>
+				<artifactId>jjwk</artifactId>
+				<version>${crypt.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>de.adorsys.cryptoutils</groupId>
+				<artifactId>encobject</artifactId>
+				<version>${crypt.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.5</version>
+			</dependency>
+			<dependency>
+				<groupId>com.nimbusds</groupId>
+				<artifactId>nimbus-jose-jwt</artifactId>
+				<version>4.34.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcpkix-jdk15on</artifactId>
+				<version>1.57</version>
+			</dependency>
+			<dependency>
+				<groupId>org.bouncycastle</groupId>
+				<artifactId>bcprov-jdk15on</artifactId>
+				<version>1.57</version>
+			</dependency>
+			<dependency>
+				<groupId>com.github.fakemongo</groupId>
+				<artifactId>fongo</artifactId>
+				<version>2.0.12</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-beanutils</groupId>
+				<artifactId>commons-beanutils-core</artifactId>
+				<version>1.8.0</version>
+			</dependency>
+
+	        <!-- smartanalytics -->
+			<dependency>
+	            <groupId>de.adorsys.smartanalytics</groupId>
+	            <artifactId>smartanalytics-api</artifactId>
+	            <version>${de.adorsys.smartanalytics.version}</version>
+			</dependency>
+
+			<!-- Excel Parsing -->
+			<dependency>
+				<groupId>org.apache.poi</groupId>
+				<artifactId>poi</artifactId>
+				<version>3.16</version>
+			</dependency>
+
+			<!-- https://mvnrepository.com/artifact/org.iban4j/iban4j -->
+			<dependency>
+				<groupId>org.iban4j</groupId>
+				<artifactId>iban4j</artifactId>
+				<version>3.2.1</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -154,6 +225,7 @@
 				<!--https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html#production-ready-application-info-automatic-expansion -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.0.2</version>
 				<configuration>
 					<delimiters>
 						<delimiter>@</delimiter>
@@ -220,6 +292,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.21.0</version>
 				<configuration>
 					<includes>
 						<include>**/*Test.java</include>

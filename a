@@ -1,0 +1,50 @@
+#@IgnoreInspection BashAddShebang
+
+trap error ERR
+
+function error () {
+	print "  A N    E R R O R    O C C U R R E D"
+	exit 1
+}
+
+lastCurlOut=""
+function checkCurl() {
+	status=$1
+	shift
+	rm -f curl.out
+	rm -f curl.error
+	curl "$@" > curl.out 2>curl.error
+	ret=$?
+	if (( ret==0 ))
+	then
+		lastCurlOut=$(tail -n 1 curl.out | sed "s/ //g")
+		cat curl.out
+		cat curl.out >> curl.log
+		httpStatus=$(cat curl.out | head -n 1 | cut -d$' ' -f2)
+	else
+		lastCurlOut="not set due to error"
+		cat curl.error >> curl.log
+		httpStatus=$(cat curl.error)
+                httpStatus=$(echo ${httpStatus##*The requested URL returned error: })
+	fi
+	rm -f curl.out
+	rm -f curl.error
+
+	if [[ status -eq "any" ]]
+	then
+		echo "$httpStatus is ignored" | tee -a curl.log
+	else
+		if (( httpStatus!=status ))
+		then
+			echo "expected status $status but was $httpStatus of cmd" | tee -a curl.log
+			exit 1
+		else
+			echo "expected status was $httpStatus" | tee -a curl.log
+		fi
+	fi
+}
+
+checkCurl 200 POST -H 'Content-Type: application/json' -H 'Accept: application/json' -i http://localhost:8080/api/v1/auth/mobile --data '{"username":"testmb", "password":"12345"}'
+
+jwt=$(echo $lastCurlOut)
+echo "jwt:$jwt"

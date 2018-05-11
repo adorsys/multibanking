@@ -1,0 +1,1 @@
+http://localhost:8080/token/password-grant?grant_type=password&username=0c545a68-6a25-41c0-b980-12a806a5d3dc&password=592460f4-17a0-4913-9f55-fa4080097460&audience=multibanking
