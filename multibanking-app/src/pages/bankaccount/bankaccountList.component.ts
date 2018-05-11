@@ -4,7 +4,6 @@ import { BankAccountService } from "../../services/bankAccount.service";
 import { BankAccess } from "../../api/BankAccess";
 import { BankAccount } from "../../api/BankAccount";
 import { BookingTabsPage } from "../booking-tabs/booking-tabs.component";
-import { BankAccessService } from "../../services/bankAccess.service";
 
 
 @Component({
@@ -18,8 +17,7 @@ export class BankAccountListPage {
 
   constructor(public navCtrl: NavController,
     public navparams: NavParams,
-    public bankAccountService: BankAccountService,
-    public bankAccessService: BankAccessService) {
+    public bankAccountService: BankAccountService) {
 
     this.bankAccess = navparams.data.bankAccess;
   }
@@ -27,17 +25,12 @@ export class BankAccountListPage {
   ngOnInit() {
     this.loadBankAccounts();
 
-    this.bankAccessService.bankAccessDeletedObservable.subscribe(changed => {
-      this.bankAccess = undefined;
-    });
     this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
-      if (this.bankAccess) {
-        this.loadBankAccounts();
-      }
+      this.loadBankAccounts();
     });
   }
 
-  loadBankAccounts() {  
+  loadBankAccounts() {
     this.bankAccountService.getBankAccounts(this.bankAccess.id).subscribe(response => {
       this.bankAccounts = response;
     });

@@ -52,7 +52,7 @@
       <div item-right>
         <h4>{{ booking.bookingDate | date }}</h4>
         <h2 [ngClass]="{'amount--negative': booking.amount < 0, 'amount--positive': booking.amount > 0}">
-          {{ booking.amount | currency:'EUR':'symbol' }}
+          {{ booking.amount | currency:'EUR':true }}
         </h2>
       </div>
     </ion-item>

@@ -19,9 +19,6 @@ public class RuleEntity extends Rule {
     @Id
     private String id;
     @Indexed
-    private String userId;
-    private boolean released;
-    @Indexed
     private List<String> searchIndex;
 
     public void updateSearchIndex() {

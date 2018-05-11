@@ -1,8 +1,10 @@
 package de.adorsys.multibanking.impl;
 
+import de.adorsys.multibanking.domain.CustomRuleEntity;
 import de.adorsys.multibanking.domain.RuleEntity;
 import de.adorsys.multibanking.pers.spi.repository.BookingRuleRepositoryIf;
-import de.adorsys.multibanking.repository.BookingRuleRepositoryMongodb;
+import de.adorsys.multibanking.repository.CustomRuleRepositoryMongodb;
+import de.adorsys.multibanking.repository.RuleRepositoryMongodb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -19,22 +21,42 @@ import java.util.*;
 public class BookingRuleRepositoryImpl implements BookingRuleRepositoryIf {
 
     @Autowired
-    private BookingRuleRepositoryMongodb ruleRepository;
+    private RuleRepositoryMongodb ruleRepository;
+
+    @Autowired
+    private CustomRuleRepositoryMongodb customRuleRepository;
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    public List<RuleEntity> findByIncoming(boolean incoming) {
+        return ruleRepository.findByIncoming(incoming);
+    }
+
+    public List<CustomRuleEntity> findByUserId(String userId) {
+        return customRuleRepository.findByUserId(userId);
+    }
+
+    public Page<? extends RuleEntity> findAllPageable(Pageable pageable, boolean custom) {
+        if (custom) {
+            return customRuleRepository.findAll(pageable);
+        } else {
+            return ruleRepository.findAll(pageable);
+        }
+    }
+
+    public List<? extends RuleEntity> findAll(boolean custom) {
+        if (custom) {
+            return customRuleRepository.findAll();
+        } else {
+            return ruleRepository.findAll();
+        }
+    }
+
     @Override
-    public List<RuleEntity> findByUserId(String userId) {
-        return ruleRepository.findByUserId(userId);
-    }
-
-    public Page<RuleEntity> findAllPageable(Pageable pageable) {
-        return ruleRepository.findAll(pageable);
-    }
-
-    public List<RuleEntity> findAll() {
-        return ruleRepository.findAll();
+    public CustomRuleEntity createOrUpdateCustomRule(CustomRuleEntity ruleEntity) {
+        ruleEntity.updateSearchIndex();
+        return customRuleRepository.save(ruleEntity);
     }
 
     @Override
@@ -44,7 +66,7 @@ public class BookingRuleRepositoryImpl implements BookingRuleRepositoryIf {
     }
 
     @Override
-    public List<RuleEntity> search(String text) {
+    public List<? extends RuleEntity> search(boolean customRules, String text) {
         Collection<String> terms = new HashSet(Arrays.asList(text.split(" ")));
 
         Criteria[] criterias = terms
@@ -52,17 +74,39 @@ public class BookingRuleRepositoryImpl implements BookingRuleRepositoryIf {
                 .map(s -> Criteria.where("searchIndex").regex(s.toLowerCase(), "iu"))
                 .toArray(Criteria[]::new);
 
+        if (customRules) {
+            return mongoTemplate.find(Query.query(new Criteria().andOperator(criterias)), CustomRuleEntity.class);
+        }
         return mongoTemplate.find(Query.query(new Criteria().andOperator(criterias)), RuleEntity.class);
     }
 
     @Override
-    public Optional<RuleEntity> getRuleById(String ruleId) {
-        return Optional.empty();
+    public Optional<? extends RuleEntity> getRuleById(boolean customRule, String ruleId) {
+        if (customRule) {
+            return customRuleRepository.getRuleById(ruleId);
+        }
+        return ruleRepository.getRuleById(ruleId);
+    }
+
+    @Override
+    public void deleteCustomRule(String id) {
+        customRuleRepository.deleteById(id);
     }
 
     @Override
     public void deleteRule(String id) {
         ruleRepository.deleteById(id);
+    }
+
+    @Override
+    public void replacesRules(List<? extends RuleEntity> rules, boolean custom) {
+        if (custom) {
+            mongoTemplate.remove(new Query(), CustomRuleEntity.class);
+            customRuleRepository.saveAll((List<CustomRuleEntity>) rules);
+        } else {
+            mongoTemplate.remove(new Query(), RuleEntity.class);
+            ruleRepository.saveAll(rules);
+        }
     }
 
 }

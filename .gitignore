@@ -8,8 +8,3 @@
 */src/**/*.js.map
 */src/**/*.js
 multibanking-app/.history
-**/*.log.gz
-**/*.log
-*.log.gz
-*.log
-

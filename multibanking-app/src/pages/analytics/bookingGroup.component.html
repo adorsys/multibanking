@@ -15,7 +15,7 @@
     <h4 *ngIf="bookingGroup.specification">{{bookingGroup.specification}}</h4>
     <div item-right>
       <h4>{{ bookingGroup.nextExecutionDate | date }}</h4>
-      <h2>{{ bookingGroup.amount | currency:'EUR':'symbol' }}</h2>
+      <h2>{{ bookingGroup.amount | currency:'EUR':true }}</h2>
     </div>
   </ion-item>
 </ion-content>

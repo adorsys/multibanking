@@ -18,7 +18,7 @@ export class RulesCustomPage extends RulesStaticPage {
   @ViewChild(Navbar) navBar: Navbar;
   selectedRule: Rule;
   rules: Rule[];
-  custom: boolean = true;
+  type: string = "custom";
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
@@ -40,10 +40,8 @@ export class RulesCustomPage extends RulesStaticPage {
 
   releaseRule(rule: Rule) {
     rule.released = true;
-    this.rulesService.createRule(rule, false).subscribe(rules => {
-      this.rulesService.deleteRule(rule.id, true).subscribe(rules => {
-        this.loadRules();
-      });
+    this.rulesService.updateRule(rule).subscribe(rules => {
+      this.loadRules();
     });
   }
 

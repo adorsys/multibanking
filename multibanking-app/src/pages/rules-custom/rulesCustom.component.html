@@ -19,6 +19,10 @@
       <ion-icon name="arrow-dropleft"></ion-icon>
     </button>
     <ion-fab-list side="left">
+      <label ion-fab mini>
+        <ion-icon name="cloud-upload"></ion-icon>
+        <input type="file" (change)="uploadRules($event)" style="display: none">
+      </label>
       <button ion-fab mini (click)="downloadRules()">
         <ion-icon name="download"></ion-icon>
       </button>

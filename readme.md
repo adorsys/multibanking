@@ -1,9 +1,5 @@
 # Multibanking
 
-# THIS BRANCH (smartanalytics-integration) REQUIRES to checkout and build https://github.com/adorsys/smartanalytics branch analytics-facade
-# Still to be merged to develop.
-
-
 ## Introduction
 The multibanking project provides authenticated access to a users bank account. With validated online-banking credentials, the user can authorize an application to fetch transaction data, prepare and display it. The project itself uses HBCI and Figo to do so. Furthermore, it is possible to test the functionality of this project not only with real- but with fake-data (mocks). The mocked-data can be set up by the user and acts just as real data. 
 
