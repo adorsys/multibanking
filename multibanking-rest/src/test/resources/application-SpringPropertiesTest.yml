@@ -1,0 +1,44 @@
+sts:
+  resourceServers:
+  - audience: "multibanking"
+    jwksUrl: "http://localhost:${}/pop"
+  keymanagement:
+    rotation:
+      checkInterval: 5000
+      encKeyPairs:
+        minKeys: 1
+        enabled: false
+      signKeyPairs:
+        minKeys: 1
+        enabled: false
+      secretKeys:
+        minKeys: 1
+        enabled: false
+    keystore:
+      password: FEDCBA9876543210
+      type: UBER
+      name: adsts-dev-keystore
+      alias_prefix: adsts-dev-
+      keys:
+        encKeyPairs:
+          initialCount: 1
+          algo: RSA
+          sigAlgo: SHA256withRSA
+          size: 2048
+          name: Adorsys Security Token Service
+          validityInterval: 60000
+          legacyInterval: 120000
+        signKeyPairs:
+          initialCount: 1
+          algo: RSA
+          sigAlgo: SHA256withRSA
+          size: 2048
+          name: Adorsys Security Token Service
+          validityInterval: 60000
+          legacyInterval: 120000
+        secretKeys:
+          initialCount: 1
+          algo: AES
+          size: 256
+          validityInterval: 60000
+          legacyInterval: 120000
