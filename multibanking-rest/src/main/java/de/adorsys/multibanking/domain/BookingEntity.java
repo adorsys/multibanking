@@ -12,6 +12,7 @@ public class BookingEntity extends Booking implements IdentityIf {
   private String id;
   private String accountId;
   private String userId;
+  private String filePeriod;
 
   public BookingEntity id(String id) {
     this.id = id;

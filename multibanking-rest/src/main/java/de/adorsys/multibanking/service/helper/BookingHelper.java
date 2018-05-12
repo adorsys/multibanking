@@ -28,15 +28,22 @@ public class BookingHelper {
                 .collect(Collectors.groupingBy(booking -> period(booking, accountSynchPref)));
     }
 
+    public static Map<String, List<BookingEntity>> reMapBookings(List<BookingEntity> bookings) {
+        return bookings.stream()
+                .collect(Collectors.groupingBy(BookingEntity::getFilePeriod));
+    }
+
     /**
      * Associates booking with period by booking date.
      * 
      * @param b
      * @return
      */
-    static String period(BookingEntity b, AccountSynchPref pref) {
+    public static String period(BookingEntity b, AccountSynchPref pref) {
     	LocalDate bookingDate = b.getBookingDate();
     	if(bookingDate==null) throw new BaseException("Missing booking date for booking: " + b.getId());
-    	return pref.getBookingPeriod().marker(bookingDate);
+    	String period = pref.getBookingPeriod().marker(bookingDate);
+    	b.setFilePeriod(period);
+    	return period;
 	}
 }

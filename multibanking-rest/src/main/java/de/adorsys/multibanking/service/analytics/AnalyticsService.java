@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.service.analytics;
 
-import static de.adorsys.multibanking.service.analytics.SmartanalyticsMapper.mapBookingGroups;
 import static de.adorsys.multibanking.service.analytics.SmartanalyticsMapper.toContract;
 
 import java.time.LocalDate;
@@ -28,18 +27,21 @@ public class AnalyticsService {
         accountAnalyticsEntity.setAccountId(bankAccountEntity.getId());
         accountAnalyticsEntity.setAnalyticsDate(referenceDate);
 
-        accountAnalyticsEntity.setBalanceCalculated(
+        if(bankAccountEntity.getBankAccountBalance()!=null && bankAccountEntity.getBankAccountBalance().getReadyHbciBalance()!=null)
+        	accountAnalyticsEntity.setBalanceCalculated(
                 bankAccountEntity.getBankAccountBalance().getReadyHbciBalance()
                         .add(accountAnalyticsEntity.getIncomeNext()).add(accountAnalyticsEntity.getExpensesNext()));
         bankAccountService.saveAccountAnalytics(bankAccountEntity.getId(), accountAnalyticsEntity);
     }
 
     public void identifyAndStoreContracts(String userId, String accountId, AnalyticsResult categoryResult) {
-        List<ContractEntity> contractEntities = categoryResult.getBookingGroups()
-                .stream()
-                .filter(BookingGroup::isContract)
-                .map(category -> toContract(userId, accountId, category))
-                .collect(Collectors.toList());
-        bankAccountService.saveContracts(accountId, contractEntities);
+    	if(categoryResult.getBookingGroups()!=null){
+	        List<ContractEntity> contractEntities = categoryResult.getBookingGroups()
+	                .stream()
+	                .filter(BookingGroup::isContract)
+	                .map(category -> toContract(userId, accountId, category))
+	                .collect(Collectors.toList());
+	        bankAccountService.saveContracts(accountId, contractEntities);
+    	}
     }
 }
