@@ -35,7 +35,7 @@ public class MB_005_BankAccount extends MB_BaseTest {
 
     @Test
     public void synch_bank_account_returns_204() {
-    	BankAccessData accessData = accessDataWith2BankAccounts(this);
+    	BankAccessData accessData = createAccessDataWith2BankAccounts(this);
     	BankAccessID bankAccessID = new BankAccessID(accessData.getBankAccess().getId());
     	accessData.getBankAccounts().forEach(accountData -> {
     		BankAccountID bankAccountID = new BankAccountID(accountData.getBankAccount().getId());
@@ -45,7 +45,7 @@ public class MB_005_BankAccount extends MB_BaseTest {
 
     @Test
     public void synched_bank_account_status_ready_unsynched_bank_account_status_null() {
-    	BankAccessData accessData = accessDataWith2BankAccounts(this);
+    	BankAccessData accessData = createAccessDataWith2BankAccounts(this);
     	BankAccessID bankAccessID = new BankAccessID(accessData.getBankAccess().getId());
     	// Check synch data0 are still null
     	BankAccountData accountData0 = accessData.getBankAccounts().get(0);
@@ -64,7 +64,7 @@ public class MB_005_BankAccount extends MB_BaseTest {
 
 		// Do not synch second bank account.
 		// Reload account data
-		accessData = accessDataWith2BankAccounts(this);
+		accessData = loadAccessDataWith2BankAccounts(this);
 		// Assert synch data0 set
     	accountData0 = accessData.getBankAccounts().get(0);
 		Assert.assertEquals(SyncStatus.READY, accountData0.getBankAccount().getSyncStatus());
@@ -95,7 +95,7 @@ public class MB_005_BankAccount extends MB_BaseTest {
             LOGGER.info("PUT TO uri:" + uri);
             this.testRestTemplate.put(uri, pin);
             
-            List<BankAccountData> bankAccountData = accessDataWith2BankAccounts(this).getBankAccounts();
+            List<BankAccountData> bankAccountData = loadAccessDataWith2BankAccounts(this).getBankAccounts();
             bankAccountData.forEach(bad -> {
             	Map<String, BookingFile> bookingFiles = bad.getBookingFiles();
             	Assert.assertNotNull(bookingFiles);
@@ -108,8 +108,11 @@ public class MB_005_BankAccount extends MB_BaseTest {
     	return base.path( BankAccountController.SYNC_PATH).build(accessID.getValue(), bankAccountID.getValue());
     }
     
-    public static BankAccessData accessDataWith2BankAccounts(MB_BaseTest base){
+    public static BankAccessData createAccessDataWith2BankAccounts(MB_BaseTest base){
         MB_004_BankAccess.createBankAccess(base, base.theBeckerTuple);
+        return loadAccessDataWith2BankAccounts(base);
+    }
+    public static BankAccessData loadAccessDataWith2BankAccounts(MB_BaseTest base){
         UserData userData = loadUserData(base);
         Assume.assumeNotNull(userData.getBankAccesses());
         Assume.assumeTrue(1==userData.getBankAccesses().size());

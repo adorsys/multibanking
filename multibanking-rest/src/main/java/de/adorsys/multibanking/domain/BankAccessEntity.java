@@ -24,9 +24,9 @@ public class BankAccessEntity extends BankAccess implements IdentityIf {
     @ApiModelProperty(value = "States whether bookings loaded from the user's online banking account shall be stored.", example = "true")
     private boolean storeBookings = true;
     @ApiModelProperty(value = "States whether bookings loaded from the user's online banking account shall be sent to category service.", example = "true")
-    private boolean categorizeBookings;
+    private boolean categorizeBookings = true;
     @ApiModelProperty(value = "States whether analytics result shall be stored.", example = "true")
-    private boolean storeAnalytics;
+    private boolean storeAnalytics = true;
     @ApiModelProperty(value = "States whether anonymized booking shall be stored.", example = "true")
     private boolean storeAnonymizedBookings;
 
