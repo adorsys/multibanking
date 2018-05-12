@@ -102,6 +102,10 @@ public class BookingService {
     		throw new UnexistentBookingFileException(bookingFQN.getValue());
         return uos.loadDocument(bookingFQN);
     }
+    
+    public List<BookingEntity> getAllBookingsAlList(String accessId, String accountId){
+    	return loadAllBookings(uds.load(), accessId, accountId);
+    }
 
     /**
      * - Get additional booking from the remote repository.
@@ -158,7 +162,7 @@ public class BookingService {
         
         if (bankAccess.isCategorizeBookings() || bankAccess.isStoreAnalytics()) {
             bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
-        	List<BookingEntity> bookingEntities = loadAllBookings(userData, bankAccess, bankAccount);
+        	List<BookingEntity> bookingEntities = loadAllBookings(userData, bankAccess.getId(), bankAccount.getId());
             LocalDate analyticsDate = LocalDate.now();
             // TODO. I don't like this smartanalytic that takes all booking.
             // Check for an API for incremental loading of bookings.
@@ -188,14 +192,14 @@ public class BookingService {
         }
     }
 
-	private List<BookingEntity> loadAllBookings(UserData userData, BankAccessEntity bankAccess, BankAccountEntity bankAccount) {
-        BankAccountData bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
+	private List<BookingEntity> loadAllBookings(UserData userData, String accessId, String accountId) {
+        BankAccountData bankAccountData = userData.bankAccountData(accessId, accountId);
         Map<String, BookingFile> bookingFiles = bankAccountData.getBookingFiles();
         List<BookingEntity> result = new ArrayList<>();
 		bookingFiles.values().forEach(bookingFile -> {
         	String period = bookingFile.getPeriod();
         	if(bookingFile.getNumberOfRecords()>0){
-    			DocumentFQN bookingFQN = FQNUtils.bookingFQN(bankAccess.getId(),bankAccount.getId(),period);
+    			DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId, accountId,period);
     			List<BookingEntity> existingBookings = uos.load(bookingFQN, listType()).orElse(new ArrayList<>());
         		result .addAll(existingBookings);
         	}
