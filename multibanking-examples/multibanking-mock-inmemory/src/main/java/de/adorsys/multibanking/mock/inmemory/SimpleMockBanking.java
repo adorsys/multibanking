@@ -89,12 +89,12 @@ public class SimpleMockBanking extends MockBanking {
 	private DataMap data = new DataMap();
 	private void load(InputStream bookingCategoryStream, InputStream banksStream, InputStream bookingsStream) throws IOException {
 		if(bookingCategoryStream==null)
-			bookingCategoryStream = SimpleMockBanking.class.getClassLoader().getResourceAsStream("booking_category.json");
+			bookingCategoryStream = SimpleMockBanking.class.getResourceAsStream("/booking_category.json");
 		
 		bookingCategoryData = mapper.readValue( bookingCategoryStream, BookingCategoryData.class );
 		
 		if(banksStream==null)
-			banksStream = SimpleMockBanking.class.getClassLoader().getResourceAsStream("mock_bank.json");
+			banksStream = SimpleMockBanking.class.getResourceAsStream("/mock_bank.json");
 		
 		banks = mapper.readValue(banksStream, new TypeReference<List<XLSBank>>(){});
 
@@ -107,7 +107,7 @@ public class SimpleMockBanking extends MockBanking {
 		DataSheetLoader dataSheetLoader = new DataSheetLoader(bankAccesLoader, bankAccountLoader, bookingLoader, standingOrderLoader);
 		
 		if(bookingsStream==null)
-			bookingsStream = SimpleMockBanking.class.getClassLoader().getResourceAsStream("test_data.xls");
+			bookingsStream = SimpleMockBanking.class.getResourceAsStream("/mock_bank.xls");
 		
 		dataSheetLoader.loadDataSheet(bookingsStream);
 	}
