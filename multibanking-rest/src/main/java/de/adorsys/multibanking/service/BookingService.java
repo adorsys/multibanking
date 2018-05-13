@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,7 @@ import de.adorsys.multibanking.service.base.UserObjectService;
 import de.adorsys.multibanking.service.helper.BookingHelper;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.FQNUtils;
+import de.adorsys.multibanking.utils.Ids;
 import de.adorsys.smartanalytics.api.AnalyticsResult;
 import domain.BankAccount;
 import domain.BankApi;
@@ -319,6 +321,9 @@ public class BookingService {
             Collections.sort(bookingEntities, (o1, o2) -> o2.getBookingDate().compareTo(o1.getBookingDate()));
             processBookingPeriods.put(period, bookingEntities);
             if (persist) {
+            	bookingEntities.forEach(b -> {
+            		if(StringUtils.isBlank(b.getId()))b.setId(Ids.uuid());
+            	});
             	uos.store(bookingFQN, listType(), bookingEntities);
             }
 		}
