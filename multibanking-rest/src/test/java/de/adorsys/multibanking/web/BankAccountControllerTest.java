@@ -17,8 +17,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import de.adorsys.multibanking.config.web.ControllerUnitTestConfig;
 import de.adorsys.multibanking.config.web.WebMvcUnitTest;
-import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.domain.BankAccountEntity;
+import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.service.BankAccessService;
 import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;

@@ -22,6 +22,7 @@ import de.adorsys.multibanking.domain.UserData;
  */
 
 import de.adorsys.multibanking.web.account.BankAccountController;
+import de.adorsys.multibanking.web.base.BankLoginTuple;
 import de.adorsys.multibanking.web.base.entity.BankAccessID;
 import de.adorsys.multibanking.web.base.entity.BankAccountID;
 import domain.BankAccount.SyncStatus;
@@ -103,6 +104,24 @@ public class MB_005_BankAccount extends MB_BaseTest {
             });
         });
     }
+    
+    @Test
+    public void test_synch_bank_accounts_wrong_pin_shall_return_403() {
+        URI location = MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
+        UserDataStructure userDataStructure = MB_004_BankAccess.loadBankAccess(this, location);
+        List<BankAccessID> bankAccessIDs = userDataStructure.getBankAccessIDs();
+        Assert.assertEquals(1, bankAccessIDs.size());
+        List<BankAccountID> bankAccountIDs = userDataStructure.getBankAccountIDs(bankAccessIDs.get(0));
+        Assert.assertEquals(2, bankAccountIDs.size());
+        bankAccountIDs.forEach(bankAccountID -> {
+            URI uri = syncPath(this, bankAccessIDs.get(0),bankAccountID);
+            String pin = "1234567";
+            this.setNextExpectedStatusCode(403);
+            LOGGER.info("PUT TO uri:" + uri);
+            this.testRestTemplate.put(uri, pin);
+        });
+    }
+    
 
     public static URI syncPath(MB_BaseTest base, BankAccessID accessID, BankAccountID bankAccountID) {
     	return base.path( BankAccountController.SYNC_PATH).build(accessID.getValue(), bankAccountID.getValue());

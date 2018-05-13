@@ -24,9 +24,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import de.adorsys.multibanking.domain.AccountSynchPref;
 import de.adorsys.multibanking.domain.AnonymizedBookingEntity;
-import de.adorsys.multibanking.domain.BankAccessData;
 import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.BookingEntity;
@@ -34,6 +32,8 @@ import de.adorsys.multibanking.domain.BookingFile;
 import de.adorsys.multibanking.domain.UserData;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.UnexistentBookingFileException;
+import de.adorsys.multibanking.domain.BankAccessData;
+import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.AnonymizationService;
 import de.adorsys.multibanking.service.analytics.CategoriesProvider;
@@ -96,7 +96,7 @@ public class BookingService {
      * @return
      */
     public DSDocument getBookings(String accessId, String accountId, String period) {
-    	BankAccountData bankAccountData = uds.load().bankAccountData(accessId, accountId);
+    	BankAccountData bankAccountData = uds.load().bankAccountDataOrException(accessId, accountId);
     	DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId,accountId,period);
     	if(!bankAccountData.getBookingFiles().containsKey(period))
     		throw new UnexistentBookingFileException(bookingFQN.getValue());
@@ -118,13 +118,13 @@ public class BookingService {
      */
     public void syncBookings(String accessId, String accountId, BankApi bankApi, String pin) {
     	UserData userData = uds.load();
-    	BankAccountData bankAccountData = userData.bankAccountData(accessId, accountId);
+    	BankAccountData bankAccountData = userData.bankAccountDataOrException(accessId, accountId);
     	// Set the synch status and flush
     	bankAccountData.updateSyncStatus(BankAccount.SyncStatus.SYNC);
         uos.flush();
 
         // Reload
-        BankAccessEntity bankAccess = userData.bankAccessData(accessId).getBankAccess();
+        BankAccessEntity bankAccess = userData.bankAccessDataOrException(accessId).getBankAccess();
         BankAccountEntity bankAccount = bankAccountData.getBankAccount();
         LoadBookingsResponse response = loadBookingsOnline(bankApi, bankAccess, bankAccount, pin);
 
@@ -153,7 +153,7 @@ public class BookingService {
         // Processed booking periods. Used for anonymization
         // Check with alex if we can use this for analytics. 
         // I don't think we need to reload all bookings of a user for analytics.
-        BankAccountData bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
+        BankAccountData bankAccountData = userData.bankAccountDataOrException(bankAccess.getId(), bankAccount.getId());
         Map<String, List<BookingEntity>> processBookingPeriods = storeBookings(bankAccountData, response.getStandingOrders(), bankAccess.isStoreBookings(), bookings);
         
         bankAccountService.saveStandingOrders(bankAccount, response.getStandingOrders());
@@ -161,7 +161,7 @@ public class BookingService {
         uos.flush();
         
         if (bankAccess.isCategorizeBookings() || bankAccess.isStoreAnalytics()) {
-            bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
+            bankAccountData = userData.bankAccountDataOrException(bankAccess.getId(), bankAccount.getId());
         	List<BookingEntity> bookingEntities = loadAllBookings(userData, bankAccess.getId(), bankAccount.getId());
             LocalDate analyticsDate = LocalDate.now();
             // TODO. I don't like this smartanalytic that takes all booking.
@@ -193,7 +193,7 @@ public class BookingService {
     }
 
 	private List<BookingEntity> loadAllBookings(UserData userData, String accessId, String accountId) {
-        BankAccountData bankAccountData = userData.bankAccountData(accessId, accountId);
+        BankAccountData bankAccountData = userData.bankAccountDataOrException(accessId, accountId);
         Map<String, BookingFile> bookingFiles = bankAccountData.getBookingFiles();
         List<BookingEntity> result = new ArrayList<>();
 		bookingFiles.values().forEach(bookingFile -> {
@@ -220,7 +220,11 @@ public class BookingService {
             response.setOnlineBankingService(onlineBankingService);
             return response;
         } catch (InvalidPinException e) {
-        	credentialService.setInvalidPin(bankAccess.getId());
+        	try {
+        		credentialService.setInvalidPin(bankAccess.getId());
+        	} catch(Exception ex){
+        		// Noop
+        	}
             throw new de.adorsys.multibanking.exception.InvalidPinException(bankAccess.getId());
         }
     }
@@ -254,7 +258,7 @@ public class BookingService {
             String blzHbci = bankService.findByBankCode(bankAccess.getBankCode())
                     .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode())).getBlzHbci();
             List<BankAccount> apiBankAccounts = onlineBankingService.loadBankAccounts(bankApiUser, bankAccess, blzHbci, pin, bankAccess.isStorePin());
-            BankAccessData bankAccessData = userData.bankAccessData(bankAccess.getId());
+            BankAccessData bankAccessData = userData.bankAccessDataOrException(bankAccess.getId());
 	        List<BankAccountData> dbBankAccounts = bankAccessData.getBankAccounts();
             apiBankAccounts.forEach(apiBankAccount -> {
                 dbBankAccounts.forEach(dbBankAccountData -> {

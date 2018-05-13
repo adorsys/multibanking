@@ -3,8 +3,8 @@ package de.adorsys.multibanking.web.common;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.exception.SyncInProgressException;
+import de.adorsys.multibanking.domain.BankAccountData;
 import domain.BankAccount;
 
 public class SynchChecker {

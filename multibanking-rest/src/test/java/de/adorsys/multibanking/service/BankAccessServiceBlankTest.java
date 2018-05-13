@@ -136,8 +136,8 @@ public class BankAccessServiceBlankTest extends BaseServiceTest {
                 .thenReturn(Arrays.asList(bankAccountEntity));
 
         bankAccessService.createBankAccess(bankAccessEntity);
-        isInstanceOf(BankAccessData.class, uds.load().bankAccessData(bankAccessEntity.getId()));
-        isInstanceOf(BankAccountData.class, uds.load().bankAccountData(bankAccessEntity.getId(), bankAccountEntity.getId()));
+        isInstanceOf(BankAccessData.class, uds.load().bankAccessDataOrException(bankAccessEntity.getId()));
+        isInstanceOf(BankAccountData.class, uds.load().bankAccountDataOrException(bankAccessEntity.getId(), bankAccountEntity.getId()));
     }
 
     @Test
@@ -160,6 +160,6 @@ public class BankAccessServiceBlankTest extends BaseServiceTest {
         boolean deleteBankAccess = bankAccessService.deleteBankAccess(bankAccessEntity.getId());
         assertThat(deleteBankAccess).isEqualTo(true);
         thrown.expect(ResourceNotFoundException.class);
-        isInstanceOf(BankAccessData.class, uds.load().bankAccessData(bankAccessEntity.getId()));
+        isInstanceOf(BankAccessData.class, uds.load().bankAccessDataOrException(bankAccessEntity.getId()));
     }
 }

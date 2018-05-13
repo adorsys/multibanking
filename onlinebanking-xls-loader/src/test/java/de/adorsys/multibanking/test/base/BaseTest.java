@@ -9,8 +9,9 @@ import org.junit.BeforeClass;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.adorsys.multibanking.domain.BookingCategoryData;
-import de.adorsys.multibanking.domain.XLSBank;
+import de.adorsys.multibanking.mock.domain.BookingCategoryData;
+import de.adorsys.multibanking.mock.domain.MockAccount;
+import de.adorsys.multibanking.mock.domain.XLSBank;
 import domain.Bank;
 
 public class BaseTest {
@@ -18,7 +19,7 @@ public class BaseTest {
 	protected static BookingCategoryData bookingCategoryData;
 	protected static List<? extends Bank> banks;
 	protected static ObjectMapper mapper = new ObjectMapper();
-	protected static DataMap data = new DataMap();
+	protected static MockAccount data = new MockAccount();
 	
 	@BeforeClass
 	public static void beforeClass() throws IOException {

@@ -1,13 +1,13 @@
-package de.adorsys.multibanking.loader;
+package de.adorsys.multibanking.mock.loader;
 
-import static de.adorsys.multibanking.utils.CellUtils.bigDecimalCell;
-import static de.adorsys.multibanking.utils.CellUtils.localDate;
-import static de.adorsys.multibanking.utils.CellUtils.stringCell;
+import static de.adorsys.multibanking.mock.utils.CellUtils.bigDecimalCell;
+import static de.adorsys.multibanking.mock.utils.CellUtils.localDate;
+import static de.adorsys.multibanking.mock.utils.CellUtils.stringCell;
 
 import org.apache.poi.ss.usermodel.Row;
 
-import de.adorsys.multibanking.service.XLSStandingOrderService;
-import de.adorsys.multibanking.utils.IbanUtils;
+import de.adorsys.multibanking.mock.service.XLSStandingOrderService;
+import de.adorsys.multibanking.mock.utils.IbanUtils;
 import domain.BankAccount;
 import domain.Cycle;
 import domain.StandingOrder;

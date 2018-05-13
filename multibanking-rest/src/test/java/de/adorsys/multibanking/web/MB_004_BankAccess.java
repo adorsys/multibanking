@@ -126,6 +126,18 @@ public class MB_004_BankAccess extends MB_BaseTest {
         UserData userData = loadUserData(this);
         Assert.assertNotNull(userData);
     }
+    
+    @Test
+    public void forbiden_on_create_bank_access_wrong_pin() {
+    	BankLoginTuple bankLogin = new BankLoginTuple("19999999", "m.becker", "1234567");
+        BankAccessEntity be = new BankAccessEntity();
+        be.setBankCode(bankLogin.getBankCode());
+        be.setBankLogin(bankLogin.getUserID());
+        be.setPin(bankLogin.getUserPIN());
+        URI uri = bankAccessPath(this).build().toUri();
+        this.setNextExpectedStatusCode(403);
+        this.testRestTemplate.postForLocation(uri, be);
+    }
 
     /**
      * After loading the bank account account, the synch status is supposed to be null. This is the initial state.

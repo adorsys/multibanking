@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.loader;
+package de.adorsys.multibanking.mock.loader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +10,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.util.IOUtils;
 
-import de.adorsys.multibanking.exception.InvalidRowException;
+import de.adorsys.multibanking.mock.exception.InvalidRowException;
 
 public class DataSheetLoader {
 	private static final Logger LOG = Logger.getLogger(DataSheetLoader.class.getName());

@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.web.common;
 
-import org.adorsys.cryptoutils.exceptions.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
-import de.adorsys.multibanking.exception.SyncInProgressException;
 import de.adorsys.multibanking.service.BankAccountService;
-import domain.BankAccount;
 
 public abstract class BankAccountBasedController extends BankAccessBasedController {
     private final static Logger LOGGER = LoggerFactory.getLogger(BankAccountBasedController.class);

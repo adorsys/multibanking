@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.exception;
+package de.adorsys.multibanking.mock.exception;
 
 public class InvalidRowException extends RuntimeException {
 	private static final long serialVersionUID = 5990327737750485489L;

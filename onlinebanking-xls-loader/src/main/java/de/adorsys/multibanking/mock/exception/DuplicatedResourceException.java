@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.exception;
+package de.adorsys.multibanking.mock.exception;
 
 public class DuplicatedResourceException extends RuntimeException {
 	private static final long serialVersionUID = 3928948758826868879L;
