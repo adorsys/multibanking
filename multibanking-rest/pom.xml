@@ -83,6 +83,12 @@
             <artifactId>onlinebanking-mock</artifactId>
             <version>${project.version}</version>
         </dependency>
+		<dependency>
+	        <groupId>de.adorsys.multibanking</groupId>
+	        <artifactId>multibanking-mock-inmemory</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 
         <!-- smartanalytics -->
 		<dependency>

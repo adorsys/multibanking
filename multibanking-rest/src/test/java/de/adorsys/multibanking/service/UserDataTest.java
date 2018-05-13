@@ -1,8 +1,9 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.domain.BankAccessData;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.UserData;
+import de.adorsys.multibanking.domain.BankAccessData;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;

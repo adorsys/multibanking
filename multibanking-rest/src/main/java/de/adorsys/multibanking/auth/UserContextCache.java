@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
@@ -54,13 +55,19 @@ public class UserContextCache {
 	 * @return
 	 */
 	public <T> boolean isCached(DocumentFQN documentFQN, TypeReference<T> valueType){
-		if(!userContext.isCacheEnabled()) return false;
-		
-		if(valueType==null) return false;
-		
+		return entry(documentFQN, valueType).isPresent();
+	}
+
+	public <T> boolean isDirty(DocumentFQN documentFQN, TypeReference<T> cachedobjecttyperef) {
+		Optional<CacheEntry<T>> entry = entry(documentFQN, cachedobjecttyperef);
+		if(entry.isPresent()) return entry.get().isDirty();
+		return false;
+	}
+
+	private <T> Optional<CacheEntry<T>> entry(DocumentFQN documentFQN, TypeReference<T> valueType){
+		if(!userContext.isCacheEnabled() || valueType==null) return Optional.empty();
 		Map<DocumentFQN, CacheEntry<?>> typeCache = typeCache(valueType);
-		CacheEntry<T> cacheEntry = (CacheEntry<T>) typeCache.get(documentFQN);
-		return cacheEntry!=null;
+		return Optional.ofNullable((CacheEntry<T>) typeCache.get(documentFQN));
 	}
 	
 	/**
@@ -96,11 +103,13 @@ public class UserContextCache {
 		Collection<Map<DocumentFQN,CacheEntry<?>>> values = cache.values();
 		String path = dir.getValue();
 		for (Map<DocumentFQN, CacheEntry<?>> map : values) {
-			Set<DocumentFQN> keySet = map.keySet();
+			Set<Entry<DocumentFQN,CacheEntry<?>>> entrySet = map.entrySet();
 			Set<DocumentFQN> keyToRemove = new HashSet<>();
-			for (DocumentFQN documentFQN : keySet) {
+			for (Entry<DocumentFQN, CacheEntry<?>> entry : entrySet) {
+				DocumentFQN documentFQN = entry.getKey();
 				if(StringUtils.startsWith(documentFQN.getValue(), path)){
-					keyToRemove.add(documentFQN);
+					if(entry.getValue()==null || !entry.getValue().isDirty())
+						keyToRemove.add(documentFQN);
 				}
 			}
 			for (DocumentFQN documentFQN : keyToRemove) {
@@ -109,5 +118,4 @@ public class UserContextCache {
 			}
 		}
 	}
-
 }

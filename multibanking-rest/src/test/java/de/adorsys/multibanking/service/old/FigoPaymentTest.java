@@ -84,7 +84,7 @@ public class FigoPaymentTest {
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(false);
 
-        List<BankAccountEntity> bankAccountEntities = uds.load().bankAccessData(bankAccessEntity.getId()).bankAccountEntityAsList();
+        List<BankAccountEntity> bankAccountEntities = uds.load().bankAccessDataOrException(bankAccessEntity.getId()).bankAccountEntityAsList();
 //        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadForBankAccess(bankAccessEntity.getId());
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
                 .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("12324463"))

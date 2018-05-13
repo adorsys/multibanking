@@ -1,7 +1,7 @@
-package de.adorsys.multibanking.loader;
+package de.adorsys.multibanking.mock.loader;
 
-import static de.adorsys.multibanking.utils.CellUtils.bigDecimalCell;
-import static de.adorsys.multibanking.utils.CellUtils.stringCell;
+import static de.adorsys.multibanking.mock.utils.CellUtils.bigDecimalCell;
+import static de.adorsys.multibanking.mock.utils.CellUtils.stringCell;
 
 import java.util.Random;
 import java.util.logging.Logger;
@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.iban4j.IbanUtil;
 
-import de.adorsys.multibanking.service.XLSBankAccountService;
+import de.adorsys.multibanking.mock.service.XLSBankAccountService;
 import domain.Bank;
 import domain.BankAccount;
 import domain.BankAccountBalance;

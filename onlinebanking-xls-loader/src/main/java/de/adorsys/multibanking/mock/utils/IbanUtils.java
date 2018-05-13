@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.utils;
+package de.adorsys.multibanking.mock.utils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.IbanUtil;
