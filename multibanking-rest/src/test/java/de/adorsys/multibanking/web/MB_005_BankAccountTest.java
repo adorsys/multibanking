@@ -58,6 +58,7 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
         // Do not synch second bank account.
         // Reload account data
         userDataStructure = accessDataWith2BankAccounts(this, location);
+        LOGGER.info("nach dem sync " + userDataStructure.toString());
         // Assert synch data0 set
         Assert.assertEquals("READY", userDataStructure.getSyncStatus(firstBankAccessID, firstBankAccountID).get().getValue());
         Assert.assertTrue(userDataStructure.getLastSync(firstBankAccessID, firstBankAccountID).isPresent());
@@ -90,6 +91,7 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
         userDataStructure.getBankAccountIDs(firstBankAccessID).forEach(bankAccountID -> {
             Optional<List<String>> bookingPeriods = reloadedUserDataStructure.getBookingPeriods(firstBankAccessID, bankAccountID);
             Assert.assertTrue(bookingPeriods.isPresent());
+            Assert.assertFalse(bookingPeriods.get().isEmpty());
         });
     }
 

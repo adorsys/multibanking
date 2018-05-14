@@ -1,27 +1,6 @@
 package de.adorsys.multibanking.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import org.adorsys.docusafe.business.types.complex.DSDocument;
-import org.adorsys.docusafe.business.types.complex.DocumentFQN;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import de.adorsys.multibanking.domain.AccountSynchPref;
 import de.adorsys.multibanking.domain.AnonymizedBookingEntity;
 import de.adorsys.multibanking.domain.BankAccessData;
@@ -51,8 +30,28 @@ import domain.Booking;
 import domain.LoadBookingsResponse;
 import domain.StandingOrder;
 import exception.InvalidPinException;
+import org.adorsys.docusafe.business.types.complex.DSDocument;
+import org.adorsys.docusafe.business.types.complex.DocumentFQN;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import spi.OnlineBankingService;
 import utils.Utils;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -98,7 +97,7 @@ public class BookingService {
     public DSDocument getBookings(String accessId, String accountId, String period) {
     	BankAccountData bankAccountData = uds.load().bankAccountData(accessId, accountId);
     	DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId,accountId,period);
-    	if(!bankAccountData.getBookingFiles().containsKey(period))
+    	if(!bankAccountData.containsBookingFileOfPeriod(period))
     		throw new UnexistentBookingFileException(bookingFQN.getValue());
         return uos.loadDocument(bookingFQN);
     }
@@ -190,9 +189,9 @@ public class BookingService {
 
 	private List<BookingEntity> loadAllBookings(UserData userData, BankAccessEntity bankAccess, BankAccountEntity bankAccount) {
         BankAccountData bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
-        Map<String, BookingFile> bookingFiles = bankAccountData.getBookingFiles();
+        List<BookingFile> bookingFiles = bankAccountData.getBookingFiles();
         List<BookingEntity> result = new ArrayList<>();
-		bookingFiles.values().forEach(bookingFile -> {
+		bookingFiles.forEach(bookingFile -> {
         	String period = bookingFile.getPeriod();
         	if(bookingFile.getNumberOfRecords()>0){
     			DocumentFQN bookingFQN = FQNUtils.bookingFQN(bankAccess.getId(),bankAccount.getId(),period);
@@ -272,7 +271,7 @@ public class BookingService {
     	Map<String, List<BookingEntity>> processBookingPeriods = new HashMap<>();
     	String accessId = bankAccountData.getBankAccount().getBankAccessId();
     	String accountId = bankAccountData.getBankAccount().getId();
-        Map<String, BookingFile> bookingFileMap = bankAccountData.getBookingFiles();
+        List<BookingFile> bookingFiles = bankAccountData.getBookingFiles();
         Set<Entry<String,List<BookingEntity>>> entrySet = bookings.entrySet();
         for (Entry<String, List<BookingEntity>> entry : entrySet) {
         	List<BookingEntity> bookingEntities = entry.getValue();
@@ -298,14 +297,15 @@ public class BookingService {
             bookingEntities = mergeBookings(existingBookings,bookingEntities);
 
             // Store meta data
-            BookingFile bookingFile = bookingFileMap.get(period);
-            if(bookingFile==null){
-            	bookingFile = new BookingFile();
-            	bookingFile.setPeriod(period);
-            	bookingFile.setLastUpdate(LocalDateTime.now());
-            	bankAccountData.update(Collections.singletonList(bookingFile));
+            Optional<BookingFile> bookingFile = bankAccountData.findBookingFileOfPeriod(period);
+
+            if(!bookingFile.isPresent()){
+            	bookingFile = Optional.of(new BookingFile());
+            	bookingFile.get().setPeriod(period);
+            	bookingFile.get().setLastUpdate(LocalDateTime.now());
+            	bankAccountData.update(Collections.singletonList(bookingFile.get()));
             }
-            bookingFile.setNumberOfRecords(bookingEntities.size());
+            bookingFile.get().setNumberOfRecords(bookingEntities.size());
 
             // Sort and store bookings
             Collections.sort(bookingEntities, (o1, o2) -> o2.getBookingDate().compareTo(o1.getBookingDate()));
