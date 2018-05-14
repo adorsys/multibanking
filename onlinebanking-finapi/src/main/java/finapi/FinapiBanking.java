@@ -1,6 +1,5 @@
 package finapi;
 
-import domain.Bank;
 import domain.*;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
@@ -32,7 +31,7 @@ public class FinapiBanking implements OnlineBankingService {
     private String finapiClientId;
     private String finapiSecret;
     private String finapiConnectionUrl;
-    private InlineResponse20024 clientToken;
+    private AccessToken clientToken;
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -82,7 +81,7 @@ public class FinapiBanking implements OnlineBankingService {
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
 
         try {
-            new UsersApi(createApiClient()).createUser(new Body18().email(uid + "@admb.de").password(password).id(uid));
+            new UsersApi(createApiClient()).createUser(new UserCreateParamsImpl().email(uid + "@admb.de").password(password).id(uid));
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
@@ -108,7 +107,7 @@ public class FinapiBanking implements OnlineBankingService {
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
         LOG.info("load bank accounts");
         try {
-            InlineResponse2006 searchAllBanks = new BanksApi(createApiClient()).getAndSearchAllBanks(null, bankAccess.getBankCode(), null, null, null, null, null);
+            PageableBankList searchAllBanks = new BanksApi(createApiClient()).getAndSearchAllBanks(null, bankAccess.getBankCode(), null, null, null, null, null, null, null, null);
             if (searchAllBanks.getBanks().size() != 1) {
                 throw new RuntimeException("Bank not supported");
             }
@@ -118,7 +117,7 @@ public class FinapiBanking implements OnlineBankingService {
             ApiClient apiClient = createUserApiClient();
             apiClient.setAccessToken(authorizeUser(bankApiUser));
 
-            InlineResponse2005Connections connections = new BankConnectionsApi(apiClient).importBankConnection(new Body3()
+            BankConnection connections = new BankConnectionsApi(apiClient).importBankConnection(new ImportBankConnectionParams()
                     .bankId(searchAllBanks.getBanks().get(0).getId())
                     .bankingUserId(bankAccess.getBankLogin())
                     .bankingPin(pin)
@@ -126,7 +125,7 @@ public class FinapiBanking implements OnlineBankingService {
 
             bankAccess.externalId(bankApi(), connections.getId().toString());
 
-            InlineResponse200 accounts = new AccountsApi(apiClient).getAndSearchAllAccounts(null, null, null, Arrays.asList(connections.getId()), null, null, null, null);
+            AccountList accounts = new AccountsApi(apiClient).getAndSearchAllAccounts(null, null, null, Arrays.asList(connections.getId()), null, null, null, null);
             return accounts.getAccounts().stream().map(account ->
                     new BankAccount()
                             .externalId(bankApi(), account.getId().toString())
@@ -168,16 +167,16 @@ public class FinapiBanking implements OnlineBankingService {
         List<String> order = Arrays.asList("id,desc");
 
         List<Booking> bookingList = new ArrayList<>();
-        InlineResponse20019 transactionsResponse = null;
+        PageableTransactionList transactionsResponse = null;
         Integer nextPage = null;
         try {
             //wait finapi loaded bookings
-            InlineResponse200Accounts account = waitAccountSynced(bankAccount, apiClient);
+            Account account = waitAccountSynced(bankAccount, apiClient);
             //wait finapi categorized bookings
             waitBookingsCategorized(bankAccess, apiClient);
 
             while (nextPage == null || transactionsResponse.getPaging().getPage() < transactionsResponse.getPaging().getPageCount()) {
-                transactionsResponse = new TransactionsApi(apiClient).getAndSearchAllTransactions("bankView", null, null, null, accountIds, null, null, null, null, null, null, null, null, null, null, null, null, null, null, nextPage, null, order);
+                transactionsResponse = new TransactionsApi(apiClient).getAndSearchAllTransactions("bankView", null, null, null, accountIds, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, nextPage, null, order);
                 nextPage = transactionsResponse.getPaging().getPage() + 1;
                 bookingList.addAll(transactionsResponse.getTransactions().stream().map(transaction -> {
                             Booking booking = new Booking();
@@ -227,9 +226,9 @@ public class FinapiBanking implements OnlineBankingService {
     public void submitPayment(Payment payment, String tan) {
     }
 
-    private InlineResponse200Accounts waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {
-        InlineResponse200Accounts account = new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
-        while (account.getStatus() == InlineResponse200Accounts.StatusEnum.DOWNLOAD_IN_PROGRESS) {
+    private Account waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {
+        Account account = new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
+        while (account.getStatus() == Account.StatusEnum.DOWNLOAD_IN_PROGRESS) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -241,8 +240,8 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     private void waitBookingsCategorized(BankAccess bankAccess, ApiClient apiClient) throws ApiException {
-        InlineResponse2005Connections connection = new BankConnectionsApi(apiClient).getBankConnection(Long.parseLong(bankAccess.getExternalIdMap().get(bankApi())));
-        while (connection.getCategorizationStatus() != InlineResponse2005Connections.CategorizationStatusEnum.READY) {
+        BankConnection connection = new BankConnectionsApi(apiClient).getBankConnection(Long.parseLong(bankAccess.getExternalIdMap().get(bankApi())));
+        while (connection.getCategorizationStatus() != BankConnection.CategorizationStatusEnum.READY) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
