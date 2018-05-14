@@ -1,9 +1,13 @@
 package de.adorsys.multibanking.web;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-
+import de.adorsys.multibanking.domain.BankAccessData;
+import de.adorsys.multibanking.domain.BankAccountData;
+import de.adorsys.multibanking.domain.BookingFile;
+import de.adorsys.multibanking.domain.UserData;
+import de.adorsys.multibanking.web.account.BankAccountController;
+import de.adorsys.multibanking.web.base.entity.BankAccessID;
+import de.adorsys.multibanking.web.base.entity.BankAccountID;
+import domain.BankAccount.SyncStatus;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
@@ -12,26 +16,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import de.adorsys.multibanking.domain.BankAccessData;
-import de.adorsys.multibanking.domain.BankAccountData;
-import de.adorsys.multibanking.domain.BookingFile;
-import de.adorsys.multibanking.domain.UserData;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by peter on 07.05.18 at 08:36.
  */
 
-import de.adorsys.multibanking.web.account.BankAccountController;
-import de.adorsys.multibanking.web.base.entity.BankAccessID;
-import de.adorsys.multibanking.web.base.entity.BankAccountID;
-import domain.BankAccount.SyncStatus;
-
 /**
  * https://wiki.adorsys.de/display/DOC/Multibanking-Rest+Tests
  */
 @RunWith(SpringRunner.class)
-public class MB_005_BankAccount extends MB_BaseTest {
-    private final static Logger LOGGER = LoggerFactory.getLogger(MB_005_BankAccount.class);
+public class MB_005_BankAccountTest extends MB_BaseTest {
+    private final static Logger LOGGER = LoggerFactory.getLogger(MB_005_BankAccountTest.class);
 
     @Test
     public void synch_bank_account_returns_204() {
@@ -79,11 +77,12 @@ public class MB_005_BankAccount extends MB_BaseTest {
 
     @Test
     public void test_synch_bank_accounts_check_booking_files() {
-        URI location = MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
-        UserDataStructure userDataStructure = MB_004_BankAccess.loadBankAccess(this, location);
+        URI location = MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple);
+        UserDataStructure userDataStructure = MB_004_BankAccessTest.loadBankAccess(this, location);
         List<BankAccessID> bankAccessIDs = userDataStructure.getBankAccessIDs();
+        BankAccessID bankAccessID = bankAccessIDs.get(0);
         Assert.assertEquals(1, bankAccessIDs.size());
-        List<BankAccountID> bankAccountIDs = userDataStructure.getBankAccountIDs(bankAccessIDs.get(0));
+        List<BankAccountID> bankAccountIDs = userDataStructure.getBankAccountIDs(bankAccessID);
         Assert.assertEquals(2, bankAccountIDs.size());
         bankAccountIDs.forEach(bankAccountID -> {
             LOGGER.info("found bank-AccountID:" + bankAccountID.toString());
@@ -93,15 +92,20 @@ public class MB_005_BankAccount extends MB_BaseTest {
             // Send a ynch while anotherone is still working.
             this.setNextExpectedStatusCode(204);
             LOGGER.info("PUT TO uri:" + uri);
+            LOGGER.info("Sync to " + bankAccountID + " " + bankAccessID);
             this.testRestTemplate.put(uri, pin);
             
-            List<BankAccountData> bankAccountData = loadAccessDataWith2BankAccounts(this).getBankAccounts();
-            bankAccountData.forEach(bad -> {
-            	Map<String, BookingFile> bookingFiles = bad.getBookingFiles();
-            	Assert.assertNotNull(bookingFiles);
-            	Assert.assertFalse(bookingFiles.isEmpty());
-            });
         });
+
+        List<BankAccountData> bankAccountData = loadAccessDataWith2BankAccounts(this).getBankAccounts();
+        bankAccountData.forEach(bad -> {
+            Map<String, BookingFile> bookingFiles = bad.getBookingFiles();
+            Assert.assertNotNull(bookingFiles);
+            LOGGER.info("get booking for " + bankAccessID +  " " + bad.getBankAccount().getId());
+            LOGGER.info("bookingFiles: " +  bookingFiles.toString());
+                Assert.assertFalse(bookingFiles.isEmpty());
+        });
+
     }
 
     public static URI syncPath(MB_BaseTest base, BankAccessID accessID, BankAccountID bankAccountID) {
@@ -109,7 +113,7 @@ public class MB_005_BankAccount extends MB_BaseTest {
     }
     
     public static BankAccessData createAccessDataWith2BankAccounts(MB_BaseTest base){
-        MB_004_BankAccess.createBankAccess(base, base.theBeckerTuple);
+        MB_004_BankAccessTest.createBankAccess(base, base.theBeckerTuple);
         return loadAccessDataWith2BankAccounts(base);
     }
     public static BankAccessData loadAccessDataWith2BankAccounts(MB_BaseTest base){
