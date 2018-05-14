@@ -1,15 +1,9 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.domain.BankAccessData;
-import de.adorsys.multibanking.domain.BankAccountData;
-import de.adorsys.multibanking.domain.BookingFile;
-import de.adorsys.multibanking.domain.UserData;
-import de.adorsys.multibanking.web.account.BankAccountController;
 import de.adorsys.multibanking.web.base.entity.BankAccessID;
 import de.adorsys.multibanking.web.base.entity.BankAccountID;
-import domain.BankAccount.SyncStatus;
+import de.adorsys.multibanking.web.base.entity.UserDataStructure;
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -18,7 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 /**
  * Created by peter on 07.05.18 at 08:36.
@@ -30,107 +24,93 @@ import java.util.Map;
 @RunWith(SpringRunner.class)
 public class MB_005_BankAccountTest extends MB_BaseTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(MB_005_BankAccountTest.class);
+    public static final String SYNC_URI = "/api/v1//bankaccesses/{accessId}/accounts/{accountId}/sync";
 
     @Test
-    public void synch_bank_account_returns_204() {
-    	BankAccessData accessData = createAccessDataWith2BankAccounts(this);
-    	BankAccessID bankAccessID = new BankAccessID(accessData.getBankAccess().getId());
-    	accessData.getBankAccounts().forEach(accountData -> {
-    		BankAccountID bankAccountID = new BankAccountID(accountData.getBankAccount().getId());
-    		syncBankAccount204(this, bankAccessID, bankAccountID);
-    	});
+    public void test_1_synch_bank_account_returns_204() {
+        URI location = MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple);
+        UserDataStructure userDataStructure = accessDataWith2BankAccounts(this, location);
+        BankAccessID bankAccessID = userDataStructure.getBankAccessIDs().get(0);
+        userDataStructure.getBankAccountIDs(bankAccessID).forEach(bankAccountID ->
+                syncBankAccount204(this, bankAccessID, bankAccountID)
+        );
     }
 
     @Test
     public void synched_bank_account_status_ready_unsynched_bank_account_status_null() {
-    	BankAccessData accessData = createAccessDataWith2BankAccounts(this);
-    	BankAccessID bankAccessID = new BankAccessID(accessData.getBankAccess().getId());
-    	// Check synch data0 are still null
-    	BankAccountData accountData0 = accessData.getBankAccounts().get(0);
-		BankAccountID bankAccountID0 = new BankAccountID(accountData0.getBankAccount().getId());
-		Assume.assumeTrue(accountData0.getBankAccount().getSyncStatus()==null);
-		Assume.assumeTrue(accountData0.getBankAccount().getLastSync()==null);
-		Assume.assumeTrue(accountData0.getSynchStatusTime()==null);
-    	// Sync first bank account
-		syncBankAccount204(this, bankAccessID, bankAccountID0);
+        URI location = MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple);
+        UserDataStructure userDataStructure = accessDataWith2BankAccounts(this, location);
+        BankAccessID firstBankAccessID = userDataStructure.getBankAccessIDs().get(0);
+        BankAccountID firstBankAccountID = userDataStructure.getBankAccountIDs(firstBankAccessID).get(0);
+        // Check synch data0 are still null
+        Assert.assertFalse(userDataStructure.getSyncStatus(firstBankAccessID, firstBankAccountID).isPresent());
+        Assert.assertFalse(userDataStructure.getLastSync(firstBankAccessID, firstBankAccountID).isPresent());
+        Assert.assertFalse(userDataStructure.getSyncStatusTime(firstBankAccessID, firstBankAccountID).isPresent());
+        // Sync first bank account
+        syncBankAccount204(this, firstBankAccessID, firstBankAccountID);
 
-		// Check synch data0 are still null
-    	BankAccountData accountData1 = accessData.getBankAccounts().get(1);
-		Assume.assumeTrue(accountData1.getBankAccount().getSyncStatus()==null);
-		Assume.assumeTrue(accountData1.getBankAccount().getLastSync()==null);
-		Assume.assumeTrue(accountData1.getSynchStatusTime()==null);
+        // Check second bankAccount data are still null
+        BankAccountID secondBankAccountID = userDataStructure.getBankAccountIDs(firstBankAccessID).get(1);
+        Assert.assertFalse(userDataStructure.getSyncStatus(firstBankAccessID, secondBankAccountID).isPresent());
+        Assert.assertFalse(userDataStructure.getLastSync(firstBankAccessID, secondBankAccountID).isPresent());
+        Assert.assertFalse(userDataStructure.getSyncStatusTime(firstBankAccessID, secondBankAccountID).isPresent());
 
-		// Do not synch second bank account.
-		// Reload account data
-		accessData = loadAccessDataWith2BankAccounts(this);
-		// Assert synch data0 set
-    	accountData0 = accessData.getBankAccounts().get(0);
-		Assert.assertEquals(SyncStatus.READY, accountData0.getBankAccount().getSyncStatus());
-		Assert.assertNotNull(accountData0.getBankAccount().getLastSync());
-		Assert.assertNotNull(accountData0.getSynchStatusTime());
+        // Do not synch second bank account.
+        // Reload account data
+        userDataStructure = accessDataWith2BankAccounts(this, location);
+        // Assert synch data0 set
+        Assert.assertEquals("READY", userDataStructure.getSyncStatus(firstBankAccessID, firstBankAccountID).get().getValue());
+        Assert.assertTrue(userDataStructure.getLastSync(firstBankAccessID, firstBankAccountID).isPresent());
+        Assert.assertTrue(userDataStructure.getSyncStatusTime(firstBankAccessID, firstBankAccountID).isPresent());
 
-    	accountData1 = accessData.getBankAccounts().get(1);
-		Assert.assertNull(accountData1.getBankAccount().getSyncStatus());
-		Assert.assertNull(accountData1.getBankAccount().getLastSync());
-		Assert.assertNull(accountData1.getSynchStatusTime());
+        // Check second bankAccount data are still null
+        Assert.assertFalse(userDataStructure.getSyncStatus(firstBankAccessID, secondBankAccountID).isPresent());
+        Assert.assertFalse(userDataStructure.getLastSync(firstBankAccessID, secondBankAccountID).isPresent());
+        Assert.assertFalse(userDataStructure.getSyncStatusTime(firstBankAccessID, secondBankAccountID).isPresent());
     }
 
     @Test
     public void test_synch_bank_accounts_check_booking_files() {
         URI location = MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple);
-        UserDataStructure userDataStructure = MB_004_BankAccessTest.loadBankAccess(this, location);
+        UserDataStructure userDataStructure = MB_004_BankAccessTest.loadUserDataStructure(this, location);
         List<BankAccessID> bankAccessIDs = userDataStructure.getBankAccessIDs();
-        BankAccessID bankAccessID = bankAccessIDs.get(0);
-        Assert.assertEquals(1, bankAccessIDs.size());
-        List<BankAccountID> bankAccountIDs = userDataStructure.getBankAccountIDs(bankAccessID);
-        Assert.assertEquals(2, bankAccountIDs.size());
-        bankAccountIDs.forEach(bankAccountID -> {
+        BankAccessID firstBankAccessID = bankAccessIDs.get(0);
+        userDataStructure.getBankAccountIDs(firstBankAccessID).forEach(bankAccountID -> {
             LOGGER.info("found bank-AccountID:" + bankAccountID.toString());
-            URI uri = syncPath(this, bankAccessIDs.get(0),bankAccountID);
+            URI uri = syncPath(this, bankAccessIDs.get(0), bankAccountID);
             String pin = null;
             // Hello Peter, this synch is working. Then we must expect 204. 102 only happens when we
-            // Send a ynch while anotherone is still working.
+            // Send a snch while anotherone is still working.
             this.setNextExpectedStatusCode(204);
             LOGGER.info("PUT TO uri:" + uri);
-            LOGGER.info("Sync to " + bankAccountID + " " + bankAccessID);
             this.testRestTemplate.put(uri, pin);
-            
         });
 
-        List<BankAccountData> bankAccountData = loadAccessDataWith2BankAccounts(this).getBankAccounts();
-        bankAccountData.forEach(bad -> {
-            Map<String, BookingFile> bookingFiles = bad.getBookingFiles();
-            Assert.assertNotNull(bookingFiles);
-            LOGGER.info("get booking for " + bankAccessID +  " " + bad.getBankAccount().getId());
-            LOGGER.info("bookingFiles: " +  bookingFiles.toString());
-                Assert.assertFalse(bookingFiles.isEmpty());
+        UserDataStructure reloadedUserDataStructure = MB_004_BankAccessTest.loadUserDataStructure(this, location);
+        userDataStructure.getBankAccountIDs(firstBankAccessID).forEach(bankAccountID -> {
+            Optional<List<String>> bookingPeriods = reloadedUserDataStructure.getBookingPeriods(firstBankAccessID, bankAccountID);
+            Assert.assertTrue(bookingPeriods.isPresent());
         });
+    }
 
+    public static UserDataStructure accessDataWith2BankAccounts(MB_BaseTest base, URI location) {
+        UserDataStructure userDataStructure = MB_004_BankAccessTest.loadUserDataStructure(base, location);
+        Assert.assertEquals(1, userDataStructure.getBankAccessIDs().size());
+        BankAccessID bankAccessID = userDataStructure.getBankAccessIDs().get(0);
+        Assert.assertEquals(2, userDataStructure.getBankAccountIDs(bankAccessID).size());
+        return userDataStructure;
+    }
+
+    public static void syncBankAccount204(MB_BaseTest base, BankAccessID accessID, BankAccountID bankAccountID) {
+        LOGGER.info("found bank-AccountID:" + bankAccountID.toString());
+        URI uri = syncPath(base, accessID, bankAccountID);
+        base.setNextExpectedStatusCode(204);
+        LOGGER.info("PUT TO uri:" + uri);
+        String pin = null;
+        base.testRestTemplate.put(uri, pin);
     }
 
     public static URI syncPath(MB_BaseTest base, BankAccessID accessID, BankAccountID bankAccountID) {
-    	return base.path( BankAccountController.SYNC_PATH).build(accessID.getValue(), bankAccountID.getValue());
-    }
-    
-    public static BankAccessData createAccessDataWith2BankAccounts(MB_BaseTest base){
-        MB_004_BankAccessTest.createBankAccess(base, base.theBeckerTuple);
-        return loadAccessDataWith2BankAccounts(base);
-    }
-    public static BankAccessData loadAccessDataWith2BankAccounts(MB_BaseTest base){
-        UserData userData = loadUserData(base);
-        Assume.assumeNotNull(userData.getBankAccesses());
-        Assume.assumeTrue(1==userData.getBankAccesses().size());
-    	BankAccessData accessData = userData.getBankAccesses().get(0);
-    	Assume.assumeTrue(2==accessData.getBankAccounts().size());
-    	return accessData;
-    }
-    
-    public static void syncBankAccount204(MB_BaseTest base, BankAccessID accessID, BankAccountID bankAccountID){
-		LOGGER.info("found bank-AccountID:" + bankAccountID.toString());
-		URI uri = syncPath(base, accessID,bankAccountID);
-		base.setNextExpectedStatusCode(204);
-		LOGGER.info("PUT TO uri:" + uri);
-		String pin = null;
-		base.testRestTemplate.put(uri, pin );
+        return base.path(SYNC_URI).build(accessID.getValue(), bankAccountID.getValue());
     }
 }
