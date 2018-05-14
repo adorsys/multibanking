@@ -1,11 +1,12 @@
 package de.adorsys.multibanking.web;
 
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankAccountData;
+import de.adorsys.multibanking.domain.UserData;
+import de.adorsys.multibanking.web.account.BankAccessController;
+import de.adorsys.multibanking.web.base.BankLoginTuple;
+import de.adorsys.multibanking.web.base.entity.BankAccessID;
+import domain.BankAccount.SyncStatus;
 import org.adorsys.cryptoutils.exceptions.BaseExceptionHandler;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -18,21 +19,19 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountData;
-import de.adorsys.multibanking.domain.UserData;
-import de.adorsys.multibanking.web.account.BankAccessController;
-import de.adorsys.multibanking.web.base.BankLoginTuple;
-import de.adorsys.multibanking.web.base.entity.BankAccessID;
-import domain.BankAccount.SyncStatus;
+import java.net.URI;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * https://wiki.adorsys.de/display/DOC/Multibanking-Rest+Tests
  */
 @RunWith(SpringRunner.class)
-public class MB_004_BankAccess extends MB_BaseTest {
+public class MB_004_BankAccessTest extends MB_BaseTest {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(MB_004_BankAccess.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(MB_004_BankAccessTest.class);
 
 
     @Before
@@ -122,7 +121,7 @@ public class MB_004_BankAccess extends MB_BaseTest {
 
     @Test
     public void user_data_not_null_on_create_bank_access() {
-    	MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
+    	MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple);
         UserData userData = loadUserData(this);
         Assert.assertNotNull(userData);
     }
@@ -132,7 +131,7 @@ public class MB_004_BankAccess extends MB_BaseTest {
      */
     @Test
     public void bank_account_synch_status_null_on_create_bank_access() {
-    	MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
+    	MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple);
         UserData userData = loadUserData(this);
         
         Assume.assumeNotNull(userData);
@@ -148,7 +147,7 @@ public class MB_004_BankAccess extends MB_BaseTest {
      */
     @Test
     public void bank_account_last_synch_null_on_create_bank_access() {
-    	MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
+    	MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple);
         UserData userData = loadUserData(this);
         
         Assume.assumeNotNull(userData);
