@@ -8,6 +8,7 @@ import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.service.BankAccountService;
+import domain.BankAccount;
 
 public abstract class BankAccountBasedController extends BankAccessBasedController {
     private final static Logger LOGGER = LoggerFactory.getLogger(BankAccountBasedController.class);

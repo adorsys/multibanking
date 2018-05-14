@@ -30,7 +30,7 @@ public class SynchChecker {
      */
     public static void checkSynch(BankAccountData accountData){
     	// 1- Never synched
-    	if(accountData.getSynchStatusTime()==null) return;
+    	if(accountData.getSyncStatusTime()==null) return;
     	
     	// Ready: then go.
         if (accountData.getBankAccount().getSyncStatus() == BankAccount.SyncStatus.READY) return;

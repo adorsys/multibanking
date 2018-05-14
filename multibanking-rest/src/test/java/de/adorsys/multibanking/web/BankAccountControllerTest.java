@@ -62,7 +62,7 @@ public class BankAccountControllerTest extends BaseControllerUnitTest {
 		BDDMockito.when(bankAccessService.exists(bankAccessId)).thenReturn(true);
 		BDDMockito.when(bankAccountService.exists(bankAccessId, accountId)).thenReturn(true);
 		BankAccountData bankAccountData = new BankAccountData();
-		bankAccountData.setSynchStatusTime(LocalDateTime.now());
+		bankAccountData.setSyncStatusTime(LocalDateTime.now());
 		bankAccountData.setBankAccount(new BankAccountEntity());
 		bankAccountData.getBankAccount().setSyncStatus(SyncStatus.SYNC);
 		BDDMockito.when(bankAccountService.loadBankAccount(bankAccessId, accountId)).thenReturn(bankAccountData);
@@ -77,7 +77,7 @@ public class BankAccountControllerTest extends BaseControllerUnitTest {
 		BDDMockito.when(bankAccessService.exists(bankAccessId)).thenReturn(true);
 		BDDMockito.when(bankAccountService.exists(bankAccessId, accountId)).thenReturn(true);
 		BankAccountData bankAccountData = new BankAccountData();
-		bankAccountData.setSynchStatusTime(LocalDateTime.now());
+		bankAccountData.setSyncStatusTime(LocalDateTime.now());
 		bankAccountData.setBankAccount(new BankAccountEntity());
 		bankAccountData.getBankAccount().setSyncStatus(SyncStatus.READY);
 		BDDMockito.when(bankAccountService.loadBankAccount(bankAccessId, accountId)).thenReturn(bankAccountData);
