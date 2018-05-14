@@ -10,7 +10,6 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,7 +83,7 @@ public class UserDataStructure {
     public Optional<Date> getSyncStatusTime(BankAccessID bankAccessID, BankAccountID bankAccountID) {
         try {
             BankAccountWrapperJson bankAccountWrapperObject = getBankAccountWrapperObject(bankAccessID, bankAccountID);
-            String syncStatusTimeString = bankAccountWrapperObject.get().getString("synchStatusTime");
+            String syncStatusTimeString = bankAccountWrapperObject.get().getString("syncStatusTime");
             if (syncStatusTimeString == null || syncStatusTimeString.equalsIgnoreCase("null")) {
                 return Optional.empty();
             }
@@ -99,25 +98,14 @@ public class UserDataStructure {
             BankAccountWrapperJson bankAccountWrapper = getBankAccountWrapperObject(bankAccessID, bankAccountID);
             String bookingFilesString = bankAccountWrapper.get().getString("bookingFiles");
             LOGGER.info("bookingfilesstring:" + bookingFilesString);
-            JSONObject bookingFiles = bankAccountWrapper.get().getJSONObject("bookingFiles");
-            if (bookingFiles == null) {
-                return Optional.empty();
-            }
-            JSONArray names = bookingFiles.names();
-            if (names == null) {
-                LOGGER.info("names ist null");
+            JSONArray bookingFiles = bankAccountWrapper.get().getJSONArray("bookingFiles");
+            if (bookingFiles == null || bookingFiles.length() == 0) {
                 return Optional.empty();
             }
             List<String> list = new ArrayList<>();
-            if (names.length() == 0) {
-                LOGGER.info("names.length() == 0");
-            } else {
-                LOGGER.info("names.length() = " + names.length());
-            }
-            Iterator<String> keys = bookingFiles.keys();
-
-            while (keys.hasNext()) {
-                String period = keys.next();
+            for (int i = 0; i<bookingFiles.length(); i++) {
+                JSONObject bookingFile = bookingFiles.getJSONObject(i);
+                String period = bookingFile.getString("period");
                 LOGGER.info("KEY ist " + period);
                 list.add(period);
             }
