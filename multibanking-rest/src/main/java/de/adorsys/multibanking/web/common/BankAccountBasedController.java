@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.web.common;
 
-import org.adorsys.cryptoutils.exceptions.BaseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +44,7 @@ public abstract class BankAccountBasedController extends BankAccessBasedControll
     protected void checkSynch(String accessId, String accountId){
     	BankAccountData accountData = bankAccountService.loadBankAccount(accessId, accountId);
     	// 1- Never synched
-    	if(accountData.getSynchStatusTime()==null) return;
+    	if(accountData.getSyncStatusTime()==null) return;
     	
     	// Ready: then go.
         if (accountData.getBankAccount().getSyncStatus() == BankAccount.SyncStatus.READY) return;

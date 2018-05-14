@@ -1,6 +1,4 @@
-package de.adorsys.multibanking.web.base;
-
-import lombok.Data;
+package de.adorsys.multibanking.web.base.entity;
 
 /**
  * Created by peter on 07.05.18 at 08:58.

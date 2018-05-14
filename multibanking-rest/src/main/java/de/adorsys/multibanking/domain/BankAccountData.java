@@ -1,19 +1,16 @@
 package de.adorsys.multibanking.domain;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import domain.BankAccount.SyncStatus;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Holds data associated with a bank account.
@@ -26,7 +23,7 @@ public class BankAccountData {
 	
 	private BankAccountEntity bankAccount;
 	
-	private Map<String, BookingFile> bookingFiles = new HashMap<>();
+	private List<BookingFile> bookingFiles = new ArrayList<>();
 
 	private AccountSynchPref accountSynchPref;
 	
@@ -38,21 +35,26 @@ public class BankAccountData {
     
     @ApiModelProperty(value = "Time of last Synchronisation status", example="2017-12-01T12:25:44")
 	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    private LocalDateTime synchStatusTime;    
+    private LocalDateTime syncStatusTime;
     
 	public void update(Collection<BookingFile> newEntries) {
-		bookingFiles.putAll(bookingPeriodsMap(newEntries));
+		bookingFiles.addAll(newEntries);
 	}
-	
-	private static Map<String, BookingFile> bookingPeriodsMap(Collection<BookingFile> bookingFileExts){
-		return bookingFileExts.stream().collect(Collectors.toMap(BookingFile::getPeriod, Function.identity()));
-	}
-    
+
 	public void updateSyncStatus(SyncStatus syncStatus) {
 		LocalDateTime now = LocalDateTime.now();
 		bankAccount.setSyncStatus(syncStatus);
-		synchStatusTime = now;
+		syncStatusTime = now;
 		// Set status if status is being set to ready.
 		if(SyncStatus.READY==syncStatus)bankAccount.setLastSync(now);
 	}
+
+	public Boolean containsBookingFileOfPeriod(String period) {
+		return bookingFiles.stream().filter(bookingFile -> period.equals(bookingFile.getPeriod())).count() > 0;
+	}
+
+	public Optional<BookingFile> findBookingFileOfPeriod(String period) {
+		return bookingFiles.stream().filter(bookingFile -> period.equals(bookingFile.getPeriod())).findFirst();
+	}
+
 }

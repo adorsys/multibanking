@@ -2,6 +2,7 @@ package de.adorsys.multibanking.web.base;
 
 import de.adorsys.multibanking.config.service.Tp;
 import de.adorsys.multibanking.service.old.TestConstants;
+import de.adorsys.multibanking.web.base.entity.UserPasswordTuple;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

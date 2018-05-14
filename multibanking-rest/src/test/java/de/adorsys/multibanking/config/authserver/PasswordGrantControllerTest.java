@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.config.authserver;
 
-import de.adorsys.multibanking.web.base.UserPasswordTuple;
+import de.adorsys.multibanking.web.base.entity.UserPasswordTuple;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
