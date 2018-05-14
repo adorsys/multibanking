@@ -1,11 +1,8 @@
 package de.adorsys.multibanking.web;
 
-import java.net.URI;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import de.adorsys.multibanking.web.base.entity.BankAccessID;
+import de.adorsys.multibanking.web.base.entity.BankAccessStructure;
+import de.adorsys.multibanking.web.base.entity.UserDataStructure;
 import org.adorsys.cryptoutils.exceptions.BaseExceptionHandler;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -18,21 +15,19 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountData;
-import de.adorsys.multibanking.domain.UserData;
-import de.adorsys.multibanking.web.account.BankAccessController;
-import de.adorsys.multibanking.web.base.BankLoginTuple;
-import de.adorsys.multibanking.web.base.entity.BankAccessID;
-import domain.BankAccount.SyncStatus;
+import java.net.URI;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * https://wiki.adorsys.de/display/DOC/Multibanking-Rest+Tests
  */
 @RunWith(SpringRunner.class)
-public class MB_004_BankAccess extends MB_BaseTest {
+public class MB_004_BankAccessTest extends MB_BaseTest {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(MB_004_BankAccess.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(MB_004_BankAccessTest.class);
+    public static final String ACCESS_URI = "/api/v1/bankaccesses";
 
 
     @Before
@@ -47,7 +42,7 @@ public class MB_004_BankAccess extends MB_BaseTest {
 
     @Test
     public void test_2() {
-        List<BankAccessID> bankAccessIDs = loadBankAccess(this, createBankAccess(this, theBeckerTuple)).getBankAccessIDs();
+        List<BankAccessID> bankAccessIDs = loadUserDataStructure(this, createBankAccess(this, theBeckerTuple)).getBankAccessIDs();
         Assert.assertEquals(1, bankAccessIDs.size());
 
         URI deleteUri = bankAccessPath(this).pathSegment(bankAccessIDs.get(0).getValue()).build().toUri();
@@ -58,7 +53,7 @@ public class MB_004_BankAccess extends MB_BaseTest {
 
     @Test
     public void test_3() {
-        List<BankAccessID> bankAccessIDs = loadBankAccess(this, createBankAccess(this, theBeckerTuple)).getBankAccessIDs();
+        List<BankAccessID> bankAccessIDs = loadUserDataStructure(this, createBankAccess(this, theBeckerTuple)).getBankAccessIDs();
         Assert.assertEquals(1, bankAccessIDs.size());
 
         URI deleteUri = bankAccessPath(this).pathSegment(bankAccessIDs.get(0).getValue()).build().toUri();
@@ -78,7 +73,7 @@ public class MB_004_BankAccess extends MB_BaseTest {
             location = createBankAccess(this, theBeckerTuple);
         }
 
-        List<BankAccessID> bankAccessIDs = loadBankAccess(this, location).getBankAccessIDs();
+        List<BankAccessID> bankAccessIDs = loadUserDataStructure(this, location).getBankAccessIDs();
         SortedSet<String> uniqueSet = new TreeSet<>();
         bankAccessIDs.forEach(bankAccessID -> uniqueSet.add(bankAccessID.getValue()));
         Assert.assertEquals(max, uniqueSet.size());
@@ -91,15 +86,11 @@ public class MB_004_BankAccess extends MB_BaseTest {
         }
     }
 
-    public static URI createBankAccess(MB_BaseTest base, BankLoginTuple bankLogin) {
+    public static URI createBankAccess(MB_BaseTest base, BankAccessStructure bankAccessStructure) {
         try {
-            BankAccessEntity be = new BankAccessEntity();
-            be.setBankCode(bankLogin.getBankCode());
-            be.setBankLogin(bankLogin.getUserID());
-            be.setPin(bankLogin.getUserPIN());
             URI uri = bankAccessPath(base).build().toUri();
             base.setNextExpectedStatusCode(201);
-            URI location = base.testRestTemplate.postForLocation(uri, be);
+            URI location = base.testRestTemplate.postForLocation(uri, bankAccessStructure);
             Assert.assertNotNull(location);
             return location;
         } catch (Exception e) {
@@ -107,14 +98,15 @@ public class MB_004_BankAccess extends MB_BaseTest {
         }
     }
 
-    public static UserDataStructure loadBankAccess(MB_BaseTest base, URI location) {
+    public static UserDataStructure loadUserDataStructure(MB_BaseTest base, URI location) {
         try {
             base.setNextExpectedStatusCode(200);
             String userData = base.testRestTemplate.getForObject(location, String.class);
             Assert.assertNotNull(userData);
-            LOGGER.info("user data\n" + userData);
             JSONObject j = new JSONObject(userData);
-            return new UserDataStructure(j);
+            UserDataStructure userDataStructure = new UserDataStructure(j);
+            LOGGER.info(userDataStructure.toString());
+            return userDataStructure;
         } catch (Exception e) {
             throw BaseExceptionHandler.handle(e);
         }
@@ -122,9 +114,8 @@ public class MB_004_BankAccess extends MB_BaseTest {
 
     @Test
     public void user_data_not_null_on_create_bank_access() {
-    	MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
-        UserData userData = loadUserData(this);
-        Assert.assertNotNull(userData);
+        UserDataStructure userDataStructure = loadUserDataStructure(this, MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple));
+        Assert.assertNotNull(userDataStructure);
     }
 
     /**
@@ -132,14 +123,12 @@ public class MB_004_BankAccess extends MB_BaseTest {
      */
     @Test
     public void bank_account_synch_status_null_on_create_bank_access() {
-    	MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
-        UserData userData = loadUserData(this);
-        
-        Assume.assumeNotNull(userData);
-        userData.getBankAccesses().forEach(bankAccessData -> {
-        	bankAccessData.getBankAccounts().forEach(bankAccountData -> {
-        		Assert.assertNull(readSyncStatus(bankAccountData));
-        	});
+        UserDataStructure userDataStructure = loadUserDataStructure(this, MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple));
+        Assume.assumeNotNull(userDataStructure);
+        userDataStructure.getBankAccessIDs().forEach(bankAccessID -> {
+            userDataStructure.getBankAccountIDs(bankAccessID).forEach(bankAccountID -> {
+                Assert.assertFalse(userDataStructure.getSyncStatus(bankAccessID, bankAccountID).isPresent());
+            });
         });
     }
 
@@ -148,27 +137,18 @@ public class MB_004_BankAccess extends MB_BaseTest {
      */
     @Test
     public void bank_account_last_synch_null_on_create_bank_access() {
-    	MB_004_BankAccess.createBankAccess(this, theBeckerTuple);
-        UserData userData = loadUserData(this);
-        
-        Assume.assumeNotNull(userData);
-        userData.getBankAccesses().forEach(bankAccessData -> {
-        	bankAccessData.getBankAccounts().forEach(bankAccountData -> {
-        		Assert.assertNull(readLastSynch(bankAccountData));
-        	});
+        UserDataStructure userDataStructure = loadUserDataStructure(this, MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple));
+        Assume.assumeNotNull(userDataStructure);
+        userDataStructure.getBankAccessIDs().forEach(bankAccessID -> {
+            userDataStructure.getBankAccountIDs(bankAccessID).forEach(bankAccountID -> {
+                Assert.assertFalse(userDataStructure.getLastSync(bankAccessID, bankAccountID).isPresent());
+            });
         });
     }
-    
-    public static SyncStatus readSyncStatus(BankAccountData accountData) {
-    	return accountData.getBankAccount().getSyncStatus();
-	}
 
-    public static LocalDateTime readLastSynch(BankAccountData accountData) {
-    	return accountData.getBankAccount().getLastSync();
-	}
-        
+
     private static UriComponentsBuilder bankAccessPath(MB_BaseTest base) {
-        return base.path(BankAccessController.BASE_PATH);
+        return base.path(ACCESS_URI);
     }
 
 

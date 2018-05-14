@@ -15,7 +15,7 @@ import java.net.URI;
 /**
  * Created by peter on 09.05.18 at 09:55.
  */
-public class MB_003_Bank extends MB_BaseTest {
+public class MB_003_BankTest extends MB_BaseTest {
     @Before
     public void setup() throws Exception {
         super.setupBank();

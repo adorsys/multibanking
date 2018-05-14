@@ -1,9 +1,20 @@
 package de.adorsys.multibanking.web;
 
-import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.util.List;
-
+import de.adorsys.multibanking.config.mock.SimpleMockBanking;
+import de.adorsys.multibanking.config.web.WebMvcUnitTest;
+import de.adorsys.multibanking.domain.BankAccountData;
+import de.adorsys.multibanking.domain.BankAccountEntity;
+import de.adorsys.multibanking.service.BankAccessService;
+import de.adorsys.multibanking.service.BankAccountService;
+import de.adorsys.multibanking.service.BookingService;
+import de.adorsys.multibanking.utils.FQNUtils;
+import de.adorsys.multibanking.web.account.BookingController;
+import de.adorsys.multibanking.web.base.BaseControllerUnitTest;
+import domain.BankAccess;
+import domain.BankAccount;
+import domain.BankAccount.SyncStatus;
+import domain.Booking;
+import domain.LoadBookingsResponse;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.service.types.DocumentContent;
 import org.junit.After;
@@ -19,21 +30,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import de.adorsys.multibanking.config.mock.SimpleMockBanking;
-import de.adorsys.multibanking.config.web.WebMvcUnitTest;
-import de.adorsys.multibanking.domain.BankAccountData;
-import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.service.BankAccessService;
-import de.adorsys.multibanking.service.BankAccountService;
-import de.adorsys.multibanking.service.BookingService;
-import de.adorsys.multibanking.utils.FQNUtils;
-import de.adorsys.multibanking.web.account.BookingController;
-import de.adorsys.multibanking.web.base.BaseControllerUnitTest;
-import domain.BankAccess;
-import domain.BankAccount;
-import domain.Booking;
-import domain.LoadBookingsResponse;
-import domain.BankAccount.SyncStatus;
+import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @WebMvcUnitTest(controllers = BookingController.class)
 public class BookingControllerTest extends BaseControllerUnitTest {
@@ -81,7 +80,7 @@ public class BookingControllerTest extends BaseControllerUnitTest {
 		BDDMockito.when(bankAccessService.exists(bankAccessId)).thenReturn(true);
 		BDDMockito.when(bankAccountService.exists(bankAccessId, accountId)).thenReturn(true);
 		BankAccountData bankAccountData = new BankAccountData();
-		bankAccountData.setSynchStatusTime(LocalDateTime.now());
+		bankAccountData.setSyncStatusTime(LocalDateTime.now());
 		bankAccountData.setBankAccount(new BankAccountEntity());
 		bankAccountData.getBankAccount().setSyncStatus(SyncStatus.READY);
 		BDDMockito.when(bankAccountService.loadBankAccount(bankAccessId, accountId)).thenReturn(bankAccountData);
@@ -118,7 +117,7 @@ public class BookingControllerTest extends BaseControllerUnitTest {
 		BDDMockito.when(bankAccessService.exists(bankAccessId)).thenReturn(true);
 		BDDMockito.when(bankAccountService.exists(bankAccessId, accountId)).thenReturn(true);
 		BankAccountData bankAccountData = new BankAccountData();
-		bankAccountData.setSynchStatusTime(LocalDateTime.now());
+		bankAccountData.setSyncStatusTime(LocalDateTime.now());
 		bankAccountData.setBankAccount(new BankAccountEntity());
 		bankAccountData.getBankAccount().setSyncStatus(SyncStatus.SYNC);
 		BDDMockito.when(bankAccountService.loadBankAccount(bankAccessId, accountId)).thenReturn(bankAccountData);
