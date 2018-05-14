@@ -13,3 +13,4 @@ multibanking-app/.history
 *.log.gz
 *.log
 
+pom.xml.versionsBackup

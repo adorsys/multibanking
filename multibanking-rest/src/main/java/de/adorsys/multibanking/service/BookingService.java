@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -25,7 +26,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import de.adorsys.multibanking.domain.AccountSynchPref;
 import de.adorsys.multibanking.domain.AnonymizedBookingEntity;
+import de.adorsys.multibanking.domain.BankAccessData;
 import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.BookingEntity;
@@ -33,8 +36,6 @@ import de.adorsys.multibanking.domain.BookingFile;
 import de.adorsys.multibanking.domain.UserData;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.UnexistentBookingFileException;
-import de.adorsys.multibanking.domain.BankAccessData;
-import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.AnonymizationService;
 import de.adorsys.multibanking.service.analytics.CategoriesProvider;
@@ -100,7 +101,7 @@ public class BookingService {
     public DSDocument getBookings(String accessId, String accountId, String period) {
     	BankAccountData bankAccountData = uds.load().bankAccountDataOrException(accessId, accountId);
     	DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId,accountId,period);
-    	if(!bankAccountData.getBookingFiles().containsKey(period))
+    	if(!bankAccountData.containsBookingFileOfPeriod(period))
     		throw new UnexistentBookingFileException(bookingFQN.getValue());
         return uos.loadDocument(bookingFQN);
     }
@@ -196,9 +197,9 @@ public class BookingService {
 
 	private List<BookingEntity> loadAllBookings(UserData userData, String accessId, String accountId) {
         BankAccountData bankAccountData = userData.bankAccountDataOrException(accessId, accountId);
-        Map<String, BookingFile> bookingFiles = bankAccountData.getBookingFiles();
+        List<BookingFile> bookingFiles = bankAccountData.getBookingFiles();
         List<BookingEntity> result = new ArrayList<>();
-		bookingFiles.values().forEach(bookingFile -> {
+		bookingFiles.forEach(bookingFile -> {
         	String period = bookingFile.getPeriod();
         	if(bookingFile.getNumberOfRecords()>0){
     			DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId, accountId,period);
@@ -282,7 +283,7 @@ public class BookingService {
     	Map<String, List<BookingEntity>> processBookingPeriods = new HashMap<>();
     	String accessId = bankAccountData.getBankAccount().getBankAccessId();
     	String accountId = bankAccountData.getBankAccount().getId();
-        Map<String, BookingFile> bookingFileMap = bankAccountData.getBookingFiles();
+        List<BookingFile> bookingFiles = bankAccountData.getBookingFiles();
         Set<Entry<String,List<BookingEntity>>> entrySet = bookings.entrySet();
         for (Entry<String, List<BookingEntity>> entry : entrySet) {
         	List<BookingEntity> bookingEntities = entry.getValue();
@@ -308,14 +309,15 @@ public class BookingService {
             bookingEntities = mergeBookings(existingBookings,bookingEntities);
 
             // Store meta data
-            BookingFile bookingFile = bookingFileMap.get(period);
-            if(bookingFile==null){
-            	bookingFile = new BookingFile();
-            	bookingFile.setPeriod(period);
-            	bookingFile.setLastUpdate(LocalDateTime.now());
-            	bankAccountData.update(Collections.singletonList(bookingFile));
+            Optional<BookingFile> bookingFile = bankAccountData.findBookingFileOfPeriod(period);
+
+            if(!bookingFile.isPresent()){
+            	bookingFile = Optional.of(new BookingFile());
+            	bookingFile.get().setPeriod(period);
+            	bookingFile.get().setLastUpdate(LocalDateTime.now());
+            	bankAccountData.update(Collections.singletonList(bookingFile.get()));
             }
-            bookingFile.setNumberOfRecords(bookingEntities.size());
+            bookingFile.get().setNumberOfRecords(bookingEntities.size());
 
             // Sort and store bookings
             Collections.sort(bookingEntities, (o1, o2) -> o2.getBookingDate().compareTo(o1.getBookingDate()));
