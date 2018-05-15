@@ -1,15 +1,17 @@
 package de.adorsys.multibanking.loader;
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import de.adorsys.multibanking.mock.loader.BankAccesLoader;
+import de.adorsys.multibanking.mock.loader.BankAccountLoader;
+import de.adorsys.multibanking.mock.loader.BookingLoader;
+import de.adorsys.multibanking.mock.loader.DataSheetLoader;
+import de.adorsys.multibanking.mock.loader.MockBankCatalogue;
+import de.adorsys.multibanking.mock.loader.StandingOrderLoader;
 import de.adorsys.multibanking.test.base.BaseTest;
-import domain.Booking;
-import domain.StandingOrder;
 
 public class DataSheetLoaderTest extends BaseTest {
 
@@ -27,26 +29,14 @@ public class DataSheetLoaderTest extends BaseTest {
 		dataSheetLoader.loadDataSheet(dataStream);
 		
 		String bankLogin = "m.becker";
-		Assert.assertEquals(1, data.getBankAccessMapByBankCode(bankLogin).size());
-		Assert.assertEquals(2, data.getBankAccountMap(bankLogin).size());
-		
-		Assert.assertEquals(2, data.getBookingMap(bankLogin).size());
+		Assert.assertTrue(data.access(bankLogin).isPresent());
+		Assert.assertEquals(2, data.accessOrException(bankLogin).countAccounts());
+		Assert.assertTrue(data.accessOrException(bankLogin).accountData("DE81199999993528307800").isPresent());
+		Assert.assertEquals(62, data.accessOrException(bankLogin).accountDataOrException("DE81199999993528307800").bookings().size());
+		Assert.assertEquals(7, data.accessOrException(bankLogin).accountDataOrException("DE12199999994076397393").bookings().size());
 
-		List<Booking> bookings1 = data.getBookingMap(bankLogin).get("DE81199999993528307800");
-		Assert.assertNotNull(bookings1);
-		Assert.assertEquals(62, bookings1.size());
-		List<Booking> bookings2 = data.getBookingMap(bankLogin).get("DE12199999994076397393");
-		Assert.assertNotNull(bookings2);
-		Assert.assertEquals(7, bookings2.size());
-
-		Assert.assertEquals(2, data.getStandingOrderMap(bankLogin).size());
-		
-		Map<String, StandingOrder> standingOrder1 = data.getStandingOrderMap(bankLogin).get("DE81199999993528307800");
-		Assert.assertNotNull(standingOrder1);
-		Assert.assertEquals(5, standingOrder1.size());
-		Map<String, StandingOrder> standingOrder2 = data.getStandingOrderMap(bankLogin).get("DE12199999994076397393");
-		Assert.assertNotNull(standingOrder2);
-		Assert.assertEquals(1, standingOrder2.size());
+		Assert.assertEquals(5, data.accessOrException(bankLogin).accountDataOrException("DE81199999993528307800").standingOrders().size());
+		Assert.assertEquals(1, data.accessOrException(bankLogin).accountDataOrException("DE12199999994076397393").standingOrders().size());
 	}
 
 }
