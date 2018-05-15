@@ -88,6 +88,7 @@ public class FigoMapping {
         bankAccount.setCurrency(transaction.getCurrency());
         bankAccount.setAccountNumber(transaction.getAccountNumber());
         bankAccount.setBlz(transaction.getBankCode());
+        bankAccount.setIban(Utils.extractIban(transaction.getPurposeText()));
         return bankAccount;
     }
 

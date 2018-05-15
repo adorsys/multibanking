@@ -14,6 +14,9 @@ public class Utils {
     private static Pattern creditorIdRegex = Pattern.compile("([deDE]{2}[0-9]{2,2}[A-Za-z0-9]{3,3}[0]{1}[0-9]{10})",
             Pattern.CASE_INSENSITIVE);
 
+    private static Pattern ibanRegex = Pattern.compile("([A-Z]{2}\\d{2} ?\\d{4} ?\\d{4} ?\\d{4} ?\\d{4} ?[\\d]{0,2})",
+            Pattern.CASE_INSENSITIVE);
+
     private static Pattern mandateReferenceRegex =
             Pattern.compile("(?:mref|mandatsreferenz|mandatsref|mandat)[:\\+]?\\s*(\\S+?)(?:\\s+|\\+|CRED|MANDATSDATUM|EINREICHER-ID)", Pattern.CASE_INSENSITIVE);
 
@@ -25,6 +28,17 @@ public class Utils {
         Matcher matcher = creditorIdRegex.matcher(input);
         if (matcher.find()) {
             return matcher.group(0);
+        }
+        return null;
+    }
+
+    public static String extractIban(String input) {
+        if (input == null) {
+            return null;
+        }
+        Matcher matcher = ibanRegex.matcher(input);
+        if (matcher.find()) {
+            return matcher.group(0).toUpperCase();
         }
         return null;
     }

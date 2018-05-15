@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static utils.Utils.extractIban;
+
 /**
  * Created by alexg on 08.02.17.
  */
@@ -150,6 +152,10 @@ public final class HbciMapping {
                 // in 27-Zeichen lange Haeppchen
                 booking.setUsage(
                         getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line.additional, 27)));
+
+                if (StringUtils.isBlank(booking.getOtherAccount().getIban())) {
+                    booking.getOtherAccount().setIban(extractIban(booking.getUsage()));
+                }
 
                 bookings.add(0, booking);
             }
