@@ -104,7 +104,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Primary
     @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
     public UserContext getUserContext(HttpServletRequest request){
-        LOGGER.info("************************************** Enter getUserContext");
+        LOGGER.debug("************************************** Enter getUserContext");
     	UserContext userContext = new UserContext();
 
     	String userId = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -121,8 +121,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	        }
         }
 
-        LOGGER.info("userContext ist " + userContext.getAuth().getUserID().getValue());
-        LOGGER.info("************************************** Exit getUserContext");
+        LOGGER.debug("userContext ist " + userContext.getAuth().getUserID().getValue());
+        LOGGER.debug("************************************** Exit getUserContext");
 
         return userContext;
     }

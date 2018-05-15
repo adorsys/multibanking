@@ -58,7 +58,7 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
         // Do not synch second bank account.
         // Reload account data
         userDataStructure = accessDataWith2BankAccounts(this, location);
-        LOGGER.info("nach dem sync " + userDataStructure.toString());
+        LOGGER.debug("nach dem sync " + userDataStructure.toString());
         // Assert synch data0 set
         Assert.assertEquals("READY", userDataStructure.getSyncStatus(firstBankAccessID, firstBankAccountID).get().getValue());
         Assert.assertTrue(userDataStructure.getLastSync(firstBankAccessID, firstBankAccountID).isPresent());
@@ -77,13 +77,13 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
         List<BankAccessID> bankAccessIDs = userDataStructure.getBankAccessIDs();
         BankAccessID firstBankAccessID = bankAccessIDs.get(0);
         userDataStructure.getBankAccountIDs(firstBankAccessID).forEach(bankAccountID -> {
-            LOGGER.info("found bank-AccountID:" + bankAccountID.toString());
+            LOGGER.debug("found bank-AccountID:" + bankAccountID.toString());
             URI uri = syncPath(this, bankAccessIDs.get(0), bankAccountID);
             String pin = "12345";
             // Hello Peter, this synch is working. Then we must expect 204. 102 only happens when we
             // Send a snch while anotherone is still working.
             this.setNextExpectedStatusCode(204);
-            LOGGER.info("PUT TO uri:" + uri);
+            LOGGER.debug("PUT TO uri:" + uri);
             this.testRestTemplate.put(uri, pin);
         });
 
@@ -107,7 +107,7 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
             URI uri = syncPath(this, bankAccessIDs.get(0),bankAccountID);
             String pin = "1234567";
             this.setNextExpectedStatusCode(403);
-            LOGGER.info("PUT TO uri:" + uri);
+            LOGGER.debug("PUT TO uri:" + uri);
             this.testRestTemplate.put(uri, pin);
         });
     }
@@ -121,10 +121,10 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
     }
 
     public static void syncBankAccount204(MB_BaseTest base, BankAccessID accessID, BankAccountID bankAccountID) {
-        LOGGER.info("found bank-AccountID:" + bankAccountID.toString());
+        LOGGER.debug("found bank-AccountID:" + bankAccountID.toString());
         URI uri = syncPath(base, accessID, bankAccountID);
         base.setNextExpectedStatusCode(204);
-        LOGGER.info("PUT TO uri:" + uri);
+        LOGGER.debug("PUT TO uri:" + uri);
         String pin = "12345";
         base.testRestTemplate.put(uri, pin);
     }

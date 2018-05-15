@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.UserID;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
@@ -19,6 +18,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -40,6 +41,7 @@ import de.adorsys.multibanking.utils.PrintMap;
 		Tp.p13,Tp.p14,Tp.p15,Tp.p16,Tp.p17,Tp.p18,Tp.p19,Tp.p20,Tp.p21,Tp.p22,Tp.p23,
 		Tp.p24,Tp.p25,Tp.p26,Tp.p27,Tp.p28,Tp.p29,Tp.p30,Tp.p31,Tp.p32,Tp.p33,Tp.p34,Tp.p35,Tp.p36,Tp.p37  })
 public abstract class BaseServiceTest {
+    private final static Logger LOGGER = LoggerFactory.getLogger(BaseServiceTest.class);
 
 	@Autowired
     protected UserDataService uds;
@@ -68,7 +70,7 @@ public abstract class BaseServiceTest {
     
     @AfterClass
     public static void afterClass(){
-    	System.out.println(PrintMap.print(rcMap));
+    	LOGGER.debug(PrintMap.print(rcMap));
     }
     
     protected void auth(String userId, String password){
@@ -88,7 +90,7 @@ public abstract class BaseServiceTest {
     	randomAuthAndUser(null);
     }
     protected void randomAuthAndUser(Date expire){
-    	auth(randomUserId(), randomPassword());
+    	auth(randomUserId(), allwaysTheSamePassword());
     	uds.createUser(expire);
     }
     
@@ -127,7 +129,9 @@ public abstract class BaseServiceTest {
     private final String randomUserId(){
     	return Ids.uuid();
     }
-    private final String randomPassword(){
-    	return Ids.uuid();
+
+    private final String allwaysTheSamePassword(){
+        return "same-password-all-the-time";
+//    	return Ids.uuid();
     }
 }

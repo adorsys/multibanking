@@ -58,7 +58,7 @@ public abstract class BaseControllerIT {
      * @return baseUri String
      */
     protected String getBaseUri() {
-        LOGGER.info("== Test Port ist " + port + "==");
+        LOGGER.debug("== Test Port ist " + port + "==");
         return "http://localhost:" + port;
     }
 
@@ -108,7 +108,7 @@ public abstract class BaseControllerIT {
         @Override
         public ClientHttpResponse intercept(HttpRequest request, byte[] bytes, ClientHttpRequestExecution execution) throws IOException {
             ClientHttpResponse response = execution.execute(request, bytes);
-            LOGGER.info("statusCode for " + request.getURI().toString() + " is:" + response.getStatusCode());
+            LOGGER.debug("statusCode for " + request.getURI().toString() + " is:" + response.getStatusCode());
             if (expectedStatusCodes == null) {
                 return response;
             }
