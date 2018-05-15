@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.utils;
+package de.adorsys.multibanking.mock.utils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-import de.adorsys.multibanking.exception.InvalidRowException;
+import de.adorsys.multibanking.mock.exception.InvalidRowException;
 
 public class CellUtils {
 	public static String stringCell(Row row, int index, boolean optional) {

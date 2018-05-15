@@ -9,7 +9,7 @@ import de.adorsys.multibanking.exception.base.ParametrizedMessageException;
 import java.text.MessageFormat;
 
 @ResponseStatus(
-        value = HttpStatus.BAD_REQUEST,
+        value = HttpStatus.FORBIDDEN,
         reason = "INVALID_PIN"
 )
 public class InvalidPinException extends ParametrizedMessageException {

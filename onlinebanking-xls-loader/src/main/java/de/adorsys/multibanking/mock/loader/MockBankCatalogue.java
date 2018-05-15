@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.loader;
+package de.adorsys.multibanking.mock.loader;
 
 import java.util.Collections;
 import java.util.List;

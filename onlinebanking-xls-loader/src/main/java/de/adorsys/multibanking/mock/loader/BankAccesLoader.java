@@ -1,12 +1,12 @@
-package de.adorsys.multibanking.loader;
+package de.adorsys.multibanking.mock.loader;
 
-import static de.adorsys.multibanking.utils.CellUtils.stringCell;
-import static de.adorsys.multibanking.utils.CellUtils.stringFromNumCell;
+import static de.adorsys.multibanking.mock.utils.CellUtils.stringCell;
+import static de.adorsys.multibanking.mock.utils.CellUtils.stringFromNumCell;
 
 import org.apache.poi.ss.usermodel.Row;
 
-import de.adorsys.multibanking.exception.DuplicatedResourceException;
-import de.adorsys.multibanking.service.XLSBankAccessService;
+import de.adorsys.multibanking.mock.exception.DuplicatedResourceException;
+import de.adorsys.multibanking.mock.service.XLSBankAccessService;
 import domain.BankAccess;
 
 public class BankAccesLoader {

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
-import de.adorsys.multibanking.exception.SyncInProgressException;
 import de.adorsys.multibanking.service.BankAccountService;
 import domain.BankAccount;
 
@@ -43,19 +42,6 @@ public abstract class BankAccountBasedController extends BankAccessBasedControll
      */
     protected void checkSynch(String accessId, String accountId){
     	BankAccountData accountData = bankAccountService.loadBankAccount(accessId, accountId);
-    	// 1- Never synched
-    	if(accountData.getSyncStatusTime()==null) return;
-    	
-    	// Ready: then go.
-        if (accountData.getBankAccount().getSyncStatus() == BankAccount.SyncStatus.READY) return;
-        
-        // Pending: then 102
-        if (accountData.getBankAccount().getSyncStatus() == BankAccount.SyncStatus.SYNC)
-        	throw new SyncInProgressException(accessId, accountId);
-        
-        // TODO: When do we need the pending status
-        if (accountData.getBankAccount().getSyncStatus() == BankAccount.SyncStatus.PENDING){
-        	LOGGER.warn("The synch status pending is not expected in this application. We will allow synch to go on.");
-        }
+    	SynchChecker.checkSynch(accountData);
     }
 }

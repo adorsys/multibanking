@@ -3,8 +3,13 @@ package de.adorsys.multibanking.domain;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import de.adorsys.multibanking.domain.BankAccessData;
+import de.adorsys.multibanking.domain.BankAccountData;
 import lombok.Data;
 
 /**
@@ -20,40 +25,29 @@ public class UserData {
     private AccountSynchPref accountSynchPref;
 
     public Optional<BankAccessData> getBankAccess(String accessId) {
-        for (BankAccessData d : bankAccesses) {
-            if (d.getBankAccess().getId().equals(accessId)) {
-                return Optional.of(d);
-            }
-        }
-        return Optional.empty();
+    	return bankAccesses.stream().filter(b -> StringUtils.equals(accessId, b.getBankAccess().getId())).findFirst();
     }
 
-    public BankAccessData bankAccessData(String accessId) {
+    public BankAccessData bankAccessDataOrException(String accessId) {
         return getBankAccess(accessId).orElseThrow(() -> new ResourceNotFoundException(BankAccessData.class, accessId));
     }
 
-    public BankAccountData bankAccountData(String accessId, String accountId) {
-        return bankAccessData(accessId)
+    public BankAccountData bankAccountDataOrException(String accessId, String accountId) {
+        return bankAccessDataOrException(accessId)
         .getBankAccount(accountId).orElseThrow(() -> new ResourceNotFoundException(BankAccountData.class, accessId));
     }
 
     public BankAccessData remove(String accessId) {
-        for (BankAccessData d : bankAccesses) {
-            if (d.getBankAccess().getId().equals(accessId)) {
-                bankAccesses.remove(d);
-                return d;
-            }
-        }
-        return null;
+    	List<BankAccessData> candidates = bankAccesses.stream()
+    			.filter(b -> StringUtils.equals(accessId, b.getBankAccess().getId()))
+    			.collect(Collectors.<BankAccessData> toList());
+    	if(candidates.isEmpty()) return null;
+    	bankAccesses.removeAll(candidates);
+    	return candidates.iterator().next();
     }
 
     public boolean containsKey(String accessId) {
-        for (BankAccessData d : bankAccesses) {
-            if (d.getBankAccess().getId().equals(accessId)) {
-                return true;
-            }
-        }
-        return false;
+    	return getBankAccess(accessId).isPresent();
     }
 
     public void put(String id, BankAccessData b) {
@@ -62,6 +56,6 @@ public class UserData {
     }
 
     public BankAccessData get(String accessId) {
-        return getBankAccess(accessId).get();
+        return getBankAccess(accessId).orElse(null);
     }
 }
