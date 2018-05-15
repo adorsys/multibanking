@@ -103,15 +103,6 @@
             <version>${docusafe.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>de.adorsys.cryptoutils</groupId>
-            <artifactId>encobject</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>de.adorsys.cryptoutils</groupId>
-            <artifactId>jjwk</artifactId>
-        </dependency>
-
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
