@@ -40,14 +40,14 @@
 
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="${pattern}"/>
-            <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            <ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/>
         </Console>
     </Appenders>
 
     <Loggers>
-        <Logger name="org.adorsys" level="debug"/>
-        <Logger name="de.adorsys" level="debug"/>
-        <Root level="info">
+        <Logger name="org.adorsys" level="warn"/>
+        <Logger name="de.adorsys" level="warn"/>
+        <Root level="warn">
             <AppenderRef ref="async"/>
             <AppenderRef ref="STDOUT"/>
             <!--
