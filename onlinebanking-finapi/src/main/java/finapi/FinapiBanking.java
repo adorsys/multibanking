@@ -194,6 +194,7 @@ public class FinapiBanking implements OnlineBankingService {
                                 booking.setOtherAccount(new BankAccount());
                                 booking.getOtherAccount().setName(transaction.getCounterpartName());
                                 booking.getOtherAccount().setAccountNumber(transaction.getCounterpartAccountNumber());
+                                booking.getOtherAccount().setIban(Utils.extractIban(transaction.getPurpose()));
                             }
 
                             if (transaction.getCategory() != null) {

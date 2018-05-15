@@ -9,7 +9,7 @@ import lombok.Data;
 public class Rule {
 
     public enum SIMILARITY_MATCH_TYPE {
-        MANDATE_REFERENCE, REFERENCE_NAME, PURPOSE
+        IBAN, REFERENCE_NAME, PURPOSE
     }
 
     private String ruleId;
