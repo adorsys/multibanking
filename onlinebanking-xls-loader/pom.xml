@@ -22,10 +22,6 @@
 			<version>${project.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>commons-beanutils</groupId>
-			<artifactId>commons-beanutils-core</artifactId>
-		</dependency>
         <!-- jackson buggy 2.8.x version https://github.com/FasterXML/jackson-databind/issues/1595 -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
