@@ -79,7 +79,7 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
         userDataStructure.getBankAccountIDs(firstBankAccessID).forEach(bankAccountID -> {
             LOGGER.info("found bank-AccountID:" + bankAccountID.toString());
             URI uri = syncPath(this, bankAccessIDs.get(0), bankAccountID);
-            String pin = null;
+            String pin = "12345";
             // Hello Peter, this synch is working. Then we must expect 204. 102 only happens when we
             // Send a snch while anotherone is still working.
             this.setNextExpectedStatusCode(204);
@@ -95,6 +95,23 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
         });
     }
 
+    @Test
+    public void test_synch_bank_accounts_wrong_pin_shall_return_403() {
+        URI location = MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple);
+        UserDataStructure userDataStructure = MB_004_BankAccessTest.loadUserDataStructure(this, location);
+        List<BankAccessID> bankAccessIDs = userDataStructure.getBankAccessIDs();
+        Assert.assertEquals(1, bankAccessIDs.size());
+        List<BankAccountID> bankAccountIDs = userDataStructure.getBankAccountIDs(bankAccessIDs.get(0));
+        Assert.assertEquals(2, bankAccountIDs.size());
+        bankAccountIDs.forEach(bankAccountID -> {
+            URI uri = syncPath(this, bankAccessIDs.get(0),bankAccountID);
+            String pin = "1234567";
+            this.setNextExpectedStatusCode(403);
+            LOGGER.info("PUT TO uri:" + uri);
+            this.testRestTemplate.put(uri, pin);
+        });
+    }
+    
     public static UserDataStructure accessDataWith2BankAccounts(MB_BaseTest base, URI location) {
         UserDataStructure userDataStructure = MB_004_BankAccessTest.loadUserDataStructure(base, location);
         Assert.assertEquals(1, userDataStructure.getBankAccessIDs().size());
@@ -108,7 +125,7 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
         URI uri = syncPath(base, accessID, bankAccountID);
         base.setNextExpectedStatusCode(204);
         LOGGER.info("PUT TO uri:" + uri);
-        String pin = null;
+        String pin = "12345";
         base.testRestTemplate.put(uri, pin);
     }
 

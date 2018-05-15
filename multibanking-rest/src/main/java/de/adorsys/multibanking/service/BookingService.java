@@ -1,6 +1,29 @@
 package de.adorsys.multibanking.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import org.adorsys.docusafe.business.types.complex.DSDocument;
+import org.adorsys.docusafe.business.types.complex.DocumentFQN;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import de.adorsys.multibanking.domain.AccountSynchPref;
 import de.adorsys.multibanking.domain.AnonymizedBookingEntity;
 import de.adorsys.multibanking.domain.BankAccessData;
@@ -22,6 +45,7 @@ import de.adorsys.multibanking.service.base.UserObjectService;
 import de.adorsys.multibanking.service.helper.BookingHelper;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.FQNUtils;
+import de.adorsys.multibanking.utils.Ids;
 import de.adorsys.smartanalytics.api.AnalyticsResult;
 import domain.BankAccount;
 import domain.BankApi;
@@ -30,28 +54,8 @@ import domain.Booking;
 import domain.LoadBookingsResponse;
 import domain.StandingOrder;
 import exception.InvalidPinException;
-import org.adorsys.docusafe.business.types.complex.DSDocument;
-import org.adorsys.docusafe.business.types.complex.DocumentFQN;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import spi.OnlineBankingService;
 import utils.Utils;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -95,11 +99,15 @@ public class BookingService {
      * @return
      */
     public DSDocument getBookings(String accessId, String accountId, String period) {
-    	BankAccountData bankAccountData = uds.load().bankAccountData(accessId, accountId);
+    	BankAccountData bankAccountData = uds.load().bankAccountDataOrException(accessId, accountId);
     	DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId,accountId,period);
     	if(!bankAccountData.containsBookingFileOfPeriod(period))
     		throw new UnexistentBookingFileException(bookingFQN.getValue());
         return uos.loadDocument(bookingFQN);
+    }
+    
+    public List<BookingEntity> getAllBookingsAlList(String accessId, String accountId){
+    	return loadAllBookings(uds.load(), accessId, accountId);
     }
 
     /**
@@ -113,13 +121,13 @@ public class BookingService {
      */
     public void syncBookings(String accessId, String accountId, BankApi bankApi, String pin) {
     	UserData userData = uds.load();
-    	BankAccountData bankAccountData = userData.bankAccountData(accessId, accountId);
+    	BankAccountData bankAccountData = userData.bankAccountDataOrException(accessId, accountId);
     	// Set the synch status and flush
     	bankAccountData.updateSyncStatus(BankAccount.SyncStatus.SYNC);
         uos.flush();
 
         // Reload
-        BankAccessEntity bankAccess = userData.bankAccessData(accessId).getBankAccess();
+        BankAccessEntity bankAccess = userData.bankAccessDataOrException(accessId).getBankAccess();
         BankAccountEntity bankAccount = bankAccountData.getBankAccount();
         LoadBookingsResponse response = loadBookingsOnline(bankApi, bankAccess, bankAccount, pin);
 
@@ -148,7 +156,7 @@ public class BookingService {
         // Processed booking periods. Used for anonymization
         // Check with alex if we can use this for analytics. 
         // I don't think we need to reload all bookings of a user for analytics.
-        BankAccountData bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
+        BankAccountData bankAccountData = userData.bankAccountDataOrException(bankAccess.getId(), bankAccount.getId());
         Map<String, List<BookingEntity>> processBookingPeriods = storeBookings(bankAccountData, response.getStandingOrders(), bankAccess.isStoreBookings(), bookings);
         
         bankAccountService.saveStandingOrders(bankAccount, response.getStandingOrders());
@@ -156,8 +164,8 @@ public class BookingService {
         uos.flush();
         
         if (bankAccess.isCategorizeBookings() || bankAccess.isStoreAnalytics()) {
-            bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
-        	List<BookingEntity> bookingEntities = loadAllBookings(userData, bankAccess, bankAccount);
+            bankAccountData = userData.bankAccountDataOrException(bankAccess.getId(), bankAccount.getId());
+        	List<BookingEntity> bookingEntities = loadAllBookings(userData, bankAccess.getId(), bankAccount.getId());
             LocalDate analyticsDate = LocalDate.now();
             // TODO. I don't like this smartanalytic that takes all booking.
             // Check for an API for incremental loading of bookings.
@@ -187,14 +195,14 @@ public class BookingService {
         }
     }
 
-	private List<BookingEntity> loadAllBookings(UserData userData, BankAccessEntity bankAccess, BankAccountEntity bankAccount) {
-        BankAccountData bankAccountData = userData.bankAccountData(bankAccess.getId(), bankAccount.getId());
+	private List<BookingEntity> loadAllBookings(UserData userData, String accessId, String accountId) {
+        BankAccountData bankAccountData = userData.bankAccountDataOrException(accessId, accountId);
         List<BookingFile> bookingFiles = bankAccountData.getBookingFiles();
         List<BookingEntity> result = new ArrayList<>();
 		bookingFiles.forEach(bookingFile -> {
         	String period = bookingFile.getPeriod();
         	if(bookingFile.getNumberOfRecords()>0){
-    			DocumentFQN bookingFQN = FQNUtils.bookingFQN(bankAccess.getId(),bankAccount.getId(),period);
+    			DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId, accountId,period);
     			List<BookingEntity> existingBookings = uos.load(bookingFQN, listType()).orElse(new ArrayList<>());
         		result .addAll(existingBookings);
         	}
@@ -215,7 +223,11 @@ public class BookingService {
             response.setOnlineBankingService(onlineBankingService);
             return response;
         } catch (InvalidPinException e) {
-        	credentialService.setInvalidPin(bankAccess.getId());
+        	try {
+        		credentialService.setInvalidPin(bankAccess.getId());
+        	} catch(Exception ex){
+        		// Noop
+        	}
             throw new de.adorsys.multibanking.exception.InvalidPinException(bankAccess.getId());
         }
     }
@@ -249,7 +261,7 @@ public class BookingService {
             String blzHbci = bankService.findByBankCode(bankAccess.getBankCode())
                     .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode())).getBlzHbci();
             List<BankAccount> apiBankAccounts = onlineBankingService.loadBankAccounts(bankApiUser, bankAccess, blzHbci, pin, bankAccess.isStorePin());
-            BankAccessData bankAccessData = userData.bankAccessData(bankAccess.getId());
+            BankAccessData bankAccessData = userData.bankAccessDataOrException(bankAccess.getId());
 	        List<BankAccountData> dbBankAccounts = bankAccessData.getBankAccounts();
             apiBankAccounts.forEach(apiBankAccount -> {
                 dbBankAccounts.forEach(dbBankAccountData -> {
@@ -311,6 +323,9 @@ public class BookingService {
             Collections.sort(bookingEntities, (o1, o2) -> o2.getBookingDate().compareTo(o1.getBookingDate()));
             processBookingPeriods.put(period, bookingEntities);
             if (persist) {
+            	bookingEntities.forEach(b -> {
+            		if(StringUtils.isBlank(b.getId()))b.setId(Ids.uuid());
+            	});
             	uos.store(bookingFQN, listType(), bookingEntities);
             }
 		}

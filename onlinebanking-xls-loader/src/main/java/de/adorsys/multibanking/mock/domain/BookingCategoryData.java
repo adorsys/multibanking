@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.mock.domain;
 
 import java.util.List;
 

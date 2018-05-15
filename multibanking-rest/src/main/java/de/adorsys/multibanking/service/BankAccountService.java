@@ -16,9 +16,7 @@ import org.springframework.stereotype.Service;
 import de.adorsys.multibanking.domain.AccountAnalyticsEntity;
 import de.adorsys.multibanking.domain.AccountSynchPref;
 import de.adorsys.multibanking.domain.BankAccessCredentials;
-import de.adorsys.multibanking.domain.BankAccessData;
 import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.ContractEntity;
@@ -27,10 +25,11 @@ import de.adorsys.multibanking.domain.UserData;
 import de.adorsys.multibanking.exception.BankAccessAlreadyExistException;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import de.adorsys.multibanking.domain.BankAccessData;
+import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.Ids;
 import domain.BankAccount;
-import domain.BankAccount.SyncStatus;
 import domain.BankApi;
 import domain.BankApiUser;
 import domain.StandingOrder;
@@ -56,7 +55,7 @@ public class BankAccountService {
             throw new InvalidBankAccessException(bankAccess.getBankCode());
         }
         UserData userData = uds.load();
-        BankAccessData bankAccessData = userData.bankAccessData(bankAccess.getId());
+        BankAccessData bankAccessData = userData.bankAccessDataOrException(bankAccess.getId());
         //Map<String, BankAccountData> bankAccountDataMap = bankAccessData.getBankAccounts();
         List<BankAccountData> bankAccountData = bankAccessData.getBankAccounts();
         bankAccounts.forEach(account -> {
@@ -111,7 +110,7 @@ public class BankAccountService {
 
 	public BankAccountData loadBankAccount(String accessId, String accountId) {
 		UserData userData = uds.load();
-		return userData.bankAccountData(accessId, accountId);
+		return userData.bankAccountDataOrException(accessId, accountId);
 	}
     
 	/**
@@ -122,21 +121,21 @@ public class BankAccountService {
 	 */
 	public void saveBankAccount(BankAccountEntity in){
 		UserData userData = uds.load();
-		userData.bankAccountData(in.getBankAccessId(), in.getId()).setBankAccount(in);
+		userData.bankAccountDataOrException(in.getBankAccessId(), in.getId()).setBankAccount(in);
 		uds.store(userData);
 	}
 
 	public void saveBankAccounts(String accessId, List<BankAccountEntity> accounts){
 		UserData userData = uds.load();
 		for (BankAccountEntity in : accounts) {
-			userData.bankAccountData(in.getBankAccessId(), in.getId()).setBankAccount(in);
+			userData.bankAccountDataOrException(in.getBankAccessId(), in.getId()).setBankAccount(in);
 		}
 		uds.store(userData);
 	}
 
 	public boolean exists(String accessId, String accountId) {
 		UserData userData = uds.load();
-		return userData.bankAccessData(accessId).containsKey(accountId);
+		return userData.bankAccessDataOrException(accessId).containsKey(accountId);
 	}
 
 //	public SyncStatus getSyncStatus(String accessId, String accountId) {
@@ -145,20 +144,20 @@ public class BankAccountService {
 //	}
 
 	public AccountSynchPref loadAccountLevelSynchPref(String accessId, String accountId){
-		return uds.load().bankAccountData(accessId, accountId).getAccountSynchPref();
+		return uds.load().bankAccountDataOrException(accessId, accountId).getAccountSynchPref();
 	}
 	public void storeAccountLevelSynchPref(String accessId, String accountId, AccountSynchPref pref){
 		UserData userData = uds.load();
-		userData.bankAccountData(accessId, accountId).setAccountSynchPref(pref);
+		userData.bankAccountDataOrException(accessId, accountId).setAccountSynchPref(pref);
 		uds.store(userData);
 	}
 
 	public AccountSynchPref loadAccessLevelSynchPref(String accessId){
-		return uds.load().bankAccessData(accessId).getAccountSynchPref();
+		return uds.load().bankAccessDataOrException(accessId).getAccountSynchPref();
 	}
 	public void storeAccessLevelSynchPref(String accessId, AccountSynchPref pref){
 		UserData userData = uds.load();
-		userData.bankAccessData(accessId).setAccountSynchPref(pref);
+		userData.bankAccessDataOrException(accessId).setAccountSynchPref(pref);
 		uds.store(userData);
 	}
 
@@ -207,7 +206,7 @@ public class BankAccountService {
 	 */
     public void saveStandingOrders(BankAccountEntity bankAccount, List<StandingOrder> standingOrders) {
     	UserData userData = uds.load();
-    	Map<String, StandingOrderEntity> standingOrdersMap = userData.bankAccountData(bankAccount.getBankAccessId(), bankAccount.getId()).getStandingOrders();
+    	Map<String, StandingOrderEntity> standingOrdersMap = userData.bankAccountDataOrException(bankAccount.getBankAccessId(), bankAccount.getId()).getStandingOrders();
         standingOrders.stream()
                 .map(standingOrder -> {
                 	// Assign an order id if none.
@@ -277,7 +276,7 @@ public class BankAccountService {
 
     private void filterAccounts(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService, List<BankAccount> bankAccounts) {
     	UserData userData = uds.load();
-    	List<BankAccountData> userBankAccounts = userData.bankAccessData(bankAccess.getId()).getBankAccounts();
+    	List<BankAccountData> userBankAccounts = userData.bankAccessDataOrException(bankAccess.getId()).getBankAccounts();
 //        List<BankAccountEntity> userBankAccounts = loadForBankAccess(bankAccess.getId());
 
         //filter out previous created accounts

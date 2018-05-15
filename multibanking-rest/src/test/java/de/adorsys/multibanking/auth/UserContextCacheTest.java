@@ -109,12 +109,13 @@ public class UserContextCacheTest {
 		Assert.assertTrue(isCacheObjectInCache(userContext, "/dir/cachedObject2.aes"));
 		Assert.assertTrue(isCacheObjectInCache(userContext, "cachedObject.aes"));
 
-		Assert.assertFalse(isCacheObjectInCache(userContext, "/dir/subdir/cachedObject.aes"));
-		Assert.assertFalse(isCacheObjectInCache(userContext, "/dir/subdir/cachedObject2.aes"));
-		Assert.assertFalse(isCacheObjectInCache(userContext, "/dir/subdir/subdir2/cachedObject.aes"));
-		Assert.assertFalse(isCacheObjectInCache(userContext, "/dir/subdir/subdir2/cachedObject2.aes"));
+		Assert.assertTrue(isNotCacheObjectInCacheOrIsDirty(userContext, "/dir/subdir/cachedObject.aes"));
+		Assert.assertTrue(isNotCacheObjectInCacheOrIsDirty(userContext, "/dir/subdir/cachedObject2.aes"));
+		Assert.assertTrue(isNotCacheObjectInCacheOrIsDirty(userContext, "/dir/subdir/subdir2/cachedObject.aes"));
+		Assert.assertTrue(isNotCacheObjectInCacheOrIsDirty(userContext, "/dir/subdir/subdir2/cachedObject2.aes"));
 	}
 	
+
 	private static UserContext enabledUserContext(){
 		UserContext userContext = new UserContext();
 		userContext.setCacheEnabled(true);
@@ -132,6 +133,11 @@ public class UserContextCacheTest {
 		UserContextCache cache = new UserContextCache(userContext);
 		DocumentFQN documentFQN = new DocumentFQN(path);
 		return cache.isCached(documentFQN, cachedObjectTypeRef);
+	}
+	private boolean isNotCacheObjectInCacheOrIsDirty(UserContext userContext, String path) {
+		UserContextCache cache = new UserContextCache(userContext);
+		DocumentFQN documentFQN = new DocumentFQN(path);
+		return !cache.isCached(documentFQN, cachedObjectTypeRef) || cache.isDirty(documentFQN, cachedObjectTypeRef);
 	}
 	
 	static final TypeReference<CachedObject> cachedObjectTypeRef = new TypeReference<CachedObject>() {};

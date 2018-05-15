@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.service;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -8,15 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import de.adorsys.multibanking.domain.BankAccessCredentials;
-import de.adorsys.multibanking.domain.BankAccessData;
 import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.UserData;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.exception.BankAccessAlreadyExistException;
 import de.adorsys.multibanking.exception.InvalidPinException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import de.adorsys.multibanking.domain.BankAccessData;
+import de.adorsys.multibanking.domain.BankAccountData;
 import de.adorsys.multibanking.service.base.UserObjectService;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.FQNUtils;
@@ -105,17 +104,7 @@ public class BankAccessService  {
     }
 
     public boolean deleteBankAccess(String accessId) {
-    	UserData userData = uds.load();
-    	BankAccessData accessData = userData.remove(accessId);
-		if(accessData!=null){
-			uds.store(userData);
-			// TODO: for transactionality. Still check existence of these files.
-	    	removeRemoteRegistrations(accessId);
-	    	uos.deleteDirectory(FQNUtils.bankAccessDirFQN(accessId));
-	    	uos.clearCached(FQNUtils.bankAccessDirFQN(accessId));
-	    	return true;
-		}
-		return false;
+    	return deleteBankAccessInternal(accessId, uds.load());
     }
 
 	/**
@@ -152,11 +141,21 @@ public class BankAccessService  {
 		uds.store(userData);
 	}
 
-	private void removeRemoteRegistrations(String accessId) {
-		UserData userData = uds.load();
-		if(!userData.containsKey(accessId)) return;
-		BankAccessData accessData = userData.get(accessId);
-
+    private boolean deleteBankAccessInternal(String accessId, UserData userData) {
+    	BankAccessData accessData = userData.remove(accessId);
+		if(accessData!=null){
+			uds.store(userData);
+			uos.flush();
+			// TODO: for transactionality. Still check existence of these files.
+	    	removeRemoteRegistrations(accessData, userData);
+	    	uos.deleteDirectory(FQNUtils.bankAccessDirFQN(accessId));
+//	    	uos.clearCached(FQNUtils.bankAccessDirFQN(accessId));
+	    	return true;
+		}
+		return false;
+    }
+    
+	private void removeRemoteRegistrations(BankAccessData accessData, UserData userData) {
     	// Load bank Accounts
 		List<BankAccountData> bankAccountDataList = accessData.getBankAccounts();
         UserEntity userEntity = userData.getUserEntity();
