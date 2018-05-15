@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.service;
+package de.adorsys.multibanking.mock.service;
 
 import domain.StandingOrder;
 

@@ -1,15 +1,7 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.config.web.ControllerUnitTestConfig;
-import de.adorsys.multibanking.config.web.WebMvcUnitTest;
-import de.adorsys.multibanking.domain.BankAccountData;
-import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.service.BankAccessService;
-import de.adorsys.multibanking.service.BankAccountService;
-import de.adorsys.multibanking.service.BookingService;
-import de.adorsys.multibanking.web.account.BankAccountController;
-import de.adorsys.multibanking.web.base.BaseControllerUnitTest;
-import domain.BankAccount.SyncStatus;
+import java.time.LocalDateTime;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.BDDMockito;
@@ -23,7 +15,16 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.LocalDateTime;
+import de.adorsys.multibanking.config.web.ControllerUnitTestConfig;
+import de.adorsys.multibanking.config.web.WebMvcUnitTest;
+import de.adorsys.multibanking.domain.BankAccountEntity;
+import de.adorsys.multibanking.domain.BankAccountData;
+import de.adorsys.multibanking.service.BankAccessService;
+import de.adorsys.multibanking.service.BankAccountService;
+import de.adorsys.multibanking.service.BookingService;
+import de.adorsys.multibanking.web.account.BankAccountController;
+import de.adorsys.multibanking.web.base.BaseControllerUnitTest;
+import domain.BankAccount.SyncStatus;
 
 @WebMvcUnitTest(controllers = BankAccountController.class)
 @ContextConfiguration(classes={ControllerUnitTestConfig.class})

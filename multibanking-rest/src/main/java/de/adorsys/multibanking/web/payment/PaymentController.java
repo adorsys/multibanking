@@ -59,11 +59,11 @@ public class PaymentController extends BaseController {
     public HttpEntity<Void> createPayment(@PathVariable String accessId, @PathVariable String accountId, @RequestBody CreatePaymentRequest paymentRequest) {
 
     	UserData userData = uds.load();
-    	BankAccessEntity bankAccessEntity = userData.bankAccessData(accessId).getBankAccess();
+    	BankAccessEntity bankAccessEntity = userData.bankAccessDataOrException(accessId).getBankAccess();
 //    	BankAccessEntity bankAccessEntity= bankAccessService.loadbankAccess(accessId)
 //    			.orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accessId));
     	
-    	BankAccountEntity bankAccountEntity = userData.bankAccountData(accessId, accountId).getBankAccount();
+    	BankAccountEntity bankAccountEntity = userData.bankAccountDataOrException(accessId, accountId).getBankAccount();
 //    	BankAccountEntity bankAccountEntity = bankAccountService.loadBankAccount(accessId, accountId)
 //				.orElseThrow(() -> new ResourceNotFoundException(BankAccountEntity.class, accountId));
 
@@ -86,7 +86,7 @@ public class PaymentController extends BaseController {
 
         PaymentEntity paymentEntity = paymentService.findPayment(accessId, accountId, paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException(PaymentEntity.class, paymentId));
-        String bankCode = uds.load().bankAccessData(accessId).getBankAccess().getBankCode();
+        String bankCode = uds.load().bankAccessDataOrException(accessId).getBankAccess().getBankCode();
         paymentService.submitPayment(paymentEntity, bankCode, paymentRequest.getTan());
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -1,20 +1,8 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.config.mock.SimpleMockBanking;
-import de.adorsys.multibanking.config.web.WebMvcUnitTest;
-import de.adorsys.multibanking.domain.BankAccountData;
-import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.service.BankAccessService;
-import de.adorsys.multibanking.service.BankAccountService;
-import de.adorsys.multibanking.service.BookingService;
-import de.adorsys.multibanking.utils.FQNUtils;
-import de.adorsys.multibanking.web.account.BookingController;
-import de.adorsys.multibanking.web.base.BaseControllerUnitTest;
-import domain.BankAccess;
-import domain.BankAccount;
-import domain.BankAccount.SyncStatus;
-import domain.Booking;
-import domain.LoadBookingsResponse;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.service.types.DocumentContent;
 import org.junit.After;
@@ -30,9 +18,21 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.util.List;
+import de.adorsys.multibanking.config.web.WebMvcUnitTest;
+import de.adorsys.multibanking.domain.BankAccountData;
+import de.adorsys.multibanking.domain.BankAccountEntity;
+import de.adorsys.multibanking.mock.inmemory.SimpleMockBanking;
+import de.adorsys.multibanking.service.BankAccessService;
+import de.adorsys.multibanking.service.BankAccountService;
+import de.adorsys.multibanking.service.BookingService;
+import de.adorsys.multibanking.utils.FQNUtils;
+import de.adorsys.multibanking.web.account.BookingController;
+import de.adorsys.multibanking.web.base.BaseControllerUnitTest;
+import domain.BankAccess;
+import domain.BankAccount;
+import domain.BankAccount.SyncStatus;
+import domain.Booking;
+import domain.LoadBookingsResponse;
 
 @WebMvcUnitTest(controllers = BookingController.class)
 public class BookingControllerTest extends BaseControllerUnitTest {
@@ -57,13 +57,14 @@ public class BookingControllerTest extends BaseControllerUnitTest {
 		MockitoAnnotations.initMocks(this);
         this.mockMvc = MockMvcBuilders.standaloneSetup(bookingController).build();
 		
-        InputStream bookingsStream = SimpleMockBanking.class.getClassLoader().getResourceAsStream("/BookingControllerTest/test_data.xls");
-		SimpleMockBanking simpleMockBanking = new SimpleMockBanking(null, null, bookingsStream);
+        // TODO: Fix This. use data provided by the booking test.
+//        InputStream bookingsStream = BookingControllerTest.class.getClassLoader().getResourceAsStream("/BookingControllerTest/test_data.xls");
+		SimpleMockBanking simpleMockBanking = new SimpleMockBanking(null, null, null);
 		BankAccess bankAccess = new BankAccess();
 		bankAccess.setBankLogin("m.becker");
 		BankAccount bankAccount = new BankAccount();
 		bankAccount.setIban("DE81199999993528307800");
-		LoadBookingsResponse bookingsResponse = simpleMockBanking.loadBookings(null, bankAccess, null, bankAccount, null);
+		LoadBookingsResponse bookingsResponse = simpleMockBanking.loadBookings(null, bankAccess, null, bankAccount, "12345");
 		List<Booking> bookings = bookingsResponse.getBookings();
 		bookingsStr = mapper.writeValueAsString(bookings);
 		
