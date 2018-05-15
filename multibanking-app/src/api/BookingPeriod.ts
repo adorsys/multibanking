@@ -1,5 +1,3 @@
-import { Booking } from "./Booking";
-
 export interface BookingPeriod {
     
     "start"?: string;

@@ -86,8 +86,8 @@ export class RulesService {
   }
 
   downloadRules(custom): Observable<any> {
-    let url = custom ? `${AppConfig.api_url}/analytics/rules`
-      : `${AppConfig.smartanalytics_url}/rules`;
+    let url = custom ? `${AppConfig.api_url}/analytics/rules/download`
+      : `${AppConfig.smartanalytics_url}/rules/download`;
 
     return this.http.get(url, { responseType: ResponseContentType.Blob })
       .map(res => {

@@ -90,7 +90,7 @@ export class RulesStaticPage {
   }
 
   editRule(rule: Rule) {
-    this.navCtrl.push(RuleEditPage, { rule: rule });
+    this.navCtrl.push(RuleEditPage, { rule: rule, customRule: false });
   }
 
   deleteRule(rule: Rule) {

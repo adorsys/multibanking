@@ -3,6 +3,7 @@ import { NavParams, NavController } from "ionic-angular";
 import { RuleCategory } from "../../api/RuleCategory";
 import { Rule } from "../../api/Rule";
 import { RulesService } from "../../services/rules.service";
+import { SimilarityMatchType } from "../../api/SimilarityMatchType";
 
 @Component({
   selector: 'page-ruleEdit',
@@ -10,7 +11,9 @@ import { RulesService } from "../../services/rules.service";
 })
 export class RuleEditPage {
 
+  customRule: boolean;
   rule: Rule;
+  similarityMatcher: Array<any> = [];
   categories: Array<RuleCategory>;
   subCategories: Array<RuleCategory>;
   specifications: Array<RuleCategory>;
@@ -28,6 +31,10 @@ export class RuleEditPage {
     private rulesService: RulesService
   ) {
     this.rule = navparams.data.rule;
+    this.customRule = navparams.data.customRule;
+    for (var n in SimilarityMatchType) {
+      this.similarityMatcher.push(n);
+    }
   }
 
   ngOnInit() {

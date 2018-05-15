@@ -6,7 +6,6 @@ import { RulesCustomAutoCompleteService } from '../../services/rulesCustomAutoCo
 import { AutoCompleteComponent } from 'ionic2-auto-complete';
 import { RulesStaticPage } from '../rules-static/rulesStatic.component';
 import { RulesStaticAutoCompleteService } from '../../services/rulesStaticAutoComplete.service';
-import { RuleEditPage } from '../rule-edit/ruleEdit.component';
 
 @Component({
   selector: 'page-rules-custom',
@@ -46,10 +45,4 @@ export class RulesCustomPage extends RulesStaticPage {
       });
     });
   }
-
-  createRule() {
-    this.navCtrl.push(RuleEditPage, { rule: {} });
-  }
-
-
 }
