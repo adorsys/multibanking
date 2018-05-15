@@ -14,6 +14,12 @@
       <ion-input type="text" name="receiver" [(ngModel)]="rule.receiver"></ion-input>
     </ion-item>
     <ion-item>
+      <ion-label>Similarity matcher</ion-label>
+      <ion-select [(ngModel)]="rule.similarityMatchType" (ionChange)="similarityMatherChanged($event)">
+        <ion-option *ngFor="let matcher of similarityMatcher" value="{{matcher}}">{{matcher}}</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
       <ion-label>Expression</ion-label>
       <ion-input type="text" name="expression" [(ngModel)]="rule.expression"></ion-input>
     </ion-item>
@@ -40,7 +46,7 @@
       <ion-toggle [(ngModel)]="rule.taxRelevant"></ion-toggle>
     </ion-item>
     <ion-item>
-      <ion-label>income</ion-label>
+      <ion-label>Income</ion-label>
       <ion-toggle [(ngModel)]="rule.incoming"></ion-toggle>
     </ion-item>
   </ion-list>

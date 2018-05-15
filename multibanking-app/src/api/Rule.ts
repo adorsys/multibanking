@@ -1,3 +1,5 @@
+import { SimilarityMatchType } from "./SimilarityMatchType";
+
 export interface Rule {
     "id"?: string;
     "ruleId"?: string;
@@ -8,6 +10,7 @@ export interface Rule {
     "subCategory"?: string;
     "specification"?: string;
     "taxRelevant"?: boolean;
+    "similarityMatchType"?: SimilarityMatchType;
     "incoming"?: boolean;
     "released"?: boolean;
 
