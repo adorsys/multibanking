@@ -79,7 +79,7 @@ public class UserAgentCredentialsController extends BaseController {
     		@RequestBody UserAgentCredentials userAgentCredentials) {
 		userAgentCredentials.setUserAgentId(userAgentId);
 		userAgentCredentialsService.store(userAgentCredentials);
-		LOGGER.info("User agent credential stored for " + userId());
+		LOGGER.debug("User agent credential stored for " + userId());
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

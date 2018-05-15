@@ -107,7 +107,7 @@ public class MB_004_BankAccessTest extends MB_BaseTest {
             Assert.assertNotNull(userData);
             JSONObject j = new JSONObject(userData);
             UserDataStructure userDataStructure = new UserDataStructure(j);
-            LOGGER.info(userDataStructure.toString());
+            LOGGER.debug(userDataStructure.toString());
             return userDataStructure;
         } catch (Exception e) {
             throw BaseExceptionHandler.handle(e);

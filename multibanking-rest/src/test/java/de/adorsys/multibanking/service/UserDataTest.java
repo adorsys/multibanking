@@ -27,15 +27,15 @@ public class UserDataTest {
         bankAccessEntity.setId(ID);
         bankAccessData.setBankAccess(bankAccessEntity);
         userData.put(ID, bankAccessData);
-        LOGGER.info("userData:" + userData);
+        LOGGER.debug("userData:" + userData);
 
         BankAccessData bankAccessData1 = userData.remove(ID);
-        LOGGER.info("bankAccessData     orig:" + bankAccessData);
-        LOGGER.info("bankAccessData  deleted:" + bankAccessData1);
+        LOGGER.debug("bankAccessData     orig:" + bankAccessData);
+        LOGGER.debug("bankAccessData  deleted:" + bankAccessData1);
         Assert.assertNotNull(bankAccessData1);
         Assert.assertEquals(bankAccessData, bankAccessData1);
         BankAccessData bankAccessData2 = userData.remove(ID);
-        LOGGER.info("bankAccessData deleted2:" + bankAccessData2);
+        LOGGER.debug("bankAccessData deleted2:" + bankAccessData2);
         Assert.assertNull(bankAccessData2);
     }
 }

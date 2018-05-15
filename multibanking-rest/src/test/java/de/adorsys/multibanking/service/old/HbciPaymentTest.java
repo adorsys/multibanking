@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
+import org.adorsys.cryptoutils.exceptions.BaseExceptionHandler;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -56,7 +57,7 @@ public class HbciPaymentTest {
 
     @BeforeClass
     public static void beforeClass() {
-		TestConstants.setup();
+        TestConstants.setup();
     }
 
     @Before
@@ -70,10 +71,10 @@ public class HbciPaymentTest {
     @Test
     public void testPayment() {
         try {
-        	// TODO inject user credentials
-        	// TODO: inject UserIdAuth
+            // TODO inject user credentials
+            // TODO: inject UserIdAuth
 //        	UserEntity userEntity = TestUtil.getUserEntity("test-user-id");
-        	uds.createUser(null);
+            uds.createUser(null);
 
             BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id", System.getProperty("blz"), System.getProperty("pin"));
             bankAccessEntity.setBankLogin(System.getProperty("login"));
@@ -101,12 +102,7 @@ public class HbciPaymentTest {
             String tan = "";
             paymentService.submitPayment(paymentEntity, bankAccessEntity.getBankCode(), tan);
         } catch (Exception e) {
-            System.out.println();
-            throw e;
+            throw BaseExceptionHandler.handle(e);
         }
-
-
     }
-
-
 }
