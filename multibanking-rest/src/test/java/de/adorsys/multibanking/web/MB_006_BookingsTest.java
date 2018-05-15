@@ -35,12 +35,12 @@ public class MB_006_BookingsTest extends MB_BaseTest {
 			Optional<List<String>> bookingPeriods = userDataStructure.getBookingPeriods(firstBankAccessID, bankAccountID);
 			Assert.assertTrue(bookingPeriods.isPresent());
 			for (String period : bookingPeriods.get()) {
-				LOGGER.info("period is " + period);
+				LOGGER.debug("period is " + period);
 				URI uri = path(BOOKING_URI).queryParam("period", period).build(firstBankAccessID.getValue(), bankAccountID.getValue());
 				this.setNextExpectedStatusCode(200);
-				LOGGER.info("GET TO uri:" + uri);
+				LOGGER.debug("GET TO uri:" + uri);
 				ResponseEntity<String> bookings = this.testRestTemplate.getForEntity(uri, String.class);
-				LOGGER.info("bookings:" + bookings.getBody());
+				LOGGER.debug("bookings:" + bookings.getBody());
 			}
 		}
 	}

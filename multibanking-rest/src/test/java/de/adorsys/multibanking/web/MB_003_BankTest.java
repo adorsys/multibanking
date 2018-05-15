@@ -31,8 +31,8 @@ public class MB_003_BankTest extends MB_BaseTest {
 
             String foundBanksString = banks.getBody();
             String expectedBanksString = IOUtils.toString(this.getClass().getClassLoader().getResourceAsStream("mock_bank.json"));
-            LOGGER.info("expected banks:" + expectedBanksString);
-            LOGGER.info("found    banks:" + foundBanksString);
+            LOGGER.debug("expected banks:" + expectedBanksString);
+            LOGGER.debug("found    banks:" + foundBanksString);
             JSONArray expectedBanks = new JSONArray(expectedBanksString);
             JSONArray foundBanks = new JSONArray(foundBanksString);
             Assert.assertEquals(expectedBanks.length(), foundBanks.length());
@@ -40,7 +40,7 @@ public class MB_003_BankTest extends MB_BaseTest {
                 String fouindBankCode = foundBanks.getJSONObject(i).getString("bankCode");
                 String expectedBankCode = expectedBanks.getJSONObject(i).getString("bankCode");
                 Assert.assertEquals(expectedBankCode, fouindBankCode);
-                LOGGER.info("bankCode " + fouindBankCode + " ok");
+                LOGGER.debug("bankCode " + fouindBankCode + " ok");
             }
         } catch (Exception e) {
             throw BaseExceptionHandler.handle(e);

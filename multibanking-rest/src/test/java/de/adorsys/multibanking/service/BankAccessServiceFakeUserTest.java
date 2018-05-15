@@ -13,6 +13,8 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.MockitoAnnotations;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -26,6 +28,7 @@ import figo.FigoBanking;
 
 @RunWith(SpringRunner.class)
 public class BankAccessServiceFakeUserTest extends BaseServiceTest {
+    private final static Logger LOGGER = LoggerFactory.getLogger(BankAccessServiceFakeUserTest.class);
 
     @MockBean
     private FigoBanking figoBanking;
@@ -55,7 +58,7 @@ public class BankAccessServiceFakeUserTest extends BaseServiceTest {
     @After
     public void after(){
     	if(userContext!=null)
-    		System.out.println(userContext.getRequestCounter());
+    		LOGGER.debug(userContext.getRequestCounter().toString());
     }
 
     @Test

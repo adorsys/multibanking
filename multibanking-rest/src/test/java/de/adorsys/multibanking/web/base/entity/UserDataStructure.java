@@ -56,7 +56,7 @@ public class UserDataStructure {
     public Optional<SyncStatus> getSyncStatus(BankAccessID bankAccessID, BankAccountID bankAccountID) {
         try {
             String syncStatusString = getBankAccountObject(getBankAccountWrapperObject(bankAccessID, bankAccountID)).get().getString("syncStatus");
-            LOGGER.info(bankAccessID + " " + bankAccountID + " syncStatus:" + syncStatusString);
+            LOGGER.debug(bankAccessID + " " + bankAccountID + " syncStatus:" + syncStatusString);
             if (syncStatusString == null || syncStatusString.equalsIgnoreCase("null")) {
                 return Optional.empty();
             }
@@ -97,7 +97,7 @@ public class UserDataStructure {
         try {
             BankAccountWrapperJson bankAccountWrapper = getBankAccountWrapperObject(bankAccessID, bankAccountID);
             String bookingFilesString = bankAccountWrapper.get().getString("bookingFiles");
-            LOGGER.info("bookingfilesstring:" + bookingFilesString);
+            LOGGER.debug("bookingfilesstring:" + bookingFilesString);
             JSONArray bookingFiles = bankAccountWrapper.get().getJSONArray("bookingFiles");
             if (bookingFiles == null || bookingFiles.length() == 0) {
                 return Optional.empty();
@@ -106,10 +106,10 @@ public class UserDataStructure {
             for (int i = 0; i<bookingFiles.length(); i++) {
                 JSONObject bookingFile = bookingFiles.getJSONObject(i);
                 String period = bookingFile.getString("period");
-                LOGGER.info("KEY ist " + period);
+                LOGGER.debug("KEY ist " + period);
                 list.add(period);
             }
-            LOGGER.info("Das waren alle Keys");
+            LOGGER.debug("Das waren alle Keys");
             return Optional.of(list);
         } catch (Exception e) {
             throw BaseExceptionHandler.handle(e);
