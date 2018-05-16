@@ -28,7 +28,7 @@ public class TestConstants {
 	        field.setAccessible(true);
 	        field.set(null, Boolean.FALSE);
 	    } catch (ClassNotFoundException | NoSuchFieldException | SecurityException | IllegalArgumentException | IllegalAccessException ex) {
-            LOGGER.error("can not turn off Enc Policy");
+            LOGGER.warn("can not turn off Enc Policy");
 	    }
 	}
 

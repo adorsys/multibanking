@@ -5,6 +5,8 @@ import de.adorsys.multibanking.web.base.entity.BankAccountID;
 import de.adorsys.multibanking.web.base.entity.UserDataStructure;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
@@ -15,6 +17,7 @@ import java.util.Optional;
  * Created by peter on 08.05.18 at 15:49.
  */
 public class MB_006_BookingsTest extends MB_BaseTest {
+	private final static Logger LOGGER = LoggerFactory.getLogger(MB_006_BookingsTest.class);
 	public final static String BOOKING_URI = "/api/v1/bankaccesses/{accessId}/accounts/{accountId}/bookings";
 
 	@Test
