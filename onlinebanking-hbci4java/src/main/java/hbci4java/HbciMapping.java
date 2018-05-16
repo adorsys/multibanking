@@ -153,7 +153,7 @@ public final class HbciMapping {
                 booking.setUsage(
                         getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line.additional, 27)));
 
-                if (StringUtils.isBlank(booking.getOtherAccount().getIban())) {
+                if (booking.getOtherAccount() != null && StringUtils.isBlank(booking.getOtherAccount().getIban())) {
                     booking.getOtherAccount().setIban(extractIban(booking.getUsage()));
                 }
 
