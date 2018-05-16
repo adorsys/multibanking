@@ -43,9 +43,9 @@
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZZ</maven.build.timestamp.format>
         <maven.build-timestamp>${maven.build.timestamp}</maven.build-timestamp>
 
-        <de.adorsys.sts.version>0.25.0</de.adorsys.sts.version>
+        <de.adorsys.sts.version>0.25.1</de.adorsys.sts.version>
         <docusafe.version>0.3.5</docusafe.version>
-        <crypt.version>0.18.5</crypt.version>
+        <crypt.version>0.18.6</crypt.version>
         <de.adorsys.smartanalytics.version>1.0.1</de.adorsys.smartanalytics.version>
 
         <scmBranch/>
@@ -70,11 +70,6 @@
     <dependencyManagement>
         <dependencies>
             <!--https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-build-systems.html#using-boot-maven-without-a-parent -->
-            <dependency>
-                <groupId>de.adorsys.cryptoutils</groupId>
-                <artifactId>encobject</artifactId>
-                <version>${crypt.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
