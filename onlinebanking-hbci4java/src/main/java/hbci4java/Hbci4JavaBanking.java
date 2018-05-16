@@ -140,7 +140,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             HBCIJob standingOrdersJob = hbciHandler.newJob("DauerSEPAList");
             standingOrdersJob.setParam("src", account);
-            standingOrdersJob.addToQueue();
+            if (((HBCIJobImpl) standingOrdersJob).getHBCICode() == null) {
+                LOG.warn("GV DauerSEPAList not supported");
+            } else {
+                standingOrdersJob.addToQueue();
+            }
 
             // Let the Handler execute all jobs in one batch
             HBCIExecStatus status = hbciHandler.execute();
