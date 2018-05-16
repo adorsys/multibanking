@@ -6,6 +6,8 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -16,6 +18,9 @@ import java.net.URI;
  * Created by peter on 09.05.18 at 09:55.
  */
 public class MB_003_BankTest extends MB_BaseTest {
+    private final static Logger LOGGER = LoggerFactory.getLogger(MB_003_BankTest.class);
+    final static String BANK_URI = "api/v1/bank";
+
     @Before
     public void setup() throws Exception {
         super.setupBank();
@@ -48,7 +53,7 @@ public class MB_003_BankTest extends MB_BaseTest {
     }
 
     private static UriComponentsBuilder bankPath(MB_BaseTest base) {
-        return base.path(BankController.BASE_PATH);
+        return base.path(BANK_URI);
     }
 
 }
