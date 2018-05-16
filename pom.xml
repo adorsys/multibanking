@@ -61,7 +61,6 @@
         <module>onlinebanking-hbci4java</module>
         <module>onlinebanking-mock</module>
         <module>multibanking-pers-spi</module>
-        <module>multibanking-app</module>
         <module>multibanking-rest</module>
         <module>onlinebanking-xls-loader</module>
         <module>multibanking-examples</module>
