@@ -57,7 +57,7 @@ public class BookingRuleRepositoryImpl implements BookingRuleRepositoryIf {
 
     @Override
     public Optional<RuleEntity> getRuleById(String ruleId) {
-        return Optional.empty();
+        return ruleRepository.getRuleById(ruleId);
     }
 
     @Override
