@@ -8,7 +8,6 @@ import { BookingGroup } from "../../api/BookingGroup";
 import { AppConfig } from "../../app/app.config";
 import { BookingGroupPage } from "./bookingGroup.component";
 import { GroupType } from "../../api/GroupType";
-import { Contract } from "../../api/Contract";
 import { Moment } from "moment";
 import * as moment from 'moment';
 import { BookingPeriod } from "../../api/BookingPeriod";
@@ -126,6 +125,10 @@ export class AnalyticsPage {
   }
 
   includeGroup(group: BookingGroup): boolean {
+    if (group.amount == 0) {
+      return false;
+    }
+
     switch (group.type) {
       case GroupType.OTHER_INCOME:
       case GroupType.OTHER_INCOME:
@@ -135,12 +138,9 @@ export class AnalyticsPage {
         return true;
     }
 
-    if (group.contract && group.contract.interval == Contract.IntervalEnum.MONTHLY) {
-      return true;
-    }
-
     let period: BookingPeriod = group.bookingPeriods.find((period: BookingPeriod) => {
-      return moment(period.start).month() == this.referenceDate.month();
+      let start: Moment = moment(period.start);
+      return start.month() == this.referenceDate.month() && start.year() == this.referenceDate.year();
     });
 
     if (!period) {

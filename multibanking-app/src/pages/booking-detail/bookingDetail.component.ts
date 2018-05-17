@@ -23,11 +23,11 @@ export class BookingDetailPage {
   }
 
   editRule() {
-    if (this.booking.bookingCategory && this.booking.bookingCategory.rules) {
+    if (this.booking.bookingCategory && this.booking.bookingCategory.rules && this.booking.bookingCategory.rules[0].startsWith("custom")) {
       this.rulesService.getRule(this.booking.bookingCategory.rules[0]).subscribe(rule => {
         this.navCtrl.push(RuleEditPage, {
           rule: rule,
-          customRule: rule.id.startsWith("custom")
+          customRule: true
         });
       });
     } else {
