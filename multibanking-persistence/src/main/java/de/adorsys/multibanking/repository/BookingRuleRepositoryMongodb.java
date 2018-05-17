@@ -16,8 +16,6 @@ public interface BookingRuleRepositoryMongodb extends MongoRepository<RuleEntity
 
     Page<RuleEntity> findAll(Pageable pageable);
 
-    List<RuleEntity> findByIncoming(boolean incoming);
-
     List<RuleEntity> findByUserId(String userId);
 
     Optional<RuleEntity> getRuleById(String ruleId);
