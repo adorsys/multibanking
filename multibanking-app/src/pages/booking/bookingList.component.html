@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar class="force-back-button">
-    <ion-title>Bookings</ion-title>
+    <ion-title>{{pageable?.page.totalElements}} bookings</ion-title>
     <ion-buttons end>
       <button ion-button (click)="syncBookings()">
         Reload
@@ -57,4 +57,7 @@
       </div>
     </ion-item>
   </ion-list>
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+      <ion-infinite-scroll-content></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
 </ion-content>

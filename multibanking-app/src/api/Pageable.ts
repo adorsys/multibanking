@@ -1,6 +1,6 @@
 import { Link } from "./Link";
 
-export interface PageableRules {
+export interface Pageable {
 
     _embedded;
     _links: PageableLinks;

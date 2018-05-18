@@ -5,7 +5,7 @@ import { Observable } from "rxjs/Observable";
 import { RuleCategory } from "../api/RuleCategory";
 import { Rule } from "../api/Rule";
 import { Subject } from "rxjs";
-import { PageableRules } from "../api/PageableRules";
+import { Pageable } from "../api/Pageable";
 
 @Injectable()
 export class RulesService {
@@ -43,7 +43,7 @@ export class RulesService {
       })
   }
 
-  getRules(custom: boolean): Observable<PageableRules> {
+  getRules(custom: boolean): Observable<Pageable> {
     let url = custom ? `${AppConfig.api_url}/analytics/rules/` : `${AppConfig.smartanalytics_url}/rules/`;
 
     return this.http.get(url)
@@ -51,7 +51,7 @@ export class RulesService {
       .catch(this.handleError);
   }
 
-  getNextRules(url: string): Observable<PageableRules> {
+  getNextRules(url: string): Observable<Pageable> {
     return this.http.get(url)
       .map(response => response.json())
       .catch(this.handleError);

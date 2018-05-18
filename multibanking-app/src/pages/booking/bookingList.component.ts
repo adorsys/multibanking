@@ -8,6 +8,7 @@ import { LogoService } from '../../services/logo.service';
 import { PaymentCreatePage } from "../payment/paymentCreate.component";
 import { BankAccount } from "../../api/BankAccount";
 import { BookingDetailPage } from "../booking-detail/bookingDetail.component";
+import { Pageable } from "../../api/Pageable";
 
 @Component({
   selector: 'page-bookingList',
@@ -18,7 +19,8 @@ export class BookingListPage {
   bankAccess: BankAccess;
   bankAccount: BankAccount;
   getLogo: Function;
-  bookings: Array<Booking>;
+  pageable: Pageable;
+  bookings: Booking[];
 
   @ViewChild(Navbar) navBar: Navbar;
 
@@ -38,9 +40,20 @@ export class BookingListPage {
   }
 
   ngOnInit() {
+    this.loadBookings();
+  }
+
+  ionViewDidLoad() {
+    this.navBar.backButtonClick = (e: UIEvent) => {
+      this.navCtrl.parent.viewCtrl.dismiss();
+    };
+  }
+
+  loadBookings() {
     this.bookingService.getBookings(this.bankAccess.id, this.bankAccount.id).subscribe(
       response => {
-        this.bookings = response;
+        this.pageable = response;
+        this.bookings = response._embedded ? response._embedded.bookingEntityList : [];
       },
       error => {
         if (error == "SYNC_IN_PROGRESS") {
@@ -53,10 +66,21 @@ export class BookingListPage {
       });
   }
 
-  ionViewDidLoad() {
-    this.navBar.backButtonClick = (e: UIEvent) => {
-      this.navCtrl.parent.viewCtrl.dismiss();
-    };
+  loadNextBookings(infiniteScroll) {
+    if (this.pageable._links.next) {
+      this.bookingService.getNextBookings(this.pageable._links.next.href).subscribe(response => {
+        this.pageable = response;
+        this.bookings = this.bookings.concat(response._embedded.bookingEntityList);
+        
+        infiniteScroll.complete();
+      });
+    } else {
+      infiniteScroll.complete();
+    }
+  }
+
+  doInfinite(infiniteScroll) {
+    this.loadNextBookings(infiniteScroll);
   }
 
   syncBookingsPromptPin() {
@@ -99,7 +123,7 @@ export class BookingListPage {
 
     this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccount.id, pin).subscribe(
       response => {
-        this.bookings = response;
+        this.loadBookings();
         loading.dismiss();
       },
       error => {

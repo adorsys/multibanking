@@ -6,7 +6,7 @@ import { RulesStaticAutoCompleteService } from '../../services/rulesStaticAutoCo
 import { AutoCompleteComponent } from 'ionic2-auto-complete';
 import { RuleEditPage } from '../rule-edit/ruleEdit.component';
 import { RulesCustomAutoCompleteService } from '../../services/rulesCustomAutoComplete.service';
-import { PageableRules } from '../../api/PageableRules';
+import { Pageable } from '../../api/Pageable';
 
 
 @Component({
@@ -19,7 +19,7 @@ export class RulesStaticPage {
   @ViewChild(Navbar) navBar: Navbar;
   selectedRule: Rule;
   rules: Rule[];
-  pageable: PageableRules;
+  pageable: Pageable;
   custom: boolean = false;
 
   constructor(public navCtrl: NavController,

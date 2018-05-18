@@ -9,6 +9,7 @@
     <ion-thumbnail item-left>
       <img [src]="getCompanyLogoUrl(bookingGroup)" *ngIf="bookingGroup.contract.logo" item-left/>
     </ion-thumbnail>
+    <h3 *ngIf="bookingGroup.name">{{bookingGroup.name}}</h3>
     <h4 *ngIf="bookingGroup.otherAccount">{{bookingGroup.otherAccount}}</h4>
     <h4 *ngIf="bookingGroup.mainCategory">{{bookingGroup.mainCategory}}</h4>
     <h4 *ngIf="bookingGroup.subCategory">{{bookingGroup.subCategory}}</h4>
