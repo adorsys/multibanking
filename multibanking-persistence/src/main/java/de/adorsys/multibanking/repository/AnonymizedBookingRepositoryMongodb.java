@@ -10,6 +10,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 @Profile({"mongo", "fongo"})
-public interface AnonymizdBookingRepositoryMongodb extends MongoRepository<AnonymizedBookingEntity, String> {
+public interface AnonymizedBookingRepositoryMongodb extends MongoRepository<AnonymizedBookingEntity, String> {
 
 }

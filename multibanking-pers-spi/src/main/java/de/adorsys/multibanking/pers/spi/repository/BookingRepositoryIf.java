@@ -1,16 +1,20 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
-import java.util.List;
-import java.util.Optional;
-
 import de.adorsys.multibanking.domain.BookingEntity;
 import domain.BankApi;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * @author alexg on 07.02.17
  * @author fpo on 21.05.2017
  */
 public interface BookingRepositoryIf {
+
+    Page<BookingEntity> findPageableByUserIdAndAccountIdAndBankApi(Pageable pageable, String userId, String bankAccountId, BankApi bankApi);
 
     List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId, BankApi bankApi);
 
