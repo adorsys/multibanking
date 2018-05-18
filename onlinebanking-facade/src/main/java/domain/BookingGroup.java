@@ -18,6 +18,7 @@ public class BookingGroup {
     }
 
     private Type type;
+    private String name;
     private String mainCategory;
     private String subCategory;
     private String specification;

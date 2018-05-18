@@ -3,6 +3,8 @@ package de.adorsys.multibanking.impl;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.repository.BankAccessRepositoryMongodb;
+import domain.BankAccess;
+import lombok.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -45,9 +47,10 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 
     @Override
     public String getBankCode(String id) {
-        Query where = Query.query(Criteria.where("id").is(id));
+        Query query = Query.query(Criteria.where("_id").is(id));
+        query.fields().include("bankCode");
 
-        BankAccessEntity found = mongoTemplate.findOne(where, BankAccessEntity.class);
+        BankAccess found = mongoTemplate.findOne(query, BankAccessEntity.class);
         return found != null ? found.getBankCode() : null;
     }
 
@@ -57,9 +60,12 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     }
 
     @Override
-    public boolean deleteByUserIdAndBankAccessId(String userId, String bankAccessId) {
-        Query where = Query.query(Criteria.where("id").is(bankAccessId).and("userId").is(userId));
-        return mongoTemplate.remove(where, BankAccessEntity.class).getDeletedCount() > 0;
+    public boolean deleteByUserIdAndBankAccessId(String userId, String id) {
+        return bankAccessRepository.deleteByUserIdAndId(userId, id) > 0;
     }
 
+    @Value
+    class BankCodeOnly {
+        String bankCode;
+    }
 }

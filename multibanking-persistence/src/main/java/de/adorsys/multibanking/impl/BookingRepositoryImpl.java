@@ -2,11 +2,14 @@ package de.adorsys.multibanking.impl;
 
 import de.adorsys.multibanking.domain.BookingEntity;
 import de.adorsys.multibanking.pers.spi.repository.BookingRepositoryIf;
+import de.adorsys.multibanking.repository.BookingPageableRepositoryMongodb;
 import de.adorsys.multibanking.repository.BookingRepositoryMongodb;
 import domain.BankApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,13 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 
 	@Autowired
     private BookingRepositoryMongodb bookingRepository;
+	@Autowired
+	private BookingPageableRepositoryMongodb bookingPageableRepositoryMongodb;
+
+	@Override
+	public Page<BookingEntity> findPageableByUserIdAndAccountIdAndBankApi(Pageable pageable, String userId, String bankAccountId, BankApi bankApi) {
+		return bookingPageableRepositoryMongodb.findByUserIdAndAccountIdAndBankApi(pageable, userId, bankAccountId, bankApi);
+	}
 
 	@Override
 	public List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId,
