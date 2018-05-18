@@ -24,8 +24,6 @@ export class BankAccountService {
     return this.http.put(AppConfig.api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/sync", pin)
       .map((res: Response) => {
         this.bookingsChangedObservable.next(true);
-
-        return res.json()._embedded != null ? res.json()._embedded.bookingEntityList : []
       })
       .catch(this.handleError);
   }

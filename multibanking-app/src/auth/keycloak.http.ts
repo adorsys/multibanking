@@ -1,7 +1,7 @@
-import {Injectable} from '@angular/core';
-import {Http, Request, XHRBackend, ConnectionBackend, RequestOptions, RequestOptionsArgs, Response, Headers} from '@angular/http';
+import { Injectable } from '@angular/core';
+import { Http, Request, XHRBackend, ConnectionBackend, RequestOptions, RequestOptionsArgs, Response, Headers } from '@angular/http';
 
-import {KeycloakService} from './keycloak.service';
+import { KeycloakService } from './keycloak.service';
 import { Observable } from 'rxjs/Observable'
 
 /**
@@ -19,7 +19,7 @@ export class KeycloakHttp extends Http {
 
     if (typeof url === 'string') {
       return tokenObservable.map(token => {
-        const authOptions = new RequestOptions({headers: new Headers({'Authorization': 'Bearer ' + token})});
+        const authOptions = new RequestOptions({ headers: new Headers({ 'Authorization': 'Bearer ' + token }) });
         return new RequestOptions().merge(options).merge(authOptions);
       }).concatMap(opts => super.request(url, opts));
     } else if (url instanceof Request) {

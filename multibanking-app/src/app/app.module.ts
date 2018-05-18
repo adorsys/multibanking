@@ -38,6 +38,7 @@ import { RulesStaticPage } from '../pages/rules-static/rulesStatic.component';
 import { ListActionDirective } from '../directives/listAction.directive';
 import { RulesCustomAutoCompleteService } from '../services/rulesCustomAutoComplete.service';
 import { RulesStaticAutoCompleteService } from '../services/rulesStaticAutoComplete.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -64,6 +65,7 @@ import { RulesStaticAutoCompleteService } from '../services/rulesStaticAutoCompl
     AutoCompleteModule,
     BrowserModule,
     HttpModule,
+    HttpClientModule,
     MomentModule,
     IonicModule.forRoot(MyApp),
   ],
