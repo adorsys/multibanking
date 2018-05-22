@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
 import { AppConfig } from '../app/app.config';
-import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from "rxjs";
 import { BankAccount } from "../api/BankAccount";
 import { Booking } from "../api/Booking";
+import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class BankAccountService {
 
   public bookingsChangedObservable = new Subject();
 
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
   }
 
   getBankAccounts(accessId: string): Observable<Array<BankAccount>> {
     return this.http.get(AppConfig.api_url + "/bankaccesses/" + accessId + "/accounts")
-      .map((res: Response) => res.json()._embedded.bankAccountEntityList)
+      .map((res: any) => res._embedded.bankAccountEntityList)
       .catch(this.handleError);
   }
 

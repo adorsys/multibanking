@@ -4,6 +4,7 @@ export interface Contract {
     "hotline"?: string;
     "interval"?: Contract.IntervalEnum;
     "logo"?: string;
+    "amount"?: number;
     "mandateReference"?: string;
 }
 

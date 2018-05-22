@@ -1,42 +1,42 @@
 import { Injectable } from '@angular/core';
-import { Http, Request, XHRBackend, ConnectionBackend, RequestOptions, RequestOptionsArgs, Response, Headers } from '@angular/http';
-
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HTTP_INTERCEPTORS, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs/Observable';
 import { KeycloakService } from './keycloak.service';
-import { Observable } from 'rxjs/Observable'
+import { Observer } from 'rxjs/Observer';
+import { mergeMap } from 'rxjs/operators';
 
-/**
- * This provides a wrapper over the ng2 Http class that insures tokens are refreshed on each request.
- */
 @Injectable()
-export class KeycloakHttp extends Http {
-  constructor(_backend: ConnectionBackend, _defaultOptions: RequestOptions, private _keycloakService: KeycloakService) {
-    super(_backend, _defaultOptions);
+export class KeycloakHttpInterceptor implements HttpInterceptor {
+
+  constructor(private _keycloakService: KeycloakService) {
   }
 
-  request(url: string | Request, options?: RequestOptionsArgs): Observable<Response> {
-    const tokenPromise: Promise<string> = this._keycloakService.getToken();
-    const tokenObservable: Observable<string> = Observable.fromPromise(tokenPromise);
-
-    if (typeof url === 'string') {
-      return tokenObservable.map(token => {
-        const authOptions = new RequestOptions({ headers: new Headers({ 'Authorization': 'Bearer ' + token }) });
-        return new RequestOptions().merge(options).merge(authOptions);
-      }).concatMap(opts => super.request(url, opts));
-    } else if (url instanceof Request) {
-      return tokenObservable.map(token => {
-        url.headers.set('Authorization', 'Bearer ' + token);
-        return url;
-      }).concatMap(request => super.request(request));
-    }
+  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    return Observable.create(async (observer: Observer<any>) => {
+      let headers = request.headers;
+      if (!headers) {
+        headers = new HttpHeaders();
+      }
+      try {
+        const token: string = await this._keycloakService.getToken();
+        headers = headers.set('Authorization', 'Bearer ' + token);
+        observer.next(headers);
+        observer.complete();
+      } catch (error) {
+        observer.error(error);
+      }
+    }).pipe(
+      mergeMap((headersWithBearer: HttpHeaders) => {
+        const kcReq = request.clone({ headers: headersWithBearer });
+        return next.handle(kcReq);
+      })
+    )
   }
-}
 
-export function keycloakHttpFactory(backend: XHRBackend, defaultOptions: RequestOptions, keycloakService: KeycloakService) {
-  return new KeycloakHttp(backend, defaultOptions, keycloakService);
 }
 
 export const KEYCLOAK_HTTP_PROVIDER = {
-  provide: Http,
-  useFactory: keycloakHttpFactory,
-  deps: [XHRBackend, RequestOptions, KeycloakService]
+  provide: HTTP_INTERCEPTORS,
+  useClass: KeycloakHttpInterceptor,
+  multi: true
 };
