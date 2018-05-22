@@ -1,39 +1,37 @@
 import { Injectable } from '@angular/core';
 import { AppConfig } from '../app/app.config';
-import { Http, Response, ResponseContentType } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { Booking } from "../api/Booking";
 import { Pageable } from '../api/Pageable';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class BookingService {
 
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
   }
 
   getBookings(accessId, accountId): Observable<Pageable> {
     return this.http.get(`${AppConfig.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings`)
-      .map(response => response.json())
       .catch(this.handleError);
   }
 
   getNextBookings(url: string): Observable<Pageable> {
     return this.http.get(url)
-      .map(response => response.json())
       .catch(this.handleError);
   }
 
   getBooking(accessId, accountId, bookingId): Observable<Booking> {
     return this.http.get(`${AppConfig.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/${bookingId}`)
-      .map((res: Response) => res.json()._embedded != null ? res.json()._embedded.bookingEntityList : [])
+      .map((res: any) => res._embedded != null ? res._embedded.bookingEntityList : [])
       .catch(this.handleError);
   }
 
   downloadBookings(accessId, accountId): Observable<any> {
     return this.http.get(`${AppConfig.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/download`,
-      { responseType: ResponseContentType.Blob })
+      { responseType: 'blob' })
       .map(res => {
-        return new Blob([res.blob()], { type: 'application/csv' })
+        return new Blob([res], { type: 'application/csv' })
       })
       .catch(this.handleError);
   }

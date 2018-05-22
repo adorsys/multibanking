@@ -1,23 +1,23 @@
 import { Injectable } from "@angular/core";
 import { AppConfig } from "../app/app.config";
-import { Http, Response, ResponseContentType } from "@angular/http";
 import { Observable } from "rxjs/Observable";
 import { RuleCategory } from "../api/RuleCategory";
 import { Rule } from "../api/Rule";
 import { Subject } from "rxjs";
 import { Pageable } from "../api/Pageable";
+import { HttpClient } from "@angular/common/http";
 
 @Injectable()
 export class RulesService {
 
   public rulesChangedObservable = new Subject<Rule>();
 
-  constructor(private http: Http) {
+  constructor(private http: HttpClient) {
   }
 
   getAvailableCategories(): Observable<Array<RuleCategory>> {
     return this.http.get(`${AppConfig.api_url}/analytics/rules/categories`)
-      .map((res: Response) => res.json()._embedded.ruleCategoryList)
+      .map((res: any) => res._embedded.ruleCategoryList)
       .catch(this.handleError);
   }
 
@@ -25,7 +25,7 @@ export class RulesService {
     let url = custom ? `${AppConfig.api_url}/analytics/rules`
       : `${AppConfig.smartanalytics_url}/rules`;
 
-    return this.http.post(url, rule)
+    return this.http.post(url, rule, { responseType: 'text' })
       .catch(this.handleError)
       .finally(() => {
         this.rulesChangedObservable.next(rule)
@@ -47,25 +47,12 @@ export class RulesService {
     let url = custom ? `${AppConfig.api_url}/analytics/rules/` : `${AppConfig.smartanalytics_url}/rules/`;
 
     return this.http.get(url)
-      .map(response => response.json())
       .catch(this.handleError);
   }
 
   getNextRules(url: string): Observable<Pageable> {
     return this.http.get(url)
-      .map(response => response.json())
       .catch(this.handleError);
-  }
-
-  mapRulesResponse(res: Response, custom: boolean) {
-    let json = res.json();
-    if (json._embedded && json._embedded.customRuleEntityList) {
-      return json._embedded.customRuleEntityList;
-    } else if (json._embedded && json._embedded.ruleEntityList) {
-      return json._embedded.ruleEntityList;
-    }
-    return [];
-
   }
 
   getRule(id: string): Observable<Rule> {
@@ -89,9 +76,9 @@ export class RulesService {
     let url = custom ? `${AppConfig.api_url}/analytics/rules/download`
       : `${AppConfig.smartanalytics_url}/rules/download`;
 
-    return this.http.get(url, { responseType: ResponseContentType.Blob })
+    return this.http.get(url, { responseType: 'blob' })
       .map(res => {
-        return new Blob([res.blob()], { type: 'application/yaml' })
+        return new Blob([res], { type: 'application/yaml' })
       })
       .catch(this.handleError);
   }

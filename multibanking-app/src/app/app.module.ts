@@ -1,7 +1,6 @@
 import { AutoCompleteModule } from 'ionic2-auto-complete';
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
-import { HttpModule } from '@angular/http';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -19,7 +18,6 @@ import { BankAutoCompleteService } from "../services/bankAutoComplete.service";
 import { BookingGroupPage } from "../pages/analytics/bookingGroup.component";
 import { BookingListPage } from '../pages/booking/bookingList.component';
 import { BookingService } from '../services/booking.service';
-import { ContractService } from "../pages/contracts/contract.service";
 import { ContractsComponent } from "../pages/contracts/contracts.component";
 import { CyclePipe } from '../pages/contracts/cycle.pipe';
 import { KEYCLOAK_HTTP_PROVIDER } from '../auth/keycloak.http';
@@ -39,6 +37,7 @@ import { ListActionDirective } from '../directives/listAction.directive';
 import { RulesCustomAutoCompleteService } from '../services/rulesCustomAutoComplete.service';
 import { RulesStaticAutoCompleteService } from '../services/rulesStaticAutoComplete.service';
 import { HttpClientModule } from '@angular/common/http';
+import { ContractService } from '../services/contract.service';
 
 @NgModule({
   declarations: [
@@ -64,7 +63,6 @@ import { HttpClientModule } from '@angular/common/http';
   imports: [
     AutoCompleteModule,
     BrowserModule,
-    HttpModule,
     HttpClientModule,
     MomentModule,
     IonicModule.forRoot(MyApp),

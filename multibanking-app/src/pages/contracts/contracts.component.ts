@@ -1,10 +1,10 @@
 import { Component, ViewChild } from "@angular/core";
 import { NavParams, AlertController, ToastController, LoadingController, Navbar, NavController } from "ionic-angular";
 
-import { ContractService } from "./contract.service";
 import { LogoService } from '../../services/logo.service';
 import { BankAccountService } from "../../services/bankAccount.service";
 import { BankAccess } from "../../api/BankAccess";
+import { ContractService } from "../../services/contract.service";
 
 @Component({
   selector: 'contracts',
