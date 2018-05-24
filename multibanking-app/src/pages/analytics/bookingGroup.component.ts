@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { NavParams } from "ionic-angular";
 import { BookingGroup } from "../../api/BookingGroup";
-import { AppConfig } from "../../app/app.config";
+import { ENV } from "../../env/env";
 import { GroupType } from "../../api/GroupType";
 import { AggregatedGroups } from "../../api/AggregatedGroups";
 
@@ -32,6 +32,6 @@ export class BookingGroupPage {
   }
 
   getCompanyLogoUrl(bookingGroup: BookingGroup) {
-    return AppConfig.api_url + "/image/" + bookingGroup.contract.logo;
+    return ENV.api_url + "/image/" + bookingGroup.contract.logo;
   }
 }

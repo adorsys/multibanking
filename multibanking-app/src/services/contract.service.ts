@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient } from '@angular/common/http';
-import { AppConfig } from '../app/app.config';
 import { Contract } from '../api/Contract';
+import { ENV } from "../env/env";
 
 @Injectable()
 export class ContractService {
@@ -10,7 +10,7 @@ export class ContractService {
   constructor(private http: HttpClient) { }
 
   getContracts(accessId: string, accountId: string): Observable<Array<Contract>> {
-    return this.http.get(`${AppConfig.api_url}/bankaccesses/${accessId}/accounts/${accountId}/contracts`)
+    return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/contracts`)
       .map((res: any) => res._embedded.contractEntityList)
       .catch(this.handleError);
   }

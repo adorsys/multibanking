@@ -12,6 +12,12 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "target": "es5",
+    "baseUrl" : "./src",
+    "paths" : {
+      "@app/env" : [
+        "env/env.ts"
+      ]
+    },
     "typeRoots": [
       "../node_modules/@types"
     ]

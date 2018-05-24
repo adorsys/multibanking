@@ -5,13 +5,13 @@ import { AnalyticsService } from "../../services/analytics.service";
 import { BankAccess } from "../../api/BankAccess";
 import { AccountAnalytics } from "../../api/AccountAnalytics";
 import { BookingGroup } from "../../api/BookingGroup";
-import { AppConfig } from "../../app/app.config";
 import { BookingGroupPage } from "./bookingGroup.component";
 import { GroupType } from "../../api/GroupType";
 import { Moment } from "moment";
 import * as moment from 'moment';
 import { BookingPeriod } from "../../api/BookingPeriod";
 import { AggregatedGroups } from "../../api/AggregatedGroups";
+import { ENV } from "../../env/env";
 
 
 @Component({
@@ -155,7 +155,7 @@ export class AnalyticsPage {
   }
 
   getCompanyLogoUrl(bookingGroup: BookingGroup) {
-    return AppConfig.api_url + "/image/" + bookingGroup.contract.logo;
+    return ENV.api_url + "/image/" + bookingGroup.contract.logo;
   }
 
   syncBookingsPromptPin() {

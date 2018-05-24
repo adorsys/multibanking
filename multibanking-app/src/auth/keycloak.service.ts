@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import * as Keycloak from 'keycloak-js';
-import { AppConfig } from '../app/app.config';
+import { ENV } from '../env/env';
 
 const keycloak = Keycloak({
-  url: AppConfig.auth_url,
+  url: ENV.auth_url,
   realm: 'multibanking',
   clientId: 'multibanking-client'
 })
