@@ -14,3 +14,5 @@ multibanking-app/.history
 *.log
 
 pom.xml.versionsBackup
+multibanking-app/.sourcemaps
+multibanking-app/platforms
