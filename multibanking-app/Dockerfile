@@ -6,11 +6,10 @@ WORKDIR /www/app
 
 ADD . /www/app
 
-RUN ls -l
-
 RUN apk add --update nodejs nodejs-npm \ 
     && npm install -g ionic cordova \
     && npm rebuild node-sass \
     && npm install \
+    && ionic cordova platform add browser \
     && ionic cordova build browser --prod \
     cp -r platforms/browser/www/* /usr/share/nginx/html 
