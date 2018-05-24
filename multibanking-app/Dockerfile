@@ -19,7 +19,7 @@ RUN apk add --update nodejs nodejs-npm \
     && npm rebuild node-sass \
     && npm install
 
-RUN  ionic cordova platform remove browser && ionic cordova platform add browser
+RUN ionic cordova platform remove browser && ionic cordova platform add browser
 RUN ionic cordova build browser --prod
 
 RUN cp -r platforms/browser/www/* /usr/share/nginx/html
