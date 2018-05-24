@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
+import { ENV } from "../env/env";
 
-import { AppConfig } from "../app/app.config";
 
 @Injectable()
 export class LogoService {
@@ -9,8 +9,8 @@ export class LogoService {
 
   getLogo(logoId: string) {
     if (!logoId) {
-      return `${AppConfig.api_url}/image/keinlogo_256`
+      return `${ENV.api_url}/image/keinlogo_256`
     }
-    return `${AppConfig.api_url}/image/${logoId}`;
+    return `${ENV.api_url}/image/${logoId}`;
   }
 }

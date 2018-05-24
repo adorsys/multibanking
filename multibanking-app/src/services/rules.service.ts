@@ -1,11 +1,11 @@
 import { Injectable } from "@angular/core";
-import { AppConfig } from "../app/app.config";
 import { Observable } from "rxjs/Observable";
 import { RuleCategory } from "../api/RuleCategory";
 import { Rule } from "../api/Rule";
 import { Subject } from "rxjs";
 import { Pageable } from "../api/Pageable";
 import { HttpClient } from "@angular/common/http";
+import { ENV } from "../env/env";
 
 @Injectable()
 export class RulesService {
@@ -16,14 +16,14 @@ export class RulesService {
   }
 
   getAvailableCategories(): Observable<Array<RuleCategory>> {
-    return this.http.get(`${AppConfig.api_url}/analytics/rules/categories`)
+    return this.http.get(`${ENV.api_url}/analytics/rules/categories`)
       .map((res: any) => res._embedded.ruleCategoryList)
       .catch(this.handleError);
   }
 
   createRule(rule: Rule, custom: boolean): Observable<Array<RuleCategory>> {
-    let url = custom ? `${AppConfig.api_url}/analytics/rules`
-      : `${AppConfig.smartanalytics_url}/rules`;
+    let url = custom ? `${ENV.api_url}/analytics/rules`
+      : `${ENV.smartanalytics_url}/rules`;
 
     return this.http.post(url, rule, { responseType: 'text' })
       .catch(this.handleError)
@@ -33,8 +33,8 @@ export class RulesService {
   }
 
   updateRule(rule: Rule): Observable<Array<RuleCategory>> {
-    let url = rule.released ? `${AppConfig.smartanalytics_url}/rules/${rule.id}`
-      : `${AppConfig.api_url}/analytics/rules/${rule.id}`;
+    let url = rule.released ? `${ENV.smartanalytics_url}/rules/${rule.id}`
+      : `${ENV.api_url}/analytics/rules/${rule.id}`;
 
     return this.http.put(url, rule)
       .catch(this.handleError)
@@ -44,7 +44,7 @@ export class RulesService {
   }
 
   getRules(custom: boolean): Observable<Pageable> {
-    let url = custom ? `${AppConfig.api_url}/analytics/rules/` : `${AppConfig.smartanalytics_url}/rules/`;
+    let url = custom ? `${ENV.api_url}/analytics/rules/` : `${ENV.smartanalytics_url}/rules/`;
 
     return this.http.get(url)
       .catch(this.handleError);
@@ -56,8 +56,8 @@ export class RulesService {
   }
 
   getRule(id: string): Observable<Rule> {
-    let url = id.startsWith("custom") ? `${AppConfig.api_url}/analytics/rules/${id}`
-      : `${AppConfig.smartanalytics_url}/rules/${id}`;
+    let url = id.startsWith("custom") ? `${ENV.api_url}/analytics/rules/${id}`
+      : `${ENV.smartanalytics_url}/rules/${id}`;
 
     return this.http.get(url)
       .map((res: Response) => res.json() != null ? res.json() : {})
@@ -65,16 +65,16 @@ export class RulesService {
   }
 
   deleteRule(id, custom): Observable<any> {
-    let url = custom ? `${AppConfig.api_url}/analytics/rules/${id}`
-      : `${AppConfig.smartanalytics_url}/rules/${id}`;
+    let url = custom ? `${ENV.api_url}/analytics/rules/${id}`
+      : `${ENV.smartanalytics_url}/rules/${id}`;
 
     return this.http.delete(url)
       .catch(this.handleError);
   }
 
   downloadRules(custom): Observable<any> {
-    let url = custom ? `${AppConfig.api_url}/analytics/rules/download`
-      : `${AppConfig.smartanalytics_url}/rules/download`;
+    let url = custom ? `${ENV.api_url}/analytics/rules/download`
+      : `${ENV.smartanalytics_url}/rules/download`;
 
     return this.http.get(url, { responseType: 'blob' })
       .map(res => {
@@ -87,7 +87,7 @@ export class RulesService {
     let formData: FormData = new FormData();
     formData.append('rulesFile', file, 'rules.yml');
 
-    return this.http.post(`${AppConfig.smartanalytics_url}/rules/upload`, formData)
+    return this.http.post(`${ENV.smartanalytics_url}/rules/upload`, formData)
       .catch(this.handleError);
   }
 
