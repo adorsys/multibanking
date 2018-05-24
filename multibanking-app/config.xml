@@ -2,7 +2,7 @@
 <widget id="io.ionic.starter" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Multibanking</name>
     <description>Multibanking app.</description>
-    <author email="age@adorsys.de" href="https://adorsys.de/"></author>
+    <author email="age@adorsys.de" href="https://adorsys.de/" />
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
