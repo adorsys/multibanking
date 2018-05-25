@@ -8,6 +8,8 @@ import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.Optional;
  * Created by peter on 07.05.18 at 19:34.
  */
 public class UserDataStructure {
-    public static final String DateFormatPattern = "yyyy-MM-dd'T'HH:mm:ss";
+    private static final String DateFormatPattern = "yyyy-MM-dd'T'HH:mm:ss";
     private final static Logger LOGGER = LoggerFactory.getLogger(UserDataStructure.class);
 
     private final JSONObject root;
@@ -255,20 +257,39 @@ public class UserDataStructure {
 
     @Override
     public String toString() {
+        return formatJson(root.toString());
+    }
+
+    public static String formatJson(String content) {
         try {
             int spacesToIndentEachLevel = 4;
-            return new JSONObject(root.toString()).toString(spacesToIndentEachLevel);
+            return new JSONObject(content).toString(spacesToIndentEachLevel);
         } catch (Exception e) {
             throw BaseExceptionHandler.handle(e);
         }
     }
 
-    public Date getDateFromString(String dateString) {
+    public static Date getDateFromString(String dateString) {
         try {
             // 2018-05-12T16:22:25
             // yyyy-MM-dd HH:mm:ss
             SimpleDateFormat sdf = new SimpleDateFormat(DateFormatPattern);
             return sdf.parse(dateString);
+        } catch (Exception e) {
+            throw BaseExceptionHandler.handle(e);
+        }
+    }
+
+    public static String getStringFromLocalDate(LocalDate localDate) {
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        return getStringFromDate(date);
+    }
+    public static String getStringFromDate(Date date) {
+        try {
+            // 2018-05-12T16:22:25
+            // yyyy-MM-dd HH:mm:ss
+            SimpleDateFormat sdf = new SimpleDateFormat(DateFormatPattern);
+            return sdf.format(date);
         } catch (Exception e) {
             throw BaseExceptionHandler.handle(e);
         }

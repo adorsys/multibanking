@@ -22,6 +22,8 @@ public abstract class MB_BaseTest extends BaseControllerIT {
     public BankService bankService;
     public UserPasswordTuple userPasswordTuple;
     public BankAccessStructure theBeckerTuple = new BankAccessStructure("19999999", "m.becker", "12345");
+    public String PIN = "12345";
+    public String WRONG_PIN = "22344";
 
     @Before
     public void setupBank() throws Exception {
