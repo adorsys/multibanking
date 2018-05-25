@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.web.banks.BankController;
 import org.adorsys.cryptoutils.exceptions.BaseExceptionHandler;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;

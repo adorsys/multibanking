@@ -26,6 +26,7 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
     private final static Logger LOGGER = LoggerFactory.getLogger(MB_005_BankAccountTest.class);
     public static final String SYNC_URI = "/api/v1//bankaccesses/{accessId}/accounts/{accountId}/sync";
 
+
     @Test
     public void test_1_synch_bank_account_returns_204() {
         URI location = MB_004_BankAccessTest.createBankAccess(this, theBeckerTuple);
@@ -79,12 +80,11 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
         userDataStructure.getBankAccountIDs(firstBankAccessID).forEach(bankAccountID -> {
             LOGGER.debug("found bank-AccountID:" + bankAccountID.toString());
             URI uri = syncPath(this, bankAccessIDs.get(0), bankAccountID);
-            String pin = "12345";
             // Hello Peter, this synch is working. Then we must expect 204. 102 only happens when we
             // Send a snch while anotherone is still working.
             this.setNextExpectedStatusCode(204);
             LOGGER.debug("PUT TO uri:" + uri);
-            this.testRestTemplate.put(uri, pin);
+            this.testRestTemplate.put(uri, PIN);
         });
 
         UserDataStructure reloadedUserDataStructure = MB_004_BankAccessTest.loadUserDataStructure(this, location);
@@ -105,10 +105,9 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
         Assert.assertEquals(2, bankAccountIDs.size());
         bankAccountIDs.forEach(bankAccountID -> {
             URI uri = syncPath(this, bankAccessIDs.get(0),bankAccountID);
-            String pin = "1234567";
             this.setNextExpectedStatusCode(403);
             LOGGER.debug("PUT TO uri:" + uri);
-            this.testRestTemplate.put(uri, pin);
+            this.testRestTemplate.put(uri, WRONG_PIN);
         });
     }
     
@@ -125,8 +124,7 @@ public class MB_005_BankAccountTest extends MB_BaseTest {
         URI uri = syncPath(base, accessID, bankAccountID);
         base.setNextExpectedStatusCode(204);
         LOGGER.debug("PUT TO uri:" + uri);
-        String pin = "12345";
-        base.testRestTemplate.put(uri, pin);
+        base.testRestTemplate.put(uri, base.PIN);
     }
 
     public static URI syncPath(MB_BaseTest base, BankAccessID accessID, BankAccountID bankAccountID) {
