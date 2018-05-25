@@ -44,10 +44,10 @@
         <maven.build-timestamp>${maven.build.timestamp}</maven.build-timestamp>
 
         <de.adorsys.sts.version>0.25.1</de.adorsys.sts.version>
-        <docusafe.version>0.3.5</docusafe.version>
+        <docusafe.version>0.3.6-SNAPSHOT</docusafe.version>
         <crypt.version>0.18.6</crypt.version>
         <de.adorsys.smartanalytics.version>1.0.4</de.adorsys.smartanalytics.version>
-
+        <slf4j-simple.version>1.7.25</slf4j-simple.version>
         <scmBranch/>
         <start-class/>
     </properties>
@@ -124,6 +124,16 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <dependencies>
+        <!-- Tests -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j-simple.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <!--https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html#production-ready-application-info-automatic-expansion -->

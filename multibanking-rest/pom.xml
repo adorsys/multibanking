@@ -22,24 +22,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-to-lsf4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-to-slf4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
         </dependency>
 
         <!-- STS -->
@@ -48,12 +30,12 @@
             <artifactId>sts-spring</artifactId>
             <version>${de.adorsys.sts.version}</version>
         </dependency>
-		<dependency>
-			<groupId>de.adorsys.sts</groupId>
-			<artifactId>sts-persistence-docusafe</artifactId>
+        <dependency>
+            <groupId>de.adorsys.sts</groupId>
+            <artifactId>sts-persistence-docusafe</artifactId>
             <version>${de.adorsys.sts.version}</version>
             <scope>test</scope>
-		</dependency>
+        </dependency>
 
         <!-- Docusafe Connection -->
         <dependency>
@@ -89,18 +71,18 @@
             <artifactId>onlinebanking-mock</artifactId>
             <version>${project.version}</version>
         </dependency>
-		<dependency>
-	        <groupId>de.adorsys.multibanking</groupId>
-	        <artifactId>multibanking-mock-inmemory</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>de.adorsys.multibanking</groupId>
+            <artifactId>multibanking-mock-inmemory</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- smartanalytics -->
-		<dependency>
+        <dependency>
             <groupId>de.adorsys.smartanalytics</groupId>
             <artifactId>smartanalytics-api</artifactId>
-		</dependency>
+        </dependency>
 
         <!-- Persistence -->
         <dependency>
@@ -120,15 +102,15 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-		<!-- module to support JSR-310 (Java 8 Date & Time API) data types. -->
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-parameter-names</artifactId>
-		</dependency>
+        <!-- module to support JSR-310 (Java 8 Date & Time API) data types. -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-parameter-names</artifactId>
+        </dependency>
 
         <!-- monitoring -->
         <dependency>
@@ -170,10 +152,10 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
         </dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger-ui</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+        </dependency>
 
 
         <!-- test dependencies -->
@@ -238,7 +220,7 @@
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>2.7</version>
             </plugin>
-			<!-- 
+            <!--
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -292,10 +274,10 @@
                         -Ddocusafe.system.user.password=password
                         
                         -Dsts.resourceServer.list=multibanking
-						-Dsts.resourceServers.multibanking.jwksUrl=http://localhost:8081/pop
-						-Dsts.resourceServers.multibanking.audience=multibanking
-						-Dsts.resourceServers.multibanking.userSecretClaimName=multibanking
-                        
+                        -Dsts.resourceServers.multibanking.jwksUrl=http://localhost:8081/pop
+                        -Dsts.resourceServers.multibanking.audience=multibanking
+                        -Dsts.resourceServers.multibanking.userSecretClaimName=multibanking
+
                     </jvmArguments>
                 </configuration>
                 <executions>
@@ -306,7 +288,7 @@
                     </execution>
                 </executions>
             </plugin>
-			 -->
+             -->
             <!-- -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=10022 -->
 
             <!-- Maven Release Build fails if javadoc comments are invalid. http://stackoverflow.com/questions/15886209/maven-is-not-working-in-java-8-when-javadoc-tags-are-incomplete -->
