@@ -1,10 +1,9 @@
 package de.adorsys.multibanking.web;
 
-import java.net.URI;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.web.base.entity.BankAccessID;
+import de.adorsys.multibanking.web.base.entity.BankAccessStructure;
+import de.adorsys.multibanking.web.base.entity.UserDataStructure;
 import org.adorsys.cryptoutils.exceptions.BaseExceptionHandler;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -17,10 +16,10 @@ import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.web.base.entity.BankAccessID;
-import de.adorsys.multibanking.web.base.entity.BankAccessStructure;
-import de.adorsys.multibanking.web.base.entity.UserDataStructure;
+import java.net.URI;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * https://wiki.adorsys.de/display/DOC/Multibanking-Rest+Tests
@@ -122,7 +121,7 @@ public class MB_004_BankAccessTest extends MB_BaseTest {
     
     @Test
     public void forbiden_on_create_bank_access_wrong_pin() {
-    	BankAccessStructure bankLogin = new BankAccessStructure("19999999", "m.becker", "1234567");
+    	BankAccessStructure bankLogin = new BankAccessStructure("19999999", "m.becker", WRONG_PIN);
         BankAccessEntity be = new BankAccessEntity();
         be.setBankCode(bankLogin.getBankCode());
         be.setBankLogin(bankLogin.getBankLogin());
