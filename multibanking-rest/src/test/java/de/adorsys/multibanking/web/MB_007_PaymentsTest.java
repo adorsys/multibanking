@@ -63,7 +63,7 @@ public class MB_007_PaymentsTest extends MB_BaseTest {
         URI paymentUri = this.testRestTemplate.postForLocation(uri, paymentRequest);
         Assert.assertNotNull(paymentUri);
         String paymentData = this.testRestTemplate.getForObject(paymentUri, String.class);
-        LOGGER.info(UserDataStructure.formatJson(paymentData));
+        LOGGER.debug(UserDataStructure.formatJson(paymentData));
 
 
         PaymentLocation paymentLocation = new PaymentLocation(paymentUri);
@@ -75,7 +75,7 @@ public class MB_007_PaymentsTest extends MB_BaseTest {
         URI paymentLocation = paymentPath(base, bankAccessID, bankAccountID, paymentID);
         String paymentData = base.testRestTemplate.getForObject(paymentLocation, String.class);
         String nicePaymentData = UserDataStructure.formatJson(paymentData);
-        LOGGER.info(nicePaymentData);
+        LOGGER.debug(nicePaymentData);
         return nicePaymentData;
     }
 

@@ -1,0 +1,31 @@
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- pattern>%d{HH:mm:ss.SSS} [%thread] %level %logger{50} - %msg%n</pattern -->
+            <pattern>%d{"yyyy/MM/dd HH:mm:ss,SSS"} [%t] [%-5p] [%-75c] %-100m %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>multibanking.log</file>
+        <append>false</append>
+        <!-- set immediateFlush to false for much higher logging throughput -->
+        <immediateFlush>true</immediateFlush>
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>%d{"yyyy/MM/dd HH:mm:ss,SSS"} [%t] [%-5p] [%-75c] %-100m %n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.adorsys" level="info"/>
+    <logger name="de.adorsys" level="info"/>
+    <logger name="domain" level="info"/>
+    <logger name="org.springframework" level="warn"/>
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
