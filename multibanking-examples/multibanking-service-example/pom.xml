@@ -59,6 +59,25 @@
 			<groupId>de.adorsys.sts</groupId>
 			<artifactId>sts-persistence-docusafe</artifactId>
 			<version>${de.adorsys.sts.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>de.adorsys.cryptoutils</groupId>
+					<artifactId>filesystemstoreconnection</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>de.adorsys.cryptoutils</groupId>
+					<artifactId>jjwk</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>de.adorsys.cryptoutils</groupId>
+					<artifactId>encobject</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>de.adorsys.cryptoutils</groupId>
+					<artifactId>storeconnection-api</artifactId>
+				</exclusion>
+			</exclusions>
+
 		</dependency>
 
 		<!-- Docusafe Connection -->
