@@ -116,6 +116,26 @@ public abstract class CacheBasedService{
 		if (userContextCache().isCached(documentFQN, valueType))return true;
 		return documentSafeService.documentExists(auth(), documentFQN);
 	}
+	
+    public <T> boolean deleteDocument(DocumentFQN documentFQN, TypeReference<T> valueType) {
+        LOGGER.debug("deleteDocument " + documentFQN);
+        
+        // Remove from cache
+        Optional<CacheEntry<T>> removed = userContextCache().remove(documentFQN, valueType);
+        boolean docExist=false;
+        try {
+            docExist = documentSafeService.documentExists(auth(), documentFQN);
+        } catch (BaseException b){
+            LOGGER.warn("error checking existence of Document " + documentFQN);
+            // No Action. might nit have been flushed yet.
+        }
+        if(docExist){
+            documentSafeService.deleteDocument(auth(), documentFQN);
+            return true;
+        }
+        return removed!=null;
+    }
+	
 
 	public UserIDAuth auth() {
         return user().getAuth();
