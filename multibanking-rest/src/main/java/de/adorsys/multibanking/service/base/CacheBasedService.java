@@ -9,8 +9,9 @@ import org.adorsys.cryptoutils.exceptions.BaseException;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.business.types.complex.DocumentDirectoryFQN;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
-import org.adorsys.docusafe.business.types.complex.UserIDAuth;
 import org.adorsys.docusafe.service.types.DocumentContent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -20,8 +21,6 @@ import de.adorsys.multibanking.auth.CacheEntry;
 import de.adorsys.multibanking.auth.UserContext;
 import de.adorsys.multibanking.auth.UserContextCache;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for providing access to object thru cache.
