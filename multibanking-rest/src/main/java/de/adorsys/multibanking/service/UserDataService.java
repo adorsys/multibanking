@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.adorsys.cryptoutils.exceptions.BaseException;
+import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import de.adorsys.multibanking.domain.UserData;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.exception.UserNotFoundException;
-import de.adorsys.multibanking.service.base.UserObjectService;
 import de.adorsys.multibanking.service.base.StorageUserService;
+import de.adorsys.multibanking.service.base.UserObjectService;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.FQNUtils;
 import de.adorsys.multibanking.utils.Ids;
@@ -39,6 +40,8 @@ public class UserDataService {
     private OnlineBankingServiceProducer bankingServiceProducer;
     @Autowired
     private StorageUserService storageUserService;
+    @Autowired
+    private DocumentSafeService documentSafeService;
 
 	public UserData load(){
 		return uos.load(FQNUtils.userDataFQN(), valueType())
@@ -54,7 +57,7 @@ public class UserDataService {
 	}
 	
     public DSDocument loadDocument() {
-    	return uos.loadDocument(FQNUtils.userDataFQN());
+        return documentSafeService.readDocument(uos.auth(), FQNUtils.userDataFQN());
     }
 	
 	

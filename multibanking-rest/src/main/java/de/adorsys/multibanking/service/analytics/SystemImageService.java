@@ -1,6 +1,8 @@
 package de.adorsys.multibanking.service.analytics;
 
+import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
+import org.adorsys.docusafe.service.types.DocumentContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,8 @@ import de.adorsys.multibanking.utils.FQNUtils;
 public class SystemImageService {
 	@Autowired
 	private SystemObjectService sos;
+    @Autowired
+    private DocumentSafeService documentSafeService;
 
 	public boolean hasImage(String imageName){
 		return sos.documentExists(FQNUtils.imageFQN(imageName), null);
@@ -29,7 +33,7 @@ public class SystemImageService {
 	 * @return
 	 */
 	public DSDocument loadStaticImage(String imageName){
-		return sos.loadDocument(FQNUtils.imageFQN(imageName));
+        return documentSafeService.readDocument(sos.auth(), FQNUtils.imageFQN(imageName));
 	}
 	
 	/**
@@ -39,6 +43,8 @@ public class SystemImageService {
 	 * @param data
 	 */
 	public void storeStaticImage(String imageName, byte[] data){
-		sos.storeDocument(FQNUtils.imageFQN(imageName), data);
+        DocumentContent documentContent = new DocumentContent(data);
+        DSDocument dsDocument = new DSDocument(FQNUtils.imageFQN(imageName), documentContent, null);
+        documentSafeService.storeDocument(sos.auth(), dsDocument);
 	}
 }
