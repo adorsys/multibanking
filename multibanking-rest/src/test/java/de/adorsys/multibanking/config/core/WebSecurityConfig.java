@@ -132,7 +132,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
     
     @Bean
-    @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
     UserObjectService userObjectService(UserContext userContext){
     	return new UserObjectService(objectMapper, userContext, documentSafeService);
     }
