@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.adorsys.cryptoutils.exceptions.BaseException;
+import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.business.types.complex.DocumentDirectoryFQN;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
+import org.adorsys.docusafe.business.types.complex.UserIDAuth;
 import org.adorsys.docusafe.service.types.DocumentContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +32,14 @@ import de.adorsys.multibanking.exception.ResourceNotFoundException;
  * @author fpo 2018-04-06 04:36
  *
  */
-public abstract class CacheBasedService extends DocumentBasedService {
+public abstract class CacheBasedService{
     private final static Logger LOGGER = LoggerFactory.getLogger(CacheBasedService.class);
 
 	private ObjectMapper objectMapper;
-	public CacheBasedService(ObjectMapper objectMapper) {
+	private DocumentSafeService documentSafeService;
+	public CacheBasedService(ObjectMapper objectMapper, DocumentSafeService documentSafeService) {
 		this.objectMapper = objectMapper;
+		this.documentSafeService = documentSafeService;
 	}
 
 	protected abstract UserContext user();
@@ -66,14 +70,14 @@ public abstract class CacheBasedService extends DocumentBasedService {
 		}
 
 		// Return empty if base document does not exist.
-		if (!documentExists(documentFQN)){
+		if (!documentSafeService.documentExists(user().getAuth(), documentFQN)){
 	        LOGGER.debug("load, doc not found: " + documentFQN);
 			return Optional.empty();
 		}
 
 		try {
 	        LOGGER.debug("loading from file: " + documentFQN);
-			Optional<T> ot = Optional.of(objectMapper.readValue(loadDocument(documentFQN).getDocumentContent().getValue(), valueType));
+			Optional<T> ot = Optional.of(objectMapper.readValue(documentSafeService.readDocument(user().getAuth(), documentFQN).getDocumentContent().getValue(), valueType));
 
 			// Cache document.
 			userContextCache().cacheHit(documentFQN, valueType, ot, false);
@@ -94,11 +98,10 @@ public abstract class CacheBasedService extends DocumentBasedService {
 
 	}
 
-	@Override
 	public void deleteDirectory(DocumentDirectoryFQN dirFQN) {
 		// First remove all cached object from this dir.
 		clearCached(dirFQN);
-		super.deleteDirectory(dirFQN);
+		documentSafeService.deleteFolder(auth(), dirFQN);
 	}
 
 	/**
@@ -111,10 +114,14 @@ public abstract class CacheBasedService extends DocumentBasedService {
 	 */
 	public <T> boolean documentExists(DocumentFQN documentFQN, TypeReference<T> valueType) {
 		if (userContextCache().isCached(documentFQN, valueType))return true;
-		return documentExists(documentFQN);
+		return documentSafeService.documentExists(auth(), documentFQN);
 	}
 
-	/**
+	public UserIDAuth auth() {
+        return user().getAuth();
+    }
+
+    /**
 	 * Store the file in cache. If cache not supported, flush document.
 	 *
 	 * @param documentFQN
@@ -148,7 +155,7 @@ public abstract class CacheBasedService extends DocumentBasedService {
 			throw new BaseException(e);
 		}
 		DSDocument dsDocument = new DSDocument(documentFQN, documentContent, null);
-		storeDocument(dsDocument);
+		documentSafeService.storeDocument(auth(), dsDocument);
 	}
 
 	public void enableCaching() {
@@ -171,7 +178,7 @@ public abstract class CacheBasedService extends DocumentBasedService {
 						flush(cacheEntry.getDocFqn(), cacheEntry.getEntry().get());
 					} else {
 				        LOGGER.debug("Cache entry pre flush : absent. File will be deleted: " + cacheEntry.getDocFqn());
-						deleteDocument(cacheEntry.getDocFqn());
+				        documentSafeService.deleteDocument(auth(), cacheEntry.getDocFqn());
 					}
 				} else {
 			        LOGGER.debug("Cache entry pre flush : clean. No file write : " + cacheEntry.getDocFqn());

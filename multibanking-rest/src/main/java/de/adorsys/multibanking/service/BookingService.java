@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
 import org.apache.commons.lang3.StringUtils;
@@ -89,6 +90,8 @@ public class BookingService {
     private AnonymizationService anonymizationService;
     @Autowired
     private CategoriesProvider categoriesProvider;
+    @Autowired
+    private DocumentSafeService documentSafeService;
     /**
      * Read and returns the booking file for a given period. Single bookings are not deserialized in
      * the memory of this JVM.
@@ -103,7 +106,7 @@ public class BookingService {
     	DocumentFQN bookingFQN = FQNUtils.bookingFQN(accessId,accountId,period);
     	if(!bankAccountData.containsBookingFileOfPeriod(period))
     		throw new UnexistentBookingFileException(bookingFQN.getValue());
-        return uos.loadDocument(bookingFQN);
+        return documentSafeService.readDocument(uos.auth(), bookingFQN);
     }
     
     public List<BookingEntity> getAllBookingsAlList(String accessId, String accountId){

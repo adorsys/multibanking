@@ -3,7 +3,9 @@ package de.adorsys.multibanking.service.helper;
 import java.util.Collections;
 import java.util.List;
 
+import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -21,9 +23,12 @@ public abstract class BookingCategoryServiceTemplate<T extends CategoryEntity> {
 	
 	protected abstract CacheBasedService cbs();
 	protected abstract TypeReference<List<T>> listType();
+	
+    @Autowired
+    private DocumentSafeService documentSafeService;
 
 	public DSDocument getBookingCategories() {
-    	return cbs().loadDocument(CategoryUtils.bookingCategoriesFQN);
+        return documentSafeService.readDocument(cbs().auth(), CategoryUtils.bookingCategoriesFQN);
     }
 
 	public void createOrUpdateCategory(T categoryEntity) {
