@@ -5,7 +5,7 @@
 
     <groupId>de.adorsys.multibanking</groupId>
     <artifactId>multibanking</artifactId>
-    <version>3.0.21</version>
+    <version>3.0.22-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Multibanking</name>
     <url>https://github.com/adorsys/multibanking</url>
