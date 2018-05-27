@@ -69,6 +69,15 @@ public class UserContextCache {
 		Map<DocumentFQN, CacheEntry<?>> typeCache = typeCache(valueType);
 		return Optional.ofNullable((CacheEntry<T>) typeCache.get(documentFQN));
 	}
+
+    public <T> Optional<CacheEntry<T>> remove(DocumentFQN documentFQN, TypeReference<T> valueType){
+        if(!userContext.isCacheEnabled() || valueType==null) return Optional.empty();
+        Map<DocumentFQN, CacheEntry<?>> typeCache = typeCache(valueType);
+        if(typeCache.containsKey(documentFQN)){
+            return Optional.ofNullable((CacheEntry<T>)typeCache.remove(documentFQN));
+        }
+        return Optional.empty();
+    }
 	
 	/**
 	 * @param documentFQN

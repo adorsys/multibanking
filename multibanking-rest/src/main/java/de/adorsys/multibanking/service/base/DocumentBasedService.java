@@ -8,7 +8,6 @@ import org.adorsys.docusafe.business.types.complex.UserIDAuth;
 import org.adorsys.docusafe.service.types.DocumentContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Base class for providing access to the document safe service.
@@ -19,13 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class DocumentBasedService {
     private final static Logger LOGGER = LoggerFactory.getLogger(DocumentBasedService.class);
 
-	@Autowired
-	private DocumentSafeService documentSafeService;
-
-	protected abstract UserIDAuth auth();
+    protected abstract UserIDAuth auth();
+    protected abstract DocumentSafeService docs();
 
 	public boolean documentExists(DocumentFQN documentFQN){
-		return documentSafeService.documentExists(auth(), documentFQN);
+		return docs().documentExists(auth(), documentFQN);
 	}
 
 	/**
@@ -35,11 +32,11 @@ public abstract class DocumentBasedService {
 	 */
 	public DSDocument loadDocument(DocumentFQN documentFQN) {
         LOGGER.debug("loadDocument " + documentFQN);
-		return documentSafeService.readDocument(auth(), documentFQN);
+		return docs().readDocument(auth(), documentFQN);
 	}
 
 	public void storeDocument(DSDocument dsDocument) {
-		documentSafeService.storeDocument(auth(), dsDocument);
+		docs().storeDocument(auth(), dsDocument);
 	}
 
 	/**
@@ -52,7 +49,7 @@ public abstract class DocumentBasedService {
         LOGGER.debug("storeDocument " + documentFQN);
 		DocumentContent documentContent = new DocumentContent(data);
 		DSDocument dsDocument = new DSDocument(documentFQN, documentContent, null);
-		documentSafeService.storeDocument(auth(), dsDocument);
+		docs().storeDocument(auth(), dsDocument);
 	}
 
 	/**
@@ -61,12 +58,11 @@ public abstract class DocumentBasedService {
 	 * @param dirFQN
 	 */
 	public void deleteDirectory(DocumentDirectoryFQN dirFQN) {
-		documentSafeService.deleteFolder(auth(), dirFQN);
+		docs().deleteFolder(auth(), dirFQN);
 	}
 
 	public void deleteDocument(DocumentFQN documentFQN) {
         LOGGER.debug("deleteDocument " + documentFQN);
-
-        documentSafeService.deleteDocument(auth(), documentFQN);
+        docs().deleteDocument(auth(), documentFQN);
 	}
 }

@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.service.base;
 
-import org.adorsys.docusafe.business.types.complex.UserIDAuth;
+import org.adorsys.docusafe.business.DocumentSafeService;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -16,18 +16,13 @@ import de.adorsys.multibanking.auth.UserContext;
 public class SystemObjectService extends CacheBasedService {
 	private SystemContext systemContext;
 
-	public SystemObjectService(ObjectMapper objectMapper, SystemContext systemContext) {
-		super(objectMapper);
+	public SystemObjectService(ObjectMapper objectMapper, SystemContext systemContext, DocumentSafeService documentSafeService) {
+	    super(objectMapper, documentSafeService);
 		this.systemContext = systemContext;
 	}
 
 	@Override
 	public UserContext user() {
 		return systemContext.getUser();
-	}
-
-	@Override
-	public UserIDAuth auth() {
-		return systemContext.getUser().getAuth();
 	}
 }

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -23,8 +25,11 @@ public abstract class BookingRuleServiceTemplate<T extends RuleEntity>{
 	protected abstract CacheBasedService cbs();
 	protected abstract TypeReference<List<T>> listType();
 	
+    @Autowired
+    private DocumentSafeService documentSafeService;
+	
     public DSDocument getBookingRules() {
-    	return cbs().loadDocument(RuleUtils.bookingRulesFQN);
+        return documentSafeService.readDocument(cbs().auth(), RuleUtils.bookingRulesFQN);
     }
 
 	public void createOrUpdateRule(T ruleEntity) {

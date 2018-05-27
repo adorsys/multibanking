@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.UserID;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
 import org.adorsys.encobject.domain.ReadKeyPassword;
@@ -63,6 +64,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     
     @Autowired
 	private ObjectMapper objectMapper;
+    
+    @Autowired
+    private DocumentSafeService documentSafeService;
 
 
     @Override
@@ -130,12 +134,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
     UserObjectService userObjectService(UserContext userContext){
-    	return new UserObjectService(objectMapper, userContext);
+    	return new UserObjectService(objectMapper, userContext, documentSafeService);
     }
 
     @Bean
     SystemObjectService systemObjectService(SystemContext systemContext){
-    	return new SystemObjectService(objectMapper, systemContext);
+    	return new SystemObjectService(objectMapper, systemContext, documentSafeService);
     }
 
     @Bean
