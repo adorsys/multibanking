@@ -44,7 +44,7 @@
         <maven.build-timestamp>${maven.build.timestamp}</maven.build-timestamp>
 
         <de.adorsys.sts.version>0.25.1</de.adorsys.sts.version>
-        <de.adorsys.smartanalytics.version>1.0.4</de.adorsys.smartanalytics.version>
+        <de.adorsys.smartanalytics.version>1.0.5</de.adorsys.smartanalytics.version>
         <!--
         <slf4j-simple.version>1.7.25</slf4j-simple.version>
         -->

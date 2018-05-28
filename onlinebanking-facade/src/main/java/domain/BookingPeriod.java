@@ -3,6 +3,7 @@ package domain;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -12,5 +13,6 @@ public class BookingPeriod {
 
     private LocalDate start;
     private LocalDate end;
-    private List<LocalDate> bookingDates;
+    private BigDecimal amount;
+    private List<ExecutedBooking> bookings;
 }
