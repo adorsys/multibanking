@@ -20,18 +20,18 @@ public class SmartanalyticsMapper {
     static List<Booking> convertInput(Collection<BookingEntity> bookings) {
         List<Booking> interfaceBookings = new ArrayList<>();
         for (BookingEntity booking : bookings) {
-            Booking smartanalyticsBooking = Booking.builder()
-                    .bookingId(booking.getExternalId())
-                    .creditorId(booking.getCreditorId())
-                    .purpose(booking.getUsage())
-                    .iban(booking.getOtherAccount() != null ? booking.getOtherAccount().getIban() : null)
-                    .accountNumber(booking.getOtherAccount() != null ? booking.getOtherAccount().getAccountNumber() : null)
-                    .bankCode(booking.getOtherAccount() != null ? booking.getOtherAccount().getBlz() : null)
-                    .amount(booking.getAmount())
-                    .executionDate(booking.getValutaDate())
-                    .standingOrder(booking.isStandingOrder())
-                    .mandateReference(booking.getMandateReference())
-                    .build();
+            Booking smartanalyticsBooking = new Booking();
+            smartanalyticsBooking.setBookingId(booking.getExternalId());
+            smartanalyticsBooking.setCreditorId(booking.getCreditorId());
+            smartanalyticsBooking.setPurpose(booking.getUsage());
+            smartanalyticsBooking.setIban(booking.getOtherAccount() != null ? booking.getOtherAccount().getIban() : null);
+            smartanalyticsBooking.setAccountNumber(booking.getOtherAccount() != null ? booking.getOtherAccount().getAccountNumber() : null);
+            smartanalyticsBooking.setBankCode(booking.getOtherAccount() != null ? booking.getOtherAccount().getBlz() : null);
+            smartanalyticsBooking.setAmount(booking.getAmount());
+            smartanalyticsBooking.setExecutionDate(booking.getValutaDate());
+            smartanalyticsBooking.setStandingOrder(booking.isStandingOrder());
+            smartanalyticsBooking.setMandateReference(booking.getMandateReference());
+
             if (booking.getOtherAccount() != null) {
                 if (booking.getOtherAccount().getOwner() != null) {
                     smartanalyticsBooking.setReferenceName(booking.getOtherAccount().getOwner());
