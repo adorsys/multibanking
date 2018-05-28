@@ -38,6 +38,7 @@ import { RulesCustomAutoCompleteService } from '../services/rulesCustomAutoCompl
 import { RulesStaticAutoCompleteService } from '../services/rulesStaticAutoComplete.service';
 import { HttpClientModule } from '@angular/common/http';
 import { ContractService } from '../services/contract.service';
+import { BookingGroupDetailPage } from '../pages/analytics/bookingGroupDetail.component';
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { ContractService } from '../services/contract.service';
     BankAccessUpdatePage,
     BankAccountListPage,
     BookingGroupPage,
+    BookingGroupDetailPage,
     BookingListPage,
     BookingDetailPage,
     RuleEditPage,
@@ -75,6 +77,7 @@ import { ContractService } from '../services/contract.service';
     BankAccessUpdatePage,
     BankAccountListPage,
     BookingGroupPage,
+    BookingGroupDetailPage,
     BookingListPage,
     BookingDetailPage,
     RuleEditPage,

@@ -2,13 +2,25 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Booking } from "../api/Booking";
 import { Pageable } from '../api/Pageable';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { ENV } from "../env/env";
 
 @Injectable()
 export class BookingService {
 
   constructor(private http: HttpClient) {
+  }
+
+  getBookingsByIds(accessId, accountId, bookingIds: string[]): Observable<Booking[]> {
+    const params = new HttpParams({
+      fromObject: {
+        ids: bookingIds,
+      }
+    });
+
+    return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings`, { params: params })
+      .map((res: any) => res._embedded != null ? res._embedded.bookingEntityList : [])
+      .catch(this.handleError);
   }
 
   getBookings(accessId, accountId): Observable<Pageable> {

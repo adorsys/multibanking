@@ -1,22 +1,20 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>{{ label }}</ion-title>
+    <ion-title>{{ label }} - {{ referenceDate | amDateFormat:'MMM YYYY' }}</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
-  <ion-item *ngFor="let bookingGroup of bookingGroups">
+  <ion-item *ngFor="let group of bookingGroups" (click)="itemSelected(group)">
     <ion-thumbnail item-left>
-      <img [src]="getCompanyLogoUrl(bookingGroup)" *ngIf="bookingGroup.contract.logo" item-left/>
+      <img [src]="getCompanyLogoUrl(group)" *ngIf="group.contract?.logo" item-left/>
     </ion-thumbnail>
-    <h3 *ngIf="bookingGroup.name">{{bookingGroup.name}}</h3>
-    <h4 *ngIf="bookingGroup.otherAccount">{{bookingGroup.otherAccount}}</h4>
-    <h4 *ngIf="bookingGroup.mainCategory">{{bookingGroup.mainCategory}}</h4>
-    <h4 *ngIf="bookingGroup.subCategory">{{bookingGroup.subCategory}}</h4>
-    <h4 *ngIf="bookingGroup.specification">{{bookingGroup.specification}}</h4>
+    <h3>{{group.otherAccount ? group.otherAccount : group.name}}</h3>
+    <h4 *ngIf="group.mainCategory">{{group.mainCategory}}</h4>
+    <h4 *ngIf="group.subCategory">{{group.subCategory}}</h4>
+    <h4 *ngIf="group.specification">{{group.specification}}</h4>
     <div item-right>
-      <h4>{{ bookingGroup.nextExecutionDate | date }}</h4>
-      <h2>{{ bookingGroup.amount | currency:'EUR':'symbol' }}</h2>
+      <h2>{{ getAmount(group) | currency:'EUR':'symbol' }}</h2>
     </div>
   </ion-item>
 </ion-content>

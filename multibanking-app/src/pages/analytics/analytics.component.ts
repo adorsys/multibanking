@@ -12,6 +12,7 @@ import * as moment from 'moment';
 import { BookingPeriod } from "../../api/BookingPeriod";
 import { AggregatedGroups } from "../../api/AggregatedGroups";
 import { ENV } from "../../env/env";
+import { ExecutedBooking } from "../../api/ExecutedBooking";
 
 
 @Component({
@@ -26,6 +27,7 @@ export class AnalyticsPage {
 
   dates: Moment[] = [];
   referenceDate: Moment;
+  forecast: boolean = false;
   incomeFix: AggregatedGroups;
   incomeOther: AggregatedGroups;
   expensesFix: AggregatedGroups;
@@ -95,28 +97,30 @@ export class AnalyticsPage {
     this.expensesOther = { amount: 0, groups: [] };
 
     this.analytics.bookingGroups.forEach((group: BookingGroup) => {
-      if (this.includeGroup(group)) {
+      let amount = this.getAmount(group);
+
+      if (amount != 0 && this.includeGroup(group)) {
         switch (group.type) {
           case GroupType.RECURRENT_INCOME:
-            this.incomeFix.amount += group.amount;
+            this.incomeFix.amount += amount;
             this.incomeFix.groups.push(group);
             break;
           case GroupType.OTHER_INCOME:
-            this.incomeOther.amount += group.amount;
+            this.incomeOther.amount += amount;
             this.incomeOther.groups.push(group);
             break;
           case GroupType.RECURRENT_NONSEPA:
           case GroupType.RECURRENT_SEPA:
           case GroupType.STANDING_ORDER:
-            this.expensesFix.amount += group.amount;
+            this.expensesFix.amount += amount;
             this.expensesFix.groups.push(group);
             break;
           case GroupType.CUSTOM:
-            this.expensesVariable.amount += group.amount;
+            this.expensesVariable.amount += amount;
             this.expensesVariable.groups.push(group);
             break;
           case GroupType.OTHER_EXPENSES:
-            this.expensesOther.amount += group.amount;
+            this.expensesOther.amount += amount;
             this.expensesOther.groups.push(group);
             break;
         }
@@ -124,11 +128,38 @@ export class AnalyticsPage {
     })
   }
 
-  includeGroup(group: BookingGroup): boolean {
-    if (group.amount == 0) {
-      return false;
+  getAmount(group: BookingGroup): number {
+    let period: BookingPeriod = group.bookingPeriods.find((period: BookingPeriod) => {
+      let start: Moment = moment(period.start);
+      return start.month() == this.referenceDate.month() && start.year() == this.referenceDate.year();
+    });
+
+    if (period) {
+      return period.amount ? period.amount : group.amount
     }
 
+    if (this.forecast) {
+      return group.amount;
+    }
+
+    return 0;
+  }
+
+  isRecurrent(group: BookingGroup) {
+    switch (group.type) {
+      case GroupType.RECURRENT_INCOME:
+      case GroupType.RECURRENT_NONSEPA:
+      case GroupType.RECURRENT_SEPA:
+      case GroupType.STANDING_ORDER:
+        return true;
+      case GroupType.OTHER_INCOME:
+      case GroupType.CUSTOM:
+      case GroupType.OTHER_EXPENSES:
+        return false;
+    }
+  }
+
+  includeGroup(group: BookingGroup): boolean {
     switch (group.type) {
       case GroupType.OTHER_INCOME:
       case GroupType.OTHER_INCOME:
@@ -143,15 +174,7 @@ export class AnalyticsPage {
       return start.month() == this.referenceDate.month() && start.year() == this.referenceDate.year();
     });
 
-    if (!period) {
-      return false;
-    }
-
-    let periodBookingDate: string = period.bookingDates.find((bookingDate: string) => {
-      return moment(bookingDate).month() == this.referenceDate.month();
-    });
-
-    return periodBookingDate != null;
+    return period != null;
   }
 
   getCompanyLogoUrl(bookingGroup: BookingGroup) {
@@ -224,11 +247,19 @@ export class AnalyticsPage {
 
   newDateSelected(date: Moment) {
     this.referenceDate = date;
+    this.forecast = date.isAfter(moment(), "month");
     this.calculateBudget();
   }
 
   itemSelected(label: string, bookingGroups: AggregatedGroups) {
-    this.navCtrl.push(BookingGroupPage, { label: label, bookingGroups: bookingGroups })
+    this.navCtrl.push(BookingGroupPage,
+      {
+        label: label,
+        date: this.referenceDate,
+        bankAccessId: this.bankAccess.id,
+        bankAccountId: this.bankAccountId,
+        bookingGroups: bookingGroups
+      })
   }
 
 }

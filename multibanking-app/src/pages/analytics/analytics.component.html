@@ -24,7 +24,7 @@
     <ion-item-group>
       <ion-item-divider color="light">Incomings</ion-item-divider>
       <ion-item (click)="itemSelected('Income fix', incomeFix)">
-        <h2>Fix incomings {{ referenceDate | amDateFormat:'MMM YYYY' }}</h2>
+        <h2>{{!forecast ? 'Fix incomings' : 'Estimated fix incomings' }}</h2>
         <div item-right>
           <h2 [ngClass]="{'amount--negative': incomeFix?.amount < 0, 'amount--positive': incomeFix?.amount > 0}">
             {{ incomeFix?.amount | currency:'EUR':'symbol' }}
@@ -32,7 +32,7 @@
         </div>
       </ion-item>
       <ion-item (click)="itemSelected('Income other', incomeOther)">
-        <h2>Average other incomings over last 2 months</h2>
+        <h2>{{!forecast ? 'Other incomings' : 'Estimated other incomings' }}</h2>
         <div item-right>
           <h2 [ngClass]="{'amount--negative': incomeOther?.amount < 0, 'amount--positive': incomeOther?.amount > 0}">
             {{ incomeOther?.amount | currency:'EUR':'symbol' }}
@@ -43,7 +43,7 @@
     <ion-item-group>
       <ion-item-divider color="light">Expenses</ion-item-divider>
       <ion-item (click)="itemSelected('Expenses fix', expensesFix)">
-        <h2>Fix expenses {{ referenceDate | amDateFormat:'MMM YYYY' }}</h2>
+        <h2>{{!forecast ? 'Fix expenses' : 'Estimated fix expenses' }}</h2>
         <div item-right>
           <h2 [ngClass]="{'amount--negative': expensesFix?.amount < 0, 'amount--positive': expensesFix?.amount > 0}">
             {{ expensesFix?.amount | currency:'EUR':'symbol' }}
@@ -51,7 +51,7 @@
         </div>
       </ion-item>
       <ion-item (click)="itemSelected('Expenses variable', expensesVariable)">
-        <h2>Average variable expenses over last 2 months</h2>
+        <h2>{{!forecast ? 'Variable expenses' : 'Estimated variable expenses' }}</h2>
         <div item-right>
           <h2 [ngClass]="{'amount--negative': expensesVariable?.amount < 0, 'amount--positive': expensesVariable?.amount > 0}">
             {{ expensesVariable?.amount | currency:'EUR':'symbol' }}
@@ -59,7 +59,7 @@
         </div>
       </ion-item>
       <ion-item (click)="itemSelected('Expenses other', expensesOther)">
-        <h2>Average other expenses over last 2 months</h2>
+        <h2>{{!forecast ? 'Other expenses' : 'Estimated other expenses' }}</h2>
         <div item-right>
           <h2 [ngClass]="{'amount--negative': expensesOther?.amount < 0, 'amount--positive': expensesOther?.amount > 0}">
             {{ expensesOther?.amount | currency:'EUR':'symbol' }}

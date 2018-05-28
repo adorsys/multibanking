@@ -1,7 +1,8 @@
+import { ExecutedBooking } from "./ExecutedBooking";
+
 export interface BookingPeriod {
-    
     "start"?: string;
     "end"?: string;
-    "bookingDates"?: string[];
-    
+    "amount"?: number;
+    "bookings"?: ExecutedBooking[];
 }
