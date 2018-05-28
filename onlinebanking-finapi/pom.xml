@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.adorsys.multibanking</groupId>
 		<artifactId>multibanking</artifactId>
-		<version>3.0.22-SNAPSHOT</version>
+		<version>3.0.22</version>
 	</parent>
 
 	<artifactId>onlinebanking-finapi</artifactId>
@@ -14,12 +14,12 @@
 		<dependency>
 			<groupId>de.adorsys.multibanking</groupId>
 			<artifactId>onlinebanking-facade</artifactId>
-			<version>3.0.22-SNAPSHOT</version>
+			<version>3.0.22</version>
 		</dependency>
 		<dependency>
 			<groupId>de.adorsys.multibanking</groupId>
 			<artifactId>finapi-adapter</artifactId>
-			<version>3.0.22-SNAPSHOT</version>
+			<version>3.0.22</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
