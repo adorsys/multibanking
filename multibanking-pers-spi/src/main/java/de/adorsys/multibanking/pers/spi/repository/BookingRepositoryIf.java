@@ -20,6 +20,8 @@ public interface BookingRepositoryIf {
 
     Optional<BookingEntity> findByUserIdAndId(String userId, String bookingId);
 
+    Iterable<BookingEntity> findByUserIdAndIds(String name, List<String> ids);
+
     List<BookingEntity> save(List<BookingEntity> bookingEntities);
 
     void deleteByAccountId(String id);

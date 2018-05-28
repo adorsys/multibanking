@@ -43,6 +43,12 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 	}
 
 	@Override
+	public Iterable<BookingEntity> findByUserIdAndIds(String name, List<String> ids) {
+        return bookingRepository.findAllById(ids);
+	}
+
+
+	@Override
 	public List<BookingEntity> save(List<BookingEntity> bookingEntities) {
         List<BookingEntity> newEntities = bookingEntities
                 .stream()
@@ -66,5 +72,6 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 	public void deleteByAccountId(String id) {
 		bookingRepository.deleteByAccountId(id);
 	}
+
 
 }
