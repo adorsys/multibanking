@@ -20,6 +20,9 @@ public class Utils {
     private static Pattern mandateReferenceRegex =
             Pattern.compile("(?:mref|mandatsreferenz|mandatsref|mandat)[:\\+]?\\s*(\\S+?)(?:\\s+|\\+|CRED|MANDATSDATUM|EINREICHER-ID)", Pattern.CASE_INSENSITIVE);
 
+    private static Pattern abwaRegex =
+            Pattern.compile("(?:abwa\\+)(.*)", Pattern.CASE_INSENSITIVE);
+
 
     public static String extractCreditorId(String input) {
         if (input == null) {
@@ -28,6 +31,17 @@ public class Utils {
         Matcher matcher = creditorIdRegex.matcher(input);
         if (matcher.find()) {
             return matcher.group(0);
+        }
+        return null;
+    }
+
+    public static String extractDifferentInitiator(String input) {
+        if (input == null) {
+            return null;
+        }
+        Matcher matcher = abwaRegex.matcher(input);
+        if (matcher.find()) {
+            return matcher.group(1);
         }
         return null;
     }

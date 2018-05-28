@@ -4,13 +4,14 @@ package hbci4java;
 import domain.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.text.WordUtils;
+import org.apache.commons.text.WordUtils;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.structures.Konto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.Utils;
 
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -153,7 +154,12 @@ public final class HbciMapping {
                 booking.setUsage(
                         getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line.additional, 27)));
 
-                if (booking.getOtherAccount() != null && StringUtils.isBlank(booking.getOtherAccount().getIban())) {
+                String differentInitiator = Utils.extractDifferentInitiator(booking.getUsage());
+                if (differentInitiator != null){
+                    booking.getOtherAccount().setOwner(booking.getOtherAccount().getOwner()+" "+differentInitiator);
+                }
+
+                if (StringUtils.isBlank(booking.getOtherAccount().getIban())) {
                     booking.getOtherAccount().setIban(extractIban(booking.getUsage()));
                 }
 
@@ -180,63 +186,13 @@ public final class HbciMapping {
 
     private static String getUsage(List<String> lines) {
         StringBuilder sb = new StringBuilder();
-        int lineIndex = 0;
+
         for (String line : lines) {
             sb.append(StringUtils.chomp(line));
             sb.append(line.length() < 27 ? " " : "");
-            lineIndex++;
         }
         return WordUtils.capitalizeFully(sb.toString().trim(), ' ', '/');
     }
-
-    /**
-     * sb
-     * Bereinigt die Verwendungszweck-Zeilen. Hierbei werden leere Zeilen oder NULL-Elemente entfernt.
-     * Ausserdem werden alle Zeilen getrimt.
-     *
-     * @param trim  wenn die Zeilen-Enden getrimmt werden sollen.
-     * @param lines die zu bereinigenden Zeilen.
-     * @return die bereinigten Zeilen.
-     */
-    private static List<String> clean(boolean trim, List<String> lines) {
-        List<String> result = new ArrayList<>();
-        if (lines == null || lines.size() == 0) {
-            return result;
-        }
-
-        for (String line : lines) {
-            if (line == null) {
-                continue;
-            }
-
-            if (trim) {
-                line = line.trim();
-            }
-            if (line.length() > 0) {
-                result.add(line);
-            }
-        }
-
-        return result;
-    }
-
-//    /**
-//     * Zerlegt einen langen Verwendungszweck in 27 Zeichen lange Haeppchen.
-//     *
-//     * @param line die zu parsende Zeile.
-//     * @return die 27 Zeichen langen Schnippsel.
-//     */
-//    private static List<String> parse(String line) {
-//        if (line == null || line.length() == 0)
-//            return new ArrayList<>();
-//
-//        // Java's Regex-Implementierung ist sowas von daemlich.
-//        // String.split() macht nur Rotz, wenn man mit Quantifierern
-//        // arbeitet. Also ersetzten wir erst mal alles gegen nen
-//        // eigenen String und verwenden den dann zum Splitten.
-//        String s = line.replaceAll("(.{27})", "$1--##--##");
-//        return s.split("--##--##");
-//    }
 
     public static List<String> splitEqually(String text, int size) {
         if (text == null || text.length() == 0) {
@@ -253,37 +209,5 @@ public final class HbciMapping {
         return ret;
     }
 
-    /**
-     * Bricht die Verwendungszweck-Zeilen auf $limit Zeichen lange Haeppchen neu um. Jedoch nur, wenn
-     * wirklich Zeilen enthalten sind, die laenger sind. Andernfalls wird nichts umgebrochen.
-     *
-     * @param limit das Zeichen-Limit pro Zeile.
-     * @param lines die Zeilen.
-     * @return die neu umgebrochenen Zeilen.
-     */
-    private static List<String> rewrap(int limit, List<String> lines) {
-        if (lines == null || lines.size() == 0) {
-            return lines;
-        }
 
-        boolean found = false;
-        for (String s : lines) {
-            if (s != null && s.length() > limit) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            return lines;
-        }
-
-        List<String> l = clean(true, lines);
-
-        // Zu einem String mergen
-        StringBuilder sb = new StringBuilder();
-        l.forEach(sb::append);
-        String result = sb.toString();
-
-        return splitEqually(result, limit);
-    }
 }
