@@ -12,8 +12,6 @@ import * as moment from 'moment';
 import { BookingPeriod } from "../../api/BookingPeriod";
 import { AggregatedGroups } from "../../api/AggregatedGroups";
 import { ENV } from "../../env/env";
-import { ExecutedBooking } from "../../api/ExecutedBooking";
-
 
 @Component({
   selector: 'page-analytics',

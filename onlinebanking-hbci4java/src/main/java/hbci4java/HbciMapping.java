@@ -144,6 +144,16 @@ public final class HbciMapping {
                 }
                 if (line.other != null) {
                     booking.setOtherAccount(toBankAccount(line.other));
+
+                    String differentInitiator = Utils.extractDifferentInitiator(booking.getUsage());
+                    if (differentInitiator != null){
+                        booking.getOtherAccount().setOwner(booking.getOtherAccount().getOwner()+" "+differentInitiator);
+                    }
+
+                    if (StringUtils.isBlank(booking.getOtherAccount().getIban())) {
+                        booking.getOtherAccount().setIban(extractIban(booking.getUsage()));
+                    }
+
                 }
                 booking.setExternalId("B-" + line.bdate.getTime() + "_" + line.value.getLongValue()
                         + "_" + line.saldo.value.getLongValue());
@@ -154,14 +164,6 @@ public final class HbciMapping {
                 booking.setUsage(
                         getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line.additional, 27)));
 
-                String differentInitiator = Utils.extractDifferentInitiator(booking.getUsage());
-                if (differentInitiator != null){
-                    booking.getOtherAccount().setOwner(booking.getOtherAccount().getOwner()+" "+differentInitiator);
-                }
-
-                if (StringUtils.isBlank(booking.getOtherAccount().getIban())) {
-                    booking.getOtherAccount().setIban(extractIban(booking.getUsage()));
-                }
 
                 bookings.add(0, booking);
             }
