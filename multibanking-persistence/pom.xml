@@ -5,7 +5,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>3.0.23</version>
+        <version>3.0.24-SNAPSHOT</version>
     </parent>
 
     <artifactId>multibanking-persistence</artifactId>
@@ -15,12 +15,12 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-facade</artifactId>
-            <version>3.0.23</version>
+            <version>3.0.24-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>multibanking-pers-spi</artifactId>
-            <version>3.0.23</version>
+            <version>3.0.24-SNAPSHOT</version>
         </dependency>
 
         <dependency>
