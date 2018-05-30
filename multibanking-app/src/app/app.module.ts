@@ -5,6 +5,7 @@ import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { MomentModule } from 'ngx-moment';
+import { ChartsModule } from 'ng2-charts';
 
 import { AnalyticsPage } from "../pages/analytics/analytics.component";
 import { AnalyticsService } from "../services/analytics.service";
@@ -67,6 +68,7 @@ import { BookingGroupDetailPage } from '../pages/analytics/bookingGroupDetail.co
     BrowserModule,
     HttpClientModule,
     MomentModule,
+    ChartsModule,
     IonicModule.forRoot(MyApp),
   ],
   bootstrap: [IonicApp],
