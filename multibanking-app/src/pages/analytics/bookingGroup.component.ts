@@ -26,7 +26,17 @@ export class BookingGroupPage {
     this.label = navparams.data.label;
     this.bankAccessId = navparams.data.bankAccessId;
     this.bankAccountId = navparams.data.bankAccountId;
-    this.bookingGroups = navparams.data.bookingGroups.groups;
+    this.bookingGroups = this.sortGroups(navparams.data.bookingGroups.groups);
+  }
+
+  sortGroups(bookingGroups: BookingGroup[]): BookingGroup[] {
+    return bookingGroups.sort((group1: BookingGroup, group2: BookingGroup) => {
+      if (moment(this.getExecutionDate(group1)).isAfter(moment(this.getExecutionDate(group2)))) {
+        return 1;
+      } else {
+        return -1;
+      }
+    });
   }
 
   getMatchingBookingPeriod(bookingGroup: BookingGroup): BookingPeriod {
@@ -40,6 +50,27 @@ export class BookingGroupPage {
     let period = this.getMatchingBookingPeriod(bookingGroup);
     return period && period.amount ? period.amount : bookingGroup.amount;
   }
+
+  getExecutionDate(bookingGroup: BookingGroup) {
+    if (this.isRecurrent(bookingGroup)) {
+      let period = this.getMatchingBookingPeriod(bookingGroup);
+      if (period && period.bookings.length == 1) {
+        return period.bookings[0].executionDate;
+      }
+      return null;
+    }
+    return null;
+  }
+
+  isExecuted(bookingGroup: BookingGroup) {
+    if (this.isRecurrent(bookingGroup)) {
+      let period = this.getMatchingBookingPeriod(bookingGroup);
+      if (period && period.bookings.length == 1) {
+        return period.bookings[0].executed;
+      }
+    }
+    return false;
+  } 
 
   getCompanyLogoUrl(bookingGroup: BookingGroup) {
     return ENV.api_url + "/image/" + bookingGroup.contract.logo;

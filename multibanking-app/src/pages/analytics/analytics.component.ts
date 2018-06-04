@@ -85,7 +85,7 @@ export class AnalyticsPage {
 
   ngOnInit() {
     let start: Moment = moment().subtract(6, "months");
-    for (let index = 1; index < 13; index++) {
+    for (let index = 1; index < 10; index++) {
       let date = start.clone().add(index, "months");
       if (index == 6) {
         this.referenceDate = date;
@@ -106,22 +106,51 @@ export class AnalyticsPage {
     };
   }
 
-  public chartClicked(e: any): void {
-    console.log();
-    // this.referenceDate = date;
-    // this.forecast = date.isAfter(moment(), "month");
+  chartClicked(e: any): void {
+    var activePoints = this._chart.chart.getElementsAtEventForMode(e.event, 'point', e.event.options);
+    var firstPoint = activePoints[0];
+
+    if (firstPoint) {
+      let date = this.dates[firstPoint._index];
+      let budget = this.calculateBudget(date);
+      let bookingGroups;
+
+      switch (firstPoint._datasetIndex) {
+        case 0:
+          bookingGroups = budget.incomeFix;
+          break;
+        case 1:
+          bookingGroups = budget.incomeOther;
+          break;
+        case 2:
+          bookingGroups = budget.expensesFix;
+          break;
+        case 3:
+          bookingGroups = budget.expensesVariable;
+          break;
+        case 4:
+          bookingGroups = budget.expensesOther;
+          break;
+      }
+
+      this.navCtrl.push(BookingGroupPage,
+        {
+          label: this.lineChartLabels[firstPoint._datasetIndex],
+          date: date,
+          bankAccessId: this.bankAccess.id,
+          bankAccountId: this.bankAccountId,
+          bookingGroups: bookingGroups
+        })
+    }
   }
 
-  public chartHovered(e: any): void {
-    console.log(e);
-  }
 
   loadAnalytics() {
     this.analyticsService.getAnalytics(this.bankAccess.id, this.bankAccountId).subscribe(
       response => {
         this.analytics = response;
         this.initChart();
-        this.budget = this.calculateBudget(this.referenceDate, this.forecast);
+        this.budget = this.calculateBudget(this.referenceDate);
       },
       error => {
         if (error == "SYNC_IN_PROGRESS") {
@@ -136,9 +165,9 @@ export class AnalyticsPage {
 
   initChart() {
     let start: Moment = moment().subtract(6, "months");
-    for (let index = 1; index < 13; index++) {
+    for (let index = 1; index < 10; index++) {
       let date = start.clone().add(index, "months");
-      let budget = this.calculateBudget(date, date.isAfter(moment(), "month"))
+      let budget = this.calculateBudget(date)
 
       this.lineChartData[0].data.push(budget.incomeFix.amount);
       this.lineChartData[1].data.push(budget.incomeOther.amount);
@@ -149,7 +178,7 @@ export class AnalyticsPage {
     this._chart.refresh();
   }
 
-  calculateBudget(referenceDate: Moment, forecast: boolean): Budget {
+  calculateBudget(referenceDate: Moment): Budget {
     let budget: Budget = {
       incomeFix: { amount: 0, groups: [] },
       incomeOther: { amount: 0, groups: [] },
@@ -159,7 +188,7 @@ export class AnalyticsPage {
     };
 
     this.analytics.bookingGroups.forEach((group: BookingGroup) => {
-      let amount = this.getAmount(group, referenceDate, forecast);
+      let amount = this.getAmount(group, referenceDate);
 
       if (amount != 0 && this.includeGroup(group, referenceDate)) {
         switch (group.type) {
@@ -191,7 +220,7 @@ export class AnalyticsPage {
     return budget;
   }
 
-  getAmount(group: BookingGroup, referenceDate: Moment, forecast: boolean): number {
+  getAmount(group: BookingGroup, referenceDate: Moment): number {
     let period: BookingPeriod = group.bookingPeriods.find((period: BookingPeriod) => {
       let start: Moment = moment(period.start);
       return start.month() == referenceDate.month() && start.year() == referenceDate.year();
@@ -201,7 +230,7 @@ export class AnalyticsPage {
       return period.amount ? period.amount : group.amount
     }
 
-    if (forecast) {
+    if (group.amount) {
       return group.amount;
     }
 
@@ -310,8 +339,8 @@ export class AnalyticsPage {
 
   newDateSelected(date: Moment) {
     this.referenceDate = date;
-    this.forecast = date.isAfter(moment(), "month");
-    this.budget = this.calculateBudget(date, this.forecast);
+    this.forecast = date.isAfter(moment(), "month") || date.isSame(moment(), "month");
+    this.budget = this.calculateBudget(date);
   }
 
 

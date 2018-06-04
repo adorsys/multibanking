@@ -14,7 +14,8 @@
     <h4 *ngIf="group.subCategory">{{group.subCategory}}</h4>
     <h4 *ngIf="group.specification">{{group.specification}}</h4>
     <div item-right>
-      <h2>{{ getAmount(group) | currency:'EUR':'symbol' }}</h2>
+      <h4 [ngClass]="{'executed': isExecuted(group), 'not-executed': isExecuted(group)}">{{ getExecutionDate(group)| date }}</h4>
+      <h2 [ngClass]="{'executed': isExecuted(group), 'not-executed': isExecuted(group)}">{{ getAmount(group) | currency:'EUR':'symbol' }}</h2>
     </div>
   </ion-item>
 </ion-content>
