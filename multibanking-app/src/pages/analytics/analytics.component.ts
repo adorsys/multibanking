@@ -139,7 +139,7 @@ export class AnalyticsPage {
           date: date,
           bankAccessId: this.bankAccess.id,
           bankAccountId: this.bankAccountId,
-          bookingGroups: bookingGroups
+          aggregatedGroups: bookingGroups
         })
     }
   }
