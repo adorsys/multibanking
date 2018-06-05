@@ -1,5 +1,6 @@
 package domain;
 
+import java.util.Map;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
@@ -11,15 +12,14 @@ import lombok.NoArgsConstructor;
  * Created by alexg on 18.05.17.
  */
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingCategory {
+public class BookingCategory extends Contract {
 
-  private Set<String> rules;
-  private String mainCategory;
-  private String subCategory;
-  private String specification;
-
+    private Set<String> rules;
+    private Map<String, String> custom;
+    private String mainCategory;
+    private String subCategory;
+    private String specification;
 
 }

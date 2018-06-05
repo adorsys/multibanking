@@ -61,13 +61,24 @@ public class SmartanalyticsMapper {
         });
     }
 
-    static BookingCategory mapToBookingcategory(WrappedBooking extendedBooking, List<RuleCategory> categories) {
-        return BookingCategory.builder()
-                .mainCategory(extendedBooking.getMainCategory())
-                .subCategory(extendedBooking.getSubCategory())
-                .specification(extendedBooking.getSpecification())
-                .rules(extendedBooking.getRuleIds())
-                .build();
+    static BookingCategory mapToBookingcategory(WrappedBooking wrappedBooking, List<RuleCategory> categories) {
+        BookingCategory bookingCategory = new BookingCategory();
+        bookingCategory.setMainCategory(wrappedBooking.getMainCategory());
+        bookingCategory.setSubCategory(wrappedBooking.getSubCategory());
+        bookingCategory.setSpecification(wrappedBooking.getSpecification());
+        bookingCategory.setCustom(wrappedBooking.getCustom());
+
+        bookingCategory.setEmail(wrappedBooking.getEmail());
+        bookingCategory.setHomepage(wrappedBooking.getHomepage());
+        bookingCategory.setHotline(wrappedBooking.getHotline());
+        bookingCategory.setLogo(wrappedBooking.getLogo());
+
+        if (wrappedBooking.getCycle() != null) {
+            bookingCategory.setInterval(Cycle.valueOf(wrappedBooking.getCycle().toString()));
+        }
+
+        bookingCategory.setRules(wrappedBooking.getRuleIds());
+        return bookingCategory;
     }
 
 

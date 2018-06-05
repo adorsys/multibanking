@@ -20,7 +20,6 @@ public class RuleEntity extends Rule {
     private String id;
     @Indexed
     private String userId;
-    private boolean released;
     @Indexed
     private List<String> searchIndex;
 
