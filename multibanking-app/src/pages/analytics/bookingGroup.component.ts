@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, group } from "@angular/core";
 import { NavParams, NavController } from "ionic-angular";
 import { BookingGroup } from "../../api/BookingGroup";
 import { ENV } from "../../env/env";
@@ -7,6 +7,7 @@ import { Moment } from "moment";
 import { BookingPeriod } from "../../api/BookingPeriod";
 import * as moment from 'moment';
 import { BookingGroupDetailPage } from "./bookingGroupDetail.component";
+import { AggregatedGroups } from "../../api/AggregatedGroups";
 
 @Component({
   selector: 'page-bookingGroup',
@@ -15,10 +16,15 @@ import { BookingGroupDetailPage } from "./bookingGroupDetail.component";
 export class BookingGroupPage {
 
   referenceDate: Moment;
+  amount: number;
   label: string;
+  aggregatedGroups: AggregatedGroups;
   bookingGroups: BookingGroup[];
   bankAccessId: string;
   bankAccountId: string;
+
+  lineChartLabels: string[] = [];
+  lineChartData: number[] = [];
 
   constructor(public navparams: NavParams,
     public navCtrl: NavController) {
@@ -26,11 +32,25 @@ export class BookingGroupPage {
     this.label = navparams.data.label;
     this.bankAccessId = navparams.data.bankAccessId;
     this.bankAccountId = navparams.data.bankAccountId;
-    this.bookingGroups = this.sortGroups(navparams.data.bookingGroups.groups);
+    this.amount = navparams.data.amount;
+    this.aggregatedGroups = navparams.data.aggregatedGroups;
+    this.bookingGroups = this.sortGroups(navparams.data.aggregatedGroups);
   }
 
-  sortGroups(bookingGroups: BookingGroup[]): BookingGroup[] {
-    return bookingGroups.sort((group1: BookingGroup, group2: BookingGroup) => {
+  ngOnInit() {
+    this.amount = 0;
+    this.bookingGroups.forEach(group => {
+      this.lineChartLabels.push(group.name ? group.name : group.otherAccount);
+
+      let tmpAmount = this.getPeriodAmount(group);
+      tmpAmount = tmpAmount != 0 ? tmpAmount : group.amount;
+      this.lineChartData.push(tmpAmount);
+      this.amount += tmpAmount;
+    }, this);
+  }
+
+  sortGroups(aggregatedGroups: AggregatedGroups): BookingGroup[] {
+    return aggregatedGroups.groups.sort((group1: BookingGroup, group2: BookingGroup) => {
       if (moment(this.getExecutionDate(group1)).isAfter(moment(this.getExecutionDate(group2)))) {
         return 1;
       } else {
@@ -47,8 +67,18 @@ export class BookingGroupPage {
   }
 
   getAmount(bookingGroup: BookingGroup) {
+    let amount = this.getPeriodAmount(bookingGroup);
+    amount = amount ? amount : bookingGroup.amount;
+    return amount >= 0 ? amount : amount * -1;
+  }
+
+  periodAmountExists(bookingGroup: BookingGroup) {
+    return this.getPeriodAmount(bookingGroup);
+  }
+
+  getPeriodAmount(bookingGroup: BookingGroup): number {
     let period = this.getMatchingBookingPeriod(bookingGroup);
-    return period && period.amount ? period.amount : bookingGroup.amount;
+    return period && period.amount ? period.amount : 0;
   }
 
   getExecutionDate(bookingGroup: BookingGroup) {
@@ -70,7 +100,7 @@ export class BookingGroupPage {
       }
     }
     return false;
-  } 
+  }
 
   getCompanyLogoUrl(bookingGroup: BookingGroup) {
     return ENV.api_url + "/image/" + bookingGroup.contract.logo;

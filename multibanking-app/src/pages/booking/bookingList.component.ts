@@ -127,6 +127,7 @@ export class BookingListPage {
         loading.dismiss();
       },
       error => {
+        loading.dismiss();
         if (error && error.messages) {
           error.messages.forEach(message => {
             if (message.key == "SYNC_IN_PROGRESS") {

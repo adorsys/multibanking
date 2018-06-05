@@ -10,10 +10,10 @@ import { GroupType } from "../../api/GroupType";
 import { Moment } from "moment";
 import * as moment from 'moment';
 import { BookingPeriod } from "../../api/BookingPeriod";
-import { AggregatedGroups } from "../../api/AggregatedGroups";
 import { ENV } from "../../env/env";
 import { Budget } from "../../api/Budget";
 import { BaseChartDirective } from "ng2-charts";
+import { AggregatedGroups } from "../../api/AggregatedGroups";
 
 @Component({
   selector: 'page-analytics',
@@ -344,14 +344,14 @@ export class AnalyticsPage {
   }
 
 
-  itemSelected(label: string, bookingGroups: AggregatedGroups) {
+  itemSelected(label: string, aggregatedGroups: AggregatedGroups) {
     this.navCtrl.push(BookingGroupPage,
       {
         label: label,
         date: this.referenceDate,
         bankAccessId: this.bankAccess.id,
         bankAccountId: this.bankAccountId,
-        bookingGroups: bookingGroups
+        aggregatedGroups: aggregatedGroups,
       })
   }
 

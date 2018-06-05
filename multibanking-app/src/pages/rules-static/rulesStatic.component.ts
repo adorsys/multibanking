@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { NavController, NavParams, AlertController, Navbar } from 'ionic-angular';
+import { NavController, NavParams, AlertController, Navbar, LoadingController } from 'ionic-angular';
 import { RulesService } from '../../services/rules.service';
 import { Rule } from '../../api/Rule';
 import { RulesStaticAutoCompleteService } from '../../services/rulesStaticAutoComplete.service';
@@ -24,6 +24,7 @@ export class RulesStaticPage {
 
   constructor(public navCtrl: NavController,
     public navParams: NavParams,
+    public loadingCtrl: LoadingController,
     public rulesCustomAutoCompleteService: RulesCustomAutoCompleteService,
     public rulesStaticAutoCompleteService: RulesStaticAutoCompleteService,
     public alertCtrl: AlertController,
@@ -53,9 +54,7 @@ export class RulesStaticPage {
 
   registerRulesChangedListener() {
     this.rulesService.rulesChangedObservable.subscribe(rule => {
-      if (rule.released) {
-        this.loadRules();
-      }
+      this.loadRules();
     });
   }
 
@@ -63,7 +62,7 @@ export class RulesStaticPage {
     this.rulesService.getRules(this.custom).subscribe(response => {
       this.pageable = response;
       this.rules = response._embedded ? response._embedded.ruleEntityList : [];
-      
+
       this.selectedRule = undefined;
     });
   }
@@ -77,7 +76,7 @@ export class RulesStaticPage {
         } else {
           this.rules = this.rules.concat(response._embedded.ruleEntityList);
         }
-        
+
         infiniteScroll.complete();
       });
     } else {
@@ -130,12 +129,19 @@ export class RulesStaticPage {
   }
 
   uploadRules(input) {
+    let loading = this.loadingCtrl.create({
+      content: 'Please wait...'
+    });
+    loading.present();
+
     let file: File = input.target.files[0];
     this.rulesService.uploadRules(file).subscribe(
       data => {
         this.loadRules();
+        loading.dismiss();
       },
       error => {
+        loading.dismiss();
         if (error && error.messages) {
           error.messages.forEach(message => {
             if (message.key == "INVALID_RULES") {

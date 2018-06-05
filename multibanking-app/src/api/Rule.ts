@@ -9,9 +9,8 @@ export interface Rule {
     "mainCategory"?: string;
     "subCategory"?: string;
     "specification"?: string;
-    "taxRelevant"?: boolean;
     "similarityMatchType"?: SimilarityMatchType;
     "incoming"?: boolean;
-    "released"?: boolean;
+    "custom"?: Map<string, string>;
 
 }

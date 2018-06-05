@@ -28,9 +28,8 @@
               *ngFor="let booking of bookings"
               (click)="itemSelected(booking)">
       <ion-avatar item-start>
-        <img [src]="getLogo(booking?.bookingCategory?.contract?.logo)" *ngIf="booking?.bookingCategory?.contract?.logo" item-left/>
+        <img [src]="getLogo(booking?.bookingCategory?.logo)" item-left/>
       </ion-avatar>
-
       <h3>
         <strong *ngIf="booking.amount < 0">Payee:</strong>
         <strong *ngIf="booking.amount > 0">Payer:</strong>

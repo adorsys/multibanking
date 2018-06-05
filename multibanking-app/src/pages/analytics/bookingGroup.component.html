@@ -1,21 +1,27 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>{{ label }} - {{ referenceDate | amDateFormat:'MMM YYYY' }}</ion-title>
+    <ion-title>{{ label }} - {{ referenceDate | amDateFormat:'MMM YYYY' }} {{ amount | currency:'EUR':'symbol' }}</ion-title>
   </ion-navbar>
 </ion-header>
 
 <ion-content padding>
+  <canvas baseChart [data]="lineChartData" [labels]="lineChartLabels" [options]="'{responsive: true}'" [chartType]="'doughnut'"
+    (chartClick)="chartClicked($event)">
+  </canvas>
+
   <ion-item *ngFor="let group of bookingGroups" (click)="itemSelected(group)">
-    <ion-thumbnail item-left>
+    <ion-avatar item-start *ngIf="isRecurrent(group)">
       <img [src]="getCompanyLogoUrl(group)" *ngIf="group.contract?.logo" item-left/>
-    </ion-thumbnail>
+    </ion-avatar>
     <h3>{{group.otherAccount ? group.otherAccount : group.name}}</h3>
     <h4 *ngIf="group.mainCategory">{{group.mainCategory}}</h4>
     <h4 *ngIf="group.subCategory">{{group.subCategory}}</h4>
     <h4 *ngIf="group.specification">{{group.specification}}</h4>
     <div item-right>
       <h4 [ngClass]="{'executed': isExecuted(group), 'not-executed': isExecuted(group)}">{{ getExecutionDate(group)| date }}</h4>
-      <h2 [ngClass]="{'executed': isExecuted(group), 'not-executed': isExecuted(group)}">{{ getAmount(group) | currency:'EUR':'symbol' }}</h2>
+      <h2 *ngIf="isRecurrent(group)" [ngClass]="{'executed': isExecuted(group), 'not-executed': isExecuted(group)}">{{ getAmount(group) | currency:'EUR':'symbol' }}</h2>
+      <h2 *ngIf="!isRecurrent(group)">consumed {{ getPeriodAmount(group) | currency:'EUR':'symbol' }}</h2>
+      <h2 *ngIf="!isRecurrent(group)">average {{ group.amount | currency:'EUR':'symbol' }}</h2>
     </div>
   </ion-item>
 </ion-content>

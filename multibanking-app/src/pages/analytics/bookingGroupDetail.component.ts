@@ -94,6 +94,6 @@ export class BookingGroupDetailPage {
   }
 
   getCompanyLogoUrl(booking: Booking) {
-    return ENV.api_url + "/image/" + booking.bookingCategory.contract.logo;
+    return ENV.api_url + "/image/" + booking.bookingCategory.logo;
   }
 }
