@@ -33,7 +33,7 @@ export class RulesService {
   }
 
   updateRule(rule: Rule): Observable<Array<RuleCategory>> {
-    let url = rule.id.startsWith("custom") ? `${ENV.api_url}/analytics/rules/${rule.id}`
+    let url = rule.ruleId.startsWith("custom") ? `${ENV.api_url}/analytics/rules/${rule.id}`
       : `${ENV.smartanalytics_url}/rules/${rule.id}`;
 
     return this.http.put(url, rule)
@@ -85,7 +85,7 @@ export class RulesService {
 
   uploadRules(file: File): Observable<any> {
     let formData: FormData = new FormData();
-    formData.append('rulesFile', file, 'rules.yml');
+    formData.append('rulesFile', file, file.name);
 
     return this.http.post(`${ENV.smartanalytics_url}/rules/upload`, formData, { responseType: 'text' })
       .catch(this.handleError);

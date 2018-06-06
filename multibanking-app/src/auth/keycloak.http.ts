@@ -23,7 +23,7 @@ export class KeycloakHttpInterceptor implements HttpInterceptor {
         observer.next(headers);
         observer.complete();
       } catch (error) {
-        observer.error(error);
+        this._keycloakService.login();
       }
     }).pipe(
       mergeMap((headersWithBearer: HttpHeaders) => {

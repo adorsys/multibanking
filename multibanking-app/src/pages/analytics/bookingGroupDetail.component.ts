@@ -16,46 +16,37 @@ import { ExecutedBooking } from "../../api/ExecutedBooking";
 })
 export class BookingGroupDetailPage {
 
-  referenceDate: Moment;
-  bookingGroup: BookingGroup;
+  groupName: string;
+  bookingPeriod: BookingPeriod;
   bookings: ExecutedBooking[] = [];
   bankAccessId: string;
   bankAccountId: string;
 
   constructor(public navparams: NavParams,
     private bookingService: BookingService) {
-    this.referenceDate = navparams.data.date;
     this.bankAccessId = navparams.data.bankAccessId;
     this.bankAccountId = navparams.data.bankAccountId;
-    this.bookingGroup = navparams.data.bookingGroup;
-    
-    this.initBookingGroup(navparams.data.bookingGroup);
+    this.groupName = navparams.data.groupName;
+    this.bookingPeriod = navparams.data.bookingPeriod;
   }
 
-  initBookingGroup(group: BookingGroup) {
-    let bookingIds: string[] = [];
+  ngOnInit() {
+    let bookingIds = this.bookingPeriod.bookings.map(booking => booking.bookingId);
 
-    let period: BookingPeriod = this.getMatchingBookingPeriod(group, this.referenceDate);
-    if (period) {
-      bookingIds = bookingIds.concat(period.bookings.map(booking => booking.bookingId));
+    let executedBookings: ExecutedBooking[] = [];
+    this.bookingService.getBookingsByIds(this.bankAccessId, this.bankAccountId, bookingIds).subscribe((bookings: Booking[]) => {
+      bookings.forEach(loadedBooking => {
+        let executedBooking = this.bookingPeriod.bookings.find(booking => booking.bookingId == loadedBooking.id);
+        executedBooking.loadedBooking = loadedBooking;
+        executedBooking.executionDate = this.getExecutionDate(executedBooking);
+        // if (!executedBooking.executed) {
+        //   executedBooking.loadedBooking.amount = this.bookingPeriod.amount ? this.bookingPeriod.amount : group.amount;
+        // }
+        executedBookings.push(executedBooking);
+      });
 
-      let bookings = [];
-      this.bookingService.getBookingsByIds(this.bankAccessId, this.bankAccountId, bookingIds).subscribe((response: Booking[]) => {
-        response.forEach(loadedBooking => {
-          let executedBooking = period.bookings.find(booking => booking.bookingId == loadedBooking.id);
-          if (executedBooking) {
-            executedBooking.loadedBooking = loadedBooking;
-            executedBooking.executionDate = this.getExecutionDate(executedBooking);
-            if (!executedBooking.executed) {
-              executedBooking.loadedBooking.amount = period.amount ? period.amount : group.amount;
-            }
-            bookings.push(executedBooking);
-          }
-        });
-
-        this.bookings = this.sortBookings(bookings);
-      })
-    }
+      this.bookings = this.sortBookings(executedBookings);
+    })
   }
 
   getExecutionDate(booking: ExecutedBooking) {

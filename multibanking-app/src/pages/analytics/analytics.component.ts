@@ -106,45 +106,6 @@ export class AnalyticsPage {
     };
   }
 
-  chartClicked(e: any): void {
-    var activePoints = this._chart.chart.getElementsAtEventForMode(e.event, 'point', e.event.options);
-    var firstPoint = activePoints[0];
-
-    if (firstPoint) {
-      let date = this.dates[firstPoint._index];
-      let budget = this.calculateBudget(date);
-      let bookingGroups;
-
-      switch (firstPoint._datasetIndex) {
-        case 0:
-          bookingGroups = budget.incomeFix;
-          break;
-        case 1:
-          bookingGroups = budget.incomeOther;
-          break;
-        case 2:
-          bookingGroups = budget.expensesFix;
-          break;
-        case 3:
-          bookingGroups = budget.expensesVariable;
-          break;
-        case 4:
-          bookingGroups = budget.expensesOther;
-          break;
-      }
-
-      this.navCtrl.push(BookingGroupPage,
-        {
-          label: this.lineChartLabels[firstPoint._datasetIndex],
-          date: date,
-          bankAccessId: this.bankAccess.id,
-          bankAccountId: this.bankAccountId,
-          aggregatedGroups: bookingGroups
-        })
-    }
-  }
-
-
   loadAnalytics() {
     this.analyticsService.getAnalytics(this.bankAccess.id, this.bankAccountId).subscribe(
       response => {
@@ -343,6 +304,43 @@ export class AnalyticsPage {
     this.budget = this.calculateBudget(date);
   }
 
+  chartClicked(e: any): void {
+    var activePoints = this._chart.chart.getElementsAtEventForMode(e.event, 'point', e.event.options);
+    var firstPoint = activePoints[0];
+
+    if (firstPoint) {
+      let date = this.dates[firstPoint._index];
+      let budget = this.calculateBudget(date);
+      let bookingGroups;
+
+      switch (firstPoint._datasetIndex) {
+        case 0:
+          bookingGroups = budget.incomeFix;
+          break;
+        case 1:
+          bookingGroups = budget.incomeOther;
+          break;
+        case 2:
+          bookingGroups = budget.expensesFix;
+          break;
+        case 3:
+          bookingGroups = budget.expensesVariable;
+          break;
+        case 4:
+          bookingGroups = budget.expensesOther;
+          break;
+      }
+
+      this.navCtrl.push(BookingGroupPage,
+        {
+          label: this.lineChartLabels[firstPoint._datasetIndex],
+          date: date,
+          bankAccessId: this.bankAccess.id,
+          bankAccountId: this.bankAccountId,
+          aggregatedGroups: bookingGroups
+        })
+    }
+  }
 
   itemSelected(label: string, aggregatedGroups: AggregatedGroups) {
     this.navCtrl.push(BookingGroupPage,

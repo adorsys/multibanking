@@ -1,4 +1,4 @@
-import { Component, group } from "@angular/core";
+import { Component, group, ViewChild } from "@angular/core";
 import { NavParams, NavController } from "ionic-angular";
 import { BookingGroup } from "../../api/BookingGroup";
 import { ENV } from "../../env/env";
@@ -8,6 +8,7 @@ import { BookingPeriod } from "../../api/BookingPeriod";
 import * as moment from 'moment';
 import { BookingGroupDetailPage } from "./bookingGroupDetail.component";
 import { AggregatedGroups } from "../../api/AggregatedGroups";
+import { BaseChartDirective } from "ng2-charts";
 
 @Component({
   selector: 'page-bookingGroup',
@@ -25,6 +26,8 @@ export class BookingGroupPage {
 
   lineChartLabels: string[] = [];
   lineChartData: number[] = [];
+
+  @ViewChild(BaseChartDirective) _chart;
 
   constructor(public navparams: NavParams,
     public navCtrl: NavController) {
@@ -120,13 +123,26 @@ export class BookingGroupPage {
     }
   }
 
+  chartClicked(e: any): void {
+    let activePoints = this._chart.chart.getElementsAtEventForMode(e.event, 'point', e.event.options);
+    var firstPoint = activePoints[0];
+
+    if (firstPoint) {
+      let group: BookingGroup = this.aggregatedGroups.groups[firstPoint._index];
+      this.itemSelected(group);
+    }
+  }
+
   itemSelected(bookingGroup: BookingGroup) {
-    this.navCtrl.push(BookingGroupDetailPage,
-      {
-        date: this.referenceDate,
-        bankAccessId: this.bankAccessId,
-        bankAccountId: this.bankAccountId,
-        bookingGroup: bookingGroup
-      })
+    let period = this.getMatchingBookingPeriod(bookingGroup);
+    if (period) {
+      this.navCtrl.push(BookingGroupDetailPage,
+        {
+          groupName: bookingGroup.name ? bookingGroup.name : bookingGroup.otherAccount,
+          bankAccessId: this.bankAccessId,
+          bankAccountId: this.bankAccountId,
+          bookingPeriod: period
+        })
+    }
   }
 }
