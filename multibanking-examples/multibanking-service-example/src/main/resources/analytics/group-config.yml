@@ -4,26 +4,26 @@ groups:
 - type: "RECURRENT_INCOME"
 - name: "LEBENSMITTEL"
   type: "CUSTOM"
-  matcher:
+  whitelistMatcher:
   - "UKAT = 'LEBENSMITTEL'"
 - name: "TANKSTELLE"
   type: "CUSTOM"
-  matcher:
+  whitelistMatcher:
   - "SPEZ = 'TANKSTELLE'"
 - name: "BARGELDABHEBUNG"
   type: "CUSTOM"
-  matcher:
+  whitelistMatcher:
   - "UKAT = 'BARGELDABHEBUNG'"
 - name: "KREDITKARTE"
   type: "CUSTOM"
-  matcher:
+  whitelistMatcher:
   - "UKAT = 'KREDITKARTENABRECHNUNG'"
 - name: "SHOPPING"
   type: "CUSTOM"
-  matcher:
+  whitelistMatcher:
   - "UKAT = 'SHOPPING'"
 - type: "RECURRENT_SEPA"
-  matcher:
+  blacklistMatcher:
   - "GID = 'LU96ZZZ0000000000000000058'"
   - "IBAN = 'DE88500700100175526303'"
   - "GID = 'DE94ZZZ00000561653'"
@@ -40,7 +40,7 @@ groups:
   - "UKAT = 'KREDITKARTENABRECHNUNG'"
   - "SPEZ = 'SONDERTILGUNG'"
 - type: "RECURRENT_NONSEPA"
-  matcher:
+  blacklistMatcher:
   - "HKAT = 'PRIVAT'"
   - "VWZ LIKE '%OFFLINE%' OR VWZ LIKE '%TERMINAL%' OR VWZ LIKE '%KART%ZAHL%'"
   - "RFN LIKE 'EC%' OR RFN LIKE '%ELV%ME%' OR RFN LIKE '%KART%ZAHL%'"
