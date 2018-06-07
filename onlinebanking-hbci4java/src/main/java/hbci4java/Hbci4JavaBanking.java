@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import domain.*;
+import exception.AccessLockedAccountException;
 import exception.InvalidPinException;
 import exception.PaymentException;
 import org.apache.commons.lang3.StringUtils;
@@ -150,6 +151,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             HBCIExecStatus status = hbciHandler.execute();
             if (!status.isOK()) {
                 LOG.error("Status of SaldoReq+KUmsAll+DauerSEPAList batch job not OK " + status);
+                throw new AccessLockedAccountException();
             }
 
             if (hbciPassport.getState().isPresent()) {
