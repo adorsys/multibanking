@@ -1,4 +1,4 @@
-import { Component, group, ViewChild } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { NavParams, NavController } from "ionic-angular";
 import { BookingGroup } from "../../api/BookingGroup";
 import { ENV } from "../../env/env";

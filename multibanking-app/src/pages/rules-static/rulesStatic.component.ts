@@ -17,6 +17,7 @@ export class RulesStaticPage {
 
   @ViewChild(AutoCompleteComponent) autocomplete: AutoCompleteComponent;
   @ViewChild(Navbar) navBar: Navbar;
+  rulesStatus;
   selectedRule: Rule;
   rules: Rule[];
   pageable: Pageable;
@@ -64,6 +65,10 @@ export class RulesStaticPage {
       this.rules = response._embedded ? response._embedded.ruleEntityList : [];
 
       this.selectedRule = undefined;
+
+      this.rulesService.getRulesStatus().subscribe(response => {
+        this.rulesStatus = response;
+      })
     });
   }
 

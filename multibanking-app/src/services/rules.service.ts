@@ -43,6 +43,11 @@ export class RulesService {
       })
   }
 
+  getRulesStatus() {
+    return this.http.get(`${ENV.smartanalytics_url.replace("/api/v1", "")}/status`)
+      .catch(this.handleError);
+  }
+
   getRules(custom: boolean): Observable<Pageable> {
     let url = custom ? `${ENV.api_url}/analytics/rules/` : `${ENV.smartanalytics_url}/rules/`;
 
