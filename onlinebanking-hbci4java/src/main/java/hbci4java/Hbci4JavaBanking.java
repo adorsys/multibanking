@@ -150,6 +150,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             // Let the Handler execute all jobs in one batch
             HBCIExecStatus status = hbciHandler.execute();
             if (!status.isOK()) {
+
                 LOG.error("Status of SaldoReq+KUmsAll+DauerSEPAList batch job not OK " + status);
                 throw new AccessLockedAccountException();
             }
