@@ -4,6 +4,9 @@ import de.adorsys.multibanking.domain.common.IdentityIf;
 import domain.BankAccess;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
+
+import java.util.UUID;
 
 /**
  * Created by alexg on 07.02.17.
@@ -33,5 +36,21 @@ public class BankAccessEntity extends BankAccess implements IdentityIf {
     public BankAccessEntity id(String id) {
         this.id = id;
         return this;
+    }
+
+    public void cleanCredentials(){
+        this.setPin(null);
+        this.setPin2(null);
+        this.setHbciPassportState(null);
+    }
+
+    public BankAccessCredentials cloneCredentials(){
+        BankAccessCredentials b = new BankAccessCredentials();
+
+        BeanUtils.copyProperties(this, b);
+        b.setId(UUID.randomUUID().toString());
+        b.setAccessId(this.getId());
+
+        return b;
     }
 }
