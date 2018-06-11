@@ -2,6 +2,7 @@ package de.adorsys.multibanking.service;
 
 import java.util.Date;
 
+import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,13 +32,13 @@ public class BankAccessCredentialService  {
 	public void setInvalidPin(String accessId) {
 		DocumentFQN credentialsFQN = FQNUtils.credentialFQN(accessId);
 		BankAccessCredentials credentials = uos.load(credentialsFQN, credentialsType())
-				.orElseThrow(() -> uos.resourceNotFound(BankAccessCredentials.class, accessId));
+				.orElseThrow(() -> new ResourceNotFoundException(BankAccessCredentials.class, accessId));
 		invalidate(credentials);
 	}
 	
 	public BankAccessCredentials loadCredentials(String accessId){
 		return uos.load(FQNUtils.credentialFQN(accessId), credentialsType())
-				.orElseThrow(() -> uos.resourceNotFound(BankAccessCredentials.class, accessId));
+				.orElseThrow(() -> new ResourceNotFoundException(BankAccessCredentials.class, accessId));
 	}
 
 	public void invalidate(BankAccessCredentials credentials) {
