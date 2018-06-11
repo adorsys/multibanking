@@ -175,7 +175,7 @@ public class BookingService {
             AnalyticsResult analyticsResult = smartAnalyticsService.analyzeBookings(bankAccess.getUserId(), bookingEntities);
             if (analyticsResult != null) {
                 if (!response.getOnlineBankingService().bookingsCategorized()) {
-                    SmartanalyticsMapper.applyCategories(bookingEntities, analyticsResult, categoriesProvider.getCategoriesTree());
+                    SmartanalyticsMapper.applyCategories(bookingEntities, analyticsResult);
                 }
                 if (bankAccess.isStoreAnalytics()) {
                 	Map<String, List<BookingEntity>> mapBookings = BookingHelper.reMapBookings(bookingEntities);
