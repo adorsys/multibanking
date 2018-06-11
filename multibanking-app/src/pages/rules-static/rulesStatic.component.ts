@@ -126,7 +126,7 @@ export class RulesStaticPage {
     const data = window.URL.createObjectURL(newBlob);
     let link = document.createElement('a');
     link.href = data;
-    link.download = "rules.yaml";
+    link.download = "rules.csv";
     link.click();
     setTimeout(() =>
       // For Firefox it is necessary to delay revoking the ObjectURL

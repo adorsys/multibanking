@@ -67,9 +67,8 @@ public class BankAccessService  {
     		}
     	}
 
-    	BankAccessCredentials credentials = BankAccessCredentials.cloneCredentials(bankAccess);
-    	// Clean credentials
-    	BankAccessCredentials.cleanCredentials(bankAccess);
+    	BankAccessCredentials credentials = bankAccess.cloneCredentials();
+		bankAccess.cleanCredentials();
 
 		// disect credentials
         if (bankAccess.isStorePin()) {
@@ -123,7 +122,7 @@ public class BankAccessService  {
      * @param bankAccess
      */
 	private void storeBankAccess(BankAccessEntity bankAccess) {
-		BankAccessCredentials.cleanCredentials(bankAccess);
+		bankAccess.cleanCredentials();
 		UserData userData;
 		if(!uds.exists()){
 			userData = uds.createUser(null);

@@ -5,7 +5,7 @@
 
     <groupId>de.adorsys.multibanking</groupId>
     <artifactId>multibanking</artifactId>
-    <version>3.0.27-SNAPSHOT</version>
+    <version>3.0.28-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Multibanking</name>
     <url>https://github.com/adorsys/multibanking</url>
@@ -45,9 +45,6 @@
 
         <de.adorsys.sts.version>0.25.1</de.adorsys.sts.version>
         <de.adorsys.smartanalytics.version>1.0.7</de.adorsys.smartanalytics.version>
-        <!--
-        <slf4j-simple.version>1.7.25</slf4j-simple.version>
-        -->
         <crypt.version>0.18.7</crypt.version>
         <docusafe.version>0.3.8</docusafe.version>
         <scmBranch/>
@@ -126,17 +123,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <!--
-        <dependencies>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j-simple.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-        -->
 
     <build>
         <!--https://docs.spring.io/spring-boot/docs/current/reference/html/production-ready-endpoints.html#production-ready-application-info-automatic-expansion -->

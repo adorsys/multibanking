@@ -44,25 +44,21 @@ public class SmartanalyticsMapper {
         return interfaceBookings;
     }
 
-    public static void applyCategories(List<BookingEntity> bookingEntities, AnalyticsResult result, List<RuleCategory> categories) {
+    public static void applyCategories(List<BookingEntity> bookingEntities, AnalyticsResult result) {
         result.getBookings().forEach(categorizedBooking -> {
             bookingEntities.stream()
                     .filter(bookingEntity -> categorizedBooking.getBooking().getBookingId().equals(bookingEntity.getExternalId()))
                     .findFirst().ifPresent(bookingEntity -> {
-                //Überschreibe Gegegenkonto Inhaber mit einem besseren Namen aus Kategorisierung, statt z.b. '2631EDEKA HOFMANN CADOLZBU'
-                if (StringUtils.isNotBlank(categorizedBooking.getOtherAccount()) && bookingEntity.getOtherAccount() != null) {
-                    bookingEntity.getOtherAccount().setOwner(categorizedBooking.getOtherAccount());
-                }
-
                 if (categorizedBooking.getMainCategory() != null) {
-                    bookingEntity.setBookingCategory(mapToBookingcategory(categorizedBooking, categories));
+                    bookingEntity.setBookingCategory(mapToBookingcategory(categorizedBooking));
                 }
             });
         });
     }
 
-    static BookingCategory mapToBookingcategory(WrappedBooking wrappedBooking, List<RuleCategory> categories) {
+    static BookingCategory mapToBookingcategory(WrappedBooking wrappedBooking) {
         BookingCategory bookingCategory = new BookingCategory();
+        bookingCategory.setReceiver(wrappedBooking.getOtherAccount());
         bookingCategory.setMainCategory(wrappedBooking.getMainCategory());
         bookingCategory.setSubCategory(wrappedBooking.getSubCategory());
         bookingCategory.setSpecification(wrappedBooking.getSpecification());
