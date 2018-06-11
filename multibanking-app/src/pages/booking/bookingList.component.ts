@@ -71,7 +71,7 @@ export class BookingListPage {
       this.bookingService.getNextBookings(this.pageable._links.next.href).subscribe(response => {
         this.pageable = response;
         this.bookings = this.bookings.concat(response._embedded.bookingEntityList);
-        
+
         infiniteScroll.complete();
       });
     } else {
@@ -81,6 +81,15 @@ export class BookingListPage {
 
   doInfinite(infiniteScroll) {
     this.loadNextBookings(infiniteScroll);
+  }
+
+  getReceiver(booking: Booking): string {
+    if (booking.bookingCategory && booking.bookingCategory.receiver) {
+      return booking.bookingCategory.receiver;
+    } else if (booking.otherAccount && booking.otherAccount.owner) {
+      return booking.otherAccount.owner;
+    }
+    return "";
   }
 
   syncBookingsPromptPin() {

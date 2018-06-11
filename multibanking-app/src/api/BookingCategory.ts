@@ -1,6 +1,7 @@
 import { Contract } from "./Contract";
 
 export interface BookingCategory {
+    "receiver"?: string;
     "mainCategory"?: string;
     "specification"?: string;
     "subCategory"?: string;
