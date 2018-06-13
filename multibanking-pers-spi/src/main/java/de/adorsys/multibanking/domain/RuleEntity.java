@@ -36,6 +36,10 @@ public class RuleEntity extends Rule {
         if (getReceiver() != null) {
             searchIndex.add(getReceiver());
         }
+
+        if (getSimilarityMatchType() != null && getExpression() != null) {
+            searchIndex.add(getExpression());
+        }
     }
 
 }
