@@ -41,9 +41,7 @@ public class BankRepositoryImpl implements BankRepositoryIf {
                 .map(s -> Criteria.where("searchIndex").regex(s.toLowerCase(), "iu"))
                 .toArray(Criteria[]::new);
 
-        List<BankEntity> bankEntities = mongoTemplate.find(Query.query( new Criteria().andOperator(criterias)), BankEntity.class);
-
-        return bankEntities;
+        return mongoTemplate.find(Query.query(new Criteria().andOperator(criterias)), BankEntity.class);
     }
 
 
