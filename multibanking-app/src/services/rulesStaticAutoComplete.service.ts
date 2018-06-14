@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { AutoCompleteService } from "ionic2-auto-complete";
 import { HttpClient } from '@angular/common/http';
 import { ENV } from "../env/env";
+import { Rule } from '../api/Rule';
 
 @Injectable()
 export class RulesStaticAutoCompleteService implements AutoCompleteService {
@@ -39,4 +40,7 @@ export class RulesStaticAutoCompleteService implements AutoCompleteService {
     return Observable.throw(error || 'Server error');
   }
 
+  getItemLabel?(item: Rule): any {
+    return item.ruleId + ' ' + (item.receiver ? item.receiver + ' ' : '') + (item.similarityMatchType ? item.expression : '')
+  }
 }

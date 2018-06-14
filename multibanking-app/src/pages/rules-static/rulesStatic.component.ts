@@ -17,6 +17,7 @@ export class RulesStaticPage {
 
   @ViewChild(AutoCompleteComponent) autocomplete: AutoCompleteComponent;
   @ViewChild(Navbar) navBar: Navbar;
+  rulesStatus;
   selectedRule: Rule;
   rules: Rule[];
   pageable: Pageable;
@@ -64,6 +65,10 @@ export class RulesStaticPage {
       this.rules = response._embedded ? response._embedded.ruleEntityList : [];
 
       this.selectedRule = undefined;
+
+      this.rulesService.getRulesStatus().subscribe(response => {
+        this.rulesStatus = response;
+      })
     });
   }
 
@@ -121,7 +126,7 @@ export class RulesStaticPage {
     const data = window.URL.createObjectURL(newBlob);
     let link = document.createElement('a');
     link.href = data;
-    link.download = "rules.yaml";
+    link.download = "rules.csv";
     link.click();
     setTimeout(() =>
       // For Firefox it is necessary to delay revoking the ObjectURL

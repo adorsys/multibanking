@@ -47,23 +47,22 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
         return bookingRepository.findAllById(ids);
 	}
 
-
 	@Override
 	public List<BookingEntity> save(List<BookingEntity> bookingEntities) {
         List<BookingEntity> newEntities = bookingEntities
                 .stream()
                 .filter(bookingEntity -> bookingEntity.getId() == null)
                 .collect(Collectors.toList());
+
+		List<BookingEntity> existingEntities = bookingEntities
+				.stream()
+				.filter(bookingEntity -> bookingEntity.getId() != null)
+				.collect(Collectors.toList());
         try {
             bookingRepository.insert(newEntities);
         } catch (DuplicateKeyException e) {
             //ignore it
         }
-
-        List<BookingEntity> existingEntities = bookingEntities
-                .stream()
-                .filter(bookingEntity -> bookingEntity.getId() != null)
-                .collect(Collectors.toList());
 
 		return bookingRepository.saveAll(existingEntities);
 	}

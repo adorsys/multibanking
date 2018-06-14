@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.service;
 
+import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +32,7 @@ public class UserAgentCredentialsService {
 
 	public UserAgentCredentials load(String userAgentId){
 		return uos.load(FQNUtils.userAgentCredentialFQN(userAgentId), valueType())
-				.orElseThrow(() -> uos.resourceNotFound(UserData.class, uos.auth().getUserID().getValue()));
+				.orElseThrow(() -> new ResourceNotFoundException(UserData.class, uos.auth().getUserID().getValue()));
 	}
 	
 	public boolean exists(String userAgentId){

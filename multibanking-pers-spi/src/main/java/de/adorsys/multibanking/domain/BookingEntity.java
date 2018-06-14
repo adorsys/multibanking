@@ -24,8 +24,4 @@ public class BookingEntity extends Booking {
     private String accountId;
     private String userId;
 
-    public BookingEntity id(String id) {
-        this.id = id;
-        return this;
-    }
 }

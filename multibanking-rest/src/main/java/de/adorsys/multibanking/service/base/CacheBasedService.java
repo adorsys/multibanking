@@ -32,20 +32,28 @@ import de.adorsys.multibanking.exception.ResourceNotFoundException;
  * @author fpo 2018-04-06 04:36
  *
  */
-public abstract class CacheBasedService{
+public abstract class CacheBasedService implements CacheBasedInterface {
     private final static Logger LOGGER = LoggerFactory.getLogger(CacheBasedService.class);
 
 	private ObjectMapper objectMapper;
 	private DocumentSafeService documentSafeService;
-	public CacheBasedService(ObjectMapper objectMapper, DocumentSafeService documentSafeService) {
-		this.objectMapper = objectMapper;
-		this.documentSafeService = documentSafeService;
-	}
-
 	protected abstract UserContext user();
 
 	public UserContextCache userContextCache() {
 		return new UserContextCache(user());
+	}
+
+	public void enableCaching() {
+		user().setCacheEnabled(true);
+	}
+
+	protected CacheBasedService(ObjectMapper objectMapper, DocumentSafeService documentSafeService) {
+		this.objectMapper = objectMapper;
+		this.documentSafeService = documentSafeService;
+	}
+
+	public UserIDAuth auth() {
+		return user().getAuth();
 	}
 
 	/**
@@ -56,6 +64,7 @@ public abstract class CacheBasedService{
 	 * @param valueType
 	 * @return
 	 */
+	@Override
 	public <T> Optional<T> load(DocumentFQN documentFQN, TypeReference<T> valueType) {
         LOGGER.debug("load: " + documentFQN);
 		// Log request count
@@ -88,20 +97,23 @@ public abstract class CacheBasedService{
 	}
 
 	/**
-	 * Remove all Objects whose path start with the corresponding path.
+	 * Store the file in cache. If cache not supported, flush document.
 	 *
-	 * @param accessId
+	 * @param documentFQN
+	 * @param valueType
+	 * @param entity
 	 */
-	public void clearCached(DocumentDirectoryFQN dir) {
-        LOGGER.debug("clearing Cached " + dir);
-		userContextCache().clearCached(dir);
-
-	}
-
-	public void deleteDirectory(DocumentDirectoryFQN dirFQN) {
-		// First remove all cached object from this dir.
-		clearCached(dirFQN);
-		documentSafeService.deleteFolder(auth(), dirFQN);
+	@Override
+	public <T> void store(DocumentFQN documentFQN, TypeReference<T> valueType, T entity) {
+		LOGGER.debug("store: " + documentFQN + " cache enabled:" + user().isCacheEnabled());
+		user().getRequestCounter().store(documentFQN);
+		boolean cacheHit = userContextCache().cacheHit(documentFQN, valueType, Optional.ofNullable(entity), true);
+		if (!cacheHit) {
+			LOGGER.debug("flush im store " + documentFQN);
+			flush(documentFQN, entity);
+		} else {
+			LOGGER.debug("No flush, will store on cache flush " + documentFQN);
+		}
 	}
 
 	/**
@@ -112,11 +124,13 @@ public abstract class CacheBasedService{
 	 * @param valueType
 	 * @return
 	 */
+	@Override
 	public <T> boolean documentExists(DocumentFQN documentFQN, TypeReference<T> valueType) {
 		if (userContextCache().isCached(documentFQN, valueType))return true;
 		return documentSafeService.documentExists(auth(), documentFQN);
 	}
-	
+
+	@Override
     public <T> boolean deleteDocument(DocumentFQN documentFQN, TypeReference<T> valueType) {
         LOGGER.debug("deleteDocument " + documentFQN);
         
@@ -135,36 +149,53 @@ public abstract class CacheBasedService{
         }
         return removed!=null;
     }
-	
 
-	public UserIDAuth auth() {
-        return user().getAuth();
-    }
+	@Override
+	public void deleteDirectory(DocumentDirectoryFQN dirFQN) {
+		// First remove all cached object from this dir.
+		clearCached(dirFQN);
+		documentSafeService.deleteFolder(auth(), dirFQN);
+	}
 
-    /**
-	 * Store the file in cache. If cache not supported, flush document.
+	@Override
+	public void flush() {
+		if (!user().isCacheEnabled())return;
+		Collection<Map<DocumentFQN, CacheEntry<?>>> values = user().getCache().values();
+		LOGGER.debug("Flushing cache: " + user().getAuth().getUserID() + " Objects in cache: " + values.size());
+		for (Map<DocumentFQN, CacheEntry<?>> map : values) {
+			Collection<CacheEntry<?>> collection = map.values();
+			for (CacheEntry<?> cacheEntry : collection) {
+				LOGGER.debug("Cache entry pre flush: " + cacheEntry.getDocFqn());
+				if (cacheEntry.isDirty()) {
+					cacheEntry.setDirty(false);
+					LOGGER.debug("Cache entry pre flush : dirty: " + cacheEntry.getDocFqn());
+					if (cacheEntry.getEntry().isPresent()) {
+						LOGGER.debug("Cache entry pre flush : present: " + cacheEntry.getDocFqn());
+						flush(cacheEntry.getDocFqn(), cacheEntry.getEntry().get());
+					} else {
+						LOGGER.debug("Cache entry pre flush : absent. File will be deleted: " + cacheEntry.getDocFqn());
+						documentSafeService.deleteDocument(auth(), cacheEntry.getDocFqn());
+					}
+				} else {
+					LOGGER.debug("Cache entry pre flush : clean. No file write : " + cacheEntry.getDocFqn());
+				}
+			}
+		}
+		LOGGER.debug("Flushed cache: " + user().getAuth().getUserID());
+	}
+
+	/**
+	 * Remove all Objects whose path start with the corresponding path.
 	 *
-	 * @param documentFQN
-	 * @param valueType
-	 * @param entity
+	 * @param accessId
 	 */
-	public <T> void store(DocumentFQN documentFQN, TypeReference<T> valueType, T entity) {
-        LOGGER.debug("store: " + documentFQN + " cache enabled:" + user().isCacheEnabled());
-		user().getRequestCounter().store(documentFQN);
-		boolean cacheHit = userContextCache().cacheHit(documentFQN, valueType, Optional.ofNullable(entity), true);
-		if (!cacheHit) {
-            LOGGER.debug("flush im store " + documentFQN);
-            flush(documentFQN, entity);
-        } else {
-            LOGGER.debug("No flush, will store on cache flush " + documentFQN);
-        }
+	private void clearCached(DocumentDirectoryFQN dir) {
+		LOGGER.debug("clearing Cached " + dir);
+		userContextCache().clearCached(dir);
+
 	}
 
-	public ResourceNotFoundException resourceNotFound(Class<?> klass, String id) {
-		return new ResourceNotFoundException(klass, id);
-	}
-
-	protected <T> void flush(DocumentFQN documentFQN, T entity) {
+	private <T> void flush(DocumentFQN documentFQN, T entity) {
         LOGGER.debug("flushing: " + documentFQN);
 
         user().getRequestCounter().flush(documentFQN);
@@ -178,34 +209,5 @@ public abstract class CacheBasedService{
 		documentSafeService.storeDocument(auth(), dsDocument);
 	}
 
-	public void enableCaching() {
-         user().setCacheEnabled(true);
-	}
-
-	public void flush() {
-		if (!user().isCacheEnabled())return;
-		Collection<Map<DocumentFQN, CacheEntry<?>>> values = user().getCache().values();
-		LOGGER.debug("Flushing cache: " + user().getAuth().getUserID() + " Objects in cache: " + values.size());
-		for (Map<DocumentFQN, CacheEntry<?>> map : values) {
-			Collection<CacheEntry<?>> collection = map.values();
-			for (CacheEntry<?> cacheEntry : collection) {
-		        LOGGER.debug("Cache entry pre flush: " + cacheEntry.getDocFqn());
-				if (cacheEntry.isDirty()) {
-					cacheEntry.setDirty(false);
-			        LOGGER.debug("Cache entry pre flush : dirty: " + cacheEntry.getDocFqn());
-					if (cacheEntry.getEntry().isPresent()) {
-				        LOGGER.debug("Cache entry pre flush : present: " + cacheEntry.getDocFqn());
-						flush(cacheEntry.getDocFqn(), cacheEntry.getEntry().get());
-					} else {
-				        LOGGER.debug("Cache entry pre flush : absent. File will be deleted: " + cacheEntry.getDocFqn());
-				        documentSafeService.deleteDocument(auth(), cacheEntry.getDocFqn());
-					}
-				} else {
-			        LOGGER.debug("Cache entry pre flush : clean. No file write : " + cacheEntry.getDocFqn());
-				}
-			}
-		}
-        LOGGER.debug("Flushed cache: " + user().getAuth().getUserID());
-	}
 
 }

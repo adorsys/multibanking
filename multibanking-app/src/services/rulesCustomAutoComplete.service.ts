@@ -4,4 +4,5 @@ import { RulesStaticAutoCompleteService } from './rulesStaticAutoComplete.servic
 @Injectable()
 export class RulesCustomAutoCompleteService extends RulesStaticAutoCompleteService {
   customRules: boolean = true;
+  
 }
