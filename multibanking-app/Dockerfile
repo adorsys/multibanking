@@ -15,6 +15,7 @@ WORKDIR /www/app
 ADD . /www/app
 
 RUN apk add --update nodejs nodejs-npm \
+    && npm config set unsafe-perm true \
     && npm install -g ionic cordova \
     && npm rebuild node-sass \
     && npm install

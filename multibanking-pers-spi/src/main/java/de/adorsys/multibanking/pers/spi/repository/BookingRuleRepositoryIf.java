@@ -22,7 +22,9 @@ public interface BookingRuleRepositoryIf {
 
     List<RuleEntity> search(String query);
 
-    Optional<RuleEntity> getRuleById(String ruleId);
+    Optional<RuleEntity> findById(String id);
+
+    Optional<RuleEntity> findByRuleId(String ruleId);
 
     void deleteRule(String id);
 }

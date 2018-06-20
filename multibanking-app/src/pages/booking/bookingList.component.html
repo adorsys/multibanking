@@ -45,12 +45,12 @@
         <ion-icon name="alert" float-left *ngIf="!booking?.bookingCategory?.mainCategory"></ion-icon>
         <h3 float-left padding-left>not categorized</h3>
       </div>
-
       <div item-right>
         <h4>{{ booking.bookingDate | date }}</h4>
         <h2 [ngClass]="{'amount--negative': booking.amount < 0, 'amount--positive': booking.amount > 0}">
           {{ booking.amount | currency:'EUR':'symbol' }}
         </h2>
+        <ion-icon *ngIf="booking.bookingCategory?.custom?.taxRelevant" name="logo-usd"></ion-icon>
       </div>
     </ion-item>
   </ion-list>

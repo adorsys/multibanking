@@ -1,7 +1,5 @@
 package de.adorsys.multibanking.encrypt;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.util.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.slf4j.Logger;
@@ -18,7 +16,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,8 +34,6 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
     @Autowired
     private UserSecret userSecret;
 
-    private static final Logger LOG = LoggerFactory.getLogger(EncryptionEventListener.class);
-
     @Override
     public void onBeforeSave(BeforeSaveEvent<Object> event) {
         Object source = event.getSource();
@@ -47,13 +42,24 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
             return;
         }
 
-        //encrypt dbobject
-        Document document = event.getDocument();
-        String encrypted = EncryptionUtil.encrypt(document.toJson(), secretKey());
+        Document srcDocument = event.getDocument();
         List<List<String>> excludes = loadExcludes((source.getClass().getAnnotation(Encrypted.class)).exclude());
 
-        mergeFields(excludes, document);
-        document.put(ENCRYPTION_FIELD, encrypted);
+        //collect excluded fields
+        Document documentWithExcludes = documentWithExcludes(srcDocument, excludes);
+
+        //remove excluded fields form source document
+        removeExcludes(srcDocument, excludes);
+
+        //collect field for encrption
+        String fieldsForEncrypt = srcDocument.toJson();
+
+        //clean the source document
+        removeAllFields(srcDocument);
+
+        //put excluded and encrypted fields to source document
+        srcDocument.putAll(documentWithExcludes);
+        srcDocument.put(ENCRYPTION_FIELD, EncryptionUtil.encrypt(fieldsForEncrypt, secretKey()));
     }
 
     @Override
@@ -67,16 +73,27 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
         Document document = event.getDocument();
         String decryptedJson = EncryptionUtil.decrypt(document.get(ENCRYPTION_FIELD).toString(), secretKey());
 
-        List<List<String>> excludes = loadExcludes(((Encrypted) source.getAnnotation(Encrypted.class)).exclude());
-
         Document decryptedDocument = Document.parse(decryptedJson);
-        mergeFields(document, decryptedDocument);
+        document.putAll(decryptedDocument);
     }
 
     private List<List<String>> loadExcludes(String[] excludes) {
         return Stream.of(excludes)
                 .map(exclude -> Arrays.asList(StringUtils.splitByWholeSeparator(exclude, ".")))
                 .collect(Collectors.toList());
+    }
+
+    private void removeExcludes(Document document, List<List<String>> excludes) {
+        if (excludes.isEmpty()) {
+            return;
+        }
+
+        excludes.forEach(exclude -> {
+            if (!exclude.isEmpty()) {
+                document.remove(exclude.get(0));
+            }
+
+        });
     }
 
     private void removeAllFields(Document document) {
@@ -87,47 +104,10 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
         }
     }
 
-    private void mergeFields(List<List<String>> excludes, Document document) {
+    private Document documentWithExcludes(Document document, List<List<String>> excludes) {
         Document copy = new Document();
         excludes.forEach(exclude -> copyField(exclude, document, copy));
-        removeAllFields(document);
-        document.putAll(copy);
-    }
-
-    private void mergeFields(Document document, Document decryptedDocument) {
-        Document copy = createDbObject(document, decryptedDocument);
-        removeAllFields(document);
-        convertMapToDBObject(copy);
-        document.putAll(copy);
-    }
-
-    private Document createDbObject(Document document, Document decryptedDocument) {
-        Document copy = decryptedDocument == null
-                ? new Document()
-                : new Document(decryptedDocument);
-
-        if (copy.get(ID_FIELD) == null) {
-            copy.put(ID_FIELD, document.get(ID_FIELD));
-        }
-
         return copy;
-    }
-
-    private void convertMapToDBObject(Document document) {
-
-        String[] fields = document.keySet().toArray(new String[0]);
-
-        for (String field : fields) {
-            Object obj = document.get(field);
-
-            if (obj instanceof Map) {
-                Document innerDocument = new Document((Map) obj);
-
-                document.put(field, innerDocument);
-
-                convertMapToDBObject(innerDocument);
-            }
-        }
     }
 
     private void copyField(List<String> excludes, Document original, Document copy) {
@@ -143,9 +123,8 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
             copy.put(field, obj);
         }
 
-
         if (obj instanceof Document) {
-            copyField(excludes.subList(1, excludes.size()), (Document)obj, (Document) copy.get(field));
+            copyField(excludes.subList(1, excludes.size()), (Document) obj, (Document) copy.get(field));
         }
     }
 
