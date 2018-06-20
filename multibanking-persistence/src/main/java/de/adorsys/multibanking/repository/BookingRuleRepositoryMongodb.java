@@ -18,5 +18,6 @@ public interface BookingRuleRepositoryMongodb extends MongoRepository<RuleEntity
 
     List<RuleEntity> findByUserId(String userId);
 
-    Optional<RuleEntity> getRuleById(String ruleId);
+    Optional<RuleEntity> findByRuleId(String ruleId);
+
 }
