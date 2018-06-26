@@ -5,13 +5,14 @@ import { BankAccount } from "../api/BankAccount";
 import { Booking } from "../api/Booking";
 import { HttpClient } from '@angular/common/http';
 import { ENV } from "../env/env";
+import { AlertController } from "ionic-angular";
 
 @Injectable()
 export class BankAccountService {
 
   public bookingsChangedObservable = new Subject();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private alertCtrl: AlertController) {
   }
 
   getBankAccounts(accessId: string): Observable<Array<BankAccount>> {
@@ -29,7 +30,9 @@ export class BankAccountService {
   }
 
   handleError(error) {
-    console.error(error);
+    if (error.status == 404) {
+      alert(error.error.messages[0].renderedMessage);
+    }
     let errorJson = error.json();
     if (errorJson) {
       return Observable.throw(errorJson || 'Server error');
