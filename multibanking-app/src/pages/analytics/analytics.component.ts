@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, group } from "@angular/core";
 import { AlertController, ToastController, NavParams, LoadingController, NavController, Navbar } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccount.service";
 import { AnalyticsService } from "../../services/analytics.service";
@@ -14,6 +14,7 @@ import { ENV } from "../../env/env";
 import { Budget } from "../../api/Budget";
 import { BaseChartDirective } from "ng2-charts";
 import { AggregatedGroups } from "../../api/AggregatedGroups";
+import { Contract } from "../../api/Contract";
 
 @Component({
   selector: 'page-analytics',
@@ -25,7 +26,8 @@ export class AnalyticsPage {
   bankAccess: BankAccess;
   bankAccountId: string;
 
-  dates: Moment[] = [];
+  periods: Moment[][] = [];
+  analyticsDate: Moment;
   referenceDate: Moment;
   forecast: boolean = false;
   budget: Budget = {
@@ -84,16 +86,6 @@ export class AnalyticsPage {
   }
 
   ngOnInit() {
-    let start: Moment = moment().subtract(6, "months");
-    for (let index = 1; index < 10; index++) {
-      let date = start.clone().add(index, "months");
-      if (index == 6) {
-        this.referenceDate = date;
-      }
-      this.dates.push(date);
-      this.lineChartLabels.push(date.format('MMM YYYY'))
-    }
-
     this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
       this.loadAnalytics();
     });
@@ -109,9 +101,7 @@ export class AnalyticsPage {
   loadAnalytics() {
     this.analyticsService.getAnalytics(this.bankAccess.id, this.bankAccountId).subscribe(
       response => {
-        this.analytics = response;
-        this.initChart();
-        this.budget = this.calculateBudget(this.referenceDate);
+        this.analyticsLoaded(response);
       },
       error => {
         if (error == "SYNC_IN_PROGRESS") {
@@ -124,22 +114,47 @@ export class AnalyticsPage {
       });
   }
 
+  analyticsLoaded(accountAnalytics: AccountAnalytics) {
+    this.analytics = accountAnalytics;
+    this.analyticsDate = moment(accountAnalytics.analyticsDate);
+    this.referenceDate = moment(accountAnalytics.analyticsDate);
+
+    let group: BookingGroup = this.analytics.bookingGroups.find((group: BookingGroup) => {
+      return group.salaryWage;
+    });
+    if (!group) {
+      group = this.analytics.bookingGroups.find((group: BookingGroup) => {
+        return group.contract.interval == Contract.IntervalEnum.MONTHLY;
+      });
+    }
+
+    this.periods = [];
+    this.lineChartLabels = [];
+
+    group.bookingPeriods.forEach(period => {
+      this.periods.push([moment(period.start), moment(period.end)]);
+      this.lineChartLabels.push(moment(period.end).format('MMM YYYY'))
+    });
+
+    this.initChart();
+    let referencePeriod = this.findPeriod(group.bookingPeriods, moment(this.referenceDate).startOf('month'), moment(this.referenceDate).endOf('month'));
+    this.budget = this.calculateBudget(moment(referencePeriod.start), moment(referencePeriod.end));
+  }
+
   initChart() {
-    let start: Moment = moment().subtract(6, "months");
-    for (let index = 1; index < 10; index++) {
-      let date = start.clone().add(index, "months");
-      let budget = this.calculateBudget(date)
+    this.periods.forEach(period => {
+      let budget = this.calculateBudget(period[0], period[1])
 
       this.lineChartData[0].data.push(budget.incomeFix.amount);
       this.lineChartData[1].data.push(budget.incomeOther.amount);
       this.lineChartData[2].data.push(budget.expensesFix.amount * -1);
       this.lineChartData[3].data.push(budget.expensesVariable.amount * -1);
       this.lineChartData[4].data.push(budget.expensesOther.amount * -1);
-    }
+    });
     this._chart.refresh();
   }
 
-  calculateBudget(referenceDate: Moment): Budget {
+  calculateBudget(periodStart: Moment, periodEnd: Moment): Budget {
     let budget: Budget = {
       incomeFix: { amount: 0, groups: [] },
       incomeOther: { amount: 0, groups: [] },
@@ -149,9 +164,9 @@ export class AnalyticsPage {
     };
 
     this.analytics.bookingGroups.forEach((group: BookingGroup) => {
-      let amount = this.getAmount(group, referenceDate);
+      let amount = this.getPeriodAmount(group, periodStart, periodEnd);
 
-      if (amount != 0 && this.includeGroup(group, referenceDate)) {
+      if (amount && amount != 0 && this.includeGroup(group, periodStart, periodEnd)) {
         switch (group.type) {
           case GroupType.RECURRENT_INCOME:
             budget.incomeFix.amount += amount;
@@ -181,20 +196,21 @@ export class AnalyticsPage {
     return budget;
   }
 
-  getAmount(group: BookingGroup, referenceDate: Moment): number {
-    let period: BookingPeriod = group.bookingPeriods.find((period: BookingPeriod) => {
-      let start: Moment = moment(period.start);
-      return start.month() == referenceDate.month() && start.year() == referenceDate.year();
-    });
+  getPeriodAmount(group: BookingGroup, periodStart: Moment, periodEnd: Moment): number {
+    let period: BookingPeriod = this.findPeriod(group.bookingPeriods, periodStart, periodEnd);
 
-    if (period) {
-      return period.amount ? period.amount : group.amount
+    if (period ) {
+      if (period.amount) {
+        return period.amount;
+      } else if (this.isRecurrent(group)) {
+        return group.amount;
+      }
     }
 
-    if (group.amount) {
+    if (!this.isRecurrent(group)) {
       return group.amount;
     }
-
+    
     return 0;
   }
 
@@ -212,22 +228,25 @@ export class AnalyticsPage {
     }
   }
 
-  includeGroup(group: BookingGroup, referenceDate: Moment): boolean {
+  includeGroup(group: BookingGroup, periodStart: Moment, periodEnd: Moment): boolean {
     switch (group.type) {
       case GroupType.OTHER_INCOME:
-      case GroupType.OTHER_INCOME:
+      case GroupType.OTHER_EXPENSES:
       case GroupType.STANDING_ORDER:
       case GroupType.CUSTOM:
-      case GroupType.OTHER_EXPENSES:
         return true;
     }
 
-    let period: BookingPeriod = group.bookingPeriods.find((period: BookingPeriod) => {
-      let start: Moment = moment(period.start);
-      return start.month() == referenceDate.month() && start.year() == referenceDate.year();
-    });
+    return this.findPeriod(group.bookingPeriods, periodStart, periodEnd) != null;
+  }
 
-    return period != null;
+  findPeriod(periods: BookingPeriod[], referenceStart: Moment, referenceEnd: Moment): BookingPeriod {
+    if (periods) {
+      return periods.find((period: BookingPeriod) => {
+        let periodEnd: Moment = moment(period.end);
+        return periodEnd.isSameOrAfter(referenceStart) && periodEnd.isSameOrBefore(referenceEnd);
+      });
+    }
   }
 
   getCompanyLogoUrl(bookingGroup: BookingGroup) {
@@ -294,14 +313,18 @@ export class AnalyticsPage {
             }
           })
         }
-
       })
   }
 
   newDateSelected(date: Moment) {
     this.referenceDate = date;
-    this.forecast = date.isAfter(moment(), "month") || date.isSame(moment(), "month");
-    this.budget = this.calculateBudget(date);
+    this.forecast = date.isSameOrAfter(moment(), "month");
+
+    let period = this.periods.find((period: Moment[]) => {
+      return date.isSameOrAfter(period[0]) && date.isSameOrBefore(period[1]);
+    });
+
+    this.budget = this.calculateBudget(period[0], period[1]);
   }
 
   chartClicked(e: any): void {
@@ -309,8 +332,8 @@ export class AnalyticsPage {
     var firstPoint = activePoints[0];
 
     if (firstPoint) {
-      let date = this.dates[firstPoint._index];
-      let budget = this.calculateBudget(date);
+      let period = this.periods[firstPoint._index];
+      let budget = this.calculateBudget(period[0], period[1]);
       let bookingGroups;
 
       switch (firstPoint._datasetIndex) {
@@ -334,7 +357,7 @@ export class AnalyticsPage {
       this.navCtrl.push(BookingGroupPage,
         {
           label: this.lineChartLabels[firstPoint._datasetIndex],
-          date: date,
+          period: period,
           bankAccessId: this.bankAccess.id,
           bankAccountId: this.bankAccountId,
           aggregatedGroups: bookingGroups
@@ -343,10 +366,14 @@ export class AnalyticsPage {
   }
 
   itemSelected(label: string, aggregatedGroups: AggregatedGroups) {
+    let period = this.periods.find((period: Moment[]) => {
+      return this.referenceDate.isSameOrAfter(period[0]) && this.referenceDate.isSameOrBefore(period[1]);
+    });
+
     this.navCtrl.push(BookingGroupPage,
       {
         label: label,
-        date: this.referenceDate,
+        period: period,
         bankAccessId: this.bankAccess.id,
         bankAccountId: this.bankAccountId,
         aggregatedGroups: aggregatedGroups,

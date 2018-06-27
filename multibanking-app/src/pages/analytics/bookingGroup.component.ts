@@ -16,7 +16,7 @@ import { BaseChartDirective } from "ng2-charts";
 })
 export class BookingGroupPage {
 
-  referenceDate: Moment;
+  period: Moment[];
   amount: number;
   label: string;
   aggregatedGroups: AggregatedGroups;
@@ -31,7 +31,7 @@ export class BookingGroupPage {
 
   constructor(public navparams: NavParams,
     public navCtrl: NavController) {
-    this.referenceDate = navparams.data.date;
+    this.period = navparams.data.period;
     this.label = navparams.data.label;
     this.bankAccessId = navparams.data.bankAccessId;
     this.bankAccountId = navparams.data.bankAccountId;
@@ -63,9 +63,9 @@ export class BookingGroupPage {
   }
 
   getMatchingBookingPeriod(bookingGroup: BookingGroup): BookingPeriod {
-    return bookingGroup.bookingPeriods.find((period: BookingPeriod) => {
-      let start: Moment = moment(period.start);
-      return start.month() == this.referenceDate.month() && start.year() == this.referenceDate.year();
+    return bookingGroup.bookingPeriods.find((groupPeriod: BookingPeriod) => {
+      let groupPeriodEnd: Moment = moment(groupPeriod.end);
+      return groupPeriodEnd.isSameOrAfter(this.period[0]) && groupPeriodEnd.isSameOrBefore(this.period[1]);
     });
   }
 

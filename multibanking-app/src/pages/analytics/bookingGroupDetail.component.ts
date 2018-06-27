@@ -39,9 +39,6 @@ export class BookingGroupDetailPage {
         let executedBooking = this.bookingPeriod.bookings.find(booking => booking.bookingId == loadedBooking.id);
         executedBooking.loadedBooking = loadedBooking;
         executedBooking.executionDate = this.getExecutionDate(executedBooking);
-        // if (!executedBooking.executed) {
-        //   executedBooking.loadedBooking.amount = this.bookingPeriod.amount ? this.bookingPeriod.amount : group.amount;
-        // }
         executedBookings.push(executedBooking);
       });
 
@@ -87,4 +84,13 @@ export class BookingGroupDetailPage {
   getCompanyLogoUrl(booking: Booking) {
     return ENV.api_url + "/image/" + booking.bookingCategory.logo;
   }
+  getReceiver(booking: ExecutedBooking): string {
+    if (booking.loadedBooking.bookingCategory && booking.loadedBooking.bookingCategory.receiver) {
+      return booking.loadedBooking.bookingCategory.receiver;
+    } else if (booking.loadedBooking.otherAccount && booking.loadedBooking.otherAccount.owner) {
+      return booking.loadedBooking.otherAccount.owner;
+    }
+    return "";
+  }
+
 }

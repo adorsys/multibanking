@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>{{ label }} - {{ referenceDate | amDateFormat:'MMM YYYY' }} {{ amount | currency:'EUR':'symbol' }}</ion-title>
+    <ion-title>{{ period[0] | amDateFormat:'DD MMM YYYY' }} - {{ period[1] | amDateFormat:'DD MMM YYYY ' }}</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -21,7 +21,7 @@
       <h4 [ngClass]="{'executed': isExecuted(group), 'not-executed': isExecuted(group)}">{{ getExecutionDate(group)| date }}</h4>
       <h2 *ngIf="isRecurrent(group)" [ngClass]="{'executed': isExecuted(group), 'not-executed': isExecuted(group)}">{{ getAmount(group) | currency:'EUR':'symbol' }}</h2>
       <h2 *ngIf="!isRecurrent(group)">consumed {{ getPeriodAmount(group) | currency:'EUR':'symbol' }}</h2>
-      <h2 *ngIf="!isRecurrent(group)">average {{ group.amount | currency:'EUR':'symbol' }}</h2>
+      <h2 *ngIf="!isRecurrent(group) && group.amount">average {{ group.amount | currency:'EUR':'symbol' }}</h2>
     </div>
   </ion-item>
 </ion-content>
