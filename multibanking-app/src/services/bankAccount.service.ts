@@ -5,14 +5,13 @@ import { BankAccount } from "../api/BankAccount";
 import { Booking } from "../api/Booking";
 import { HttpClient } from '@angular/common/http';
 import { ENV } from "../env/env";
-import { AlertController } from "ionic-angular";
 
 @Injectable()
 export class BankAccountService {
 
   public bookingsChangedObservable = new Subject();
 
-  constructor(private http: HttpClient, private alertCtrl: AlertController) {
+  constructor(private http: HttpClient) {
   }
 
   getBankAccounts(accessId: string): Observable<Array<BankAccount>> {
