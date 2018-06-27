@@ -19,6 +19,7 @@ public class BookingGroup {
 
     private Type type;
     private String name;
+    private boolean salaryWage;
     private String mainCategory;
     private String subCategory;
     private String specification;
