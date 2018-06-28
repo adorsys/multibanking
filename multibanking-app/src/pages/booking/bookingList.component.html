@@ -25,9 +25,9 @@
   </ion-fab>
   <ion-list>
     <ion-item class="booking-list__item" *ngFor="let booking of bookings" (click)="itemSelected(booking)">
-      <ion-avatar item-start>
+      <!--ion-avatar item-start>
         <img [src]="getLogo(booking?.bookingCategory?.logo)" item-left/>
-      </ion-avatar>
+      </ion-avatar-->
       <h3>
         <strong *ngIf="booking.amount < 0">Payee:</strong>
         <strong *ngIf="booking.amount > 0">Payer:</strong>
