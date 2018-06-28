@@ -29,9 +29,9 @@
   <ion-list>
     <ion-item-divider color="light">Expenses</ion-item-divider>
     <ion-item *ngFor="let contract of contracts.expenses">
-      <ion-avatar item-start>
+      <!--ion-avatar item-start>
         <img [src]="getLogo(contract.logo)" item-left/>
-      </ion-avatar>
+      </ion-avatar-->
       <h4 *ngIf="contract.provider">{{contract.provider}}</h4>
       <h4 *ngIf="contract.mainCategory">{{contract.mainCategory}}</h4>
       <h4 *ngIf="contract.subCategory">{{contract.subCategory}}</h4>
