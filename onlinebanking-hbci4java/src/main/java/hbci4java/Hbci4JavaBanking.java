@@ -46,6 +46,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
         OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

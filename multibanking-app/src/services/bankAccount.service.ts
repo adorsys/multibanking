@@ -29,7 +29,9 @@ export class BankAccountService {
   }
 
   handleError(error) {
-    console.error(error);
+    if (error.status == 404) {
+      alert(error.error.messages[0].renderedMessage);
+    }
     let errorJson = error.json();
     if (errorJson) {
       return Observable.throw(errorJson || 'Server error');
