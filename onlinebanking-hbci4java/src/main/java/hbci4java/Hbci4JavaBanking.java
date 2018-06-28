@@ -152,6 +152,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 LOG.error("Status of SaldoReq+KUmsAll+DauerSEPAList batch job not OK " + status);
             }
 
+            if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
+                LOG.error("Bookings job not OK ");
+                throw new HBCI_Exception(bookingsJob.getJobResult().getJobStatus().getErrorString());
+            }
+
             if (hbciPassport.getState().isPresent()) {
                 bankAccess.setHbciPassportState(hbciPassport.getState().get().toJson());
             }
