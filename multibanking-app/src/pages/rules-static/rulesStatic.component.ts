@@ -145,13 +145,13 @@ export class RulesStaticPage {
         this.loadRules();
         loading.dismiss();
       },
-      error => {
+      messages => {
         loading.dismiss();
-        if (error && error.messages) {
-          error.messages.forEach(message => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
             if (message.key == "INVALID_RULES") {
               this.alertCtrl.create({
-                message: message.paramsMap.message,
+                message: "Invalid rules file",
                 buttons: ['OK']
               }).present();
             }

@@ -60,9 +60,9 @@ export class BookingGroupDetailPage {
   sortBookings(bookings: ExecutedBooking[]): ExecutedBooking[] {
     return bookings.sort((booking1: ExecutedBooking, booking2: ExecutedBooking) => {
       if (moment(booking1.executionDate).isAfter(booking2.executionDate)) {
-        return 1;
-      } else {
         return -1;
+      } else {
+        return 1;
       }
     });
   }

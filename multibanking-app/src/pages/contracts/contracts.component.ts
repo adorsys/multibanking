@@ -103,10 +103,9 @@ export class ContractsComponent {
       response => {
         loading.dismiss();
       },
-      error => {
-        if (error && error.messages) {
-          error.messages.forEach(message => {
-
+      messages => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
             if (message.key == "SYNC_IN_PROGRESS") {
               this.toastCtrl.create({
                 message: 'Account sync in progress',
@@ -120,9 +119,8 @@ export class ContractsComponent {
                 buttons: ['OK']
               }).present();
             }
-          })
+          });
         }
-      }
-    );
+      })
   }
 }

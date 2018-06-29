@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
 import { AccountAnalytics } from "../api/AccountAnalytics";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { ENV } from "../env/env";
 
 
@@ -16,20 +16,19 @@ export class AnalyticsService {
       .catch(this.handleError);
   }
 
-  handleError(error): Observable<any> {
+  handleError(error: HttpErrorResponse, ): Observable<any> {
     console.error(error);
-    let errorJson = error.json();
-    if (errorJson) {
-      if (errorJson.message == "RESCOURCE_NOT_FOUND") {
-        return Observable.of({});
-      } else if (errorJson.message == "SYNC_IN_PROGRESS") {
-        return Observable.throw(errorJson.message);
+    let result: Observable<any>;
+    if (error.error) {
+      if (error.error.messages) {
+        result = Observable.throw(error.error.messages);
       } else {
-        return Observable.throw(errorJson || 'Server error');
+        result = Observable.throw(JSON.parse(error.error).messages);
       }
     } else {
-      return Observable.throw(error || 'Server error');
+      result = Observable.throw(error || 'Server error');
     }
+    return result;
   }
 
 }

@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { PaymentCreate } from '../api/PaymentCreate';
 import { PaymentSubmit } from '../api/PaymentSubmit';
 import { Payment } from '../api/Payment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
 
 @Injectable()
@@ -28,13 +28,19 @@ export class PaymentService {
       .catch(this.handleError);
   }
 
-  handleError(error) {
+  handleError(error: HttpErrorResponse): Observable<any> {
     console.error(error);
-    let errorJson = error.json();
-    if (errorJson) {
-      return Observable.throw(errorJson || 'Server error');
+    let result: Observable<any>;
+    if (error.error) {
+      if (error.error.messages) {
+        result = Observable.throw(error.error.messages);
+      } else {
+        result = Observable.throw(JSON.parse(error.error).messages);
+      }
+    } else {
+      result = Observable.throw(error || 'Server error');
     }
-    return Observable.throw(error || 'Server error');
+    return result;
   }
 
 

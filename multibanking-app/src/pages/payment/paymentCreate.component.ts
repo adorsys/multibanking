@@ -41,9 +41,9 @@ export class PaymentCreatePage {
         loading.dismiss();
         this.askForTan(paymentLocation);
       },
-      error => {
-        if (error && error.messages) {
-          error.messages.forEach(message => {
+      messages => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
             if (message.key == "ERROR_PAYMENT") {
               this.alertCtrl.create({
                 message: 'Payment Error',
@@ -56,9 +56,9 @@ export class PaymentCreatePage {
                 buttons: ['OK']
               }).present();
             }
-          })
+          });
         }
-      });
+      })
   }
 
   createPaymentPromptPin() {

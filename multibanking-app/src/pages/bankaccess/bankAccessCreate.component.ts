@@ -90,10 +90,10 @@ export class BankAccessCreatePage {
         this.parent.bankAccessesChanged();
         this.navCtrl.pop();
       },
-      error => {
+      messages => {
         loading.dismiss();
-        if (error && error.messages) {
-          error.messages.forEach(message => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
             if (message.key == "BANK_ACCESS_ALREADY_EXIST") {
               this.alertCtrl.create({
                 message: 'Bank connection already exists',

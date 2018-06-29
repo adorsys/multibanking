@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Booking } from "../api/Booking";
 import { Pageable } from '../api/Pageable';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
 
 @Injectable()
@@ -48,16 +48,19 @@ export class BookingService {
       .catch(this.handleError);
   }
 
-  handleError(error): Observable<any> {
+  handleError(error: HttpErrorResponse): Observable<any> {
     console.error(error);
-    let errorJson = error.json();
-    if (errorJson) {
-      if (errorJson.message == "SYNC_IN_PROGRESS") {
-        return Observable.throw(errorJson.message);
+    let result: Observable<any>;
+    if (error.error) {
+      if (error.error.messages) {
+        result = Observable.throw(error.error.messages);
+      } else {
+        result = Observable.throw(JSON.parse(error.error).messages);
       }
-      return Observable.throw(errorJson || 'Server error');
+    } else {
+      result = Observable.throw(error || 'Server error');
     }
-    return Observable.throw(error || 'Server error');
+    return result;
   }
 
 

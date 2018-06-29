@@ -9,6 +9,12 @@ import { PaymentCreatePage } from "../payment/paymentCreate.component";
 import { BankAccount } from "../../api/BankAccount";
 import { BookingDetailPage } from "../booking-detail/bookingDetail.component";
 import { Pageable } from "../../api/Pageable";
+import { AnalyticsService } from "../../services/analytics.service";
+import { AccountAnalytics } from "../../api/AccountAnalytics";
+import { BookingPeriod } from "../../api/BookingPeriod";
+import { Moment } from "moment";
+import * as moment from 'moment';
+import { ExecutedBooking } from "../../api/ExecutedBooking";
 
 @Component({
   selector: 'page-bookingList',
@@ -20,7 +26,7 @@ export class BookingListPage {
   bankAccount: BankAccount;
   getLogo: Function;
   pageable: Pageable;
-  bookings: Booking[];
+  bookingMonths: Moment[] = [];
 
   @ViewChild(Navbar) navBar: Navbar;
 
@@ -32,6 +38,7 @@ export class BookingListPage {
     private loadingCtrl: LoadingController,
     private bankAccountService: BankAccountService,
     private bookingService: BookingService,
+    private analyticsService: AnalyticsService,
     public logoService: LogoService
   ) {
     this.bankAccess = navparams.data.bankAccess;
@@ -41,6 +48,9 @@ export class BookingListPage {
 
   ngOnInit() {
     this.loadBookings();
+    this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
+      this.loadBookings();
+    });
   }
 
   ionViewDidLoad() {
@@ -50,27 +60,138 @@ export class BookingListPage {
   }
 
   loadBookings() {
+    this.bookingMonths = [];
     this.bookingService.getBookings(this.bankAccess.id, this.bankAccount.id).subscribe(
       response => {
         this.pageable = response;
-        this.bookings = response._embedded ? response._embedded.bookingEntityList : [];
+        this.bookingsLoaded(response._embedded ? response._embedded.bookingEntityList : []);
+        this.loadAnalytics();
       },
-      error => {
-        if (error == "SYNC_IN_PROGRESS") {
-          this.toastCtrl.create({
-            message: 'Account sync in progress',
-            showCloseButton: true,
-            position: 'top'
-          }).present();
+      messages => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
+            if (message.key == "SYNC_IN_PROGRESS") {
+              this.toastCtrl.create({
+                message: 'Account sync in progress',
+                showCloseButton: true,
+                position: 'top'
+              }).present();
+            }
+          });
         }
+      })
+  }
+
+  loadAnalytics() {
+    this.analyticsService.getAnalytics(this.bankAccess.id, this.bankAccount.id).subscribe(
+      response => {
+        this.evalForecastBookings(response)
+      },
+      messages => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
+            if (message.key == "RESCOURCE_NOT_FOUND") {
+              //ignore
+            }
+            else if (message.key == "SYNC_IN_PROGRESS") {
+              this.toastCtrl.create({
+                message: 'Account sync in progress',
+                showCloseButton: true,
+                position: 'top'
+              }).present();
+            }
+          });
+        }
+      }
+    );
+  }
+
+  evalForecastBookings(analytics: AccountAnalytics) {
+    let referenceDate = moment(analytics.analyticsDate);
+    let nextMonth = referenceDate.clone().add(1, 'month');
+
+    //collect booking for current and next period
+    let forecastBookings: ExecutedBooking[] = [];
+    analytics.bookingGroups.forEach(group => {
+      let currentPeriod = this.findPeriod(group.bookingPeriods, referenceDate.clone().startOf('month'), referenceDate.clone().endOf('month'));
+      let nextPeriod = this.findPeriod(group.bookingPeriods, nextMonth.clone().startOf('month'), nextMonth.clone().endOf('month'));
+
+      if (currentPeriod && currentPeriod.bookings) {
+        forecastBookings = forecastBookings.concat(currentPeriod.bookings.filter(booking => !booking.executed));
+      }
+      if (nextPeriod && nextPeriod.bookings) {
+        forecastBookings = forecastBookings.concat(nextPeriod.bookings.filter(booking => !booking.executed));
+      }
+    });
+
+    let bookingIds = forecastBookings.map(booking => booking.bookingId);
+
+    //map real bookings to forecast bookings
+    this.bookingService.getBookingsByIds(this.bankAccess.id, this.bankAccount.id, bookingIds)
+      .subscribe((bookings: Booking[]) => {
+        bookings.forEach(loadedBooking => {
+          let forecastBooking = forecastBookings.find(booking => booking.bookingId == loadedBooking.id);
+          loadedBooking.bookingDate = forecastBooking.executionDate;
+          loadedBooking.forecastBooking = forecastBooking;
+        });
+        this.bookingsLoaded(bookings);
+      })
+  }
+
+  bookingsLoaded(bookings: Booking[]) {
+    console.log('bookingsLoaded')
+
+    this.sortBookings(bookings).forEach(booking => {
+      let bookingMonth: any = this.monthExist(moment(booking.bookingDate));
+      if (!bookingMonth) {
+        bookingMonth = moment(booking.bookingDate);
+        bookingMonth.bookings = [];
+        this.bookingMonths.push(bookingMonth);
+        this.bookingMonths = this.sortBookingMonths(this.bookingMonths);
+      }
+      bookingMonth.bookings.push(booking);
+      bookingMonth.bookings = this.sortBookings(bookingMonth.bookings);
+    });
+  }
+
+  monthExist(month: Moment): Moment {
+    return this.bookingMonths.find(bookingMonth => bookingMonth.isSame(month, 'month'));
+  }
+
+  sortBookingMonths(months: Moment[]): Moment[] {
+    return months.sort((moment1: Moment, moment2: Moment) => {
+      if (moment1.isAfter(moment2)) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+  }
+
+  sortBookings(bookings: Booking[]): Booking[] {
+    return bookings.sort((booking1: Booking, booking2: Booking) => {
+      if (moment(booking1.bookingDate).isAfter(booking2.bookingDate)) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+  }
+
+  findPeriod(periods: BookingPeriod[], referenceStart: Moment, referenceEnd: Moment): BookingPeriod {
+    if (periods) {
+      return periods.find((period: BookingPeriod) => {
+        let periodEnd: Moment = moment(period.end);
+        return periodEnd.isSameOrAfter(referenceStart) && periodEnd.isSameOrBefore(referenceEnd);
       });
+    }
   }
 
   loadNextBookings(infiniteScroll) {
     if (this.pageable._links.next) {
       this.bookingService.getNextBookings(this.pageable._links.next.href).subscribe(response => {
         this.pageable = response;
-        this.bookings = this.bookings.concat(response._embedded.bookingEntityList);
+        this.bookingsLoaded(response._embedded.bookingEntityList);
 
         infiniteScroll.complete();
       });
@@ -132,13 +253,11 @@ export class BookingListPage {
 
     this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccount.id, pin).subscribe(
       response => {
-        this.loadBookings();
         loading.dismiss();
       },
-      error => {
-        loading.dismiss();
-        if (error && error.messages) {
-          error.messages.forEach(message => {
+      messages => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
             if (message.key == "SYNC_IN_PROGRESS") {
               this.toastCtrl.create({
                 message: 'Account sync in progress',
@@ -152,9 +271,9 @@ export class BookingListPage {
                 buttons: ['OK']
               }).present();
             }
-          })
+          });
         }
-      });
+      })
   }
 
   downloadBookings() {

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { AutoCompleteService } from "ionic2-auto-complete";
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
 import { Rule } from '../api/Rule';
 
@@ -31,16 +31,22 @@ export class RulesStaticAutoCompleteService implements AutoCompleteService {
       .catch(this.handleError);
   }
 
-  handleError(error) {
-    console.error(error);
-    let errorJson = error.json();
-    if (errorJson) {
-      return Observable.throw(errorJson || 'Server error');
-    }
-    return Observable.throw(error || 'Server error');
-  }
-
   getItemLabel?(item: Rule): any {
     return item.ruleId + ' ' + (item.receiver ? item.receiver + ' ' : '') + (item.similarityMatchType ? item.expression : '')
+  }
+
+  handleError(error: HttpErrorResponse): Observable<any> {
+    console.error(error);
+    let result: Observable<any>;
+    if (error.error) {
+      if (error.error.messages) {
+        result = Observable.throw(error.error.messages);
+      } else {
+        result = Observable.throw(JSON.parse(error.error).messages);
+      }
+    } else {
+      result = Observable.throw(error || 'Server error');
+    }
+    return result;
   }
 }

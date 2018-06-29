@@ -25,7 +25,7 @@
 
   <ion-list>
     <ion-item-group>
-      <ion-item-divider color="light">Incomings</ion-item-divider>
+      <ion-item-divider color="light">Incomings ({{ budget.periodStart | amDateFormat:'DD MMM YYYY' }} - {{ budget.periodEnd | amDateFormat:'DD MMM YYYY' }})</ion-item-divider>
       <ion-item (click)="itemSelected('Income fix', budget.incomeFix)">
         <h2>{{!forecast ? 'Fix incomings' : 'Estimated fix incomings' }}</h2>
         <div item-right>
@@ -44,7 +44,7 @@
       </ion-item>
     </ion-item-group>
     <ion-item-group>
-      <ion-item-divider color="light">Expenses</ion-item-divider>
+      <ion-item-divider color="light">Expenses ({{ budget.periodStart | amDateFormat:'DD MMM YYYY' }} - {{ budget.periodEnd | amDateFormat:'DD MMM YYYY' }})</ion-item-divider>
       <ion-item (click)="itemSelected('Expenses fix', budget.expensesFix)">
         <h2>{{!forecast ? 'Fix expenses' : 'Estimated fix expenses' }}</h2>
         <div item-right>

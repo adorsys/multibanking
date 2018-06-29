@@ -55,9 +55,9 @@ export class BookingGroupPage {
   sortGroups(aggregatedGroups: AggregatedGroups): BookingGroup[] {
     return aggregatedGroups.groups.sort((group1: BookingGroup, group2: BookingGroup) => {
       if (moment(this.getExecutionDate(group1)).isAfter(moment(this.getExecutionDate(group2)))) {
-        return 1;
-      } else {
         return -1;
+      } else {
+        return 1;
       }
     });
   }

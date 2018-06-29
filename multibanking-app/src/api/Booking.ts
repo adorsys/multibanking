@@ -1,6 +1,7 @@
 import { BankAccount } from "./BankAccount";
 import { BookingCategory } from "./BookingCategory";
 import { BankApi } from "./BankApi";
+import { ExecutedBooking } from "./ExecutedBooking";
 
 export interface Booking {
     "id"?: string;
@@ -32,4 +33,5 @@ export interface Booking {
     "standingOrder"?: boolean;
     "userId"?: string;
     "valutaDate"?: Date;
+    "forecastBooking"?: ExecutedBooking;
 }

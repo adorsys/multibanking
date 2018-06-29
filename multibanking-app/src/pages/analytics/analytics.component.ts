@@ -1,4 +1,4 @@
-import { Component, ViewChild, group } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { AlertController, ToastController, NavParams, LoadingController, NavController, Navbar } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccount.service";
 import { AnalyticsService } from "../../services/analytics.service";
@@ -31,6 +31,8 @@ export class AnalyticsPage {
   referenceDate: Moment;
   forecast: boolean = false;
   budget: Budget = {
+    periodStart: moment(),
+    periodEnd: moment(),
     incomeFix: { amount: 0, groups: [] },
     incomeOther: { amount: 0, groups: [] },
     expensesFix: { amount: 0, groups: [] },
@@ -103,15 +105,23 @@ export class AnalyticsPage {
       response => {
         this.analyticsLoaded(response);
       },
-      error => {
-        if (error == "SYNC_IN_PROGRESS") {
-          this.toastCtrl.create({
-            message: 'Account sync in progress',
-            showCloseButton: true,
-            position: 'top'
-          }).present();
+      messages => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
+            if (message.key == "RESCOURCE_NOT_FOUND") {
+              //ignore
+            }
+            else if (message.key == "SYNC_IN_PROGRESS") {
+              this.toastCtrl.create({
+                message: 'Account sync in progress',
+                showCloseButton: true,
+                position: 'top'
+              }).present();
+            }
+          });
         }
-      });
+      }
+    )
   }
 
   analyticsLoaded(accountAnalytics: AccountAnalytics) {
@@ -119,26 +129,33 @@ export class AnalyticsPage {
     this.analyticsDate = moment(accountAnalytics.analyticsDate);
     this.referenceDate = moment(accountAnalytics.analyticsDate);
 
-    let group: BookingGroup = this.analytics.bookingGroups.find((group: BookingGroup) => {
+    let referenceGroup = this.getReferenceGroup();
+
+    this.periods = [];
+    this.lineChartLabels = [];
+
+    referenceGroup.bookingPeriods.forEach(period => {
+      this.periods.push([moment(period.start), moment(period.end)]);
+      this.lineChartLabels.push(moment(period.end).format('MMM YYYY'))
+    });
+
+    this.initChart();
+    let referencePeriod = this.findPeriod(referenceGroup.bookingPeriods, this.referenceDate);
+    this.budget = this.calculateBudget(moment(referencePeriod.start), moment(referencePeriod.end));
+  }
+
+  getReferenceGroup() {
+    let group = this.analytics.bookingGroups.find((group: BookingGroup) => {
       return group.salaryWage;
     });
+
     if (!group) {
       group = this.analytics.bookingGroups.find((group: BookingGroup) => {
         return group.contract.interval == Contract.IntervalEnum.MONTHLY;
       });
     }
 
-    this.periods = [];
-    this.lineChartLabels = [];
-
-    group.bookingPeriods.forEach(period => {
-      this.periods.push([moment(period.start), moment(period.end)]);
-      this.lineChartLabels.push(moment(period.end).format('MMM YYYY'))
-    });
-
-    this.initChart();
-    let referencePeriod = this.findPeriod(group.bookingPeriods, moment(this.referenceDate).startOf('month'), moment(this.referenceDate).endOf('month'));
-    this.budget = this.calculateBudget(moment(referencePeriod.start), moment(referencePeriod.end));
+    return group;
   }
 
   initChart() {
@@ -156,6 +173,8 @@ export class AnalyticsPage {
 
   calculateBudget(periodStart: Moment, periodEnd: Moment): Budget {
     let budget: Budget = {
+      periodStart: periodStart,
+      periodEnd: periodEnd,
       incomeFix: { amount: 0, groups: [] },
       incomeOther: { amount: 0, groups: [] },
       expensesFix: { amount: 0, groups: [] },
@@ -164,9 +183,9 @@ export class AnalyticsPage {
     };
 
     this.analytics.bookingGroups.forEach((group: BookingGroup) => {
-      let amount = this.getPeriodAmount(group, periodStart, periodEnd);
+      let amount = this.getPeriodAmount(group, periodStart);
 
-      if (amount && amount != 0 && this.includeGroup(group, periodStart, periodEnd)) {
+      if (amount && amount != 0 && this.includeGroup(group, periodStart)) {
         switch (group.type) {
           case GroupType.RECURRENT_INCOME:
             budget.incomeFix.amount += amount;
@@ -196,10 +215,10 @@ export class AnalyticsPage {
     return budget;
   }
 
-  getPeriodAmount(group: BookingGroup, periodStart: Moment, periodEnd: Moment): number {
-    let period: BookingPeriod = this.findPeriod(group.bookingPeriods, periodStart, periodEnd);
+  getPeriodAmount(group: BookingGroup, referenceDate: Moment): number {
+    let period: BookingPeriod = this.findPeriod(group.bookingPeriods, referenceDate);
 
-    if (period ) {
+    if (period) {
       if (period.amount) {
         return period.amount;
       } else if (this.isRecurrent(group)) {
@@ -210,7 +229,7 @@ export class AnalyticsPage {
     if (!this.isRecurrent(group)) {
       return group.amount;
     }
-    
+
     return 0;
   }
 
@@ -228,7 +247,7 @@ export class AnalyticsPage {
     }
   }
 
-  includeGroup(group: BookingGroup, periodStart: Moment, periodEnd: Moment): boolean {
+  includeGroup(group: BookingGroup, referenceDate: Moment): boolean {
     switch (group.type) {
       case GroupType.OTHER_INCOME:
       case GroupType.OTHER_EXPENSES:
@@ -237,14 +256,15 @@ export class AnalyticsPage {
         return true;
     }
 
-    return this.findPeriod(group.bookingPeriods, periodStart, periodEnd) != null;
+    return this.findPeriod(group.bookingPeriods, referenceDate) != null;
   }
 
-  findPeriod(periods: BookingPeriod[], referenceStart: Moment, referenceEnd: Moment): BookingPeriod {
+  findPeriod(periods: BookingPeriod[], referenceDate: Moment): BookingPeriod {
     if (periods) {
       return periods.find((period: BookingPeriod) => {
+        let periodStart: Moment = moment(period.start);
         let periodEnd: Moment = moment(period.end);
-        return periodEnd.isSameOrAfter(referenceStart) && periodEnd.isSameOrBefore(referenceEnd);
+        return referenceDate.isSameOrAfter(periodStart) && referenceDate.isSameOrBefore(periodEnd);
       });
     }
   }
@@ -295,9 +315,9 @@ export class AnalyticsPage {
       response => {
         loading.dismiss();
       },
-      error => {
-        if (error && error.messages) {
-          error.messages.forEach(message => {
+      messages => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
             if (message.key == "SYNC_IN_PROGRESS") {
               this.toastCtrl.create({
                 message: 'Account sync in progress',
@@ -311,7 +331,7 @@ export class AnalyticsPage {
                 buttons: ['OK']
               }).present();
             }
-          })
+          });
         }
       })
   }
