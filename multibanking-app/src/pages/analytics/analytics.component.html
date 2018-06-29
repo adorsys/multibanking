@@ -9,23 +9,25 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content class="analytics-content" padding>
-  <canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels" [options]="'{responsive: true}'" [legend]="true"
-    [chartType]="'line'" [colors]="lineChartColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)">
-  </canvas>
-  <ion-scroll scrollX="true" direction="x">
-    <ion-card *ngFor="let item of dates" [ngClass]="{'active': item == referenceDate }" (click)="newDateSelected(item)">
-      <ion-card-content>
-        <ion-card-title>
-          {{ item | amDateFormat:'MMM YYYY' }}
-        </ion-card-title>
-      </ion-card-content>
-    </ion-card>
-  </ion-scroll>
-
+<ion-content class="analytics-content">
+  <div padding>
+    <canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels" [options]="'{responsive: true}'" [legend]="true"
+      [chartType]="'line'" [colors]="lineChartColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)">
+    </canvas>
+    <ion-scroll scrollX="true" direction="x">
+      <ion-card *ngFor="let item of dates" [ngClass]="{'active': item == referenceDate }" (click)="newDateSelected(item)">
+        <ion-card-content>
+          <ion-card-title>
+            {{ item | amDateFormat:'MMM YYYY' }}
+          </ion-card-title>
+        </ion-card-content>
+      </ion-card>
+    </ion-scroll>
+  </div>
   <ion-list>
     <ion-item-group>
-      <ion-item-divider color="light">Incomings ({{ budget.periodStart | amDateFormat:'DD MMM YYYY' }} - {{ budget.periodEnd | amDateFormat:'DD MMM YYYY' }})</ion-item-divider>
+      <ion-item-divider color="light">Incomings ({{ budget.periodStart | amDateFormat:'DD MMM YYYY' }} - {{ budget.periodEnd | amDateFormat:'DD MMM YYYY'
+        }})</ion-item-divider>
       <ion-item (click)="itemSelected('Income fix', budget.incomeFix)">
         <h2>{{!forecast ? 'Fix incomings' : 'Estimated fix incomings' }}</h2>
         <div item-right>
@@ -44,7 +46,8 @@
       </ion-item>
     </ion-item-group>
     <ion-item-group>
-      <ion-item-divider color="light">Expenses ({{ budget.periodStart | amDateFormat:'DD MMM YYYY' }} - {{ budget.periodEnd | amDateFormat:'DD MMM YYYY' }})</ion-item-divider>
+      <ion-item-divider color="light">Expenses ({{ budget.periodStart | amDateFormat:'DD MMM YYYY' }} - {{ budget.periodEnd | amDateFormat:'DD MMM YYYY'
+        }})</ion-item-divider>
       <ion-item (click)="itemSelected('Expenses fix', budget.expensesFix)">
         <h2>{{!forecast ? 'Fix expenses' : 'Estimated fix expenses' }}</h2>
         <div item-right>

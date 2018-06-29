@@ -7,8 +7,7 @@
   </ion-navbar>
 </ion-header>
 
-
-<ion-content padding>
+<ion-content>
   <ion-fab bottom right>
     <button ion-fab mini>
       <ion-icon name="arrow-dropleft"></ion-icon>
@@ -19,7 +18,7 @@
       </button>
     </ion-fab-list>
   </ion-fab>
-  <ion-auto-complete [dataProvider]="rulesCustomAutoCompleteService" [options]="{placeholder : 'Name or creditor id'}" #autocomplete></ion-auto-complete>
+  <ion-auto-complete padding [dataProvider]="rulesCustomAutoCompleteService" [options]="{placeholder : 'Name or creditor id'}" #autocomplete></ion-auto-complete>
   <ion-list>
     <ion-item *ngFor="let rule of rules">
       <ion-grid>
