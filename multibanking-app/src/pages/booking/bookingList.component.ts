@@ -47,7 +47,12 @@ export class BookingListPage {
   }
 
   ngOnInit() {
-    this.loadBookings();
+    if (!this.bankAccount.lastSync || moment(this.bankAccount.lastSync).isBefore(moment(), 'day')) {
+      this.syncBookings(null);
+    } else {
+      this.loadBookings();
+    }
+    
     this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
       this.loadBookings();
     });
@@ -139,8 +144,6 @@ export class BookingListPage {
   }
 
   bookingsLoaded(bookings: Booking[]) {
-    console.log('bookingsLoaded')
-
     this.sortBookings(bookings).forEach(booking => {
       let bookingMonth: any = this.monthExist(moment(booking.bookingDate));
       if (!bookingMonth) {

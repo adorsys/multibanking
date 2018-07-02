@@ -7,6 +7,7 @@ export interface BankAccount {
     "bankAccessId"?: string;
     "bankAccountBalance"?: BankAccountBalance;
     "bankName"?: string;
+    "lastSync"?: Date;
     "bic"?: string;
     "blz"?: string;
     "country"?: string;

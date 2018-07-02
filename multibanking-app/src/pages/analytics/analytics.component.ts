@@ -136,7 +136,8 @@ export class AnalyticsPage {
 
     referenceGroup.bookingPeriods.forEach(period => {
       this.periods.push([moment(period.start), moment(period.end)]);
-      this.lineChartLabels.push(moment(period.end).format('MMM YYYY'))
+      this.lineChartLabels.push(referenceGroup.salaryWage ?
+        moment(period.end).format('MMM YYYY') : moment(period.start).format('MMM YYYY'))
     });
 
     this.initChart();
