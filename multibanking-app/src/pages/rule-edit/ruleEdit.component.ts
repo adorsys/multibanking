@@ -41,13 +41,15 @@ export class RuleEditPage {
     this.rulesService.getAvailableCategories().subscribe(
       response => {
         this.categories = response;
-        if (this.rule.mainCategory) {
-          this.mainCategoryChanged(this.rule.mainCategory);
-          if (this.rule.subCategory) {
-            this.subCategoryChanged(this.rule.subCategory);
-          }
-          if (this.rule.specification) {
-            this.specificationChanged(this.rule.specification);
+        if (this.categories) {
+          if (this.rule.mainCategory) {
+            this.mainCategoryChanged(this.rule.mainCategory);
+            if (this.rule.subCategory) {
+              this.subCategoryChanged(this.rule.subCategory);
+            }
+            if (this.rule.specification) {
+              this.specificationChanged(this.rule.specification);
+            }
           }
         }
       });
@@ -68,9 +70,16 @@ export class RuleEditPage {
     this.specification = this.specifications.filter((element: RuleCategory) => element.id == catId)[0];
   }
 
+  similarityMatherChanged($event) {
+    this.rule.expression = null;
+  }
+
   submit() {
     if (this.rule.receiver && this.rule.receiver.length == 0) {
       this.rule.receiver = undefined;
+    }
+    if (this.rule.similarityMatchType == SimilarityMatchType.CUSTOM) {
+      this.rule.similarityMatchType = undefined;
     }
     if (this.rule.id) {
       this.rulesService.updateRule(this.rule).subscribe(
