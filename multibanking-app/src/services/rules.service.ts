@@ -6,6 +6,7 @@ import { Subject } from "rxjs";
 import { Pageable } from "../api/Pageable";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { ENV } from "../env/env";
+import { CategoriesContainer } from "../api/CategoriesContainer";
 
 @Injectable()
 export class RulesService {
@@ -15,9 +16,21 @@ export class RulesService {
   constructor(private http: HttpClient) {
   }
 
-  getAvailableCategories(): Observable<Array<RuleCategory>> {
-    return this.http.get(`${ENV.api_url}/analytics/rules/categories`)
-      .map((res: any) => res._embedded.ruleCategoryList)
+  getAvailableCategories(): Observable<CategoriesContainer> {
+    return this.http.get(`${ENV.smartanalytics_url}/categories`)
+      .catch(this.handleError);
+  }
+
+  updateCategories(categoriesContainer): Observable<any> {
+    return this.http.post(`${ENV.smartanalytics_url}/categories`, categoriesContainer)
+      .catch(this.handleError);
+  }
+
+  uploadCategories(file: File): Observable<any> {
+    let formData: FormData = new FormData();
+    formData.append('categoriesFile', file, file.name);
+
+    return this.http.post(`${ENV.smartanalytics_url}/categories/upload`, formData, { responseType: 'text' })
       .catch(this.handleError);
   }
 

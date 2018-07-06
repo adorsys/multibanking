@@ -40,10 +40,13 @@ import { RulesStaticAutoCompleteService } from '../services/rulesStaticAutoCompl
 import { HttpClientModule } from '@angular/common/http';
 import { ContractService } from '../services/contract.service';
 import { BookingGroupDetailPage } from '../pages/analytics/bookingGroupDetail.component';
+import { CategoriesPage } from '../pages/categories/categories.component';
+import { ResourceTreeDirective } from '../directives/resourceTree.directive';
 
 @NgModule({
   declarations: [
     ListActionDirective,
+    ResourceTreeDirective,
     AnalyticsPage,
     BankAccessCreatePage,
     BankAccessListPage,
@@ -60,6 +63,7 @@ import { BookingGroupDetailPage } from '../pages/analytics/bookingGroupDetail.co
     ContractsComponent,
     BookingTabsPage,
     RulesTabsPage,
+    CategoriesPage,
     CyclePipe,
     MyApp,
   ],
@@ -73,6 +77,7 @@ import { BookingGroupDetailPage } from '../pages/analytics/bookingGroupDetail.co
   ],
   bootstrap: [IonicApp],
   entryComponents: [
+    ResourceTreeDirective,
     AnalyticsPage,
     BankAccessCreatePage,
     BankAccessListPage,
@@ -89,6 +94,7 @@ import { BookingGroupDetailPage } from '../pages/analytics/bookingGroupDetail.co
     ContractsComponent,
     BookingTabsPage,
     RulesTabsPage,
+    CategoriesPage,
     MyApp,
   ],
   providers: [

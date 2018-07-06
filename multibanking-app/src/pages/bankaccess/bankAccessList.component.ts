@@ -16,23 +16,14 @@ export class BankAccessListPage {
   bankaccesses: Array<BankAccess>;
 
   constructor(public navCtrl: NavController,
-    private bankAccessService: BankAccessService,
-    private keycloakService: KeycloakService) {
+    private bankAccessService: BankAccessService) {
   }
 
   ngOnInit() {
-    console.log("init Keycloak");
-    KeycloakService.init({ onLoad: 'check-sso', checkLoginIframe: false, adapter: 'default' }).then(() => {
-      console.log("Keycloak initialized, authenticated: " + this.keycloakService.authenticated());
-      if (this.keycloakService.authenticated()) {
-        this.bankAccessService.getBankAccesses().subscribe(
-          response => {
-            this.bankaccesses = response
-          });
-      } else {
-        this.keycloakService.login();
-      }
-    });
+    this.bankAccessService.getBankAccesses().subscribe(
+      response => {
+        this.bankaccesses = response
+      });
   }
 
   itemSelected(bankAccess) {

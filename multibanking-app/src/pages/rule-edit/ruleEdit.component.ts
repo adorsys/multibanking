@@ -40,7 +40,7 @@ export class RuleEditPage {
   ngOnInit() {
     this.rulesService.getAvailableCategories().subscribe(
       response => {
-        this.categories = response;
+        this.categories = response.bookingCategories;
         if (this.categories) {
           if (this.rule.mainCategory) {
             this.mainCategoryChanged(this.rule.mainCategory);
