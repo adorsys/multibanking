@@ -1,45 +1,11 @@
 package de.adorsys.multibanking.service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
-
-import org.adorsys.docusafe.business.DocumentSafeService;
-import org.adorsys.docusafe.business.types.complex.DSDocument;
-import org.adorsys.docusafe.business.types.complex.DocumentFQN;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-
-import de.adorsys.multibanking.domain.AccountSynchPref;
-import de.adorsys.multibanking.domain.AnonymizedBookingEntity;
-import de.adorsys.multibanking.domain.BankAccessData;
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountData;
-import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.BankEntity;
-import de.adorsys.multibanking.domain.BookingEntity;
-import de.adorsys.multibanking.domain.BookingFile;
-import de.adorsys.multibanking.domain.UserData;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.UnexistentBookingFileException;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.AnonymizationService;
-import de.adorsys.multibanking.service.analytics.CategoriesProvider;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsService;
 import de.adorsys.multibanking.service.analytics.SmartanalyticsMapper;
 import de.adorsys.multibanking.service.base.UserObjectService;
@@ -48,15 +14,24 @@ import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.FQNUtils;
 import de.adorsys.multibanking.utils.Ids;
 import de.adorsys.smartanalytics.api.AnalyticsResult;
-import domain.BankAccount;
-import domain.BankApi;
-import domain.BankApiUser;
-import domain.Booking;
-import domain.LoadBookingsResponse;
-import domain.StandingOrder;
+import domain.*;
 import exception.InvalidPinException;
+import org.adorsys.docusafe.business.DocumentSafeService;
+import org.adorsys.docusafe.business.types.complex.DSDocument;
+import org.adorsys.docusafe.business.types.complex.DocumentFQN;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import spi.OnlineBankingService;
 import utils.Utils;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -88,8 +63,6 @@ public class BookingService {
     private OnlineBankingServiceProducer bankingServiceProducer;
     @Autowired
     private AnonymizationService anonymizationService;
-    @Autowired
-    private CategoriesProvider categoriesProvider;
     @Autowired
     private DocumentSafeService documentSafeService;
     /**

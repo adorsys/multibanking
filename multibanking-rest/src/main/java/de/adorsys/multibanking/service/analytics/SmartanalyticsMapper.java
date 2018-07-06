@@ -6,8 +6,6 @@ import de.adorsys.smartanalytics.api.*;
 import domain.BookingCategory;
 import domain.Contract;
 import domain.Cycle;
-import domain.RuleCategory;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
