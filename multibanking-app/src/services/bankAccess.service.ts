@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { BankAccess } from "../api/BankAccess";
 import { Subject } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
+import { ResourceBankAccess } from '../model/multibanking/models';
 
 @Injectable()
 export class BankAccessService {
@@ -13,7 +13,7 @@ export class BankAccessService {
   constructor(private http: HttpClient) {
   }
 
-  getBankAccesses(): Observable<Array<BankAccess>> {
+  getBankAccesses(): Observable<Array<ResourceBankAccess>> {
     return this.http.get(ENV.api_url + "/bankaccesses")
       .map((res: any) => {
         return res._embedded != null ? res._embedded.bankAccessEntityList : []
@@ -21,12 +21,12 @@ export class BankAccessService {
       .catch(this.handleError);
   }
 
-  createBankAcccess(bankaccess: BankAccess): Observable<Object> {
+  createBankAcccess(bankaccess: ResourceBankAccess): Observable<Object> {
     return this.http.post(ENV.api_url + "/bankaccesses", bankaccess, { responseType: 'text' })
       .catch(this.handleError);
   }
 
-  updateBankAcccess(bankaccess: BankAccess): Observable<any> {
+  updateBankAcccess(bankaccess: ResourceBankAccess): Observable<any> {
     return this.http.put(ENV.api_url + "/bankaccesses/" + bankaccess.id, bankaccess)
       .catch(this.handleError);
   }

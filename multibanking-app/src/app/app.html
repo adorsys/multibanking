@@ -2,13 +2,10 @@
   <ion-content>
     <ion-list>
       <button ion-item (click)="openPage(backAccessListPage)" menuToggle>
-        Bank Connections
+        Bank connections
       </button>
-      <button ion-item (click)="openPage(categoriesPage)" menuToggle *ngIf="isRulesAdmin()">
-        Categories
-      </button>
-      <button ion-item (click)="openPage(rulesPage)" menuToggle *ngIf="isRulesAdmin()">
-        Rules
+      <button ion-item (click)="openPage(configTabsPage)" menuToggle *ngIf="isRulesAdmin()">
+        Smartanalytics config
       </button>
       <button ion-item (click)="logout()" menuToggle>
         Logout

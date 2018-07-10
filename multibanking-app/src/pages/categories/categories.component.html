@@ -3,7 +3,7 @@
     <button ion-button menuToggle icon-only>
       <ion-icon name='menu'></ion-icon>
     </button>
-    <ion-title>Categories</ion-title>
+    <ion-title>Categories {{categoriesContainer?.version}}</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -21,7 +21,7 @@
   </ion-fab>
   <ion-list padding>
     <ion-item>
-      <resource-tree-view [TreeData]="categoriesContainer?.bookingCategories" [hasCheckbox]="false"></resource-tree-view>
+      <resource-tree-view [TreeData]="categoriesContainer?.categories" [hasCheckbox]="false"></resource-tree-view>
     </ion-item>
   </ion-list>
 </ion-content>

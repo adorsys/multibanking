@@ -1,9 +1,7 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams, LoadingController, AlertController, ToastController } from "ionic-angular";
 import { PaymentService } from "../../services/payment.service";
-import { Payment } from "../../api/Payment";
-import { BankAccount } from "../../api/BankAccount";
-import { BankAccess } from "../../api/BankAccess";
+import { BankAccess, Payment, ResourceBankAccount, ResourcePaymentEntity } from "../../model/multibanking/models";
 
 @Component({
   selector: 'page-payment-create',
@@ -12,7 +10,7 @@ import { BankAccess } from "../../api/BankAccess";
 export class PaymentCreatePage {
 
   bankAccess: BankAccess;
-  bankAccount: BankAccount;
+  bankAccount: ResourceBankAccount;
   payment: Payment = { receiver: "", purpose: "", amount: undefined };
 
   constructor(public navCtrl: NavController,
@@ -122,7 +120,7 @@ export class PaymentCreatePage {
     )
   }
 
-  submitPayment(payment: Payment, tan: string) {
+  submitPayment(payment: ResourcePaymentEntity, tan: string) {
     this.paymentService.submitPayment(this.bankAccess.id, this.bankAccount.id, payment.id, { tan: tan }).subscribe(
       response => {
         this.toastCtrl.create({

@@ -42,6 +42,10 @@ import { ContractService } from '../services/contract.service';
 import { BookingGroupDetailPage } from '../pages/analytics/bookingGroupDetail.component';
 import { CategoriesPage } from '../pages/categories/categories.component';
 import { ResourceTreeDirective } from '../directives/resourceTree.directive';
+import { ConfigTabsPage } from '../pages/config-tabs/config-tabs.component';
+import { ContractBlacklistPage } from '../pages/contract-blacklist/contract-blacklist.component';
+import { BookingGroupsPage } from '../pages/booking-groups/booking-groups.component';
+
 
 @NgModule({
   declarations: [
@@ -65,6 +69,9 @@ import { ResourceTreeDirective } from '../directives/resourceTree.directive';
     RulesTabsPage,
     CategoriesPage,
     CyclePipe,
+    ConfigTabsPage,
+    ContractBlacklistPage,
+    BookingGroupsPage,
     MyApp,
   ],
   imports: [
@@ -95,6 +102,9 @@ import { ResourceTreeDirective } from '../directives/resourceTree.directive';
     BookingTabsPage,
     RulesTabsPage,
     CategoriesPage,
+    ConfigTabsPage,
+    BookingGroupsPage,
+    ContractBlacklistPage,
     MyApp,
   ],
   providers: [

@@ -1,14 +1,10 @@
 import { Component } from "@angular/core";
 import { NavParams } from "ionic-angular";
-import { BookingGroup } from "../../api/BookingGroup";
 import { ENV } from "../../env/env";
-import { GroupType } from "../../api/GroupType";
 import { Moment } from "moment";
-import { BookingPeriod } from "../../api/BookingPeriod";
 import * as moment from 'moment';
 import { BookingService } from "../../services/booking.service";
-import { Booking } from "../../api/Booking";
-import { ExecutedBooking } from "../../api/ExecutedBooking";
+import { BookingPeriod, ExecutedBooking, BookingGroup, Booking } from "../../model/multibanking/models";
 
 @Component({
   selector: 'page-bookingGroupDetail',
@@ -36,7 +32,7 @@ export class BookingGroupDetailPage {
     let executedBookings: ExecutedBooking[] = [];
     this.bookingService.getBookingsByIds(this.bankAccessId, this.bankAccountId, bookingIds).subscribe((bookings: Booking[]) => {
       bookings.forEach(loadedBooking => {
-        let executedBooking = this.bookingPeriod.bookings.find(booking => booking.bookingId == loadedBooking.id);
+        let executedBooking: any  = this.bookingPeriod.bookings.find(booking => booking.bookingId == loadedBooking.id);
         executedBooking.loadedBooking = loadedBooking;
         executedBooking.executionDate = this.getExecutionDate(executedBooking);
         executedBookings.push(executedBooking);
@@ -46,7 +42,7 @@ export class BookingGroupDetailPage {
     })
   }
 
-  getExecutionDate(booking: ExecutedBooking) {
+  getExecutionDate(booking) {
     return booking.executed ? booking.loadedBooking.bookingDate : booking.executionDate;
   }
 
@@ -69,14 +65,14 @@ export class BookingGroupDetailPage {
 
   isRecurrent(group: BookingGroup) {
     switch (group.type) {
-      case GroupType.RECURRENT_INCOME:
-      case GroupType.RECURRENT_NONSEPA:
-      case GroupType.RECURRENT_SEPA:
-      case GroupType.STANDING_ORDER:
+      case BookingGroup.TypeEnum.RECURRENTINCOME:
+      case BookingGroup.TypeEnum.RECURRENTNONSEPA:
+      case BookingGroup.TypeEnum.RECURRENTSEPA:
+      case BookingGroup.TypeEnum.STANDINGORDER:
         return true;
-      case GroupType.OTHER_INCOME:
-      case GroupType.CUSTOM:
-      case GroupType.OTHER_EXPENSES:
+      case BookingGroup.TypeEnum.OTHERINCOME:
+      case BookingGroup.TypeEnum.CUSTOM:
+      case BookingGroup.TypeEnum.OTHEREXPENSES:
         return false;
     }
   }
@@ -84,7 +80,8 @@ export class BookingGroupDetailPage {
   getCompanyLogoUrl(booking: Booking) {
     return ENV.api_url + "/image/" + booking.bookingCategory.logo;
   }
-  getReceiver(booking: ExecutedBooking): string {
+
+  getReceiver(booking): string {
     if (booking.loadedBooking.bookingCategory && booking.loadedBooking.bookingCategory.receiver) {
       return booking.loadedBooking.bookingCategory.receiver;
     } else if (booking.loadedBooking.otherAccount && booking.loadedBooking.otherAccount.owner) {

@@ -2,9 +2,8 @@ import { Component, ViewChild } from "@angular/core";
 import { NavController, NavParams, LoadingController, AlertController } from "ionic-angular";
 import { BankAccessService } from "../../services/bankAccess.service";
 import { AutoCompleteComponent } from "ionic2-auto-complete";
-import { BankAccess } from "../../api/BankAccess";
-import { Bank } from "../../api/Bank";
 import { BankAutoCompleteService } from "../../services/bankAutoComplete.service";
+import { BankAccess, Bank } from "../../model/multibanking/models";
 
 @Component({
   selector: 'page-bankaccess-create',
@@ -68,18 +67,20 @@ export class BankAccessCreatePage {
     this.bankAccess.bankCode = this.selectedBank.bankCode;
 
     for (let i = 0; i < this.selectedBank.loginSettings.credentials.length; i++) {
+      let credentials: any = this.selectedBank.loginSettings.credentials[i];
+
       if (i == 0) {
-        this.bankAccess.bankLogin = this.selectedBank.loginSettings.credentials[i].input;
+        this.bankAccess.bankLogin = credentials.input;
       }
       else if (i == 1) {
         if (!this.selectedBank.loginSettings.credentials[i].masked) {
-          this.bankAccess.bankLogin2 = this.selectedBank.loginSettings.credentials[i].input;
+          this.bankAccess.bankLogin2 = credentials.input;
         } else {
-          this.bankAccess.pin = this.selectedBank.loginSettings.credentials[i].input;
+          this.bankAccess.pin = credentials.input;
         }
       }
       else if (i == 2) {
-        this.bankAccess.pin = this.selectedBank.loginSettings.credentials[i].input;
+        this.bankAccess.pin = credentials.input;
       }
     }
 

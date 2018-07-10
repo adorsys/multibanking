@@ -1,14 +1,12 @@
 import { Component, ViewChild } from "@angular/core";
 import { NavParams, NavController } from "ionic-angular";
-import { BookingGroup } from "../../api/BookingGroup";
 import { ENV } from "../../env/env";
-import { GroupType } from "../../api/GroupType";
 import { Moment } from "moment";
-import { BookingPeriod } from "../../api/BookingPeriod";
 import * as moment from 'moment';
 import { BookingGroupDetailPage } from "./bookingGroupDetail.component";
-import { AggregatedGroups } from "../../api/AggregatedGroups";
 import { BaseChartDirective } from "ng2-charts";
+import { AggregatedGroups } from "model/aggregatedGroups";
+import { BookingGroup, BookingPeriod } from "../../model/multibanking/models";
 
 @Component({
   selector: 'page-bookingGroup',
@@ -111,14 +109,14 @@ export class BookingGroupPage {
 
   isRecurrent(group: BookingGroup) {
     switch (group.type) {
-      case GroupType.RECURRENT_INCOME:
-      case GroupType.RECURRENT_NONSEPA:
-      case GroupType.RECURRENT_SEPA:
-      case GroupType.STANDING_ORDER:
+      case BookingGroup.TypeEnum.RECURRENTINCOME:
+      case BookingGroup.TypeEnum.RECURRENTNONSEPA:
+      case BookingGroup.TypeEnum.RECURRENTSEPA:
+      case BookingGroup.TypeEnum.STANDINGORDER:
         return true;
-      case GroupType.OTHER_INCOME:
-      case GroupType.CUSTOM:
-      case GroupType.OTHER_EXPENSES:
+      case BookingGroup.TypeEnum.OTHERINCOME:
+      case BookingGroup.TypeEnum.CUSTOM:
+      case BookingGroup.TypeEnum.OTHEREXPENSES:
         return false;
     }
   }

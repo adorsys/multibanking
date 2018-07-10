@@ -4,8 +4,7 @@ import { BankAccountListPage } from "../bankaccount/bankaccountList.component";
 import { BankAccessCreatePage } from "./bankAccessCreate.component";
 import { BankAccessService } from "../../services/bankAccess.service";
 import { BankAccessUpdatePage } from "./bankAccessUpdate.component";
-import { BankAccess } from "../../api/BankAccess";
-import { KeycloakService } from '../../auth/keycloak.service';
+import { BankAccess } from '../../model/multibanking/models';
 
 @Component({
   selector: 'page-bankaccessList',

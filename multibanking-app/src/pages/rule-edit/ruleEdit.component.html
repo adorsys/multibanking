@@ -6,15 +6,20 @@
 
 <ion-content class="ruleEdit-content" padding>
   <ion-list>
-    <ion-item *ngIf="rule?.creditorId">
-      <ion-label>Creditor id: {{rule.creditorId}}</ion-label>
+    <ion-item>
+      <ion-label>Order</ion-label>
+      <ion-input type="number" name="order" [(ngModel)]="rule.order"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Creditor id</ion-label>
+      <ion-input type="text" name="creditorId" [(ngModel)]="rule.creditorId"></ion-input>
     </ion-item>
     <ion-item>
       <ion-label>Receiver</ion-label>
       <ion-input type="text" name="receiver" [(ngModel)]="rule.receiver"></ion-input>
     </ion-item>
     <ion-item>
-      <ion-label>Similarity matcher</ion-label>
+      <ion-label>Similarity match</ion-label>
       <ion-select [(ngModel)]="rule.similarityMatchType" (ionChange)="similarityMatherChanged($event)">
         <ion-option *ngFor="let matcher of similarityMatcher" value="{{matcher}}">{{matcher}}</ion-option>
       </ion-select>

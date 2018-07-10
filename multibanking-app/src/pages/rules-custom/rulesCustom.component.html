@@ -18,7 +18,8 @@
       </button>
     </ion-fab-list>
   </ion-fab>
-  <ion-auto-complete padding [dataProvider]="rulesCustomAutoCompleteService" [options]="{placeholder : 'Name or creditor id'}" #autocomplete></ion-auto-complete>
+  <ion-auto-complete padding [dataProvider]="rulesCustomAutoCompleteService" [options]="{placeholder : 'Name or creditor id'}"
+    #autocomplete></ion-auto-complete>
   <ion-list>
     <ion-item *ngFor="let rule of rules">
       <ion-grid>
@@ -27,10 +28,10 @@
             <ion-row>
               <ion-col col-4>Rule id:</ion-col>
               <ion-col col-8>{{ rule.ruleId }}</ion-col>
-              <ion-col col-4>Receiver:</ion-col>
-              <ion-col col-8>{{ rule.receiver }}</ion-col>
-              <ion-col col-4>Creditor id:</ion-col>
-              <ion-col col-8>{{ rule.creditorId }}</ion-col>
+              <ion-col *ngIf="rule.receiver" col-4>Receiver:</ion-col>
+              <ion-col *ngIf="rule.receiver" col-8>{{ rule.receiver }}</ion-col>
+              <ion-col *ngIf="rule.creditorId" col-4>Creditor id:</ion-col>
+              <ion-col *ngIf="rule.creditorId" col-8>{{ rule.creditorId }}</ion-col>
             </ion-row>
           </ion-col>
           <ion-col col-12 col-lg-6>
@@ -45,8 +46,10 @@
           </ion-col>
           <ion-col col-12>
             <ion-row>
-              <ion-col col-4 col-lg-2>Expression:</ion-col>
-              <ion-col col-8 col-lg-10>
+              <ion-col col-4 col-lg-2 *ngIf="rule.similarityMatchType" col-4>Similarity match:</ion-col>
+              <ion-col col-8 col-lg-10 *ngIf="rule.similarityMatchType" col-8>{{ rule.similarityMatchType }}</ion-col>
+              <ion-col col-4 col-lg-2 *ngIf="rule.expression">Expression:</ion-col>
+              <ion-col col-8 col-lg-10 *ngIf="rule.expression">
                 <p style="white-space: normal;">{{ rule.expression }}</p>
               </ion-col>
             </ion-row>

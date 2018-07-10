@@ -1,7 +1,9 @@
 import { Component } from "@angular/core";
 import { RulesService } from "../../services/rules.service";
-import { CategoriesContainer } from "api/CategoriesContainer";
 import { LoadingController, AlertController } from 'ionic-angular';
+import { Observable } from "rxjs";
+import { CategoriesTree } from "model/multibanking/categoriesTree";
+
 
 @Component({
   selector: 'page-categories',
@@ -9,7 +11,7 @@ import { LoadingController, AlertController } from 'ionic-angular';
 })
 export class CategoriesPage {
 
-  categoriesContainer: CategoriesContainer;
+  categoriesContainer: CategoriesTree;
 
   constructor(private rulesService: RulesService,
     public alertCtrl: AlertController,
@@ -23,6 +25,15 @@ export class CategoriesPage {
   loadCategories() {
     this.rulesService.getAvailableCategories().subscribe(result => {
       this.categoriesContainer = result;
+    },
+    messages => {
+      if (messages instanceof Array) {
+        messages.forEach(message => {
+          if (message.key != "RESOUCE_NOT_FOUND") {
+            Observable.throw(messages);
+          }
+        })
+      }
     })
   }
 
@@ -42,7 +53,7 @@ export class CategoriesPage {
         loading.dismiss();
         if (messages instanceof Array) {
           messages.forEach(message => {
-            if (message.key == "INVALID_CATEGORIES") {
+            if (message.key == "INVALID_FILE") {
               this.alertCtrl.create({
                 message: "Invalid categories file",
                 buttons: ['OK']
@@ -51,6 +62,7 @@ export class CategoriesPage {
           })
         }
       });
+      input.target.value = null;
   }
 
 }

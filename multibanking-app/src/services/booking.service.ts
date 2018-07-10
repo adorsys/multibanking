@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { Booking } from "../api/Booking";
-import { Pageable } from '../api/Pageable';
 import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
+import { ResourceBooking } from '../model/multibanking/models';
+import { Pageable } from '../model/pageable';
 
 @Injectable()
 export class BookingService {
@@ -11,7 +11,7 @@ export class BookingService {
   constructor(private http: HttpClient) {
   }
 
-  getBookingsByIds(accessId, accountId, bookingIds: string[]): Observable<Booking[]> {
+  getBookingsByIds(accessId, accountId, bookingIds: string[]): Observable<ResourceBooking[]> {
     const params = new HttpParams({
       fromObject: {
         ids: bookingIds,
@@ -33,7 +33,7 @@ export class BookingService {
       .catch(this.handleError);
   }
 
-  getBooking(accessId, accountId, bookingId): Observable<Booking> {
+  getBooking(accessId, accountId, bookingId): Observable<ResourceBooking> {
     return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/${bookingId}`)
       .map((res: any) => res._embedded != null ? res._embedded.bookingEntityList : [])
       .catch(this.handleError);

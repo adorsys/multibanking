@@ -3,8 +3,8 @@ import { NavParams, AlertController, ToastController, LoadingController, Navbar,
 
 import { LogoService } from '../../services/logo.service';
 import { BankAccountService } from "../../services/bankAccount.service";
-import { BankAccess } from "../../api/BankAccess";
 import { ContractService } from "../../services/contract.service";
+import { BankAccess } from "../../model/multibanking/models";
 
 @Component({
   selector: 'contracts',

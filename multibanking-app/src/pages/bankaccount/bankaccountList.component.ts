@@ -1,10 +1,9 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccount.service";
-import { BankAccess } from "../../api/BankAccess";
-import { BankAccount } from "../../api/BankAccount";
 import { BookingTabsPage } from "../booking-tabs/booking-tabs.component";
 import { BankAccessService } from "../../services/bankAccess.service";
+import { BankAccess, BankAccount } from "../../model/multibanking/models";
 
 
 @Component({

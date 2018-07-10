@@ -2,19 +2,14 @@ import { Component, ViewChild } from "@angular/core";
 import { AlertController, ToastController, NavParams, LoadingController, NavController, Navbar } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccount.service";
 import { AnalyticsService } from "../../services/analytics.service";
-import { BankAccess } from "../../api/BankAccess";
-import { AccountAnalytics } from "../../api/AccountAnalytics";
-import { BookingGroup } from "../../api/BookingGroup";
 import { BookingGroupPage } from "./bookingGroup.component";
-import { GroupType } from "../../api/GroupType";
 import { Moment } from "moment";
 import * as moment from 'moment';
-import { BookingPeriod } from "../../api/BookingPeriod";
 import { ENV } from "../../env/env";
-import { Budget } from "../../api/Budget";
 import { BaseChartDirective } from "ng2-charts";
-import { AggregatedGroups } from "../../api/AggregatedGroups";
-import { Contract } from "../../api/Contract";
+import { Budget } from "model/budget";
+import { AccountAnalyticsEntity, BankAccess, BookingGroup, Contract, BookingPeriod } from "../../model/multibanking/models";
+import { AggregatedGroups } from "model/aggregatedGroups";
 
 @Component({
   selector: 'page-analytics',
@@ -22,7 +17,7 @@ import { Contract } from "../../api/Contract";
 })
 export class AnalyticsPage {
 
-  analytics: AccountAnalytics;
+  analytics: AccountAnalyticsEntity;
   bankAccess: BankAccess;
   bankAccountId: string;
 
@@ -124,7 +119,7 @@ export class AnalyticsPage {
     )
   }
 
-  analyticsLoaded(accountAnalytics: AccountAnalytics) {
+  analyticsLoaded(accountAnalytics: AccountAnalyticsEntity) {
     this.analytics = accountAnalytics;
     this.analyticsDate = moment(accountAnalytics.analyticsDate);
     this.referenceDate = moment(accountAnalytics.analyticsDate);
@@ -134,15 +129,17 @@ export class AnalyticsPage {
     this.periods = [];
     this.lineChartLabels = [];
 
-    referenceGroup.bookingPeriods.forEach(period => {
-      this.periods.push([moment(period.start), moment(period.end)]);
-      this.lineChartLabels.push(referenceGroup.salaryWage ?
-        moment(period.end).format('MMM YYYY') : moment(period.start).format('MMM YYYY'))
-    });
+    if (referenceGroup) {
+      referenceGroup.bookingPeriods.forEach(period => {
+        this.periods.push([moment(period.start), moment(period.end)]);
+        this.lineChartLabels.push(referenceGroup.salaryWage ?
+          moment(period.end).format('MMM YYYY') : moment(period.start).format('MMM YYYY'))
+      });
 
-    this.initChart();
-    let referencePeriod = this.findPeriod(referenceGroup.bookingPeriods, this.referenceDate);
-    this.budget = this.calculateBudget(moment(referencePeriod.start), moment(referencePeriod.end));
+      this.initChart();
+      let referencePeriod = this.findPeriod(referenceGroup.bookingPeriods, this.referenceDate);
+      this.budget = this.calculateBudget(moment(referencePeriod.start), moment(referencePeriod.end));
+    }
   }
 
   getReferenceGroup() {
@@ -188,25 +185,25 @@ export class AnalyticsPage {
 
       if (amount && amount != 0 && this.includeGroup(group, periodStart)) {
         switch (group.type) {
-          case GroupType.RECURRENT_INCOME:
+          case BookingGroup.TypeEnum.RECURRENTINCOME:
             budget.incomeFix.amount += amount;
             budget.incomeFix.groups.push(group);
             break;
-          case GroupType.OTHER_INCOME:
+          case BookingGroup.TypeEnum.OTHERINCOME:
             budget.incomeOther.amount += amount;
             budget.incomeOther.groups.push(group);
             break;
-          case GroupType.RECURRENT_NONSEPA:
-          case GroupType.RECURRENT_SEPA:
-          case GroupType.STANDING_ORDER:
+          case BookingGroup.TypeEnum.RECURRENTNONSEPA:
+          case BookingGroup.TypeEnum.RECURRENTSEPA:
+          case BookingGroup.TypeEnum.STANDINGORDER:
             budget.expensesFix.amount += amount;
             budget.expensesFix.groups.push(group);
             break;
-          case GroupType.CUSTOM:
+          case BookingGroup.TypeEnum.CUSTOM:
             budget.expensesVariable.amount += amount;
             budget.expensesVariable.groups.push(group);
             break;
-          case GroupType.OTHER_EXPENSES:
+          case BookingGroup.TypeEnum.OTHEREXPENSES:
             budget.expensesOther.amount += amount;
             budget.expensesOther.groups.push(group);
             break;
@@ -236,24 +233,24 @@ export class AnalyticsPage {
 
   isRecurrent(group: BookingGroup) {
     switch (group.type) {
-      case GroupType.RECURRENT_INCOME:
-      case GroupType.RECURRENT_NONSEPA:
-      case GroupType.RECURRENT_SEPA:
-      case GroupType.STANDING_ORDER:
+      case BookingGroup.TypeEnum.RECURRENTINCOME:
+      case BookingGroup.TypeEnum.RECURRENTNONSEPA:
+      case BookingGroup.TypeEnum.RECURRENTSEPA:
+      case BookingGroup.TypeEnum.STANDINGORDER:
         return true;
-      case GroupType.OTHER_INCOME:
-      case GroupType.CUSTOM:
-      case GroupType.OTHER_EXPENSES:
+      case BookingGroup.TypeEnum.OTHERINCOME:
+      case BookingGroup.TypeEnum.CUSTOM:
+      case BookingGroup.TypeEnum.OTHEREXPENSES:
         return false;
     }
   }
 
   includeGroup(group: BookingGroup, referenceDate: Moment): boolean {
     switch (group.type) {
-      case GroupType.OTHER_INCOME:
-      case GroupType.OTHER_EXPENSES:
-      case GroupType.STANDING_ORDER:
-      case GroupType.CUSTOM:
+      case BookingGroup.TypeEnum.OTHERINCOME:
+      case BookingGroup.TypeEnum.OTHEREXPENSES:
+      case BookingGroup.TypeEnum.STANDINGORDER:
+      case BookingGroup.TypeEnum.CUSTOM:
         return true;
     }
 

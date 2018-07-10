@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams, LoadingController } from "ionic-angular";
 import { BankAccessService } from "../../services/bankAccess.service";
-import { BankAccess } from "../../api/BankAccess";
+import { BankAccess } from "../../model/multibanking/models";
 
 @Component({
   selector: 'page-bankaccess-update',

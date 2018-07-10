@@ -1,12 +1,12 @@
 import { Component, ViewChild } from '@angular/core';
 import { NavController, NavParams, AlertController, Navbar, LoadingController } from 'ionic-angular';
 import { RulesService } from '../../services/rules.service';
-import { Rule } from '../../api/Rule';
 import { RulesStaticAutoCompleteService } from '../../services/rulesStaticAutoComplete.service';
 import { AutoCompleteComponent } from 'ionic2-auto-complete';
 import { RuleEditPage } from '../rule-edit/ruleEdit.component';
 import { RulesCustomAutoCompleteService } from '../../services/rulesCustomAutoComplete.service';
-import { Pageable } from '../../api/Pageable';
+import { ResourceRuleEntity } from '../../model/multibanking/models';
+import { Pageable } from '../../model/pageable';
 
 
 @Component({
@@ -18,8 +18,8 @@ export class RulesStaticPage {
   @ViewChild(AutoCompleteComponent) autocomplete: AutoCompleteComponent;
   @ViewChild(Navbar) navBar: Navbar;
   rulesStatus;
-  selectedRule: Rule;
-  rules: Rule[];
+  selectedRule: ResourceRuleEntity;
+  rules: ResourceRuleEntity[];
   pageable: Pageable;
   custom: boolean = false;
 
@@ -93,11 +93,15 @@ export class RulesStaticPage {
     this.loadNextRules(infiniteScroll);
   }
 
-  editRule(rule: Rule) {
+  createRule() {
+    this.navCtrl.push(RuleEditPage, { customRule: false });
+  }
+
+  editRule(rule: ResourceRuleEntity) {
     this.navCtrl.push(RuleEditPage, { rule: rule, customRule: false });
   }
 
-  deleteRule(rule: Rule) {
+  deleteRule(rule: ResourceRuleEntity) {
     this.rulesService.deleteRule(rule.id, this.custom).subscribe(rules => {
       this.loadRules();
     });
@@ -158,5 +162,6 @@ export class RulesStaticPage {
           })
         }
       });
+    input.target.value = null;
   }
 }

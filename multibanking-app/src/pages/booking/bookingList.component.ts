@@ -2,19 +2,14 @@ import { Component, ViewChild } from "@angular/core";
 import { NavController, AlertController, ToastController, NavParams, LoadingController, Navbar } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccount.service";
 import { BookingService } from "../../services/booking.service";
-import { BankAccess } from "../../api/BankAccess";
-import { Booking } from "../../api/Booking";
 import { LogoService } from '../../services/logo.service';
 import { PaymentCreatePage } from "../payment/paymentCreate.component";
-import { BankAccount } from "../../api/BankAccount";
 import { BookingDetailPage } from "../booking-detail/bookingDetail.component";
-import { Pageable } from "../../api/Pageable";
 import { AnalyticsService } from "../../services/analytics.service";
-import { AccountAnalytics } from "../../api/AccountAnalytics";
-import { BookingPeriod } from "../../api/BookingPeriod";
 import { Moment } from "moment";
 import * as moment from 'moment';
-import { ExecutedBooking } from "../../api/ExecutedBooking";
+import { BankAccess, ResourceBankAccount, AccountAnalyticsEntity, ExecutedBooking, Booking, BookingPeriod } from "../../model/multibanking/models";
+import { Pageable } from "../../model/pageable";
 
 @Component({
   selector: 'page-bookingList',
@@ -23,7 +18,7 @@ import { ExecutedBooking } from "../../api/ExecutedBooking";
 export class BookingListPage {
 
   bankAccess: BankAccess;
-  bankAccount: BankAccount;
+  bankAccount: ResourceBankAccount;
   getLogo: Function;
   pageable: Pageable;
   bookingMonths: Moment[] = [];
@@ -52,7 +47,7 @@ export class BookingListPage {
     } else {
       this.loadBookings();
     }
-    
+
     this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
       this.loadBookings();
     });
@@ -111,7 +106,7 @@ export class BookingListPage {
     );
   }
 
-  evalForecastBookings(analytics: AccountAnalytics) {
+  evalForecastBookings(analytics: AccountAnalyticsEntity) {
     let referenceDate = moment(analytics.analyticsDate);
     let nextMonth = referenceDate.clone().add(1, 'month');
 
@@ -131,16 +126,18 @@ export class BookingListPage {
 
     let bookingIds = forecastBookings.map(booking => booking.bookingId);
 
-    //map real bookings to forecast bookings
-    this.bookingService.getBookingsByIds(this.bankAccess.id, this.bankAccount.id, bookingIds)
-      .subscribe((bookings: Booking[]) => {
-        bookings.forEach(loadedBooking => {
-          let forecastBooking = forecastBookings.find(booking => booking.bookingId == loadedBooking.id);
-          loadedBooking.bookingDate = forecastBooking.executionDate;
-          loadedBooking.forecastBooking = forecastBooking;
-        });
-        this.bookingsLoaded(bookings);
-      })
+    if (bookingIds.length > 0) {
+      //map real bookings to forecast bookings
+      this.bookingService.getBookingsByIds(this.bankAccess.id, this.bankAccount.id, bookingIds)
+        .subscribe((bookings: Booking[]) => {
+          bookings.forEach((loadedBooking: any) => {
+            let forecastBooking = forecastBookings.find(booking => booking.bookingId == loadedBooking.id);
+            loadedBooking.bookingDate = forecastBooking.executionDate;
+            loadedBooking.forecastBooking = forecastBooking;
+          });
+          this.bookingsLoaded(bookings);
+        })
+    }
   }
 
   bookingsLoaded(bookings: Booking[]) {

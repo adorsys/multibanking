@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subject } from "rxjs";
-import { BankAccount } from "../api/BankAccount";
-import { Booking } from "../api/Booking";
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
+import { ResourceBankAccount, ResourceBooking } from '../model/multibanking/models';
 
 @Injectable()
 export class BankAccountService {
@@ -14,13 +13,13 @@ export class BankAccountService {
   constructor(private http: HttpClient) {
   }
 
-  getBankAccounts(accessId: string): Observable<Array<BankAccount>> {
+  getBankAccounts(accessId: string): Observable<Array<ResourceBankAccount>> {
     return this.http.get(ENV.api_url + "/bankaccesses/" + accessId + "/accounts")
       .map((res: any) => res._embedded.bankAccountEntityList)
       .catch(this.handleError);
   }
 
-  syncBookings(accessId: string, accountId: string, pin: string): Observable<Array<Booking>> {
+  syncBookings(accessId: string, accountId: string, pin: string): Observable<Array<ResourceBooking>> {
     return this.http.put(ENV.api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/sync", pin)
       .map((res: Response) => {
         this.bookingsChangedObservable.next(true);

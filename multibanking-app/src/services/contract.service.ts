@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Contract } from '../api/Contract';
 import { ENV } from "../env/env";
+import { ContractEntity } from '../model/multibanking/models';
 
 @Injectable()
 export class ContractService {
 
   constructor(private http: HttpClient) { }
 
-  getContracts(accessId: string, accountId: string): Observable<Array<Contract>> {
+  getContracts(accessId: string, accountId: string): Observable<Array<ContractEntity>> {
     return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/contracts`)
-      .map((res: any) => res._embedded.contractEntityList)
+      .map((res: any) => res._embedded ? res._embedded.contractEntityList : [])
       .catch(this.handleError);
   }
 

@@ -3,9 +3,9 @@ import { NavController, Platform, Nav } from "ionic-angular";
 import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { BankAccessListPage } from "../pages/bankaccess/bankAccessList.component";
-import { RulesTabsPage } from "../pages/rules-tabs/rules-tabs.component";
 import { KeycloakService } from "../auth/keycloak.service";
 import { CategoriesPage } from "../pages/categories/categories.component";
+import { ConfigTabsPage } from "../pages/config-tabs/config-tabs.component";
 
 @Component({
   templateUrl: 'app.html'
@@ -17,7 +17,7 @@ export class MyApp {
 
   backAccessListPage: any = BankAccessListPage;
   categoriesPage: any = CategoriesPage;
-  rulesPage: any = RulesTabsPage;
+  configTabsPage: any = ConfigTabsPage;
 
   constructor(
     platform: Platform,

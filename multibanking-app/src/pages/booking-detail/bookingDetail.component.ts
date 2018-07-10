@@ -1,10 +1,8 @@
 import { Component } from "@angular/core";
 import { NavParams, NavController } from "ionic-angular";
-import { Booking } from "../../api/Booking";
 import { RuleEditPage } from "../rule-edit/ruleEdit.component";
 import { RulesService } from "../../services/rules.service";
-import { Rule } from "../../api/Rule";
-import { SimilarityMatchType } from "../../api/SimilarityMatchType";
+import { Booking, Rule } from "../../model/multibanking/models";
 
 @Component({
   selector: 'page-bookingDetail',
@@ -37,13 +35,13 @@ export class BookingDetailPage {
         incoming: this.booking.amount > 0
       };
       if (this.booking.otherAccount && this.booking.otherAccount.iban) {
-        rule.similarityMatchType = SimilarityMatchType.IBAN;
+        rule.similarityMatchType = Rule.SimilarityMatchTypeEnum.IBAN;
         rule.expression = this.booking.otherAccount.iban;
       } else if (rule.receiver) {
-        rule.similarityMatchType = SimilarityMatchType.REFERENCE_NAME;
+        rule.similarityMatchType = Rule.SimilarityMatchTypeEnum.REFERENCENAME;
         rule.expression = rule.receiver;
       } else {
-        rule.similarityMatchType = SimilarityMatchType.PURPOSE;
+        rule.similarityMatchType = Rule.SimilarityMatchTypeEnum.PURPOSE;
         rule.expression = this.booking.usage;
       }
       this.navCtrl.push(RuleEditPage, {

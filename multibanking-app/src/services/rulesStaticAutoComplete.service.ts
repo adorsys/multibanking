@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { AutoCompleteService } from "ionic2-auto-complete";
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
-import { Rule } from '../api/Rule';
+import { Rule } from 'model/multibanking/rule';
 
 @Injectable()
 export class RulesStaticAutoCompleteService implements AutoCompleteService {

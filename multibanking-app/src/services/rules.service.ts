@@ -1,28 +1,28 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs/Observable";
-import { RuleCategory } from "../api/RuleCategory";
-import { Rule } from "../api/Rule";
 import { Subject } from "rxjs";
-import { Pageable } from "../api/Pageable";
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { ENV } from "../env/env";
-import { CategoriesContainer } from "../api/CategoriesContainer";
+import { ResourceRuleEntity, ResourceContractBlacklist } from "../model/multibanking/models";
+import { CategoriesTree } from "../model/multibanking/categoriesTree";
+import { Pageable } from "../model/pageable";
+import { ResourceGroupConfig } from "model/multibanking/resourceGroupConfig";
 
 @Injectable()
 export class RulesService {
 
-  public rulesChangedObservable = new Subject<Rule>();
+  public rulesChangedObservable = new Subject<ResourceRuleEntity>();
 
   constructor(private http: HttpClient) {
   }
 
-  getAvailableCategories(): Observable<CategoriesContainer> {
-    return this.http.get(`${ENV.smartanalytics_url}/categories`)
+  getAvailableCategories(): Observable<CategoriesTree> {
+    return this.http.get(`${ENV.smartanalytics_url}/config/booking-categories`)
       .catch(this.handleError);
   }
 
   updateCategories(categoriesContainer): Observable<any> {
-    return this.http.post(`${ENV.smartanalytics_url}/categories`, categoriesContainer)
+    return this.http.post(`${ENV.smartanalytics_url}/config/booking-categories`, categoriesContainer)
       .catch(this.handleError);
   }
 
@@ -30,13 +30,39 @@ export class RulesService {
     let formData: FormData = new FormData();
     formData.append('categoriesFile', file, file.name);
 
-    return this.http.post(`${ENV.smartanalytics_url}/categories/upload`, formData, { responseType: 'text' })
+    return this.http.post(`${ENV.smartanalytics_url}/config/booking-categories/upload`, formData, { responseType: 'text' })
       .catch(this.handleError);
   }
 
-  createRule(rule: Rule, custom: boolean): Observable<Array<RuleCategory>> {
+  getBookingGroups(): Observable<ResourceGroupConfig> {
+    return this.http.get(`${ENV.smartanalytics_url}/config/booking-groups`)
+      .catch(this.handleError);
+  }
+
+  uploadBookingGroups(file: File): Observable<any> {
+    let formData: FormData = new FormData();
+    formData.append('bookingGroupsFile', file, file.name);
+
+    return this.http.post(`${ENV.smartanalytics_url}/config/booking-groups/upload`, formData, { responseType: 'text' })
+      .catch(this.handleError);
+  }
+
+  getContractBlacklist(): Observable<ResourceContractBlacklist> {
+    return this.http.get(`${ENV.smartanalytics_url}/config/contract-blacklist`)
+      .catch(this.handleError);
+  }
+
+  uploadContractBlacklist(file: File): Observable<any> {
+    let formData: FormData = new FormData();
+    formData.append('contractBlacklistFile', file, file.name);
+
+    return this.http.post(`${ENV.smartanalytics_url}/config/contract-blacklist/upload`, formData, { responseType: 'text' })
+      .catch(this.handleError);
+  }
+
+  createRule(rule: ResourceRuleEntity, custom: boolean): Observable<any> {
     let url = custom ? `${ENV.api_url}/analytics/rules`
-      : `${ENV.smartanalytics_url}/rules`;
+      : `${ENV.smartanalytics_url}/config/booking-rules`;
 
     return this.http.post(url, rule, { responseType: 'text' })
       .catch(this.handleError)
@@ -45,9 +71,9 @@ export class RulesService {
       })
   }
 
-  updateRule(rule: Rule): Observable<Array<RuleCategory>> {
+  updateRule(rule: ResourceRuleEntity): Observable<any> {
     let url = rule.ruleId.startsWith("custom") ? `${ENV.api_url}/analytics/rules/${rule.id}`
-      : `${ENV.smartanalytics_url}/rules/${rule.id}`;
+      : `${ENV.smartanalytics_url}/config/booking-rules/${rule.id}`;
 
     return this.http.put(url, rule)
       .catch(this.handleError)
@@ -62,7 +88,7 @@ export class RulesService {
   }
 
   getRules(custom: boolean): Observable<Pageable> {
-    let url = custom ? `${ENV.api_url}/analytics/rules/` : `${ENV.smartanalytics_url}/rules/`;
+    let url = custom ? `${ENV.api_url}/analytics/rules/` : `${ENV.smartanalytics_url}/config/booking-rules/`;
 
     return this.http.get(url)
       .catch(this.handleError);
@@ -73,9 +99,9 @@ export class RulesService {
       .catch(this.handleError);
   }
 
-  getRule(id: string): Observable<Rule> {
+  getRule(id: string): Observable<ResourceRuleEntity> {
     let url = id.startsWith("custom") ? `${ENV.api_url}/analytics/rules/${id}`
-      : `${ENV.smartanalytics_url}/rules/${id}`;
+      : `${ENV.smartanalytics_url}/config/booking-rules/${id}`;
 
     return this.http.get(url)
       .map((res: Response) => res.json() != null ? res.json() : {})
@@ -84,7 +110,7 @@ export class RulesService {
 
   deleteRule(id, custom): Observable<any> {
     let url = custom ? `${ENV.api_url}/analytics/rules/${id}`
-      : `${ENV.smartanalytics_url}/rules/${id}`;
+      : `${ENV.smartanalytics_url}/config/booking-rules/${id}`;
 
     return this.http.delete(url)
       .catch(this.handleError);
@@ -92,7 +118,7 @@ export class RulesService {
 
   downloadRules(custom): Observable<any> {
     let url = custom ? `${ENV.api_url}/analytics/rules/download`
-      : `${ENV.smartanalytics_url}/rules/download`;
+      : `${ENV.smartanalytics_url}/config/booking-rules/download`;
 
     return this.http.get(url, { responseType: 'blob' })
       .map(res => {
@@ -105,7 +131,7 @@ export class RulesService {
     let formData: FormData = new FormData();
     formData.append('rulesFile', file, file.name);
 
-    return this.http.post(`${ENV.smartanalytics_url}/rules/upload`, formData, { responseType: 'text' })
+    return this.http.post(`${ENV.smartanalytics_url}/config/booking-rules/upload`, formData, { responseType: 'text' })
       .catch(this.handleError);
   }
 
