@@ -22,7 +22,7 @@ export class RulesStaticAutoCompleteService implements AutoCompleteService {
 
     let url = this.customRules ?
       `${ENV.api_url}/analytics/rules/search?query=${keyword}&custom=${this.customRules}` :
-      `${ENV.smartanalytics_url}/rules/search?query=${keyword}&custom=${this.customRules}`;
+      `${ENV.smartanalytics_url}/config/booking-rules/search?query=${keyword}&custom=${this.customRules}`;
 
     return this.http.get(url)
       .map((res: any) => {
@@ -32,7 +32,7 @@ export class RulesStaticAutoCompleteService implements AutoCompleteService {
   }
 
   getItemLabel?(item: Rule): any {
-    return item.ruleId + ' ' + (item.receiver ? item.receiver + ' ' : '') + (item.similarityMatchType ? item.expression : '')
+    return item.order + ' ' + item.ruleId + ' ' + (item.receiver ? item.receiver + ' ' : '') + (item.similarityMatchType ? item.expression : '')
   }
 
   handleError(error: HttpErrorResponse): Observable<any> {

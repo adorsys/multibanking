@@ -17,10 +17,12 @@ import lombok.NoArgsConstructor;
 public class BookingCategory extends Contract {
 
     private Set<String> rules;
-    private String receiver;
+    
     private String mainCategory;
     private String subCategory;
     private String specification;
+    private String receiver;
+
     private Map<String, String> custom;
 
 }

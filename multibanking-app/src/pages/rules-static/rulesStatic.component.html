@@ -3,8 +3,8 @@
     <button ion-button menuToggle icon-only>
       <ion-icon name='menu'></ion-icon>
     </button>
-    <ion-title>{{pageable?.page.totalElements}} static rules - {{rulesStatus?.rulesVersion}} - {{rulesStatus?.lastChangeDate | amLocal |
-      amDateFormat:'DD MMM YYYY HH:mm A'}}</ion-title>
+    <ion-title>{{pageable?.page.totalElements}} static rules - {{rulesStatus?.rulesVersion}} - {{rulesStatus?.lastChangeDate | amLocal
+      | amDateFormat:'DD MMM YYYY HH:mm A'}}</ion-title>
   </ion-navbar>
 </ion-header>
 
@@ -36,7 +36,7 @@
         <ion-row>
           <ion-col col-12 col-lg-6>
             <ion-row>
-              <ion-col col-4>Rule id:</ion-col>
+              <ion-col col-4>{{rule.order}}. Rule id:</ion-col>
               <ion-col col-8>{{ rule.ruleId }}</ion-col>
               <ion-col *ngIf="rule.receiver" col-4>Receiver:</ion-col>
               <ion-col *ngIf="rule.receiver" col-8>{{ rule.receiver }}</ion-col>
