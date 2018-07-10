@@ -31,9 +31,12 @@ export class RuleEditPage {
   ) {
     this.rule = navparams.data.rule ? navparams.data.rule : {};
     this.customRule = navparams.data.customRule;
-    for (var n in Rule.SimilarityMatchTypeEnum) {
-      this.similarityMatcher.push(n);
-    }
+
+    Object.keys(Rule.SimilarityMatchTypeEnum)
+      .map(key => Rule.SimilarityMatchTypeEnum[key])
+      .forEach(element => {
+        this.similarityMatcher.push(element);
+      });
   }
 
   ngOnInit() {
@@ -69,7 +72,7 @@ export class RuleEditPage {
     this.specification = this.specifications.filter((element: Category) => element.id == catId)[0];
   }
 
-  similarityMatherChanged($event) {
+  similarityMatcherChanged($event) {
     this.rule.expression = null;
   }
 
@@ -86,7 +89,7 @@ export class RuleEditPage {
           this.navCtrl.pop();
         });
     } else {
-      this. rulesService.createRule(this.rule, true).subscribe(
+      this.rulesService.createRule(this.rule, true).subscribe(
         response => {
           this.navCtrl.pop();
         });

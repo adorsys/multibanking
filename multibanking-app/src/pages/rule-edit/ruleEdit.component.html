@@ -20,7 +20,7 @@
     </ion-item>
     <ion-item>
       <ion-label>Similarity match</ion-label>
-      <ion-select [(ngModel)]="rule.similarityMatchType" (ionChange)="similarityMatherChanged($event)">
+      <ion-select [(ngModel)]="rule.similarityMatchType" (ionChange)="similarityMatcherChanged($event)">
         <ion-option *ngFor="let matcher of similarityMatcher" value="{{matcher}}">{{matcher}}</ion-option>
       </ion-select>
     </ion-item>
