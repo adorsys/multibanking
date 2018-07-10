@@ -1,4 +1,8 @@
 page-rules-static {
+  .auto-complete {
+    width: 100%;
+    z-index: 998
+  }
   ion-auto-complete {
     width: 100%;
   }

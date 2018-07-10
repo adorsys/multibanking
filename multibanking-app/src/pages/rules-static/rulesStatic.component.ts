@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { NavController, NavParams, AlertController, Navbar, LoadingController } from 'ionic-angular';
 import { RulesService } from '../../services/rules.service';
 import { RulesStaticAutoCompleteService } from '../../services/rulesStaticAutoComplete.service';
@@ -17,6 +17,8 @@ export class RulesStaticPage {
 
   @ViewChild(AutoCompleteComponent) autocomplete: AutoCompleteComponent;
   @ViewChild(Navbar) navBar: Navbar;
+  @ViewChild('headerTag') headerTag: ElementRef;
+  @ViewChild('scrollableTag') scrollableTag: ElementRef;
   rulesStatus;
   selectedRule: ResourceRuleEntity;
   rules: ResourceRuleEntity[];
@@ -45,6 +47,13 @@ export class RulesStaticPage {
     });
 
     this.loadRules();
+  }
+
+  ionViewDidEnter() {
+    if (this.headerTag) {
+      let offset = this.headerTag.nativeElement.offsetHeight;
+      (<HTMLDivElement>this.scrollableTag.nativeElement).style.marginTop = offset + 'px';
+    }
   }
 
   ionViewDidLoad() {

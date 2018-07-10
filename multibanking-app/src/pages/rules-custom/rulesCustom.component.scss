@@ -3,6 +3,11 @@ page-rules-custom {
     margin-right: 0.2em;
   }
 
+  .auto-complete {
+    width: 100%;
+    z-index: 998
+  }
+
   ion-auto-complete {
     width: 100%;
   }
