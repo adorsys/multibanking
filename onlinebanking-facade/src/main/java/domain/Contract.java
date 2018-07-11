@@ -20,4 +20,5 @@ public class Contract {
     private String email;
     private String mandateReference;
     private Cycle interval;
+    private boolean cancelled;
 }
