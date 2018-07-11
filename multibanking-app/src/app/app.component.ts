@@ -4,8 +4,8 @@ import { StatusBar } from "@ionic-native/status-bar";
 import { SplashScreen } from "@ionic-native/splash-screen";
 import { BankAccessListPage } from "../pages/bankaccess/bankAccessList.component";
 import { KeycloakService } from "../auth/keycloak.service";
-import { CategoriesPage } from "../pages/categories/categories.component";
 import { ConfigTabsPage } from "../pages/config-tabs/config-tabs.component";
+import { BanksPage } from "../pages/banks/banks.component";
 
 @Component({
   templateUrl: 'app.html'
@@ -16,7 +16,7 @@ export class MyApp {
   @ViewChild('content') content: NavController;
 
   backAccessListPage: any = BankAccessListPage;
-  categoriesPage: any = CategoriesPage;
+  banksPage: any = BanksPage;
   configTabsPage: any = ConfigTabsPage;
 
   constructor(

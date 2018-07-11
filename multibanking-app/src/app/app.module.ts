@@ -23,7 +23,7 @@ import { ContractsComponent } from "../pages/contracts/contracts.component";
 import { CyclePipe } from '../pages/contracts/cycle.pipe';
 import { KEYCLOAK_HTTP_PROVIDER } from '../auth/keycloak.http';
 import { KeycloakService } from '../auth/keycloak.service';
-import { LogoService } from '../services/logo.service';
+import { ImageService } from '../services/image.service';
 import { MyApp } from './app.component';
 import { PaymentCreatePage } from '../pages/payment/paymentCreate.component';
 import { PaymentService } from '../services/payment.service';
@@ -31,7 +31,6 @@ import { BookingDetailPage } from '../pages/booking-detail/bookingDetail.compone
 import { RulesService } from '../services/rules.service';
 import { RuleEditPage } from '../pages/rule-edit/ruleEdit.component';
 import { BookingTabsPage } from '../pages/booking-tabs/booking-tabs.component';
-import { RulesTabsPage } from '../pages/rules-tabs/rules-tabs.component';
 import { RulesCustomPage } from '../pages/rules-custom/rulesCustom.component';
 import { RulesStaticPage } from '../pages/rules-static/rulesStatic.component';
 import { ListActionDirective } from '../directives/listAction.directive';
@@ -45,6 +44,9 @@ import { ResourceTreeDirective } from '../directives/resourceTree.directive';
 import { ConfigTabsPage } from '../pages/config-tabs/config-tabs.component';
 import { ContractBlacklistPage } from '../pages/contract-blacklist/contract-blacklist.component';
 import { BookingGroupsPage } from '../pages/booking-groups/booking-groups.component';
+import { BookingImagesPage } from '../pages/booking-images/booking-images.component';
+import { BanksPage } from '../pages/banks/banks.component';
+import { BankService } from '../services/bank.service';
 
 
 @NgModule({
@@ -66,12 +68,13 @@ import { BookingGroupsPage } from '../pages/booking-groups/booking-groups.compon
     RulesCustomPage,
     ContractsComponent,
     BookingTabsPage,
-    RulesTabsPage,
     CategoriesPage,
     CyclePipe,
     ConfigTabsPage,
     ContractBlacklistPage,
     BookingGroupsPage,
+    BookingImagesPage,
+    BanksPage,
     MyApp,
   ],
   imports: [
@@ -100,11 +103,12 @@ import { BookingGroupsPage } from '../pages/booking-groups/booking-groups.compon
     RulesCustomPage,
     ContractsComponent,
     BookingTabsPage,
-    RulesTabsPage,
     CategoriesPage,
     ConfigTabsPage,
     BookingGroupsPage,
     ContractBlacklistPage,
+    BookingImagesPage,
+    BanksPage,
     MyApp,
   ],
   providers: [
@@ -119,8 +123,9 @@ import { BookingGroupsPage } from '../pages/booking-groups/booking-groups.compon
     ContractService,
     KEYCLOAK_HTTP_PROVIDER,
     KeycloakService,
-    LogoService,
+    ImageService,
     PaymentService,
+    BankService,
     SplashScreen,
     StatusBar,
     { provide: ErrorHandler, useClass: IonicErrorHandler },

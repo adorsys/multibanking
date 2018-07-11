@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 import { RulesService } from "../../services/rules.service";
 import { LoadingController, AlertController } from 'ionic-angular';
-import { Observable } from "rxjs";
 import { ContractBlacklist } from "../../model/multibanking/models";
 
 @Component({
@@ -25,15 +24,18 @@ export class ContractBlacklistPage {
     this.rulesService.getContractBlacklist().subscribe(result => {
       this.contractBlacklistConfig = result;
     },
-    messages => {
-      if (messages instanceof Array) {
-        messages.forEach(message => {
-          if (message.key != "RESOUCE_NOT_FOUND") {
-            Observable.throw(messages);
-          }
-        })
-      }
-    })
+      messages => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
+            if (message.key != "RESOUCE_NOT_FOUND") {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
+                buttons: ['OK']
+              }).present();
+            }
+          })
+        }
+      })
   }
 
   uploadContractBlacklist(input) {
@@ -57,11 +59,16 @@ export class ContractBlacklistPage {
                 message: "Invalid contract blacklist file",
                 buttons: ['OK']
               }).present();
+            } else {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
+                buttons: ['OK']
+              }).present();
             }
           })
         }
       });
-      input.target.value = null;
+    input.target.value = null;
   }
 
 }

@@ -112,6 +112,11 @@ export class AnalyticsPage {
                 showCloseButton: true,
                 position: 'top'
               }).present();
+            } else {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
+                buttons: ['OK']
+              }).present();
             }
           });
         }
@@ -322,10 +327,14 @@ export class AnalyticsPage {
                 showCloseButton: true,
                 position: 'top'
               }).present();
-            }
-            else if (message.key == "INVALID_PIN") {
+            } else if (message.key == "INVALID_PIN") {
               this.alertCtrl.create({
                 message: 'Invalid pin',
+                buttons: ['OK']
+              }).present();
+            } else {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
                 buttons: ['OK']
               }).present();
             }

@@ -1,7 +1,7 @@
 import { Component, ViewChild } from "@angular/core";
 import { NavParams, AlertController, ToastController, LoadingController, Navbar, NavController } from "ionic-angular";
 
-import { LogoService } from '../../services/logo.service';
+import { ImageService } from '../../services/image.service';
 import { BankAccountService } from "../../services/bankAccount.service";
 import { ContractService } from "../../services/contract.service";
 import { BankAccess } from "../../model/multibanking/models";
@@ -27,11 +27,11 @@ export class ContractsComponent {
     private loadingCtrl: LoadingController,
     private contractService: ContractService,
     private bankAccountService: BankAccountService,
-    public logoService: LogoService
+    public logoService: ImageService
   ) {
     this.bankAccess = navParams.data.bankAccess;
     this.bankAccountId = navParams.data.bankAccount.id;
-    this.getLogo = logoService.getLogo;
+    this.getLogo = logoService.getImage;
   }
 
   ngOnInit() {

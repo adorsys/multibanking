@@ -2,7 +2,7 @@ import { Component, ViewChild } from "@angular/core";
 import { NavController, AlertController, ToastController, NavParams, LoadingController, Navbar } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccount.service";
 import { BookingService } from "../../services/booking.service";
-import { LogoService } from '../../services/logo.service';
+import { ImageService } from '../../services/image.service';
 import { PaymentCreatePage } from "../payment/paymentCreate.component";
 import { BookingDetailPage } from "../booking-detail/bookingDetail.component";
 import { AnalyticsService } from "../../services/analytics.service";
@@ -34,11 +34,11 @@ export class BookingListPage {
     private bankAccountService: BankAccountService,
     private bookingService: BookingService,
     private analyticsService: AnalyticsService,
-    public logoService: LogoService
+    public logoService: ImageService
   ) {
     this.bankAccess = navparams.data.bankAccess;
     this.bankAccount = navparams.data.bankAccount;
-    this.getLogo = logoService.getLogo;
+    this.getLogo = logoService.getImage;
   }
 
   ngOnInit() {
@@ -76,6 +76,11 @@ export class BookingListPage {
                 showCloseButton: true,
                 position: 'top'
               }).present();
+            } else {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
+                buttons: ['OK']
+              }).present();
             }
           });
         }
@@ -92,12 +97,16 @@ export class BookingListPage {
           messages.forEach(message => {
             if (message.key == "RESCOURCE_NOT_FOUND") {
               //ignore
-            }
-            else if (message.key == "SYNC_IN_PROGRESS") {
+            } else if (message.key == "SYNC_IN_PROGRESS") {
               this.toastCtrl.create({
                 message: 'Account sync in progress',
                 showCloseButton: true,
                 position: 'top'
+              }).present();
+            } else {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
+                buttons: ['OK']
               }).present();
             }
           });
@@ -264,10 +273,14 @@ export class BookingListPage {
                 showCloseButton: true,
                 position: 'top'
               }).present();
-            }
-            else if (message.key == "INVALID_PIN") {
+            } else if (message.key == "INVALID_PIN") {
               this.alertCtrl.create({
                 message: 'Invalid pin',
+                buttons: ['OK']
+              }).present();
+            } else {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
                 buttons: ['OK']
               }).present();
             }

@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 import { RulesService } from "../../services/rules.service";
 import { LoadingController, AlertController } from 'ionic-angular';
-import { Observable } from "rxjs";
 import { CategoriesTree } from "model/multibanking/categoriesTree";
 
 
@@ -26,15 +25,18 @@ export class CategoriesPage {
     this.rulesService.getAvailableCategories().subscribe(result => {
       this.categoriesContainer = result;
     },
-    messages => {
-      if (messages instanceof Array) {
-        messages.forEach(message => {
-          if (message.key != "RESOUCE_NOT_FOUND") {
-            Observable.throw(messages);
-          }
-        })
-      }
-    })
+      messages => {
+        if (messages instanceof Array) {
+          messages.forEach(message => {
+            if (message.key != "RESOUCE_NOT_FOUND") {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
+                buttons: ['OK']
+              }).present();
+            }
+          })
+        }
+      })
   }
 
   uploadCategories(input) {
@@ -58,11 +60,16 @@ export class CategoriesPage {
                 message: "Invalid categories file",
                 buttons: ['OK']
               }).present();
+            } else {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
+                buttons: ['OK']
+              }).present();
             }
           })
         }
       });
-      input.target.value = null;
+    input.target.value = null;
   }
 
 }

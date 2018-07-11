@@ -13,7 +13,7 @@ export class BankAutoCompleteService implements AutoCompleteService {
   }
 
   getResults(keyword: string) {
-    return this.http.get(ENV.api_url + "/bank?query=" + keyword)
+    return this.http.get(ENV.api_url + "/banks?query=" + keyword)
       .map((res: any) =>  {
         return res._embedded != null ? res._embedded.bankEntityList : [];
       })

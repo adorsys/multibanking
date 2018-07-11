@@ -100,16 +100,19 @@ export class BankAccessCreatePage {
                 message: 'Bank connection already exists',
                 buttons: ['OK']
               }).present();
-            }
-            else if (message.key == "INVALID_BANK_ACCESS") {
+            } else if (message.key == "INVALID_BANK_ACCESS") {
               this.alertCtrl.create({
                 message: 'Bank not supported',
                 buttons: ['OK']
               }).present();
-            }
-            else if (message.key == "INVALID_PIN") {
+            } else if (message.key == "INVALID_PIN") {
               this.alertCtrl.create({
                 message: 'Invalid pin',
+                buttons: ['OK']
+              }).present();
+            } else {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
                 buttons: ['OK']
               }).present();
             }

@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 import { RulesService } from "../../services/rules.service";
 import { LoadingController, AlertController } from 'ionic-angular';
-import { Observable } from "rxjs";
 import { GroupConfig } from "../../model/multibanking/groupConfig";
 
 
@@ -32,10 +31,13 @@ export class BookingGroupsPage {
         if (messages instanceof Array) {
           messages.forEach(message => {
             if (message.key != "RESOUCE_NOT_FOUND") {
-              Observable.throw(messages);
+              this.alertCtrl.create({
+                message: message.renderedMessage,
+                buttons: ['OK']
+              }).present();
             }
           })
-        }
+        } 
       })
   }
 
@@ -58,6 +60,11 @@ export class BookingGroupsPage {
             if (message.key == "INVALID_FILE") {
               this.alertCtrl.create({
                 message: "Invalid booking groups file",
+                buttons: ['OK']
+              }).present();
+            } else {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
                 buttons: ['OK']
               }).present();
             }

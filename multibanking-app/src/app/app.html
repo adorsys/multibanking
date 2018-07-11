@@ -4,6 +4,9 @@
       <button ion-item (click)="openPage(backAccessListPage)" menuToggle>
         Bank connections
       </button>
+      <button ion-item (click)="openPage(banksPage)" menuToggle *ngIf="isRulesAdmin()">
+        Banks config
+      </button>
       <button ion-item (click)="openPage(configTabsPage)" menuToggle *ngIf="isRulesAdmin()">
         Smartanalytics config
       </button>

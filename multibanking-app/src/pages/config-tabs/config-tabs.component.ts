@@ -5,6 +5,7 @@ import { RulesStaticPage } from '../rules-static/rulesStatic.component';
 import { CategoriesPage } from '../categories/categories.component';
 import { BookingGroupsPage } from '../booking-groups/booking-groups.component';
 import { ContractBlacklistPage } from '../contract-blacklist/contract-blacklist.component';
+import { BookingImagesPage } from '../booking-images/booking-images.component';
 
 @Component({
   templateUrl: 'config-tabs.component.html'
@@ -18,6 +19,7 @@ export class ConfigTabsPage {
   tab3Root = CategoriesPage;
   tab4Root = BookingGroupsPage;
   tab5Root = ContractBlacklistPage;
+  tab6Root = BookingImagesPage;
 
   constructor(public navparams: NavParams) {
     this.navParams = navparams.data;

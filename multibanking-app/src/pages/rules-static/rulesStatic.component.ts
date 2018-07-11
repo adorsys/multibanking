@@ -167,6 +167,11 @@ export class RulesStaticPage {
                 message: "Invalid rules file",
                 buttons: ['OK']
               }).present();
+            } else {
+              this.alertCtrl.create({
+                message: message.renderedMessage,
+                buttons: ['OK']
+              }).present();
             }
           })
         }
