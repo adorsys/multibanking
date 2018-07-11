@@ -15,5 +15,9 @@ public interface BankRepositoryIf {
 
     void save(BankEntity bank);
 
+    void save(Iterable<BankEntity> bankEntities);
+
+    void deleteAll();
+
     List<BankEntity> search(String terms);
 }

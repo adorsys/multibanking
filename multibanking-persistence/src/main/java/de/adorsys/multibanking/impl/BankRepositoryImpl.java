@@ -28,6 +28,16 @@ public class BankRepositoryImpl implements BankRepositoryIf {
     }
 
     @Override
+    public void save(Iterable<BankEntity> bankEntities) {
+        bankRepositoryMongodb.saveAll(bankEntities);
+    }
+
+    @Override
+    public void deleteAll() {
+        bankRepositoryMongodb.deleteAll();
+    }
+
+    @Override
     public void save(BankEntity bank) {
         bankRepositoryMongodb.save(bank);
     }
