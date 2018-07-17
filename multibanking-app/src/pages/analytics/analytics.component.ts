@@ -137,11 +137,9 @@ export class AnalyticsPage {
     if (referenceGroup) {
       referenceGroup.bookingPeriods.forEach(period => {
         this.periods.push([moment(period.start), moment(period.end)]);
-        this.lineChartLabels.push(referenceGroup.salaryWage ?
-          moment(period.end).format('MMM YYYY') : moment(period.start).format('MMM YYYY'))
       });
 
-      this.initChart();
+      this.initChart(referenceGroup);
       let referencePeriod = this.findPeriod(referenceGroup.bookingPeriods, this.referenceDate);
       this.budget = this.calculateBudget(moment(referencePeriod.start), moment(referencePeriod.end));
     }
@@ -161,8 +159,11 @@ export class AnalyticsPage {
     return group;
   }
 
-  initChart() {
+  initChart(referenceGroup: BookingGroup) {
     this.periods.forEach(period => {
+      this.lineChartLabels.push(referenceGroup.salaryWage ?
+        moment(period[1]).format('MMM YYYY') : moment(period[0]).format('MMM YYYY'))
+
       let budget = this.calculateBudget(period[0], period[1])
 
       this.lineChartData[0].data.push(budget.incomeFix.amount);
@@ -185,10 +186,12 @@ export class AnalyticsPage {
       expensesOther: { amount: 0, groups: [] }
     };
 
-    this.analytics.bookingGroups.forEach((group: BookingGroup) => {
-      let amount = this.getPeriodAmount(group, periodStart);
+    let forecast = moment().isSameOrAfter(periodStart) && moment().isSameOrBefore(periodEnd)
 
-      if (amount && amount != 0 && this.includeGroup(group, periodStart)) {
+    this.analytics.bookingGroups.forEach((group: BookingGroup) => {
+      let amount = this.getPeriodAmount(group, periodStart, forecast);
+
+      if (this.includeGroup(group, periodStart)) {
         switch (group.type) {
           case BookingGroup.TypeEnum.RECURRENTINCOME:
             budget.incomeFix.amount += amount;
@@ -218,18 +221,18 @@ export class AnalyticsPage {
     return budget;
   }
 
-  getPeriodAmount(group: BookingGroup, referenceDate: Moment): number {
+  getPeriodAmount(group: BookingGroup, referenceDate: Moment, forecast: boolean): number {
     let period: BookingPeriod = this.findPeriod(group.bookingPeriods, referenceDate);
 
     if (period) {
       if (period.amount) {
         return period.amount;
-      } else if (this.isRecurrent(group)) {
+      } else if (!forecast && this.isRecurrent(group)) {
         return group.amount;
       }
     }
 
-    if (!this.isRecurrent(group)) {
+    if (!forecast && !this.isRecurrent(group) && group.amount) {
       return group.amount;
     }
 

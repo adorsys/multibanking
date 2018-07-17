@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, group } from "@angular/core";
 import { NavParams, NavController } from "ionic-angular";
 import { ENV } from "../../env/env";
 import { Moment } from "moment";
@@ -35,18 +35,24 @@ export class BookingGroupPage {
     this.bankAccountId = navparams.data.bankAccountId;
     this.amount = navparams.data.amount;
     this.aggregatedGroups = navparams.data.aggregatedGroups;
-    this.bookingGroups = this.sortGroups(navparams.data.aggregatedGroups);
+    this.bookingGroups = this.sortGroups(navparams.data.aggregatedGroups)
+      .filter(group => {
+        let tmpAmount = this.getPeriodAmount(group);
+        return tmpAmount && tmpAmount != 0;
+      });
   }
 
   ngOnInit() {
     this.amount = 0;
     this.bookingGroups.forEach(group => {
-      this.lineChartLabels.push(group.name ? group.name : group.otherAccount);
 
       let tmpAmount = this.getPeriodAmount(group);
       tmpAmount = tmpAmount != 0 ? tmpAmount : group.amount;
-      this.lineChartData.push(tmpAmount);
-      this.amount += tmpAmount;
+      if (tmpAmount && tmpAmount != 0) {
+        this.lineChartLabels.push(group.name ? group.name : group.otherAccount);
+        this.lineChartData.push(tmpAmount);
+        this.amount += tmpAmount;
+      }
     }, this);
   }
 
@@ -61,6 +67,10 @@ export class BookingGroupPage {
   }
 
   getMatchingBookingPeriod(bookingGroup: BookingGroup): BookingPeriod {
+    if (!bookingGroup.bookingPeriods) {
+      return undefined;
+    }
+
     return bookingGroup.bookingPeriods.find((groupPeriod: BookingPeriod) => {
       let groupPeriodEnd: Moment = moment(groupPeriod.end);
       return groupPeriodEnd.isSameOrAfter(this.period[0]) && groupPeriodEnd.isSameOrBefore(this.period[1]);

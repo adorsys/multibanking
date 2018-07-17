@@ -5,7 +5,7 @@
 </ion-header>
 
 <ion-content padding>
-  <canvas baseChart [data]="lineChartData" [labels]="lineChartLabels" [options]="'{responsive: true}'" [chartType]="'doughnut'"
+  <canvas *ngIf="bookingGroups.length > 1" baseChart [data]="lineChartData" [labels]="lineChartLabels" [options]="'{responsive: true}'" [chartType]="'doughnut'"
     (chartClick)="chartClicked($event)">
   </canvas>
 
