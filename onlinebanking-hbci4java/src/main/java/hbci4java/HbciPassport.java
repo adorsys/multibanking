@@ -3,7 +3,6 @@ package hbci4java;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIUtils;
-import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.manager.LogFilter;
 import org.kapott.hbci.passport.HBCIPassportPinTanNoFile;
 import org.kapott.hbci.security.Sig;
@@ -22,11 +21,11 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
 
     //needed for jackson
     public HbciPassport() {
-        super(null, null, null);
+        super(null, null);
     }
 
-    public HbciPassport(String passportState, Properties properties, HbciCallback hbciCallback, Object initObject) {
-        super(properties, hbciCallback != null ? hbciCallback : new HbciCallback(), initObject);
+    public HbciPassport(String passportState, Properties properties, HbciCallback hbciCallback) {
+        super(properties, hbciCallback != null ? hbciCallback : new HbciCallback());
 
         if (passportState != null) {
             state = Optional.of(HbciPassport.State.readJson(passportState));
@@ -51,7 +50,7 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
             if (getPIN() == null) {
                 StringBuffer s = new StringBuffer();
 
-                callback.callback(this,
+                callback.callback(
                         HbciCallback.NEED_PT_PIN,
                         HBCIUtils.getLocMsg("CALLB_NEED_PTPIN"),
                         HbciCallback.TYPE_SECRET, s);
@@ -98,7 +97,6 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
 
                             StringBuffer callbackReturn = new StringBuffer();
                             getCallback().callback(
-                                    this,
                                     HbciCallback.NEED_PT_TAN,
                                     HBCIUtils
                                             .getLocMsg("CALLB_NEED_PTTAN"),
@@ -149,7 +147,6 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
 
                     StringBuffer s = new StringBuffer();
                     callback.callback(
-                            this,
                             HbciCallback.NEED_PT_TAN,
                             secmechInfo.getProperty("name") + " "
                                     + secmechInfo.getProperty("inputinfo")
@@ -200,17 +197,8 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
         }
     }
 
-    @Override
-    public void resetPassphrase() {
-    }
-
-    @Override
-    public void saveChanges() {
-        state = Optional.of(new State(this, getState()));
-    }
-
     public HbciPassport clone() {
-        HbciPassport passport = new HbciPassport(null, getProperties(), null, null);
+        HbciPassport passport = new HbciPassport(null, getProperties(), null);
         passport.setCountry(this.getCountry());
         passport.setHost(this.getHost());
         passport.setPort(this.getPort());
@@ -220,23 +208,20 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
         passport.setUPD(this.getUPD());
         passport.setHBCIVersion(this.getHBCIVersion());
         passport.setCustomerId(this.getCustomerId());
-        passport.setFilterType(this.getFilterType());
         passport.setAllowedTwostepMechanisms(this.getAllowedTwostepMechanisms());
         passport.setCurrentTANMethod(this.getCurrentTANMethod(false));
         passport.setPIN(this.getPIN());
         passport.setPersistentData(this.getPersistentData());
-
-        passport.unsetComm();
-        passport.setCallback(null);
         return passport;
     }
 
     /**
-     * Captures the internal state of this passport. This mirrors what the {@link org.kapott.hbci.passport.HBCIPassportPinTan} writes in a file.
+     * Captures the internal state of this passport.
      * <p>
      * All fields are non-final public so that jackson can easily serialize them.
      */
     public static class State {
+
         public String country;
         public String host;
         public int port;
@@ -271,7 +256,6 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
             sysId = passport.getSysId();
             hbciVersion = passport.getHBCIVersion();
             customerId = passport.getCustomerId();
-            filterType = passport.getFilterType();
             allowedTwostepMechanisms = passport.getAllowedTwostepMechanisms();
             currentTANMethod = passport.getCurrentTANMethod(false);
 
@@ -299,7 +283,6 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
             passport.setUPD(upd == null ? null : (Properties) upd.clone());
             passport.setHBCIVersion(hbciVersion);
             passport.setCustomerId(customerId);
-            passport.setFilterType(filterType);
             passport.setAllowedTwostepMechanisms(new ArrayList<>(allowedTwostepMechanisms));
             passport.setCurrentTANMethod(currentTANMethod);
         }

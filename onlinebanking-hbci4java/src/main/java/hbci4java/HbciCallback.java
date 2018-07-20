@@ -82,7 +82,7 @@ public class HbciCallback implements HBCICallback {
     }
 
     @Override
-    public void callback(HBCIPassport passport, int reason, String msg, int datatype, StringBuffer retData) {
+    public void callback(int reason, String msg, int datatype, StringBuffer retData) {
         switch (reason) {
             case HBCICallback.NEED_PT_PHOTOTAN: {
                 String hhduc = retData.toString();
@@ -139,18 +139,13 @@ public class HbciCallback implements HBCICallback {
     }
 
     @Override
-    public void status(HBCIPassport passport, int statusTag, Object[] o) {
+    public void status(int statusTag, Object[] o) {
         LOG.debug("Status: {} {}, objects: {}", statusTag, statusToString(statusTag), o);
     }
 
     @Override
-    public void status(HBCIPassport passport, int statusTag, Object o) {
-        status(passport, statusTag, new Object[]{o});
-    }
-
-    @Override
-    public boolean useThreadedCallback(HBCIPassport passport, int reason, String msg, int datatype, StringBuffer retData) {
-        return false;
+    public void status(int statusTag, Object o) {
+        status(statusTag, new Object[]{o});
     }
 
     String statusToString(int status) {
