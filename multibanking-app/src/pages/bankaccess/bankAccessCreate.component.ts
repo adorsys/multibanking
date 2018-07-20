@@ -11,8 +11,7 @@ import { BankAccess, Bank } from "../../model/multibanking/models";
 })
 export class BankAccessCreatePage {
 
-  @ViewChild('autocomplete')
-  autocomplete: AutoCompleteComponent;
+  @ViewChild(AutoCompleteComponent) autocomplete: AutoCompleteComponent;
 
   selectedBank: Bank;
 

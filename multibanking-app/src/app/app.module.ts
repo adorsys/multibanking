@@ -6,6 +6,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { MomentModule } from 'ngx-moment';
 import { ChartsModule } from 'ng2-charts';
+import {CurrencyPipe} from '@angular/common'
 
 import { AnalyticsPage } from "../pages/analytics/analytics.component";
 import { AnalyticsService } from "../services/analytics.service";
@@ -47,6 +48,7 @@ import { BookingGroupsPage } from '../pages/booking-groups/booking-groups.compon
 import { BookingImagesPage } from '../pages/booking-images/booking-images.component';
 import { BanksPage } from '../pages/banks/banks.component';
 import { BankService } from '../services/bank.service';
+import { BookingAutoCompleteService } from '../services/bookingAutoComplete.service';
 
 
 @NgModule({
@@ -119,6 +121,7 @@ import { BankService } from '../services/bank.service';
     BankAutoCompleteService,
     RulesCustomAutoCompleteService,
     RulesStaticAutoCompleteService,
+    BookingAutoCompleteService,
     BookingService,
     ContractService,
     KEYCLOAK_HTTP_PROVIDER,
@@ -128,6 +131,7 @@ import { BankService } from '../services/bank.service';
     BankService,
     SplashScreen,
     StatusBar,
+    CurrencyPipe,
     { provide: ErrorHandler, useClass: IonicErrorHandler },
   ]
 })

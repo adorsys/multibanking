@@ -1,4 +1,4 @@
-import { Component, ViewChild, group } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
 import { NavParams, NavController } from "ionic-angular";
 import { ENV } from "../../env/env";
 import { Moment } from "moment";

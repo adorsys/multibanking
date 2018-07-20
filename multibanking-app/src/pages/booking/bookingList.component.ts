@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, ElementRef } from "@angular/core";
 import { NavController, AlertController, ToastController, NavParams, LoadingController, Navbar } from "ionic-angular";
 import { BankAccountService } from "../../services/bankAccount.service";
 import { BookingService } from "../../services/booking.service";
@@ -10,6 +10,8 @@ import { Moment } from "moment";
 import * as moment from 'moment';
 import { BankAccess, ResourceBankAccount, AccountAnalyticsEntity, ExecutedBooking, Booking, BookingPeriod } from "../../model/multibanking/models";
 import { Pageable } from "../../model/pageable";
+import { AutoCompleteComponent, AutoCompleteService } from "ionic2-auto-complete";
+import { BookingAutoCompleteService } from "../../services/bookingAutoComplete.service";
 
 @Component({
   selector: 'page-bookingList',
@@ -23,7 +25,10 @@ export class BookingListPage {
   pageable: Pageable;
   bookingMonths: Moment[] = [];
 
+  @ViewChild(AutoCompleteComponent) autocomplete: AutoCompleteComponent;
   @ViewChild(Navbar) navBar: Navbar;
+  @ViewChild('headerTag') headerTag: ElementRef;
+  @ViewChild('scrollableTag') scrollableTag: ElementRef;
 
   constructor(
     public navCtrl: NavController,
@@ -32,6 +37,7 @@ export class BookingListPage {
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
     private bankAccountService: BankAccountService,
+    public bookingAutoCompleteService: BookingAutoCompleteService,
     private bookingService: BookingService,
     private analyticsService: AnalyticsService,
     public logoService: ImageService
@@ -42,6 +48,16 @@ export class BookingListPage {
   }
 
   ngOnInit() {
+    this.autocomplete.itemSelected.subscribe(booking => {
+      let bookingMonth: any = moment(booking.bookingDate);
+      bookingMonth.bookings = [booking];
+      this.bookingMonths = [bookingMonth];
+    });
+
+    this.autocomplete.searchbarElem.ionClear.subscribe(() => {
+      this.loadBookings();
+    });
+
     if (!this.bankAccount.lastSync || moment(this.bankAccount.lastSync).isBefore(moment(), 'day')) {
       this.syncBookings(null);
     } else {
@@ -51,6 +67,13 @@ export class BookingListPage {
     this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
       this.loadBookings();
     });
+  }
+
+  ionViewDidEnter() {
+    if (this.headerTag) {
+      let offset = this.headerTag.nativeElement.offsetHeight;
+      (<HTMLDivElement>this.scrollableTag.nativeElement).style.marginTop = offset + 'px';
+    }
   }
 
   ionViewDidLoad() {
@@ -66,6 +89,7 @@ export class BookingListPage {
         this.pageable = response;
         this.bookingsLoaded(response._embedded ? response._embedded.bookingEntityList : []);
         this.loadAnalytics();
+        this.bookingAutoCompleteService.loadSearchIndex(this.bankAccess.id, this.bankAccount.id);
       },
       messages => {
         if (messages instanceof Array) {

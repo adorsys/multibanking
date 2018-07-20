@@ -4,6 +4,7 @@ import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http'
 import { ENV } from "../env/env";
 import { ResourceBooking } from '../model/multibanking/models';
 import { Pageable } from '../model/pageable';
+import { BookingsIndexEntity } from 'model/multibanking/bookingsIndexEntity';
 
 @Injectable()
 export class BookingService {
@@ -45,6 +46,12 @@ export class BookingService {
       .map(res => {
         return new Blob([res], { type: 'application/csv' })
       })
+      .catch(this.handleError);
+  }
+
+  getSearchIndex(accessId, accountId): Observable<{ [key: string]: Array<string> }> {
+    return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/index`)
+      .map((res: any) => res != null ? res.bookingIdSearchList : {})
       .catch(this.handleError);
   }
 
