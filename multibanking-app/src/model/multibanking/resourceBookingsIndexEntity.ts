@@ -9,11 +9,13 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Category } from './category';
+import { Link } from './link';
 
 
-export interface CategoriesTree {
-    categories?: Array<Category>;
-    changeDate?: string;
-    version?: string;
+export interface ResourceBookingsIndexEntity {
+    accountId?: string;
+    bookingIdSearchList?: { [key: string]: Array<string>; };
+    id?: string;
+    links?: Array<Link>;
+    userId?: string;
 }
