@@ -10,7 +10,7 @@ import { Moment } from "moment";
 import * as moment from 'moment';
 import { BankAccess, ResourceBankAccount, AccountAnalyticsEntity, ExecutedBooking, Booking, BookingPeriod } from "../../model/multibanking/models";
 import { Pageable } from "../../model/pageable";
-import { AutoCompleteComponent, AutoCompleteService } from "ionic2-auto-complete";
+import { AutoCompleteComponent } from "ionic2-auto-complete";
 import { BookingAutoCompleteService } from "../../services/bookingAutoComplete.service";
 
 @Component({

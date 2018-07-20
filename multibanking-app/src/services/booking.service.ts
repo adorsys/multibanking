@@ -4,7 +4,6 @@ import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http'
 import { ENV } from "../env/env";
 import { ResourceBooking } from '../model/multibanking/models';
 import { Pageable } from '../model/pageable';
-import { BookingsIndexEntity } from 'model/multibanking/bookingsIndexEntity';
 
 @Injectable()
 export class BookingService {

@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { AutoCompleteService } from "ionic2-auto-complete";
 import { BookingService } from './booking.service';
 import { Booking } from 'model/multibanking/models';
-import { Moment } from "moment";
 import * as moment from 'moment';
 import { CurrencyPipe } from '@angular/common';
 
