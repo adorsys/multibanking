@@ -16,10 +16,12 @@ import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.exceptions.HBCI_Exception;
+import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.manager.HBCIJobFactory;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.passport.HBCIPassport;
+import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
@@ -120,20 +122,20 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         try {
             Konto account = dialog.getPassport().getAccount(bankAccount.getAccountNumber());
 
-            AbstractHBCIJob balanceJob = HBCIJobFactory.newJob("SaldoReq", dialog.getPassport(), dialog.getKernel().getMsgGen());
+            AbstractHBCIJob balanceJob = HBCIJobFactory.newJob("SaldoReq", dialog.getPassport());
             balanceJob.setParam("my", account);
             dialog.addTask(balanceJob);
 
-            AbstractHBCIJob bookingsJob = HBCIJobFactory.newJob("KUmsAll", dialog.getPassport(), dialog.getKernel().getMsgGen());
+            AbstractHBCIJob bookingsJob = HBCIJobFactory.newJob("KUmsAll", dialog.getPassport());
             bookingsJob.setParam("my", account);
             if (bankAccount.getLastSync() != null) {
                 bookingsJob.setParam("startdate", Date.from(bankAccount.getLastSync().atZone(ZoneId.systemDefault()).toInstant()));
             }
             dialog.addTask(bookingsJob);
 
-            AbstractHBCIJob standingOrdersJob = HBCIJobFactory.newJob("DauerSEPAList", dialog.getPassport(), dialog.getKernel().getMsgGen());
+            AbstractHBCIJob standingOrdersJob = HBCIJobFactory.newJob("DauerSEPAList", dialog.getPassport());
             standingOrdersJob.setParam("src", account);
-            if (((AbstractHBCIJob) standingOrdersJob).getHBCICode() == null) {
+            if (standingOrdersJob.getHBCICode() == null) {
                 LOG.warn("GV DauerSEPAList not supported");
             } else {
                 dialog.addTask(standingOrdersJob);
@@ -182,13 +184,35 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment) {
-        HbciTanSubmit hbciTanSubmit = HbciTanSubmit.builder().build();
+        HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
 
         HBCIDialog dialog = createDialog(bankAccess, bankCode, new HbciCallback() {
 
             @Override
-            public boolean tanCallback(HBCIPassport passport, GVTAN2Step hktan) {
-                return updateTanSubmit((HbciPassport) passport, hktan, hbciTanSubmit, payment);
+            public String tanMediaCallback(String mediaList) {
+                if (mediaList.length() > 0 && !mediaList.contains("|")) {
+                    return mediaList;
+                } else {
+                    payment.setTanMedias(Arrays.asList(mediaList.split("\\|")));
+                    payment.setPaymentState(Payment.PaymentState.SELECT_TAN_MEDIA);
+                    return null;
+                }
+            }
+
+            @Override
+            public void tanCallback(HBCIPassport passport, GVTAN2Step hktan) {
+                Object pintan_challenge = passport.getPersistentData("pintan_challenge");
+                if (pintan_challenge != null) {
+                    payment.setPaymentChallenge(PaymentChallenge.builder()
+                            .title(pintan_challenge.toString())
+                            .build());
+                }
+                try {
+                    hbciTanSubmit.setHbciPassport(OBJECT_MAPPER.writeValueAsString(((HbciPassport) passport).clone()));
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+                payment.setPaymentState(Payment.PaymentState.NEED_TAN);
             }
 
         }, pin);
@@ -203,7 +227,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             Value value = new Value(payment.getAmount());
 
-            AbstractHBCIJob uebSEPA = HBCIJobFactory.newJob("UebSEPA", dialog.getPassport(), dialog.getKernel().getMsgGen());
+            AbstractHBCIJob uebSEPA = HBCIJobFactory.newJob("UebSEPA", dialog.getPassport());
             uebSEPA.setParam("src", src);
             uebSEPA.setParam("dst", dst);
             uebSEPA.setParam("btg", value);
@@ -227,25 +251,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
-    private boolean updateTanSubmit(HbciPassport passport, GVTAN2Step hktan, HbciTanSubmit hbciTanSubmit, Payment payment) {
-        try {
-            hbciTanSubmit.setGvTanSubmit(HbciGVTanSubmit.builder()
-                    .properties(OBJECT_MAPPER.writeValueAsString(hktan.getLowlevelParams()))
-                    .build());
-
-            hbciTanSubmit.setHbciPassport(OBJECT_MAPPER.writeValueAsString(passport.clone()));
-
-            Object pintan_challenge = passport.getPersistentData("pintan_challenge");
-            if (pintan_challenge != null) {
-                payment.setPaymentChallenge(PaymentChallenge.builder().title(pintan_challenge.toString()).build());
-            }
-
-            return true;
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Override
     public void submitPayment(Payment payment, String tan) {
         HbciTanSubmit hbciTanSubmit = (HbciTanSubmit) payment.getTanSubmitExternal();
@@ -264,7 +269,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         hbciDialog.setMsgnum(hbciTanSubmit.getMsgNum());
 
         try {
-            GVTAN2Step hktan = (GVTAN2Step) HBCIJobFactory.newJob("TAN2Step", hbciDialog.getPassport(), hbciDialog.getKernel().getMsgGen());
+            GVTAN2Step hktan = (GVTAN2Step) HBCIJobFactory.newJob("TAN2Step", hbciDialog.getPassport());
             hktan.setLowlevelParams(OBJECT_MAPPER.readValue(hbciTanSubmit.getGvTanSubmit().getProperties(), Properties.class));
             hbciDialog.getMessages().get(hbciDialog.getMessages().size() - 1).add(hktan);
 //                       hktan.getMainPassport().setCallback(new HbciCallback() {
@@ -294,10 +299,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public boolean bankSupported(String bankCode) {
         org.kapott.hbci.manager.BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
-        if (bankInfo == null || bankInfo.getPinTanVersion() == null) {
-            return false;
-        }
-        return true;
+        return bankInfo != null && bankInfo.getPinTanVersion() != null;
     }
 
     private void updateTanTransportTypes(BankAccess bankAccess, HbciPassport hbciPassport) {
@@ -314,7 +316,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                     bankAccess.getTanTransportTypes().get(bankApi()).add(
                             TanTransportType.builder()
                                     .id(id)
-                                    .name(properties.getProperty("name") != null ? properties.getProperty("name") : null)
+                                    .name(properties.getProperty("name"))
                                     .medium(hbciPassport.getUPD().getProperty("tanmedia.names"))
                                     .build()
                     );
@@ -325,6 +327,21 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         } else {
             LOG.warn("missing passport upd, unable find transport types or bank code {}", bankAccess.getBankCode());
         }
+    }
+
+    private void bla(HBCIDialog dialog) {
+        PinTanPassport passport = ((PinTanPassport) dialog.getPassport());
+
+        for (List<AbstractHBCIJob> messages : dialog.getMessages()) {
+            for (AbstractHBCIJob job : messages) {
+                String segcode = job.getHBCICode();
+                if (passport.getPinTanInfo(segcode).equals("J")) {
+
+                }
+            }
+        }
+
+
     }
 
     private HBCIDialog createDialog(BankAccess bankAccess, String bankCode, HbciCallback callback, String pin) {
@@ -345,8 +362,16 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             properties.put("client.passport.userId", bankAccess.getBankLogin2());
         }
 
-        HbciPassport passport = new HbciPassport(bankAccess.getHbciPassportState(), properties, callback);
+        BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode != null ? bankCode : bankAccess.getBankCode());
+        HbciPassport passport = new HbciPassport(bankInfo.getPinTanVersion().getId(), bankAccess.getHbciPassportState(), properties, callback);
         passport.setPIN(pin);
+
+        String url = bankInfo.getPinTanAddress();
+        String proxyPrefix = System.getProperty("proxyPrefix", null);
+        if (proxyPrefix != null) {
+            url = proxyPrefix + url;
+        }
+        passport.setHost(url);
 
         return new HBCIDialog(passport);
     }

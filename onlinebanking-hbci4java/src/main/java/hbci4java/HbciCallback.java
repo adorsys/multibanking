@@ -94,20 +94,8 @@ public class HbciCallback implements HBCICallback {
                     // Wir haben einen Flicker-Code. Also zeigen wir den Flicker-Dialog statt
                     // dem normalen TAN-Dialog an
 
-                } else  {
-
-                }
-                break;
-            }
-            case HBCICallback.NEED_PT_TANMEDIA: {
-                // Wenn wir eine Medienbezeichnung von HBCI4Java gekriegt haben und das genau
-                // eine einzige ist. Dann uebernehmen wir diese ohne Rueckfrage. Der User
-                // hat hier sonst eh keine andere Wahl.
-                String media = retData.toString();
-                if (media.length() > 0 && !media.contains("|")) {
-                    LOG.info("having exactly one TAN media name (provided by institute) - automatically using this: " + media);
                 } else {
-                    String tanMedias = retData.toString();
+
                 }
                 break;
             }
@@ -134,8 +122,12 @@ public class HbciCallback implements HBCICallback {
     }
 
     @Override
-    public boolean tanCallback(HBCIPassport passport, GVTAN2Step hktan) {
-        return false;
+    public String tanMediaCallback(String medialist) {
+        return null;
+    }
+
+    @Override
+    public void tanCallback(HBCIPassport passport, GVTAN2Step hktan) {
     }
 
     @Override

@@ -2,9 +2,9 @@ package hbci4java;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.kapott.hbci.exceptions.HBCI_Exception;
+import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIUtils;
-import org.kapott.hbci.manager.LogFilter;
-import org.kapott.hbci.passport.HBCIPassportPinTanNoFile;
+import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.security.Sig;
 
 import java.io.IOException;
@@ -13,7 +13,7 @@ import java.util.*;
 /**
  * Created by alexg on 08.02.17.
  */
-public class HbciPassport extends HBCIPassportPinTanNoFile {
+public class HbciPassport extends PinTanPassport {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -21,11 +21,11 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
 
     //needed for jackson
     public HbciPassport() {
-        super(null, null);
+        super(null, null, null);
     }
 
-    public HbciPassport(String passportState, Properties properties, HbciCallback hbciCallback) {
-        super(properties, hbciCallback != null ? hbciCallback : new HbciCallback());
+    public HbciPassport(String hbciversion, String passportState, Properties properties, HbciCallback hbciCallback) {
+        super(hbciversion, properties, hbciCallback != null ? hbciCallback : new HbciCallback());
 
         if (passportState != null) {
             state = Optional.of(HbciPassport.State.readJson(passportState));
@@ -35,11 +35,6 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
 
     public Optional<State> getState() {
         return state;
-    }
-
-    @Override
-    public byte[] hash(byte[] bytes) {
-        return new byte[0];
     }
 
     @Override
@@ -59,8 +54,6 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
                             HBCIUtils.getLocMsg("EXCMSG_PINZERO"));
                 }
                 setPIN(s.toString());
-                LogFilter.getInstance().addSecretData(getPIN(), "X",
-                        LogFilter.FILTER_SECRETS);
             }
 
             String tan = "";
@@ -159,20 +152,10 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
                     tan = s.toString();
                 }
             }
-            if (tan.length() != 0) {
-                LogFilter.getInstance().addSecretData(tan, "X",
-                        LogFilter.FILTER_SECRETS);
-            }
-
             return (getPIN() + "|" + tan).getBytes("ISO-8859-1");
         } catch (Exception ex) {
             throw new HBCI_Exception("*** signing failed", ex);
         }
-    }
-
-    @Override
-    public boolean verify(byte[] bytes, byte[] bytes1) {
-        return true;
     }
 
     @Override
@@ -198,7 +181,7 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
     }
 
     public HbciPassport clone() {
-        HbciPassport passport = new HbciPassport(null, getProperties(), null);
+        HbciPassport passport = new HbciPassport(this.getHBCIVersion(), null, getProperties(), null);
         passport.setCountry(this.getCountry());
         passport.setHost(this.getHost());
         passport.setPort(this.getPort());
@@ -206,7 +189,6 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
         passport.setSysId(this.getSysId());
         passport.setBPD(this.getBPD());
         passport.setUPD(this.getUPD());
-        passport.setHBCIVersion(this.getHBCIVersion());
         passport.setCustomerId(this.getCustomerId());
         passport.setAllowedTwostepMechanisms(this.getAllowedTwostepMechanisms());
         passport.setCurrentTANMethod(this.getCurrentTANMethod(false));
@@ -281,7 +263,6 @@ public class HbciPassport extends HBCIPassportPinTanNoFile {
             passport.setSysId(sysId);
             passport.setBPD(bpd == null ? null : (Properties) bpd.clone());
             passport.setUPD(upd == null ? null : (Properties) upd.clone());
-            passport.setHBCIVersion(hbciVersion);
             passport.setCustomerId(customerId);
             passport.setAllowedTwostepMechanisms(new ArrayList<>(allowedTwostepMechanisms));
             passport.setCurrentTANMethod(currentTANMethod);

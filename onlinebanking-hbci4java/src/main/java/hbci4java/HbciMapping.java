@@ -146,8 +146,8 @@ public final class HbciMapping {
                     booking.setOtherAccount(toBankAccount(line.other));
 
                     String differentInitiator = Utils.extractDifferentInitiator(booking.getUsage());
-                    if (differentInitiator != null){
-                        booking.getOtherAccount().setOwner(booking.getOtherAccount().getOwner()+" "+differentInitiator);
+                    if (differentInitiator != null) {
+                        booking.getOtherAccount().setOwner(booking.getOtherAccount().getOwner() + " " + differentInitiator);
                     }
 
                     if (StringUtils.isBlank(booking.getOtherAccount().getIban())) {
@@ -189,10 +189,15 @@ public final class HbciMapping {
     private static String getUsage(List<String> lines) {
         StringBuilder sb = new StringBuilder();
 
-        for (String line : lines) {
-            sb.append(StringUtils.chomp(line));
-            sb.append(line.length() < 27 ? " " : "");
+        if (lines != null) {
+            for (String line : lines) {
+                if (line != null) {
+                    sb.append(StringUtils.chomp(line));
+                    sb.append(line.length() < 27 ? " " : "");
+                }
+            }
         }
+
         return WordUtils.capitalizeFully(sb.toString().trim(), ' ', '/');
     }
 

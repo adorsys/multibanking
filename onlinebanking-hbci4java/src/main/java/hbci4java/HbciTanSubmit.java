@@ -10,7 +10,6 @@ import java.util.Properties;
  * Created by alexg on 16.11.17.
  */
 @Data
-@Builder
 public class HbciTanSubmit {
 
     private String hbciPassport;
