@@ -122,11 +122,7 @@ export class BookingListPage {
             if (message.key == "RESCOURCE_NOT_FOUND") {
               //ignore
             } else if (message.key == "SYNC_IN_PROGRESS") {
-              this.toastCtrl.create({
-                message: 'Account sync in progress',
-                showCloseButton: true,
-                position: 'top'
-              }).present();
+              //ignore
             } else {
               this.alertCtrl.create({
                 message: message.renderedMessage,
@@ -311,6 +307,7 @@ export class BookingListPage {
           });
         }
       })
+      loading.dismiss();
   }
 
   downloadBookings() {
