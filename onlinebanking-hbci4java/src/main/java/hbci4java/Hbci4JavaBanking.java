@@ -262,7 +262,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             throw new RuntimeException(e);
         }
 //        hbciPassport.setCallback(new HbciCallback());
-        hbciPassport.getUPD().put("_fetchedMetaInfo", new Date());
+        hbciPassport.getUPD().put("_fetchedMetaInfo", new Date().toString());
 
         HBCIDialog hbciDialog = new HBCIDialog(hbciPassport);
         hbciDialog.setDialogid(hbciTanSubmit.getDialogId());
@@ -310,14 +310,14 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
         if (hbciPassport.getUPD() != null) {
             hbciPassport.getAllowedTwostepMechanisms().forEach(id -> {
-                Properties properties = hbciPassport.getTwostepMechanisms().get(id);
+                HashMap<String, String> properties = hbciPassport.getTwostepMechanisms().get(id);
 
                 if (properties != null) {
                     bankAccess.getTanTransportTypes().get(bankApi()).add(
                             TanTransportType.builder()
                                     .id(id)
-                                    .name(properties.getProperty("name"))
-                                    .medium(hbciPassport.getUPD().getProperty("tanmedia.names"))
+                                    .name(properties.get("name"))
+                                    .medium(hbciPassport.getUPD().get("tanmedia.names"))
                                     .build()
                     );
                 } else {
@@ -340,12 +340,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 }
             }
         }
-
-
     }
 
     private HBCIDialog createDialog(BankAccess bankAccess, String bankCode, HbciCallback callback, String pin) {
-        Properties properties = new Properties();
+        HashMap<String, String> properties = new HashMap<>();
         properties.put("kernel.rewriter", "InvalidSegment,WrongStatusSegOrder,WrongSequenceNumbers,MissingMsgRef,HBCIVersion,SigIdLeadingZero,InvalidSuppHBCIVersion,SecTypeTAN,KUmsDelimiters,KUmsEmptyBDateSets");
         properties.put("log.loglevel.default", "2");
         properties.put("default.hbciversion", "FinTS3");

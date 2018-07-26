@@ -25,7 +25,7 @@ public class HbciPassport extends PinTanPassport {
         super(null, null, null);
     }
 
-    public HbciPassport(String hbciversion, String passportState, Properties properties, HbciCallback hbciCallback) {
+    public HbciPassport(String hbciversion, String passportState, HashMap<String, String> properties, HbciCallback hbciCallback) {
         super(hbciversion, properties, hbciCallback != null ? hbciCallback : new HbciCallback());
 
         if (passportState != null) {
@@ -111,7 +111,7 @@ public class HbciPassport extends PinTanPassport {
                 }
             } else {
                 log.debug("twostep method - checking passport(challenge) to decide whether or not we need a TAN");
-                Properties secmechInfo = getCurrentSecMechInfo();
+                HashMap<String, String> secmechInfo = getCurrentSecMechInfo();
 
                 // gespeicherte challenge aus passport holen
                 String challenge = (String) getPersistentData("pintan_challenge");
@@ -127,8 +127,8 @@ public class HbciPassport extends PinTanPassport {
                     StringBuffer s = new StringBuffer();
                     callback.callback(
                             HbciCallback.NEED_PT_TAN,
-                            secmechInfo.getProperty("name") + " "
-                                    + secmechInfo.getProperty("inputinfo")
+                            secmechInfo.get("name") + " "
+                                    + secmechInfo.get("inputinfo")
                                     + ": " + challenge, HbciCallback.TYPE_TEXT,
                             s);
                     if (s.length() == 0) {
@@ -195,8 +195,8 @@ public class HbciPassport extends PinTanPassport {
         public int port;
         public String userId;
         public String sysId;
-        public Properties bpd;
-        public Properties upd;
+        public HashMap<String, String> bpd;
+        public HashMap<String, String> upd;
         public String hbciVersion;
         public String customerId;
         public String filterType;
@@ -233,9 +233,9 @@ public class HbciPassport extends PinTanPassport {
             });
         }
 
-        private static Properties mergeProperties(Properties oldP, Properties newP) {
+        private static HashMap<String, String> mergeProperties(HashMap<String, String> oldP, HashMap<String, String> newP) {
             if (oldP == null && newP == null) return null;
-            Properties result = new Properties();
+            HashMap<String, String> result = new HashMap<>();
             if (oldP != null) result.putAll(oldP);
             if (newP != null) result.putAll(newP);
             return result;
@@ -247,8 +247,8 @@ public class HbciPassport extends PinTanPassport {
             passport.setPort(port);
             passport.setUserId(userId);
             passport.setSysId(sysId);
-            passport.setBPD(bpd == null ? null : (Properties) bpd.clone());
-            passport.setUPD(upd == null ? null : (Properties) upd.clone());
+            passport.setBPD(bpd == null ? null : (HashMap<String, String>) bpd.clone());
+            passport.setUPD(upd == null ? null : (HashMap<String, String>) upd.clone());
             passport.setCustomerId(customerId);
             passport.setAllowedTwostepMechanisms(new ArrayList<>(allowedTwostepMechanisms));
             passport.setCurrentTANMethod(currentTANMethod);
