@@ -1,6 +1,7 @@
 package hbci4java;
 
 import exception.InvalidPinException;
+import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.manager.HBCIUtils;
@@ -14,55 +15,8 @@ import java.util.regex.Pattern;
 /**
  * Created by alexg on 08.02.17.
  */
+@Slf4j
 public class HbciCallback implements HBCICallback {
-
-    private static final Logger LOG = LoggerFactory.getLogger(HbciCallback.class);
-
-    @Override
-    public void log(String msg, int level, Date date, StackTraceElement trace) {
-        String msg2 = preprocessLogMsg(msg);
-        if (shouldPrintTrace(trace)) {
-            switch (level) {
-                case HBCIUtils.LOG_ERR:
-                    LOG.error("Log: {} (at {})", msg2, trace);
-                    break;
-                case HBCIUtils.LOG_WARN:
-                    LOG.warn("Log: {} (at {})", msg2, trace);
-                    break;
-                case HBCIUtils.LOG_INFO:
-                    LOG.info("Log: {} (at {})", msg2, trace);
-                    break;
-                case HBCIUtils.LOG_DEBUG:
-                    LOG.debug("Log: {} (at {})", msg2, trace);
-                    break;
-                case HBCIUtils.LOG_DEBUG2:
-                    LOG.trace("Log: {} (at {})", msg2, trace);
-                    break;
-                default:
-                    break;
-            }
-        } else {
-            switch (level) {
-                case HBCIUtils.LOG_ERR:
-                    LOG.error("Log: {}", msg2);
-                    break;
-                case HBCIUtils.LOG_WARN:
-                    LOG.warn("Log: {}", msg2);
-                    break;
-                case HBCIUtils.LOG_INFO:
-                    LOG.info("Log: {}", msg2);
-                    break;
-                case HBCIUtils.LOG_DEBUG:
-                    LOG.debug("Log: {}", msg2);
-                    break;
-                case HBCIUtils.LOG_DEBUG2:
-                    LOG.trace("Log: {}", msg2);
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
 
     /**
      * We want to suppress the (at ...) info for calls from hbci4java.
@@ -114,10 +68,10 @@ public class HbciCallback implements HBCICallback {
             // No need to tell when we may open or close our internet connection
             case HBCICallback.NEED_CONNECTION:
             case HBCICallback.CLOSE_CONNECTION:
-                LOG.debug("Callback: reason: {}, message: {}", reason, msg);
+                log.debug("Callback: reason: {}, message: {}", reason, msg);
                 break;
             default:
-                LOG.warn("Callback: reason: {}, message: {}", reason, msg);
+                log.warn("Callback: reason: {}, message: {}", reason, msg);
         }
     }
 
@@ -132,7 +86,7 @@ public class HbciCallback implements HBCICallback {
 
     @Override
     public void status(int statusTag, Object[] o) {
-        LOG.debug("Status: {} {}, objects: {}", statusTag, statusToString(statusTag), o);
+        log.debug("Status: {} {}, objects: {}", statusTag, statusToString(statusTag), o);
     }
 
     @Override

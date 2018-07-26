@@ -1,8 +1,8 @@
 package hbci4java;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.exceptions.HBCI_Exception;
-import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.security.Sig;
@@ -13,6 +13,7 @@ import java.util.*;
 /**
  * Created by alexg on 08.02.17.
  */
+@Slf4j
 public class HbciPassport extends PinTanPassport {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -70,8 +71,7 @@ public class HbciPassport extends PinTanPassport {
                 // nur beim normalen einschritt-verfahren muss anhand der
                 // segment-
                 // codes ermittelt werden, ob eine tan benötigt wird
-                HBCIUtils.log("onestep method - checking GVs to decide whether or not we need a TAN",
-                        HBCIUtils.LOG_DEBUG);
+                log.debug("onestep method - checking GVs to decide whether or not we need a TAN");
 
                 // segment-codes durchlaufen
                 String codes = collectSegCodes(new String(bytes, "ISO-8859-1"));
@@ -83,7 +83,7 @@ public class HbciPassport extends PinTanPassport {
 
                     if (info.equals("J")) {
                         // für dieses segment wird eine tan benötigt
-                        HBCIUtils.log("the job with the code " + code + " needs a TAN", HBCIUtils.LOG_DEBUG);
+                        log.info("the job with the code " + code + " needs a TAN");
 
                         if (tan.length() == 0) {
                             // noch keine tan bekannt --> callback
@@ -100,27 +100,17 @@ public class HbciPassport extends PinTanPassport {
                             }
                             tan = callbackReturn.toString();
                         } else {
-                            HBCIUtils.log("there should be only one job that needs a TAN!",
-                                    HBCIUtils.LOG_WARN);
+                            log.warn("there should be only one job that needs a TAN!");
                         }
 
                     } else if (info.equals("N")) {
-                        HBCIUtils.log("the job with the code " + code
-                                + " does not need a TAN", HBCIUtils.LOG_DEBUG);
+                        log.debug("the job with the code " + code
+                                + " does not need a TAN");
 
-                    } else if (info.length() == 0) {
-                        // TODO: ist das hier dann nicht ein A-Segment? In dem
-                        // Fall
-                        // wäre diese Warnung überflüssig
-                        HBCIUtils.log("the job with the code " + code
-                                        + " seems not to be allowed with PIN/TAN",
-                                HBCIUtils.LOG_WARN);
                     }
                 }
             } else {
-                HBCIUtils
-                        .log("twostep method - checking passport(challenge) to decide whether or not we need a TAN",
-                                HBCIUtils.LOG_DEBUG);
+                log.debug("twostep method - checking passport(challenge) to decide whether or not we need a TAN");
                 Properties secmechInfo = getCurrentSecMechInfo();
 
                 // gespeicherte challenge aus passport holen
@@ -129,13 +119,9 @@ public class HbciPassport extends PinTanPassport {
 
                 if (challenge == null) {
                     // es gibt noch keine challenge
-                    HBCIUtils
-                            .log("will not sign with a TAN, because there is no challenge",
-                                    HBCIUtils.LOG_DEBUG);
+                    log.debug("will not sign with a TAN, because there is no challenge");
                 } else {
-                    HBCIUtils.log(
-                            "found challenge in passport, so we ask for a TAN",
-                            HBCIUtils.LOG_DEBUG);
+                    log.info("found challenge in passport, so we ask for a TAN");
                     // es gibt eine challenge, also damit tan ermitteln
 
                     StringBuffer s = new StringBuffer();
