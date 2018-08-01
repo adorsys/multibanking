@@ -17,4 +17,5 @@ public class TanTransportType {
     private String id;
     private String name;
     private String medium;
+    private String inputInfo;
 }

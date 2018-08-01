@@ -14,24 +14,16 @@ import java.util.Map;
 @Data
 public class Payment {
 
-    public enum PaymentState {
-        CREATED,
-        SELECT_TAN_MEDIA,
-        NEED_TAN
-    }
-
     public enum PaymentType {
         TRANSFER,
         SEPA_TRANSFER,
         STANDING_ORDER
     }
 
+    private TanTransportType tanMedia;
+
     private PaymentChallenge paymentChallenge;
-
-    private PaymentState paymentState = PaymentState.CREATED;
     private PaymentType paymentType;
-
-    private List<String> tanMedias;
 
     private String receiver;
     private String receiverBic;

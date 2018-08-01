@@ -12,7 +12,7 @@ import java.util.Properties;
 @Data
 public class HbciTanSubmit {
 
-    private String hbciPassport;
+    private String passportState;
     private String dialogId;
     private long msgNum;
     private HbciGVTanSubmit gvTanSubmit;

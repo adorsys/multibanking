@@ -2,38 +2,16 @@ package hbci4java;
 
 import exception.InvalidPinException;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV.GVTAN2Step;
+import org.kapott.hbci.GV_Result.GVRTANMediaList;
 import org.kapott.hbci.callback.HBCICallback;
-import org.kapott.hbci.manager.HBCIUtils;
-import org.kapott.hbci.passport.HBCIPassport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.regex.Pattern;
+import java.util.List;
 
 /**
  * Created by alexg on 08.02.17.
  */
 @Slf4j
 public class HbciCallback implements HBCICallback {
-
-    /**
-     * We want to suppress the (at ...) info for calls from hbci4java.
-     * This is the same thing done here: {@link org.kapott.hbci.callback.AbstractHBCICallback#createDefaultLogLine}.
-     */
-    boolean shouldPrintTrace(StackTraceElement trace) {
-        String className = trace.getClassName();
-        return !className.startsWith("org.kapott.hbci.");
-    }
-
-    /**
-     * Removes all but the first line of the complete stacktraces that hbci4java generates when an exception has occured.
-     */
-    private String preprocessLogMsg(String msg) {
-        /** the (?s) turns on {@link Pattern#DOTALL} mode. */
-        return msg.replaceFirst("(?s)\\n\\s*at org\\.kapott\\.hbci.*", "");
-    }
 
     @Override
     public void callback(int reason, String msg, int datatype, StringBuffer retData) {
@@ -42,29 +20,9 @@ public class HbciCallback implements HBCICallback {
                 String hhduc = retData.toString();
                 break;
             }
-            case HBCICallback.NEED_PT_TAN: {
-                String flicker = retData.toString();
-                if (flicker != null && flicker.length() > 0) {
-                    // Wir haben einen Flicker-Code. Also zeigen wir den Flicker-Dialog statt
-                    // dem normalen TAN-Dialog an
-
-                } else {
-
-                }
-                break;
-            }
-            // BUGZILLA 200
-            case HBCICallback.NEED_PT_SECMECH: {
-                String firstTanMethod = retData.toString().substring(0, retData.toString().indexOf(':'));
-                retData.setLength(0);
-                retData.insert(0, firstTanMethod);
-                break;
-            }
-
             case HBCICallback.WRONG_PIN: {
                 throw new InvalidPinException();
             }
-
             // No need to tell when we may open or close our internet connection
             case HBCICallback.NEED_CONNECTION:
             case HBCICallback.CLOSE_CONNECTION:
@@ -76,12 +34,17 @@ public class HbciCallback implements HBCICallback {
     }
 
     @Override
-    public String tanMediaCallback(String medialist) {
+    public String selectTanMedia(List<GVRTANMediaList.TANMediaInfo> tanMedias) {
         return null;
     }
 
     @Override
-    public void tanCallback(HBCIPassport passport, GVTAN2Step hktan) {
+    public void tanChallengeCallback(String challenge) {
+    }
+
+    @Override
+    public String needTankCallback() {
+        return null;
     }
 
     @Override

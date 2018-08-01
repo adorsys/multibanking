@@ -96,7 +96,7 @@ public class FigoMapping {
         return TanTransportType.builder()
                 .id(tanScheme.getTan_scheme_id())
                 .name(tanScheme.getName())
-                .medium(tanScheme.getMedium_name())
+//                .medium(tanScheme.getMedium_name())
                 .build();
     }
 

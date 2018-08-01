@@ -1,14 +1,15 @@
 package hbci4java;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.exceptions.HBCI_Exception;
-import org.kapott.hbci.manager.HBCIUtils;
+import org.kapott.hbci.GV_Result.GVRTANMediaList;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.security.Sig;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by alexg on 08.02.17.
@@ -18,156 +19,12 @@ public class HbciPassport extends PinTanPassport {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private Optional<State> state = Optional.empty();
-
-    //needed for jackson
-    public HbciPassport() {
-        super(null, null, null);
-    }
-
-    public HbciPassport(String hbciversion, String passportState, HashMap<String, String> properties, HbciCallback hbciCallback) {
+    public HbciPassport(String hbciversion, HashMap<String, String> properties, HbciCallback hbciCallback) {
         super(hbciversion, properties, hbciCallback != null ? hbciCallback : new HbciCallback());
-
-        if (passportState != null) {
-            state = Optional.of(HbciPassport.State.readJson(passportState));
-            state.get().apply(this);
-        }
-    }
-
-    public Optional<State> getState() {
-        return state;
-    }
-
-    @Override
-    public byte[] sign(byte[] bytes) {
-        try {
-            // TODO: wenn die eingegebene PIN falsch war, muss die irgendwie
-            // resettet werden, damit wieder danach gefragt wird
-            if (getPIN() == null) {
-                StringBuffer s = new StringBuffer();
-
-                callback.callback(
-                        HbciCallback.NEED_PT_PIN,
-                        HBCIUtils.getLocMsg("CALLB_NEED_PTPIN"),
-                        HbciCallback.TYPE_SECRET, s);
-                if (s.length() == 0) {
-                    throw new HBCI_Exception(
-                            HBCIUtils.getLocMsg("EXCMSG_PINZERO"));
-                }
-                setPIN(s.toString());
-            }
-
-            String tan = "";
-
-            // tan darf nur beim einschrittverfahren oder bei
-            // PV=1 und passport.contains(challenge) und tan-pflichtiger auftrag
-            // oder bei
-            // PV=2 und passport.contains(challenge+reference) und HKTAN
-            // ermittelt werden
-
-            String pintanMethod = getCurrentTANMethod(false);
-
-            if (pintanMethod.equals(Sig.SECFUNC_SIG_PT_1STEP)) {
-                // nur beim normalen einschritt-verfahren muss anhand der
-                // segment-
-                // codes ermittelt werden, ob eine tan benötigt wird
-                log.debug("onestep method - checking GVs to decide whether or not we need a TAN");
-
-                // segment-codes durchlaufen
-                String codes = collectSegCodes(new String(bytes, "ISO-8859-1"));
-                StringTokenizer tok = new StringTokenizer(codes, "|");
-
-                while (tok.hasMoreTokens()) {
-                    String code = tok.nextToken();
-                    String info = getPinTanInfo(code);
-
-                    if (info.equals("J")) {
-                        // für dieses segment wird eine tan benötigt
-                        log.info("the job with the code " + code + " needs a TAN");
-
-                        if (tan.length() == 0) {
-                            // noch keine tan bekannt --> callback
-
-                            StringBuffer callbackReturn = new StringBuffer();
-                            getCallback().callback(
-                                    HbciCallback.NEED_PT_TAN,
-                                    HBCIUtils
-                                            .getLocMsg("CALLB_NEED_PTTAN"),
-                                    HbciCallback.TYPE_TEXT, callbackReturn);
-                            if (callbackReturn.length() == 0) {
-                                throw new HBCI_Exception(
-                                        HBCIUtils.getLocMsg("EXCMSG_TANZERO"));
-                            }
-                            tan = callbackReturn.toString();
-                        } else {
-                            log.warn("there should be only one job that needs a TAN!");
-                        }
-
-                    } else if (info.equals("N")) {
-                        log.debug("the job with the code " + code
-                                + " does not need a TAN");
-
-                    }
-                }
-            } else {
-                log.debug("twostep method - checking passport(challenge) to decide whether or not we need a TAN");
-                HashMap<String, String> secmechInfo = getCurrentSecMechInfo();
-
-                // gespeicherte challenge aus passport holen
-                String challenge = (String) getPersistentData("pintan_challenge");
-                setPersistentData("pintan_challenge", null);
-
-                if (challenge == null) {
-                    // es gibt noch keine challenge
-                    log.debug("will not sign with a TAN, because there is no challenge");
-                } else {
-                    log.info("found challenge in passport, so we ask for a TAN");
-                    // es gibt eine challenge, also damit tan ermitteln
-
-                    StringBuffer s = new StringBuffer();
-                    callback.callback(
-                            HbciCallback.NEED_PT_TAN,
-                            secmechInfo.get("name") + " "
-                                    + secmechInfo.get("inputinfo")
-                                    + ": " + challenge, HbciCallback.TYPE_TEXT,
-                            s);
-                    if (s.length() == 0) {
-                        throw new HBCI_Exception(
-                                HBCIUtils.getLocMsg("EXCMSG_TANZERO"));
-                    }
-                    tan = s.toString();
-                }
-            }
-            return (getPIN() + "|" + tan).getBytes("ISO-8859-1");
-        } catch (Exception ex) {
-            throw new HBCI_Exception("*** signing failed", ex);
-        }
-    }
-
-    @Override
-    public byte[][] encrypt(byte[] bytes) {
-        try {
-            int padLength = bytes[bytes.length - 1];
-            byte[] encrypted = new String(bytes, 0, bytes.length
-                    - padLength, "ISO-8859-1").getBytes("ISO-8859-1");
-            return new byte[][]{new byte[8], encrypted};
-        } catch (Exception ex) {
-            throw new HBCI_Exception("*** encrypting message failed", ex);
-        }
-    }
-
-    @Override
-    public byte[] decrypt(byte[] bytes, byte[] bytes1) {
-        try {
-            return new String(new String(bytes1, "ISO-8859-1") + '\001')
-                    .getBytes("ISO-8859-1");
-        } catch (Exception ex) {
-            throw new HBCI_Exception("*** decrypting of message failed", ex);
-        }
     }
 
     public HbciPassport clone() {
-        HbciPassport passport = new HbciPassport(this.getHBCIVersion(), null, getProperties(), null);
+        HbciPassport passport = new HbciPassport(this.getHBCIVersion(), getProperties(), null);
         passport.setCountry(this.getCountry());
         passport.setHost(this.getHost());
         passport.setPort(this.getPort());
@@ -177,7 +34,6 @@ public class HbciPassport extends PinTanPassport {
         passport.setUPD(this.getUPD());
         passport.setCustomerId(this.getCustomerId());
         passport.setAllowedTwostepMechanisms(this.getAllowedTwostepMechanisms());
-        passport.setCurrentTANMethod(this.getCurrentTANMethod(false));
         passport.setPIN(this.getPIN());
         passport.setPersistentData(this.getPersistentData());
         return passport;
@@ -188,20 +44,24 @@ public class HbciPassport extends PinTanPassport {
      * <p>
      * All fields are non-final public so that jackson can easily serialize them.
      */
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class State {
+
+        public String hbciVersion;
+        public String customerId;
+        public String blz;
+        public String userId;
 
         public String country;
         public String host;
         public int port;
-        public String userId;
         public String sysId;
         public HashMap<String, String> bpd;
         public HashMap<String, String> upd;
-        public String hbciVersion;
-        public String customerId;
-        public String filterType;
+
         public List<String> allowedTwostepMechanisms;
-        public String currentTANMethod;
+        public List<GVRTANMediaList.TANMediaInfo> tanMedias;
+        public HashMap<String, String> currentSecMechInfo;
 
         /**
          * Default constructor is needed by jackson
@@ -209,36 +69,23 @@ public class HbciPassport extends PinTanPassport {
         State() {
         }
 
-        public State(HbciPassport passport) {
-            this(passport, null);
-        }
-
         /**
          * Creates a new State snapshot of the supplied passport. If oldState is non-null, its properties are used as fallback. This is useful so that the meta info of the UPD does not need to be refetched.
          */
-        public State(HbciPassport passport, Optional<State> optionalOldState) {
+        public State(PinTanPassport passport) {
             country = passport.getCountry();
             host = passport.getHost();
             port = passport.getPort();
+            blz = passport.getBLZ();
             userId = passport.getUserId();
             sysId = passport.getSysId();
             hbciVersion = passport.getHBCIVersion();
             customerId = passport.getCustomerId();
             allowedTwostepMechanisms = passport.getAllowedTwostepMechanisms();
-            currentTANMethod = passport.getCurrentTANMethod(false);
-
-            optionalOldState.ifPresent(oldState -> {
-                bpd = mergeProperties(oldState.bpd, passport.getBPD());
-                upd = mergeProperties(oldState.upd, passport.getUPD());
-            });
-        }
-
-        private static HashMap<String, String> mergeProperties(HashMap<String, String> oldP, HashMap<String, String> newP) {
-            if (oldP == null && newP == null) return null;
-            HashMap<String, String> result = new HashMap<>();
-            if (oldP != null) result.putAll(oldP);
-            if (newP != null) result.putAll(newP);
-            return result;
+            bpd = passport.getBPD();
+            upd = passport.getUPD();
+            tanMedias = passport.getTanMedias();
+            currentSecMechInfo = passport.getCurrentSecMechInfo();
         }
 
         public void apply(HbciPassport passport) {
@@ -251,7 +98,8 @@ public class HbciPassport extends PinTanPassport {
             passport.setUPD(upd == null ? null : (HashMap<String, String>) upd.clone());
             passport.setCustomerId(customerId);
             passport.setAllowedTwostepMechanisms(new ArrayList<>(allowedTwostepMechanisms));
-            passport.setCurrentTANMethod(currentTANMethod);
+            passport.setTanMedias(tanMedias);
+            passport.setCurrentSecMechInfo(currentSecMechInfo);
         }
 
         public String toJson() {
