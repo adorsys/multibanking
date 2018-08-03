@@ -78,7 +78,8 @@ public class PaymentService {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankCode);
 
         try {
-            bankingService.submitPayment(paymentEntity, tan);
+            //TODO pin is needed here
+            bankingService.submitPayment(paymentEntity, null, tan);
         } catch (PaymentException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }
