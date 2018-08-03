@@ -224,7 +224,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void submitPayment(Payment payment, String tan) {
+    public void submitPayment(Payment payment, String pin, String tan) {
     }
 
     private Account waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {

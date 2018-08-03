@@ -30,6 +30,6 @@ public interface OnlineBankingService {
 
     void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment);
 
-    void submitPayment(Payment payment, String tan);
+    void submitPayment(Payment payment, String pin, String tan);
 
 }

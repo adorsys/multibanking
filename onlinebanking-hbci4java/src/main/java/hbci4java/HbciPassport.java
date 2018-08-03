@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV_Result.GVRTANMediaList;
+import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.passport.PinTanPassport;
 
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class HbciPassport extends PinTanPassport {
 
         public List<String> allowedTwostepMechanisms;
         public List<GVRTANMediaList.TANMediaInfo> tanMedias;
-        public HashMap<String, String> currentSecMechInfo;
+        public HBCITwoStepMechanism currentSecMechInfo;
 
         /**
          * Default constructor is needed by jackson

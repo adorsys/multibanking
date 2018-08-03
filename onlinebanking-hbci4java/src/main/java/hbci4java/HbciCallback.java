@@ -34,16 +34,11 @@ public class HbciCallback implements HBCICallback {
     }
 
     @Override
-    public String selectTanMedia(List<GVRTANMediaList.TANMediaInfo> tanMedias) {
-        return null;
+    public void tanChallengeCallback(String orderRef, String challenge) {
     }
 
     @Override
-    public void tanChallengeCallback(String challenge) {
-    }
-
-    @Override
-    public String needTankCallback() {
+    public String needTAN() {
         return null;
     }
 

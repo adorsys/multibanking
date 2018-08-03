@@ -12,8 +12,10 @@ import java.util.Properties;
 @Data
 public class HbciTanSubmit {
 
-    private String passportState;
     private String dialogId;
     private long msgNum;
-    private HbciGVTanSubmit gvTanSubmit;
+    private String orderRef;
+    private String passportState;
+    private String originJobName;
+    private int originSegVersion;
 }

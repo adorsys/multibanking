@@ -309,7 +309,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void submitPayment(Payment payment, String tan) {
+    public void submitPayment(Payment payment, String pin, String tan) {
         try {
             FigoTanSubmit tanSubmit = (FigoTanSubmit)payment.getTanSubmitExternal();
             FigoSession session = new FigoSession(tanSubmit.getAccessToken(), 10000, figoConnection.getApiEndpoint());

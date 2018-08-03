@@ -124,7 +124,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public void submitPayment(Payment payment, String tan) {
+    public void submitPayment(Payment payment, String pin, String tan) {
     }
 
     public RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {

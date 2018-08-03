@@ -164,10 +164,13 @@ public final class HbciMapping {
                 booking.setUsage(
                         getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line.additional, 27)));
 
+                booking.setCreditorId((Utils.extractCreditorId(booking.getUsage())));
+                booking.setMandateReference(Utils.extractMandateReference(booking.getUsage()));
 
                 bookings.add(0, booking);
             }
         }
+
         LOG.debug("Received {} bookings: {}", bookings.size(), bookings);
         return bookings;
     }

@@ -15,10 +15,10 @@ import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
-import org.kapott.hbci.GV_Result.GVRTANMediaList;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIDialog;
+import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
@@ -26,9 +26,7 @@ import org.kapott.hbci.structures.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
-import utils.Utils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZoneId;
 import java.util.*;
@@ -91,10 +89,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         try {
             HBCIDialog dialog = createDialog(bankAccess, bankCode, null, pin);
 
-            if (dialog.getPassport().jobSupported("SEPAInfo")) {
-                log.info("fetching SEPA information");
-                dialog.addTask(newJob("SEPAInfo", dialog.getPassport()));
-            }
+            if (!dialog.getPassport().jobSupported("SEPAInfo"))
+                throw new RuntimeException("SEPAInfo job not supported");
+
+            log.info("fetching SEPA information");
+            dialog.addTask(newJob("SEPAInfo", dialog.getPassport()));
 
             // TAN-Medien abrufen
             if (dialog.getPassport().jobSupported("TANMediaList")) {
@@ -111,6 +110,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 bankAccount.bankName(bankAccess.getBankName());
                 hbciAccounts.add(bankAccount);
             }
+
+            updateTanTransportTypes(bankAccess, ((HbciPassport) dialog.getPassport()));
+
             bankAccess.setHbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
             return hbciAccounts;
         } catch (HBCI_Exception e) {
@@ -156,27 +158,21 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
 
             if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
-                LOG.error("Bookings job not OK ");
+                LOG.error("Bookings job not OK");
                 throw new HBCI_Exception(bookingsJob.getJobResult().getJobStatus().getErrorString());
             }
 
             bankAccess.setHbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
-
-            List<Booking> bookings = HbciMapping.createBookings((GVRKUms) bookingsJob.getJobResult());
 
             List<StandingOrder> standingOrders = null;
             if (standingOrdersJob != null) {
                 standingOrders = HbciMapping.createStandingOrders((GVRDauerList) standingOrdersJob.getJobResult());
             }
 
+            List<Booking> bookings = HbciMapping.createBookings((GVRKUms) bookingsJob.getJobResult());
             ArrayList<Booking> bookingList = bookings.stream()
                     .collect(Collectors.collectingAndThen(Collectors.toCollection(
                             () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
-
-            bookingList.forEach(booking -> {
-                booking.setCreditorId((Utils.extractCreditorId(booking.getUsage())));
-                booking.setMandateReference(Utils.extractMandateReference(booking.getUsage()));
-            });
 
             updateTanTransportTypes(bankAccess, ((HbciPassport) dialog.getPassport()));
 
@@ -193,17 +189,14 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
+        hbciTanSubmit.setOriginJobName("UebSEPA");
 
         HBCIDialog dialog = createDialog(bankAccess, bankCode, new HbciCallback() {
 
             @Override
-            public String selectTanMedia(List<GVRTANMediaList.TANMediaInfo> mediaList) {
-                return payment.getTanMedia().getMedium();
-            }
-
-            @Override
-            public void tanChallengeCallback(String challenge) {
+            public void tanChallengeCallback(String orderRef, String challenge) {
                 //needed later for submit
+                hbciTanSubmit.setOrderRef(orderRef);
                 if (challenge != null) {
                     payment.setPaymentChallenge(PaymentChallenge.builder()
                             .title(challenge)
@@ -213,11 +206,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
         }, pin);
 
-        HashMap<String, String> secmecParams = dialog.getPassport().getTwostepMechanisms().get(payment.getTanMedia().getId());
-        if (secmecParams == null) {
-            throw new PaymentException("inavalid tan media: " + payment.getTanMedia().getId());
+        HBCITwoStepMechanism hbciTwoStepMechanism = dialog.getPassport().getTwostepMechanisms().get(payment.getTanMedia().getId());
+        if (hbciTwoStepMechanism == null) {
+            throw new PaymentException("inavalid two stem mechanism: " + payment.getTanMedia().getId());
         }
-        dialog.getPassport().setCurrentSecMechInfo(secmecParams);
+        dialog.getPassport().setCurrentSecMechInfo(hbciTwoStepMechanism);
 
         try {
             Konto src = dialog.getPassport().getAccount(bankAccount.getAccountNumber());
@@ -234,48 +227,66 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             uebSEPA.setParam("dst", dst);
             uebSEPA.setParam("btg", new Value(payment.getAmount()));
             uebSEPA.setParam("usage", payment.getPurpose());
-            dialog.addTask(uebSEPA);
+            List<AbstractHBCIJob> messageJobs = dialog.addTask(uebSEPA);
 
-            HBCIExecStatus status = dialog.execute(true);
+            GVTAN2Step hktan = (GVTAN2Step) newJob("TAN2Step", dialog.getPassport());
+            hktan.setSegVersion(hbciTwoStepMechanism.getSegversion());
+            hktan.setParam("orderaccount", src);
+            hktan.setParam("process", "4");
+            if (dialog.getPassport().tanMediaNeeded()) {
+                hktan.setParam("tanmedia", payment.getTanMedia().getMedium());
+            }
+            messageJobs.add(hktan);
+
+            HBCIExecStatus status = dialog.execute(false);
             if (!status.isOK()) {
                 throw new PaymentException(status.getDialogStatus().getErrorString());
             }
 
-            bankAccess.setHbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
-
             hbciTanSubmit.setPassportState(bankAccess.getHbciPassportState());
             hbciTanSubmit.setDialogId(dialog.getDialogID());
             hbciTanSubmit.setMsgNum(dialog.getMsgnum());
+            hbciTanSubmit.setOriginSegVersion(uebSEPA.getSegVersion());
             payment.setTanSubmitExternal(hbciTanSubmit);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
-    public void submitPayment(Payment payment, String tan) {
+    @Override
+    public void submitPayment(Payment payment, String pin, String tan) {
         HbciTanSubmit hbciTanSubmit = (HbciTanSubmit) payment.getTanSubmitExternal();
 
         HbciPassport.State state = HbciPassport.State.readJson(hbciTanSubmit.getPassportState());
         HbciPassport hbciPassport = createPassport(state.hbciVersion, state.blz, state.customerId, state.userId, new HbciCallback() {
 
             @Override
-            public String needTankCallback() {
+            public String needTAN() {
                 return tan;
             }
         });
         state.apply(hbciPassport);
+        hbciPassport.setPIN(pin);
 
         HBCIDialog hbciDialog = new HBCIDialog(hbciPassport, hbciTanSubmit.getDialogId(), hbciTanSubmit.getMsgNum());
 
         try {
-            GVTAN2Step hktan = (GVTAN2Step) newJob("TAN2Step", hbciDialog.getPassport());
-            hktan.setLowlevelParams(OBJECT_MAPPER.readValue(hbciTanSubmit.getGvTanSubmit().getProperties(), HashMap.class));
-            hbciDialog.getMessages().get(hbciDialog.getMessages().size() - 1).add(hktan);
+            AbstractHBCIJob originJob = newJob(hbciTanSubmit.getOriginJobName(), hbciDialog.getPassport());
+            originJob.setSegVersion(hbciTanSubmit.getOriginSegVersion());
 
+            GVTAN2Step hktan = (GVTAN2Step) newJob("TAN2Step", hbciDialog.getPassport());
+            hktan.setOriginJob(originJob);
+            hktan.setParam("orderref", hbciTanSubmit.getOrderRef());
+            hktan.setParam("process", "2");
+            hktan.setParam("notlasttan", "N");
+            hbciDialog.addTask(hktan, false);
+
+            HBCIExecStatus status = hbciDialog.execute(true);
+            if (!status.isOK()) {
+                throw new PaymentException(status.getDialogStatus().getErrorString());
+            }
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
@@ -291,18 +302,18 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
         bankAccess.getTanTransportTypes().put(bankApi(), new ArrayList<>());
 
-        if (hbciPassport.getUPD() != null && hbciPassport.getTanMedias() != null) {
+        if (hbciPassport.getUPD() != null) {
             hbciPassport.getAllowedTwostepMechanisms().forEach(id -> {
-                HashMap<String, String> properties = hbciPassport.getTwostepMechanisms().get(id);
+                HBCITwoStepMechanism properties = hbciPassport.getTwostepMechanisms().get(id);
 
                 if (properties != null) {
-                    String name = properties.get("name");
+                    String name = properties.getName();
                     bankAccess.getTanTransportTypes().get(bankApi()).add(
                             TanTransportType.builder()
                                     .id(id)
                                     .name(name)
-                                    .inputInfo(properties.get("inputinfo"))
-                                    .medium(hbciPassport.getTanMedia(name).mediaName)
+                                    .inputInfo(properties.getInputinfo())
+                                    .medium(hbciPassport.getTanMedia(name) != null ? hbciPassport.getTanMedia(name).mediaName : null)
                                     .build()
                     );
                 } else {
