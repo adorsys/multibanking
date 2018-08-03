@@ -36,7 +36,6 @@ public class HbciPassport extends PinTanPassport {
         passport.setCustomerId(this.getCustomerId());
         passport.setAllowedTwostepMechanisms(this.getAllowedTwostepMechanisms());
         passport.setPIN(this.getPIN());
-        passport.setPersistentData(this.getPersistentData());
         return passport;
     }
 

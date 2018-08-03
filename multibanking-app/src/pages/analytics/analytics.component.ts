@@ -224,15 +224,11 @@ export class AnalyticsPage {
   getPeriodAmount(group: BookingGroup, referenceDate: Moment, forecast: boolean): number {
     let period: BookingPeriod = this.findPeriod(group.bookingPeriods, referenceDate);
 
-    if (period) {
-      if (period.amount) {
-        return period.amount;
-      } else if (!forecast && this.isRecurrent(group)) {
-        return group.amount;
-      }
+    if (period && period.amount) {
+      return period.amount;
     }
 
-    if (!forecast && !this.isRecurrent(group) && group.amount) {
+    if (group.amount) {
       return group.amount;
     }
 
