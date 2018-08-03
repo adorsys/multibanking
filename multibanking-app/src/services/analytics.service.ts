@@ -12,7 +12,7 @@ export class AnalyticsService {
   }
 
   getAnalytics(accessId: string, accountId: string): Observable<ResourceAccountAnalyticsEntity> {
-    return this.http.get(ENV.api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/analytics")
+    return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/analytics`)
       .catch(this.handleError);
   }
 

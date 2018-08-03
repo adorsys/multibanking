@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
 import { ResourcePaymentEntity, CreatePaymentRequest, SubmitPaymentRequest } from '../model/multibanking/models';
 
@@ -16,8 +16,10 @@ export class PaymentService {
   }
 
   createPayment(accessId: string, accountId: string, paymentCreate: CreatePaymentRequest): Observable<string> {
-    return this.http.post(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/payments`, paymentCreate, { responseType: 'text' })
-      .map((res: any) => res.headers.get("Location"))
+    return this.http.post(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/payments`, paymentCreate, { observe: 'response', responseType: 'text' })
+      .map((res: HttpResponse<any>) => {
+        return res.headers.get('Location');
+      })
       .catch(this.handleError);
   }
 

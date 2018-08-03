@@ -11,6 +11,7 @@
  */
 import { Link } from './link';
 import { PaymentChallenge } from './paymentChallenge';
+import { TanTransportType } from './tanTransportType';
 
 
 export interface ResourcePaymentEntity {
@@ -30,6 +31,7 @@ export interface ResourcePaymentEntity {
     receiverBankCode?: string;
     receiverBic?: string;
     receiverIban?: string;
+    tanMedia?: TanTransportType;
     tanSubmitExternal?: any;
     userId?: string;
 }

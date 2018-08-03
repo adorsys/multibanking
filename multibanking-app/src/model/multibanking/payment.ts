@@ -10,6 +10,7 @@
  * Do not edit the class manually.
  */
 import { PaymentChallenge } from './paymentChallenge';
+import { TanTransportType } from './tanTransportType';
 
 
 export interface Payment {
@@ -26,6 +27,7 @@ export interface Payment {
     receiverBankCode?: string;
     receiverBic?: string;
     receiverIban?: string;
+    tanMedia?: TanTransportType;
     tanSubmitExternal?: any;
 }
 export namespace Payment {

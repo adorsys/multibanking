@@ -2,12 +2,18 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
+import { ResourceBank } from '../model/multibanking/resourceBank';
 
 @Injectable()
 export class BankService {
 
     constructor(private http: HttpClient) {
     }
+
+    getBank(bankCode: string,): Observable<ResourceBank> {
+        return this.http.get(`${ENV.api_url}/banks/${bankCode}`)
+          .catch(this.handleError);
+      }
 
     uploadBanks(file: File): Observable<any> {
         let formData: FormData = new FormData();

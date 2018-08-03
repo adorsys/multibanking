@@ -13,6 +13,7 @@
 
 export interface TanTransportType {
     id?: string;
+    inputInfo?: string;
     medium?: string;
     name?: string;
 }

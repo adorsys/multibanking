@@ -10,6 +10,7 @@
  * Do not edit the class manually.
  */
 import { PaymentChallenge } from './paymentChallenge';
+import { TanTransportType } from './tanTransportType';
 
 
 export interface PaymentEntity {
@@ -28,6 +29,7 @@ export interface PaymentEntity {
     receiverBankCode?: string;
     receiverBic?: string;
     receiverIban?: string;
+    tanMedia?: TanTransportType;
     tanSubmitExternal?: any;
     userId?: string;
 }

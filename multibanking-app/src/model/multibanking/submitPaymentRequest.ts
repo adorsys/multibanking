@@ -12,5 +12,6 @@
 
 
 export interface SubmitPaymentRequest {
+    pin?: string;
     tan?: string;
 }

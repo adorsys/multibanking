@@ -14,13 +14,13 @@ export class BankAccountService {
   }
 
   getBankAccounts(accessId: string): Observable<Array<ResourceBankAccount>> {
-    return this.http.get(ENV.api_url + "/bankaccesses/" + accessId + "/accounts")
+    return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts`)
       .map((res: any) => res._embedded.bankAccountEntityList)
       .catch(this.handleError);
   }
 
   syncBookings(accessId: string, accountId: string, pin: string): Observable<Array<ResourceBooking>> {
-    return this.http.put(ENV.api_url + "/bankaccesses/" + accessId + "/accounts/" + accountId + "/sync", pin)
+    return this.http.put(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/sync`, pin)
       .map((res: Response) => {
         this.bookingsChangedObservable.next(true);
       })
