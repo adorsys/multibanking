@@ -89,7 +89,14 @@ export class BookingGroupPage {
 
   getPeriodAmount(bookingGroup: BookingGroup): number {
     let period = this.getMatchingBookingPeriod(bookingGroup);
-    return period && period.amount ? period.amount : 0;
+    if (period && period.amount) {
+      return period.amount;
+    }
+
+    if (bookingGroup.amount) {
+      return bookingGroup.amount;
+    }
+    return 0;
   }
 
   getExecutionDate(bookingGroup: BookingGroup) {
