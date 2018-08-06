@@ -10,6 +10,7 @@
     "lint": "ionic-app-scripts lint",
     "ionic:build": "ionic-app-scripts build",
     "ionic:serve": "ionic-app-scripts serve",
+    "ionic:serve:before": "node ./config/env-script.js",
     "ionic:build:before": "node ./config/env-script.js",
     "ionic:watch:before": "node ./config/env-script.js"
   },
