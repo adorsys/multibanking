@@ -58,6 +58,7 @@
         <module>onlinebanking-figo</module>
         <module>onlinebanking-finapi</module>
         <module>onlinebanking-hbci4java</module>
+        <module>onlinebanking-xs2a</module>
         <module>onlinebanking-mock</module>
         <module>multibanking-pers-spi</module>
         <module>multibanking-rest</module>
