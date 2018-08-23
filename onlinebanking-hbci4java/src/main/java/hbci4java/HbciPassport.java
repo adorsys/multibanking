@@ -34,7 +34,7 @@ public class HbciPassport extends PinTanPassport {
         passport.setBPD(this.getBPD());
         passport.setUPD(this.getUPD());
         passport.setCustomerId(this.getCustomerId());
-        passport.setAllowedTwostepMechanisms(this.getAllowedTwostepMechanisms());
+        passport.setUserTwostepMechanisms(this.getUserTwostepMechanisms());
         passport.setPIN(this.getPIN());
         return passport;
     }
@@ -81,7 +81,7 @@ public class HbciPassport extends PinTanPassport {
             sysId = passport.getSysId();
             hbciVersion = passport.getHBCIVersion();
             customerId = passport.getCustomerId();
-            allowedTwostepMechanisms = passport.getAllowedTwostepMechanisms();
+            allowedTwostepMechanisms = passport.getUserTwostepMechanisms();
             bpd = passport.getBPD();
             upd = passport.getUPD();
             tanMedias = passport.getTanMedias();
@@ -97,7 +97,7 @@ public class HbciPassport extends PinTanPassport {
             passport.setBPD(bpd == null ? null : (HashMap<String, String>) bpd.clone());
             passport.setUPD(upd == null ? null : (HashMap<String, String>) upd.clone());
             passport.setCustomerId(customerId);
-            passport.setAllowedTwostepMechanisms(new ArrayList<>(allowedTwostepMechanisms));
+            passport.setUserTwostepMechanisms(new ArrayList<>(allowedTwostepMechanisms));
             passport.setTanMedias(tanMedias);
             passport.setCurrentSecMechInfo(currentSecMechInfo);
         }

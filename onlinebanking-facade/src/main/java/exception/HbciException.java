@@ -6,9 +6,9 @@ import lombok.Data;
  * Created by alexg on 21.11.17.
  */
 @Data
-public class PaymentException extends RuntimeException {
+public class HbciException extends RuntimeException {
 
-    public PaymentException(String msg) {
+    public HbciException(String msg) {
         this.message = msg;
     }
 

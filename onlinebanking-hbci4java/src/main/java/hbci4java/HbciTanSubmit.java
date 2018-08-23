@@ -18,4 +18,5 @@ public class HbciTanSubmit {
     private String passportState;
     private String originJobName;
     private int originSegVersion;
+    private String sepaPain;
 }

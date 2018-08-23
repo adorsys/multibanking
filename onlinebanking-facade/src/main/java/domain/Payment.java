@@ -25,6 +25,9 @@ public class Payment {
     private PaymentChallenge paymentChallenge;
     private PaymentType paymentType;
 
+    private String senderAccountNumber;
+    private String senderIban;
+    private String senderBic;
     private String receiver;
     private String receiverBic;
     private String receiverIban;

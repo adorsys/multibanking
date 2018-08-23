@@ -53,7 +53,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String uid) {
+    public BankApiUser registerUser(String uid, String bankCode) {
         //no registration needed
         return null;
     }
@@ -120,7 +120,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment) {
+    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
     }
 
     @Override

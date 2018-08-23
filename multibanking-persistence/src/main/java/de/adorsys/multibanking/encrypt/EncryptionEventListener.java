@@ -26,7 +26,6 @@ import java.util.stream.Stream;
 public class EncryptionEventListener extends AbstractMongoEventListener<Object> {
 
     private static final String ENCRYPTION_METHOD = "AES";
-    private static final String ID_FIELD = "_id";
     private static final String ENCRYPTION_FIELD = "encrypted";
 
     @Value("${db_secret}")

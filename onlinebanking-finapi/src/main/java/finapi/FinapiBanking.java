@@ -77,7 +77,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String uid) {
+    public BankApiUser registerUser(String uid, String bankCode) {
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
 
         try {
@@ -220,7 +220,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment) {
+    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
     }
 
     @Override

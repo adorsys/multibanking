@@ -2,7 +2,7 @@ package figo;
 
 import domain.*;
 import exception.InvalidPinException;
-import exception.PaymentException;
+import exception.HbciException;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -109,7 +109,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String uid) {
+    public BankApiUser registerUser(String uid, String bankCode) {
         if (figoConnection == null) {
             throw new IllegalArgumentException("figo connection not available, check env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
         }
@@ -279,33 +279,33 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment) {
-        try {
-            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
-            FigoSession session = createSession(tokenResponse.getAccessToken());
-
-            me.figo.models.Payment figoPayment = session.addPayment(FigoMapping.mapToFigoPayment(bankAccount.getExternalIdMap().get(bankApi()), payment));
-
-            TanTransportType tanTransportType = bankAccess.getTanTransportTypes().get(bankApi()).get(0);
-            String taskTokenLink = session.submitPayment(figoPayment, tanTransportType.getId(), RandomStringUtils.randomAlphanumeric(5));
-            String taskToken = extractTaskToken(new URL(taskTokenLink));
-
-            Status status = waitForFinish(session, taskToken);
-            if (status == Status.PIN) {
-                TaskStatusResponse taskStatusResponse = submitPin(taskToken, pin, session);
-
-                payment.setTanSubmitExternal(FigoTanSubmit.builder()
-                        .accessToken(tokenResponse.getAccessToken())
-                        .taskToken(taskToken)
-                        .build());
-
-                payment.setPaymentChallenge(FigoMapping.mapToChallenge(taskStatusResponse.getChallenge()));
-            } else {
-                throw new RuntimeException("invalid figo payment status " + status);
-            }
-        } catch (IOException | FigoException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
+//        try {
+//            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
+//            FigoSession session = createSession(tokenResponse.getAccessToken());
+//
+//            me.figo.models.Payment figoPayment = session.addPayment(FigoMapping.mapToFigoPayment(bankAccount.getExternalIdMap().get(bankApi()), payment));
+//
+//            TanTransportType tanTransportType = bankAccess.getTanTransportTypes().get(bankApi()).get(0);
+//            String taskTokenLink = session.submitPayment(figoPayment, tanTransportType.getId(), RandomStringUtils.randomAlphanumeric(5));
+//            String taskToken = extractTaskToken(new URL(taskTokenLink));
+//
+//            Status status = waitForFinish(session, taskToken);
+//            if (status == Status.PIN) {
+//                TaskStatusResponse taskStatusResponse = submitPin(taskToken, pin, session);
+//
+//                payment.setTanSubmitExternal(FigoTanSubmit.builder()
+//                        .accessToken(tokenResponse.getAccessToken())
+//                        .taskToken(taskToken)
+//                        .build());
+//
+//                payment.setPaymentChallenge(FigoMapping.mapToChallenge(taskStatusResponse.getChallenge()));
+//            } else {
+//                throw new RuntimeException("invalid figo payment status " + status);
+//            }
+//        } catch (IOException | FigoException | InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     @Override
@@ -338,7 +338,7 @@ public class FigoBanking implements OnlineBankingService {
         Status status = waitForFinish(session, taskToken);
 
         if (status != Status.OK) {
-            throw new PaymentException("figo tan error");
+            throw new HbciException("figo tan error");
         }
     }
 

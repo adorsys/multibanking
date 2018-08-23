@@ -14,7 +14,7 @@ public interface OnlineBankingService {
 
     boolean userRegistrationRequired();
 
-    BankApiUser registerUser(String uid);
+    BankApiUser registerUser(String uid, String bankCode);
 
     void removeUser(BankApiUser bankApiUser);
 
@@ -28,7 +28,7 @@ public interface OnlineBankingService {
 
     boolean bookingsCategorized();
 
-    void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment);
+    void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment);
 
     void submitPayment(Payment payment, String pin, String tan);
 

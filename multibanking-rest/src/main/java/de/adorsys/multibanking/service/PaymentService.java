@@ -24,7 +24,7 @@ import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.FQNUtils;
 import domain.BankApiUser;
 import domain.Payment;
-import exception.PaymentException;
+import exception.HbciException;
 import spi.OnlineBankingService;
 
 /**
@@ -58,14 +58,18 @@ public class PaymentService {
                 .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode())).getBlzHbci();
 
         try {
-            bankingService.createPayment(bankApiUser, bankAccess, mappedBlz, bankAccount, pin, payment);
-        } catch (PaymentException e) {
+            bankingService.createPayment(bankApiUser, bankAccess, mappedBlz, pin, payment);
+        } catch (HbciException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }
 
         PaymentEntity pe = new PaymentEntity();
         BeanUtils.copyProperties(payment, pe);
+
         pe.setUserId(bankAccess.getUserId());
+        pe.setSenderAccountNumber(bankAccount.getAccountNumber());
+        pe.setSenderIban(bankAccount.getIban());
+        pe.setSenderBic(bankAccount.getBic());
         pe.setCreatedDateTime(new Date());
         pe.setBankAccessId(bankAccess.getId());
         pe.setBankAccountId(bankAccount.getId());
@@ -80,7 +84,7 @@ public class PaymentService {
         try {
             //TODO pin is needed here
             bankingService.submitPayment(paymentEntity, null, tan);
-        } catch (PaymentException e) {
+        } catch (HbciException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }
 
