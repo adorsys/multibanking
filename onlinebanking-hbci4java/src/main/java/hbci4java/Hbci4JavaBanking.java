@@ -22,8 +22,6 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 
 import java.io.InputStream;
@@ -36,7 +34,6 @@ import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 @Slf4j
 public class Hbci4JavaBanking implements OnlineBankingService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Hbci4JavaBanking.class);
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public Hbci4JavaBanking() {
@@ -84,7 +81,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
-        LOG.info("Loading Account list for access {}", bankAccess.getBankCode());
+        log.info("Loading Account list for access {}", bankAccess.getBankCode());
         try {
             HBCIDialog dialog = createDialog(bankAccess, bankCode, null, pin);
 
@@ -157,11 +154,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             // Let the Handler execute all jobs in one batch
             HBCIExecStatus status = dialog.execute(true);
             if (!status.isOK()) {
-                LOG.error("Status of SaldoReq+KUmsAll+DauerSEPAList batch job not OK " + status);
+                log.error("Status of SaldoReq+KUmsAll+DauerSEPAList batch job not OK " + status);
             }
 
             if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
-                LOG.error("Bookings job not OK");
+                log.error("Bookings job not OK");
                 throw new HBCI_Exception(bookingsJob.getJobResult().getJobStatus().getErrorString());
             }
 
@@ -367,11 +364,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                                     .build()
                     );
                 } else {
-                    LOG.warn("unable find transport type {} for bank code {}", id, bankAccess.getBankCode());
+                    log.warn("unable find transport type {} for bank code {}", id, bankAccess.getBankCode());
                 }
             });
         } else {
-            LOG.warn("missing passport upd, unable find transport types or bank code {}", bankAccess.getBankCode());
+            log.warn("missing passport upd, unable find transport types or bank code {}", bankAccess.getBankCode());
         }
     }
 

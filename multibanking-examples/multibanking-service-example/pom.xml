@@ -110,6 +110,7 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- jackson buggy 2.8.x version https://github.com/FasterXML/jackson-databind/issues/1595 

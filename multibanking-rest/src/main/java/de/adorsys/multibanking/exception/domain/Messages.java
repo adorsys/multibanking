@@ -8,10 +8,10 @@ import java.util.Map;
 
 import static de.adorsys.multibanking.exception.domain.Message.Severity.ERROR;
 
-@Data
-@Builder
 @NoArgsConstructor
+@Data
 @AllArgsConstructor
+@Builder
 public class Messages implements Serializable {
 
     private static final long serialVersionUID = -1L;
@@ -23,19 +23,31 @@ public class Messages implements Serializable {
 
     public static Messages createError(String key) {
         return builder()
-                .message(new Message(key, ERROR))
+                .message(Message.builder()
+                        .key(key)
+                        .severity(ERROR)
+                        .build())
                 .build();
     }
 
     public static Messages createError(String key, String renderedMessage) {
         return builder()
-                .message(new Message(key, ERROR, renderedMessage))
+                .message(Message.builder()
+                        .key(key)
+                        .severity(ERROR)
+                        .renderedMessage(renderedMessage)
+                        .build())
                 .build();
     }
 
     public static Messages createError(String key, String renderedMessage, Map<String, String> params) {
         return builder()
-            .message(new Message(key, ERROR, renderedMessage, params))
-            .build();
+                .message(Message.builder()
+                        .key(key)
+                        .severity(ERROR)
+                        .renderedMessage(renderedMessage)
+                        .paramsMap(params)
+                        .build())
+                .build();
     }
 }

@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.exception.domain;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,12 +9,10 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.Map;
 
-import io.swagger.annotations.ApiModelProperty;
-
-@Data
-@Builder
 @NoArgsConstructor
+@Data
 @AllArgsConstructor
+@Builder
 public class Message implements Serializable {
 
     private static final long serialVersionUID = -1L;
@@ -46,22 +45,5 @@ public class Message implements Serializable {
         WARNING,
         INFO
     }
-
-    public Message(String key, Severity severity) {
-        this.key = key;
-        this.severity = severity;
-    }
-
-    public Message(String key, Severity severity, String renderedMessage) {
-        this.key = key;
-        this.severity = severity;
-        this.renderedMessage = renderedMessage;
-    }
-
-    public Message(String key, Severity severity, String renderedMessage, Map<String, String> paramsMap) {
-        this.key = key;
-        this.severity = severity;
-        this.renderedMessage = renderedMessage;
-        this.paramsMap = paramsMap;
-    }
 }
+

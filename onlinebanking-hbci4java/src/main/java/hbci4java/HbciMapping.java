@@ -2,6 +2,7 @@ package hbci4java;
 
 
 import domain.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.text.WordUtils;
@@ -23,9 +24,8 @@ import static utils.Utils.extractIban;
 /**
  * Created by alexg on 08.02.17.
  */
+@Slf4j
 public final class HbciMapping {
-
-    private static final Logger LOG = LoggerFactory.getLogger(HbciMapping.class);
 
     public static BankAccountBalance createBalance(GVRSaldoReq gvSaldoReq) {
         BankAccountBalance result = new BankAccountBalance();
@@ -113,11 +113,11 @@ public final class HbciMapping {
                     continue;
                 }
                 if (line.value == null) {
-                    LOG.warn("Booking has no amount, skipping: %s", line);
+                    log.warn("Booking has no amount, skipping: %s", line);
                     continue;
                 }
                 if (line.bdate == null) {
-                    LOG.warn("Booking has no booking date, skipping: %s", line);
+                    log.warn("Booking has no booking date, skipping: %s", line);
                     continue;
                 }
                 Booking booking = new Booking();
@@ -171,7 +171,7 @@ public final class HbciMapping {
             }
         }
 
-        LOG.debug("Received {} bookings: {}", bookings.size(), bookings);
+        log.debug("Received {} bookings: {}", bookings.size(), bookings);
         return bookings;
     }
 

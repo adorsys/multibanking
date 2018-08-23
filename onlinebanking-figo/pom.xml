@@ -33,6 +33,12 @@
 			<groupId>de.adorsys.envutils</groupId>
 			<artifactId>envutils4j</artifactId>
 		</dependency>
+		<!-- lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
