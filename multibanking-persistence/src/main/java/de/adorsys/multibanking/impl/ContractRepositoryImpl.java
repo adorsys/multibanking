@@ -22,6 +22,11 @@ public class ContractRepositoryImpl implements ContractRepositoryIf {
     }
 
     @Override
+    public List<ContractEntity> findByUserIdAndAccountIdAndCancelledIsFalse(String userId, String accountId) {
+        return contractRepositoryMongodb.findByUserIdAndAccountIdAndCancelledIsFalse(userId, accountId);
+    }
+
+    @Override
     public void save(List<ContractEntity> contractEntities) {
         contractRepositoryMongodb.insert(contractEntities);
     }

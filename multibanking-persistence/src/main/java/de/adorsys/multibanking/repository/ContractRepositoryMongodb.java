@@ -16,6 +16,8 @@ public interface ContractRepositoryMongodb extends MongoRepository<ContractEntit
 
     List<ContractEntity> findByUserIdAndAccountId(String userId, String accountId);
 
+    List<ContractEntity> findByUserIdAndAccountIdAndCancelledIsFalse(String userId, String accountId);
+
     void deleteByAccountId(String accountId);
 
 
