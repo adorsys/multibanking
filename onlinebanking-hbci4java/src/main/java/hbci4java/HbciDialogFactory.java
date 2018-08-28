@@ -1,6 +1,6 @@
 package hbci4java;
 
-import domain.BankAccess;
+import domain.LoadBookingsRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIDialog;
@@ -10,22 +10,26 @@ import java.util.HashMap;
 
 public class HbciDialogFactory {
 
-    public static HBCIDialog createDialog(BankAccess bankAccess, String bankCode, HbciCallback callback, String pin) {
-        return createDialog(null, bankAccess, bankCode, callback, pin);
+    public static HBCIDialog createDialog(HbciDialogRequest dialogRequest) {
+        return createDialog(dialogRequest, null);
     }
 
-    private static HBCIDialog createDialog(HbciPassport passport, BankAccess bankAccess, String bankCode, HbciCallback callback, String pin) {
-        BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode != null ? bankCode : bankAccess.getBankCode());
-        bankCode = bankCode != null ? bankCode : bankAccess.getBankCode();
+    public static HBCIDialog createDialog(HbciDialogRequest dialogRequest, HbciCallback callback) {
+        return createDialog(null, dialogRequest, callback);
+    }
+
+    private static HBCIDialog createDialog(HbciPassport passport, HbciDialogRequest dialogRequest, HbciCallback callback) {
+        BankInfo bankInfo = HBCIUtils.getBankInfo(dialogRequest.getBankCode());
 
         if (passport == null) {
-            passport = createPassport(bankInfo.getPinTanVersion().getId(), bankCode, bankAccess.getBankLogin(), bankAccess.getBankLogin2(), callback);
-            if (bankAccess.getHbciPassportState() != null) {
-                HbciPassport.State.readJson(bankAccess.getHbciPassportState()).apply(passport);
+            passport = createPassport(bankInfo.getPinTanVersion().getId(), dialogRequest.getBankCode(), dialogRequest.getCustomerId(), dialogRequest.getLogin(), callback);
+
+            if (dialogRequest.getHbciPassportState() != null) {
+                HbciPassport.State.readJson(dialogRequest.getHbciPassportState()).apply(passport);
             }
         }
 
-        passport.setPIN(pin);
+        passport.setPIN(dialogRequest.getPin());
 
         String url = bankInfo.getPinTanAddress();
         String proxyPrefix = System.getProperty("proxyPrefix", null);

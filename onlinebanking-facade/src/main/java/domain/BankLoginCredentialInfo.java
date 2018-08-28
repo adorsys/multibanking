@@ -6,7 +6,7 @@ import lombok.Data;
  * Created by alexg on 10.07.17.
  */
 @Data
-public class BankLoginCredential {
+public class BankLoginCredentialInfo {
 
     private String label;
     private boolean masked;

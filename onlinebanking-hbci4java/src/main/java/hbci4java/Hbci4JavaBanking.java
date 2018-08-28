@@ -51,7 +51,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String uid, String bankCode) {
+    public BankApiUser registerUser(String uid) {
         //no registration needed
         return null;
     }
@@ -62,9 +62,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
+    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest request) {
         try {
-            return HbciAccountInformationJob.loadBankAccounts(bankAccess, bankCode, pin);
+            return HbciAccountInformationJob.loadBankAccounts(request);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -100,9 +100,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
         try {
-            return HbciLoadBookingsJob.loadBookings(bankAccess, bankCode, bankAccount, pin);
+            return HbciLoadBookingsJob.loadBookings(loadBookingsRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }

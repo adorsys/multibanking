@@ -17,4 +17,5 @@ public class LoadBookingsResponse {
     private List<Booking> bookings;
     private List<StandingOrder> standingOrders;
     private BankAccountBalance bankAccountBalance;
+    private String hbciPassportState;
 }

@@ -77,7 +77,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String uid, String bankCode) {
+    public BankApiUser registerUser(String uid) {
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
 
         try {
@@ -104,8 +104,10 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
+    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
         LOG.info("load bank accounts");
+        BankAccess bankAccess = loadAccountInformationRequest.getBankAccess();
+
         try {
             PageableBankList searchAllBanks = new BanksApi(createApiClient()).getAndSearchAllBanks(null, bankAccess.getBankCode(), null, null, null, null, null, null, null, null);
             if (searchAllBanks.getBanks().size() != 1) {
@@ -115,18 +117,19 @@ public class FinapiBanking implements OnlineBankingService {
             bankAccess.setBankName(searchAllBanks.getBanks().get(0).getName());
 
             ApiClient apiClient = createUserApiClient();
-            apiClient.setAccessToken(authorizeUser(bankApiUser));
+            apiClient.setAccessToken(authorizeUser(loadAccountInformationRequest.getBankApiUser()));
 
             BankConnection connections = new BankConnectionsApi(apiClient).importBankConnection(new ImportBankConnectionParams()
                     .bankId(searchAllBanks.getBanks().get(0).getId())
                     .bankingUserId(bankAccess.getBankLogin())
-                    .bankingPin(pin)
-                    .storePin(storePin));
+                    .bankingPin(loadAccountInformationRequest.getPin())
+                    .storePin(loadAccountInformationRequest.isStorePin()));
 
             bankAccess.externalId(bankApi(), connections.getId().toString());
 
             AccountList accounts = new AccountsApi(apiClient).getAndSearchAllAccounts(null, null, null, Arrays.asList(connections.getId()), null, null, null, null);
-            return accounts.getAccounts().stream().map(account ->
+
+            return LoadAccountInformationResponse.builder().bankAccounts(accounts.getAccounts().stream().map(account ->
                     new BankAccount()
                             .externalId(bankApi(), account.getId().toString())
                             .owner(account.getAccountHolderName())
@@ -138,11 +141,13 @@ public class FinapiBanking implements OnlineBankingService {
                             .type(BankAccountType.fromFinapiType(account.getAccountTypeId().intValue()))
                             .bankAccountBalance(new BankAccountBalance()
                                     .readyHbciBalance(account.getBalance())))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()))
+                    .build();
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
@@ -157,11 +162,13 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+        BankAccount bankAccount = loadBookingsRequest.getBankAccount();
+
         //TODO standing orders needed
         LOG.debug("load bookings for account [{}]", bankAccount.getAccountNumber());
         ApiClient apiClient = createUserApiClient();
-        apiClient.setAccessToken(authorizeUser(bankApiUser));
+        apiClient.setAccessToken(authorizeUser(loadBookingsRequest.getBankApiUser()));
 
         List<Long> accountIds = Arrays.asList(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
         List<String> order = Arrays.asList("id,desc");
@@ -173,7 +180,7 @@ public class FinapiBanking implements OnlineBankingService {
             //wait finapi loaded bookings
             Account account = waitAccountSynced(bankAccount, apiClient);
             //wait finapi categorized bookings
-            waitBookingsCategorized(bankAccess, apiClient);
+            waitBookingsCategorized(loadBookingsRequest.getBankAccess(), apiClient);
 
             while (nextPage == null || transactionsResponse.getPaging().getPage() < transactionsResponse.getPaging().getPageCount()) {
                 transactionsResponse = new TransactionsApi(apiClient).getAndSearchAllTransactions("bankView", null, null, null, accountIds, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, nextPage, null, order);

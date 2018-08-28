@@ -5,6 +5,7 @@ import domain.Payment;
 import domain.PaymentChallenge;
 import exception.HbciException;
 import hbci4java.HbciCallback;
+import hbci4java.HbciDialogRequest;
 import hbci4java.HbciPassport;
 import hbci4java.HbciTanSubmit;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +32,7 @@ public class HbciSinglePaymentJob {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
         hbciTanSubmit.setOriginJobName("UebSEPA");
 
-        HBCIDialog dialog = createDialog(bankAccess, bankCode, new HbciCallback() {
+        HbciCallback hbciCallback = new HbciCallback() {
 
             @Override
             public void tanChallengeCallback(String orderRef, String challenge) {
@@ -43,15 +44,21 @@ public class HbciSinglePaymentJob {
                             .build());
                 }
             }
+        };
 
-        }, pin);
+        HBCIDialog dialog = createDialog(HbciDialogRequest.builder()
+                .bankCode(bankCode != null ? bankCode : bankAccess.getBankCode())
+                .customerId(bankAccess.getBankLogin())
+                .login(bankAccess.getBankLogin2())
+                .hbciPassportState(bankAccess.getHbciPassportState())
+                .pin(pin)
+                .build(), hbciCallback);
 
         HBCITwoStepMechanism hbciTwoStepMechanism = dialog.getPassport().getBankTwostepMechanisms().get(payment.getTanMedia().getId());
-        if (hbciTwoStepMechanism == null) {
+        if (hbciTwoStepMechanism == null)
             throw new HbciException("inavalid two stem mechanism: " + payment.getTanMedia().getId());
-        }
-        dialog.getPassport().setCurrentSecMechInfo(hbciTwoStepMechanism);
 
+        dialog.getPassport().setCurrentSecMechInfo(hbciTwoStepMechanism);
 
         Konto src = dialog.getPassport().findAccountByAccountNumber(payment.getSenderAccountNumber());
         src.iban = payment.getSenderIban();
@@ -95,7 +102,8 @@ public class HbciSinglePaymentJob {
         messages.add(hktan);
     }
 
-    private static void hktanProcess1(HbciTanSubmit hbciTanSubmit, HBCITwoStepMechanism hbciTwoStepMechanism, GVUebSEPA uebSEPA, GVTAN2Step hktan) {
+    private static void hktanProcess1(HbciTanSubmit hbciTanSubmit, HBCITwoStepMechanism
+            hbciTwoStepMechanism, GVUebSEPA uebSEPA, GVTAN2Step hktan) {
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
         hktan.setParam("process", hbciTwoStepMechanism.getProcess());
@@ -157,7 +165,8 @@ public class HbciSinglePaymentJob {
         hbciDialog.addTask(hktan, false);
     }
 
-    private static void uebSepaProcess1(Payment payment, HbciTanSubmit hbciTanSubmit, HbciPassport hbciPassport, HBCIDialog hbciDialog) {
+    private static void uebSepaProcess1(Payment payment, HbciTanSubmit hbciTanSubmit, HbciPassport
+            hbciPassport, HBCIDialog hbciDialog) {
         //1. Schritt: HKTAN  HITAN
         //2. Schritt: HKUEB  HIRMS zu HKUEB
         Konto src = hbciPassport.findAccountByAccountNumber(payment.getSenderAccountNumber());

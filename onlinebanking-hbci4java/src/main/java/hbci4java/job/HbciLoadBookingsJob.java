@@ -1,6 +1,7 @@
 package hbci4java.job;
 
 import domain.*;
+import hbci4java.HbciDialogRequest;
 import hbci4java.HbciMapping;
 import hbci4java.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
@@ -13,41 +14,38 @@ import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static hbci4java.HbciDialogFactory.createDialog;
-import static hbci4java.job.HbciAccountInformationJob.updateTanTransportTypes;
+import static hbci4java.job.HbciAccountInformationJob.extractTanTransportTypes;
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @Slf4j
 public class HbciLoadBookingsJob {
 
-    public static LoadBookingsResponse loadBookings(BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
-        HBCIDialog dialog = createDialog(bankAccess, bankCode, null, pin);
+    public static LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+        HBCIDialog dialog = createDialog(HbciDialogRequest.builder()
+                .bankCode(loadBookingsRequest.getBankCode() != null ? loadBookingsRequest.getBankCode() : loadBookingsRequest.getBankAccess().getBankCode())
+                .customerId(loadBookingsRequest.getBankAccess().getBankLogin())
+                .login(loadBookingsRequest.getBankAccess().getBankLogin2())
+                .hbciPassportState(loadBookingsRequest.getBankAccess().getHbciPassportState())
+                .pin(loadBookingsRequest.getPin())
+                .build());
 
-        Konto account = dialog.getPassport().findAccountByAccountNumber(bankAccount.getAccountNumber());
-        account.iban = bankAccount.getIban();
-        account.bic = bankAccount.getBic();
+        Konto account = createAccount(dialog, loadBookingsRequest.getBankAccount());
 
-        AbstractHBCIJob balanceJob = newJob("SaldoReq", dialog.getPassport());
-        balanceJob.setParam("my", account);
-        dialog.addTask(balanceJob);
+        AbstractHBCIJob bookingsJob = createBookingsJob(dialog, loadBookingsRequest.getBankAccount().getLastSync(), account);
 
-        AbstractHBCIJob bookingsJob = newJob("KUmsAll", dialog.getPassport());
-        bookingsJob.setParam("my", account);
-        if (bankAccount.getLastSync() != null) {
-            bookingsJob.setParam("startdate", Date.from(bankAccount.getLastSync().atZone(ZoneId.systemDefault()).toInstant()));
-        }
-        dialog.addTask(bookingsJob);
+        Optional<AbstractHBCIJob> balanceJob = loadBookingsRequest.isWithBalance() ?
+                Optional.of(createBalanceJob(dialog, account)) :
+                Optional.empty();
 
-        AbstractHBCIJob standingOrdersJob = null;
-        if (dialog.getPassport().jobSupported("DauerSEPAList")) {
-            standingOrdersJob = newJob("DauerSEPAList", dialog.getPassport());
-            standingOrdersJob.setParam("src", account);
-            dialog.addTask(standingOrdersJob);
-        }
+        Optional<AbstractHBCIJob> standingOrdersJob = loadBookingsRequest.isWithStandingOrders() ?
+                Optional.of(createStandingOrdersJob(dialog, account)) :
+                Optional.empty();
 
         // Let the Handler execute all jobs in one batch
         HBCIExecStatus status = dialog.execute(true);
@@ -60,25 +58,72 @@ public class HbciLoadBookingsJob {
             throw new HBCI_Exception(bookingsJob.getJobResult().getJobStatus().getErrorString());
         }
 
-        bankAccess.setHbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
+        List<StandingOrder> standingOrders = standingOrdersJob
+                .map(abstractHBCIJob -> HbciMapping.createStandingOrders((GVRDauerList) abstractHBCIJob.getJobResult()))
+                .orElse(null);
 
-        List<StandingOrder> standingOrders = null;
-        if (standingOrdersJob != null) {
-            standingOrders = HbciMapping.createStandingOrders((GVRDauerList) standingOrdersJob.getJobResult());
-        }
+        BankAccountBalance bankAccountBalance = balanceJob
+                .map(abstractHBCIJob -> HbciMapping.createBalance((GVRSaldoReq) abstractHBCIJob.getJobResult()))
+                .orElse(null);
+
 
         List<Booking> bookings = HbciMapping.createBookings((GVRKUms) bookingsJob.getJobResult());
         ArrayList<Booking> bookingList = bookings.stream()
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
                         () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
 
-        updateTanTransportTypes(bankAccess, dialog.getPassport());
+        if (loadBookingsRequest.isUpdateTanTransportTypes()) {
+            extractTanTransportTypes(dialog.getPassport()).ifPresent(tanTransportTypes -> {
+                if (loadBookingsRequest.getBankAccess().getTanTransportTypes() == null) {
+                    loadBookingsRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
+                }
+                loadBookingsRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI, tanTransportTypes);
+            });
+        }
 
         return LoadBookingsResponse.builder()
+                .hbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson())
                 .bookings(bookingList)
-                .bankAccountBalance(HbciMapping.createBalance((GVRSaldoReq) balanceJob.getJobResult()))
+                .bankAccountBalance(bankAccountBalance)
                 .standingOrders(standingOrders)
                 .build();
 
     }
+
+    private static AbstractHBCIJob createStandingOrdersJob(HBCIDialog dialog, Konto account) {
+        AbstractHBCIJob standingOrdersJob = null;
+        if (dialog.getPassport().jobSupported("DauerSEPAList")) {
+            standingOrdersJob = newJob("DauerSEPAList", dialog.getPassport());
+            standingOrdersJob.setParam("src", account);
+            dialog.addTask(standingOrdersJob);
+        }
+        return standingOrdersJob;
+    }
+
+    private static AbstractHBCIJob createBookingsJob(HBCIDialog dialog, LocalDateTime lastSync, Konto account) {
+        AbstractHBCIJob bookingsJob = newJob("KUmsAll", dialog.getPassport());
+        bookingsJob.setParam("my", account);
+
+        Optional.ofNullable(lastSync)
+                .ifPresent(localDateTime -> bookingsJob.setParam("startdate", Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant())));
+
+        dialog.addTask(bookingsJob);
+        return bookingsJob;
+    }
+
+    private static AbstractHBCIJob createBalanceJob(HBCIDialog dialog, Konto account) {
+        AbstractHBCIJob balanceJob = newJob("SaldoReq", dialog.getPassport());
+        balanceJob.setParam("my", account);
+        dialog.addTask(balanceJob);
+        return balanceJob;
+    }
+
+    private static Konto createAccount(HBCIDialog dialog, BankAccount bankAccount) {
+        Konto account = dialog.getPassport().findAccountByAccountNumber(bankAccount.getAccountNumber());
+        account.iban = bankAccount.getIban();
+        account.bic = bankAccount.getBic();
+        return account;
+    }
+
+
 }

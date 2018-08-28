@@ -3,8 +3,6 @@ package de.adorsys.onlinebanking.mock;
 import domain.*;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.tomcat.util.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
@@ -53,7 +51,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String uid, String bankCode) {
+    public BankApiUser registerUser(String uid) {
         //no registration needed
         return null;
     }
@@ -63,15 +61,23 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
-        BankAccount[] bankAccounts = getRestTemplate(bankAccess.getBankLogin(), bankCode, pin)
-                .getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts", BankAccount[].class, bankCode);
+    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
+        RestTemplate restTemplate = getRestTemplate(loadAccountInformationRequest.getBankAccess().getBankLogin(),
+                loadAccountInformationRequest.getBankAccess().getBankCode(), loadAccountInformationRequest.getPin());
+
+        BankAccount[] bankAccounts = restTemplate.getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts",
+                BankAccount[].class, loadAccountInformationRequest.getBankCode());
+
+
         for (BankAccount bankAccount : bankAccounts) {
-            bankAccount.bankName(bankAccess.getBankName());
+            bankAccount.bankName(loadAccountInformationRequest.getBankAccess().getBankName());
             bankAccount.externalId(bankApi(), UUID.randomUUID().toString());
         }
-        return Arrays.asList(bankAccounts);
+        return LoadAccountInformationResponse.builder()
+                .bankAccounts(Arrays.asList(bankAccounts))
+                .build();
     }
+
 
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
@@ -79,13 +85,16 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+        BankAccess bankAccess = loadBookingsRequest.getBankAccess();
+        BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 
-        List<Booking> bookingList = getRestTemplate(bankAccess.getBankLogin(), bankCode, pin).exchange(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/bookings",
+        List<Booking> bookingList = getRestTemplate(bankAccess.getBankLogin(), loadBookingsRequest.getBankCode(), loadBookingsRequest.getPin()).exchange(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/bookings",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<Booking>>()  {},
-                bankCode,
+                new ParameterizedTypeReference<List<Booking>>() {
+                },
+                loadBookingsRequest.getBankCode(),
                 bankAccount.getIban()).getBody();
 
         bookingList.forEach(booking -> {
@@ -95,8 +104,8 @@ public class MockBanking implements OnlineBankingService {
 
         return LoadBookingsResponse.builder()
                 .bookings(bookingList)
-                .standingOrders(getStandingOders(bankAccess, pin, bankAccount.getIban()))
-                .bankAccountBalance(getBalance(bankAccess, pin, bankAccount.getIban()))
+                .standingOrders(getStandingOders(bankAccess, loadBookingsRequest.getPin(), bankAccount.getIban()))
+                .bankAccountBalance(getBalance(bankAccess, loadBookingsRequest.getPin(), bankAccount.getIban()))
                 .build();
     }
 
@@ -105,7 +114,8 @@ public class MockBanking implements OnlineBankingService {
                 .exchange(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/standingorders",
                         HttpMethod.GET,
                         null,
-                        new ParameterizedTypeReference<List<StandingOrder>>()  {},
+                        new ParameterizedTypeReference<List<StandingOrder>>() {
+                        },
                         ba.getBankCode(),
                         iban).getBody();
     }

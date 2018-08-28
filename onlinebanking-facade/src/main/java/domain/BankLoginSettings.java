@@ -13,7 +13,7 @@ public class BankLoginSettings {
 
     private String icon;
     private HashMap<String, String> additional_icons;
-    private List<BankLoginCredential> credentials;
+    private List<BankLoginCredentialInfo> credentials;
     private String auth_type;
     private String advice;
 }

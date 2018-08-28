@@ -107,7 +107,7 @@ public class UserDataService {
                     .filter(bankApiUser -> bankApiUser.getBankApi() == onlineBankingService.bankApi())
                     .findFirst()
                     .orElseGet(() -> {
-                        BankApiUser bankApiUser = onlineBankingService.registerUser(Ids.uuid(), bankCode);
+                        BankApiUser bankApiUser = onlineBankingService.registerUser(Ids.uuid());
                         userEntity.getApiUser().add(bankApiUser);
                         store(userData);
 

@@ -3,9 +3,6 @@ package spi;
 
 import domain.*;
 
-import java.io.IOException;
-import java.util.List;
-
 public interface OnlineBankingService {
 
     BankApi bankApi();
@@ -14,15 +11,15 @@ public interface OnlineBankingService {
 
     boolean userRegistrationRequired();
 
-    BankApiUser registerUser(String uid, String bankCode);
+    BankApiUser registerUser(String userId);
 
     void removeUser(BankApiUser bankApiUser);
 
-    List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin);
+    LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest);
 
     void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
 
-    LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin);
+    LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest);
 
     boolean bankSupported(String bankCode);
 

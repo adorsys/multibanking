@@ -2,10 +2,7 @@ package hbci4java;
 
 import exception.InvalidPinException;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV_Result.GVRTANMediaList;
 import org.kapott.hbci.callback.HBCICallback;
-
-import java.util.List;
 
 /**
  * Created by alexg on 08.02.17.

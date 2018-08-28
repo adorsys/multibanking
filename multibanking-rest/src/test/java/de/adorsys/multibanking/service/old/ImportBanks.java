@@ -21,7 +21,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import de.adorsys.multibanking.domain.BankEntity;
 import domain.BankApi;
-import domain.BankLoginCredential;
+import domain.BankLoginCredentialInfo;
 import domain.BankLoginSettings;
 
 public class ImportBanks {
@@ -122,22 +122,22 @@ public class ImportBanks {
             bankEntity.setLoginSettings(loginSettings);
             loginSettings.setAdvice(strings.get(2));
 
-            List<BankLoginCredential> bankLoginCredentials = new ArrayList<>();
+            List<BankLoginCredentialInfo> bankLoginCredentials = new ArrayList<>();
             loginSettings.setCredentials(bankLoginCredentials);
 
-            BankLoginCredential bankLoginCredential = new BankLoginCredential();
+            BankLoginCredentialInfo bankLoginCredential = new BankLoginCredentialInfo();
             if (strings.size() > 4) {
                 bankLoginCredential.setLabel(strings.get(3));
                 bankLoginCredential.setMasked(Boolean.parseBoolean(strings.get(4)));
                 bankLoginCredentials.add(bankLoginCredential);
 
-                bankLoginCredential = new BankLoginCredential();
+                bankLoginCredential = new BankLoginCredentialInfo();
                 bankLoginCredential.setLabel(strings.get(5));
                 bankLoginCredential.setMasked(Boolean.parseBoolean(strings.get(6)));
                 bankLoginCredentials.add(bankLoginCredential);
 
                 if (strings.size() > 7) {
-                    bankLoginCredential = new BankLoginCredential();
+                    bankLoginCredential = new BankLoginCredentialInfo();
                     bankLoginCredential.setLabel(strings.get(7));
                     bankLoginCredential.setMasked(Boolean.parseBoolean(strings.get(8)));
                     bankLoginCredentials.add(bankLoginCredential);
