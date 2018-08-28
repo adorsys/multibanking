@@ -68,7 +68,7 @@ public class BankAccountService {
 
         List<BankAccount> bankAccounts;
         try {
-            bankAccounts = onlineBankingService.loadBankAccounts(LoadAccountInformationRequest.builder()
+            bankAccounts = Optional.ofNullable(onlineBankingService.loadBankAccounts(LoadAccountInformationRequest.builder()
                     .bankApiUser(bankApiUser)
                     .bankAccess(bankAccess)
                     .bankCode(blzHbci)
@@ -76,7 +76,7 @@ public class BankAccountService {
                     .storePin(false)
                     .updateTanTransportTypes(true)
                     .build()
-            ).getBankAccounts();
+            )).map(ba -> ba.getBankAccounts()).orElse(Collections.EMPTY_LIST);
         } catch (InvalidPinException e) {
             throw new de.adorsys.multibanking.exception.InvalidPinException(bankAccess.getId());
         }
