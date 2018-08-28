@@ -13,10 +13,6 @@ import java.util.List;
 @Builder
 public class BookingGroup {
 
-    public enum Type {
-        STANDING_ORDER, RECURRENT_INCOME, RECURRENT_SEPA, RECURRENT_NONSEPA, CUSTOM, OTHER_INCOME, OTHER_EXPENSES
-    }
-
     private Type type;
     private String name;
     private boolean salaryWage;
@@ -27,4 +23,7 @@ public class BookingGroup {
     private BigDecimal amount;
     private List<BookingPeriod> bookingPeriods;
     private Contract contract;
+    public enum Type {
+        STANDING_ORDER, RECURRENT_INCOME, RECURRENT_SEPA, RECURRENT_NONSEPA, CUSTOM, OTHER_INCOME, OTHER_EXPENSES
+    }
 }

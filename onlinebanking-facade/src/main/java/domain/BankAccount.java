@@ -12,56 +12,38 @@ import java.util.Map;
  * Created by alexg on 07.02.17.
  */
 @Data
-@ApiModel(description="The bank account object", value="BankAccount" )
+@ApiModel(description = "The bank account object", value = "BankAccount")
 public class BankAccount {
-
-    public enum SyncStatus {
-        PENDING, SYNC, READY
-    }
 
     @ApiModelProperty(hidden = true)
     private Map<BankApi, String> externalIdMap = new HashMap<>();
-
-    @ApiModelProperty(value = "Bank account balance", example="2.000,00")
+    @ApiModelProperty(value = "Bank account balance", example = "2.000,00")
     private BankAccountBalance bankAccountBalance;
-
-    @ApiModelProperty(value = "Name of the account owner", example="EDEKA")
+    @ApiModelProperty(value = "Name of the account owner", example = "EDEKA")
     private String owner;
-
-    @ApiModelProperty(value = "ISO-2 country of this bank account", example="DE")
+    @ApiModelProperty(value = "ISO-2 country of this bank account", example = "DE")
     private String country;
-
-    @ApiModelProperty(value = "Bank code", example="29999999")
+    @ApiModelProperty(value = "Bank code", example = "29999999")
     private String blz;
-
-    @ApiModelProperty(value = "Bank name", example="Mock Bank")
+    @ApiModelProperty(value = "Bank name", example = "Mock Bank")
     private String bankName;
-
-    @ApiModelProperty(value = "Account number", example="1234567890")
+    @ApiModelProperty(value = "Account number", example = "1234567890")
     private String accountNumber;
-
-    @ApiModelProperty(value = "Type of this bank account", example="GIRO")
+    @ApiModelProperty(value = "Type of this bank account", example = "GIRO")
     private BankAccountType type;
-
-    @ApiModelProperty(value = "Currency of this bank account", example="EURO")
+    @ApiModelProperty(value = "Currency of this bank account", example = "EURO")
     private String currency;
-
     @ApiModelProperty(value = "Name of this bank account")
     private String name;
-
-    @ApiModelProperty(value = "Bank identification code", example="EDEKDEHHXXX")
+    @ApiModelProperty(value = "Bank identification code", example = "EDEKDEHHXXX")
     private String bic;
-
-    @ApiModelProperty(value = "International bank account number", example="DE50200907003443582071", required=true)
+    @ApiModelProperty(value = "International bank account number", example = "DE50200907003443582071", required = true)
     private String iban;
-
-    @ApiModelProperty(value = "Synchronisation status", example="PENDING")
+    @ApiModelProperty(value = "Synchronisation status", example = "PENDING")
     private SyncStatus syncStatus;
-
-    @ApiModelProperty(value = "Last Synchronisation date", example="2017-12-01")
+    @ApiModelProperty(value = "Last Synchronisation date", example = "2017-12-01")
     private LocalDateTime lastSync;
-
-    @ApiModelProperty(value = "Categorization rules version", example="v1.3")
+    @ApiModelProperty(value = "Categorization rules version", example = "v1.3")
     private String rulesVersion;
 
     public BankAccount bankAccountBalance(BankAccountBalance bankAccountBalance) {
@@ -125,6 +107,10 @@ public class BankAccount {
     public BankAccount owner(String owner) {
         this.owner = owner;
         return this;
+    }
+
+    public enum SyncStatus {
+        PENDING, SYNC, READY
     }
 
 

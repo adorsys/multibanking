@@ -10,23 +10,23 @@ import java.math.BigDecimal;
  * Created by alexg on 08.02.17.
  */
 @Data
-@ApiModel(description="The balance of this bank account", value="BankAccountBalance" )
+@ApiModel(description = "The balance of this bank account", value = "BankAccountBalance")
 public class BankAccountBalance {
 
-	@ApiModelProperty(value = "Ready account balance")
+    @ApiModelProperty(value = "Ready account balance")
     private BigDecimal readyHbciBalance;
 
-	@ApiModelProperty(value = "Unreleased account balance")
-	private BigDecimal unreadyHbciBalance;
+    @ApiModelProperty(value = "Unreleased account balance")
+    private BigDecimal unreadyHbciBalance;
 
-	@ApiModelProperty(value = "Credit balance")
-	private BigDecimal creditHbciBalance;
+    @ApiModelProperty(value = "Credit balance")
+    private BigDecimal creditHbciBalance;
 
-	@ApiModelProperty(value = "Available balance")
-	private BigDecimal availableHbciBalance;
+    @ApiModelProperty(value = "Available balance")
+    private BigDecimal availableHbciBalance;
 
-	@ApiModelProperty(value = "Used balance")
-	private BigDecimal usedHbciBalance;
+    @ApiModelProperty(value = "Used balance")
+    private BigDecimal usedHbciBalance;
 
     public BankAccountBalance readyHbciBalance(BigDecimal readyHbciBalance) {
         this.readyHbciBalance = readyHbciBalance;
