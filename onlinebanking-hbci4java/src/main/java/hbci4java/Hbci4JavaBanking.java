@@ -10,13 +10,13 @@ import exception.InvalidPinException;
 import hbci4java.job.HbciAccountInformationJob;
 import hbci4java.job.HbciLoadBookingsJob;
 import hbci4java.job.HbciSinglePaymentJob;
+import hbci4java.job.HbciNewStandingOrderJob;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIUtils;
 import spi.OnlineBankingService;
 
 import java.io.InputStream;
-import java.util.List;
 
 @Slf4j
 public class Hbci4JavaBanking implements OnlineBankingService {
@@ -93,6 +93,23 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
+    @Override
+    public void createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
+        try {
+            HbciNewStandingOrderJob.createStandingOrder(bankAccess, bankCode, pin, standingOrder);
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
+
+    @Override
+    public void submitStandingOrder(StandingOrder standingOrder, String pin, String tan) {
+        try {
+            HbciNewStandingOrderJob.submitStandingOrder(standingOrder, pin, tan);
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
 
     @Override
     public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
@@ -128,6 +145,4 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
         return e;
     }
-
-
 }

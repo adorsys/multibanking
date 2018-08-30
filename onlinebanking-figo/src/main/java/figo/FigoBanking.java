@@ -330,6 +330,16 @@ public class FigoBanking implements OnlineBankingService {
         }
     }
 
+    @Override
+    public void createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
+
+    }
+
+    @Override
+    public void submitStandingOrder(StandingOrder standingOrder, String pin, String tan) {
+
+    }
+
     private TaskStatusResponse submitPin(String taskToken, String pin, FigoSession session) throws FigoException, InterruptedException, IOException {
         TaskStatusResponse response = session.queryApi("/task/progress?id=" + taskToken, new TaskStatusRequest(taskToken, pin), "POST", TaskStatusResponse.class);
         Status status = waitForFinish(session, taskToken);

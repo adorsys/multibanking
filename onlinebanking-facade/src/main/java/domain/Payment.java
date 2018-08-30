@@ -9,10 +9,8 @@ import java.time.LocalDate;
  * Created by alexg on 19.10.17.
  */
 @Data
-public class Payment {
+public class Payment extends AbstractScaType {
 
-    private TanTransportType tanMedia;
-    private PaymentChallenge paymentChallenge;
     private PaymentType paymentType;
     private String senderAccountNumber;
     private String senderIban;
@@ -28,13 +26,10 @@ public class Payment {
     private LocalDate firstExecutionDate;
     private LocalDate lastExecutionDate;
     private Cycle cycle;
-    private Object tanSubmitExternal;
 
     public enum PaymentType {
         TRANSFER,
         SEPA_TRANSFER,
         STANDING_ORDER
     }
-
-
 }

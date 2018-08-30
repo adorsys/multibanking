@@ -234,6 +234,16 @@ public class FinapiBanking implements OnlineBankingService {
     public void submitPayment(Payment payment, String pin, String tan) {
     }
 
+    @Override
+    public void createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
+
+    }
+
+    @Override
+    public void submitStandingOrder(StandingOrder standingOrder, String pin, String tan) {
+
+    }
+
     private Account waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {
         Account account = new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
         while (account.getStatus() == Account.StatusEnum.DOWNLOAD_IN_PROGRESS) {

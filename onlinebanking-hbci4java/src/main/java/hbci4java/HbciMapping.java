@@ -189,6 +189,33 @@ public final class HbciMapping {
         return bankAccount;
     }
 
+    public static String cycleToTurnus(Cycle cycle) {
+        switch (cycle) {
+            case WEEKLY:
+                return "1";
+            case MONTHLY:
+                return "1";
+            case TWO_MONTHLY:
+                return "2";
+            case QUARTERLY:
+                return "3";
+            case HALF_YEARLY:
+                return "6";
+            case YEARLY:
+                return "12";
+        }
+        return null; //INVALID
+    }
+
+    public static String cycleToTimeunit(Cycle cycle) {
+        switch (cycle) {
+            case WEEKLY:
+                return "W";
+            default:
+                return "M";
+        }
+    }
+
     private static String getUsage(List<String> lines) {
         StringBuilder sb = new StringBuilder();
 
