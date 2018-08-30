@@ -11,14 +11,16 @@ import java.time.LocalDate;
  */
 @Data
 @ApiModel(description = "Standing order", value = "StandingOrder")
-public class StandingOrder {
-
+public class StandingOrder extends AbstractScaType {
     private String orderId;
     private Cycle cycle;
     private int executionDay;
     private LocalDate firstExecutionDate;
     private LocalDate lastExecutionDate;
     private BigDecimal amount;
+    private String senderAccountNumber;
+    private String senderIban;
+    private String senderBic;
     private BankAccount otherAccount;
     private String usage;
 }

@@ -137,6 +137,16 @@ public class MockBanking implements OnlineBankingService {
     public void submitPayment(Payment payment, String pin, String tan) {
     }
 
+    @Override
+    public void createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
+
+    }
+
+    @Override
+    public void submitStandingOrder(StandingOrder standingOrder, String pin, String tan) {
+
+    }
+
     public RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {
         String basicToken = new Base64().encodeAsString((bankLogin + "_" + bankCode + ":" + pin).getBytes(Charset.forName("UTF-8")));
         RestTemplate restTemplate = new RestTemplate();
