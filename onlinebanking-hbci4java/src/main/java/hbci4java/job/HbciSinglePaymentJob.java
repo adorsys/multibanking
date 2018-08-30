@@ -138,7 +138,6 @@ public class HbciSinglePaymentJob {
 
         HBCIDialog hbciDialog = new HBCIDialog(hbciPassport, hbciTanSubmit.getDialogId(), hbciTanSubmit.getMsgNum());
 
-
         if (hbciTwoStepMechanism.getProcess() == 1) {
             uebSepaProcess1(payment, hbciTanSubmit, hbciPassport, hbciDialog);
         } else {
