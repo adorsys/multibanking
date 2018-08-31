@@ -5,6 +5,7 @@ import hbci4java.HbciDialogRequest;
 import hbci4java.HbciMapping;
 import hbci4java.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static hbci4java.HbciDialogFactory.createDialog;
 import static hbci4java.job.HbciAccountInformationJob.extractTanTransportTypes;
@@ -51,6 +53,10 @@ public class HbciLoadBookingsJob {
         HBCIExecStatus status = dialog.execute(true);
         if (!status.isOK()) {
             log.error("Status of SaldoReq+KUmsAll+DauerSEPAList batch job not OK " + status);
+
+            if (initFailed(status)) {
+                throw new HBCI_Exception(status.getErrorString());
+            }
         }
 
         if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
@@ -72,14 +78,14 @@ public class HbciLoadBookingsJob {
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
                         () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
 
-        if (loadBookingsRequest.isUpdateTanTransportTypes()) {
-            extractTanTransportTypes(dialog.getPassport()).ifPresent(tanTransportTypes -> {
-                if (loadBookingsRequest.getBankAccess().getTanTransportTypes() == null) {
-                    loadBookingsRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
-                }
-                loadBookingsRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI, tanTransportTypes);
-            });
-        }
+//        if (loadBookingsRequest.isUpdateTanTransportTypes()) {
+//            extractTanTransportTypes(dialog.getPassport()).ifPresent(tanTransportTypes -> {
+//                if (loadBookingsRequest.getBankAccess().getTanTransportTypes() == null) {
+//                    loadBookingsRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
+//                }
+//                loadBookingsRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI, tanTransportTypes);
+//            });
+//        }
 
         return LoadBookingsResponse.builder()
                 .hbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson())
@@ -125,5 +131,8 @@ public class HbciLoadBookingsJob {
         return account;
     }
 
-
+    private static boolean initFailed(HBCIExecStatus status) {
+        return Stream.of(StringUtils.split(status.getErrorString(), System.getProperty("line.separator")))
+                .anyMatch(line -> line.charAt(0) == '9');
+    }
 }
