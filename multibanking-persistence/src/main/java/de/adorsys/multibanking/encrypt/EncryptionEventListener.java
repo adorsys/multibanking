@@ -2,8 +2,6 @@ package de.adorsys.multibanking.encrypt;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +25,7 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
 
     private static final String ENCRYPTION_METHOD = "AES";
     private static final String ENCRYPTION_FIELD = "encrypted";
+    private static final String ID_FIELD = "_id";
 
     @Value("${db_secret}")
     private String databaseSecret;
@@ -73,7 +72,12 @@ public class EncryptionEventListener extends AbstractMongoEventListener<Object> 
         String decryptedJson = EncryptionUtil.decrypt(document.get(ENCRYPTION_FIELD).toString(), secretKey());
 
         Document decryptedDocument = Document.parse(decryptedJson);
-        document.putAll(decryptedDocument);
+
+        decryptedDocument.forEach((key, value) -> {
+            if (!key.equals(ID_FIELD)) {
+                document.put(key, value);
+            }
+        });
     }
 
     private List<List<String>> loadExcludes(String[] excludes) {
