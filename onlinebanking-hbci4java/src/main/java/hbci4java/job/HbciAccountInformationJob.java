@@ -38,10 +38,10 @@ public class HbciAccountInformationJob {
         dialog.addTask(newJob("SEPAInfo", dialog.getPassport()));
 
         // TAN-Medien abrufen
-        if (dialog.getPassport().jobSupported("TANMediaList")) {
-            log.info("fetching TAN media list");
-            dialog.addTask(newJob("TANMediaList", dialog.getPassport()));
-        }
+//        if (dialog.getPassport().jobSupported("TANMediaList")) {
+//            log.info("fetching TAN media list");
+//            dialog.addTask(newJob("TANMediaList", dialog.getPassport()));
+//        }
         HBCIExecStatus status = dialog.execute(true);
 
         if (!status.isOK()) {
@@ -57,14 +57,14 @@ public class HbciAccountInformationJob {
             hbciAccounts.add(bankAccount);
         }
 
-        if (request.isUpdateTanTransportTypes()) {
-            extractTanTransportTypes(dialog.getPassport()).ifPresent(tanTransportTypes -> {
-                if (request.getBankAccess().getTanTransportTypes() == null) {
-                    request.getBankAccess().setTanTransportTypes(new HashMap<>());
-                }
-                request.getBankAccess().getTanTransportTypes().put(BankApi.HBCI, tanTransportTypes);
-            });
-        }
+//        if (request.isUpdateTanTransportTypes()) {
+//            extractTanTransportTypes(dialog.getPassport()).ifPresent(tanTransportTypes -> {
+//                if (request.getBankAccess().getTanTransportTypes() == null) {
+//                    request.getBankAccess().setTanTransportTypes(new HashMap<>());
+//                }
+//                request.getBankAccess().getTanTransportTypes().put(BankApi.HBCI, tanTransportTypes);
+//            });
+//        }
 
         request.getBankAccess().setHbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
         return LoadAccountInformationResponse.builder()
