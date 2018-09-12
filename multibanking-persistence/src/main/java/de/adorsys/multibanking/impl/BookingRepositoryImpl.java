@@ -72,5 +72,10 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 		bookingRepository.deleteByAccountId(id);
 	}
 
+	@Override
+	public void deleteByUserIdAndAccountId(String userId, String accountId) {
+		bookingRepository.deleteByUserIdAndAccountId(userId, accountId);
+	}
+
 
 }
