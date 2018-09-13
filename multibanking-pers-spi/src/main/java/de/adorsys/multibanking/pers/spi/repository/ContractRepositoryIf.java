@@ -13,6 +13,8 @@ public interface ContractRepositoryIf {
 
     List<ContractEntity> findByUserIdAndAccountId(String userId, String accountId);
 
+    List<ContractEntity> findByUserIdAndAccountIdAndCancelledIsFalse(String userId, String accountId);
+
     void save(List<ContractEntity> contractEntities);
 
     void deleteByAccountId(String accountId);
