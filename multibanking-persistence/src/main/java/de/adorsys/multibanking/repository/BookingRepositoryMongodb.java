@@ -22,4 +22,6 @@ public interface BookingRepositoryMongodb extends MongoRepository<BookingEntity,
     Optional<BookingEntity> findByUserIdAndId(String userId, String bookingId);
 
     void deleteByAccountId(String id);
+
+    void deleteByUserIdAndAccountId(String userId, String accountId);
 }
