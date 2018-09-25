@@ -25,4 +25,6 @@ public interface BookingRepositoryIf {
     List<BookingEntity> save(List<BookingEntity> bookingEntities);
 
     void deleteByAccountId(String id);
+
+    void deleteByUserIdAndAccountId(String userId, String accountId);
 }
