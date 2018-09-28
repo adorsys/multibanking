@@ -28,7 +28,7 @@ import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 @Slf4j
 public class HbciNewStandingOrderJob {
 
-    public static void createStandingOrder(BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
+    public static HbciTanSubmit createStandingOrder(BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
         hbciTanSubmit.setOriginJobName("DauerSEPANew");
 
@@ -89,7 +89,8 @@ public class HbciNewStandingOrderJob {
         hbciTanSubmit.setDialogId(dialog.getDialogID());
         hbciTanSubmit.setMsgNum(dialog.getMsgnum());
         hbciTanSubmit.setOriginSegVersion(standingorderSEPA.getSegVersion());
-        standingOrder.setTanSubmitExternal(hbciTanSubmit);
+
+        return hbciTanSubmit;
     }
 
     private static void hktanProcess2(HBCIDialog dialog, Konto src, AbstractSEPAGV standingorderSEPA, GVTAN2Step hktan) {
@@ -118,9 +119,7 @@ public class HbciNewStandingOrderJob {
         }
     }
 
-    public static void submitStandingOrder(StandingOrder standingOrder, String pin, String tan) {
-        HbciTanSubmit hbciTanSubmit = (HbciTanSubmit) standingOrder.getTanSubmitExternal();
-
+    public static void submitStandingOrder(StandingOrder standingOrder, HbciTanSubmit hbciTanSubmit, String pin, String tan) {
         HbciPassport.State state = HbciPassport.State.readJson(hbciTanSubmit.getPassportState());
         HbciPassport hbciPassport = createPassport(state.hbciVersion, state.blz, state.customerId, state.userId, new HbciCallback() {
 
@@ -203,7 +202,7 @@ public class HbciNewStandingOrderJob {
         }
 
         gvDauerSEPANew.verifyConstraints();
-        
+
         return gvDauerSEPANew;
     }
 }

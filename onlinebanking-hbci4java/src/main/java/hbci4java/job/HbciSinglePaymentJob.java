@@ -28,7 +28,7 @@ import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 public class HbciSinglePaymentJob {
 
-    public static void createPayment(BankAccess bankAccess, String bankCode, String pin, Payment payment) {
+    public static HbciTanSubmit createPayment(BankAccess bankAccess, String bankCode, String pin, Payment payment) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
         hbciTanSubmit.setOriginJobName("UebSEPA");
 
@@ -89,7 +89,8 @@ public class HbciSinglePaymentJob {
         hbciTanSubmit.setDialogId(dialog.getDialogID());
         hbciTanSubmit.setMsgNum(dialog.getMsgnum());
         hbciTanSubmit.setOriginSegVersion(uebSEPA.getSegVersion());
-        payment.setTanSubmitExternal(hbciTanSubmit);
+
+        return hbciTanSubmit;
     }
 
     private static void hktanProcess2(HBCIDialog dialog, Konto src, GVUebSEPA uebSEPA, GVTAN2Step hktan) {
@@ -119,9 +120,7 @@ public class HbciSinglePaymentJob {
         }
     }
 
-    public static void submitPayment(Payment payment, String pin, String tan) {
-        HbciTanSubmit hbciTanSubmit = (HbciTanSubmit) payment.getTanSubmitExternal();
-
+    public static void submitPayment(Payment payment, HbciTanSubmit hbciTanSubmit, String pin, String tan) {
         HbciPassport.State state = HbciPassport.State.readJson(hbciTanSubmit.getPassportState());
         HbciPassport hbciPassport = createPassport(state.hbciVersion, state.blz, state.customerId, state.userId, new HbciCallback() {
 

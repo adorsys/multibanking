@@ -9,5 +9,4 @@ import lombok.Data;
 public abstract class AbstractScaType {
     private TanTransportType tanMedia;
     private PaymentChallenge paymentChallenge;
-    private Object tanSubmitExternal;
 }

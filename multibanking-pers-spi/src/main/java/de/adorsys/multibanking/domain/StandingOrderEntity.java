@@ -23,5 +23,6 @@ public class StandingOrderEntity extends StandingOrder {
     private String id;
     private String accountId;
     private String userId;
+    private Object tanSubmitExternal;
 
 }

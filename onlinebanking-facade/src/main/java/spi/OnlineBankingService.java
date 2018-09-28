@@ -25,11 +25,11 @@ public interface OnlineBankingService {
 
     boolean bookingsCategorized();
 
-    void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment);
+    Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment);
 
-    void submitPayment(Payment payment, String pin, String tan);
+    void submitPayment(Payment payment, Object tanSubmit, String pin, String tan);
 
-    void createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder);
+    Object createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder);
 
-    void submitStandingOrder(StandingOrder standingOrder, String pin, String tan);
+    void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, String pin, String tan);
 }

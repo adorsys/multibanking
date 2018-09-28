@@ -22,5 +22,6 @@ public class PaymentEntity extends Payment {
     private String userId;
     @Indexed(expireAfterSeconds = 300)
     private Date createdDateTime;
+    private Object tanSubmitExternal;
 
 }

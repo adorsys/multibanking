@@ -35,7 +35,6 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public void removeUser(BankApiUser bankApiUser) {
-
     }
 
     @Override
@@ -53,7 +52,6 @@ public class XS2ABanking implements OnlineBankingService {
                 .recurringIndicator(true);
 
         UUID requestId = UUID.randomUUID();
-
 
         //TODO bankcode to remote url mapping needed
         ApiClient apiClient = new ApiClient();
@@ -117,22 +115,22 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
+    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
+        return null;
+    }
+
+    @Override
+    public void submitPayment(Payment payment, Object tanSubmit, String pin, String tan) {
 
     }
 
     @Override
-    public void submitPayment(Payment payment, String pin, String tan) {
-
+    public Object createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
+        return null;
     }
 
     @Override
-    public void createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
-
-    }
-
-    @Override
-    public void submitStandingOrder(StandingOrder standingOrder, String pin, String tan) {
+    public void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, String pin, String tan) {
 
     }
 }

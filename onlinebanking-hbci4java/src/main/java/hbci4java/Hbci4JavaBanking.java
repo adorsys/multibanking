@@ -9,8 +9,8 @@ import domain.*;
 import exception.InvalidPinException;
 import hbci4java.job.HbciAccountInformationJob;
 import hbci4java.job.HbciLoadBookingsJob;
-import hbci4java.job.HbciSinglePaymentJob;
 import hbci4java.job.HbciNewStandingOrderJob;
+import hbci4java.job.HbciSinglePaymentJob;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIUtils;
@@ -76,36 +76,36 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
+    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
         try {
-            HbciSinglePaymentJob.createPayment(bankAccess, bankCode, pin, payment);
+            return HbciSinglePaymentJob.createPayment(bankAccess, bankCode, pin, payment);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public void submitPayment(Payment payment, String pin, String tan) {
+    public void submitPayment(Payment payment, Object tanSubmit, String pin, String tan) {
         try {
-            HbciSinglePaymentJob.submitPayment(payment, pin, tan);
+            HbciSinglePaymentJob.submitPayment(payment, (HbciTanSubmit) tanSubmit, pin, tan);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public void createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
+    public Object createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
         try {
-            HbciNewStandingOrderJob.createStandingOrder(bankAccess, bankCode, pin, standingOrder);
+            return HbciNewStandingOrderJob.createStandingOrder(bankAccess, bankCode, pin, standingOrder);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public void submitStandingOrder(StandingOrder standingOrder, String pin, String tan) {
+    public void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, String pin, String tan) {
         try {
-            HbciNewStandingOrderJob.submitStandingOrder(standingOrder, pin, tan);
+            HbciNewStandingOrderJob.submitStandingOrder(standingOrder, (HbciTanSubmit) tanSubmit, pin, tan);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }

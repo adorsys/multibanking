@@ -28,6 +28,11 @@ public class StandingOrderRepositoryImpl implements StandingOrderRepositoryIf {
     }
 
     @Override
+    public void save(StandingOrderEntity standingOrder) {
+        standingOrderRepositoryMongodb.save(standingOrder);
+    }
+
+    @Override
     public void deleteByAccountId(String accountId) {
         standingOrderRepositoryMongodb.deleteByAccountId(accountId);
     }

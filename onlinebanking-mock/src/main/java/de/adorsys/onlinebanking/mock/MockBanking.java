@@ -130,21 +130,21 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
+    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
+        return null;
     }
 
     @Override
-    public void submitPayment(Payment payment, String pin, String tan) {
+    public void submitPayment(Payment payment, Object tanSubmit, String pin, String tan) {
     }
 
     @Override
-    public void createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
-
+    public Object createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
+        return null;
     }
 
     @Override
-    public void submitStandingOrder(StandingOrder standingOrder, String pin, String tan) {
-
+    public void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, String pin, String tan) {
     }
 
     public RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {

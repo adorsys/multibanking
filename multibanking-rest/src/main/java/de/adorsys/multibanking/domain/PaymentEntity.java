@@ -17,5 +17,6 @@ public class PaymentEntity extends Payment implements IdentityIf {
     private Date createdDateTime;
     private String bankAccessId;
     private String bankAccountId;
+    private Object tanSubmitExternal;
 
 }

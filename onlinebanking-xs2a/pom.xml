@@ -33,6 +33,12 @@
 			<groupId>de.adorsys.envutils</groupId>
 			<artifactId>envutils4j</artifactId>
 		</dependency>
+
+        <!-- test -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
 	</dependencies>
 
 	<build>
