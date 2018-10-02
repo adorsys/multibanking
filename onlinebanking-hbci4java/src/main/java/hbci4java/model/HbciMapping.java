@@ -208,6 +208,8 @@ public final class HbciMapping {
         switch (cycle) {
             case WEEKLY:
                 return "1";
+            case TWO_WEEKLY:
+                return "2";
             case MONTHLY:
                 return "1";
             case TWO_MONTHLY:
@@ -225,6 +227,7 @@ public final class HbciMapping {
     public static String cycleToTimeunit(Cycle cycle) {
         switch (cycle) {
             case WEEKLY:
+            case TWO_WEEKLY:
                 return "W";
             default:
                 return "M";
