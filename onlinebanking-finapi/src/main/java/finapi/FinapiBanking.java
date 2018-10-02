@@ -226,23 +226,7 @@ public class FinapiBanking implements OnlineBankingService {
         }
     }
 
-    @Override
-    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
-        return null;
-    }
 
-    @Override
-    public void submitPayment(Payment payment, Object tanSubmit, String pin, String tan) {
-    }
-
-    @Override
-    public Object createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
-        return null;
-    }
-
-    @Override
-    public void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, String pin, String tan) {
-    }
 
     private Account waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {
         Account account = new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
@@ -272,6 +256,16 @@ public class FinapiBanking implements OnlineBankingService {
     @Override
     public boolean bookingsCategorized() {
         return true;
+    }
+
+    @Override
+    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+        return null;
+    }
+
+    @Override
+    public void submitPayment(AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+
     }
 
     private ApiClient createApiClient() {

@@ -1,7 +1,6 @@
 package figo;
 
 import domain.*;
-import domain.Payment;
 import me.figo.models.*;
 import me.figo.models.StandingOrder;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +17,7 @@ import java.util.Map;
 public class FigoMapping {
 
     private static final Map<Cycle, String> FIGO_CYCLE = new HashMap<>();
-    private static final Map<Payment.PaymentType, String> FIGO_TRANSFER = new HashMap<>();
+    private static final Map<SinglePayment.PaymentType, String> FIGO_TRANSFER = new HashMap<>();
 
     static {
         FIGO_CYCLE.put(Cycle.WEEKLY, "weekly");
@@ -28,9 +27,8 @@ public class FigoMapping {
         FIGO_CYCLE.put(Cycle.HALF_YEARLY, "half yearly");
         FIGO_CYCLE.put(Cycle.YEARLY, "yearly");
 
-        FIGO_TRANSFER.put(Payment.PaymentType.TRANSFER, "Transfer");
-        FIGO_TRANSFER.put(Payment.PaymentType.SEPA_TRANSFER, "SEPA transfer");
-        FIGO_TRANSFER.put(Payment.PaymentType.STANDING_ORDER, "SEPA standing order");
+        FIGO_TRANSFER.put(SinglePayment.PaymentType.SINGLE_PAYMENT, "SEPA transfer");
+        FIGO_TRANSFER.put(SinglePayment.PaymentType.STANDING_ORDER, "SEPA standing order");
     }
 
 
@@ -100,7 +98,7 @@ public class FigoMapping {
                 .build();
     }
 
-    public static me.figo.models.Payment mapToFigoPayment(String accountId, Payment payment) {
+    public static me.figo.models.Payment mapToFigoPayment(String accountId, SinglePayment payment) {
         me.figo.models.Payment figoPayment = new me.figo.models.Payment();
         figoPayment.setAccountId(accountId);
 

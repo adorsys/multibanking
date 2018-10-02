@@ -7,10 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import domain.*;
 import exception.InvalidPinException;
-import hbci4java.job.HbciAccountInformationJob;
-import hbci4java.job.HbciLoadBookingsJob;
-import hbci4java.job.HbciNewStandingOrderJob;
-import hbci4java.job.HbciSinglePaymentJob;
+import hbci4java.job.*;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIUtils;
@@ -76,36 +73,18 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
+    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
         try {
-            return HbciSinglePaymentJob.createPayment(bankAccess, bankCode, pin, payment);
+            return createPaymentJob(payment).createPayment(bankAccess, bankCode, pin, payment);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public void submitPayment(Payment payment, Object tanSubmit, String pin, String tan) {
+    public void submitPayment(AbstractPayment payment, Object tanSubmit, String pin, String tan) {
         try {
-            HbciSinglePaymentJob.submitPayment(payment, (HbciTanSubmit) tanSubmit, pin, tan);
-        } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
-        }
-    }
-
-    @Override
-    public Object createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
-        try {
-            return HbciNewStandingOrderJob.createStandingOrder(bankAccess, bankCode, pin, standingOrder);
-        } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
-        }
-    }
-
-    @Override
-    public void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, String pin, String tan) {
-        try {
-            HbciNewStandingOrderJob.submitStandingOrder(standingOrder, (HbciTanSubmit) tanSubmit, pin, tan);
+            createPaymentJob(payment).submitPayment(payment, (HbciTanSubmit) tanSubmit, pin, tan);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -125,13 +104,24 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
-
     @Override
     public boolean bankSupported(String bankCode) {
         org.kapott.hbci.manager.BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
         return bankInfo != null && bankInfo.getPinTanVersion() != null;
     }
 
+    private AbstractPaymentJob createPaymentJob(AbstractPayment payment) {
+        switch (payment.getPaymentType()) {
+            case SINGLE_PAYMENT:
+                return new HbciSinglePaymentJob();
+            case BULK_PAYMENT:
+                return new HbciBulkPaymentJob();
+
+            case STANDING_ORDER:
+                return new HbciNewStandingOrderJob();
+        }
+        throw new IllegalArgumentException("invalid payment type " + payment.getPaymentType());
+    }
 
     private RuntimeException handleHbciException(HBCI_Exception e) {
         Throwable processException = e;

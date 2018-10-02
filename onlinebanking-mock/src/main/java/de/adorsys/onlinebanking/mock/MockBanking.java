@@ -46,6 +46,16 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
+    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+        return null;
+    }
+
+    @Override
+    public void submitPayment(AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+
+    }
+
+    @Override
     public boolean userRegistrationRequired() {
         return false;
     }
@@ -129,23 +139,7 @@ public class MockBanking implements OnlineBankingService {
         return new BankAccountBalance().readyHbciBalance(account.getBankAccountBalance().getReadyHbciBalance());
     }
 
-    @Override
-    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
-        return null;
-    }
 
-    @Override
-    public void submitPayment(Payment payment, Object tanSubmit, String pin, String tan) {
-    }
-
-    @Override
-    public Object createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
-        return null;
-    }
-
-    @Override
-    public void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, String pin, String tan) {
-    }
 
     public RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {
         String basicToken = new Base64().encodeAsString((bankLogin + "_" + bankCode + ":" + pin).getBytes(Charset.forName("UTF-8")));

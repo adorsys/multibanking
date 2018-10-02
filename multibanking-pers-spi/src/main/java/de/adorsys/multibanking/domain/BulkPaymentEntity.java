@@ -1,7 +1,7 @@
 package de.adorsys.multibanking.domain;
 
 import de.adorsys.multibanking.encrypt.Encrypted;
-import domain.SinglePayment;
+import domain.BulkPayment;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -15,7 +15,7 @@ import java.util.Date;
 @Data
 @Document
 @Encrypted(exclude = {"_id", "userId"})
-public class PaymentEntity extends SinglePayment {
+public class BulkPaymentEntity extends BulkPayment {
 
     @Id
     private String id;

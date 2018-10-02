@@ -289,7 +289,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
+    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
 //        try {
 //            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
 //            FigoSession session = createSession(tokenResponse.getAccessToken());
@@ -320,7 +320,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void submitPayment(Payment payment, Object tanSubmit, String pin, String tan) {
+    public void submitPayment(AbstractPayment payment, Object tanSubmit, String pin, String tan) {
         try {
             FigoTanSubmit figoTanSubmit = (FigoTanSubmit) tanSubmit;
             FigoSession session = new FigoSession(figoTanSubmit.getAccessToken(), 10000, figoConnection.getApiEndpoint());
@@ -329,16 +329,6 @@ public class FigoBanking implements OnlineBankingService {
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public Object createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
-        return null;
-    }
-
-    @Override
-    public void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, String pin, String tan) {
-
     }
 
     private TaskStatusResponse submitPin(String taskToken, String pin, FigoSession session) throws FigoException, InterruptedException, IOException {

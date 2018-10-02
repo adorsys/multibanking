@@ -8,12 +8,7 @@ import java.util.Optional;
 /**
  * @author alexg on 04.09.17
  */
-public interface PaymentRepositoryIf {
+public interface BulkPaymentRepositoryIf {
 
-    Optional<PaymentEntity> findByUserIdAndId(String userId, String id);
-
-    void save(PaymentEntity paymentEntity);
-
-    void delete(String id);
-
+    void save(BulkPaymentEntity target);
 }

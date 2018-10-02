@@ -25,11 +25,7 @@ public interface OnlineBankingService {
 
     boolean bookingsCategorized();
 
-    Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment);
+    Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment);
 
-    void submitPayment(Payment payment, Object tanSubmit, String pin, String tan);
-
-    Object createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder);
-
-    void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, String pin, String tan);
+    void submitPayment(AbstractPayment payment, Object tanSubmit, String pin, String tan);
 }

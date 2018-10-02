@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.impl;
 
+import de.adorsys.multibanking.domain.BulkPaymentEntity;
 import de.adorsys.multibanking.domain.PaymentEntity;
 import de.adorsys.multibanking.pers.spi.repository.PaymentRepositoryIf;
 import de.adorsys.multibanking.repository.PaymentRepositoryMongodb;
@@ -30,4 +31,5 @@ public class PaymentRepositoryImpl implements PaymentRepositoryIf {
     public void delete(String id) {
         paymentRepository.deleteById(id);
     }
+
 }

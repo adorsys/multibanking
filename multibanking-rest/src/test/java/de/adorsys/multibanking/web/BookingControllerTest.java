@@ -55,7 +55,7 @@ public class BookingControllerTest extends BaseControllerUnitTest {
 
         // TODO: Fix This. use data provided by the booking test.
 //        InputStream bookingsStream = BookingControllerTest.class.getClassLoader().getResourceAsStream("/BookingControllerTest/test_data.xls");
-        SimpleMockBanking simpleMockBanking = new SimpleMockBanking(null, null, null);
+        SimpleMockBanking simpleMockBanking = new SimpleMockBanking(null, null);
         BankAccess bankAccess = new BankAccess();
         bankAccess.setBankLogin("m.becker");
         BankAccount bankAccount = new BankAccount();
