@@ -5,6 +5,7 @@ import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 
+import de.adorsys.multibanking.auth.BearerTokenFactory;
 import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.UserID;
 import org.adorsys.docusafe.business.types.complex.UserIDAuth;
@@ -115,7 +116,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         UserIDAuth userIDAuth = new UserIDAuth(new UserID(userId), new ReadKeyPassword(userSecret));
         userContext.setAuth(userIDAuth);
 
-        String token = request.getHeader(BearerTokenValidator.HEADER_KEY);
+        String token = BearerTokenFactory.extractToken(request);
         BearerToken bearerToken = bearerTokenValidator.extract(token);
         userContext.setBearerToken(bearerToken);
         if(StringUtils.isNotBlank(userSecret)){
