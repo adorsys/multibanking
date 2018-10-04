@@ -26,7 +26,7 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-public class HbciBulkPaymentJob extends AbstractPaymentJob {
+public class BulkPaymentJob extends AbstractPaymentJob {
 
     @Override
     protected AbstractSEPAGV createPaymentJob(AbstractPayment abstractPayment, PinTanPassport passport, String sepaPain) {

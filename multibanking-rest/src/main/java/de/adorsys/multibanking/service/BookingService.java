@@ -201,7 +201,7 @@ public class BookingService {
                             .bankCode(mappedBlz)
                             .bankAccount(bankAccount)
                             .pin(pin)
-                            .updateTanTransportTypes(true)
+                            .withTanTransportTypes(true)
                             .withBalance(true)
                             .withStandingOrders(true)
                             .build()

@@ -20,10 +20,10 @@ import domain.AbstractPayment;
 import domain.BankAccess;
 import domain.PaymentChallenge;
 import exception.HbciException;
-import hbci4java.HbciCallback;
-import hbci4java.HbciDialogRequest;
-import hbci4java.HbciPassport;
-import hbci4java.HbciTanSubmit;
+import hbci4java.model.HbciCallback;
+import hbci4java.model.HbciDialogRequest;
+import hbci4java.model.HbciPassport;
+import hbci4java.model.HbciTanSubmit;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.AbstractSEPAGV;
@@ -37,8 +37,8 @@ import org.kapott.hbci.structures.Konto;
 
 import java.util.List;
 
-import static hbci4java.HbciDialogFactory.createDialog;
-import static hbci4java.HbciDialogFactory.createPassport;
+import static hbci4java.model.HbciDialogFactory.createDialog;
+import static hbci4java.model.HbciDialogFactory.createPassport;
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 public abstract class AbstractPaymentJob {

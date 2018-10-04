@@ -8,11 +8,16 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import domain.*;
 import exception.InvalidPinException;
 import hbci4java.job.*;
+import hbci4java.model.HbciDialogFactory;
+import hbci4java.model.HbciDialogRequest;
+import hbci4java.model.HbciTanSubmit;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.exceptions.HBCI_Exception;
+import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.manager.HBCIUtils;
 import spi.OnlineBankingService;
 
+import java.io.IOException;
 import java.io.InputStream;
 
 @Slf4j
@@ -21,11 +26,24 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public Hbci4JavaBanking() {
-        try (InputStream inputStream = HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream()) {
-            HBCIUtils.refreshBLZList(inputStream);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        this(null);
+    }
+
+    public Hbci4JavaBanking(InputStream customBankConfigInput) {
+        if (customBankConfigInput != null) {
+            try {
+                HBCIUtils.refreshBLZList(customBankConfigInput);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            try (InputStream inputStream = HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream()) {
+                HBCIUtils.refreshBLZList(inputStream);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
+
         OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -61,7 +79,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest request) {
         try {
-            return HbciAccountInformationJob.loadBankAccounts(request);
+            return AccountInformationJob.loadBankAccounts(request);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -98,7 +116,15 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
         try {
-            return HbciLoadBookingsJob.loadBookings(loadBookingsRequest);
+            return LoadBookingsJob.loadBookings(loadBookingsRequest);
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
+
+    public HBCIDialog createDialog(HbciDialogRequest dialogRequest) {
+        try {
+            return HbciDialogFactory.createDialog(dialogRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -113,11 +139,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     private AbstractPaymentJob createPaymentJob(AbstractPayment payment) {
         switch (payment.getPaymentType()) {
             case SINGLE_PAYMENT:
-                return new HbciSinglePaymentJob();
+                return new SinglePaymentJob();
             case BULK_PAYMENT:
-                return new HbciBulkPaymentJob();
+                return new BulkPaymentJob();
             case STANDING_ORDER:
-                return new HbciNewStandingOrderJob();
+                return new NewStandingOrderJob();
         }
         throw new IllegalArgumentException("invalid payment type " + payment.getPaymentType());
     }

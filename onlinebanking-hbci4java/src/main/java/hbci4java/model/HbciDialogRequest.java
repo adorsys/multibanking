@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package hbci4java;
+package hbci4java.model;
 
 import lombok.Builder;
 import lombok.Data;

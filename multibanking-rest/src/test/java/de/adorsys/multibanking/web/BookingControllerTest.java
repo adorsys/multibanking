@@ -67,7 +67,7 @@ public class BookingControllerTest extends BaseControllerUnitTest {
                         .bankCode(null)
                         .bankAccount(bankAccount)
                         .pin("12345")
-                        .updateTanTransportTypes(true)
+                        .withTanTransportTypes(true)
                         .withBalance(true)
                         .withStandingOrders(true)
                         .build()

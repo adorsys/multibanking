@@ -1,9 +1,25 @@
+/*
+ * Copyright 2018-2018 adorsys GmbH & Co KG
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package hbci4java.job;
 
 import domain.*;
-import hbci4java.HbciDialogRequest;
-import hbci4java.HbciMapping;
-import hbci4java.HbciPassport;
+import hbci4java.model.HbciDialogRequest;
+import hbci4java.model.HbciMapping;
+import hbci4java.model.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -21,12 +37,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static hbci4java.HbciDialogFactory.createDialog;
-import static hbci4java.job.HbciAccountInformationJob.extractTanTransportTypes;
+import static hbci4java.model.HbciDialogFactory.createDialog;
+import static hbci4java.job.AccountInformationJob.extractTanTransportTypes;
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @Slf4j
-public class HbciLoadBookingsJob {
+public class LoadBookingsJob {
 
     public static LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
         HBCIDialog dialog = createDialog(HbciDialogRequest.builder()
@@ -78,7 +94,7 @@ public class HbciLoadBookingsJob {
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
                         () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
 
-        if (loadBookingsRequest.isUpdateTanTransportTypes()) {
+        if (loadBookingsRequest.isWithTanTransportTypes()) {
             extractTanTransportTypes(dialog.getPassport()).ifPresent(tanTransportTypes -> {
                 if (loadBookingsRequest.getBankAccess().getTanTransportTypes() == null) {
                     loadBookingsRequest.getBankAccess().setTanTransportTypes(new HashMap<>());

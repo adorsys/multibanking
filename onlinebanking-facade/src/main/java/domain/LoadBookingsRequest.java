@@ -34,5 +34,5 @@ public class LoadBookingsRequest {
 
     private boolean withBalance;
     private boolean withStandingOrders;
-    private boolean updateTanTransportTypes;
+    private boolean withTanTransportTypes;
 }
