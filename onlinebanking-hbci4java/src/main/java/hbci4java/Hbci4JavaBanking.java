@@ -116,7 +116,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 return new HbciSinglePaymentJob();
             case BULK_PAYMENT:
                 return new HbciBulkPaymentJob();
-
             case STANDING_ORDER:
                 return new HbciNewStandingOrderJob();
         }
