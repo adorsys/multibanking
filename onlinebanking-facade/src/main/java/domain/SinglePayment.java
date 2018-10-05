@@ -18,10 +18,7 @@ public class SinglePayment extends AbstractPayment {
     private String receiverAccountNumber;
     private String purpose;
     private BigDecimal amount;
-    private int executionDay;
-    private LocalDate firstExecutionDate;
-    private LocalDate lastExecutionDate;
-    private Cycle cycle;
+    private LocalDate executionDate;
 
     @Override
     public PaymentType getPaymentType() {

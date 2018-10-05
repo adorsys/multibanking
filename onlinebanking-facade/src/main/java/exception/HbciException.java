@@ -8,10 +8,10 @@ import lombok.Data;
 @Data
 public class HbciException extends RuntimeException {
 
+    private String message;
+
     public HbciException(String msg) {
         this.message = msg;
     }
-
-    private String message;
 
 }

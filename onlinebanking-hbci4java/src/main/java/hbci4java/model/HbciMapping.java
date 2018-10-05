@@ -26,8 +26,6 @@ import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.structures.Konto;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import utils.Utils;
 
 import java.time.ZoneId;

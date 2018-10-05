@@ -19,12 +19,15 @@ package hbci4java.job;
 import domain.AbstractPayment;
 import domain.SinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
+import org.kapott.hbci.GV.GVTermUebSEPA;
 import org.kapott.hbci.GV.GVUebSEPA;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
 public class SinglePaymentJob extends AbstractPaymentJob {
+
+    private String jobName;
 
     @Override
     protected AbstractSEPAGV createPaymentJob(AbstractPayment payment, PinTanPassport passport, String sepaPain) {
@@ -39,19 +42,30 @@ public class SinglePaymentJob extends AbstractPaymentJob {
         dst.iban = singlePayment.getReceiverIban();
         dst.bic = singlePayment.getReceiverBic();
 
-        GVUebSEPA uebSEPA = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName(), sepaPain);
-        uebSEPA.setParam("src", src);
-        uebSEPA.setParam("dst", dst);
-        uebSEPA.setParam("btg", new Value(singlePayment.getAmount()));
-        uebSEPA.setParam("usage", singlePayment.getPurpose());
+        AbstractSEPAGV sepagv;
+        if (singlePayment.getExecutionDate() != null) {
+            jobName = GVTermUebSEPA.getLowlevelName();
 
-        uebSEPA.verifyConstraints();
+            sepagv = new GVTermUebSEPA(passport, jobName, sepaPain);
+            sepagv.setParam("date", singlePayment.getExecutionDate().toString());
+        } else {
+            jobName = GVUebSEPA.getLowlevelName();
 
-        return uebSEPA;
+            sepagv = new GVUebSEPA(passport, jobName, sepaPain);
+        }
+
+        sepagv.setParam("src", src);
+        sepagv.setParam("dst", dst);
+        sepagv.setParam("btg", new Value(singlePayment.getAmount()));
+        sepagv.setParam("usage", singlePayment.getPurpose());
+
+        sepagv.verifyConstraints();
+
+        return sepagv;
     }
 
     @Override
     protected String getJobName() {
-        return GVUebSEPA.getLowlevelName();
+        return jobName;
     }
 }
