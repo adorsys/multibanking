@@ -116,23 +116,23 @@ public class FigoMapping {
         figoPayment.setPurpose(payment.getPurpose());
 
         // Mögliche Dauerauftragsattribute
-        if (payment.getExecutionDay() > -1) {
-            figoPayment.setExecution_day(payment.getExecutionDay());
-        }
-
-        if (payment.getFirstExecutionDate() != null) {
-            figoPayment.setFirst_execution_date(Date.from(
-                    payment.getFirstExecutionDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
-        }
-
-        if (payment.getLastExecutionDate() != null) {
-            figoPayment.setLast_execution_date(Date.from(
-                    payment.getLastExecutionDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
-        }
-
-        if (payment.getCycle() != null) {
-            figoPayment.setInterval(FIGO_CYCLE.get(payment.getCycle()));
-        }
+//        if (payment.getExecutionDay() > -1) {
+//            figoPayment.setExecution_day(payment.getExecutionDay());
+//        }
+//
+//        if (payment.getFirstExecutionDate() != null) {
+//            figoPayment.setFirst_execution_date(Date.from(
+//                    payment.getFirstExecutionDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+//        }
+//
+//        if (payment.getLastExecutionDate() != null) {
+//            figoPayment.setLast_execution_date(Date.from(
+//                    payment.getLastExecutionDate().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant()));
+//        }
+//
+//        if (payment.getCycle() != null) {
+//            figoPayment.setInterval(FIGO_CYCLE.get(payment.getCycle()));
+//        }
 
         return figoPayment;
     }
