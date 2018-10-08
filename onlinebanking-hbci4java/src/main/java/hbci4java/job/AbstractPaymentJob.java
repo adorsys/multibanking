@@ -54,12 +54,13 @@ public abstract class AbstractPaymentJob {
         HbciCallback hbciCallback = new HbciCallback() {
 
             @Override
-            public void tanChallengeCallback(String orderRef, String challenge) {
+            public void tanChallengeCallback(String orderRef, String challenge, String challenge_hhd_uc) {
                 //needed later for submit
                 hbciTanSubmit.setOrderRef(orderRef);
                 if (challenge != null) {
                     payment.setPaymentChallenge(PaymentChallenge.builder()
                             .title(challenge)
+                            .data(challenge_hhd_uc)
                             .build());
                 }
             }
