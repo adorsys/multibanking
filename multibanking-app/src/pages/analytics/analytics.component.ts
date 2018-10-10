@@ -197,10 +197,6 @@ export class AnalyticsPage {
             budget.incomeFix.amount += amount;
             budget.incomeFix.groups.push(group);
             break;
-          case BookingGroup.TypeEnum.OTHERINCOME:
-            budget.incomeOther.amount += amount;
-            budget.incomeOther.groups.push(group);
-            break;
           case BookingGroup.TypeEnum.RECURRENTNONSEPA:
           case BookingGroup.TypeEnum.RECURRENTSEPA:
           case BookingGroup.TypeEnum.STANDINGORDER:
@@ -214,6 +210,10 @@ export class AnalyticsPage {
           case BookingGroup.TypeEnum.OTHEREXPENSES:
             budget.expensesOther.amount += amount;
             budget.expensesOther.groups.push(group);
+            break;
+          case BookingGroup.TypeEnum.OTHERINCOME:
+            budget.incomeOther.amount += amount;
+            budget.incomeOther.groups.push(group);
             break;
         }
       }
