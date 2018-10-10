@@ -11,21 +11,21 @@ public interface OnlineBankingService {
 
     boolean userRegistrationRequired();
 
-    BankApiUser registerUser(String userId);
+    BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin);
 
-    void removeUser(BankApiUser bankApiUser);
+    void removeUser(String bankingUrl, BankApiUser bankApiUser);
 
-    LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest);
+    LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest);
 
-    void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
+    void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser);
 
-    LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest);
+    LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest);
 
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
 
-    Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment);
+    Object createPayment(String bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment);
 
-    void submitPayment(AbstractPayment payment, Object tanSubmit, String pin, String tan);
+    void submitPayment(String bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan);
 }

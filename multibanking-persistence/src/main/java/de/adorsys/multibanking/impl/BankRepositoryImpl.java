@@ -23,6 +23,16 @@ public class BankRepositoryImpl implements BankRepositoryIf {
     private MongoTemplate mongoTemplate;
 
     @Override
+    public Optional<String> findBankingUrl(String bankCode) {
+        Query query = new Query(
+                Criteria.where("bankCode").is(bankCode)
+        );
+        query.fields().include("bankingUrl");
+        return Optional.ofNullable(mongoTemplate.findOne(query, BankEntity.class))
+                .map(BankEntity::getBankingUrl);
+    }
+
+    @Override
     public Optional<BankEntity> findByBankCode(String blz) {
         return bankRepositoryMongodb.findByBankCode(blz);
     }

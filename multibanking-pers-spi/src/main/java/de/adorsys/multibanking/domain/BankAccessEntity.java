@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.BankAccess;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Created by alexg on 07.02.17.
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Document
 @JsonIgnoreProperties(value = {"pin", "pin2", "hbciPassportState"}, allowSetters = true)
 @Encrypted(exclude = {"_id", "userId", "bankCode"})

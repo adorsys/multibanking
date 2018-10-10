@@ -1,5 +1,7 @@
 package de.adorsys.xs2a;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.psd2.ApiClient;
 import de.adorsys.psd2.ApiException;
 import de.adorsys.psd2.api.AccountInformationServiceAisApi;
@@ -9,7 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import spi.OnlineBankingService;
 
 import java.time.LocalDate;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class XS2ABanking implements OnlineBankingService {
 
@@ -25,84 +29,98 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public boolean userRegistrationRequired() {
-        return false;
+        return true;
     }
 
     @Override
-    public BankApiUser registerUser(String uid) {
-        return null;
-    }
+    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+        String psuId = String.format("%s;%s;%s", bankAccess.getBankLogin(), bankAccess.getBankLogin2(), bankAccess.getBankCode());
 
-    @Override
-    public void removeUser(BankApiUser bankApiUser) {
-    }
+        AccountAccess accountAccess = new AccountAccess();
+        accountAccess.setAllPsd2(AccountAccess.AllPsd2Enum.ALLACCOUNTS);
 
-    @Override
-    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
-        AccountReferenceIban accountReferenceIban = new AccountReferenceIban()
-                .iban("DE81250400903312345678")
-                .currency("EUR");
+        Consents consents = new Consents();
+        consents.setValidUntil(LocalDate.now().plusDays(30));
+        consents.setFrequencyPerDay(100);
+        consents.setAccess(accountAccess);
+        consents.setRecurringIndicator(true);
 
-        Consents consents = new Consents()
-                .access(new AccountAccess()
-                        .availableAccounts(AccountAccess.AvailableAccountsEnum.ALLACCOUNTS)
-                )
-                .frequencyPerDay(Integer.MAX_VALUE)
-                .validUntil(LocalDate.now().plusYears(1000))
-                .recurringIndicator(true);
-
-        UUID requestId = UUID.randomUUID();
-
-        //TODO bankcode to remote url mapping needed
-        ApiClient apiClient = new ApiClient();
-        apiClient.setBasePath("http://localhost:8082");
-
-        AccountInformationServiceAisApi service = new AccountInformationServiceAisApi(apiClient);
         try {
-            ConsentsResponse201 consent = service.createConsent(requestId, consents, null, null, null,
-                    loadAccountInformationRequest.getBankAccess().getBankLogin(), null, null, null,
-                    false, null, null, null, null,
-                    null, null, null, null, null,
+            BankApiUser bankApiUser = new BankApiUser();
+            bankApiUser.setApiUserId(bankAccess.getBankLogin());
+            bankApiUser.setBankApi(BankApi.XS2A);
+            bankApiUser.setProperties(new HashMap<>());
+            bankApiUser.getProperties().put("consentId", createConsent(bankingUrl, psuId, pin, consents).getConsentId());
+
+            return bankApiUser;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+    }
+
+    @Override
+    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
+        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
+
+        String consentId = loadAccountInformationRequest.getBankApiUser().getProperties().get("consentId");
+        try {
+            AccountList accountList = ais.getAccountList(UUID.randomUUID(), consentId, false,
+                    null, null, null,
+                    null, "127.0.0.1", null, null,
+                    null, null,
                     null, null, null, null);
 
-            StartScaprocessResponse startScaprocessResponse = service.startConsentAuthorisation(consent.getConsentId(), requestId, null, null, null,
-                    loadAccountInformationRequest.getBankAccess().getBankLogin(), null, null, null, null, null,
+            return LoadAccountInformationResponse.builder()
+                    .bankAccounts(accountList.getAccounts()
+                            .stream()
+                            .map(XS2AMapping::toBankAccount)
+                            .collect(Collectors.toList()))
+                    .build();
+        } catch (ApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    }
+
+    @Override
+    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+        String consentId = Optional.ofNullable(loadBookingsRequest.getBankApiUser().getProperties().get("consentId-" + loadBookingsRequest.getBankAccount().getIban()))
+                .orElseGet(() -> {
+                    String psuId = String.format("%s;%s;%s", loadBookingsRequest.getBankAccess().getBankLogin(),
+                            loadBookingsRequest.getBankAccess().getBankLogin2(), loadBookingsRequest.getBankAccess().getBankCode());
+
+                    String newConsent = createAccountConsent(bankingUrl, loadBookingsRequest, psuId);
+                    loadBookingsRequest.getBankApiUser().getProperties().put("consentId-" + loadBookingsRequest.getBankAccount().getIban(), newConsent);
+                    return newConsent;
+                });
+
+        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
+
+        try {
+            TransactionsResponse200Json transactionList = ais.getTransactionList(
+                    loadBookingsRequest.getBankAccount().getIban(), "booked", UUID.randomUUID(),
+                    consentId, null, null, null, null,
                     null, null, null, null, null,
-                    null, null, null);
+                    "127.0.0.1", null, null, null,
+                    null, null, null, null,
+                    null);
 
-            String authorisationLink = startScaprocessResponse.getLinks().get("startAuthorisationWithPsuAuthentication").toString();
-            String authorizationId = StringUtils.substringAfterLast(authorisationLink, "/");
-
-            UpdatePsuAuthentication updatePsuAuthentication = new UpdatePsuAuthentication();
-            updatePsuAuthentication.psuData(new PsuData()
-                    .password(loadAccountInformationRequest.getPin()));
-
-            Object o = service.updateConsentsPsuData(consent.getConsentId(), authorizationId, requestId, updatePsuAuthentication, null, null,
-                    null, loadAccountInformationRequest.getBankAccess().getBankLogin(), null, null, null, null,
-                    null, null, null, null, null, null,
-                    null, null, null);
-
-            service.getAccountList(requestId, consent.getConsentId(), false, null, null, null,
-                    null, null, null, null, null, null,
-                    null, null, null, null);
+            return LoadBookingsResponse.builder()
+                    .bookings(XS2AMapping.toBookings(transactionList))
+                    .build();
 
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
-
-        return null;
     }
 
-
-    @Override
-    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
-
-    }
-
-    @Override
-    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
-        return null;
-    }
 
     @Override
     public boolean bankSupported(String bankCode) {
@@ -115,13 +133,101 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object createPayment(String bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
         return null;
     }
 
     @Override
-    public void submitPayment(AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public void submitPayment(String bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    }
 
+    private String createAccountConsent(String bankingUrl, LoadBookingsRequest loadBookingsRequest, String psuId) {
+        Consents consents = new Consents();
+        consents.setValidUntil(LocalDate.now().plusDays(30));
+        consents.setFrequencyPerDay(100);
+
+        AccountAccess accountAccess = new AccountAccess();
+        List<Object> accounts = Arrays.asList(new AccountReferenceIban()
+                .currency("EUR").iban(loadBookingsRequest.getBankAccount().getIban()));
+        accountAccess.setTransactions(accounts);
+        accountAccess.setAccounts(accounts);
+        accountAccess.setBalances(accounts);
+        consents.setAccess(accountAccess);
+
+        consents.setRecurringIndicator(true);
+
+        try {
+            return createConsent(bankingUrl, psuId, loadBookingsRequest.getPin(), consents).getConsentId();
+        } catch (ApiException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ConsentsResponse201 createConsent(String bankingUrl, String psuId, String pin, Consents consents) throws ApiException {
+        UUID session = UUID.randomUUID();
+        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
+
+        ConsentsResponse201 consent = ais.createConsent(
+                session, consents, null, null, null, psuId, null, null, null, false, null, null, null, "127.0.0.1", null,
+                null, null, null, null, null, null, null, null
+        );
+
+        StartScaprocessResponse startScaprocessResponse = ais.startConsentAuthorisation(consent.getConsentId(), session, null, null, null,
+                psuId, null, null, null, null, null,
+                null, null, null, null, null,
+                null, null, null);
+
+        String authorisationLink = startScaprocessResponse.getLinks().get("startAuthorisationWithPsuAuthentication").toString();
+        String authorizationId = StringUtils.substringAfterLast(authorisationLink, "/");
+
+        UpdatePsuAuthentication updatePsuAuthentication = new UpdatePsuAuthentication();
+        updatePsuAuthentication.psuData(new PsuData()
+                .password(pin));
+
+        Map<String, Object> updatePsuResponse = (Map<String, Object>) ais.updateConsentsPsuData(consent.getConsentId(), authorizationId, session, updatePsuAuthentication, null, null,
+                null, psuId, null, null, null, null,
+                null, null, null, null, null, null,
+                null, null, null);
+
+        List<Map> scaMethods = (List<Map>) updatePsuResponse.get("scaMethods");
+        String otp = (String) scaMethods
+                .stream()
+                .map(x -> x.get("authenticationMethodId"))
+                .filter(x -> "SMS_OTP".equals(x))
+                .findFirst()
+                .get();
+
+        SelectPsuAuthenticationMethod selectPsuAuthenticationMethod = new SelectPsuAuthenticationMethod();
+        selectPsuAuthenticationMethod.setAuthenticationMethodId(otp);
+
+        updatePsuResponse = (Map<String, Object>) ais.updateConsentsPsuData(
+                consent.getConsentId(), authorizationId, session, selectPsuAuthenticationMethod, null, null, null, psuId,
+                null, null, null, "127.0.0.1", null, null, null, null, null, null, null, null, null
+        );
+
+        TransactionAuthorisation transactionAuthorisation = new TransactionAuthorisation();
+        transactionAuthorisation.setScaAuthenticationData("dontcare"); // TODO we need this step but there is no actual TAN verification
+
+        updatePsuResponse = (Map<String, Object>) ais.updateConsentsPsuData(
+                consent.getConsentId(), authorizationId, session, transactionAuthorisation, null, null, null, psuId,
+                null, null, null, "127.0.0.1", null, null, null, null, null, null, null, null, null
+        );
+
+        return consent;
+    }
+
+
+    private ApiClient createApiClient(String bankingUrl) {
+        ApiClient apiClient = new ApiClient();
+        OkHttpClient client = new OkHttpClient();
+        client.interceptors().add(
+                new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+        );
+        client.setReadTimeout(600, TimeUnit.SECONDS);
+        apiClient.setHttpClient(client);
+        Optional.ofNullable(bankingUrl).ifPresent(url -> apiClient.setBasePath(url));
+
+        return apiClient;
     }
 
 

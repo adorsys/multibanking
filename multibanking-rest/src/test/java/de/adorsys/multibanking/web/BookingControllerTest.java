@@ -61,6 +61,7 @@ public class BookingControllerTest extends BaseControllerUnitTest {
         BankAccount bankAccount = new BankAccount();
         bankAccount.setIban("DE81199999993528307800");
         LoadBookingsResponse bookingsResponse = simpleMockBanking.loadBookings(
+                null,
                 LoadBookingsRequest.builder()
                         .bankApiUser(null)
                         .bankAccess(bankAccess)

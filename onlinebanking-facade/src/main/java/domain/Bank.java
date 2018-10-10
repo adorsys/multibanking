@@ -8,6 +8,7 @@ import lombok.Data;
 @Data
 public class Bank {
 
+    private String bankingUrl;
     private String bankCode;
     private String bic;
     private String name;

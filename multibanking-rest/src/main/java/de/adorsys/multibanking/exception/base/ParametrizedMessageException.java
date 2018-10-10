@@ -1,12 +1,15 @@
 package de.adorsys.multibanking.exception.base;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class ParametrizedMessageException extends RuntimeException {
+    
     private final Map<String, String> paramsMap = new HashMap<>();
 
     public ParametrizedMessageException() {

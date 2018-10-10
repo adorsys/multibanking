@@ -13,12 +13,15 @@ import hbci4java.model.HbciDialogRequest;
 import hbci4java.model.HbciTanSubmit;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.exceptions.HBCI_Exception;
+import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.manager.HBCIUtils;
+import org.kapott.hbci.manager.HBCIVersion;
 import spi.OnlineBankingService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 @Slf4j
 public class Hbci4JavaBanking implements OnlineBankingService {
@@ -66,19 +69,20 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String uid) {
+    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
         //no registration needed
         return null;
     }
 
     @Override
-    public void removeUser(BankApiUser bankApiUser) {
+    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
         //not needed
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest request) {
+    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest request) {
         try {
+            checkBankExists(request.getBankCode(), bankingUrl);
             return AccountInformationJob.loadBankAccounts(request);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
@@ -91,8 +95,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object createPayment(String bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
         try {
+            checkBankExists(bankCode != null ? bankCode : bankAccess.getBankCode(), bankingUrl);
             return createPaymentJob(payment).createPayment(bankAccess, bankCode, pin, payment);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
@@ -100,7 +105,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public void submitPayment(AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public void submitPayment(String bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
         try {
             createPaymentJob(payment).submitPayment(payment, (HbciTanSubmit) tanSubmit, pin, tan);
         } catch (HBCI_Exception e) {
@@ -109,21 +114,23 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
         //not needed
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         try {
+            checkBankExists(loadBookingsRequest.getBankCode(), bankingUrl);
             return LoadBookingsJob.loadBookings(loadBookingsRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
-    public HBCIDialog createDialog(HbciDialogRequest dialogRequest) {
+    public HBCIDialog createDialog(String bankingUrl, HbciDialogRequest dialogRequest) {
         try {
+            checkBankExists(dialogRequest.getBankCode(), bankingUrl);
             return HbciDialogFactory.createDialog(dialogRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
@@ -134,6 +141,19 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     public boolean bankSupported(String bankCode) {
         org.kapott.hbci.manager.BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
         return bankInfo != null && bankInfo.getPinTanVersion() != null;
+    }
+
+    private void checkBankExists(String bankCode, String bankingUrl) {
+        Optional.ofNullable(bankingUrl).ifPresent(s -> {
+            BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
+            if (bankInfo == null) {
+                bankInfo = new BankInfo();
+                bankInfo.setBlz(bankCode);
+                bankInfo.setPinTanAddress(s);
+                bankInfo.setPinTanVersion(HBCIVersion.HBCI_300);
+                HBCIUtils.addBankInfo(bankInfo);
+            }
+        });
     }
 
     private AbstractPaymentJob createPaymentJob(AbstractPayment payment) {

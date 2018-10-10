@@ -62,13 +62,14 @@ public class BankAccountService {
             throw new InvalidBankAccessException(bankAccess.getBankCode());
         }
 
-        BankApiUser bankApiUser = uds.checkApiRegistration(bankApi, bankAccess.getBankCode());
+        BankApiUser bankApiUser = uds.checkApiRegistration(bankApi, bankAccess);
         String blzHbci = bankService.findByBankCode(bankAccess.getBankCode())
                 .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode())).getBlzHbci();
 
         List<BankAccount> bankAccounts;
         try {
-            bankAccounts = Optional.ofNullable(onlineBankingService.loadBankAccounts(LoadAccountInformationRequest.builder()
+            bankAccounts = Optional.ofNullable(onlineBankingService.loadBankAccounts(null,
+                    LoadAccountInformationRequest.builder()
                     .bankApiUser(bankApiUser)
                     .bankAccess(bankAccess)
                     .bankCode(blzHbci)

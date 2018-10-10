@@ -2,6 +2,7 @@ package de.adorsys.multibanking.domain;
 
 import domain.Rule;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -13,6 +14,7 @@ import java.util.List;
  * Created by alexg on 05.09.17.
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Document
 public class RuleEntity extends Rule {
 

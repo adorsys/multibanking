@@ -3,6 +3,7 @@ package de.adorsys.multibanking.domain;
 import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.Booking;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Created by alexg on 07.02.17.
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Document
 @CompoundIndexes({
         @CompoundIndex(name = "booking_index", def = "{'userId': 1, 'accountId': 1}"),

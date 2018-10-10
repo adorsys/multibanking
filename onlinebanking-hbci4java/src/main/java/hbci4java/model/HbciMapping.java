@@ -138,6 +138,7 @@ public final class HbciMapping {
                 booking.setBankApi(BankApi.HBCI);
                 booking.setBookingDate(line.bdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                 booking.setAmount(line.value.getBigDecimalValue().setScale(2));
+                booking.setCurrency(line.value.getCurr());
                 booking.setAdditional(line.additional);
                 booking.setAddkey(line.addkey);
                 booking.setCustomerRef(line.customerref);

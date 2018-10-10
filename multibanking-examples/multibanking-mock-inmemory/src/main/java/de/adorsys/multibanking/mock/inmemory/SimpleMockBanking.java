@@ -34,7 +34,7 @@ public class SimpleMockBanking extends MockBanking {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
         List<BankAccount> bankAccounts = data.loadBankAccounts(loadAccountInformationRequest.getBankAccess(), loadAccountInformationRequest.getBankCode(), loadAccountInformationRequest.getPin());
         return LoadAccountInformationResponse.builder()
                 .bankAccounts(bankAccounts)
@@ -42,7 +42,7 @@ public class SimpleMockBanking extends MockBanking {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         String bankLogin = loadBookingsRequest.getBankAccess().getBankLogin();
         String iban = loadBookingsRequest.getBankAccount().getIban();
         BankAccessData bankAccessData = data.accessOrException(bankLogin);

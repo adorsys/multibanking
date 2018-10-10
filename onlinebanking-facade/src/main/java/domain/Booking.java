@@ -29,6 +29,9 @@ public class Booking {
     @ApiModelProperty(value = "Target amount", example = "-19.93")
     private BigDecimal amount;
 
+    @ApiModelProperty(value = "Currency", example = "EUR")
+    private String currency;
+
     @ApiModelProperty(value = "Does this reverses a preexisting booking", example = "false")
     private boolean reversal;
 

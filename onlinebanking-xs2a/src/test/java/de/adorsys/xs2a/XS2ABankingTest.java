@@ -23,8 +23,7 @@ public class XS2ABankingTest {
                 .pin(System.getProperty("pin"))
                 .build();
 
-        LoadAccountInformationResponse response = xs2aBanking.loadBankAccounts(request);
-
+        LoadAccountInformationResponse response = xs2aBanking.loadBankAccounts("http://localhost:8082", request);
 
     }
 }

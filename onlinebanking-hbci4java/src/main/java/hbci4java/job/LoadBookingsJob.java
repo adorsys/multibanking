@@ -55,7 +55,7 @@ public class LoadBookingsJob {
 
         Konto account = createAccount(dialog, loadBookingsRequest.getBankAccount());
 
-        AbstractHBCIJob bookingsJob = createBookingsJob(dialog, loadBookingsRequest.getBankAccount().getLastSync(), account);
+        AbstractHBCIJob bookingsJob = createBookingsJob(dialog, loadBookingsRequest, account);
 
         Optional<AbstractHBCIJob> balanceJob = loadBookingsRequest.isWithBalance() ?
                 Optional.of(createBalanceJob(dialog, account)) :
@@ -122,12 +122,15 @@ public class LoadBookingsJob {
         return standingOrdersJob;
     }
 
-    private static AbstractHBCIJob createBookingsJob(HBCIDialog dialog, LocalDateTime lastSync, Konto account) {
+    private static AbstractHBCIJob createBookingsJob(HBCIDialog dialog, LoadBookingsRequest loadBookingsRequest, Konto account) {
         AbstractHBCIJob bookingsJob = newJob("KUmsAll", dialog.getPassport());
         bookingsJob.setParam("my", account);
 
-        Optional.ofNullable(lastSync)
-                .ifPresent(localDateTime -> bookingsJob.setParam("startdate", Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant())));
+        Optional.ofNullable(loadBookingsRequest.getDateFrom())
+                .ifPresent(localDate -> bookingsJob.setParam("startdate", Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
+
+        Optional.ofNullable(loadBookingsRequest.getDateTo())
+                .ifPresent(localDate -> bookingsJob.setParam("enddate", Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
         dialog.addTask(bookingsJob);
         return bookingsJob;

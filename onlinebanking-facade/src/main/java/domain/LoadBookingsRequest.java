@@ -19,6 +19,8 @@ package domain;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 /**
  * Created by alexg on 05.09.17.
  */
@@ -31,6 +33,9 @@ public class LoadBookingsRequest {
     private BankAccess bankAccess;
     private String bankCode;
     private String pin;
+
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
 
     private boolean withBalance;
     private boolean withStandingOrders;

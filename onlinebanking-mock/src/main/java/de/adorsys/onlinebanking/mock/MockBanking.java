@@ -46,12 +46,12 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object createPayment(String bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
         return null;
     }
 
     @Override
-    public void submitPayment(AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public void submitPayment(String bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
 
     }
 
@@ -61,17 +61,17 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String uid) {
+    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
         //no registration needed
         return null;
     }
 
     @Override
-    public void removeUser(BankApiUser bankApiUser) {
+    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
         RestTemplate restTemplate = getRestTemplate(loadAccountInformationRequest.getBankAccess().getBankLogin(),
                 loadAccountInformationRequest.getBankAccess().getBankCode(), loadAccountInformationRequest.getPin());
 
@@ -90,12 +90,12 @@ public class MockBanking implements OnlineBankingService {
 
 
     @Override
-    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
         // getRestTemplate(bankApiUser.getApiUserId()).delete(mockConnectionUrl+"/bankaccesses/{bankcode}/accounts/{iban}",bankAccount.getBlz(),bankAccount.getIban());
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         BankAccess bankAccess = loadBookingsRequest.getBankAccess();
         BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 

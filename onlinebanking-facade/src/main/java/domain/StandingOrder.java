@@ -2,6 +2,7 @@ package domain;
 
 import io.swagger.annotations.ApiModel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
  * Created by alexg on 18.08.17.
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @ApiModel(description = "Standing order", value = "StandingOrder")
 public class StandingOrder extends AbstractPayment {
 

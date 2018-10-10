@@ -3,6 +3,8 @@ package de.adorsys.multibanking.service;
 import java.util.ArrayList;
 import java.util.Date;
 
+import de.adorsys.multibanking.domain.BankAccessEntity;
+import domain.BankAccess;
 import org.adorsys.cryptoutils.exceptions.BaseException;
 import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
@@ -88,13 +90,13 @@ public class UserDataService {
      * User must have been create before.
      * 
      * @param bankApi
-     * @param bankCode
+     * @param bankAccess
      * @return
      */
-    public BankApiUser checkApiRegistration(BankApi bankApi, String bankCode) {
+    public BankApiUser checkApiRegistration(BankApi bankApi, BankAccessEntity bankAccess) {
         OnlineBankingService onlineBankingService = bankApi != null
                 ? bankingServiceProducer.getBankingService(bankApi)
-                : bankingServiceProducer.getBankingService(bankCode);
+                : bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         if (onlineBankingService.userRegistrationRequired()) {
         	if(!storageUserService.userExists(uos.auth().getUserID())) 
@@ -107,7 +109,7 @@ public class UserDataService {
                     .filter(bankApiUser -> bankApiUser.getBankApi() == onlineBankingService.bankApi())
                     .findFirst()
                     .orElseGet(() -> {
-                        BankApiUser bankApiUser = onlineBankingService.registerUser(Ids.uuid());
+                        BankApiUser bankApiUser = onlineBankingService.registerUser(null, bankAccess, bankAccess.getPin());
                         userEntity.getApiUser().add(bankApiUser);
                         store(userData);
 

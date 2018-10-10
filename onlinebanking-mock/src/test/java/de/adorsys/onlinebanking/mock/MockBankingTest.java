@@ -32,7 +32,7 @@ public class MockBankingTest {
 
     @Test
     public void testLoadBankAccounts() {
-        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(LoadAccountInformationRequest.builder()
+        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(null, LoadAccountInformationRequest.builder()
                 .bankAccess(bankAccess)
                 .pin(pin)
                 .build());
@@ -42,14 +42,14 @@ public class MockBankingTest {
 
     @Test
     public void testLoadBookings() {
-        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(LoadAccountInformationRequest.builder()
+        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(null, LoadAccountInformationRequest.builder()
                 .bankAccess(bankAccess)
                 .pin(pin)
                 .build());
         Assume.assumeNotNull(loadAccountInformationResponse.getBankAccounts());
         Assume.assumeFalse(loadAccountInformationResponse.getBankAccounts().isEmpty());
         BankAccount bankAccount = loadAccountInformationResponse.getBankAccounts().iterator().next();
-        LoadBookingsResponse response = mockBanking.loadBookings(LoadBookingsRequest.builder()
+        LoadBookingsResponse response = mockBanking.loadBookings(null, LoadBookingsRequest.builder()
                 .bankAccess(bankAccess)
                 .bankAccount(bankAccount)
                 .pin(pin)

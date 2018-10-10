@@ -7,11 +7,13 @@ import java.util.List;
 import de.adorsys.multibanking.domain.common.AbstractId;
 import domain.BankApiUser;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * Created by alexg on 07.02.17.
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class UserEntity extends AbstractId {
     private String id;
     private Date expireUser;

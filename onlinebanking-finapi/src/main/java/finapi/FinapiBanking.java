@@ -77,17 +77,17 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String uid) {
+    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
 
         try {
-            new UsersApi(createApiClient()).createUser(new UserCreateParamsImpl().email(uid + "@admb.de").password(password).id(uid));
+            new UsersApi(createApiClient()).createUser(new UserCreateParamsImpl().email(bankAccess.getBankLogin() + "@admb.de").password(password).id(bankAccess.getBankLogin()));
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
 
         BankApiUser bankApiUser = new BankApiUser();
-        bankApiUser.setApiUserId(uid);
+        bankApiUser.setApiUserId(bankAccess.getBankLogin());
         bankApiUser.setApiPassword(password);
         bankApiUser.setBankApi(BankApi.FINAPI);
 
@@ -95,7 +95,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeUser(BankApiUser bankApiUser) {
+    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
         try {
             new UsersApi(createApiClient()).deleteUnverifiedUser(bankApiUser.getApiUserId());
         } catch (ApiException e) {
@@ -104,7 +104,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
         LOG.info("load bank accounts");
         BankAccess bankAccess = loadAccountInformationRequest.getBankAccess();
 
@@ -150,7 +150,7 @@ public class FinapiBanking implements OnlineBankingService {
 
 
     @Override
-    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
         ApiClient apiClient = createUserApiClient();
         apiClient.setAccessToken(authorizeUser(bankApiUser));
 
@@ -162,7 +162,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 
         //TODO standing orders needed
@@ -259,12 +259,12 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object createPayment(String bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
         return null;
     }
 
     @Override
-    public void submitPayment(AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public void submitPayment(String bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
 
     }
 

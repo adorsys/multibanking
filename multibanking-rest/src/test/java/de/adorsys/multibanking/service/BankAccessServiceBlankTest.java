@@ -112,7 +112,7 @@ public class BankAccessServiceBlankTest extends BaseServiceTest {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity(userId(), randomAccessId(), "29999999", "0000");
 
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any()))
+        when(mockBanking.loadBankAccounts(any(), any()))
                 .thenThrow(new InvalidPinException(bankAccessEntity.getId()));
         thrown.expect(InvalidPinException.class);
 
@@ -127,7 +127,7 @@ public class BankAccessServiceBlankTest extends BaseServiceTest {
         BankAccountEntity bankAccountEntity = TestUtil.getBankAccountEntity(bankAccessEntity, randomAccountId());
 
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any()))
+        when(mockBanking.loadBankAccounts(any(), any()))
                 .thenReturn(LoadAccountInformationResponse.builder().bankAccounts(Arrays.asList(bankAccountEntity)).build());
 
         bankAccessService.createBankAccess(bankAccessEntity);
@@ -148,7 +148,7 @@ public class BankAccessServiceBlankTest extends BaseServiceTest {
         BankAccountEntity bankAccountEntity = TestUtil.getBankAccountEntity(bankAccessEntity, randomAccountId());
 
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any()))
+        when(mockBanking.loadBankAccounts(any(), any()))
                 .thenReturn(LoadAccountInformationResponse.builder().bankAccounts(Arrays.asList(bankAccountEntity)).build());
 
         bankAccessService.createBankAccess(bankAccessEntity);

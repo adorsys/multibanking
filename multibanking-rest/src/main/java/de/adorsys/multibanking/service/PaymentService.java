@@ -44,7 +44,7 @@ public class PaymentService {
     public SinglePaymentEntity createPayment(BankAccessEntity bankAccess, BankAccountEntity bankAccount, String pin, SinglePayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        BankApiUser bankApiUser = uds.checkApiRegistration(bankingService.bankApi(), bankAccess.getBankCode());
+        BankApiUser bankApiUser = uds.checkApiRegistration(bankingService.bankApi(), bankAccess);
 
         pin = pin == null ? bankAccess.getPin() : pin;
         if (pin == null) {
@@ -55,7 +55,7 @@ public class PaymentService {
                 .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode())).getBlzHbci();
 
         try {
-            Object tanSubmit = bankingService.createPayment(bankApiUser, bankAccess, mappedBlz, pin, payment);
+            Object tanSubmit = bankingService.createPayment(null, bankApiUser, bankAccess, mappedBlz, pin, payment);
 
             SinglePaymentEntity pe = new SinglePaymentEntity();
             BeanUtils.copyProperties(payment, pe);
@@ -82,7 +82,7 @@ public class PaymentService {
 
         try {
             //TODO pin is needed here
-            bankingService.submitPayment(paymentEntity, paymentEntity.getTanSubmitExternal(), null, tan);
+            bankingService.submitPayment(null, paymentEntity, paymentEntity.getTanSubmitExternal(), null, tan);
         } catch (HbciException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }
