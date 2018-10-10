@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Mock Banking operating on the base of a json file.
@@ -34,7 +35,7 @@ public class SimpleMockBanking extends MockBanking {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
         List<BankAccount> bankAccounts = data.loadBankAccounts(loadAccountInformationRequest.getBankAccess(), loadAccountInformationRequest.getBankCode(), loadAccountInformationRequest.getPin());
         return LoadAccountInformationResponse.builder()
                 .bankAccounts(bankAccounts)
@@ -42,7 +43,7 @@ public class SimpleMockBanking extends MockBanking {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         String bankLogin = loadBookingsRequest.getBankAccess().getBankLogin();
         String iban = loadBookingsRequest.getBankAccount().getIban();
         BankAccessData bankAccessData = data.accessOrException(bankLogin);

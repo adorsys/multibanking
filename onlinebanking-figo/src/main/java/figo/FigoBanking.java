@@ -100,7 +100,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin) {
         if (figoConnection == null) {
             throw new IllegalArgumentException("figo connection not available, check env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
         }
@@ -122,7 +122,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX, bankApiUser.getApiPassword());
             FigoSession session = createSession(tokenResponse.getAccessToken());
@@ -133,7 +133,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
 
         BankApiUser bankApiUser = loadAccountInformationRequest.getBankApiUser();
         BankAccess bankAccess = loadAccountInformationRequest.getBankAccess();
@@ -217,7 +217,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX,
                     bankApiUser.getApiPassword());
@@ -230,7 +230,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         BankApiUser bankApiUser = loadBookingsRequest.getBankApiUser();
         BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 
@@ -279,7 +279,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(String bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object createPayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
 //        try {
 //            TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de", bankApiUser.getApiPassword());
 //            FigoSession session = createSession(tokenResponse.getAccessToken());
@@ -310,7 +310,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void submitPayment(String bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public void submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
         try {
             FigoTanSubmit figoTanSubmit = (FigoTanSubmit) tanSubmit;
             FigoSession session = new FigoSession(figoTanSubmit.getAccessToken(), 10000, figoConnection.getApiEndpoint());
@@ -319,6 +319,16 @@ public class FigoBanking implements OnlineBankingService {
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference) {
+        return false;
+    }
+
+    @Override
+    public void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest) {
+
     }
 
     private TaskStatusResponse submitPin(String taskToken, String pin, FigoSession session) throws FigoException, InterruptedException, IOException {

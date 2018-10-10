@@ -41,6 +41,15 @@ public class PaymentService {
     @Autowired
     private BankService bankService;
 
+    private static DocumentFQN paymentsFQN(SinglePaymentEntity target) {
+        return FQNUtils.paymentsFQN(target.getBankAccessId(), target.getBankAccountId());
+    }
+
+    private static TypeReference<List<SinglePaymentEntity>> listType() {
+        return new TypeReference<List<SinglePaymentEntity>>() {
+        };
+    }
+
     public SinglePaymentEntity createPayment(BankAccessEntity bankAccess, BankAccountEntity bankAccount, String pin, SinglePayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
@@ -51,11 +60,12 @@ public class PaymentService {
             throw new MissingPinException();
         }
 
-        String mappedBlz = bankService.findByBankCode(bankAccess.getBankCode())
-                .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode())).getBlzHbci();
+        BankEntity bankEntity = bankService.findByBankCode(bankAccess.getBankCode())
+                .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode()));
 
         try {
-            Object tanSubmit = bankingService.createPayment(null, bankApiUser, bankAccess, mappedBlz, pin, payment);
+            Object tanSubmit = bankingService.createPayment(Optional.ofNullable(bankEntity.getBankingUrl()), bankApiUser,
+                    bankAccess, bankEntity.getBlzHbci(), pin, payment);
 
             SinglePaymentEntity pe = new SinglePaymentEntity();
             BeanUtils.copyProperties(payment, pe);
@@ -106,14 +116,5 @@ public class PaymentService {
         List<SinglePaymentEntity> newPersList = ListUtils.deleteList(Collections.singletonList(payment), persList);
         uos.store(paymentsFQN(payment), listType(), persList);
         return persList.size() - newPersList.size() != 0;
-    }
-
-    private static DocumentFQN paymentsFQN(SinglePaymentEntity target) {
-        return FQNUtils.paymentsFQN(target.getBankAccessId(), target.getBankAccountId());
-    }
-
-    private static TypeReference<List<SinglePaymentEntity>> listType() {
-        return new TypeReference<List<SinglePaymentEntity>>() {
-        };
     }
 }

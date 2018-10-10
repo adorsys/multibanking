@@ -3,6 +3,8 @@ package spi;
 
 import domain.*;
 
+import java.util.Optional;
+
 public interface OnlineBankingService {
 
     BankApi bankApi();
@@ -11,21 +13,25 @@ public interface OnlineBankingService {
 
     boolean userRegistrationRequired();
 
-    BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin);
+    BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin);
 
-    void removeUser(String bankingUrl, BankApiUser bankApiUser);
+    void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser);
 
-    LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest);
+    LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest);
 
-    void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser);
+    void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser);
 
-    LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest);
+    LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest);
 
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
 
-    Object createPayment(String bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment);
+    Object createPayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment);
 
-    void submitPayment(String bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan);
+    void submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan);
+
+    boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference);
+
+    void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest);
 }

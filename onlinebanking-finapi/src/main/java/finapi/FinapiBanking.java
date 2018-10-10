@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static utils.Utils.getSecureRandom;
@@ -77,7 +78,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin) {
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
 
         try {
@@ -95,7 +96,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser) {
         try {
             new UsersApi(createApiClient()).deleteUnverifiedUser(bankApiUser.getApiUserId());
         } catch (ApiException e) {
@@ -104,7 +105,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
         LOG.info("load bank accounts");
         BankAccess bankAccess = loadAccountInformationRequest.getBankAccess();
 
@@ -150,7 +151,7 @@ public class FinapiBanking implements OnlineBankingService {
 
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
         ApiClient apiClient = createUserApiClient();
         apiClient.setAccessToken(authorizeUser(bankApiUser));
 
@@ -162,7 +163,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 
         //TODO standing orders needed
@@ -259,12 +260,21 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(String bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object createPayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
         return null;
     }
 
     @Override
-    public void submitPayment(String bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public void submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    }
+
+    @Override
+    public boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference) {
+        return false;
+    }
+
+    @Override
+    public void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest) {
 
     }
 

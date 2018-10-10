@@ -195,16 +195,16 @@ public class BookingService {
 
         OnlineBankingService onlineBankingService = checkAndGetOnlineBankingService(bankAccess, bankAccount, pin, bankApiUser);
 
-        String mappedBlz = bankService.findByBankCode(bankAccess.getBankCode())
-                .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode())).getBlzHbci();
+        BankEntity bankEntity = bankService.findByBankCode(bankAccess.getBankCode())
+                .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode()));
 
         try {
             LoadBookingsResponse response = onlineBankingService.loadBookings(
-                    null,
+                    Optional.ofNullable(bankEntity.getBankingUrl()),
                     LoadBookingsRequest.builder()
                             .bankApiUser(bankApiUser)
                             .bankAccess(bankAccess)
-                            .bankCode(mappedBlz)
+                            .bankCode(bankEntity.getBlzHbci())
                             .bankAccount(bankAccount)
                             .pin(pin)
                             .dateFrom(bankAccount.getLastSync() != null ? bankAccount.getLastSync().toLocalDate() : null)
@@ -254,7 +254,7 @@ public class BookingService {
             String blzHbci = bankService.findByBankCode(bankAccess.getBankCode())
                     .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode())).getBlzHbci();
             List<BankAccount> apiBankAccounts = onlineBankingService.loadBankAccounts(
-                    null,
+                    Optional.empty(),
                     LoadAccountInformationRequest.builder()
                             .bankApiUser(bankApiUser)
                             .bankAccess(bankAccess)

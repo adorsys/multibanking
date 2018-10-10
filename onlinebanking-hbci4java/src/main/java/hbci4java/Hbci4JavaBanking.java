@@ -69,18 +69,18 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin) {
         //no registration needed
         return null;
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser) {
         //not needed
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest request) {
+    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest request) {
         try {
             checkBankExists(request.getBankCode(), bankingUrl);
             return AccountInformationJob.loadBankAccounts(request);
@@ -95,7 +95,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(String bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object createPayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
         try {
             checkBankExists(bankCode != null ? bankCode : bankAccess.getBankCode(), bankingUrl);
             return createPaymentJob(payment).createPayment(bankAccess, bankCode, pin, payment);
@@ -105,7 +105,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public void submitPayment(String bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public void submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
         try {
             createPaymentJob(payment).submitPayment(payment, (HbciTanSubmit) tanSubmit, pin, tan);
         } catch (HBCI_Exception e) {
@@ -114,12 +114,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
         //not needed
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         try {
             checkBankExists(loadBookingsRequest.getBankCode(), bankingUrl);
             return LoadBookingsJob.loadBookings(loadBookingsRequest);
@@ -128,7 +128,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
-    public HBCIDialog createDialog(String bankingUrl, HbciDialogRequest dialogRequest) {
+    public HBCIDialog createDialog(Optional<String> bankingUrl, HbciDialogRequest dialogRequest) {
         try {
             checkBankExists(dialogRequest.getBankCode(), bankingUrl);
             return HbciDialogFactory.createDialog(dialogRequest);
@@ -143,8 +143,18 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return bankInfo != null && bankInfo.getPinTanVersion() != null;
     }
 
-    private void checkBankExists(String bankCode, String bankingUrl) {
-        Optional.ofNullable(bankingUrl).ifPresent(s -> {
+    @Override
+    public boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference) {
+        return false;
+    }
+
+    @Override
+    public void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest) {
+
+    }
+
+    private void checkBankExists(String bankCode, Optional<String> bankingUrl) {
+        bankingUrl.ifPresent(s -> {
             BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
             if (bankInfo == null) {
                 bankInfo = new BankInfo();

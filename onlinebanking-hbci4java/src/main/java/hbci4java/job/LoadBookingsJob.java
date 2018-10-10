@@ -23,6 +23,8 @@ import hbci4java.model.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV.GVKUmsAll;
+import org.kapott.hbci.GV.GVKUmsZeitSEPA;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
@@ -123,7 +125,7 @@ public class LoadBookingsJob {
     }
 
     private static AbstractHBCIJob createBookingsJob(HBCIDialog dialog, LoadBookingsRequest loadBookingsRequest, Konto account) {
-        AbstractHBCIJob bookingsJob = newJob("KUmsAll", dialog.getPassport());
+        AbstractHBCIJob bookingsJob = new GVKUmsAll(dialog.getPassport());
         bookingsJob.setParam("my", account);
 
         Optional.ofNullable(loadBookingsRequest.getDateFrom())

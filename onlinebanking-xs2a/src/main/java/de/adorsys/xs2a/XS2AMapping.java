@@ -4,8 +4,10 @@ import de.adorsys.psd2.model.AccountDetails;
 import de.adorsys.psd2.model.TransactionDetails;
 import de.adorsys.psd2.model.TransactionsResponse200Json;
 import domain.BankAccount;
+import domain.BankApi;
 import domain.Booking;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,21 @@ public class XS2AMapping {
     }
 
     private static Booking toBooking(TransactionDetails transactionDetails) {
-        return null;
+        Booking booking = new Booking();
+        booking.setBankApi(BankApi.XS2A);
+        booking.setBookingDate(transactionDetails.getBookingDate());
+        booking.setValutaDate(transactionDetails.getValueDate());
+        booking.setAmount(new BigDecimal(transactionDetails.getTransactionAmount().getAmount()));
+        booking.setCurrency(transactionDetails.getTransactionAmount().getCurrency());
+        booking.setExternalId(transactionDetails.getEndToEndId());
+        booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
+
+        if (transactionDetails.getCreditorName() != null || transactionDetails.getDebtorName() != null) {
+            BankAccount bankAccount = new BankAccount();
+            bankAccount.setOwner(transactionDetails.getCreditorName() != null ? transactionDetails.getCreditorName(): transactionDetails.getDebtorName());
+            booking.setOtherAccount(bankAccount);
+        }
+
+        return booking;
     }
 }

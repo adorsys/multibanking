@@ -68,7 +68,8 @@ public class BankAccountService {
 
         List<BankAccount> bankAccounts;
         try {
-            bankAccounts = Optional.ofNullable(onlineBankingService.loadBankAccounts(null,
+            bankAccounts = Optional.ofNullable(onlineBankingService.loadBankAccounts(
+                    Optional.empty(),
                     LoadAccountInformationRequest.builder()
                     .bankApiUser(bankApiUser)
                     .bankAccess(bankAccess)

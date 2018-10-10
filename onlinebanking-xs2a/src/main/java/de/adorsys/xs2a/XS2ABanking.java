@@ -33,7 +33,7 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin) {
         String psuId = String.format("%s;%s;%s", bankAccess.getBankLogin(), bankAccess.getBankLogin2(), bankAccess.getBankCode());
 
         AccountAccess accountAccess = new AccountAccess();
@@ -59,11 +59,11 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser) {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
 
         String consentId = loadAccountInformationRequest.getBankApiUser().getProperties().get("consentId");
@@ -86,20 +86,13 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         String consentId = Optional.ofNullable(loadBookingsRequest.getBankApiUser().getProperties().get("consentId-" + loadBookingsRequest.getBankAccount().getIban()))
-                .orElseGet(() -> {
-                    String psuId = String.format("%s;%s;%s", loadBookingsRequest.getBankAccess().getBankLogin(),
-                            loadBookingsRequest.getBankAccess().getBankLogin2(), loadBookingsRequest.getBankAccess().getBankCode());
-
-                    String newConsent = createAccountConsent(bankingUrl, loadBookingsRequest, psuId);
-                    loadBookingsRequest.getBankApiUser().getProperties().put("consentId-" + loadBookingsRequest.getBankAccount().getIban(), newConsent);
-                    return newConsent;
-                });
+                .orElseThrow(() -> new MissingConsentException("missing consent for transactions request"));
 
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
 
@@ -133,22 +126,36 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(String bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object createPayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
         return null;
     }
 
     @Override
-    public void submitPayment(String bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public void submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
     }
 
-    private String createAccountConsent(String bankingUrl, LoadBookingsRequest loadBookingsRequest, String psuId) {
+    @Override
+    public boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference) {
+        return !Optional.ofNullable(bankApiUser.getProperties().get("consentId-" + accountReference)).isPresent();
+    }
+
+    @Override
+    public void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest) {
+        String psuId = String.format("%s;%s;%s", startScaRequest.getBankAccess().getBankLogin(),
+                startScaRequest.getBankAccess().getBankLogin2(), startScaRequest.getBankAccess().getBankCode());
+
+        String newConsent = createAccountConsent(bankingUrl, startScaRequest, psuId);
+        startScaRequest.getBankApiUser().getProperties().put("consentId-" + startScaRequest.getIban(), newConsent);
+    }
+
+    private String createAccountConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest, String psuId) {
         Consents consents = new Consents();
         consents.setValidUntil(LocalDate.now().plusDays(30));
         consents.setFrequencyPerDay(100);
 
         AccountAccess accountAccess = new AccountAccess();
         List<Object> accounts = Arrays.asList(new AccountReferenceIban()
-                .currency("EUR").iban(loadBookingsRequest.getBankAccount().getIban()));
+                .currency("EUR").iban(startScaRequest.getIban()));
         accountAccess.setTransactions(accounts);
         accountAccess.setAccounts(accounts);
         accountAccess.setBalances(accounts);
@@ -157,13 +164,13 @@ public class XS2ABanking implements OnlineBankingService {
         consents.setRecurringIndicator(true);
 
         try {
-            return createConsent(bankingUrl, psuId, loadBookingsRequest.getPin(), consents).getConsentId();
+            return createConsent(bankingUrl, psuId, startScaRequest.getPin(), consents).getConsentId();
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private ConsentsResponse201 createConsent(String bankingUrl, String psuId, String pin, Consents consents) throws ApiException {
+    private ConsentsResponse201 createConsent(Optional<String> bankingUrl, String psuId, String pin, Consents consents) throws ApiException {
         UUID session = UUID.randomUUID();
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
 
@@ -216,8 +223,7 @@ public class XS2ABanking implements OnlineBankingService {
         return consent;
     }
 
-
-    private ApiClient createApiClient(String bankingUrl) {
+    private ApiClient createApiClient(Optional<String> bankingUrl) {
         ApiClient apiClient = new ApiClient();
         OkHttpClient client = new OkHttpClient();
         client.interceptors().add(
@@ -225,7 +231,7 @@ public class XS2ABanking implements OnlineBankingService {
         );
         client.setReadTimeout(600, TimeUnit.SECONDS);
         apiClient.setHttpClient(client);
-        Optional.ofNullable(bankingUrl).ifPresent(url -> apiClient.setBasePath(url));
+        bankingUrl.ifPresent(url -> apiClient.setBasePath(url));
 
         return apiClient;
     }

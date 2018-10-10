@@ -2,6 +2,7 @@ package de.adorsys.multibanking.service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Optional;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import domain.BankAccess;
@@ -109,7 +110,7 @@ public class UserDataService {
                     .filter(bankApiUser -> bankApiUser.getBankApi() == onlineBankingService.bankApi())
                     .findFirst()
                     .orElseGet(() -> {
-                        BankApiUser bankApiUser = onlineBankingService.registerUser(null, bankAccess, bankAccess.getPin());
+                        BankApiUser bankApiUser = onlineBankingService.registerUser(Optional.empty(), bankAccess, bankAccess.getPin());
                         userEntity.getApiUser().add(bankApiUser);
                         store(userData);
 

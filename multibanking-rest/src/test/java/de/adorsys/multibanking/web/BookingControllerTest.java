@@ -29,6 +29,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @WebMvcUnitTest(controllers = BookingController.class)
 public class BookingControllerTest extends BaseControllerUnitTest {
@@ -61,7 +62,7 @@ public class BookingControllerTest extends BaseControllerUnitTest {
         BankAccount bankAccount = new BankAccount();
         bankAccount.setIban("DE81199999993528307800");
         LoadBookingsResponse bookingsResponse = simpleMockBanking.loadBookings(
-                null,
+                Optional.empty(),
                 LoadBookingsRequest.builder()
                         .bankApiUser(null)
                         .bankAccess(bankAccess)
