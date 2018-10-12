@@ -4,7 +4,8 @@ import { NavParams, AlertController, ToastController, LoadingController, Navbar,
 import { ImageService } from '../../services/image.service';
 import { BankAccountService } from "../../services/bankAccount.service";
 import { ContractService } from "../../services/contract.service";
-import { BankAccess } from "../../model/multibanking/models";
+import { BankAccess, ContractEntity } from "../../model/multibanking/models";
+import { SortedContracts } from "../../model/sortedContracts";
 
 @Component({
   selector: 'contracts',
@@ -15,7 +16,7 @@ export class ContractsComponent {
   bankAccess: BankAccess;
   bankAccountId: string;
   getLogo: Function;
-  contracts;
+  contracts: { income: SortedContracts, expenses: SortedContracts };
 
   @ViewChild(Navbar) navBar: Navbar;
 
@@ -48,17 +49,76 @@ export class ContractsComponent {
   }
 
   loadContracts() {
-    this.contracts = {
-      income: [],
-      expenses: []
-    };
     this.contractService.getContracts(this.bankAccess.id, this.bankAccountId)
       .subscribe(contracts => {
-        contracts.reduce((acc, contract) => {
-          contract.amount > 0 ? acc.income.push(contract) : acc.expenses.push(contract)
-          return acc;
-        }, this.contracts)
-      });
+        this.contractsLoaded(contracts);
+      })
+  }
+
+  contractsLoaded(contracts: ContractEntity[]) {
+    this.contracts = {
+      income: {
+        WEEKLY: [],
+        MONTHLY: [],
+        TWOMONTHLY: [],
+        QUARTERLY: [],
+        HALFYEARLY: [],
+        YEARLY: []
+      },
+      expenses: {
+        WEEKLY: [],
+        MONTHLY: [],
+        TWOMONTHLY: [],
+        QUARTERLY: [],
+        HALFYEARLY: [],
+        YEARLY: []
+      }
+    };
+    contracts.forEach(contract => {
+      if (contract.amount > 0) {
+        switch (contract.interval) {
+          case ContractEntity.IntervalEnum.WEEKLY:
+            this.contracts.income.WEEKLY.push(contract);
+            break;
+          case ContractEntity.IntervalEnum.MONTHLY:
+            this.contracts.income.MONTHLY.push(contract);
+            break;
+          case ContractEntity.IntervalEnum.TWOMONTHLY:
+            this.contracts.income.TWOMONTHLY.push(contract);
+            break;
+          case ContractEntity.IntervalEnum.QUARTERLY:
+            this.contracts.income.QUARTERLY.push(contract);
+            break;
+          case ContractEntity.IntervalEnum.HALFYEARLY:
+            this.contracts.income.HALFYEARLY.push(contract);
+            break;
+          case ContractEntity.IntervalEnum.YEARLY:
+            this.contracts.income.YEARLY.push(contract);
+            break;
+        }
+      } else {
+        switch (contract.interval) {
+          case ContractEntity.IntervalEnum.WEEKLY:
+            this.contracts.expenses.WEEKLY.push(contract);
+            break;
+          case ContractEntity.IntervalEnum.MONTHLY:
+            this.contracts.expenses.MONTHLY.push(contract);
+            break;
+          case ContractEntity.IntervalEnum.TWOMONTHLY:
+            this.contracts.expenses.TWOMONTHLY.push(contract);
+            break;
+          case ContractEntity.IntervalEnum.QUARTERLY:
+            this.contracts.expenses.QUARTERLY.push(contract);
+            break;
+          case ContractEntity.IntervalEnum.HALFYEARLY:
+            this.contracts.expenses.HALFYEARLY.push(contract);
+            break;
+          case ContractEntity.IntervalEnum.YEARLY:
+            this.contracts.expenses.YEARLY.push(contract);
+            break;
+        }
+      };
+    });
   }
 
   syncBookingsPromptPin() {
