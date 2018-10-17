@@ -310,7 +310,12 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public Object deletePayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+        return null;
+    }
+
+    @Override
+    public String submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
         try {
             FigoTanSubmit figoTanSubmit = (FigoTanSubmit) tanSubmit;
             FigoSession session = new FigoSession(figoTanSubmit.getAccessToken(), 10000, figoConnection.getApiEndpoint());
@@ -319,6 +324,12 @@ public class FigoBanking implements OnlineBankingService {
         } catch (IOException | FigoException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+        return null;
+    }
+
+    @Override
+    public String submitDelete(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+        return null;
     }
 
     @Override

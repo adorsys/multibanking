@@ -52,8 +52,18 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public void submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public Object deletePayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+        return null;
+    }
 
+    @Override
+    public String submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+        return null;
+    }
+
+    @Override
+    public String submitDelete(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+        return null;
     }
 
     @Override

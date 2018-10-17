@@ -18,5 +18,7 @@ public abstract class AbstractPayment {
     private String senderIban;
     private String senderBic;
 
+    private String orderId;
+
     public abstract PaymentType getPaymentType();
 }

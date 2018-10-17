@@ -105,9 +105,28 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public void submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public Object deletePayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
         try {
-            createPaymentJob(payment).submitPayment(payment, (HbciTanSubmit) tanSubmit, pin, tan);
+            checkBankExists(bankCode != null ? bankCode : bankAccess.getBankCode(), bankingUrl);
+            return createDeleteJob(payment).createPayment(bankAccess, bankCode, pin, payment);
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
+
+    @Override
+    public String submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+        try {
+            return createPaymentJob(payment).submitPayment(payment, (HbciTanSubmit) tanSubmit, pin, tan);
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
+
+    @Override
+    public String submitDelete(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+        try {
+            return createDeleteJob(payment).submitPayment(payment, (HbciTanSubmit) tanSubmit, pin, tan);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -174,6 +193,16 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 return new BulkPaymentJob();
             case STANDING_ORDER:
                 return new NewStandingOrderJob();
+        }
+        throw new IllegalArgumentException("invalid payment type " + payment.getPaymentType());
+    }
+
+    private AbstractPaymentJob createDeleteJob(AbstractPayment payment) {
+        switch (payment.getPaymentType()) {
+            case SINGLE_PAYMENT:
+                return new DeleteSinglePaymentJob();
+            case STANDING_ORDER:
+                return new DeleteStandingOrderJob();
         }
         throw new IllegalArgumentException("invalid payment type " + payment.getPaymentType());
     }

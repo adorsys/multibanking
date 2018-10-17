@@ -20,6 +20,7 @@ import domain.AbstractPayment;
 import domain.SinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTermUebSEPA;
+import org.kapott.hbci.GV.GVTermUebSEPADel;
 import org.kapott.hbci.GV.GVUebSEPA;
 import org.kapott.hbci.GV_Result.GVRTermUeb;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -27,7 +28,10 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-public class SinglePaymentJob extends AbstractPaymentJob {
+/**
+ * Only for future payment (GVTermUebSEPA)
+ */
+public class DeleteSinglePaymentJob extends AbstractPaymentJob {
 
     private String jobName;
 
@@ -44,26 +48,21 @@ public class SinglePaymentJob extends AbstractPaymentJob {
         dst.iban = singlePayment.getReceiverIban();
         dst.bic = singlePayment.getReceiverBic();
 
-        AbstractSEPAGV sepagv;
-        if (singlePayment.getExecutionDate() != null) {
-            jobName = GVTermUebSEPA.getLowlevelName();
+        jobName = GVTermUebSEPADel.getLowlevelName();
 
-            sepagv = new GVTermUebSEPA(passport, jobName, sepaPain);
-            sepagv.setParam("date", singlePayment.getExecutionDate().toString());
-        } else {
-            jobName = GVUebSEPA.getLowlevelName();
+        GVTermUebSEPADel sepadelgv = new GVTermUebSEPADel(passport, jobName, sepaPain);
 
-            sepagv = new GVUebSEPA(passport, jobName, sepaPain);
-        }
+        sepadelgv.setParam("orderid", singlePayment.getOrderId());
+        sepadelgv.setParam("date", singlePayment.getExecutionDate().toString());
 
-        sepagv.setParam("src", src);
-        sepagv.setParam("dst", dst);
-        sepagv.setParam("btg", new Value(singlePayment.getAmount()));
-        sepagv.setParam("usage", singlePayment.getPurpose());
+        sepadelgv.setParam("src", src);
+        sepadelgv.setParam("dst", dst);
+        sepadelgv.setParam("btg", new Value(singlePayment.getAmount()));
+        sepadelgv.setParam("usage", singlePayment.getPurpose());
 
-        sepagv.verifyConstraints();
+        sepadelgv.verifyConstraints();
 
-        return sepagv;
+        return sepadelgv;
     }
 
     @Override
@@ -73,6 +72,6 @@ public class SinglePaymentJob extends AbstractPaymentJob {
 
     @Override
     protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
-        return paymentGV instanceof GVRTermUeb ? ((GVRTermUeb)paymentGV).getOrderId() : null; // no order id for single payment
+        return null;
     }
 }

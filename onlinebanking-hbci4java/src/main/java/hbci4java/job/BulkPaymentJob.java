@@ -22,6 +22,7 @@ import domain.SinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVMultiUebSEPA;
 import org.kapott.hbci.GV.GVUebSEPA;
+import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
@@ -60,5 +61,10 @@ public class BulkPaymentJob extends AbstractPaymentJob {
     @Override
     protected String getJobName() {
         return GVMultiUebSEPA.getLowlevelName();
+    }
+
+    @Override
+    protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
+        return null; // no orderId for bulk payment
     }
 }
