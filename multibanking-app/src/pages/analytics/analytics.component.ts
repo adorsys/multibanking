@@ -134,10 +134,14 @@ export class AnalyticsPage {
     this.periods = [];
     this.lineChartLabels = [];
 
+
     if (referenceGroup) {
-      referenceGroup.bookingPeriods.forEach(period => {
-        this.periods.push([moment(period.start), moment(period.end)]);
-      });
+      let analyticsStart: Moment = moment().subtract(12, "month").day(1);
+      let analyticsEnd: Moment = moment().add(13, "month").day(1);
+
+      referenceGroup.bookingPeriods
+        .filter(period => moment(period.start).isAfter(analyticsStart) && moment(period.end).isBefore(analyticsEnd))
+        .forEach(period => this.periods.push([moment(period.start), moment(period.end)]));
 
       this.initChart(referenceGroup);
       let referencePeriod = this.findPeriod(referenceGroup.bookingPeriods, this.referenceDate);
@@ -152,7 +156,9 @@ export class AnalyticsPage {
 
     if (!group) {
       group = this.analytics.bookingGroups.find((group: BookingGroup) => {
-        return group.contract.interval == Contract.IntervalEnum.MONTHLY;
+        return group.contract.interval == Contract.IntervalEnum.MONTHLY
+          && !group.contract.cancelled
+          && this.getPeriodAmount(group, moment()) != 0;
       });
     }
 
@@ -186,10 +192,8 @@ export class AnalyticsPage {
       expensesOther: { amount: 0, groups: [] }
     };
 
-    let forecast = moment().isSameOrAfter(periodStart) && moment().isSameOrBefore(periodEnd)
-
     this.analytics.bookingGroups.forEach((group: BookingGroup) => {
-      let amount = this.getPeriodAmount(group, periodStart, forecast);
+      let amount = this.getPeriodAmount(group, periodStart);
 
       if (this.includeGroup(group, periodStart)) {
         switch (group.type) {
@@ -221,7 +225,7 @@ export class AnalyticsPage {
     return budget;
   }
 
-  getPeriodAmount(group: BookingGroup, referenceDate: Moment, forecast: boolean): number {
+  getPeriodAmount(group: BookingGroup, referenceDate: Moment): number {
     let period: BookingPeriod = this.findPeriod(group.bookingPeriods, referenceDate);
 
     if (period && period.amount) {
