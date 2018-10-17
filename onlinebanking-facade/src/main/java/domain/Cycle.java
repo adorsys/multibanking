@@ -9,6 +9,10 @@ public enum Cycle {
      */
     WEEKLY,
     /**
+     * every 2nd week.
+     */
+    TWO_WEEKLY,
+    /**
      * every month.
      */
     MONTHLY,
