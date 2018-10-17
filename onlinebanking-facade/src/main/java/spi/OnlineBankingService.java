@@ -29,7 +29,11 @@ public interface OnlineBankingService {
 
     Object createPayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment);
 
-    void submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan);
+    Object deletePayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment);
+
+    String submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan);
+
+    String submitDelete(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan);
 
     boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference);
 

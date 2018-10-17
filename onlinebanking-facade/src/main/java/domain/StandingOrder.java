@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @ApiModel(description = "Standing order", value = "StandingOrder")
 public class StandingOrder extends AbstractPayment {
 
-    private String orderId;
     private Cycle cycle;
     private int executionDay;
     private LocalDate firstExecutionDate;

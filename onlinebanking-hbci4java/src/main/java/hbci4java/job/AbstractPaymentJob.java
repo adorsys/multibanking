@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTAN2Step;
+import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.manager.ChallengeInfo;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.manager.HBCITwoStepMechanism;
@@ -46,6 +47,8 @@ public abstract class AbstractPaymentJob {
     abstract AbstractSEPAGV createPaymentJob(AbstractPayment payment, PinTanPassport passport, String sepaPain);
 
     abstract String getJobName();
+
+    abstract String orderIdFromJobResult(HBCIJobResult paymentGV);
 
     public HbciTanSubmit createPayment(BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
@@ -140,7 +143,7 @@ public abstract class AbstractPaymentJob {
         messages.add(hktan);
     }
 
-    public void submitPayment(AbstractPayment payment, HbciTanSubmit hbciTanSubmit, String pin, String tan) {
+    public String submitPayment(AbstractPayment payment, HbciTanSubmit hbciTanSubmit, String pin, String tan) {
         HbciPassport.State state = HbciPassport.State.readJson(hbciTanSubmit.getPassportState());
         HbciPassport hbciPassport = createPassport(state.hbciVersion, state.blz, state.customerId, state.userId, new HbciCallback() {
 
@@ -156,28 +159,32 @@ public abstract class AbstractPaymentJob {
         hbciPassport.setCurrentSecMechInfo(hbciTwoStepMechanism);
 
         HBCIDialog hbciDialog = new HBCIDialog(hbciPassport, hbciTanSubmit.getDialogId(), hbciTanSubmit.getMsgNum());
+        AbstractHBCIJob paymentGV;
 
         if (hbciTwoStepMechanism.getProcess() == 1) {
-            paymentProcess1(payment, hbciTanSubmit, hbciPassport, hbciDialog);
+            paymentGV = paymentProcess1(payment, hbciTanSubmit, hbciPassport, hbciDialog);
         } else {
-            paymentProcess2(hbciTanSubmit, hbciDialog);
+            paymentGV = paymentProcess2(hbciTanSubmit, hbciDialog);
         }
 
         HBCIExecStatus status = hbciDialog.execute(true);
         if (!status.isOK()) {
             throw new HbciException(status.getDialogStatus().getErrorString());
+        } else {
+            return orderIdFromJobResult(paymentGV.getJobResult());
         }
     }
 
-    private void paymentProcess1(AbstractPayment payment, HbciTanSubmit hbciTanSubmit, HbciPassport
+    private AbstractHBCIJob paymentProcess1(AbstractPayment payment, HbciTanSubmit hbciTanSubmit, HbciPassport
             hbciPassport, HBCIDialog hbciDialog) {
         //1. Schritt: HKTAN  HITAN
         //2. Schritt: HKUEB  HIRMS zu HKUEB
         AbstractHBCIJob uebSEPAJob = createPaymentJob(payment, hbciPassport, hbciTanSubmit.getSepaPain());
         hbciDialog.addTask(uebSEPAJob);
+        return uebSEPAJob;
     }
 
-    private void paymentProcess2(HbciTanSubmit hbciTanSubmit, HBCIDialog hbciDialog) {
+    private AbstractHBCIJob paymentProcess2(HbciTanSubmit hbciTanSubmit, HBCIDialog hbciDialog) {
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         AbstractHBCIJob originJob = newJob(hbciTanSubmit.getOriginJobName(), hbciDialog.getPassport());
@@ -189,5 +196,6 @@ public abstract class AbstractPaymentJob {
         hktan.setParam("process", "2");
         hktan.setParam("notlasttan", "N");
         hbciDialog.addTask(hktan, false);
+        return originJob;
     }
 }
