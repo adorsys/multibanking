@@ -12,7 +12,9 @@ import de.adorsys.multibanking.service.base.UserObjectService;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.FQNUtils;
 import domain.BankApiUser;
+import domain.PaymentRequest;
 import domain.SinglePayment;
+import domain.SubmitPaymentRequest;
 import exception.HbciException;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
 import org.springframework.beans.BeanUtils;
@@ -50,7 +52,8 @@ public class PaymentService {
         };
     }
 
-    public SinglePaymentEntity createPayment(BankAccessEntity bankAccess, BankAccountEntity bankAccount, String pin, SinglePayment payment) {
+    public SinglePaymentEntity createPayment(BankAccessEntity bankAccess, BankAccountEntity bankAccount, String pin,
+                                             SinglePayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         BankApiUser bankApiUser = uds.checkApiRegistration(bankingService.bankApi(), bankAccess);
@@ -64,8 +67,14 @@ public class PaymentService {
                 .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode()));
 
         try {
-            Object tanSubmit = bankingService.createPayment(Optional.ofNullable(bankEntity.getBankingUrl()), bankApiUser,
-                    bankAccess, bankEntity.getBlzHbci(), pin, payment);
+            Object tanSubmit = bankingService.createPayment(Optional.ofNullable(bankEntity.getBankingUrl()),
+                    PaymentRequest.builder()
+                    .bankApiUser(bankApiUser)
+                    .payment(payment)
+                    .bankAccess(bankAccess)
+                    .pin(pin)
+                    .bankCode(bankEntity.getBlzHbci())
+                    .build());
 
             SinglePaymentEntity pe = new SinglePaymentEntity();
             BeanUtils.copyProperties(payment, pe);
@@ -90,9 +99,14 @@ public class PaymentService {
     public void submitPayment(SinglePaymentEntity paymentEntity, String bankCode, String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankCode);
 
+        SubmitPaymentRequest submitPaymentRequest = SubmitPaymentRequest.builder()
+                .payment(paymentEntity)
+                .tanSubmit(paymentEntity.getTanSubmitExternal())
+                .tan(tan)
+                .build();
         try {
             //TODO pin is needed here
-            bankingService.submitPayment(null, paymentEntity, paymentEntity.getTanSubmitExternal(), null, tan);
+            bankingService.submitPayment(Optional.empty(), submitPaymentRequest);
         } catch (HbciException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }
@@ -101,7 +115,8 @@ public class PaymentService {
     }
 
     public Optional<SinglePaymentEntity> findPayment(String accessId, String accountId, String paymentId) {
-        List<SinglePaymentEntity> persList = uos.load(FQNUtils.paymentsFQN(accessId, accountId), listType()).orElse(Collections.emptyList());
+        List<SinglePaymentEntity> persList =
+                uos.load(FQNUtils.paymentsFQN(accessId, accountId), listType()).orElse(Collections.emptyList());
         return ListUtils.find(paymentId, persList);
     }
 

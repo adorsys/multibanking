@@ -34,7 +34,8 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin) {
-        String psuId = String.format("%s;%s;%s", bankAccess.getBankLogin(), bankAccess.getBankLogin2(), bankAccess.getBankCode());
+        String psuId = String.format("%s;%s;%s", bankAccess.getBankLogin(), bankAccess.getBankLogin2(),
+                bankAccess.getBankCode());
 
         AccountAccess accountAccess = new AccountAccess();
         accountAccess.setAllPsd2(AccountAccess.AllPsd2Enum.ALLACCOUNTS);
@@ -50,7 +51,8 @@ public class XS2ABanking implements OnlineBankingService {
             bankApiUser.setApiUserId(bankAccess.getBankLogin());
             bankApiUser.setBankApi(BankApi.XS2A);
             bankApiUser.setProperties(new HashMap<>());
-            bankApiUser.getProperties().put("consentId", createConsent(bankingUrl, psuId, pin, consents).getConsentId());
+            bankApiUser.getProperties().put("consentId",
+                    createConsent(bankingUrl, psuId, pin, consents).getConsentId());
 
             return bankApiUser;
         } catch (Exception e) {
@@ -63,7 +65,8 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
+                                                           LoadAccountInformationRequest loadAccountInformationRequest) {
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
 
         String consentId = loadAccountInformationRequest.getBankApiUser().getProperties().get("consentId");
@@ -91,7 +94,8 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
-        String consentId = Optional.ofNullable(loadBookingsRequest.getBankApiUser().getProperties().get("consentId-" + loadBookingsRequest.getBankAccount().getIban()))
+        String consentId =
+                Optional.ofNullable(loadBookingsRequest.getBankApiUser().getProperties().get("consentId-" + loadBookingsRequest.getBankAccount().getIban()))
                 .orElseThrow(() -> new MissingConsentException("missing consent for transactions request"));
 
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
@@ -114,7 +118,6 @@ public class XS2ABanking implements OnlineBankingService {
         }
     }
 
-
     @Override
     public boolean bankSupported(String bankCode) {
         return true;
@@ -126,22 +129,22 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         return null;
     }
 
     @Override
-    public Object deletePayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object deletePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         return null;
     }
 
     @Override
-    public String submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public String submitPayment(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
         return null;
     }
 
     @Override
-    public String submitDelete(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public String submitDelete(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
         return null;
     }
 
@@ -159,7 +162,8 @@ public class XS2ABanking implements OnlineBankingService {
         startScaRequest.getBankApiUser().getProperties().put("consentId-" + startScaRequest.getIban(), newConsent);
     }
 
-    private String createAccountConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest, String psuId) {
+    private String createAccountConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest,
+                                        String psuId) {
         Consents consents = new Consents();
         consents.setValidUntil(LocalDate.now().plusDays(30));
         consents.setFrequencyPerDay(100);
@@ -181,28 +185,34 @@ public class XS2ABanking implements OnlineBankingService {
         }
     }
 
-    private ConsentsResponse201 createConsent(Optional<String> bankingUrl, String psuId, String pin, Consents consents) throws ApiException {
+    private ConsentsResponse201 createConsent(Optional<String> bankingUrl, String psuId, String pin,
+                                              Consents consents) throws ApiException {
         UUID session = UUID.randomUUID();
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
 
         ConsentsResponse201 consent = ais.createConsent(
-                session, consents, null, null, null, psuId, null, null, null, false, null, null, null, "127.0.0.1", null,
+                session, consents, null, null, null, psuId, null, null, null, false, null, null, null, "127.0.0.1",
+                null,
                 null, null, null, null, null, null, null, null
         );
 
-        StartScaprocessResponse startScaprocessResponse = ais.startConsentAuthorisation(consent.getConsentId(), session, null, null, null,
+        StartScaprocessResponse startScaprocessResponse = ais.startConsentAuthorisation(consent.getConsentId(),
+                session, null, null, null,
                 psuId, null, null, null, null, null,
                 null, null, null, null, null,
                 null, null, null);
 
-        String authorisationLink = startScaprocessResponse.getLinks().get("startAuthorisationWithPsuAuthentication").toString();
+        String authorisationLink =
+                startScaprocessResponse.getLinks().get("startAuthorisationWithPsuAuthentication").toString();
         String authorizationId = StringUtils.substringAfterLast(authorisationLink, "/");
 
         UpdatePsuAuthentication updatePsuAuthentication = new UpdatePsuAuthentication();
         updatePsuAuthentication.psuData(new PsuData()
                 .password(pin));
 
-        Map<String, Object> updatePsuResponse = (Map<String, Object>) ais.updateConsentsPsuData(consent.getConsentId(), authorizationId, session, updatePsuAuthentication, null, null,
+        Map<String, Object> updatePsuResponse =
+                (Map<String, Object>) ais.updateConsentsPsuData(consent.getConsentId(), authorizationId, session,
+                        updatePsuAuthentication, null, null,
                 null, psuId, null, null, null, null,
                 null, null, null, null, null, null,
                 null, null, null);
@@ -219,12 +229,14 @@ public class XS2ABanking implements OnlineBankingService {
         selectPsuAuthenticationMethod.setAuthenticationMethodId(otp);
 
         updatePsuResponse = (Map<String, Object>) ais.updateConsentsPsuData(
-                consent.getConsentId(), authorizationId, session, selectPsuAuthenticationMethod, null, null, null, psuId,
+                consent.getConsentId(), authorizationId, session, selectPsuAuthenticationMethod, null, null, null,
+                psuId,
                 null, null, null, "127.0.0.1", null, null, null, null, null, null, null, null, null
         );
 
         TransactionAuthorisation transactionAuthorisation = new TransactionAuthorisation();
-        transactionAuthorisation.setScaAuthenticationData("dontcare"); // TODO we need this step but there is no actual TAN verification
+        transactionAuthorisation.setScaAuthenticationData("dontcare"); // TODO we need this step but there is no
+        // actual TAN verification
 
         updatePsuResponse = (Map<String, Object>) ais.updateConsentsPsuData(
                 consent.getConsentId(), authorizationId, session, transactionAuthorisation, null, null, null, psuId,
@@ -246,6 +258,5 @@ public class XS2ABanking implements OnlineBankingService {
 
         return apiClient;
     }
-
 
 }

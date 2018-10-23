@@ -19,9 +19,11 @@ package hbci4java.model;
 import domain.AbstractHbciRequest;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Builder
+@EqualsAndHashCode(callSuper = false)
 public class HbciDialogRequest extends AbstractHbciRequest {
 
     private HbciCallback callback;

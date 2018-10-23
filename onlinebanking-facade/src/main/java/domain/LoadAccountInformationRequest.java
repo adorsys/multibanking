@@ -18,9 +18,11 @@ package domain;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Builder
+@EqualsAndHashCode(callSuper = false)
 public class LoadAccountInformationRequest extends AbstractHbciRequest {
 
     private BankApiUser bankApiUser;
