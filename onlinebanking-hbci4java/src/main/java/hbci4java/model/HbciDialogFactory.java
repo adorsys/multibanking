@@ -22,43 +22,42 @@ import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.manager.HBCIUtils;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 public class HbciDialogFactory {
 
-    public static HBCIDialog createDialog(HbciDialogRequest dialogRequest) {
-        return createDialog(dialogRequest, null);
-    }
+    public static HBCIDialog createDialog(HbciPassport passport, HbciDialogRequest dialogRequest) {
+        BankInfo bankInfo = Optional.ofNullable(HBCIUtils.getBankInfo(dialogRequest.getBankCode()))
+                .orElseThrow(() -> new IllegalArgumentException("Bank [" + dialogRequest.getBankCode() + "] not " +
+                        "supported"));
 
-    public static HBCIDialog createDialog(HbciDialogRequest dialogRequest, HbciCallback callback) {
-        return createDialog(null, dialogRequest, callback);
-    }
+        HbciPassport newPassport = Optional.ofNullable(passport)
+                .orElseGet(() -> createPassport(bankInfo.getPinTanVersion().getId(), dialogRequest.getBankCode(),
+                        dialogRequest.getCustomerId(), dialogRequest.getLogin(), dialogRequest.getCallback()));
 
-    private static HBCIDialog createDialog(HbciPassport passport, HbciDialogRequest dialogRequest, HbciCallback callback) {
-        BankInfo bankInfo = HBCIUtils.getBankInfo(dialogRequest.getBankCode());
+        Optional.ofNullable(dialogRequest.getHbciPassportState())
+                .ifPresent(s -> HbciPassport.State.readJson(dialogRequest.getHbciPassportState()).apply(newPassport));
 
-        if (passport == null) {
-            passport = createPassport(bankInfo.getPinTanVersion().getId(), dialogRequest.getBankCode(), dialogRequest.getCustomerId(), dialogRequest.getLogin(), callback);
+        Optional.ofNullable(dialogRequest.getBpd())
+                .ifPresent(bpd -> newPassport.setBPD(bpd));
 
-            if (dialogRequest.getHbciPassportState() != null) {
-                HbciPassport.State.readJson(dialogRequest.getHbciPassportState()).apply(passport);
-            }
-        }
-
-        passport.setPIN(dialogRequest.getPin());
+        newPassport.setPIN(dialogRequest.getPin());
 
         String url = bankInfo.getPinTanAddress();
         String proxyPrefix = System.getProperty("proxyPrefix", null);
         if (proxyPrefix != null) {
             url = proxyPrefix + url;
         }
-        passport.setHost(url);
+        newPassport.setHost(url);
 
-        return new HBCIDialog(passport);
+        return new HBCIDialog(newPassport);
     }
 
-    public static HbciPassport createPassport(String hbciVersion, String bankCode, String customerId, String login, HbciCallback callback) {
+    public static HbciPassport createPassport(String hbciVersion, String bankCode, String customerId, String login,
+                                              HbciCallback callback) {
         HashMap<String, String> properties = new HashMap<>();
-        properties.put("kernel.rewriter", "InvalidSegment,WrongStatusSegOrder,WrongSequenceNumbers,MissingMsgRef,HBCIVersion,SigIdLeadingZero,InvalidSuppHBCIVersion,SecTypeTAN,KUmsDelimiters,KUmsEmptyBDateSets");
+        properties.put("kernel.rewriter", "InvalidSegment,WrongStatusSegOrder,WrongSequenceNumbers,MissingMsgRef," +
+                "HBCIVersion,SigIdLeadingZero,InvalidSuppHBCIVersion,SecTypeTAN,KUmsDelimiters,KUmsEmptyBDateSets");
         properties.put("log.loglevel.default", "2");
         properties.put("default.hbciversion", "FinTS3");
         properties.put("client.passport.PinTan.checkcert", "1");

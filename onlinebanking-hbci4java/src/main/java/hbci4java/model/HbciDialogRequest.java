@@ -16,13 +16,15 @@
 
 package hbci4java.model;
 
+import domain.AbstractHbciRequest;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class HbciDialogRequest {
+public class HbciDialogRequest extends AbstractHbciRequest {
 
+    private HbciCallback callback;
     private String hbciPassportState;
     private String bankCode;
     private String customerId;

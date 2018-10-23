@@ -26,7 +26,7 @@ import java.time.LocalDate;
  */
 @Data
 @Builder
-public class LoadBookingsRequest {
+public class LoadBookingsRequest extends AbstractHbciRequest {
 
     private BankApiUser bankApiUser;
     private BankAccount bankAccount;

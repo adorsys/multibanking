@@ -39,13 +39,16 @@ public class AccountInformationJob {
     public static LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest request) {
         log.info("Loading account list for bank [{}]", request.getBankCode());
 
-        HBCIDialog dialog = createDialog(HbciDialogRequest.builder()
+        HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
                 .bankCode(request.getBankCode() != null ? request.getBankCode() : request.getBankAccess().getBankCode())
                 .customerId(request.getBankAccess().getBankLogin())
                 .login(request.getBankAccess().getBankLogin2())
                 .hbciPassportState(request.getBankAccess().getHbciPassportState())
                 .pin(request.getPin())
-                .build());
+                .build();
+        dialogRequest.setBpd(request.getBpd());
+
+        HBCIDialog dialog = createDialog(null, dialogRequest);
 
         if (!dialog.getPassport().jobSupported("SEPAInfo"))
             throw new RuntimeException("SEPAInfo job not supported");
@@ -84,6 +87,7 @@ public class AccountInformationJob {
 
         request.getBankAccess().setHbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
         return LoadAccountInformationResponse.builder()
+                .bankAccess(request.getBankAccess())
                 .bankAccounts(hbciAccounts)
                 .build();
     }

@@ -10,7 +10,6 @@ import exception.InvalidPinException;
 import hbci4java.job.*;
 import hbci4java.model.HbciDialogFactory;
 import hbci4java.model.HbciDialogRequest;
-import hbci4java.model.HbciTanSubmit;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.BankInfo;
@@ -95,38 +94,38 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         try {
-            checkBankExists(bankCode != null ? bankCode : bankAccess.getBankCode(), bankingUrl);
-            return createPaymentJob(payment).createPayment(bankAccess, bankCode, pin, payment);
+            checkBankExists(paymentRequest.getBankCode(), bankingUrl);
+            return createPaymentJob(paymentRequest.getPayment()).execute(paymentRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public Object deletePayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public Object deletePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         try {
-            checkBankExists(bankCode != null ? bankCode : bankAccess.getBankCode(), bankingUrl);
-            return createDeleteJob(payment).createPayment(bankAccess, bankCode, pin, payment);
+            checkBankExists(paymentRequest.getBankCode(), bankingUrl);
+            return createDeleteJob(paymentRequest.getPayment()).execute(paymentRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public String submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public String submitPayment(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
         try {
-            return createPaymentJob(payment).submitPayment(payment, (HbciTanSubmit) tanSubmit, pin, tan);
+            return createPaymentJob(submitPaymentRequest.getPayment()).execute(submitPaymentRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public String submitDelete(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan) {
+    public String submitDelete(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
         try {
-            return createDeleteJob(payment).submitPayment(payment, (HbciTanSubmit) tanSubmit, pin, tan);
+            return createDeleteJob(submitPaymentRequest.getPayment()).execute(submitPaymentRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -150,7 +149,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     public HBCIDialog createDialog(Optional<String> bankingUrl, HbciDialogRequest dialogRequest) {
         try {
             checkBankExists(dialogRequest.getBankCode(), bankingUrl);
-            return HbciDialogFactory.createDialog(dialogRequest);
+            return HbciDialogFactory.createDialog(null, dialogRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }

@@ -17,8 +17,9 @@
 package hbci4java.job;
 
 import domain.AbstractPayment;
-import domain.BankAccess;
 import domain.PaymentChallenge;
+import domain.PaymentRequest;
+import domain.SubmitPaymentRequest;
 import exception.HbciException;
 import hbci4java.model.HbciCallback;
 import hbci4java.model.HbciDialogRequest;
@@ -50,7 +51,7 @@ public abstract class AbstractPaymentJob {
 
     abstract String orderIdFromJobResult(HBCIJobResult paymentGV);
 
-    public HbciTanSubmit createPayment(BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment) {
+    public HbciTanSubmit execute(PaymentRequest paymentRequest) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
         hbciTanSubmit.setOriginJobName(getJobName());
 
@@ -61,7 +62,7 @@ public abstract class AbstractPaymentJob {
                 //needed later for submit
                 hbciTanSubmit.setOrderRef(orderRef);
                 if (challenge != null) {
-                    payment.setPaymentChallenge(PaymentChallenge.builder()
+                    paymentRequest.getPayment().setPaymentChallenge(PaymentChallenge.builder()
                             .title(challenge)
                             .data(challenge_hhd_uc)
                             .build());
@@ -69,21 +70,27 @@ public abstract class AbstractPaymentJob {
             }
         };
 
-        HBCIDialog dialog = createDialog(HbciDialogRequest.builder()
-                .bankCode(bankCode != null ? bankCode : bankAccess.getBankCode())
-                .customerId(bankAccess.getBankLogin())
-                .login(bankAccess.getBankLogin2())
-                .hbciPassportState(bankAccess.getHbciPassportState())
-                .pin(pin)
-                .build(), hbciCallback);
+        HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
+                .bankCode(paymentRequest.getBankCode() != null ? paymentRequest.getBankCode() :
+                        paymentRequest.getBankAccess().getBankCode())
+                .customerId(paymentRequest.getBankAccess().getBankLogin())
+                .login(paymentRequest.getBankAccess().getBankLogin2())
+                .hbciPassportState(paymentRequest.getBankAccess().getHbciPassportState())
+                .pin(paymentRequest.getPin())
+                .callback(hbciCallback)
+                .build();
+        dialogRequest.setBpd(paymentRequest.getBpd());
 
-        HBCITwoStepMechanism hbciTwoStepMechanism = dialog.getPassport().getBankTwostepMechanisms().get(payment.getTanMedia().getId());
+        HBCIDialog dialog = createDialog(null, dialogRequest);
+
+        HBCITwoStepMechanism hbciTwoStepMechanism =
+                dialog.getPassport().getBankTwostepMechanisms().get(paymentRequest.getPayment().getTanMedia().getId());
         if (hbciTwoStepMechanism == null)
-            throw new HbciException("inavalid two stem mechanism: " + payment.getTanMedia().getId());
+            throw new HbciException("inavalid two stem mechanism: " + paymentRequest.getPayment().getTanMedia().getId());
 
         dialog.getPassport().setCurrentSecMechInfo(hbciTwoStepMechanism);
 
-        AbstractSEPAGV uebSEPA = createPaymentJob(payment, dialog.getPassport(), null);
+        AbstractSEPAGV uebSEPA = createPaymentJob(paymentRequest.getPayment(), dialog.getPassport(), null);
 
         GVTAN2Step hktan = (GVTAN2Step) newJob("TAN2Step", dialog.getPassport());
         hktan.setSegVersion(hbciTwoStepMechanism.getSegversion());
@@ -92,11 +99,11 @@ public abstract class AbstractPaymentJob {
             hktanProcess1(hbciTanSubmit, hbciTwoStepMechanism, uebSEPA, hktan);
             dialog.addTask(hktan, false);
         } else {
-            hktanProcess2(dialog, uebSEPA, payment, hktan);
+            hktanProcess2(dialog, uebSEPA, paymentRequest.getPayment(), hktan);
         }
 
         if (dialog.getPassport().tanMediaNeeded()) {
-            hktan.setParam("tanmedia", payment.getTanMedia().getMedium());
+            hktan.setParam("tanmedia", paymentRequest.getPayment().getTanMedia().getMedium());
         }
 
         HBCIExecStatus status = dialog.execute(false);
@@ -143,26 +150,30 @@ public abstract class AbstractPaymentJob {
         messages.add(hktan);
     }
 
-    public String submitPayment(AbstractPayment payment, HbciTanSubmit hbciTanSubmit, String pin, String tan) {
+    public String execute(SubmitPaymentRequest submitPaymentRequest) {
+        HbciTanSubmit hbciTanSubmit = (HbciTanSubmit) submitPaymentRequest.getTanSubmit();
+
         HbciPassport.State state = HbciPassport.State.readJson(hbciTanSubmit.getPassportState());
-        HbciPassport hbciPassport = createPassport(state.hbciVersion, state.blz, state.customerId, state.userId, new HbciCallback() {
+        HbciPassport hbciPassport = createPassport(state.hbciVersion, state.blz, state.customerId, state.userId,
+                new HbciCallback() {
 
-            @Override
-            public String needTAN() {
-                return tan;
-            }
-        });
+                    @Override
+                    public String needTAN() {
+                        return submitPaymentRequest.getTan();
+                    }
+                });
         state.apply(hbciPassport);
-        hbciPassport.setPIN(pin);
+        hbciPassport.setPIN(submitPaymentRequest.getPin());
 
-        HBCITwoStepMechanism hbciTwoStepMechanism = hbciPassport.getBankTwostepMechanisms().get(payment.getTanMedia().getId());
+        HBCITwoStepMechanism hbciTwoStepMechanism =
+                hbciPassport.getBankTwostepMechanisms().get(submitPaymentRequest.getPayment().getTanMedia().getId());
         hbciPassport.setCurrentSecMechInfo(hbciTwoStepMechanism);
 
         HBCIDialog hbciDialog = new HBCIDialog(hbciPassport, hbciTanSubmit.getDialogId(), hbciTanSubmit.getMsgNum());
         AbstractHBCIJob paymentGV;
 
         if (hbciTwoStepMechanism.getProcess() == 1) {
-            paymentGV = paymentProcess1(payment, hbciTanSubmit, hbciPassport, hbciDialog);
+            paymentGV = paymentProcess1(submitPaymentRequest.getPayment(), hbciTanSubmit, hbciPassport, hbciDialog);
         } else {
             paymentGV = paymentProcess2(hbciTanSubmit, hbciDialog);
         }

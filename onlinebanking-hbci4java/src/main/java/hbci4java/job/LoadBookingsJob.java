@@ -47,13 +47,17 @@ import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 public class LoadBookingsJob {
 
     public static LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
-        HBCIDialog dialog = createDialog(HbciDialogRequest.builder()
-                .bankCode(loadBookingsRequest.getBankCode() != null ? loadBookingsRequest.getBankCode() : loadBookingsRequest.getBankAccess().getBankCode())
+        HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
+                .bankCode(loadBookingsRequest.getBankCode() != null ? loadBookingsRequest.getBankCode() :
+                        loadBookingsRequest.getBankAccess().getBankCode())
                 .customerId(loadBookingsRequest.getBankAccess().getBankLogin())
                 .login(loadBookingsRequest.getBankAccess().getBankLogin2())
                 .hbciPassportState(loadBookingsRequest.getBankAccess().getHbciPassportState())
                 .pin(loadBookingsRequest.getPin())
-                .build());
+                .build();
+        dialogRequest.setBpd(loadBookingsRequest.getBpd());
+
+        HBCIDialog dialog = createDialog(null, dialogRequest);
 
         Konto account = createAccount(dialog, loadBookingsRequest.getBankAccount());
 

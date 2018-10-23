@@ -1,6 +1,5 @@
 package spi;
 
-
 import domain.*;
 
 import java.util.Optional;
@@ -17,7 +16,8 @@ public interface OnlineBankingService {
 
     void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser);
 
-    LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest);
+    LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
+                                                    LoadAccountInformationRequest loadAccountInformationRequest);
 
     void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser);
 
@@ -27,13 +27,13 @@ public interface OnlineBankingService {
 
     boolean bookingsCategorized();
 
-    Object createPayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment);
+    Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest);
 
-    Object deletePayment(Optional<String> bankingUrl, BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, AbstractPayment payment);
+    Object deletePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest);
 
-    String submitPayment(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan);
+    String submitPayment(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest);
 
-    String submitDelete(Optional<String> bankingUrl, AbstractPayment payment, Object tanSubmit, String pin, String tan);
+    String submitDelete(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest);
 
     boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference);
 

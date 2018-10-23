@@ -25,5 +25,6 @@ import java.util.List;
 @Builder
 public class LoadAccountInformationResponse {
 
+    private BankAccess bankAccess;
     private List<BankAccount> bankAccounts;
 }

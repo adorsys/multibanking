@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by alexg on 08.02.17.
@@ -36,7 +37,7 @@ public class HbciPassport extends PinTanPassport {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public HbciPassport(String hbciversion, HashMap<String, String> properties, HbciCallback hbciCallback) {
+    public HbciPassport(String hbciversion, Map<String, String> properties, HbciCallback hbciCallback) {
         super(hbciversion, properties, hbciCallback != null ? hbciCallback : new HbciCallback());
     }
 
@@ -86,7 +87,8 @@ public class HbciPassport extends PinTanPassport {
         }
 
         /**
-         * Creates a new State snapshot of the supplied passport. If oldState is non-null, its properties are used as fallback. This is useful so that the meta info of the UPD does not need to be refetched.
+         * Creates a new State snapshot of the supplied passport. If oldState is non-null, its properties are used as
+         * fallback. This is useful so that the meta info of the UPD does not need to be refetched.
          */
         public State(PinTanPassport passport) {
             country = passport.getCountry();
@@ -98,10 +100,18 @@ public class HbciPassport extends PinTanPassport {
             hbciVersion = passport.getHBCIVersion();
             customerId = passport.getCustomerId();
             allowedTwostepMechanisms = passport.getUserTwostepMechanisms();
-            bpd = passport.getBPD();
-            upd = passport.getUPD();
+            bpd = (HashMap<String, String>) passport.getBPD();
+            upd = (HashMap<String, String>) passport.getUPD();
             tanMedias = passport.getTanMedias();
             currentSecMechInfo = passport.getCurrentSecMechInfo();
+        }
+
+        public static State readJson(String s) {
+            try {
+                return OBJECT_MAPPER.readValue(s, State.class);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         public void apply(HbciPassport passport) {
@@ -110,8 +120,8 @@ public class HbciPassport extends PinTanPassport {
             passport.setPort(port);
             passport.setUserId(userId);
             passport.setSysId(sysId);
-            passport.setBPD(bpd == null ? null : (HashMap<String, String>) bpd.clone());
-            passport.setUPD(upd == null ? null : (HashMap<String, String>) upd.clone());
+            passport.setBPD(bpd == null ? null : (Map<String, String>) bpd.clone());
+            passport.setUPD(upd == null ? null : (Map<String, String>) upd.clone());
             passport.setCustomerId(customerId);
             passport.setUserTwostepMechanisms(new ArrayList<>(allowedTwostepMechanisms));
             passport.setTanMedias(tanMedias);
@@ -121,14 +131,6 @@ public class HbciPassport extends PinTanPassport {
         public String toJson() {
             try {
                 return OBJECT_MAPPER.writeValueAsString(this);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        public static State readJson(String s) {
-            try {
-                return OBJECT_MAPPER.readValue(s, State.class);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

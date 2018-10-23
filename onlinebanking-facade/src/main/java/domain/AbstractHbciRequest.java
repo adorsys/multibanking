@@ -16,18 +16,12 @@
 
 package domain;
 
-import lombok.Builder;
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
-@Builder
-public class LoadAccountInformationRequest extends AbstractHbciRequest {
+public class AbstractHbciRequest {
 
-    private BankApiUser bankApiUser;
-    private BankAccess bankAccess;
-    private String bankCode;
-    private String pin;
-
-    private boolean storePin;
-    private boolean updateTanTransportTypes;
+    private Map<String, String> bpd;
 }
