@@ -1,13 +1,11 @@
 package spi;
 
 import domain.*;
-import domain.request.CreateConsentRequest;
-import domain.request.LoadAccountInformationRequest;
-import domain.request.LoadBookingsRequest;
-import domain.request.SubmitPaymentRequest;
+import domain.request.*;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface OnlineBankingService {
@@ -29,7 +27,7 @@ public interface OnlineBankingService {
 
     LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest);
 
-    BankAccountBalance loadBalance(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest);
+    List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest);
 
     boolean bankSupported(String bankCode);
 

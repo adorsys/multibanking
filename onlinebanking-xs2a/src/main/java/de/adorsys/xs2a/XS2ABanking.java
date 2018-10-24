@@ -7,6 +7,9 @@ import de.adorsys.psd2.ApiException;
 import de.adorsys.psd2.api.AccountInformationServiceAisApi;
 import de.adorsys.psd2.model.*;
 import domain.*;
+import domain.request.*;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
 import org.apache.commons.lang3.StringUtils;
 import spi.OnlineBankingService;
 
@@ -119,7 +122,7 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public BankAccountBalance loadBalance(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+    public List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
         return null;
     }
 

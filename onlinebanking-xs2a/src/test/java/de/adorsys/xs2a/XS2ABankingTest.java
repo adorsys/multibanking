@@ -1,8 +1,8 @@
 package de.adorsys.xs2a;
 
 import domain.BankAccess;
-import domain.LoadAccountInformationRequest;
-import domain.LoadAccountInformationResponse;
+import domain.request.LoadAccountInformationRequest;
+import domain.response.LoadAccountInformationResponse;
 import org.junit.Ignore;
 import org.junit.Test;
 

@@ -1,10 +1,7 @@
 package figo;
 
 import domain.*;
-import domain.request.CreateConsentRequest;
-import domain.request.LoadAccountInformationRequest;
-import domain.request.LoadBookingsRequest;
-import domain.request.SubmitPaymentRequest;
+import domain.request.*;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import exception.HbciException;
@@ -13,6 +10,7 @@ import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
 import me.figo.internal.*;
+import me.figo.internal.SubmitPaymentRequest;
 import me.figo.models.Account;
 import me.figo.models.AccountBalance;
 import me.figo.models.BankLoginSettings;
@@ -295,7 +293,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankAccountBalance loadBalance(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+    public List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
         return null;
     }
 
@@ -315,7 +313,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public String submitDelete(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
+    public String submitDelete(Optional<String> bankingUrl, domain.request.SubmitPaymentRequest submitPaymentRequest) {
         return null;
     }
 

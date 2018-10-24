@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package domain;
+package domain.request;
 
+import domain.BankAccess;
+import domain.BankAccount;
+import domain.BankApiUser;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
- * Created by cbr on 24.10.1
+ * Created by cbr on 24.10.18
  */
 @Data
 @Builder
@@ -31,7 +35,7 @@ import java.time.LocalDate;
 public class LoadBalanceRequest extends AbstractHbciRequest {
 
     private BankApiUser bankApiUser;
-    private BankAccount bankAccount;
+    private List<BankAccount> bankAccounts;
     private BankAccess bankAccess;
     private String bankCode;
     private String pin;

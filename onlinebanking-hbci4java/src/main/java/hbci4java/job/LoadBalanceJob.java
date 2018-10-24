@@ -17,34 +17,31 @@
 package hbci4java.job;
 
 import domain.*;
+import domain.request.LoadBalanceRequest;
 import hbci4java.model.HbciDialogRequest;
 import hbci4java.model.HbciMapping;
-import hbci4java.model.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
-import org.kapott.hbci.GV.GVKUmsAll;
-import org.kapott.hbci.GV_Result.GVRDauerList;
-import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 
-import java.time.ZoneId;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
-import static hbci4java.job.AccountInformationJob.extractTanTransportTypes;
 import static hbci4java.model.HbciDialogFactory.createDialog;
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @Slf4j
 public class LoadBalanceJob {
 
-    public static BankAccountBalance loadBalance(LoadBalanceRequest loadBalanceRequest) {
+    public static List<BankAccount> loadBalances(LoadBalanceRequest loadBalanceRequest) {
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
                 .bankCode(loadBalanceRequest.getBankCode() != null ? loadBalanceRequest.getBankCode() :
                         loadBalanceRequest.getBankAccess().getBankCode())
@@ -57,9 +54,12 @@ public class LoadBalanceJob {
 
         HBCIDialog dialog = createDialog(null, dialogRequest);
 
-        Konto account = createAccount(dialog, loadBalanceRequest.getBankAccount());
+        Map<AbstractHBCIJob, BankAccount> jobs = new HashMap<>();
 
-        AbstractHBCIJob balanceJob = createBalanceJob(dialog, account);
+        loadBalanceRequest.getBankAccounts().stream().forEach( bankAccount -> {
+            Konto account = createAccount(dialog, bankAccount);
+            jobs.put(createBalanceJob(dialog, account), bankAccount);
+        });
 
         // Let the Handler execute all jobs in one batch
         HBCIExecStatus status = dialog.execute(true);
@@ -71,17 +71,22 @@ public class LoadBalanceJob {
             }
         }
 
-        if (balanceJob.getJobResult().getJobStatus().hasErrors()) {
-            log.error("Bookings job not OK");
-            throw new HBCI_Exception(balanceJob.getJobResult().getJobStatus().getErrorString());
-        }
-
-        return HbciMapping.createBalance((GVRSaldoReq) balanceJob.getJobResult());
+        List<BankAccount> bankAccounts = new ArrayList<>();
+        jobs.keySet().stream().forEach( job -> {
+            if (job.getJobResult().getJobStatus().hasErrors()) {
+                log.error("Balance job not OK");
+                throw new HBCI_Exception(job.getJobResult().getJobStatus().getErrorString());
+            }
+            BankAccount bankAccount = jobs.get(job);
+            bankAccount.setBankAccountBalance(HbciMapping.createBalance((GVRSaldoReq) job.getJobResult()));
+            bankAccounts.add(bankAccount);
+        });
+        return bankAccounts;
     }
 
-    private static AbstractHBCIJob createBalanceJob(HBCIDialog dialog, Konto account) {
+    private static AbstractHBCIJob createBalanceJob(HBCIDialog dialog, Konto konto) {
         AbstractHBCIJob balanceJob = newJob("SaldoReq", dialog.getPassport());
-        balanceJob.setParam("my", account);
+        balanceJob.setParam("my", konto);
         dialog.addTask(balanceJob);
         return balanceJob;
     }

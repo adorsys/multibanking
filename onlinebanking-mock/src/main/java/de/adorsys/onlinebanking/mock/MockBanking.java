@@ -1,10 +1,7 @@
 package de.adorsys.onlinebanking.mock;
 
 import domain.*;
-import domain.request.CreateConsentRequest;
-import domain.request.LoadAccountInformationRequest;
-import domain.request.LoadBookingsRequest;
-import domain.request.SubmitPaymentRequest;
+import domain.request.*;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import org.adorsys.envutils.EnvProperties;
@@ -147,7 +144,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankAccountBalance loadBalance(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+    public List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
         return null;
     }
 
