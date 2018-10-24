@@ -17,6 +17,8 @@
 package hbci4java.job;
 
 import domain.*;
+import domain.request.LoadBookingsRequest;
+import domain.response.LoadBookingsResponse;
 import hbci4java.model.HbciDialogRequest;
 import hbci4java.model.HbciMapping;
 import hbci4java.model.HbciPassport;
@@ -24,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVKUmsAll;
-import org.kapott.hbci.GV.GVKUmsZeitSEPA;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
@@ -33,7 +34,6 @@ import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;

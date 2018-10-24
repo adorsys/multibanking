@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package domain;
+package domain.request;
 
+import domain.BankAccess;
+import domain.BankApiUser;
+import lombok.Builder;
 import lombok.Data;
 
-import java.util.Map;
-
 @Data
-public class AbstractHbciRequest {
+@Builder
+public class CreateConsentRequest {
 
-    private Map<String, String> bpd;
+    private BankApiUser bankApiUser;
+    private BankAccess bankAccess;
+    private String iban;
+    private String pin;
+
 }

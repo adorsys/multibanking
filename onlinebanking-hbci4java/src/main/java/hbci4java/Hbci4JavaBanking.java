@@ -6,8 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import domain.*;
+import domain.request.CreateConsentRequest;
+import domain.request.LoadAccountInformationRequest;
+import domain.request.LoadBookingsRequest;
+import domain.request.SubmitPaymentRequest;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
 import exception.InvalidPinException;
 import hbci4java.job.*;
+import hbci4java.model.HbciCallback;
 import hbci4java.model.HbciDialogFactory;
 import hbci4java.model.HbciDialogRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +46,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 throw new RuntimeException(e);
             }
         } else {
-            try (InputStream inputStream = HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream()) {
+            try (InputStream inputStream =
+                         HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream()) {
                 HBCIUtils.refreshBLZList(inputStream);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -79,10 +87,17 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest request) {
+    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
+                                                           LoadAccountInformationRequest request) {
+        return loadBankAccounts(bankingUrl, request, null);
+    }
+
+    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
+                                                           LoadAccountInformationRequest request,
+                                                           HbciCallback callback) {
         try {
             checkBankExists(request.getBankCode(), bankingUrl);
-            return AccountInformationJob.loadBankAccounts(request);
+            return AccountInformationJob.loadBankAccounts(request, callback);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }

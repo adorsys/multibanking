@@ -1,5 +1,8 @@
-package domain;
+package domain.response;
 
+import domain.BankAccountBalance;
+import domain.Booking;
+import domain.StandingOrder;
 import lombok.Builder;
 import lombok.Data;
 import spi.OnlineBankingService;

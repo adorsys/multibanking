@@ -17,7 +17,10 @@
 package hbci4java.job;
 
 import domain.*;
+import domain.request.LoadAccountInformationRequest;
+import domain.response.LoadAccountInformationResponse;
 import exception.HbciException;
+import hbci4java.model.HbciCallback;
 import hbci4java.model.HbciDialogRequest;
 import hbci4java.model.HbciMapping;
 import hbci4java.model.HbciPassport;
@@ -36,7 +39,7 @@ import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 @Slf4j
 public class AccountInformationJob {
 
-    public static LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest request) {
+    public static LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest request, HbciCallback callback) {
         log.info("Loading account list for bank [{}]", request.getBankCode());
 
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
@@ -45,6 +48,7 @@ public class AccountInformationJob {
                 .login(request.getBankAccess().getBankLogin2())
                 .hbciPassportState(request.getBankAccess().getHbciPassportState())
                 .pin(request.getPin())
+                .callback(callback)
                 .build();
         dialogRequest.setBpd(request.getBpd());
 
@@ -57,9 +61,11 @@ public class AccountInformationJob {
         dialog.addTask(newJob("SEPAInfo", dialog.getPassport()));
 
         // TAN-Medien abrufen
-        if (dialog.getPassport().jobSupported("TANMediaList")) {
-            log.info("fetching TAN media list");
-            dialog.addTask(newJob("TANMediaList", dialog.getPassport()));
+        if (request.isUpdateTanTransportTypes()) {
+            if (dialog.getPassport().jobSupported("TANMediaList")) {
+                log.info("fetching TAN media list");
+                dialog.addTask(newJob("TANMediaList", dialog.getPassport()));
+            }
         }
         HBCIExecStatus status = dialog.execute(true);
 

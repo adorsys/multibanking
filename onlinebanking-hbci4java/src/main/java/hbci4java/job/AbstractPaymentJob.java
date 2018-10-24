@@ -19,7 +19,7 @@ package hbci4java.job;
 import domain.AbstractPayment;
 import domain.PaymentChallenge;
 import domain.PaymentRequest;
-import domain.SubmitPaymentRequest;
+import domain.request.SubmitPaymentRequest;
 import exception.HbciException;
 import hbci4java.model.HbciCallback;
 import hbci4java.model.HbciDialogRequest;

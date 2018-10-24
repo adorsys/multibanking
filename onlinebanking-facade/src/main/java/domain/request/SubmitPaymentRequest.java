@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package domain;
+package domain.request;
 
+import domain.AbstractPayment;
+import domain.request.AbstractHbciRequest;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

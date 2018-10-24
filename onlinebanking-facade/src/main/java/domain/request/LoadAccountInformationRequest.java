@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package domain;
+package domain.request;
 
+import domain.BankAccess;
+import domain.BankApiUser;
+import domain.request.AbstractHbciRequest;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
+import lombok.EqualsAndHashCode;
 
 @Data
 @Builder
-public class LoadAccountInformationResponse {
+@EqualsAndHashCode(callSuper = false)
+public class LoadAccountInformationRequest extends AbstractHbciRequest {
 
+    private BankApiUser bankApiUser;
     private BankAccess bankAccess;
-    private List<BankAccount> bankAccounts;
+    private String bankCode;
+    private String pin;
+
+    private boolean storePin;
+    private boolean updateTanTransportTypes;
 }

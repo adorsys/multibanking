@@ -16,7 +16,7 @@
 
 package hbci4java.model;
 
-import domain.AbstractHbciRequest;
+import domain.request.AbstractHbciRequest;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

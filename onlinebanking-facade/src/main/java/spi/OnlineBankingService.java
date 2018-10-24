@@ -1,6 +1,12 @@
 package spi;
 
 import domain.*;
+import domain.request.CreateConsentRequest;
+import domain.request.LoadAccountInformationRequest;
+import domain.request.LoadBookingsRequest;
+import domain.request.SubmitPaymentRequest;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
 
 import java.util.Optional;
 
