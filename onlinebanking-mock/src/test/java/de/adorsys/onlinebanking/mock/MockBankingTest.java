@@ -1,6 +1,10 @@
 package de.adorsys.onlinebanking.mock;
 
 import domain.*;
+import domain.request.LoadAccountInformationRequest;
+import domain.request.LoadBookingsRequest;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
 import org.junit.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;

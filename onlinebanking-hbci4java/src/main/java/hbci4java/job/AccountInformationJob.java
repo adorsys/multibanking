@@ -16,7 +16,9 @@
 
 package hbci4java.job;
 
-import domain.*;
+import domain.BankAccount;
+import domain.BankApi;
+import domain.TanTransportType;
 import domain.request.LoadAccountInformationRequest;
 import domain.response.LoadAccountInformationResponse;
 import exception.HbciException;
@@ -25,6 +27,7 @@ import hbci4java.model.HbciDialogRequest;
 import hbci4java.model.HbciMapping;
 import hbci4java.model.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
@@ -39,7 +42,8 @@ import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 @Slf4j
 public class AccountInformationJob {
 
-    public static LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest request, HbciCallback callback) {
+    public static LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest request,
+                                                                  HbciCallback callback) {
         log.info("Loading account list for bank [{}]", request.getBankCode());
 
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
@@ -57,7 +61,7 @@ public class AccountInformationJob {
         if (!dialog.getPassport().jobSupported("SEPAInfo"))
             throw new RuntimeException("SEPAInfo job not supported");
 
-        log.info("fetching SEPA information");
+        log.info("fetching SEPA informations");
         dialog.addTask(newJob("SEPAInfo", dialog.getPassport()));
 
         // TAN-Medien abrufen
@@ -67,6 +71,7 @@ public class AccountInformationJob {
                 dialog.addTask(newJob("TANMediaList", dialog.getPassport()));
             }
         }
+
         HBCIExecStatus status = dialog.execute(true);
 
         if (!status.isOK()) {
@@ -99,23 +104,19 @@ public class AccountInformationJob {
     }
 
     public static Optional<List<TanTransportType>> extractTanTransportTypes(PinTanPassport hbciPassport) {
-        if (hbciPassport.getUPD() != null) {
-            return Optional.of(
-                    hbciPassport.getUserTwostepMechanisms()
-                            .stream()
-                            .map(id -> hbciPassport.getBankTwostepMechanisms().get(id))
-                            .filter(Objects::nonNull)
-                            .map(hbciTwoStepMechanism -> TanTransportType.builder()
-                                    .id(hbciTwoStepMechanism.getSecfunc())
-                                    .name(hbciTwoStepMechanism.getName())
-                                    .inputInfo(hbciTwoStepMechanism.getInputinfo())
-                                    .medium(hbciPassport.getTanMedia(hbciTwoStepMechanism.getId()) != null ? hbciPassport.getTanMedia(hbciTwoStepMechanism.getId()).mediaName : null)
-                                    .build())
-                            .collect(Collectors.toList())
-            );
-        } else {
-            log.warn("missing passport upd, unable find transport types for bank code {}", hbciPassport.getBLZ());
-            return Optional.empty();
-        }
+        return Optional.ofNullable(hbciPassport.getUPD())
+                .map(upd -> hbciPassport.getUserTwostepMechanisms()
+                        .stream()
+                        .map(id -> hbciPassport.getBankTwostepMechanisms().get(id))
+                        .filter(Objects::nonNull)
+                        .map(hbciTwoStepMechanism -> TanTransportType.builder()
+                                .id(hbciTwoStepMechanism.getSecfunc())
+                                .name(hbciTwoStepMechanism.getName())
+                                .inputInfo(hbciTwoStepMechanism.getInputinfo())
+                                .medium(hbciPassport.getTanMedia(hbciTwoStepMechanism.getId()) != null ?
+                                        hbciPassport.getTanMedia(hbciTwoStepMechanism.getId()).mediaName : null)
+                                .build())
+                        .collect(Collectors.toList()));
+
     }
 }

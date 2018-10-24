@@ -1,7 +1,12 @@
 package figo;
 
 import domain.*;
-import domain.SubmitPaymentRequest;
+import domain.request.CreateConsentRequest;
+import domain.request.LoadAccountInformationRequest;
+import domain.request.LoadBookingsRequest;
+import domain.request.SubmitPaymentRequest;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
 import exception.HbciException;
 import exception.InvalidPinException;
 import me.figo.FigoConnection;
@@ -300,7 +305,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public String submitPayment(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
+    public String submitPayment(Optional<String> bankingUrl, domain.request.SubmitPaymentRequest submitPaymentRequest) {
         return null;
     }
 

@@ -7,6 +7,7 @@ import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.utils.Ids;
 import domain.*;
+import domain.request.LoadAccountInformationRequest;
 import exception.InvalidPinException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;

@@ -8,7 +8,14 @@ import de.adorsys.multibanking.mock.domain.MockAccount;
 import de.adorsys.multibanking.mock.domain.XLSBank;
 import de.adorsys.multibanking.mock.loader.*;
 import de.adorsys.onlinebanking.mock.MockBanking;
-import domain.*;
+import domain.Bank;
+import domain.BankAccount;
+import domain.Booking;
+import domain.StandingOrder;
+import domain.request.LoadAccountInformationRequest;
+import domain.request.LoadBookingsRequest;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -12,6 +12,8 @@ import de.adorsys.multibanking.web.account.BookingController;
 import de.adorsys.multibanking.web.base.BaseControllerUnitTest;
 import domain.*;
 import domain.BankAccount.SyncStatus;
+import domain.request.LoadBookingsRequest;
+import domain.response.LoadBookingsResponse;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.service.types.DocumentContent;
 import org.junit.After;

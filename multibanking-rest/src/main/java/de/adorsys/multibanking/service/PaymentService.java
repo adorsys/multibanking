@@ -14,7 +14,7 @@ import de.adorsys.multibanking.utils.FQNUtils;
 import domain.BankApiUser;
 import domain.PaymentRequest;
 import domain.SinglePayment;
-import domain.SubmitPaymentRequest;
+import domain.request.SubmitPaymentRequest;
 import exception.HbciException;
 import org.adorsys.docusafe.business.types.complex.DocumentFQN;
 import org.springframework.beans.BeanUtils;

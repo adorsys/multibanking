@@ -14,7 +14,7 @@ import de.adorsys.multibanking.service.old.TestConstants;
 import de.adorsys.multibanking.service.old.TestUtil;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import de.adorsys.onlinebanking.mock.MockBanking;
-import domain.LoadAccountInformationResponse;
+import domain.response.LoadAccountInformationResponse;
 import figo.FigoBanking;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
