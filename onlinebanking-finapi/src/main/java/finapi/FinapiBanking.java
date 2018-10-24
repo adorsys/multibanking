@@ -240,6 +240,11 @@ public class FinapiBanking implements OnlineBankingService {
         }
     }
 
+    @Override
+    public BankAccountBalance loadBalance(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+        return null;
+    }
+
     private Account waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {
         Account account =
                 new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));

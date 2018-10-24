@@ -29,6 +29,8 @@ public interface OnlineBankingService {
 
     LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest);
 
+    BankAccountBalance loadBalance(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest);
+
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();

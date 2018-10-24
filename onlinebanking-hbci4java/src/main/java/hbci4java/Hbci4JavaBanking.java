@@ -161,6 +161,16 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
+    @Override
+    public BankAccountBalance loadBalance(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+        try {
+            checkBankExists(loadBalanceRequest.getBankCode(), bankingUrl);
+            return LoadBalanceJob.loadBalance(loadBalanceRequest);
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
+
     public HBCIDialog createDialog(Optional<String> bankingUrl, HbciDialogRequest dialogRequest) {
         try {
             checkBankExists(dialogRequest.getBankCode(), bankingUrl);

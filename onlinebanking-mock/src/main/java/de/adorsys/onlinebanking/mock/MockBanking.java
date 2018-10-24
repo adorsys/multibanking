@@ -146,6 +146,11 @@ public class MockBanking implements OnlineBankingService {
                 .build();
     }
 
+    @Override
+    public BankAccountBalance loadBalance(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+        return null;
+    }
+
     private List<StandingOrder> getStandingOders(BankAccess ba, String pin, String iban) {
         return getRestTemplate(ba.getBankLogin(), ba.getBankCode(), pin)
                 .exchange(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/standingorders",

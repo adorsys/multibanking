@@ -295,6 +295,11 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
+    public BankAccountBalance loadBalance(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+        return null;
+    }
+
+    @Override
     public Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         return null;
     }

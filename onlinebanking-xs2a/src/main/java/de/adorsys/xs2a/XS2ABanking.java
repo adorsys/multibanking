@@ -119,6 +119,11 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
+    public BankAccountBalance loadBalance(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+        return null;
+    }
+
+    @Override
     public boolean bankSupported(String bankCode) {
         return true;
     }
