@@ -7,6 +7,12 @@ import de.adorsys.psd2.ApiException;
 import de.adorsys.psd2.api.AccountInformationServiceAisApi;
 import de.adorsys.psd2.model.*;
 import domain.*;
+import domain.request.CreateConsentRequest;
+import domain.request.LoadAccountInformationRequest;
+import domain.request.LoadBookingsRequest;
+import domain.request.SubmitPaymentRequest;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
 import org.apache.commons.lang3.StringUtils;
 import spi.OnlineBankingService;
 
