@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVKUmsAll;
+import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
@@ -39,8 +40,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static hbci4java.model.HbciDialogFactory.createDialog;
 import static hbci4java.job.AccountInformationJob.extractTanTransportTypes;
+import static hbci4java.model.HbciDialogFactory.createDialog;
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @Slf4j
@@ -94,7 +95,6 @@ public class LoadBookingsJob {
                 .map(abstractHBCIJob -> HbciMapping.createBalance((GVRSaldoReq) abstractHBCIJob.getJobResult()))
                 .orElse(null);
 
-
         List<Booking> bookings = HbciMapping.createBookings((GVRKUms) bookingsJob.getJobResult());
         ArrayList<Booking> bookingList = bookings.stream()
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
@@ -128,22 +128,25 @@ public class LoadBookingsJob {
         return standingOrdersJob;
     }
 
-    private static AbstractHBCIJob createBookingsJob(HBCIDialog dialog, LoadBookingsRequest loadBookingsRequest, Konto account) {
+    private static AbstractHBCIJob createBookingsJob(HBCIDialog dialog, LoadBookingsRequest loadBookingsRequest,
+                                                     Konto account) {
         AbstractHBCIJob bookingsJob = new GVKUmsAll(dialog.getPassport());
         bookingsJob.setParam("my", account);
 
         Optional.ofNullable(loadBookingsRequest.getDateFrom())
-                .ifPresent(localDate -> bookingsJob.setParam("startdate", Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
+                .ifPresent(localDate -> bookingsJob.setParam("startdate",
+                        Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
         Optional.ofNullable(loadBookingsRequest.getDateTo())
-                .ifPresent(localDate -> bookingsJob.setParam("enddate", Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
+                .ifPresent(localDate -> bookingsJob.setParam("enddate",
+                        Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
         dialog.addTask(bookingsJob);
         return bookingsJob;
     }
 
     private static AbstractHBCIJob createBalanceJob(HBCIDialog dialog, Konto account) {
-        AbstractHBCIJob balanceJob = newJob("SaldoReq", dialog.getPassport());
+        AbstractHBCIJob balanceJob = new GVSaldoReq(dialog.getPassport());
         balanceJob.setParam("my", account);
         dialog.addTask(balanceJob);
         return balanceJob;

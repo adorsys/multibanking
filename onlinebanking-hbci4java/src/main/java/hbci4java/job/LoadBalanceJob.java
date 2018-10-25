@@ -16,13 +16,14 @@
 
 package hbci4java.job;
 
-import domain.*;
+import domain.BankAccount;
 import domain.request.LoadBalanceRequest;
 import hbci4java.model.HbciDialogRequest;
 import hbci4java.model.HbciMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIDialog;
@@ -36,7 +37,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static hbci4java.model.HbciDialogFactory.createDialog;
-import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @Slf4j
 public class LoadBalanceJob {
@@ -64,7 +64,7 @@ public class LoadBalanceJob {
         // Let the Handler execute all jobs in one batch
         HBCIExecStatus status = dialog.execute(true);
         if (!status.isOK()) {
-            log.error("Status of SaldoReq+KUmsAll+DauerSEPAList batch job not OK " + status);
+            log.error("Status of balance job not OK " + status);
 
             if (initFailed(status)) {
                 throw new HBCI_Exception(status.getErrorString());
@@ -85,7 +85,7 @@ public class LoadBalanceJob {
     }
 
     private static AbstractHBCIJob createBalanceJob(HBCIDialog dialog, Konto konto) {
-        AbstractHBCIJob balanceJob = newJob("SaldoReq", dialog.getPassport());
+        AbstractHBCIJob balanceJob = new GVSaldoReq(dialog.getPassport());
         balanceJob.setParam("my", konto);
         dialog.addTask(balanceJob);
         return balanceJob;
