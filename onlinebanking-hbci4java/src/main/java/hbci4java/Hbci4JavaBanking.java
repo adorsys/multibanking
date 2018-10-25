@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import domain.*;
-import domain.request.CreateConsentRequest;
-import domain.request.LoadAccountInformationRequest;
-import domain.request.LoadBookingsRequest;
-import domain.request.SubmitPaymentRequest;
+import domain.request.*;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import exception.InvalidPinException;
@@ -27,6 +24,7 @@ import spi.OnlineBankingService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -156,6 +154,16 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         try {
             checkBankExists(loadBookingsRequest.getBankCode(), bankingUrl);
             return LoadBookingsJob.loadBookings(loadBookingsRequest);
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
+
+    @Override
+    public List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+        try {
+            checkBankExists(loadBalanceRequest.getBankCode(), bankingUrl);
+            return LoadBalanceJob.loadBalances(loadBalanceRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }

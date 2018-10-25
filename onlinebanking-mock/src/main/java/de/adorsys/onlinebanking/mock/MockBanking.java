@@ -1,10 +1,7 @@
 package de.adorsys.onlinebanking.mock;
 
 import domain.*;
-import domain.request.CreateConsentRequest;
-import domain.request.LoadAccountInformationRequest;
-import domain.request.LoadBookingsRequest;
-import domain.request.SubmitPaymentRequest;
+import domain.request.*;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import org.adorsys.envutils.EnvProperties;
@@ -144,6 +141,11 @@ public class MockBanking implements OnlineBankingService {
                 .standingOrders(getStandingOders(bankAccess, loadBookingsRequest.getPin(), bankAccount.getIban()))
                 .bankAccountBalance(getBalance(bankAccess, loadBookingsRequest.getPin(), bankAccount.getIban()))
                 .build();
+    }
+
+    @Override
+    public List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+        return null;
     }
 
     private List<StandingOrder> getStandingOders(BankAccess ba, String pin, String iban) {

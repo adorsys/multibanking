@@ -1,10 +1,7 @@
 package finapi;
 
 import domain.*;
-import domain.request.CreateConsentRequest;
-import domain.request.LoadAccountInformationRequest;
-import domain.request.LoadBookingsRequest;
-import domain.request.SubmitPaymentRequest;
+import domain.request.*;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import io.swagger.client.ApiClient;
@@ -238,6 +235,11 @@ public class FinapiBanking implements OnlineBankingService {
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+        return null;
     }
 
     private Account waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {
