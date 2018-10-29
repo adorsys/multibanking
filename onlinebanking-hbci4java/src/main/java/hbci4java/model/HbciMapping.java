@@ -26,8 +26,11 @@ import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.structures.Konto;
+import org.kapott.hbci.structures.Saldo;
+import org.kapott.hbci.structures.Value;
 import utils.Utils;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,29 +44,44 @@ import static utils.Utils.extractIban;
 @Slf4j
 public final class HbciMapping {
 
-    public static BankAccountBalance createBalance(GVRSaldoReq gvSaldoReq) {
-        BankAccountBalance result = new BankAccountBalance();
+    public static BalancesReport createBalance(GVRSaldoReq gvSaldoReq) {
+        BalancesReport result = new BalancesReport();
         if (gvSaldoReq.isOK()) {
             GVRSaldoReq.Info[] infos = gvSaldoReq.getEntries();
             if (infos.length > 0) {
                 if (infos[0] != null && infos[0].ready != null && infos[0].ready.value != null) {
-                    result.setReadyHbciBalance(infos[0].ready.value.getBigDecimalValue().setScale(2));
+                    result.setReadyHbciBalance(createBalance(infos[0].ready));
                 }
                 if (infos[0] != null && infos[0].available != null) {
-                    result.setAvailableHbciBalance(infos[0].available.getBigDecimalValue().setScale(2));
+                    result.setAvailableHbciBalance(createBalance(infos[0].available));
                 }
                 if (infos[0] != null && infos[0].kredit != null) {
-                    result.setCreditHbciBalance(infos[0].kredit.getBigDecimalValue().setScale(2));
+                    result.setCreditHbciBalance(createBalance(infos[0].kredit));
                 }
                 if (infos[0] != null && infos[0].unready != null && infos[0].unready.value != null) {
-                    result.setUnreadyHbciBalance(infos[0].unready.value.getBigDecimalValue().setScale(2));
+                    result.setUnreadyHbciBalance(createBalance(infos[0].unready));
                 }
                 if (infos[0] != null && infos[0].used != null) {
-                    result.setUsedHbciBalance(infos[0].used.getBigDecimalValue().setScale(2));
+                    result.setUsedHbciBalance(createBalance(infos[0].used));
                 }
             }
         }
         return result;
+    }
+
+    private static Balance createBalance(Value value) {
+        return Balance.builder()
+                .currency(value.getCurr())
+                .amount(value.getBigDecimalValue().setScale(2))
+                .build();
+    }
+
+    private static Balance createBalance(Saldo saldo) {
+        return Balance.builder()
+                .date(saldo.timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .currency(saldo.value.getCurr())
+                .amount(saldo.value.getBigDecimalValue().setScale(2))
+                .build();
     }
 
     public static List<StandingOrder> createStandingOrders(GVRDauerList gvrDauerList) {

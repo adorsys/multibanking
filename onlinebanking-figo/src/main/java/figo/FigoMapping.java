@@ -7,7 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import utils.Utils;
 
 import java.time.ZoneId;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +29,6 @@ public class FigoMapping {
         FIGO_TRANSFER.put(SinglePayment.PaymentType.SINGLE_PAYMENT, "SEPA transfer");
         FIGO_TRANSFER.put(SinglePayment.PaymentType.STANDING_ORDER, "SEPA standing order");
     }
-
 
     public static domain.StandingOrder mapStandingOrder(StandingOrder figoStandingOrder) {
         domain.StandingOrder standingOrder = new domain.StandingOrder();
@@ -59,8 +57,8 @@ public class FigoMapping {
                 .blz(account.getBankCode())
                 .iban(account.getIBAN())
                 .type(BankAccountType.fromFigoType(account.getType()))
-                .bankAccountBalance(new BankAccountBalance()
-                        .readyHbciBalance(account.getBalance().getBalance()));
+                .bankAccountBalance(new BalancesReport()
+                        .readyHbciBalance(Balance.builder().amount(account.getBalance().getBalance()).build()));
     }
 
     public static Booking mapBooking(Transaction transaction, BankApi bankApi) {

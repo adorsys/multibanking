@@ -78,7 +78,7 @@ public class LoadBalanceJob {
                 throw new HBCI_Exception(job.getJobResult().getJobStatus().getErrorString());
             }
             BankAccount bankAccount = jobs.get(job);
-            bankAccount.setBankAccountBalance(HbciMapping.createBalance((GVRSaldoReq) job.getJobResult()));
+            bankAccount.setBalances(HbciMapping.createBalance((GVRSaldoReq) job.getJobResult()));
             bankAccounts.add(bankAccount);
         });
         return bankAccounts;

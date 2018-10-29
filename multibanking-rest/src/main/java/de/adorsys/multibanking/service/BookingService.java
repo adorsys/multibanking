@@ -114,7 +114,7 @@ public class BookingService {
         BankAccountEntity bankAccount = bankAccountData.getBankAccount();
         LoadBookingsResponse response = loadBookingsOnline(bankApi, bankAccess, bankAccount, pin);
 
-        bankAccount.setBankAccountBalance(response.getBankAccountBalance());
+        bankAccount.setBalances(response.getBankAccountBalance());
         if (bankAccess.isStoreBookings()) {
             bankAccount.setLastSync(LocalDateTime.now());
             bankAccountService.saveBankAccount(bankAccount);

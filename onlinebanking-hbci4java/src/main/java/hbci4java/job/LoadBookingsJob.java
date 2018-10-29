@@ -91,7 +91,7 @@ public class LoadBookingsJob {
                 .map(abstractHBCIJob -> HbciMapping.createStandingOrders((GVRDauerList) abstractHBCIJob.getJobResult()))
                 .orElse(null);
 
-        BankAccountBalance bankAccountBalance = balanceJob
+        BalancesReport bankAccountBalance = balanceJob
                 .map(abstractHBCIJob -> HbciMapping.createBalance((GVRSaldoReq) abstractHBCIJob.getJobResult()))
                 .orElse(null);
 

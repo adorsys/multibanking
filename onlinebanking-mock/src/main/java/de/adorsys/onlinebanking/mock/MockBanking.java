@@ -159,13 +159,13 @@ public class MockBanking implements OnlineBankingService {
                         iban).getBody();
     }
 
-    private BankAccountBalance getBalance(BankAccess ba, String pin, String iban) {
+    private BalancesReport getBalance(BankAccess ba, String pin, String iban) {
         BankAccount account = getRestTemplate(ba.getBankLogin(), ba.getBankCode(), pin)
                 .getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}",
                         BankAccount.class,
                         ba.getBankCode(),
                         iban);
-        return new BankAccountBalance().readyHbciBalance(account.getBankAccountBalance().getReadyHbciBalance());
+        return new BalancesReport().readyHbciBalance(account.getBalances().getReadyHbciBalance());
     }
 
 

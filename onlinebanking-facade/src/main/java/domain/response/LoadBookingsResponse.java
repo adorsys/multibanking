@@ -1,6 +1,6 @@
 package domain.response;
 
-import domain.BankAccountBalance;
+import domain.BalancesReport;
 import domain.Booking;
 import domain.StandingOrder;
 import lombok.Builder;
@@ -19,6 +19,6 @@ public class LoadBookingsResponse {
     private OnlineBankingService onlineBankingService;
     private List<Booking> bookings;
     private List<StandingOrder> standingOrders;
-    private BankAccountBalance bankAccountBalance;
+    private BalancesReport bankAccountBalance;
     private String hbciPassportState;
 }

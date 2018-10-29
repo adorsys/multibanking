@@ -127,10 +127,10 @@ public class FinapiBanking implements OnlineBankingService {
 
             BankConnection connections =
                     new BankConnectionsApi(apiClient).importBankConnection(new ImportBankConnectionParams()
-                    .bankId(searchAllBanks.getBanks().get(0).getId())
-                    .bankingUserId(bankAccess.getBankLogin())
-                    .bankingPin(loadAccountInformationRequest.getPin())
-                    .storePin(loadAccountInformationRequest.isStorePin()));
+                            .bankId(searchAllBanks.getBanks().get(0).getId())
+                            .bankingUserId(bankAccess.getBankLogin())
+                            .bankingPin(loadAccountInformationRequest.getPin())
+                            .storePin(loadAccountInformationRequest.isStorePin()));
 
             bankAccess.externalId(bankApi(), connections.getId().toString());
 
@@ -147,8 +147,8 @@ public class FinapiBanking implements OnlineBankingService {
                             .iban(account.getIban())
                             .blz(bankAccess.getBankCode())
                             .type(BankAccountType.fromFinapiType(account.getAccountTypeId().intValue()))
-                            .bankAccountBalance(new BankAccountBalance()
-                                    .readyHbciBalance(account.getBalance())))
+                            .bankAccountBalance(new BalancesReport()
+                                    .readyHbciBalance(Balance.builder().amount(account.getBalance()).build())))
                     .collect(Collectors.toList()))
                     .build();
         } catch (ApiException e) {
@@ -229,7 +229,7 @@ public class FinapiBanking implements OnlineBankingService {
             LOG.info("loaded [{}] bookings for account [{}]", bookingList.size(), bankAccount.getAccountNumber());
 
             return LoadBookingsResponse.builder()
-                    .bankAccountBalance(new BankAccountBalance().readyHbciBalance(account.getBalance()))
+                    .bankAccountBalance(new BalancesReport().readyHbciBalance(Balance.builder().amount(account.getBalance()).build()))
                     .bookings(bookingList)
                     .build();
         } catch (ApiException e) {

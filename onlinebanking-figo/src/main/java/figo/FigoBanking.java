@@ -1,7 +1,10 @@
 package figo;
 
 import domain.*;
-import domain.request.*;
+import domain.request.CreateConsentRequest;
+import domain.request.LoadAccountInformationRequest;
+import domain.request.LoadBalanceRequest;
+import domain.request.LoadBookingsRequest;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import exception.HbciException;
@@ -10,7 +13,6 @@ import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
 import me.figo.internal.*;
-import me.figo.internal.SubmitPaymentRequest;
 import me.figo.models.Account;
 import me.figo.models.AccountBalance;
 import me.figo.models.BankLoginSettings;
@@ -218,11 +220,11 @@ public class FigoBanking implements OnlineBankingService {
         return bank;
     }
 
-    private BankAccountBalance getBalance(FigoSession figoSession, String accountId) {
+    private BalancesReport getBalance(FigoSession figoSession, String accountId) {
         try {
             Account account = figoSession.getAccount(accountId);
             AccountBalance accountBalance = account.getBalance();
-            return new BankAccountBalance().readyHbciBalance(accountBalance.getBalance());
+            return new BalancesReport().readyHbciBalance(Balance.builder().amount(accountBalance.getBalance()).build());
         } catch (IOException | FigoException e) {
             throw new RuntimeException(e);
         }
@@ -275,9 +277,9 @@ public class FigoBanking implements OnlineBankingService {
 
             List<domain.StandingOrder> standingOrders =
                     session.getStandingOrders(bankAccount.getExternalIdMap().get(bankApi()))
-                    .stream()
-                    .map(FigoMapping::mapStandingOrder)
-                    .collect(Collectors.toList());
+                            .stream()
+                            .map(FigoMapping::mapStandingOrder)
+                            .collect(Collectors.toList());
 
             updateTanTransportTypes(loadBookingsRequest.getBankAccess(), session.getAccounts());
 

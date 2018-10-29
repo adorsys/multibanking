@@ -10,45 +10,45 @@ import java.math.BigDecimal;
  * Created by alexg on 08.02.17.
  */
 @Data
-@ApiModel(description = "The balance of this bank account", value = "BankAccountBalance")
-public class BankAccountBalance {
+@ApiModel(description = "The balances of this bank account", value = "BankAccountBalances")
+public class BalancesReport {
 
     @ApiModelProperty(value = "Ready account balance")
-    private BigDecimal readyHbciBalance;
+    private Balance readyHbciBalance;
 
     @ApiModelProperty(value = "Unreleased account balance")
-    private BigDecimal unreadyHbciBalance;
+    private Balance unreadyHbciBalance;
 
     @ApiModelProperty(value = "Credit balance")
-    private BigDecimal creditHbciBalance;
+    private Balance creditHbciBalance;
 
     @ApiModelProperty(value = "Available balance")
-    private BigDecimal availableHbciBalance;
+    private Balance availableHbciBalance;
 
     @ApiModelProperty(value = "Used balance")
-    private BigDecimal usedHbciBalance;
+    private Balance usedHbciBalance;
 
-    public BankAccountBalance readyHbciBalance(BigDecimal readyHbciBalance) {
+    public BalancesReport readyHbciBalance(Balance readyHbciBalance) {
         this.readyHbciBalance = readyHbciBalance;
         return this;
     }
 
-    public BankAccountBalance unreadyHbciBalance(BigDecimal unreadyHbciBalance) {
+    public BalancesReport unreadyHbciBalance(Balance unreadyHbciBalance) {
         this.unreadyHbciBalance = unreadyHbciBalance;
         return this;
     }
 
-    public BankAccountBalance creditHbciBalance(BigDecimal creditHbciBalance) {
+    public BalancesReport creditHbciBalance(Balance creditHbciBalance) {
         this.creditHbciBalance = creditHbciBalance;
         return this;
     }
 
-    public BankAccountBalance availableHbciBalance(BigDecimal availableHbciBalance) {
+    public BalancesReport availableHbciBalance(Balance availableHbciBalance) {
         this.availableHbciBalance = availableHbciBalance;
         return this;
     }
 
-    public BankAccountBalance usedHbciBalance(BigDecimal usedHbciBalance) {
+    public BalancesReport usedHbciBalance(Balance usedHbciBalance) {
         this.usedHbciBalance = usedHbciBalance;
         return this;
     }
