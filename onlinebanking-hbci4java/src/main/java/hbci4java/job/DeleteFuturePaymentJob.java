@@ -19,10 +19,7 @@ package hbci4java.job;
 import domain.AbstractPayment;
 import domain.SinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
-import org.kapott.hbci.GV.GVTermUebSEPA;
 import org.kapott.hbci.GV.GVTermUebSEPADel;
-import org.kapott.hbci.GV.GVUebSEPA;
-import org.kapott.hbci.GV_Result.GVRTermUeb;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
@@ -31,7 +28,7 @@ import org.kapott.hbci.structures.Value;
 /**
  * Only for future payment (GVTermUebSEPA)
  */
-public class DeleteSinglePaymentJob extends AbstractPaymentJob {
+public class DeleteFuturePaymentJob extends AbstractPaymentJob {
 
     private String jobName;
 
@@ -66,7 +63,7 @@ public class DeleteSinglePaymentJob extends AbstractPaymentJob {
     }
 
     @Override
-    protected String getJobName() {
+    protected String getJobName(AbstractPayment.PaymentType paymentType) {
         return jobName;
     }
 

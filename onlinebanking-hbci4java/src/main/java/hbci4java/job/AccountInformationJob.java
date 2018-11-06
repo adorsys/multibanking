@@ -27,7 +27,8 @@ import hbci4java.model.HbciDialogRequest;
 import hbci4java.model.HbciMapping;
 import hbci4java.model.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV.GVSEPAInfo;
+import org.kapott.hbci.GV.GVTANMediaList;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
@@ -37,7 +38,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static hbci4java.model.HbciDialogFactory.createDialog;
-import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @Slf4j
 public class AccountInformationJob {
@@ -62,13 +62,13 @@ public class AccountInformationJob {
             throw new RuntimeException("SEPAInfo job not supported");
 
         log.info("fetching SEPA informations");
-        dialog.addTask(newJob("SEPAInfo", dialog.getPassport()));
+        dialog.addTask(new GVSEPAInfo(dialog.getPassport()));
 
         // TAN-Medien abrufen
         if (request.isUpdateTanTransportTypes()) {
             if (dialog.getPassport().jobSupported("TANMediaList")) {
                 log.info("fetching TAN media list");
-                dialog.addTask(newJob("TANMediaList", dialog.getPassport()));
+                dialog.addTask(new GVTANMediaList(dialog.getPassport()));
             }
         }
 

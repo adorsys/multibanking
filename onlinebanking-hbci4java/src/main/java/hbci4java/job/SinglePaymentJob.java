@@ -29,8 +29,6 @@ import org.kapott.hbci.structures.Value;
 
 public class SinglePaymentJob extends AbstractPaymentJob {
 
-    private String jobName;
-
     @Override
     protected AbstractSEPAGV createPaymentJob(AbstractPayment payment, PinTanPassport passport, String sepaPain) {
         SinglePayment singlePayment = (SinglePayment) payment;
@@ -46,14 +44,10 @@ public class SinglePaymentJob extends AbstractPaymentJob {
 
         AbstractSEPAGV sepagv;
         if (singlePayment.getExecutionDate() != null) {
-            jobName = GVTermUebSEPA.getLowlevelName();
-
-            sepagv = new GVTermUebSEPA(passport, jobName, sepaPain);
+            sepagv = new GVTermUebSEPA(passport, GVTermUebSEPA.getLowlevelName(), sepaPain);
             sepagv.setParam("date", singlePayment.getExecutionDate().toString());
         } else {
-            jobName = GVUebSEPA.getLowlevelName();
-
-            sepagv = new GVUebSEPA(passport, jobName, sepaPain);
+            sepagv = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName(), sepaPain);
         }
 
         sepagv.setParam("src", src);
@@ -67,12 +61,16 @@ public class SinglePaymentJob extends AbstractPaymentJob {
     }
 
     @Override
-    protected String getJobName() {
-        return jobName;
+    protected String getJobName(AbstractPayment.PaymentType paymentType) {
+        if (paymentType == AbstractPayment.PaymentType.FUTURE_PAYMENT) {
+            return GVTermUebSEPA.getLowlevelName();
+        }
+        return GVUebSEPA.getLowlevelName();
     }
 
     @Override
     protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
-        return paymentGV instanceof GVRTermUeb ? ((GVRTermUeb)paymentGV).getOrderId() : null; // no order id for single payment
+        return paymentGV instanceof GVRTermUeb ? ((GVRTermUeb) paymentGV).getOrderId() : null; // no order id for
+        // single payment
     }
 }

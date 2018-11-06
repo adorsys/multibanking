@@ -59,7 +59,7 @@ public class BulkPaymentJob extends AbstractPaymentJob {
     }
 
     @Override
-    protected String getJobName() {
+    protected String getJobName(AbstractPayment.PaymentType paymentType) {
         return GVMultiUebSEPA.getLowlevelName();
     }
 

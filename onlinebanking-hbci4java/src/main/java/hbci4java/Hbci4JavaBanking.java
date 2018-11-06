@@ -210,6 +210,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     private AbstractPaymentJob createPaymentJob(AbstractPayment payment) {
         switch (payment.getPaymentType()) {
             case SINGLE_PAYMENT:
+            case FUTURE_PAYMENT:
                 return new SinglePaymentJob();
             case BULK_PAYMENT:
                 return new BulkPaymentJob();
@@ -221,8 +222,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     private AbstractPaymentJob createDeleteJob(AbstractPayment payment) {
         switch (payment.getPaymentType()) {
-            case SINGLE_PAYMENT:
-                return new DeleteSinglePaymentJob();
+            case FUTURE_PAYMENT:
+                return new DeleteFuturePaymentJob();
             case STANDING_ORDER:
                 return new DeleteStandingOrderJob();
         }

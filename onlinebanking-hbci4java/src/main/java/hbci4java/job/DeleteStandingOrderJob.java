@@ -22,7 +22,6 @@ import hbci4java.model.HbciMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVDauerSEPADel;
-import org.kapott.hbci.GV.GVDauerSEPANew;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
@@ -72,7 +71,7 @@ public class DeleteStandingOrderJob extends AbstractPaymentJob {
     }
 
     @Override
-    protected String getJobName() {
+    protected String getJobName(AbstractPayment.PaymentType paymentType) {
         return GVDauerSEPADel.getLowlevelName();
     }
 

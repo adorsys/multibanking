@@ -71,7 +71,7 @@ public class NewStandingOrderJob extends AbstractPaymentJob {
     }
 
     @Override
-    protected String getJobName() {
+    protected String getJobName(AbstractPayment.PaymentType paymentType) {
         return GVDauerSEPANew.getLowlevelName();
     }
 

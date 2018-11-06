@@ -7,12 +7,12 @@ public abstract class AbstractPayment {
 
     public enum PaymentType {
         SINGLE_PAYMENT,
+        FUTURE_PAYMENT,
         BULK_PAYMENT,
         STANDING_ORDER
     }
 
     private TanTransportType tanMedia;
-    private PaymentChallenge paymentChallenge;
 
     private String senderAccountNumber;
     private String senderIban;

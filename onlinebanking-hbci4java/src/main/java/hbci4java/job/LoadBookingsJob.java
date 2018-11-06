@@ -25,6 +25,7 @@ import hbci4java.model.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV.GVDauerSEPAList;
 import org.kapott.hbci.GV.GVKUmsAll;
 import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRDauerList;
@@ -42,7 +43,6 @@ import java.util.stream.Stream;
 
 import static hbci4java.job.AccountInformationJob.extractTanTransportTypes;
 import static hbci4java.model.HbciDialogFactory.createDialog;
-import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @Slf4j
 public class LoadBookingsJob {
@@ -121,7 +121,7 @@ public class LoadBookingsJob {
     private static AbstractHBCIJob createStandingOrdersJob(HBCIDialog dialog, Konto account) {
         AbstractHBCIJob standingOrdersJob = null;
         if (dialog.getPassport().jobSupported("DauerSEPAList")) {
-            standingOrdersJob = newJob("DauerSEPAList", dialog.getPassport());
+            standingOrdersJob = new GVDauerSEPAList(dialog.getPassport());
             standingOrdersJob.setParam("src", account);
             dialog.addTask(standingOrdersJob);
         }

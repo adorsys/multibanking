@@ -47,13 +47,13 @@ public abstract class AbstractPaymentJob {
 
     abstract AbstractSEPAGV createPaymentJob(AbstractPayment payment, PinTanPassport passport, String sepaPain);
 
-    abstract String getJobName();
+    abstract String getJobName(AbstractPayment.PaymentType paymentType);
 
     abstract String orderIdFromJobResult(HBCIJobResult paymentGV);
 
     public HbciTanSubmit execute(PaymentRequest paymentRequest) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
-        hbciTanSubmit.setOriginJobName(getJobName());
+        hbciTanSubmit.setOriginJobName(getJobName(paymentRequest.getPayment().getPaymentType()));
 
         HbciCallback hbciCallback = new HbciCallback() {
 
@@ -62,7 +62,7 @@ public abstract class AbstractPaymentJob {
                 //needed later for submit
                 hbciTanSubmit.setOrderRef(orderRef);
                 if (challenge != null) {
-                    paymentRequest.getPayment().setPaymentChallenge(PaymentChallenge.builder()
+                    hbciTanSubmit.setPaymentChallenge(PaymentChallenge.builder()
                             .title(challenge)
                             .data(challenge_hhd_uc)
                             .build());
@@ -92,7 +92,7 @@ public abstract class AbstractPaymentJob {
 
         AbstractSEPAGV uebSEPA = createPaymentJob(paymentRequest.getPayment(), dialog.getPassport(), null);
 
-        GVTAN2Step hktan = (GVTAN2Step) newJob("TAN2Step", dialog.getPassport());
+        GVTAN2Step hktan = new GVTAN2Step(dialog.getPassport());
         hktan.setSegVersion(hbciTwoStepMechanism.getSegversion());
 
         if (hbciTwoStepMechanism.getProcess() == 1) {
@@ -188,8 +188,8 @@ public abstract class AbstractPaymentJob {
 
     private AbstractHBCIJob paymentProcess1(AbstractPayment payment, HbciTanSubmit hbciTanSubmit, HbciPassport
             hbciPassport, HBCIDialog hbciDialog) {
-        //1. Schritt: HKTAN  HITAN
-        //2. Schritt: HKUEB  HIRMS zu HKUEB
+        //1. Schritt: HKTAN <-> HITAN
+        //2. Schritt: HKUEB <-> HIRMS zu HKUEB
         AbstractHBCIJob uebSEPAJob = createPaymentJob(payment, hbciPassport, hbciTanSubmit.getSepaPain());
         hbciDialog.addTask(uebSEPAJob);
         return uebSEPAJob;
@@ -201,7 +201,7 @@ public abstract class AbstractPaymentJob {
         AbstractHBCIJob originJob = newJob(hbciTanSubmit.getOriginJobName(), hbciDialog.getPassport());
         originJob.setSegVersion(hbciTanSubmit.getOriginSegVersion());
 
-        GVTAN2Step hktan = (GVTAN2Step) newJob("TAN2Step", hbciDialog.getPassport());
+        GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport());
         hktan.setOriginJob(originJob);
         hktan.setParam("orderref", hbciTanSubmit.getOrderRef());
         hktan.setParam("process", "2");

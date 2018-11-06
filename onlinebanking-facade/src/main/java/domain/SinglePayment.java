@@ -24,6 +24,9 @@ public class SinglePayment extends AbstractPayment {
 
     @Override
     public PaymentType getPaymentType() {
+        if (executionDate != null) {
+            return PaymentType.FUTURE_PAYMENT;
+        }
         return PaymentType.SINGLE_PAYMENT;
     }
 
