@@ -17,6 +17,7 @@ import java.util.List;
 public class LoadBookingsResponse {
 
     private OnlineBankingService onlineBankingService;
+    private String rawData;
     private List<Booking> bookings;
     private List<StandingOrder> standingOrders;
     private BalancesReport bankAccountBalance;

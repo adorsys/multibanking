@@ -95,10 +95,16 @@ public class LoadBookingsJob {
                 .map(abstractHBCIJob -> HbciMapping.createBalance((GVRSaldoReq) abstractHBCIJob.getJobResult()))
                 .orElse(null);
 
-        List<Booking> bookings = HbciMapping.createBookings((GVRKUms) bookingsJob.getJobResult());
-        ArrayList<Booking> bookingList = bookings.stream()
-                .collect(Collectors.collectingAndThen(Collectors.toCollection(
-                        () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
+        ArrayList<Booking> bookingList = null;
+        String raw = null;
+        GVRKUms bookingsResult = (GVRKUms) bookingsJob.getJobResult();
+        if (loadBookingsRequest.isRaw()) {
+            raw = bookingsResult.getRaw();
+        } else {
+            bookingList = HbciMapping.createBookings(bookingsResult).stream()
+                    .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                            () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
+        }
 
         if (loadBookingsRequest.isWithTanTransportTypes()) {
             extractTanTransportTypes(dialog.getPassport()).ifPresent(tanTransportTypes -> {
@@ -112,6 +118,7 @@ public class LoadBookingsJob {
         return LoadBookingsResponse.builder()
                 .hbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson())
                 .bookings(bookingList)
+                .rawData(raw)
                 .bankAccountBalance(bankAccountBalance)
                 .standingOrders(standingOrders)
                 .build();

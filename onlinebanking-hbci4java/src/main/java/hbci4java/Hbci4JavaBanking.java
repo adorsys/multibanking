@@ -37,25 +37,25 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     public Hbci4JavaBanking(InputStream customBankConfigInput) {
-        if (customBankConfigInput != null) {
-            try {
-                HBCIUtils.refreshBLZList(customBankConfigInput);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            try (InputStream inputStream =
-                         HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream()) {
-                HBCIUtils.refreshBLZList(inputStream);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        try (InputStream inputStream = Optional.ofNullable(customBankConfigInput)
+                .orElseGet(this::getDefaultBanksInput)) {
+            HBCIUtils.refreshBLZList(inputStream);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
 
         OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         OBJECT_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         OBJECT_MAPPER.registerModule(new Jdk8Module());
+    }
+
+    private InputStream getDefaultBanksInput() {
+        try {
+            return HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -150,7 +150,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest
+            loadBookingsRequest) {
         try {
             checkBankExists(loadBookingsRequest.getBankCode(), bankingUrl);
             return LoadBookingsJob.loadBookings(loadBookingsRequest);
@@ -191,7 +192,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest) {
-
     }
 
     private void checkBankExists(String bankCode, Optional<String> bankingUrl) {

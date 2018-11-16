@@ -40,6 +40,7 @@ public class LoadBookingsRequest extends AbstractHbciRequest {
     private String bankCode;
     private String pin;
 
+    private boolean raw;
     private LocalDate dateFrom;
     private LocalDate dateTo;
 
