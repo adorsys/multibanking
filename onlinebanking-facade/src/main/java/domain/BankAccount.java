@@ -31,6 +31,8 @@ public class BankAccount {
     private String accountNumber;
     @ApiModelProperty(value = "Type of this bank account", example = "GIRO")
     private BankAccountType type;
+    @ApiModelProperty(value = "Raw Type of this bank account (optional)", example = "1")
+    private Integer rawType;
     @ApiModelProperty(value = "Currency of this bank account", example = "EURO")
     private String currency;
     @ApiModelProperty(value = "Name of this bank account")
@@ -68,6 +70,11 @@ public class BankAccount {
 
     public BankAccount type(BankAccountType type) {
         this.type = type;
+        return this;
+    }
+
+    public BankAccount rawType(Integer rawType) {
+        this.rawType = rawType;
         return this;
     }
 
