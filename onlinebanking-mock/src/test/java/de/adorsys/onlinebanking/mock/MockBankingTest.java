@@ -1,9 +1,15 @@
 package de.adorsys.onlinebanking.mock;
 
 import domain.*;
+import domain.request.LoadAccountInformationRequest;
+import domain.request.LoadBookingsRequest;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
 import org.junit.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Optional;
 
 @Ignore
 public class MockBankingTest {
@@ -32,7 +38,7 @@ public class MockBankingTest {
 
     @Test
     public void testLoadBankAccounts() {
-        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(LoadAccountInformationRequest.builder()
+        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(Optional.empty(), LoadAccountInformationRequest.builder()
                 .bankAccess(bankAccess)
                 .pin(pin)
                 .build());
@@ -42,14 +48,14 @@ public class MockBankingTest {
 
     @Test
     public void testLoadBookings() {
-        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(LoadAccountInformationRequest.builder()
+        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(Optional.empty(), LoadAccountInformationRequest.builder()
                 .bankAccess(bankAccess)
                 .pin(pin)
                 .build());
         Assume.assumeNotNull(loadAccountInformationResponse.getBankAccounts());
         Assume.assumeFalse(loadAccountInformationResponse.getBankAccounts().isEmpty());
         BankAccount bankAccount = loadAccountInformationResponse.getBankAccounts().iterator().next();
-        LoadBookingsResponse response = mockBanking.loadBookings(LoadBookingsRequest.builder()
+        LoadBookingsResponse response = mockBanking.loadBookings(Optional.empty(), LoadBookingsRequest.builder()
                 .bankAccess(bankAccess)
                 .bankAccount(bankAccount)
                 .pin(pin)

@@ -306,8 +306,8 @@ export class BookingListPage {
             }
           });
         }
+        loading.dismiss();
       })
-      loading.dismiss();
   }
 
   downloadBookings() {

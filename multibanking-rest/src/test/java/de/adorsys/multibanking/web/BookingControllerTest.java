@@ -12,6 +12,8 @@ import de.adorsys.multibanking.web.account.BookingController;
 import de.adorsys.multibanking.web.base.BaseControllerUnitTest;
 import domain.*;
 import domain.BankAccount.SyncStatus;
+import domain.request.LoadBookingsRequest;
+import domain.response.LoadBookingsResponse;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
 import org.adorsys.docusafe.service.types.DocumentContent;
 import org.junit.After;
@@ -29,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @WebMvcUnitTest(controllers = BookingController.class)
 public class BookingControllerTest extends BaseControllerUnitTest {
@@ -55,19 +58,20 @@ public class BookingControllerTest extends BaseControllerUnitTest {
 
         // TODO: Fix This. use data provided by the booking test.
 //        InputStream bookingsStream = BookingControllerTest.class.getClassLoader().getResourceAsStream("/BookingControllerTest/test_data.xls");
-        SimpleMockBanking simpleMockBanking = new SimpleMockBanking(null, null, null);
+        SimpleMockBanking simpleMockBanking = new SimpleMockBanking(null, null);
         BankAccess bankAccess = new BankAccess();
         bankAccess.setBankLogin("m.becker");
         BankAccount bankAccount = new BankAccount();
         bankAccount.setIban("DE81199999993528307800");
         LoadBookingsResponse bookingsResponse = simpleMockBanking.loadBookings(
+                Optional.empty(),
                 LoadBookingsRequest.builder()
                         .bankApiUser(null)
                         .bankAccess(bankAccess)
                         .bankCode(null)
                         .bankAccount(bankAccount)
                         .pin("12345")
-                        .updateTanTransportTypes(true)
+                        .withTanTransportTypes(true)
                         .withBalance(true)
                         .withStandingOrders(true)
                         .build()

@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
@@ -16,6 +17,7 @@ import java.util.Date;
  * Created by alexg on 07.02.17.
  */
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Document
 @Encrypted(exclude = {"_id", "bankAccessId", "userId", "syncStatus", "rulesVersion"})
 @JsonIgnoreProperties(value = {"externalIdMap"}, allowSetters = true)

@@ -29,6 +29,9 @@ public class Booking {
     @ApiModelProperty(value = "Target amount", example = "-19.93")
     private BigDecimal amount;
 
+    @ApiModelProperty(value = "Currency", example = "EUR")
+    private String currency;
+
     @ApiModelProperty(value = "Does this reverses a preexisting booking", example = "false")
     private boolean reversal;
 
@@ -59,7 +62,7 @@ public class Booking {
     @ApiModelProperty(value = "Usage of this transaction", example = "Svwz+2018-02-27t11.47.44 Karte3 2020-12 Abwa+6850 Edeka//Nuernberg/De")
     private String usage;
 
-    @ApiModelProperty(value = "")
+    @ApiModelProperty
     private String addkey;
 
     @ApiModelProperty(value = "Is this a SEPA transaction", example = "true")

@@ -14,5 +14,7 @@ public interface StandingOrderRepositoryIf {
 
     void save(List<StandingOrderEntity> standingOrders);
 
+    void save(StandingOrderEntity standingOrder);
+
     void deleteByAccountId(String accountId);
 }

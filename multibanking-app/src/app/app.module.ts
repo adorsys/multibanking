@@ -49,11 +49,15 @@ import { BookingImagesPage } from '../pages/booking-images/booking-images.compon
 import { BanksPage } from '../pages/banks/banks.component';
 import { BankService } from '../services/bank.service';
 import { BookingAutoCompleteService } from '../services/bookingAutoComplete.service';
+import { ContractItemDirective } from '../directives/contractItem.directive';
+import { ContractListDirective } from '../directives/contractList.directive';
 
 
 @NgModule({
   declarations: [
     ListActionDirective,
+    ContractListDirective,
+    ContractItemDirective,
     ResourceTreeDirective,
     AnalyticsPage,
     BankAccessCreatePage,

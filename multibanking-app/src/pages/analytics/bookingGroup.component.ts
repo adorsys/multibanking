@@ -39,21 +39,23 @@ export class BookingGroupPage {
       .filter(group => {
         let tmpAmount = this.getPeriodAmount(group);
         return tmpAmount && tmpAmount != 0;
+      })
+      .filter(group => {
+        return !group.contract || !group.contract.cancelled || this.getMatchingBookingPeriod(group)
       });
   }
 
   ngOnInit() {
     this.amount = 0;
     this.bookingGroups.forEach(group => {
-
-      let tmpAmount = this.getPeriodAmount(group);
-      tmpAmount = tmpAmount != 0 ? tmpAmount : group.amount;
-      if (tmpAmount && tmpAmount != 0) {
-        this.lineChartLabels.push(group.name ? group.name : group.otherAccount);
-        this.lineChartData.push(tmpAmount);
-        this.amount += tmpAmount;
-      }
-    }, this);
+        let tmpAmount = this.getPeriodAmount(group);
+        tmpAmount = tmpAmount != 0 ? tmpAmount : group.amount;
+        if (tmpAmount && tmpAmount != 0) {
+          this.lineChartLabels.push(group.name ? group.name : group.otherAccount);
+          this.lineChartData.push(tmpAmount);
+          this.amount += tmpAmount;
+        }
+      }, this);
   }
 
   sortGroups(aggregatedGroups: AggregatedGroups): BookingGroup[] {

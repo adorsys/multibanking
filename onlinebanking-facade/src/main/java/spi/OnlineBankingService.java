@@ -1,7 +1,12 @@
 package spi;
 
-
 import domain.*;
+import domain.request.*;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface OnlineBankingService {
 
@@ -11,25 +16,32 @@ public interface OnlineBankingService {
 
     boolean userRegistrationRequired();
 
-    BankApiUser registerUser(String userId);
+    BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin);
 
-    void removeUser(BankApiUser bankApiUser);
+    void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser);
 
-    LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest);
+    LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
+                                                    LoadAccountInformationRequest loadAccountInformationRequest);
 
-    void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
+    void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser);
 
-    LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest);
+    LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest);
+
+    List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest);
 
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
 
-    void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment);
+    Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest);
 
-    void submitPayment(Payment payment, String pin, String tan);
+    Object deletePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest);
 
-    void createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder);
+    String submitPayment(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest);
 
-    void submitStandingOrder(StandingOrder standingOrder, String pin, String tan);
+    String submitDelete(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest);
+
+    boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference);
+
+    void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest);
 }

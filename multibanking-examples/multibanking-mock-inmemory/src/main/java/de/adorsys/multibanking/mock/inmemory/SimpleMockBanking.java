@@ -2,15 +2,23 @@ package de.adorsys.multibanking.mock.inmemory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.adorsys.multibanking.mock.domain.*;
+import de.adorsys.multibanking.mock.domain.BankAccessData;
+import de.adorsys.multibanking.mock.domain.BankAccountData;
+import de.adorsys.multibanking.mock.domain.MockAccount;
+import de.adorsys.multibanking.mock.domain.XLSBank;
 import de.adorsys.multibanking.mock.loader.*;
 import de.adorsys.onlinebanking.mock.MockBanking;
 import domain.*;
+import domain.request.LoadAccountInformationRequest;
+import domain.request.LoadBookingsRequest;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Mock Banking operating on the base of a json file.
@@ -18,29 +26,20 @@ import java.util.List;
  * @author fpo
  */
 public class SimpleMockBanking extends MockBanking {
-    private BookingCategoryData bookingCategoryData;
-    private List<? extends Bank> banks;
+
     private ObjectMapper mapper = new ObjectMapper();
     private MockAccount data = new MockAccount();
 
-    public SimpleMockBanking() {
+    public SimpleMockBanking(InputStream banksStream, InputStream bookingsStream) {
         try {
-            load(null, null, null);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    public SimpleMockBanking(InputStream bookingCategoryStream, InputStream banksStream, InputStream bookingsStream) {
-        try {
-            load(bookingCategoryStream, banksStream, bookingsStream);
+            load(banksStream, bookingsStream);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
         List<BankAccount> bankAccounts = data.loadBankAccounts(loadAccountInformationRequest.getBankAccess(), loadAccountInformationRequest.getBankCode(), loadAccountInformationRequest.getPin());
         return LoadAccountInformationResponse.builder()
                 .bankAccounts(bankAccounts)
@@ -48,7 +47,7 @@ public class SimpleMockBanking extends MockBanking {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         String bankLogin = loadBookingsRequest.getBankAccess().getBankLogin();
         String iban = loadBookingsRequest.getBankAccount().getIban();
         BankAccessData bankAccessData = data.accessOrException(bankLogin);
@@ -59,16 +58,11 @@ public class SimpleMockBanking extends MockBanking {
         return LoadBookingsResponse.builder().bookings(bookings).standingOrders(standingOrders).build();
     }
 
-    private void load(InputStream bookingCategoryStream, InputStream banksStream, InputStream bookingsStream) throws IOException {
-        if (bookingCategoryStream == null)
-            bookingCategoryStream = SimpleMockBanking.class.getResourceAsStream("/booking_category.json");
-
-        bookingCategoryData = mapper.readValue(bookingCategoryStream, BookingCategoryData.class);
-
+    private void load(InputStream banksStream, InputStream bookingsStream) throws IOException {
         if (banksStream == null)
             banksStream = SimpleMockBanking.class.getResourceAsStream("/mock_bank.json");
 
-        banks = mapper.readValue(banksStream, new TypeReference<List<XLSBank>>() {
+        List<? extends Bank> banks = mapper.readValue(banksStream, new TypeReference<List<XLSBank>>() {
         });
 
         BankAccesLoader bankAccesLoader = new BankAccesLoader(data);

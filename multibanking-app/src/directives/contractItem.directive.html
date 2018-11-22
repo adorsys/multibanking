@@ -1,0 +1,13 @@
+<ion-item>
+  <ion-avatar item-start>
+    <img [src]="getLogo(contract.logo)" item-left/>
+  </ion-avatar>
+  <h4 *ngIf="contract.provider">{{contract.provider}}</h4>
+  <h4 *ngIf="contract.mainCategory">{{contract.mainCategory}}</h4>
+  <h4 *ngIf="contract.subCategory">{{contract.subCategory}}</h4>
+  <h4 *ngIf="contract.specification">{{contract.specification}}</h4>
+  <div item-right>
+    <h2>{{contract.amount | currency:'EUR':'symbol'}}</h2>
+    <h2>{{contract.interval | cycle}}</h2>
+  </div>
+</ion-item>

@@ -1,6 +1,9 @@
 package de.adorsys.onlinebanking.mock;
 
 import domain.*;
+import domain.request.*;
+import domain.response.LoadAccountInformationResponse;
+import domain.response.LoadBookingsResponse;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.core.ParameterizedTypeReference;
@@ -12,6 +15,7 @@ import utils.Utils;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -46,22 +50,52 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
+    public Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+        return null;
+    }
+
+    @Override
+    public Object deletePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+        return null;
+    }
+
+    @Override
+    public String submitPayment(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
+        return null;
+    }
+
+    @Override
+    public String submitDelete(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
+        return null;
+    }
+
+    @Override
+    public boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference) {
+        return false;
+    }
+
+    @Override
+    public void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest) {
+
+    }
+
+    @Override
     public boolean userRegistrationRequired() {
         return false;
     }
 
     @Override
-    public BankApiUser registerUser(String uid) {
+    public BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin) {
         //no registration needed
         return null;
     }
 
     @Override
-    public void removeUser(BankApiUser bankApiUser) {
+    public void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser) {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
         RestTemplate restTemplate = getRestTemplate(loadAccountInformationRequest.getBankAccess().getBankLogin(),
                 loadAccountInformationRequest.getBankAccess().getBankCode(), loadAccountInformationRequest.getPin());
 
@@ -80,12 +114,12 @@ public class MockBanking implements OnlineBankingService {
 
 
     @Override
-    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
         // getRestTemplate(bankApiUser.getApiUserId()).delete(mockConnectionUrl+"/bankaccesses/{bankcode}/accounts/{iban}",bankAccount.getBlz(),bankAccount.getIban());
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         BankAccess bankAccess = loadBookingsRequest.getBankAccess();
         BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 
@@ -109,6 +143,11 @@ public class MockBanking implements OnlineBankingService {
                 .build();
     }
 
+    @Override
+    public List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+        return null;
+    }
+
     private List<StandingOrder> getStandingOders(BankAccess ba, String pin, String iban) {
         return getRestTemplate(ba.getBankLogin(), ba.getBankCode(), pin)
                 .exchange(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/standingorders",
@@ -120,32 +159,16 @@ public class MockBanking implements OnlineBankingService {
                         iban).getBody();
     }
 
-    private BankAccountBalance getBalance(BankAccess ba, String pin, String iban) {
+    private BalancesReport getBalance(BankAccess ba, String pin, String iban) {
         BankAccount account = getRestTemplate(ba.getBankLogin(), ba.getBankCode(), pin)
                 .getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}",
                         BankAccount.class,
                         ba.getBankCode(),
                         iban);
-        return new BankAccountBalance().readyHbciBalance(account.getBankAccountBalance().getReadyHbciBalance());
+        return new BalancesReport().readyHbciBalance(account.getBalances().getReadyHbciBalance());
     }
 
-    @Override
-    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, Payment payment) {
-    }
 
-    @Override
-    public void submitPayment(Payment payment, String pin, String tan) {
-    }
-
-    @Override
-    public void createStandingOrder(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, StandingOrder standingOrder) {
-
-    }
-
-    @Override
-    public void submitStandingOrder(StandingOrder standingOrder, String pin, String tan) {
-
-    }
 
     public RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {
         String basicToken = new Base64().encodeAsString((bankLogin + "_" + bankCode + ":" + pin).getBytes(Charset.forName("UTF-8")));

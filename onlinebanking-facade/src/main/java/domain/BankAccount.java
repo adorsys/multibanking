@@ -17,8 +17,8 @@ public class BankAccount {
 
     @ApiModelProperty(hidden = true)
     private Map<BankApi, String> externalIdMap = new HashMap<>();
-    @ApiModelProperty(value = "Bank account balance", example = "2.000,00")
-    private BankAccountBalance bankAccountBalance;
+    @ApiModelProperty(value = "Bank account balances")
+    private BalancesReport balances;
     @ApiModelProperty(value = "Name of the account owner", example = "EDEKA")
     private String owner;
     @ApiModelProperty(value = "ISO-2 country of this bank account", example = "DE")
@@ -46,8 +46,8 @@ public class BankAccount {
     @ApiModelProperty(value = "Categorization rules version", example = "v1.3")
     private String rulesVersion;
 
-    public BankAccount bankAccountBalance(BankAccountBalance bankAccountBalance) {
-        this.bankAccountBalance = bankAccountBalance;
+    public BankAccount bankAccountBalance(BalancesReport bankAccountBalance) {
+        this.balances = bankAccountBalance;
         return this;
     }
 

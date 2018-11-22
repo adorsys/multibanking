@@ -22,14 +22,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.PaymentEntity;
+import de.adorsys.multibanking.domain.SinglePaymentEntity;
 import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.service.PaymentService;
 import de.adorsys.multibanking.service.UserDataService;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import domain.BankApi;
-import domain.Payment;
+import domain.SinglePayment;
 import hbci4java.Hbci4JavaBanking;
 
 /**
@@ -89,15 +89,14 @@ public class HbciPaymentTest {
 
             bookingService.syncBookings(bankAccessEntity.getId(), bankAccountEntitity.getId(), BankApi.HBCI, System.getProperty("pin"));
 
-            Payment payment = new Payment();
+            SinglePayment payment = new SinglePayment();
             payment.setReceiverIban("DE56760905000002257793");
-            payment.setPaymentType(Payment.PaymentType.SEPA_TRANSFER);
             payment.setReceiver("Alexander Geist");
             payment.setAmount(new BigDecimal(1));
             payment.setPurpose("test129");
 
             // "test-user-id", 
-            PaymentEntity paymentEntity = paymentService.createPayment(bankAccessEntity, bankAccountEntitity, System.getProperty("pin"), payment);
+            SinglePaymentEntity paymentEntity = paymentService.createPayment(bankAccessEntity, bankAccountEntitity, System.getProperty("pin"), payment);
 
             String tan = "";
             paymentService.submitPayment(paymentEntity, bankAccessEntity.getBankCode(), tan);

@@ -170,7 +170,7 @@ public class BankAccessService  {
 	   						.filter(apiUser -> apiUser.getBankApi() == bankApi)
 	   						.findFirst()
 	   						.orElseThrow(() -> new ResourceNotFoundException(BankApiUser.class, bankApi.toString()));
-	   				bankingService.removeBankAccount(bankAccountEntity, bankApiUser);
+	   				bankingService.removeBankAccount(null, bankAccountEntity, bankApiUser);
 	   			}
 	   		});
 	   	});

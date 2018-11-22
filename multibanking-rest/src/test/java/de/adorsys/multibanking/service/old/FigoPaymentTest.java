@@ -21,14 +21,14 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.PaymentEntity;
+import de.adorsys.multibanking.domain.SinglePaymentEntity;
 import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.service.PaymentService;
 import de.adorsys.multibanking.service.UserDataService;
 import de.adorsys.multibanking.service.producer.OnlineBankingServiceProducer;
 import domain.BankApi;
-import domain.Payment;
+import domain.SinglePayment;
 import figo.FigoBanking;
 
 /**
@@ -92,9 +92,8 @@ public class FigoPaymentTest {
 
         bookingService.syncBookings(bankAccessEntity.getId(), bankAccountEntitity.getId(), BankApi.FIGO, System.getProperty("pin"));
 
-        PaymentEntity paymentEntity = new PaymentEntity();
+        SinglePaymentEntity paymentEntity = new SinglePaymentEntity();
         paymentEntity.setReceiverIban("receiver_iban_needed_here");
-        paymentEntity.setPaymentType(Payment.PaymentType.SEPA_TRANSFER);
         paymentEntity.setReceiver("Alexander Geist");
         paymentEntity.setAmount(new BigDecimal(1));
         paymentEntity.setPurpose("test");

@@ -15,6 +15,9 @@ import de.adorsys.multibanking.utils.FQNUtils;
 import de.adorsys.multibanking.utils.Ids;
 import de.adorsys.smartanalytics.api.AnalyticsResult;
 import domain.*;
+import domain.request.LoadAccountInformationRequest;
+import domain.request.LoadBookingsRequest;
+import domain.response.LoadBookingsResponse;
 import exception.InvalidPinException;
 import org.adorsys.docusafe.business.DocumentSafeService;
 import org.adorsys.docusafe.business.types.complex.DSDocument;
@@ -64,6 +67,11 @@ public class BookingService {
     @Autowired
     private DocumentSafeService documentSafeService;
 
+    private static TypeReference<List<BookingEntity>> listType() {
+        return new TypeReference<List<BookingEntity>>() {
+        };
+    }
+
     /**
      * Read and returns the booking file for a given period. Single bookings are not deserialized in
      * the memory of this JVM.
@@ -106,7 +114,7 @@ public class BookingService {
         BankAccountEntity bankAccount = bankAccountData.getBankAccount();
         LoadBookingsResponse response = loadBookingsOnline(bankApi, bankAccess, bankAccount, pin);
 
-        bankAccount.setBankAccountBalance(response.getBankAccountBalance());
+        bankAccount.setBalances(response.getBankAccountBalance());
         if (bankAccess.isStoreBookings()) {
             bankAccount.setLastSync(LocalDateTime.now());
             bankAccountService.saveBankAccount(bankAccount);
@@ -129,7 +137,7 @@ public class BookingService {
         Map<String, List<BookingEntity>> bookings = BookingHelper.mapBookings(bankAccount, accountSynchPref, response.getBookings());
 
         // Processed booking periods. Used for anonymization
-        // Check with alex if we can use this for analytics. 
+        // Check with alex if we can use this for analytics.
         // I don't think we need to reload all bookings of a user for analytics.
         BankAccountData bankAccountData = userData.bankAccountDataOrException(bankAccess.getId(), bankAccount.getId());
         Map<String, List<BookingEntity>> processBookingPeriods = storeBookings(bankAccountData, response.getStandingOrders(), bankAccess.isStoreBookings(), bookings);
@@ -186,22 +194,24 @@ public class BookingService {
     }
 
     private LoadBookingsResponse loadBookingsOnline(BankApi bankApi, BankAccessEntity bankAccess, BankAccountEntity bankAccount, String pin) {
-        BankApiUser bankApiUser = uds.checkApiRegistration(bankApi, bankAccess.getBankCode());
+        BankApiUser bankApiUser = uds.checkApiRegistration(bankApi, bankAccess);
 
         OnlineBankingService onlineBankingService = checkAndGetOnlineBankingService(bankAccess, bankAccount, pin, bankApiUser);
 
-        String mappedBlz = bankService.findByBankCode(bankAccess.getBankCode())
-                .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode())).getBlzHbci();
+        BankEntity bankEntity = bankService.findByBankCode(bankAccess.getBankCode())
+                .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode()));
 
         try {
             LoadBookingsResponse response = onlineBankingService.loadBookings(
+                    Optional.ofNullable(bankEntity.getBankingUrl()),
                     LoadBookingsRequest.builder()
                             .bankApiUser(bankApiUser)
                             .bankAccess(bankAccess)
-                            .bankCode(mappedBlz)
+                            .bankCode(bankEntity.getBlzHbci())
                             .bankAccount(bankAccount)
                             .pin(pin)
-                            .updateTanTransportTypes(true)
+                            .dateFrom(bankAccount.getLastSync() != null ? bankAccount.getLastSync().toLocalDate() : null)
+                            .withTanTransportTypes(true)
                             .withBalance(true)
                             .withStandingOrders(true)
                             .build()
@@ -247,6 +257,7 @@ public class BookingService {
             String blzHbci = bankService.findByBankCode(bankAccess.getBankCode())
                     .orElseThrow(() -> new ResourceNotFoundException(BankEntity.class, bankAccess.getBankCode())).getBlzHbci();
             List<BankAccount> apiBankAccounts = onlineBankingService.loadBankAccounts(
+                    Optional.empty(),
                     LoadAccountInformationRequest.builder()
                             .bankApiUser(bankApiUser)
                             .bankAccess(bankAccess)
@@ -326,11 +337,6 @@ public class BookingService {
         }
         return processBookingPeriods;
 
-    }
-
-    private static TypeReference<List<BookingEntity>> listType() {
-        return new TypeReference<List<BookingEntity>>() {
-        };
     }
 
     private TypeReference<List<AnonymizedBookingEntity>> anonymizedBookingsListType() {

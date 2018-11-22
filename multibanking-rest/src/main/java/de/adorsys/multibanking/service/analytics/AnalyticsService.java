@@ -27,9 +27,9 @@ public class AnalyticsService {
         accountAnalyticsEntity.setAccountId(bankAccountEntity.getId());
         accountAnalyticsEntity.setAnalyticsDate(referenceDate);
 
-        if(bankAccountEntity.getBankAccountBalance()!=null && bankAccountEntity.getBankAccountBalance().getReadyHbciBalance()!=null)
+        if(bankAccountEntity.getBalances()!=null && bankAccountEntity.getBalances().getReadyHbciBalance()!=null)
         	accountAnalyticsEntity.setBalanceCalculated(
-                bankAccountEntity.getBankAccountBalance().getReadyHbciBalance()
+                bankAccountEntity.getBalances().getReadyHbciBalance().getAmount()
                         .add(accountAnalyticsEntity.getIncomeNext()).add(accountAnalyticsEntity.getExpensesNext()));
         bankAccountService.saveAccountAnalytics(bankAccountEntity.getId(), accountAnalyticsEntity);
     }
