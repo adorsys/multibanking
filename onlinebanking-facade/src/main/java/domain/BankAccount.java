@@ -43,8 +43,6 @@ public class BankAccount {
     private SyncStatus syncStatus;
     @ApiModelProperty(value = "Last Synchronisation date", example = "2017-12-01")
     private LocalDateTime lastSync;
-    @ApiModelProperty(value = "Categorization rules version", example = "v1.3")
-    private String rulesVersion;
 
     public BankAccount bankAccountBalance(BalancesReport bankAccountBalance) {
         this.balances = bankAccountBalance;

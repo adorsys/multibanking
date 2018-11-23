@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Profile({"mongo", "fongo"})
 @Service
-public class BullPaymentRepositoryImpl implements BulkPaymentRepositoryIf {
+public class BulkPaymentRepositoryImpl implements BulkPaymentRepositoryIf {
 
     @Autowired
     private BulkPaymentRepositoryMongodb paymentRepository;

@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class AccountAnalyticsEntity {
     private String accountId;
     private String userId;
 
-    private LocalDate analyticsDate = LocalDate.now();
+    private LocalDateTime analyticsDate = LocalDateTime.now().now();
 
     private List<BookingGroup> bookingGroups;
 

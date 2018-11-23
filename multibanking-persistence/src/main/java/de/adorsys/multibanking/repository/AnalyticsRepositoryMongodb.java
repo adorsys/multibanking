@@ -19,5 +19,4 @@ public interface AnalyticsRepositoryMongodb extends MongoRepository<AccountAnaly
 
     void deleteByAccountId(String id);
 
-    void deleteByAccountIdAndAnalyticsDate(String accountId, LocalDate analyticsDate);
 }

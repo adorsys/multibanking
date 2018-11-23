@@ -27,7 +27,7 @@ export class ContractBlacklistPage {
       messages => {
         if (messages instanceof Array) {
           messages.forEach(message => {
-            if (message.key != "RESOUCE_NOT_FOUND") {
+            if (message.key != "RESOURCE_NOT_FOUND") {
               this.alertCtrl.create({
                 message: message.renderedMessage,
                 buttons: ['OK']

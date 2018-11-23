@@ -103,7 +103,7 @@ export class AnalyticsPage {
       messages => {
         if (messages instanceof Array) {
           messages.forEach(message => {
-            if (message.key == "RESCOURCE_NOT_FOUND") {
+            if (message.key == "RESOURCE_NOT_FOUND") {
               //ignore
             }
             else if (message.key == "SYNC_IN_PROGRESS") {
