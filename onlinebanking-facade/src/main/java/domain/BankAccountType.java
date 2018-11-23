@@ -7,6 +7,17 @@ public enum BankAccountType {
 
     GIRO, SAVINGS, FIXEDTERMDEPOSIT, DEPOT, LOAN, CREDITCARD, BUIILDINGSAVING, INSURANCE, UNKNOWN;
 
+    private Integer rawType;
+
+    public BankAccountType rawType(Integer rawType) {
+        this.rawType = rawType;
+        return this;
+    }
+
+    public Integer getRawType() {
+        return rawType;
+    }
+
     //Klassifizierung der Konten. Innerhalb der vorgegebenen Codebereiche sind kreditinstitutsindividuell bei Bedarf weitere Kontoarten möglich.
     //Codierung:
     //1 – 9: Kontokorrent-/Girokonto
@@ -21,29 +32,29 @@ public enum BankAccountType {
     //90 – 99: Sonstige (nicht zuordenbar)
     public static BankAccountType fromHbciType(Integer hbciAccountType) {
         if (hbciAccountType == null || hbciAccountType == 0)
-            return UNKNOWN;
+            return UNKNOWN.rawType(hbciAccountType);
 
         if (hbciAccountType < 10) {
-            return GIRO;
+            return GIRO.rawType(hbciAccountType);
         } else if (hbciAccountType < 20) {
-            return SAVINGS;
+            return SAVINGS.rawType(hbciAccountType);
         } else if (hbciAccountType < 30) {
-            return FIXEDTERMDEPOSIT;
+            return FIXEDTERMDEPOSIT.rawType(hbciAccountType);
         } else if (hbciAccountType < 40) {
-            return DEPOT;
+            return DEPOT.rawType(hbciAccountType);
         } else if (hbciAccountType < 50) {
-            return LOAN;
+            return LOAN.rawType(hbciAccountType);
         } else if (hbciAccountType < 60) {
-            return CREDITCARD;
+            return CREDITCARD.rawType(hbciAccountType);
         } else if (hbciAccountType < 70) {
-            return DEPOT;
+            return DEPOT.rawType(hbciAccountType);
         } else if (hbciAccountType < 80) {
-            return BUIILDINGSAVING;
+            return BUIILDINGSAVING.rawType(hbciAccountType);
         } else if (hbciAccountType < 90) {
-            return INSURANCE;
+            return INSURANCE.rawType(hbciAccountType);
         }
 
-        return UNKNOWN;
+        return UNKNOWN.rawType(hbciAccountType);
     }
 
     public static BankAccountType fromFigoType(String type) {

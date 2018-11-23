@@ -219,7 +219,6 @@ public final class HbciMapping {
         bankAccount.owner((konto.name + (konto.name2 != null ? konto.name2 : "")).trim());
         bankAccount.name(konto.type);
         bankAccount.type(BankAccountType.fromHbciType(NumberUtils.toInt(konto.acctype)));
-        bankAccount.rawType(NumberUtils.toInt(konto.acctype));
         return bankAccount;
     }
 
