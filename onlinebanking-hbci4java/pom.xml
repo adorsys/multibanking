@@ -14,7 +14,7 @@
 		<dependency>
 			<groupId>de.adorsys</groupId>
 			<artifactId>hbci4j-adorsys</artifactId>
-			<version>3.3.15</version>
+			<version>3.3.17</version>
 		</dependency>
 		<dependency>
 			<groupId>de.adorsys.multibanking</groupId>
