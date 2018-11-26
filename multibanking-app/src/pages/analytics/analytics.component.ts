@@ -134,7 +134,6 @@ export class AnalyticsPage {
     this.periods = [];
     this.lineChartLabels = [];
 
-
     if (referenceGroup) {
       let analyticsStart: Moment = moment().subtract(12, "month").day(1);
       let analyticsEnd: Moment = moment().add(13, "month").day(1);

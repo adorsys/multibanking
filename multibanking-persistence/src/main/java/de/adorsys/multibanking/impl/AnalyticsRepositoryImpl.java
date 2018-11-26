@@ -30,7 +30,7 @@ public class AnalyticsRepositoryImpl implements AnalyticsRepositoryIf {
 	@Override
 	public Optional<LocalDateTime> findLastAnalyticsDateByUserIdAndAccountId(String userId, String bankAccountId) {
 		Query query = Query.query(Criteria.where("userId").is(userId).and("accountId").is(bankAccountId));
-		query.fields().include("bankCode");
+		query.fields().include("analyticsDate");
 
         AccountAnalyticsEntity found = mongoTemplate.findOne(query, AccountAnalyticsEntity.class);
 		return found != null ? Optional.of(found.getAnalyticsDate()) : Optional.empty();
