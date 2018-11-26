@@ -10,7 +10,7 @@
     <button ion-item *ngFor="let bankAccount of bankAccounts" (click)="itemSelected(bankAccount)">
       <h3>{{ bankAccount.accountNumber }}</h3>
       <h2>{{ bankAccount.type }}</h2>
-      <h2 *ngIf="bankAccount.bankAccountBalance" item-right>{{ bankAccount.bankAccountBalance.readyHbciBalance | currency:'EUR':'symbol' }}</h2>
+      <h2 *ngIf="bankAccount.balances && bankAccount.balances.readyHbciBalance" item-right>{{ bankAccount.balances.readyHbciBalance.amount | currency:'EUR':'symbol' }}</h2>
     </button>
   </ion-list>
 </ion-content>
