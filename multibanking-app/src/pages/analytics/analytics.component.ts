@@ -192,7 +192,7 @@ export class AnalyticsPage {
     };
 
     this.analytics.bookingGroups.forEach((group: BookingGroup) => {
-      let amount = this.getPeriodAmount(group, periodStart);
+      let amount = this.getPeriodAmount(group, periodStart, periodEnd);
 
       if (this.includeGroup(group, periodStart)) {
         switch (group.type) {
@@ -224,14 +224,14 @@ export class AnalyticsPage {
     return budget;
   }
 
-  getPeriodAmount(group: BookingGroup, referenceDate: Moment): number {
-    let period: BookingPeriod = this.findPeriod(group.bookingPeriods, referenceDate);
+  getPeriodAmount(group: BookingGroup, periodStart: Moment, periodEnd: Moment): number {
+    let period: BookingPeriod = this.findPeriod(group.bookingPeriods, periodStart);
 
     if (period && period.amount) {
       return period.amount;
     }
 
-    if (group.amount) {
+    if (group.amount && moment().isBefore(periodStart, 'day')) {
       return group.amount;
     }
 
@@ -269,7 +269,7 @@ export class AnalyticsPage {
       return periods.find((period: BookingPeriod) => {
         let periodStart: Moment = moment(period.start);
         let periodEnd: Moment = moment(period.end);
-        return referenceDate.isSameOrAfter(periodStart) && referenceDate.isSameOrBefore(periodEnd);
+        return referenceDate.isSameOrAfter(periodStart, 'day') && referenceDate.isSameOrBefore(periodEnd, 'day');
       });
     }
   }
@@ -350,7 +350,7 @@ export class AnalyticsPage {
     this.forecast = date.isSameOrAfter(moment(), "month");
 
     let period = this.periods.find((period: Moment[]) => {
-      return date.isSameOrAfter(period[0]) && date.isSameOrBefore(period[1]);
+      return date.isSameOrAfter(period[0], 'day') && date.isSameOrBefore(period[1], 'day');
     });
 
     this.budget = this.calculateBudget(period[0], period[1]);
@@ -396,7 +396,7 @@ export class AnalyticsPage {
 
   itemSelected(label: string, aggregatedGroups: AggregatedGroups) {
     let period = this.periods.find((period: Moment[]) => {
-      return this.referenceDate.isSameOrAfter(period[0]) && this.referenceDate.isSameOrBefore(period[1]);
+      return this.referenceDate.isSameOrAfter(period[0], 'day') && this.referenceDate.isSameOrBefore(period[1], 'day');
     });
 
     this.navCtrl.push(BookingGroupPage,

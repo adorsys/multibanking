@@ -17,6 +17,7 @@ export class BookingGroupPage {
   period: Moment[];
   amount: number;
   label: string;
+  forecast: boolean;
   aggregatedGroups: AggregatedGroups;
   bookingGroups: BookingGroup[];
   bankAccessId: string;
@@ -35,9 +36,10 @@ export class BookingGroupPage {
     this.bankAccountId = navparams.data.bankAccountId;
     this.amount = navparams.data.amount;
     this.aggregatedGroups = navparams.data.aggregatedGroups;
+    this.forecast = moment().isBefore(this.period[0], 'day');
     this.bookingGroups = this.sortGroups(navparams.data.aggregatedGroups)
       .filter(group => {
-        let tmpAmount = this.getPeriodAmount(group);
+        let tmpAmount = this.forecast ? this.getAmount(group) : this.getPeriodAmount(group);
         return tmpAmount && tmpAmount != 0;
       })
       .filter(group => {
@@ -48,14 +50,14 @@ export class BookingGroupPage {
   ngOnInit() {
     this.amount = 0;
     this.bookingGroups.forEach(group => {
-        let tmpAmount = this.getPeriodAmount(group);
-        tmpAmount = tmpAmount != 0 ? tmpAmount : group.amount;
-        if (tmpAmount && tmpAmount != 0) {
-          this.lineChartLabels.push(group.name ? group.name : group.otherAccount);
-          this.lineChartData.push(tmpAmount);
-          this.amount += tmpAmount;
-        }
-      }, this);
+      let tmpAmount = this.forecast ? this.getAmount(group) : this.getPeriodAmount(group);
+      tmpAmount = tmpAmount != 0 ? tmpAmount : group.amount;
+      if (tmpAmount && tmpAmount != 0) {
+        this.lineChartLabels.push(group.name ? group.name : group.otherAccount);
+        this.lineChartData.push(tmpAmount);
+        this.amount += tmpAmount;
+      }
+    }, this);
   }
 
   sortGroups(aggregatedGroups: AggregatedGroups): BookingGroup[] {
@@ -75,28 +77,20 @@ export class BookingGroupPage {
 
     return bookingGroup.bookingPeriods.find((groupPeriod: BookingPeriod) => {
       let groupPeriodEnd: Moment = moment(groupPeriod.end);
-      return groupPeriodEnd.isSameOrAfter(this.period[0]) && groupPeriodEnd.isSameOrBefore(this.period[1]);
+      return groupPeriodEnd.isSameOrAfter(this.period[0], 'day') && groupPeriodEnd.isSameOrBefore(this.period[1], 'day');
     });
   }
 
   getAmount(bookingGroup: BookingGroup) {
     let amount = this.getPeriodAmount(bookingGroup);
-    amount = amount ? amount : bookingGroup.amount;
+    amount = amount > 0 ? amount : bookingGroup.amount;
     return amount >= 0 ? amount : amount * -1;
-  }
-
-  periodAmountExists(bookingGroup: BookingGroup) {
-    return this.getPeriodAmount(bookingGroup);
   }
 
   getPeriodAmount(bookingGroup: BookingGroup): number {
     let period = this.getMatchingBookingPeriod(bookingGroup);
     if (period && period.amount) {
       return period.amount;
-    }
-
-    if (bookingGroup.amount) {
-      return bookingGroup.amount;
     }
     return 0;
   }

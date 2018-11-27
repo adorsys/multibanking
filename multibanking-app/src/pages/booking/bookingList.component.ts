@@ -139,7 +139,7 @@ export class BookingListPage {
     let referenceDate = moment(analytics.analyticsDate);
     let nextMonth = referenceDate.clone().add(1, 'month');
 
-    //collect booking for current and next period
+    //collect bookings for current and next period
     let forecastBookings: ExecutedBooking[] = [];
     analytics.bookingGroups.forEach(group => {
       let currentPeriod = this.findPeriod(group.bookingPeriods, referenceDate.clone().startOf('month'), referenceDate.clone().endOf('month'));
@@ -211,7 +211,7 @@ export class BookingListPage {
     if (periods) {
       return periods.find((period: BookingPeriod) => {
         let periodEnd: Moment = moment(period.end);
-        return periodEnd.isSameOrAfter(referenceStart) && periodEnd.isSameOrBefore(referenceEnd);
+        return periodEnd.isSameOrAfter(referenceStart, 'day') && periodEnd.isSameOrBefore(referenceEnd, 'day');
       });
     }
   }
