@@ -7,6 +7,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +25,9 @@ public class UserEntity {
     private String id;
 
     @Indexed
-    private Date expireUser;
+    private LocalDateTime expireUser;
+
+    private LocalDateTime rulesLastChangeDate;
 
     private List<BankApiUser> apiUser = new ArrayList<>();
 

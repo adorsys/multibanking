@@ -76,13 +76,6 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 	}
 
 	@Override
-	public void removeRulesVersion(String userId) {
-		Query where = Query.query(Criteria.where("userId").is(userId));
-		Update update = new Update().unset("rulesVersion");
-		mongoTemplate.updateMulti(where, update, BankAccountEntity.class);
-	}
-
-	@Override
 	public List<BankAccountEntity> deleteByBankAccess(String accessId) {
 		return bankAccountRepository.deleteByBankAccessId(accessId);
 	}

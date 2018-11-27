@@ -28,8 +28,6 @@ public interface BankAccountRepositoryIf {
 
 	void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus);
 
-	void removeRulesVersion(String userId);
-
     List<BankAccountEntity> deleteByBankAccess(String accessId);
 
 	Optional<BankAccountEntity> findOne(String accountId);

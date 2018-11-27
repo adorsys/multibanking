@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,10 @@ public interface UserRepositoryIf {
     Optional<UserEntity> findById(String id);
 
 	List<String> findExpiredUser();
+
+	Optional<LocalDateTime> getRulesLastChangeDate(String id);
+
+	Optional<UserEntity> setRulesLastChangeDate(String id, LocalDateTime dateTime);
 
 	boolean exists(String userId);
 

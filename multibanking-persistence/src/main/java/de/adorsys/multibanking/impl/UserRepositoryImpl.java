@@ -5,12 +5,9 @@ import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.repository.UserRepositoryMongodb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,9 +19,6 @@ public class UserRepositoryImpl implements UserRepositoryIf {
     @Autowired
     private UserRepositoryMongodb userRepository;
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
-
     @Override
     public Optional<UserEntity> findById(String id) {
         return userRepository.findById(id);
@@ -32,15 +26,25 @@ public class UserRepositoryImpl implements UserRepositoryIf {
 
     @Override
     public List<String> findExpiredUser() {
-        Query query = new Query(
-                Criteria.where("expireUser").lte(new Date())
-        );
-        query.fields().include("id");
-
-        return mongoTemplate.find(query, UserEntity.class)
+        return userRepository.findByExpireUserLessThan(LocalDateTime.now())
                 .stream()
                 .map(userEntity -> userEntity.getId())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<LocalDateTime> getRulesLastChangeDate(String id) {
+        return findById(id)
+                .flatMap(userEntity -> Optional.ofNullable(userEntity.getRulesLastChangeDate()));
+    }
+
+    @Override
+    public Optional<UserEntity> setRulesLastChangeDate(String id, LocalDateTime dateTime) {
+        return findById(id)
+                .flatMap(userEntity -> {
+                    userEntity.setRulesLastChangeDate(dateTime);
+                    return Optional.of(userRepository.save(userEntity));
+                });
     }
 
     @Override
