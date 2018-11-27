@@ -192,7 +192,7 @@ export class AnalyticsPage {
     };
 
     this.analytics.bookingGroups.forEach((group: BookingGroup) => {
-      let amount = this.getPeriodAmount(group, periodStart, periodEnd);
+      let amount = this.getPeriodAmount(group, periodStart);
 
       if (this.includeGroup(group, periodStart)) {
         switch (group.type) {
@@ -224,7 +224,7 @@ export class AnalyticsPage {
     return budget;
   }
 
-  getPeriodAmount(group: BookingGroup, periodStart: Moment, periodEnd: Moment): number {
+  getPeriodAmount(group: BookingGroup, periodStart: Moment): number {
     let period: BookingPeriod = this.findPeriod(group.bookingPeriods, periodStart);
 
     if (period && period.amount) {
