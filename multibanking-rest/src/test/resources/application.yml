@@ -1,3 +1,7 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+
 sts:
   resourceServers:
   - audience: "multibanking"
