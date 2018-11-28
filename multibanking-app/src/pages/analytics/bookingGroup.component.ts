@@ -36,7 +36,7 @@ export class BookingGroupPage {
     this.bankAccountId = navparams.data.bankAccountId;
     this.amount = navparams.data.amount;
     this.aggregatedGroups = navparams.data.aggregatedGroups;
-    this.forecast = moment().isBefore(this.period[0], 'day');
+    this.forecast = moment().isSameOrBefore(this.period[0], 'day');
     this.bookingGroups = this.sortGroups(navparams.data.aggregatedGroups)
       .filter(group => {
         let tmpAmount = this.forecast ? this.getAmount(group) : this.getPeriodAmount(group);

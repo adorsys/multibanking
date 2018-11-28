@@ -231,7 +231,11 @@ export class AnalyticsPage {
       return period.amount;
     }
 
-    if (group.amount && moment().isBefore(periodStart, 'day')) {
+    if (periodStart.isSame(moment(), "month")) {
+        console.log();
+    }
+
+    if (group.amount && moment().isSameOrBefore(periodStart, 'day')) {
       return group.amount;
     }
 
