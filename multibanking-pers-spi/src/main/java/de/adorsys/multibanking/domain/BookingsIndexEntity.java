@@ -8,10 +8,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by alexg on 08.05.17.
@@ -33,22 +30,24 @@ public class BookingsIndexEntity {
 
     public void updateSearchIndex(List<BookingEntity> bookings) {
         bookingIdSearchList = new HashMap<>();
-        bookings.forEach(booking -> {
-            List search = new ArrayList();
-            if (booking.getBookingCategory() != null) {
-                if (StringUtils.hasText(booking.getBookingCategory().getReceiver())) {
-                    search.add(booking.getBookingCategory().getReceiver());
-                }
-            }
-            if (booking.getOtherAccount() != null) {
-                if (StringUtils.hasText(booking.getOtherAccount().getName())) {
-                    search.add(booking.getOtherAccount().getName());
-                }
-                if (StringUtils.hasText(booking.getOtherAccount().getOwner())) {
-                    search.add(booking.getOtherAccount().getOwner());
-                }
-            }
-            bookingIdSearchList.put(booking.getId(), search);
-        });
+        bookings.stream()
+                .sorted(Collections.reverseOrder())
+                .forEach(booking -> {
+                    List search = new ArrayList();
+                    if (booking.getBookingCategory() != null) {
+                        if (StringUtils.hasText(booking.getBookingCategory().getReceiver())) {
+                            search.add(booking.getBookingCategory().getReceiver());
+                        }
+                    }
+                    if (booking.getOtherAccount() != null) {
+                        if (StringUtils.hasText(booking.getOtherAccount().getName())) {
+                            search.add(booking.getOtherAccount().getName());
+                        }
+                        if (StringUtils.hasText(booking.getOtherAccount().getOwner())) {
+                            search.add(booking.getOtherAccount().getOwner());
+                        }
+                    }
+                    bookingIdSearchList.put(booking.getId(), search);
+                });
     }
 }
