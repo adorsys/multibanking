@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -99,7 +100,17 @@ public class BankAccountService {
 
         bankAccounts.forEach(source -> {
             BankAccountEntity target = new BankAccountEntity();
-            target.id(source.getIban());
+			String idToBeUsed = source.getIban();
+			if (idToBeUsed == null) {
+				idToBeUsed = source.getAccountNumber();
+				if (idToBeUsed == null) {
+					idToBeUsed = UUID.randomUUID().toString();
+					log.debug("PATCH 3.0.28 id is uuid, rather than iban or account number: " + idToBeUsed);
+				} else {
+					log.debug("PATCH 3.0.28 id is account number, rather than iban: " + idToBeUsed);
+				}
+			}
+            target.id(idToBeUsed);
             BeanUtils.copyProperties(source, target);
             target.setUserId(bankAccess.getUserId());
             bankAccountEntities.add(target);
