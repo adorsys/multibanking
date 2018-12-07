@@ -92,7 +92,17 @@ public class BankAccountService {
 
         bankAccounts.forEach(source -> {
             BankAccountEntity target = new BankAccountEntity();
-            target.id(source.getIban());
+            String idToBeUsed = source.getIban();
+            if (idToBeUsed == null) {
+                idToBeUsed = source.getAccountNumber();
+                if (idToBeUsed == null) {
+                    idToBeUsed = UUID.randomUUID().toString();
+                    log.debug("MUL-319: id is uuid, rather than iban or account number: " + idToBeUsed);
+                } else {
+                    log.debug("MUL-319 id is account number, rather than iban: " + idToBeUsed);
+                }
+            }
+            target.id(idToBeUsed);
             BeanUtils.copyProperties(source, target);
             target.setUserId(bankAccess.getUserId());
             bankAccountEntities.add(target);
