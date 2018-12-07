@@ -56,6 +56,10 @@ public class LoadBookingsJob {
                 .hbciPassportState(loadBookingsRequest.getBankAccess().getHbciPassportState())
                 .pin(loadBookingsRequest.getPin())
                 .build();
+
+        dialogRequest.setHbciProduct(Optional.ofNullable(loadBookingsRequest.getHbciProduct())
+                .map(product -> new HBCIProduct(product.getProduct(), product.getVersion()))
+                .orElse(null));
         dialogRequest.setBpd(loadBookingsRequest.getBpd());
 
         HBCIDialog dialog = createDialog(null, dialogRequest);

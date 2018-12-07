@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV_Result.GVRTANMediaList;
+import org.kapott.hbci.manager.HBCIProduct;
 import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.passport.PinTanPassport;
 
@@ -37,12 +38,12 @@ public class HbciPassport extends PinTanPassport {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public HbciPassport(String hbciversion, Map<String, String> properties, HbciCallback hbciCallback) {
-        super(hbciversion, properties, hbciCallback != null ? hbciCallback : new HbciCallback());
+    public HbciPassport(String hbciversion, Map<String, String> properties, HbciCallback hbciCallback, HBCIProduct hbciProduct) {
+        super(hbciversion, properties, hbciCallback != null ? hbciCallback : new HbciCallback(), hbciProduct);
     }
 
     public HbciPassport clone() {
-        HbciPassport passport = new HbciPassport(this.getHBCIVersion(), getProperties(), null);
+        HbciPassport passport = new HbciPassport(this.getHBCIVersion(), getProperties(), null, this.getHbciProduct());
         passport.setCountry(this.getCountry());
         passport.setHost(this.getHost());
         passport.setPort(this.getPort());
@@ -64,6 +65,7 @@ public class HbciPassport extends PinTanPassport {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class State {
 
+        public HBCIProduct hbciProduct;
         public String hbciVersion;
         public String customerId;
         public String blz;
@@ -104,6 +106,7 @@ public class HbciPassport extends PinTanPassport {
             upd = (HashMap<String, String>) passport.getUPD();
             tanMedias = passport.getTanMedias();
             currentSecMechInfo = passport.getCurrentSecMechInfo();
+            hbciProduct = passport.getHbciProduct();
         }
 
         public static State readJson(String s) {

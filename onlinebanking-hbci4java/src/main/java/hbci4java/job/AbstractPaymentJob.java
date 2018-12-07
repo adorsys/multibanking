@@ -17,6 +17,7 @@
 package hbci4java.job;
 
 import domain.AbstractPayment;
+import domain.HBCIProduct;
 import domain.PaymentChallenge;
 import domain.PaymentRequest;
 import domain.request.SubmitPaymentRequest;
@@ -38,6 +39,7 @@ import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 
 import java.util.List;
+import java.util.Optional;
 
 import static hbci4java.model.HbciDialogFactory.createDialog;
 import static hbci4java.model.HbciDialogFactory.createPassport;
@@ -79,6 +81,9 @@ public abstract class AbstractPaymentJob {
                 .pin(paymentRequest.getPin())
                 .callback(hbciCallback)
                 .build();
+        dialogRequest.setHbciProduct(Optional.ofNullable(paymentRequest.getHbciProduct())
+                .map(product -> new HBCIProduct(product.getProduct(), product.getVersion()))
+                .orElse(null));
         dialogRequest.setBpd(paymentRequest.getBpd());
 
         HBCIDialog dialog = createDialog(null, dialogRequest);
@@ -155,6 +160,7 @@ public abstract class AbstractPaymentJob {
 
         HbciPassport.State state = HbciPassport.State.readJson(hbciTanSubmit.getPassportState());
         HbciPassport hbciPassport = createPassport(state.hbciVersion, state.blz, state.customerId, state.userId,
+                state.hbciProduct,
                 new HbciCallback() {
 
                     @Override

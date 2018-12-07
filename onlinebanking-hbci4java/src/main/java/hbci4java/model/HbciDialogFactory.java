@@ -19,6 +19,7 @@ package hbci4java.model;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIDialog;
+import org.kapott.hbci.manager.HBCIProduct;
 import org.kapott.hbci.manager.HBCIUtils;
 
 import java.util.HashMap;
@@ -31,9 +32,15 @@ public class HbciDialogFactory {
                 .orElseThrow(() -> new IllegalArgumentException("Bank [" + dialogRequest.getBankCode() + "] not " +
                         "supported"));
 
+        HBCIProduct hbciProduct = Optional.ofNullable(dialogRequest.getHbciProduct())
+                .map(product -> new HBCIProduct(product.getProduct(), product.getVersion()))
+                .orElse(null);
+
         HbciPassport newPassport = Optional.ofNullable(passport)
                 .orElseGet(() -> createPassport(bankInfo.getPinTanVersion().getId(), dialogRequest.getBankCode(),
-                        dialogRequest.getCustomerId(), dialogRequest.getLogin(), dialogRequest.getCallback()));
+                        dialogRequest.getCustomerId(), dialogRequest.getLogin(), hbciProduct,
+                        dialogRequest.getCallback()
+                ));
 
         Optional.ofNullable(dialogRequest.getHbciPassportState())
                 .ifPresent(s -> HbciPassport.State.readJson(dialogRequest.getHbciPassportState()).apply(newPassport));
@@ -54,7 +61,7 @@ public class HbciDialogFactory {
     }
 
     public static HbciPassport createPassport(String hbciVersion, String bankCode, String customerId, String login,
-                                              HbciCallback callback) {
+                                              HBCIProduct hbciProduct, HbciCallback callback) {
         HashMap<String, String> properties = new HashMap<>();
         properties.put("kernel.rewriter", "InvalidSegment,WrongStatusSegOrder,WrongSequenceNumbers,MissingMsgRef," +
                 "HBCIVersion,SigIdLeadingZero,InvalidSuppHBCIVersion,SecTypeTAN,KUmsDelimiters,KUmsEmptyBDateSets");
@@ -73,7 +80,7 @@ public class HbciDialogFactory {
             properties.put("client.passport.userId", login);
         }
 
-        return new HbciPassport(hbciVersion, properties, callback);
+        return new HbciPassport(hbciVersion, properties, callback, hbciProduct);
     }
 
 }

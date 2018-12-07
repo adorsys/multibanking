@@ -17,6 +17,7 @@
 package hbci4java.job;
 
 import domain.BankAccount;
+import domain.HBCIProduct;
 import domain.request.LoadBalanceRequest;
 import hbci4java.model.HbciDialogRequest;
 import hbci4java.model.HbciMapping;
@@ -30,10 +31,7 @@ import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static hbci4java.model.HbciDialogFactory.createDialog;
@@ -50,6 +48,10 @@ public class LoadBalanceJob {
                 .hbciPassportState(loadBalanceRequest.getBankAccess().getHbciPassportState())
                 .pin(loadBalanceRequest.getPin())
                 .build();
+
+        dialogRequest.setHbciProduct(Optional.ofNullable(loadBalanceRequest.getHbciProduct())
+                .map(product -> new HBCIProduct(product.getProduct(), product.getVersion()))
+                .orElse(null));
         dialogRequest.setBpd(loadBalanceRequest.getBpd());
 
         HBCIDialog dialog = createDialog(null, dialogRequest);

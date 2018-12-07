@@ -16,6 +16,7 @@
 
 package domain.request;
 
+import domain.HBCIProduct;
 import lombok.Data;
 
 import java.util.Map;
@@ -23,5 +24,6 @@ import java.util.Map;
 @Data
 public class AbstractHbciRequest {
 
+    private HBCIProduct hbciProduct;
     private Map<String, String> bpd;
 }
