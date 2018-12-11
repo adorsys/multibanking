@@ -16,14 +16,24 @@
 
 package domain.request;
 
-import domain.HBCIProduct;
+import domain.BankAccess;
+import domain.BankAccount;
+import domain.TanTransportType;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.util.Map;
-
+/**
+ * Created by alexg on 05.09.17.
+ */
 @Data
-public abstract class AbstractHbciRequest {
+@Builder
+@EqualsAndHashCode(callSuper = false)
+public class SendTanRequest extends AbstractHbciRequest {
 
-    private HBCIProduct hbciProduct;
-    private Map<String, String> bpd;
+    private TanTransportType tanTransportType;
+    private BankAccess bankAccess;
+    private BankAccount bankAccount;
+    private String bankCode;
+    private String pin;
 }

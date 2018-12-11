@@ -37,7 +37,7 @@ public class FinapiBanking implements OnlineBankingService {
             ".:,?!+-_$@#";
     private static final Logger LOG = LoggerFactory.getLogger(FinapiBanking.class);
     private static SecureRandom random = getSecureRandom();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private String finapiClientId;
     private String finapiSecret;
     private String finapiConnectionUrl;
@@ -287,12 +287,12 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public String submitPayment(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
+    public String submitPayment(SubmitPaymentRequest submitPaymentRequest) {
         return null;
     }
 
     @Override
-    public String submitDelete(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
+    public String submitDelete(SubmitPaymentRequest submitPaymentRequest) {
         return null;
     }
 

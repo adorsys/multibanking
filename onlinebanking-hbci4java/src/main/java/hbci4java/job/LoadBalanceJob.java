@@ -63,7 +63,7 @@ public class LoadBalanceJob {
             jobs.put(createBalanceJob(dialog, account), bankAccount);
         });
 
-        // Let the Handler execute all jobs in one batch
+        // Let the Handler submit all jobs in one batch
         HBCIExecStatus status = dialog.execute(true);
         if (!status.isOK()) {
             log.error("Status of balance job not OK " + status);

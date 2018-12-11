@@ -106,7 +106,7 @@ public class PaymentService {
                 .build();
         try {
             //TODO pin is needed here
-            bankingService.submitPayment(Optional.empty(), submitPaymentRequest);
+            bankingService.submitPayment(submitPaymentRequest);
         } catch (HbciException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }

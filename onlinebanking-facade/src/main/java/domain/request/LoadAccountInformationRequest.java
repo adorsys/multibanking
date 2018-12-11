@@ -18,7 +18,6 @@ package domain.request;
 
 import domain.BankAccess;
 import domain.BankApiUser;
-import domain.request.AbstractHbciRequest;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

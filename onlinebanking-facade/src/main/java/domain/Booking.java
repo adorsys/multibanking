@@ -59,7 +59,8 @@ public class Booking {
     @ApiModelProperty(value = "Primanota")
     private String primanota;
 
-    @ApiModelProperty(value = "Usage of this transaction", example = "Svwz+2018-02-27t11.47.44 Karte3 2020-12 Abwa+6850 Edeka//Nuernberg/De")
+    @ApiModelProperty(value = "Usage of this transaction", example = "Svwz+2018-02-27t11.47.44 Karte3 2020-12 " +
+            "Abwa+6850 Edeka//Nuernberg/De")
     private String usage;
 
     @ApiModelProperty

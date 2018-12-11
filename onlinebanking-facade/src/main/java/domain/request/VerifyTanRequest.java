@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package domain;
+package domain.request;
 
-import domain.request.AbstractHbciRequest;
+import domain.TanTransportType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,12 +24,10 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class PaymentRequest extends AbstractHbciRequest {
+public class VerifyTanRequest extends AbstractHbciRequest {
 
-    private BankApiUser bankApiUser;
-    private BankAccess bankAccess;
     private TanTransportType tanTransportType;
-    private String bankCode;
+    private Object tanSubmit;
     private String pin;
-    private AbstractPayment payment;
+    private String tan;
 }

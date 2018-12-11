@@ -17,7 +17,7 @@
 package domain.request;
 
 import domain.AbstractPayment;
-import domain.request.AbstractHbciRequest;
+import domain.TanTransportType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,6 +28,7 @@ import lombok.EqualsAndHashCode;
 public class SubmitPaymentRequest extends AbstractHbciRequest {
 
     private AbstractPayment payment;
+    private TanTransportType tanTransportType;
     private Object tanSubmit;
     private String pin;
     private String tan;
