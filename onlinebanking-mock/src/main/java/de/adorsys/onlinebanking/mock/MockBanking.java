@@ -60,12 +60,12 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public String submitPayment(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
+    public String submitPayment(SubmitPaymentRequest submitPaymentRequest) {
         return null;
     }
 
     @Override
-    public String submitDelete(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
+    public String submitDelete(SubmitPaymentRequest submitPaymentRequest) {
         return null;
     }
 

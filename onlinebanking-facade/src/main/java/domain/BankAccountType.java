@@ -9,16 +9,8 @@ public enum BankAccountType {
 
     private Integer rawType;
 
-    public BankAccountType rawType(Integer rawType) {
-        this.rawType = rawType;
-        return this;
-    }
-
-    public Integer getRawType() {
-        return rawType;
-    }
-
-    //Klassifizierung der Konten. Innerhalb der vorgegebenen Codebereiche sind kreditinstitutsindividuell bei Bedarf weitere Kontoarten möglich.
+    //Klassifizierung der Konten. Innerhalb der vorgegebenen Codebereiche sind kreditinstitutsindividuell bei Bedarf
+    // weitere Kontoarten möglich.
     //Codierung:
     //1 – 9: Kontokorrent-/Girokonto
     //10 – 19: Sparkonto
@@ -116,7 +108,8 @@ public enum BankAccountType {
 //    CHAR("Charges"),  // Account used for charges if different from the account for payment
 //    CISH("CashIncome"),  // Account used for payment of income if different from the current cash account
 //    COMM("Commission"),  // Account used for commission if different from the account for payment
-//    CPAC("ClearingParticipantSettlementAccount"),  // Account used to post settlement debit and credit entries on behalf of a designated Clearing Participant
+//    CPAC("ClearingParticipantSettlementAccount"),  // Account used to post settlement debit and credit entries on
+//    behalf of a designated Clearing Participant
 //    LLSV("LimitedLiquiditySavingsAccount"),  // Account used for savings with special interest and withdrawal terms
 //    LOAN("Loan"),  // Account used for loans
 //    MGLD("Marginal Lending"),  // Account used for a marginal lending facility
@@ -125,11 +118,14 @@ public enum BankAccountType {
 //    ODFT("Overdraft"),  // Account is used for overdrafts
 //    ONDP("OverNightDeposit"),  // Account used for overnight deposits
 //    OTHR("OtherAccount"),  // Account not otherwise specified
-//    SACC("Settlement"),  // Account used to post debit and credit entries, as a result of transactions cleared and settled through a specific clearing and settlement system
+//    SACC("Settlement"),  // Account used to post debit and credit entries, as a result of transactions cleared and
+//    settled through a specific clearing and settlement system
 //    SLRY("Salary"),  // Accounts used for salary payments
 //    SVGS("Savings"),  // Account used for savings
 //    TAXE("Tax"),  // Account used for taxes if different from the account for payment
-//    TRAN("TransactingAccount"),  // A transacting account is the most basic type of bank account that you can get. The main difference between transaction and cheque accounts is that you usually do not get a cheque book with your transacting account and neither are you offered an overdraft facility
+//    TRAN("TransactingAccount"),  // A transacting account is the most basic type of bank account that you can get.
+//    The main difference between transaction and cheque accounts is that you usually do not get a cheque book with
+//    your transacting account and neither are you offered an overdraft facility
 //    TRAS("Cash Trading");
     public static BankAccountType fromXS2AType(String xs2aAccountType) {
         switch (xs2aAccountType) {
@@ -159,5 +155,14 @@ public enum BankAccountType {
         }
         return BankAccountType.UNKNOWN;
 
+    }
+
+    public BankAccountType rawType(Integer rawType) {
+        this.rawType = rawType;
+        return this;
+    }
+
+    public Integer getRawType() {
+        return rawType;
     }
 }

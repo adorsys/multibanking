@@ -310,12 +310,12 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public String submitPayment(Optional<String> bankingUrl, domain.request.SubmitPaymentRequest submitPaymentRequest) {
+    public String submitPayment(domain.request.SubmitPaymentRequest submitPaymentRequest) {
         return null;
     }
 
     @Override
-    public String submitDelete(Optional<String> bankingUrl, domain.request.SubmitPaymentRequest submitPaymentRequest) {
+    public String submitDelete(domain.request.SubmitPaymentRequest submitPaymentRequest) {
         return null;
     }
 

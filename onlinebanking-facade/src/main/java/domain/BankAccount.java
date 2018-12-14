@@ -111,5 +111,4 @@ public class BankAccount {
         PENDING, SYNC, READY
     }
 
-
 }

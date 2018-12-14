@@ -110,7 +110,16 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     public Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         try {
             checkBankExists(paymentRequest.getBankCode(), bankingUrl);
-            return createPaymentJob(paymentRequest.getPayment()).execute(paymentRequest);
+            return createPaymentJob(paymentRequest.getPayment()).init(paymentRequest);
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
+
+    @Override
+    public String submitPayment(SubmitPaymentRequest submitPaymentRequest) {
+        try {
+            return createPaymentJob(submitPaymentRequest.getPayment()).submit(submitPaymentRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -120,25 +129,33 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     public Object deletePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         try {
             checkBankExists(paymentRequest.getBankCode(), bankingUrl);
-            return createDeleteJob(paymentRequest.getPayment()).execute(paymentRequest);
+            return createDeleteJob(paymentRequest.getPayment()).init(paymentRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public String submitPayment(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
+    public String submitDelete(SubmitPaymentRequest submitPaymentRequest) {
         try {
-            return createPaymentJob(submitPaymentRequest.getPayment()).execute(submitPaymentRequest);
+            return createDeleteJob(submitPaymentRequest.getPayment()).submit(submitPaymentRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
-    @Override
-    public String submitDelete(Optional<String> bankingUrl, SubmitPaymentRequest submitPaymentRequest) {
+    public Object sendTan(Optional<String> bankingUrl, SendTanRequest sendTanRequest) {
         try {
-            return createDeleteJob(submitPaymentRequest.getPayment()).execute(submitPaymentRequest);
+            checkBankExists(sendTanRequest.getBankCode(), bankingUrl);
+            return new VerifyTanJob().sendTan(sendTanRequest);
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
+
+    public void verifyTan(VerifyTanRequest submitVerifyTanRequest) {
+        try {
+            new VerifyTanJob().submit(submitVerifyTanRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }

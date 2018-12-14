@@ -15,5 +15,4 @@ public class BankApiUser {
     private BankApi bankApi;
     private Map<String, String> properties;
 
-
 }

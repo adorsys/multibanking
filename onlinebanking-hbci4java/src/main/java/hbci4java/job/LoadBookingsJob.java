@@ -76,7 +76,7 @@ public class LoadBookingsJob {
                 Optional.of(createStandingOrdersJob(dialog, account)) :
                 Optional.empty();
 
-        // Let the Handler execute all jobs in one batch
+        // Let the Handler submit all jobs in one batch
         HBCIExecStatus status = dialog.execute(true);
         if (!status.isOK()) {
             log.error("Status of SaldoReq+KUmsAll+DauerSEPAList batch job not OK " + status);

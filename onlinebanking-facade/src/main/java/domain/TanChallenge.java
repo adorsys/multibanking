@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentChallenge {
+public class TanChallenge {
 
     private String title;
     private String label;

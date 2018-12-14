@@ -16,7 +16,7 @@
 
 package hbci4java.model;
 
-import domain.PaymentChallenge;
+import domain.TanChallenge;
 import lombok.Data;
 
 /**
@@ -32,5 +32,5 @@ public class HbciTanSubmit {
     private String originJobName;
     private int originSegVersion;
     private String sepaPain;
-    private PaymentChallenge paymentChallenge;
+    private TanChallenge tanChallenge;
 }
