@@ -1,8 +1,8 @@
 package figo;
 
 import domain.*;
-import me.figo.models.*;
 import me.figo.models.StandingOrder;
+import me.figo.models.*;
 import org.apache.commons.lang3.StringUtils;
 import utils.Utils;
 
@@ -135,8 +135,8 @@ public class FigoMapping {
         return figoPayment;
     }
 
-    public static PaymentChallenge mapToChallenge(Challenge challenge) {
-        return PaymentChallenge.builder()
+    public static TanChallenge mapToChallenge(Challenge challenge) {
+        return TanChallenge.builder()
                 .data(challenge.getData())
                 .format(challenge.getFormat())
                 .label(challenge.getLabel())
