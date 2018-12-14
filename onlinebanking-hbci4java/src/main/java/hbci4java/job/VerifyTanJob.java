@@ -2,7 +2,7 @@ package hbci4java.job;
 
 import domain.AbstractPayment;
 import domain.HBCIProduct;
-import domain.PaymentChallenge;
+import domain.TanChallenge;
 import domain.request.VerifyTanRequest;
 import domain.request.SendTanRequest;
 import exception.HbciException;
@@ -40,7 +40,7 @@ public class VerifyTanJob extends AbstractTanProcessJob {
                 //needed later for submit
                 hbciTanSubmit.setOrderRef(orderRef);
                 if (challenge != null) {
-                    hbciTanSubmit.setPaymentChallenge(PaymentChallenge.builder()
+                    hbciTanSubmit.setTanChallenge(TanChallenge.builder()
                             .title(challenge)
                             .data(challenge_hhd_uc)
                             .build());
