@@ -42,11 +42,7 @@
 
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZZ</maven.build.timestamp.format>
         <maven.build-timestamp>${maven.build.timestamp}</maven.build-timestamp>
-
-        <de.adorsys.sts.version>0.27.0</de.adorsys.sts.version>
         <de.adorsys.smartanalytics.version>1.1.4.1</de.adorsys.smartanalytics.version>
-        <crypt.version>0.18.7</crypt.version>
-        <docusafe.version>0.3.8</docusafe.version>
         <scmBranch/>
         <start-class/>
     </properties>
@@ -61,9 +57,7 @@
         <module>onlinebanking-xs2a</module>
         <module>onlinebanking-mock</module>
         <module>multibanking-pers-spi</module>
-        <module>multibanking-rest</module>
         <module>onlinebanking-xls-loader</module>
-        <module>multibanking-examples</module>
     </modules>
 
     <dependencyManagement>
