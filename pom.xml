@@ -57,7 +57,6 @@
         <module>onlinebanking-xs2a</module>
         <module>onlinebanking-mock</module>
         <module>multibanking-pers-spi</module>
-        <module>onlinebanking-xls-loader</module>
     </modules>
 
     <dependencyManagement>
