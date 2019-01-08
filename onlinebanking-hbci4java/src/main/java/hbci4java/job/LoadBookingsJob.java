@@ -77,13 +77,9 @@ public class LoadBookingsJob {
                 Optional.empty();
 
         // Let the Handler submit all jobs in one batch
-        HBCIExecStatus status = dialog.execute(true);
-        if (!status.isOK()) {
-            log.error("Status of SaldoReq+KUmsAll+DauerSEPAList batch job not OK " + status);
-
-            if (initFailed(status)) {
-                throw new HBCI_Exception(status.getErrorString());
-            }
+        HBCIExecStatus dialogStatus = dialog.execute(true);
+        if (!dialogStatus.isOK()) {
+            log.warn(dialogStatus.getErrorString());
         }
 
         if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
