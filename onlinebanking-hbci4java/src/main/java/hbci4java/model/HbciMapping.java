@@ -188,7 +188,7 @@ public final class HbciMapping {
                     }
 
                 }
-                booking.setExternalId("B-" + line.bdate.getTime() + "_" + line.value.getLongValue()
+                booking.setExternalId("B-" + line.valuta.getTime() + "_" + line.value.getLongValue()
                         + "_" + line.saldo.value.getLongValue());
 
                 // die Bank liefert keine strukturierten Verwendungszwecke (gvcode=999).
