@@ -19,6 +19,7 @@ package hbci4java.model;
 import exception.InvalidPinException;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.callback.HBCICallback;
+import org.kapott.hbci.manager.HHDVersion;
 
 /**
  * Created by alexg on 08.02.17.
@@ -47,7 +48,7 @@ public class HbciCallback implements HBCICallback {
     }
 
     @Override
-    public void tanChallengeCallback(String orderRef, String challenge, String challenge_hhd_uc) {
+    public void tanChallengeCallback(String orderRef, String challenge, String challenge_hhd_uc, HHDVersion.Type type) {
     }
 
     @Override

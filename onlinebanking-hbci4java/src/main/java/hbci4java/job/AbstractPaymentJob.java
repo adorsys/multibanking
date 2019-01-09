@@ -29,6 +29,7 @@ import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.manager.HBCITwoStepMechanism;
+import org.kapott.hbci.manager.HHDVersion;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
@@ -48,7 +49,7 @@ public abstract class AbstractPaymentJob extends AbstractTanProcessJob {
         HbciCallback hbciCallback = new HbciCallback() {
 
             @Override
-            public void tanChallengeCallback(String orderRef, String challenge, String challenge_hhd_uc) {
+            public void tanChallengeCallback(String orderRef, String challenge, String challenge_hhd_uc, HHDVersion.Type type) {
                 //needed later for submit
                 hbciTanSubmit.setOrderRef(orderRef);
                 if (challenge != null) {
