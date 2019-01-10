@@ -19,6 +19,7 @@ ion-content {
   -moz-user-select: text;
   -ms-user-select: text;
   user-select: text;
+  contain: size style;
 }
 
 .force-back-button .back-button {
