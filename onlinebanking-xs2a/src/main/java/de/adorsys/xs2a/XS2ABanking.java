@@ -171,10 +171,10 @@ public class XS2ABanking implements OnlineBankingService {
         consents.setValidUntil(LocalDate.now().plusYears(1));
         consents.setFrequencyPerDay(100);
 
-        AccountReferenceIban accountReferenceIban = new AccountReferenceIban();
+        AccountReference accountReferenceIban = new AccountReference();
         accountReferenceIban.setIban(startScaRequest.getIban());
         accountReferenceIban.setCurrency("EUR");
-        List<Object> accounts = Arrays.asList(accountReferenceIban);
+        List<AccountReference> accounts = Arrays.asList(accountReferenceIban);
 
         AccountAccess accountAccess = new AccountAccess();
         accountAccess.setTransactions(accounts);
@@ -198,7 +198,7 @@ public class XS2ABanking implements OnlineBankingService {
 
         ConsentsResponse201 consent = ais.createConsent(
                 session, consents, null, null, null, bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(),
-                null, false, null, null, null, "127.0.0.1",
+                null, "false", null, null, null, "127.0.0.1",
                 null,
                 null, null, null, null, null, null, null, null
         );
