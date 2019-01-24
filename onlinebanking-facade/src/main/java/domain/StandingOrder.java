@@ -28,4 +28,9 @@ public class StandingOrder extends AbstractPayment {
         return PaymentType.STANDING_ORDER;
     }
 
+    @Override
+    public String getSepaPain() {
+        return null;
+    }
+
 }

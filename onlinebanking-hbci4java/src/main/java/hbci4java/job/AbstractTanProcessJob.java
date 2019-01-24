@@ -26,21 +26,20 @@ import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 public abstract class AbstractTanProcessJob {
 
-    public void hktanProcess1(HbciTanSubmit hbciTanSubmit, HBCITwoStepMechanism
-            hbciTwoStepMechanism, AbstractSEPAGV sepagv, GVTAN2Step hktan) {
+    public String hktanProcess1(HBCITwoStepMechanism hbciTwoStepMechanism, AbstractSEPAGV sepagv, GVTAN2Step hktan) {
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
         hktan.setParam("process", hbciTwoStepMechanism.getProcess());
         hktan.setParam("notlasttan", "N");
         hktan.setParam("orderhash", sepagv.createOrderHash(hbciTwoStepMechanism.getSegversion()));
 
-        hbciTanSubmit.setSepaPain(sepagv.getPainXml());
-
         // wenn needchallengeklass gesetzt ist:
         if (StringUtils.equals(hbciTwoStepMechanism.getNeedchallengeklass(), "J")) {
             ChallengeInfo cinfo = ChallengeInfo.getInstance();
             cinfo.applyParams(sepagv, hktan, hbciTwoStepMechanism);
         }
+
+        return sepagv.getPainXml();
     }
 
     public void hktanProcess2(HBCIDialog dialog, AbstractSEPAGV sepagv, Konto orderAccount, GVTAN2Step hktan) {

@@ -50,7 +50,12 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+    public PaymentResponse initiatePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+        return null;
+    }
+
+    @Override
+    public Object requestPaymentAuthorizationCode(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         return null;
     }
 
@@ -92,6 +97,11 @@ public class MockBanking implements OnlineBankingService {
 
     @Override
     public void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser) {
+    }
+
+    @Override
+    public PaymentResponse authenticatePsu(Optional<String> bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+        return null;
     }
 
     @Override

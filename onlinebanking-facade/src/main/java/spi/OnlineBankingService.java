@@ -20,6 +20,8 @@ public interface OnlineBankingService {
 
     void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser);
 
+    PaymentResponse authenticatePsu(Optional<String> bankingUrl, AuthenticatePsuRequest authenticatePsuRequest);
+
     LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
                                                     LoadAccountInformationRequest loadAccountInformationRequest);
 
@@ -33,7 +35,9 @@ public interface OnlineBankingService {
 
     boolean bookingsCategorized();
 
-    Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest);
+    PaymentResponse initiatePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest);
+
+    Object requestPaymentAuthorizationCode(Optional<String> bankingUrl, PaymentRequest paymentRequest);
 
     String submitPayment(SubmitPaymentRequest submitPaymentRequest);
 
@@ -44,4 +48,5 @@ public interface OnlineBankingService {
     boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference);
 
     void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest);
+
 }

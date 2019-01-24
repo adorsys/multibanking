@@ -31,4 +31,9 @@ public class BulkPayment extends AbstractPayment {
     public PaymentType getPaymentType() {
         return PaymentType.BULK_PAYMENT;
     }
+
+    @Override
+    public String getSepaPain() {
+        return null;
+    }
 }

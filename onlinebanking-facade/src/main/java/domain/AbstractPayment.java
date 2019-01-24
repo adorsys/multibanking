@@ -13,10 +13,13 @@ public abstract class AbstractPayment {
 
     public abstract PaymentType getPaymentType();
 
+    public abstract String getSepaPain();
+
     public enum PaymentType {
         SINGLE_PAYMENT,
         FUTURE_PAYMENT,
         BULK_PAYMENT,
-        STANDING_ORDER
+        STANDING_ORDER,
+        RAW_SEPA
     }
 }

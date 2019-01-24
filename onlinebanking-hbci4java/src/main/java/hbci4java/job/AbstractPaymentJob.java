@@ -18,8 +18,8 @@ package hbci4java.job;
 
 import domain.AbstractPayment;
 import domain.HBCIProduct;
-import domain.TanChallenge;
 import domain.PaymentRequest;
+import domain.TanChallenge;
 import exception.HbciException;
 import hbci4java.model.HbciCallback;
 import hbci4java.model.HbciDialogRequest;
@@ -49,7 +49,8 @@ public abstract class AbstractPaymentJob extends AbstractTanProcessJob {
         HbciCallback hbciCallback = new HbciCallback() {
 
             @Override
-            public void tanChallengeCallback(String orderRef, String challenge, String challenge_hhd_uc, HHDVersion.Type type) {
+            public void tanChallengeCallback(String orderRef, String challenge, String challenge_hhd_uc,
+                                             HHDVersion.Type type) {
                 //needed later for submit
                 hbciTanSubmit.setOrderRef(orderRef);
                 if (challenge != null) {
@@ -90,7 +91,7 @@ public abstract class AbstractPaymentJob extends AbstractTanProcessJob {
         hktan.setSegVersion(hbciTwoStepMechanism.getSegversion());
 
         if (hbciTwoStepMechanism.getProcess() == 1) {
-            hktanProcess1(hbciTanSubmit, hbciTwoStepMechanism, uebSEPA, hktan);
+            hbciTanSubmit.setSepaPain(hktanProcess1(hbciTwoStepMechanism, uebSEPA, hktan));
             dialog.addTask(hktan, false);
         } else {
             hktanProcess2(dialog, uebSEPA, getOrderAccount(paymentRequest, dialog.getPassport()), hktan);

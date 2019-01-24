@@ -21,16 +21,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class PaymentRequest extends AbstractHbciRequest {
+public class PaymentResponse extends AbstractHbciRequest {
 
-    private BankApiUser bankApiUser;
-    private BankAccess bankAccess;
-    private TanTransportType tanTransportType;
-    private String bankCode;
-    private String pin;
-    private AbstractPayment payment;
+    private List<TanTransportType> tanTransportTypes;
 
 }

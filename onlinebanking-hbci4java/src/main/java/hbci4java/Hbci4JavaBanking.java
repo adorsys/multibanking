@@ -85,6 +85,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
+    public PaymentResponse authenticatePsu(Optional<String> bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+        throw new RuntimeException("not supported");
+    }
+
+    @Override
     public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
                                                            LoadAccountInformationRequest request) {
         return loadBankAccounts(bankingUrl, request, null);
@@ -107,7 +112,21 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+    public PaymentResponse initiatePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+        LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
+                .bankAccess(paymentRequest.getBankAccess())
+                .updateTanTransportTypes(true)
+                .build();
+
+        LoadAccountInformationResponse loadAccountInformationResponse = loadBankAccounts(bankingUrl, request);
+
+        return PaymentResponse.builder()
+                .tanTransportTypes(loadAccountInformationResponse.getBankAccess().getTanTransportTypes().get(BankApi.HBCI))
+                .build();
+    }
+
+    @Override
+    public Object requestPaymentAuthorizationCode(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         try {
             checkBankExists(paymentRequest.getBankCode(), bankingUrl);
             return createPaymentJob(paymentRequest.getPayment()).init(paymentRequest);
@@ -187,7 +206,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
-    public HBCIDialog createDialog(Optional<String> bankingUrl, HbciDialogRequest dialogRequest) {
+    private HBCIDialog createDialog(Optional<String> bankingUrl, HbciDialogRequest dialogRequest) {
         try {
             checkBankExists(dialogRequest.getBankCode(), bankingUrl);
             return HbciDialogFactory.createDialog(null, dialogRequest);
@@ -233,6 +252,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 return new BulkPaymentJob();
             case STANDING_ORDER:
                 return new NewStandingOrderJob();
+            case RAW_SEPA:
+                return new RawSepaJob();
         }
         throw new IllegalArgumentException("invalid payment type " + payment.getPaymentType());
     }

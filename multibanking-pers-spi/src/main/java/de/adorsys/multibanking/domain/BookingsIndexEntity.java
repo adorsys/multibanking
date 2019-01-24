@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by alexg on 08.05.17.
@@ -31,11 +30,10 @@ public class BookingsIndexEntity {
 
     public void updateSearchIndex(List<BookingEntity> bookings) {
         bookingIdSearchList = new HashMap<>();
-        bookings.stream()
-                .collect(Collectors.toCollection(LinkedList::new))
+        new LinkedList<>(bookings)
                 .descendingIterator()
                 .forEachRemaining(booking -> {
-                    List search = new ArrayList();
+                    List<String> search = new ArrayList();
                     if (booking.getBookingCategory() != null) {
                         if (StringUtils.hasText(booking.getBookingCategory().getReceiver())) {
                             search.add(booking.getBookingCategory().getReceiver());

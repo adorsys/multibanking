@@ -108,6 +108,11 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
+    public PaymentResponse authenticatePsu(Optional<String> bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+        return null;
+    }
+
+    @Override
     public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
                                                            LoadAccountInformationRequest loadAccountInformationRequest) {
         LOG.info("load bank accounts");
@@ -277,7 +282,12 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+    public PaymentResponse initiatePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+        return null;
+    }
+
+    @Override
+    public Object requestPaymentAuthorizationCode(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         return null;
     }
 

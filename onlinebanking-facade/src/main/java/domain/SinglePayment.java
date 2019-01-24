@@ -30,4 +30,9 @@ public class SinglePayment extends AbstractPayment {
         return PaymentType.SINGLE_PAYMENT;
     }
 
+    @Override
+    public String getSepaPain() {
+        return null;
+    }
+
 }

@@ -1,9 +1,8 @@
 package de.adorsys.multibanking.impl;
 
-import de.adorsys.multibanking.domain.BulkPaymentEntity;
-import de.adorsys.multibanking.domain.PaymentEntity;
-import de.adorsys.multibanking.pers.spi.repository.PaymentRepositoryIf;
-import de.adorsys.multibanking.repository.PaymentRepositoryMongodb;
+import de.adorsys.multibanking.domain.RawSepaTransactionEntity;
+import de.adorsys.multibanking.pers.spi.repository.RawSepaTransactionRepositoryIf;
+import de.adorsys.multibanking.repository.RawSepaTransactionRepositoryMongodb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -12,18 +11,18 @@ import java.util.Optional;
 
 @Profile({"mongo", "fongo"})
 @Service
-public class PaymentRepositoryImpl implements PaymentRepositoryIf {
+public class RawSepaTransactionRepositoryImpl implements RawSepaTransactionRepositoryIf {
 
     @Autowired
-    private PaymentRepositoryMongodb paymentRepository;
+    private RawSepaTransactionRepositoryMongodb paymentRepository;
 
     @Override
-    public Optional<PaymentEntity> findByUserIdAndId(String userId, String id) {
+    public Optional<RawSepaTransactionEntity> findByUserIdAndId(String userId, String id) {
         return paymentRepository.findByUserIdAndId(userId, id);
     }
 
     @Override
-    public void save(PaymentEntity paymentEntity) {
+    public void save(RawSepaTransactionEntity paymentEntity) {
         paymentRepository.save(paymentEntity);
     }
 

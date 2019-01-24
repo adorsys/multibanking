@@ -19,4 +19,9 @@ public class BulkPaymentRepositoryImpl implements BulkPaymentRepositoryIf {
     public void save(BulkPaymentEntity target) {
         paymentRepository.save(target);
     }
+
+    @Override
+    public void delete(String id) {
+        paymentRepository.deleteById(id);
+    }
 }

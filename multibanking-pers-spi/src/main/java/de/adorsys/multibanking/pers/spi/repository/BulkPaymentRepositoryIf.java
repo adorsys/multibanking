@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface BulkPaymentRepositoryIf {
 
     void save(BulkPaymentEntity target);
+
+    void delete(String id);
 }

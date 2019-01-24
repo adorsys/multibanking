@@ -1,10 +1,7 @@
 package figo;
 
 import domain.*;
-import domain.request.CreateConsentRequest;
-import domain.request.LoadAccountInformationRequest;
-import domain.request.LoadBalanceRequest;
-import domain.request.LoadBookingsRequest;
+import domain.request.*;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import exception.HbciException;
@@ -104,6 +101,16 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
+    public PaymentResponse initiatePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+        return null;
+    }
+
+    @Override
+    public Object requestPaymentAuthorizationCode(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+        return null;
+    }
+
+    @Override
     public boolean userRegistrationRequired() {
         return true;
     }
@@ -141,6 +148,11 @@ public class FigoBanking implements OnlineBankingService {
         } catch (IOException | FigoException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public PaymentResponse authenticatePsu(Optional<String> bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+        return null;
     }
 
     @Override
@@ -299,10 +311,6 @@ public class FigoBanking implements OnlineBankingService {
         return null;
     }
 
-    @Override
-    public Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
-        return null;
-    }
 
     @Override
     public Object deletePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {

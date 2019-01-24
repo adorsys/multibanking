@@ -65,6 +65,11 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
+    public PaymentResponse authenticatePsu(Optional<String> bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+        return null;
+    }
+
+    @Override
     public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
                                                            LoadAccountInformationRequest loadAccountInformationRequest) {
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
@@ -135,7 +140,12 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public Object createPayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+    public PaymentResponse initiatePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+        return null;
+    }
+
+    @Override
+    public Object requestPaymentAuthorizationCode(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
         return null;
     }
 
