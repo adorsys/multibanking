@@ -137,7 +137,11 @@ public abstract class ScaRequiredJob {
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         hktan.setParam("process", "4");
-        hktan.setParam("orderaccount", orderAccount);
+
+        Optional.ofNullable(orderAccount)
+                .ifPresent(konto -> {
+                    hktan.setParam("orderaccount", orderAccount);
+                });
 
         Optional<List<AbstractHBCIJob>> messages = Optional.ofNullable(sepagv)
                 .map(abstractSEPAGV -> dialog.addTask(abstractSEPAGV));
@@ -229,14 +233,14 @@ public abstract class ScaRequiredJob {
     }
 
     Konto getDebtorAccount(AbstractScaTransaction sepaTransaction, PinTanPassport passport) {
-        return Optional.of(sepaTransaction.getDebtorBankAccount())
+        return Optional.ofNullable(sepaTransaction.getDebtorBankAccount())
                 .map(bankAccount -> {
                     Konto konto = passport.findAccountByAccountNumber(bankAccount.getAccountNumber());
                     konto.iban = bankAccount.getIban();
                     konto.bic = bankAccount.getBic();
                     return konto;
                 })
-                .orElseThrow(() -> new IllegalArgumentException("bank account not exists"));
+                .orElse(null);
     }
 
     abstract String getHbciJobName(AbstractScaTransaction.TransactionType paymentType);
