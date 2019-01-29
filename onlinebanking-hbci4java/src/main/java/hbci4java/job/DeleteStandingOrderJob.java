@@ -34,7 +34,7 @@ public class DeleteStandingOrderJob extends ScaRequiredJob {
     protected AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport, String sepaPain) {
         StandingOrder standingOrder = (StandingOrder) sepaTransaction;
 
-        Konto src = getOrderAccount(sepaTransaction, passport);
+        Konto src = getDebtorAccount(sepaTransaction, passport);
 
         Konto dst = new Konto();
         dst.name = standingOrder.getOtherAccount().getOwner();

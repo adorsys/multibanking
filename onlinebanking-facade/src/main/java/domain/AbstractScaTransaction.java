@@ -5,7 +5,6 @@ import lombok.Data;
 @Data
 public abstract class AbstractScaTransaction {
 
-    private TanTransportType tanTransportType;
     private BankAccount debtorBankAccount;
     private String orderId;
 

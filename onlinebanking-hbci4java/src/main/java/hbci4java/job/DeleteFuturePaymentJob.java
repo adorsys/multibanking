@@ -36,7 +36,7 @@ public class DeleteFuturePaymentJob extends ScaRequiredJob {
     protected AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport, String sepaPain) {
         FuturePayment singlePayment = (FuturePayment) sepaTransaction;
 
-        Konto src = getOrderAccount(sepaTransaction, passport);
+        Konto src = getDebtorAccount(sepaTransaction, passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();

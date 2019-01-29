@@ -34,7 +34,7 @@ public class SinglePaymentJob extends ScaRequiredJob {
     protected AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport, String sepaPain) {
         SinglePayment singlePayment = (SinglePayment) sepaTransaction;
 
-        Konto src = getOrderAccount(sepaTransaction, passport);
+        Konto src = getDebtorAccount(sepaTransaction, passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();

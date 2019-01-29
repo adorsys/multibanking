@@ -33,7 +33,7 @@ public class BulkPaymentJob extends ScaRequiredJob {
     protected AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport, String sepaPain) {
         BulkPayment bulkPayment = (BulkPayment) sepaTransaction;
 
-        Konto src = getOrderAccount(sepaTransaction, passport);
+        Konto src = getDebtorAccount(sepaTransaction, passport);
 
         GVUebSEPA uebSEPA = new GVMultiUebSEPA(passport, GVMultiUebSEPA.getLowlevelName(), sepaPain);
         uebSEPA.setParam("src", src);

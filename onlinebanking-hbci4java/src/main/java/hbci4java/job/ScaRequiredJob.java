@@ -2,8 +2,8 @@ package hbci4java.job;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import domain.Product;
 import domain.AbstractScaTransaction;
+import domain.Product;
 import domain.TanChallenge;
 import domain.request.SepaTransactionRequest;
 import domain.request.SubmitAuthorizationCodeRequest;
@@ -44,9 +44,7 @@ public abstract class ScaRequiredJob {
     public HbciTanSubmit requestAuthorizationCode(SepaTransactionRequest sepaTransactionRequest) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
         Optional.ofNullable(sepaTransactionRequest.getSepaTransaction())
-                .ifPresent(sepaTransaction -> {
-                    hbciTanSubmit.setOriginJobName(getHbciJobName(sepaTransaction.getTransactionType()));
-                });
+                .ifPresent(sepaTransaction -> hbciTanSubmit.setOriginJobName(getHbciJobName(sepaTransaction.getTransactionType())));
 
         HbciCallback hbciCallback = new HbciCallback() {
 
@@ -96,7 +94,8 @@ public abstract class ScaRequiredJob {
             hbciTanSubmit.setSepaPain(hktanProcess1(hbciTwoStepMechanism, sepagv, hktan));
             dialog.addTask(hktan, false);
         } else {
-            hktanProcess2(dialog, sepagv, getOrderAccount(sepaTransactionRequest.getSepaTransaction(), dialog.getPassport()), hktan);
+            hktanProcess2(dialog, sepagv, getDebtorAccount(sepaTransactionRequest.getSepaTransaction(),
+                    dialog.getPassport()), hktan);
         }
 
         if (dialog.getPassport().tanMediaNeeded()) {
@@ -112,9 +111,7 @@ public abstract class ScaRequiredJob {
         hbciTanSubmit.setDialogId(dialog.getDialogID());
         hbciTanSubmit.setMsgNum(dialog.getMsgnum());
         Optional.ofNullable(sepagv)
-                .ifPresent(abstractSEPAGV -> {
-                    hbciTanSubmit.setOriginSegVersion(abstractSEPAGV.getSegVersion());
-                });
+                .ifPresent(abstractSEPAGV -> hbciTanSubmit.setOriginSegVersion(abstractSEPAGV.getSegVersion()));
 
         return hbciTanSubmit;
     }
@@ -230,7 +227,7 @@ public abstract class ScaRequiredJob {
         }
     }
 
-    Konto getOrderAccount(AbstractScaTransaction sepaTransaction, PinTanPassport passport) {
+    Konto getDebtorAccount(AbstractScaTransaction sepaTransaction, PinTanPassport passport) {
         return Optional.of(sepaTransaction.getDebtorBankAccount())
                 .map(bankAccount -> {
                     Konto konto = passport.findAccountByAccountNumber(bankAccount.getAccountNumber());
@@ -245,5 +242,6 @@ public abstract class ScaRequiredJob {
 
     abstract String orderIdFromJobResult(HBCIJobResult jobResult);
 
-    abstract AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport, String sepaPain);
+    abstract AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport,
+                                          String sepaPain);
 }
