@@ -3,12 +3,10 @@ package domain;
 import lombok.Data;
 
 @Data
-public abstract class SepaTransaction {
+public abstract class AbstractScaTransaction {
 
     private TanTransportType tanTransportType;
-    private String senderAccountNumber;
-    private String senderIban;
-    private String senderBic;
+    private BankAccount debtorBankAccount;
     private String orderId;
 
     public abstract TransactionType getTransactionType();
@@ -28,6 +26,7 @@ public abstract class SepaTransaction {
         BULK_PAYMENT,
         STANDING_ORDER,
         STANDING_ORDER_DELETE,
-        RAW_SEPA
+        RAW_SEPA,
+        TAN_REQUEST
     }
 }

@@ -1,6 +1,6 @@
 package hbci4java.job;
 
-import domain.SepaTransaction;
+import domain.AbstractScaTransaction;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
@@ -8,7 +8,7 @@ import org.kapott.hbci.passport.PinTanPassport;
 public class EmptyJob extends ScaRequiredJob {
 
     @Override
-    String getHbciJobName(SepaTransaction.TransactionType paymentType) {
+    String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
         return null;
     }
 
@@ -18,7 +18,7 @@ public class EmptyJob extends ScaRequiredJob {
     }
 
     @Override
-    AbstractSEPAGV createSepaJob(SepaTransaction payment, PinTanPassport passport, String sepaPain) {
+    AbstractSEPAGV createSepaJob(AbstractScaTransaction payment, PinTanPassport passport, String sepaPain) {
         return null;
     }
 }

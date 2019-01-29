@@ -198,7 +198,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public boolean bankSupported(String bankCode) {
-        org.kapott.hbci.manager.BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
+        BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
         return bankInfo != null && bankInfo.getPinTanVersion() != null;
     }
 
@@ -224,7 +224,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         });
     }
 
-    private ScaRequiredJob createScaJob(SepaTransaction.TransactionType transactionType) {
+    private ScaRequiredJob createScaJob(AbstractScaTransaction.TransactionType transactionType) {
         switch (transactionType) {
             case SINGLE_PAYMENT:
             case FUTURE_PAYMENT:
@@ -239,6 +239,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 return new DeleteFuturePaymentJob();
             case STANDING_ORDER_DELETE:
                 return new DeleteStandingOrderJob();
+            case TAN_REQUEST:
+                return new EmptyJob();
             default:
                 throw new IllegalArgumentException("invalid transaction type " + transactionType);
         }

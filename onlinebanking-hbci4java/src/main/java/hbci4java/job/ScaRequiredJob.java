@@ -3,7 +3,7 @@ package hbci4java.job;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import domain.Product;
-import domain.SepaTransaction;
+import domain.AbstractScaTransaction;
 import domain.TanChallenge;
 import domain.request.SepaTransactionRequest;
 import domain.request.SubmitAuthorizationCodeRequest;
@@ -96,7 +96,7 @@ public abstract class ScaRequiredJob {
             hbciTanSubmit.setSepaPain(hktanProcess1(hbciTwoStepMechanism, sepagv, hktan));
             dialog.addTask(hktan, false);
         } else {
-            hktanProcess2(dialog, sepagv, getOrderAccount(sepaTransactionRequest, dialog.getPassport()), hktan);
+            hktanProcess2(dialog, sepagv, getOrderAccount(sepaTransactionRequest.getSepaTransaction(), dialog.getPassport()), hktan);
         }
 
         if (dialog.getPassport().tanMediaNeeded()) {
@@ -194,7 +194,7 @@ public abstract class ScaRequiredJob {
         }
     }
 
-    private AbstractHBCIJob submitProcess1(SepaTransaction transaction, HbciTanSubmit hbciTanSubmit, HbciPassport
+    private AbstractHBCIJob submitProcess1(AbstractScaTransaction transaction, HbciTanSubmit hbciTanSubmit, HbciPassport
             hbciPassport, HBCIDialog hbciDialog) {
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
@@ -230,16 +230,20 @@ public abstract class ScaRequiredJob {
         }
     }
 
-    private Konto getOrderAccount(SepaTransactionRequest transactionRequest, PinTanPassport passport) {
-        Konto orderAccount = passport.findAccountByAccountNumber(transactionRequest.getBankAccount().getAccountNumber());
-        orderAccount.iban = transactionRequest.getBankAccount().getIban();
-        orderAccount.bic = transactionRequest.getBankAccount().getBic();
-        return orderAccount;
+    Konto getOrderAccount(AbstractScaTransaction sepaTransaction, PinTanPassport passport) {
+        return Optional.of(sepaTransaction.getDebtorBankAccount())
+                .map(bankAccount -> {
+                    Konto konto = passport.findAccountByAccountNumber(bankAccount.getAccountNumber());
+                    konto.iban = bankAccount.getIban();
+                    konto.bic = bankAccount.getBic();
+                    return konto;
+                })
+                .orElseThrow(() -> new IllegalArgumentException("bank account not exists"));
     }
 
-    abstract String getHbciJobName(SepaTransaction.TransactionType paymentType);
+    abstract String getHbciJobName(AbstractScaTransaction.TransactionType paymentType);
 
     abstract String orderIdFromJobResult(HBCIJobResult jobResult);
 
-    abstract AbstractSEPAGV createSepaJob(SepaTransaction sepaTransaction, PinTanPassport passport, String sepaPain);
+    abstract AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport, String sepaPain);
 }

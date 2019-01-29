@@ -4,14 +4,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 /**
  * Created by alexg on 19.10.17.
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SinglePayment extends SepaTransaction {
+public class SinglePayment extends AbstractScaTransaction {
 
     private String receiver;
     private String receiverBic;

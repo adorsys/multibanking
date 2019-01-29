@@ -28,9 +28,8 @@ public class SepaTransactionRequest extends AbstractRequest {
 
     private BankApiUser bankApiUser;
     private TanTransportType tanTransportType;
-    private SepaTransaction sepaTransaction;
+    private AbstractScaTransaction sepaTransaction;
     private BankAccess bankAccess;
-    private BankAccount bankAccount;
     private String bankCode;
     private String pin;
 

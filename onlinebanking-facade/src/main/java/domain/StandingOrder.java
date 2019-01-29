@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ApiModel(description = "Standing order", value = "StandingOrder")
-public class StandingOrder extends SepaTransaction {
+public class StandingOrder extends AbstractScaTransaction {
 
     private Cycle cycle;
     private int executionDay;

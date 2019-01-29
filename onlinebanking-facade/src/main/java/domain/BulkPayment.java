@@ -23,7 +23,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class BulkPayment extends SepaTransaction {
+public class BulkPayment extends AbstractScaTransaction {
 
     private List<SinglePayment> payments;
 

@@ -3,19 +3,21 @@ package domain;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+/**
+ * Created by alexg on 19.10.17.
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class RawSepaPayment extends AbstractScaTransaction {
-
-    private String painXml;
+public class TanRequest extends AbstractScaTransaction {
 
     @Override
     public TransactionType getTransactionType() {
-        return TransactionType.RAW_SEPA;
+        return TransactionType.TAN_REQUEST;
     }
 
     @Override
     public String getSepaPain() {
-        return painXml;
+        return null;
     }
+
 }

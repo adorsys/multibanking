@@ -16,7 +16,7 @@
 
 package domain.request;
 
-import domain.SepaTransaction;
+import domain.AbstractScaTransaction;
 import domain.TanTransportType;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +27,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class SubmitAuthorizationCodeRequest extends AbstractRequest {
 
-    private SepaTransaction sepaTransaction;
+    private AbstractScaTransaction sepaTransaction;
     private TanTransportType tanTransportType;
     private Object tanSubmit;
     private String pin;
