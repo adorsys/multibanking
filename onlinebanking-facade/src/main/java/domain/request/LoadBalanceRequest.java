@@ -31,7 +31,7 @@ import java.util.List;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class LoadBalanceRequest extends AbstractHbciRequest {
+public class LoadBalanceRequest extends AbstractRequest {
 
     private BankApiUser bankApiUser;
     private List<BankAccount> bankAccounts;

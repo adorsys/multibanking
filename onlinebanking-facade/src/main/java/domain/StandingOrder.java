@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @ApiModel(description = "Standing order", value = "StandingOrder")
-public class StandingOrder extends AbstractPayment {
+public class StandingOrder extends SepaTransaction {
 
     private Cycle cycle;
     private int executionDay;
@@ -22,10 +22,16 @@ public class StandingOrder extends AbstractPayment {
     private BigDecimal amount;
     private BankAccount otherAccount;
     private String usage;
+    private boolean delete;
 
     @Override
-    public PaymentType getPaymentType() {
-        return PaymentType.STANDING_ORDER;
+    public void delete(boolean delete) {
+        this.delete = delete;
+    }
+
+    @Override
+    public TransactionType getTransactionType() {
+        return TransactionType.STANDING_ORDER;
     }
 
     @Override

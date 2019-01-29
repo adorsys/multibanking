@@ -18,7 +18,7 @@ package hbci4java.job;
 
 import domain.BankAccount;
 import domain.BankApi;
-import domain.HBCIProduct;
+import domain.Product;
 import domain.TanTransportType;
 import domain.request.LoadAccountInformationRequest;
 import domain.response.LoadAccountInformationResponse;
@@ -56,8 +56,8 @@ public class AccountInformationJob {
                 .callback(callback)
                 .build();
 
-        dialogRequest.setHbciProduct(Optional.ofNullable(request.getHbciProduct())
-                .map(product -> new HBCIProduct(product.getProduct(), product.getVersion()))
+        dialogRequest.setProduct(Optional.ofNullable(request.getProduct())
+                .map(product -> new Product(product.getName(), product.getVersion()))
                 .orElse(null));
         dialogRequest.setBpd(request.getBpd());
 

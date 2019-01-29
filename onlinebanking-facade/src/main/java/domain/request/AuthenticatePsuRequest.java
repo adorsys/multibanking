@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class AuthenticatePsuRequest extends AbstractHbciRequest {
+public class AuthenticatePsuRequest extends AbstractRequest {
 
     private String bankCode;
     private String customerId;

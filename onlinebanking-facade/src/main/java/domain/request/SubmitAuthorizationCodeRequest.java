@@ -16,6 +16,7 @@
 
 package domain.request;
 
+import domain.SepaTransaction;
 import domain.TanTransportType;
 import lombok.Builder;
 import lombok.Data;
@@ -24,8 +25,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class VerifyTanRequest extends AbstractHbciRequest {
+public class SubmitAuthorizationCodeRequest extends AbstractRequest {
 
+    private SepaTransaction sepaTransaction;
     private TanTransportType tanTransportType;
     private Object tanSubmit;
     private String pin;

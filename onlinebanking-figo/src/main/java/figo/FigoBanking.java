@@ -4,6 +4,7 @@ import domain.*;
 import domain.request.*;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
+import domain.response.ScaMethodsResponse;
 import exception.HbciException;
 import exception.InvalidPinException;
 import me.figo.FigoConnection;
@@ -101,12 +102,17 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public PaymentResponse initiatePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+    public ScaMethodsResponse initiatePayment(String bankingUrl, SepaTransactionRequest paymentRequest) {
         return null;
     }
 
     @Override
-    public Object requestPaymentAuthorizationCode(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+    public Object requestAuthorizationCode(String bankingUrl, SepaTransactionRequest paymentRequest) {
+        return null;
+    }
+
+    @Override
+    public String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
         return null;
     }
 
@@ -116,7 +122,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
         if (figoConnection == null) {
             throw new IllegalArgumentException("figo connection not available, check env properties FIGO_CLIENT_ID " +
                     "and/or FIGO_SECRET");
@@ -139,7 +145,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX,
                     bankApiUser.getApiPassword());
@@ -151,12 +157,12 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public PaymentResponse authenticatePsu(Optional<String> bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+    public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
         return null;
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
+    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
                                                            LoadAccountInformationRequest loadAccountInformationRequest) {
 
         BankApiUser bankApiUser = loadAccountInformationRequest.getBankApiUser();
@@ -243,7 +249,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX,
                     bankApiUser.getApiPassword());
@@ -256,7 +262,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         BankApiUser bankApiUser = loadBookingsRequest.getBankApiUser();
         BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 
@@ -307,23 +313,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
-        return null;
-    }
-
-
-    @Override
-    public Object deletePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
-        return null;
-    }
-
-    @Override
-    public String submitPayment(domain.request.SubmitPaymentRequest submitPaymentRequest) {
-        return null;
-    }
-
-    @Override
-    public String submitDelete(domain.request.SubmitPaymentRequest submitPaymentRequest) {
+    public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
         return null;
     }
 
@@ -333,7 +323,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest) {
+    public void createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
 
     }
 

@@ -25,7 +25,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class LoadAccountInformationRequest extends AbstractHbciRequest {
+public class LoadAccountInformationRequest extends AbstractRequest {
 
     private BankApiUser bankApiUser;
     private BankAccess bankAccess;

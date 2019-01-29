@@ -11,7 +11,7 @@ import java.time.LocalDate;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SinglePayment extends AbstractPayment {
+public class SinglePayment extends SepaTransaction {
 
     private String receiver;
     private String receiverBic;
@@ -20,14 +20,10 @@ public class SinglePayment extends AbstractPayment {
     private String receiverAccountNumber;
     private String purpose;
     private BigDecimal amount;
-    private LocalDate executionDate;
 
     @Override
-    public PaymentType getPaymentType() {
-        if (executionDate != null) {
-            return PaymentType.FUTURE_PAYMENT;
-        }
-        return PaymentType.SINGLE_PAYMENT;
+    public TransactionType getTransactionType() {
+        return TransactionType.SINGLE_PAYMENT;
     }
 
     @Override

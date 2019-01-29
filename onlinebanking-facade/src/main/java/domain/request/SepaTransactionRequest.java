@@ -16,8 +16,7 @@
 
 package domain.request;
 
-import domain.AbstractPayment;
-import domain.TanTransportType;
+import domain.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,11 +24,14 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class SubmitPaymentRequest extends AbstractHbciRequest {
+public class SepaTransactionRequest extends AbstractRequest {
 
-    private AbstractPayment payment;
+    private BankApiUser bankApiUser;
     private TanTransportType tanTransportType;
-    private Object tanSubmit;
+    private SepaTransaction sepaTransaction;
+    private BankAccess bankAccess;
+    private BankAccount bankAccount;
+    private String bankCode;
     private String pin;
-    private String tan;
+
 }

@@ -3,8 +3,8 @@ package domain;
 import lombok.Data;
 
 @Data
-public class HBCIProduct {
+public class Product {
 
-    private final String product;
+    private final String name;
     private final String version;
 }

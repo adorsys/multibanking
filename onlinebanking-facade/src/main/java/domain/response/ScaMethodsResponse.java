@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package domain;
+package domain.response;
 
-import domain.request.AbstractHbciRequest;
+import domain.TanTransportType;
+import domain.request.AbstractRequest;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,7 +27,7 @@ import java.util.List;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class PaymentResponse extends AbstractHbciRequest {
+public class ScaMethodsResponse extends AbstractRequest {
 
     private List<TanTransportType> tanTransportTypes;
 

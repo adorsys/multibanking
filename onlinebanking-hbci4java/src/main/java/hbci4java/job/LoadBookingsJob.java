@@ -57,8 +57,8 @@ public class LoadBookingsJob {
                 .pin(loadBookingsRequest.getPin())
                 .build();
 
-        dialogRequest.setHbciProduct(Optional.ofNullable(loadBookingsRequest.getHbciProduct())
-                .map(product -> new HBCIProduct(product.getProduct(), product.getVersion()))
+        dialogRequest.setProduct(Optional.ofNullable(loadBookingsRequest.getProduct())
+                .map(product -> new Product(product.getName(), product.getVersion()))
                 .orElse(null));
         dialogRequest.setBpd(loadBookingsRequest.getBpd());
 
@@ -76,7 +76,7 @@ public class LoadBookingsJob {
                 Optional.of(createStandingOrdersJob(dialog, account)) :
                 Optional.empty();
 
-        // Let the Handler submit all jobs in one batch
+        // Let the Handler submitAuthorizationCode all jobs in one batch
         HBCIExecStatus dialogStatus = dialog.execute(true);
         if (!dialogStatus.isOK()) {
             log.warn(dialogStatus.getErrorString());

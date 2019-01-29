@@ -16,7 +16,7 @@
 
 package hbci4java.job;
 
-import domain.AbstractPayment;
+import domain.SepaTransaction;
 import domain.StandingOrder;
 import hbci4java.model.HbciMapping;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +28,10 @@ import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
 @Slf4j
-public class DeleteStandingOrderJob extends AbstractPaymentJob {
+public class DeleteStandingOrderJob extends ScaRequiredJob {
 
     @Override
-    protected AbstractSEPAGV createPaymentJob(AbstractPayment payment, PinTanPassport passport, String sepaPain) {
+    protected AbstractSEPAGV createSepaJob(SepaTransaction payment, PinTanPassport passport, String sepaPain) {
         StandingOrder standingOrder = (StandingOrder) payment;
 
         Konto src = passport.findAccountByAccountNumber(standingOrder.getSenderAccountNumber());
@@ -71,7 +71,7 @@ public class DeleteStandingOrderJob extends AbstractPaymentJob {
     }
 
     @Override
-    protected String getJobName(AbstractPayment.PaymentType paymentType) {
+    protected String getHbciJobName(SepaTransaction.TransactionType paymentType) {
         return GVDauerSEPADel.getLowlevelName();
     }
 

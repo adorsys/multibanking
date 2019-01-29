@@ -16,7 +16,7 @@ import java.util.Map;
 public class FigoMapping {
 
     private static final Map<Cycle, String> FIGO_CYCLE = new HashMap<>();
-    private static final Map<SinglePayment.PaymentType, String> FIGO_TRANSFER = new HashMap<>();
+    private static final Map<SinglePayment.TransactionType, String> FIGO_TRANSFER = new HashMap<>();
 
     static {
         FIGO_CYCLE.put(Cycle.WEEKLY, "weekly");
@@ -26,8 +26,8 @@ public class FigoMapping {
         FIGO_CYCLE.put(Cycle.HALF_YEARLY, "half yearly");
         FIGO_CYCLE.put(Cycle.YEARLY, "yearly");
 
-        FIGO_TRANSFER.put(SinglePayment.PaymentType.SINGLE_PAYMENT, "SEPA transfer");
-        FIGO_TRANSFER.put(SinglePayment.PaymentType.STANDING_ORDER, "SEPA standing order");
+        FIGO_TRANSFER.put(SinglePayment.TransactionType.SINGLE_PAYMENT, "SEPA transfer");
+        FIGO_TRANSFER.put(SinglePayment.TransactionType.STANDING_ORDER, "SEPA standing order");
     }
 
     public static domain.StandingOrder mapStandingOrder(StandingOrder figoStandingOrder) {
@@ -109,7 +109,7 @@ public class FigoMapping {
 
         figoPayment.setAmount(payment.getAmount());
         figoPayment.setCurrency("EUR");
-        figoPayment.setType(FIGO_TRANSFER.get(payment.getPaymentType()));
+        figoPayment.setType(FIGO_TRANSFER.get(payment.getTransactionType()));
         figoPayment.setName(payment.getReceiver());
         figoPayment.setPurpose(payment.getPurpose());
 

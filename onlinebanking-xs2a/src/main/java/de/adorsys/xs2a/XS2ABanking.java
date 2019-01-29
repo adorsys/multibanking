@@ -10,6 +10,7 @@ import domain.*;
 import domain.request.*;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
+import domain.response.ScaMethodsResponse;
 import org.apache.commons.lang3.StringUtils;
 import spi.OnlineBankingService;
 
@@ -36,7 +37,7 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
         AccountAccess accountAccess = new AccountAccess();
         accountAccess.setAllPsd2(AccountAccess.AllPsd2Enum.ALLACCOUNTS);
 
@@ -61,16 +62,16 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
     }
 
     @Override
-    public PaymentResponse authenticatePsu(Optional<String> bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+    public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
         return null;
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
+    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
                                                            LoadAccountInformationRequest loadAccountInformationRequest) {
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
 
@@ -94,11 +95,11 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         String consentId =
                 Optional.ofNullable(loadBookingsRequest.getBankApiUser().getProperties().get("consentId-" + loadBookingsRequest.getBankAccount().getIban()))
                         .orElseThrow(() -> new MissingConsentException("missing consent for transactions request"));
@@ -125,7 +126,7 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+    public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
         return null;
     }
 
@@ -140,27 +141,17 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public PaymentResponse initiatePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+    public ScaMethodsResponse initiatePayment(String bankingUrl, SepaTransactionRequest paymentRequest) {
         return null;
     }
 
     @Override
-    public Object requestPaymentAuthorizationCode(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+    public Object requestAuthorizationCode(String bankingUrl, SepaTransactionRequest paymentRequest) {
         return null;
     }
 
     @Override
-    public Object deletePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
-        return null;
-    }
-
-    @Override
-    public String submitPayment(SubmitPaymentRequest submitPaymentRequest) {
-        return null;
-    }
-
-    @Override
-    public String submitDelete(SubmitPaymentRequest submitPaymentRequest) {
+    public String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
         return null;
     }
 
@@ -170,12 +161,12 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest) {
+    public void createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
         String newConsent = createDedicatedAccountConsent(bankingUrl, startScaRequest, startScaRequest.getBankAccess());
         startScaRequest.getBankApiUser().getProperties().put("consentId-" + startScaRequest.getIban(), newConsent);
     }
 
-    private String createDedicatedAccountConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest,
+    private String createDedicatedAccountConsent(String bankingUrl, CreateConsentRequest startScaRequest,
                                                  BankAccess bankAccess) {
         Consents consents = new Consents();
         consents.setValidUntil(LocalDate.now().plusYears(1));
@@ -201,7 +192,7 @@ public class XS2ABanking implements OnlineBankingService {
         }
     }
 
-    private ConsentsResponse201 createConsent(Optional<String> bankingUrl, BankAccess bankAccess, String pin,
+    private ConsentsResponse201 createConsent(String bankingUrl, BankAccess bankAccess, String pin,
                                               Consents consents) throws ApiException {
         UUID session = UUID.randomUUID();
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
@@ -264,7 +255,7 @@ public class XS2ABanking implements OnlineBankingService {
         return consent;
     }
 
-    private ApiClient createApiClient(Optional<String> bankingUrl) {
+    private ApiClient createApiClient(String bankingUrl) {
         ApiClient apiClient = new ApiClient();
         OkHttpClient client = new OkHttpClient();
         client.interceptors().add(
@@ -272,7 +263,8 @@ public class XS2ABanking implements OnlineBankingService {
         );
         client.setReadTimeout(600, TimeUnit.SECONDS);
         apiClient.setHttpClient(client);
-        bankingUrl.ifPresent(url -> apiClient.setBasePath(url));
+        Optional.ofNullable(bankingUrl)
+                .ifPresent(url -> apiClient.setBasePath(url));
 
         return apiClient;
     }

@@ -32,8 +32,8 @@ public class HbciDialogFactory {
                 .orElseThrow(() -> new IllegalArgumentException("Bank [" + dialogRequest.getBankCode() + "] not " +
                         "supported"));
 
-        HBCIProduct hbciProduct = Optional.ofNullable(dialogRequest.getHbciProduct())
-                .map(product -> new HBCIProduct(product.getProduct(), product.getVersion()))
+        HBCIProduct hbciProduct = Optional.ofNullable(dialogRequest.getProduct())
+                .map(product -> new HBCIProduct(product.getName(), product.getVersion()))
                 .orElse(null);
 
         HbciPassport newPassport = Optional.ofNullable(passport)

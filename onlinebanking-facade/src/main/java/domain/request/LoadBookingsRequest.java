@@ -31,7 +31,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class LoadBookingsRequest extends AbstractHbciRequest {
+public class LoadBookingsRequest extends AbstractRequest {
 
     private BankApiUser bankApiUser;
     private BankAccount bankAccount;

@@ -16,7 +16,8 @@
 
 package hbci4java.job;
 
-import domain.AbstractPayment;
+import domain.FuturePayment;
+import domain.SepaTransaction;
 import domain.SinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTermUebSEPA;
@@ -27,10 +28,10 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-public class SinglePaymentJob extends AbstractPaymentJob {
+public class SinglePaymentJob extends ScaRequiredJob {
 
     @Override
-    protected AbstractSEPAGV createPaymentJob(AbstractPayment payment, PinTanPassport passport, String sepaPain) {
+    protected AbstractSEPAGV createSepaJob(SepaTransaction payment, PinTanPassport passport, String sepaPain) {
         SinglePayment singlePayment = (SinglePayment) payment;
 
         Konto src = passport.findAccountByAccountNumber(payment.getSenderAccountNumber());
@@ -43,9 +44,9 @@ public class SinglePaymentJob extends AbstractPaymentJob {
         dst.bic = singlePayment.getReceiverBic();
 
         AbstractSEPAGV sepagv;
-        if (singlePayment.getExecutionDate() != null) {
+        if (singlePayment instanceof FuturePayment) {
             sepagv = new GVTermUebSEPA(passport, GVTermUebSEPA.getLowlevelName(), sepaPain);
-            sepagv.setParam("date", singlePayment.getExecutionDate().toString());
+            sepagv.setParam("date", ((FuturePayment) singlePayment).getExecutionDate().toString());
         } else {
             sepagv = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName(), sepaPain);
         }
@@ -61,8 +62,8 @@ public class SinglePaymentJob extends AbstractPaymentJob {
     }
 
     @Override
-    protected String getJobName(AbstractPayment.PaymentType paymentType) {
-        if (paymentType == AbstractPayment.PaymentType.FUTURE_PAYMENT) {
+    protected String getHbciJobName(SepaTransaction.TransactionType paymentType) {
+        if (paymentType == SepaTransaction.TransactionType.FUTURE_PAYMENT) {
             return GVTermUebSEPA.getLowlevelName();
         }
         return GVUebSEPA.getLowlevelName();

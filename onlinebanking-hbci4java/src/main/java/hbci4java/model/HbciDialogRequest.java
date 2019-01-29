@@ -16,7 +16,7 @@
 
 package hbci4java.model;
 
-import domain.request.AbstractHbciRequest;
+import domain.request.AbstractRequest;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,7 +24,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class HbciDialogRequest extends AbstractHbciRequest {
+public class HbciDialogRequest extends AbstractRequest {
 
     private HbciCallback callback;
     private String hbciPassportState;

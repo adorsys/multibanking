@@ -6,8 +6,6 @@ import domain.response.LoadAccountInformationResponse;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Optional;
-
 @Ignore
 public class XS2ABankingTest {
 
@@ -25,7 +23,7 @@ public class XS2ABankingTest {
                 .pin(System.getProperty("pin"))
                 .build();
 
-        LoadAccountInformationResponse response = xs2aBanking.loadBankAccounts(Optional.of("http://localhost:8082"), request);
+        LoadAccountInformationResponse response = xs2aBanking.loadBankAccounts("http://localhost:8082", request);
 
     }
 }

@@ -16,14 +16,14 @@
 
 package domain.request;
 
-import domain.HBCIProduct;
+import domain.Product;
 import lombok.Data;
 
 import java.util.Map;
 
 @Data
-public abstract class AbstractHbciRequest {
+public abstract class AbstractRequest {
 
-    private HBCIProduct hbciProduct;
+    private Product product;
     private Map<String, String> bpd;
 }

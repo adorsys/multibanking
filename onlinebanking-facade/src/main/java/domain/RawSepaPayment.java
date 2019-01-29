@@ -5,13 +5,13 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class RawSepaPayment extends AbstractPayment {
+public class RawSepaPayment extends SepaTransaction {
 
     private String painXml;
 
     @Override
-    public PaymentType getPaymentType() {
-        return PaymentType.RAW_SEPA;
+    public TransactionType getTransactionType() {
+        return TransactionType.RAW_SEPA;
     }
 
     @Override

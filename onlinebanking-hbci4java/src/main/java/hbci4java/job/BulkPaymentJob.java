@@ -16,7 +16,7 @@
 
 package hbci4java.job;
 
-import domain.AbstractPayment;
+import domain.SepaTransaction;
 import domain.BulkPayment;
 import domain.SinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
@@ -27,10 +27,10 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-public class BulkPaymentJob extends AbstractPaymentJob {
+public class BulkPaymentJob extends ScaRequiredJob {
 
     @Override
-    protected AbstractSEPAGV createPaymentJob(AbstractPayment abstractPayment, PinTanPassport passport, String sepaPain) {
+    protected AbstractSEPAGV createSepaJob(SepaTransaction abstractPayment, PinTanPassport passport, String sepaPain) {
         BulkPayment bulkPayment = (BulkPayment) abstractPayment;
 
         Konto src = passport.findAccountByAccountNumber(bulkPayment.getSenderAccountNumber());
@@ -59,7 +59,7 @@ public class BulkPaymentJob extends AbstractPaymentJob {
     }
 
     @Override
-    protected String getJobName(AbstractPayment.PaymentType paymentType) {
+    protected String getHbciJobName(SepaTransaction.TransactionType paymentType) {
         return "MultiUebSEPA";
     }
 

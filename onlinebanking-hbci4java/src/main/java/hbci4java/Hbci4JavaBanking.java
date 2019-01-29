@@ -9,6 +9,7 @@ import domain.*;
 import domain.request.*;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
+import domain.response.ScaMethodsResponse;
 import exception.InvalidPinException;
 import hbci4java.job.*;
 import hbci4java.model.HbciCallback;
@@ -51,11 +52,15 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     private InputStream getDefaultBanksInput() {
-        try {
-            return HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        return Optional.ofNullable(HBCIUtils.class.getClassLoader().getResource("blz.properties"))
+                .map(url -> {
+                    try {
+                        return url.openStream();
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .orElseThrow(() -> new RuntimeException("blz.properties not exists in classpath"));
     }
 
     @Override
@@ -74,28 +79,28 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(Optional<String> bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
         //no registration needed
         return null;
     }
 
     @Override
-    public void removeUser(Optional<String> bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
         //not needed
     }
 
     @Override
-    public PaymentResponse authenticatePsu(Optional<String> bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+    public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
         throw new RuntimeException("not supported");
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
+    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
                                                            LoadAccountInformationRequest request) {
         return loadBankAccounts(bankingUrl, request, null);
     }
 
-    public LoadAccountInformationResponse loadBankAccounts(Optional<String> bankingUrl,
+    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
                                                            LoadAccountInformationRequest request,
                                                            HbciCallback callback) {
         try {
@@ -112,81 +117,57 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public PaymentResponse initiatePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+    public ScaMethodsResponse initiatePayment(String bankingUrl, SepaTransactionRequest paymentRequest) {
         LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
+                .pin(paymentRequest.getPin())
+                .bankCode(paymentRequest.getBankCode())
                 .bankAccess(paymentRequest.getBankAccess())
                 .updateTanTransportTypes(true)
                 .build();
 
         LoadAccountInformationResponse loadAccountInformationResponse = loadBankAccounts(bankingUrl, request);
 
-        return PaymentResponse.builder()
+        return ScaMethodsResponse.builder()
                 .tanTransportTypes(loadAccountInformationResponse.getBankAccess().getTanTransportTypes().get(BankApi.HBCI))
                 .build();
     }
 
     @Override
-    public Object requestPaymentAuthorizationCode(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
+    public Object requestAuthorizationCode(String bankingUrl,
+                                           SepaTransactionRequest sepaTransactionRequest) {
         try {
-            checkBankExists(paymentRequest.getBankCode(), bankingUrl);
-            return createPaymentJob(paymentRequest.getPayment()).init(paymentRequest);
+            checkBankExists(sepaTransactionRequest.getBankCode(), bankingUrl);
+
+            ScaRequiredJob scaJob = Optional.ofNullable(sepaTransactionRequest.getSepaTransaction())
+                    .map(sepaTransaction -> createScaJob(sepaTransaction.getTransactionType()))
+                    .orElse(new EmptyJob());
+
+            return scaJob.requestAuthorizationCode(sepaTransactionRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public String submitPayment(SubmitPaymentRequest submitPaymentRequest) {
+    public String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
         try {
-            return createPaymentJob(submitPaymentRequest.getPayment()).submit(submitPaymentRequest);
+            ScaRequiredJob scaJob = Optional.ofNullable(submitAuthorizationCodeRequest.getSepaTransaction())
+                    .map(sepaTransaction -> createScaJob(sepaTransaction.getTransactionType()))
+                    .orElse(new EmptyJob());
+
+            return scaJob.sumbitAuthorizationCode(submitAuthorizationCodeRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public Object deletePayment(Optional<String> bankingUrl, PaymentRequest paymentRequest) {
-        try {
-            checkBankExists(paymentRequest.getBankCode(), bankingUrl);
-            return createDeleteJob(paymentRequest.getPayment()).init(paymentRequest);
-        } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
-        }
-    }
-
-    @Override
-    public String submitDelete(SubmitPaymentRequest submitPaymentRequest) {
-        try {
-            return createDeleteJob(submitPaymentRequest.getPayment()).submit(submitPaymentRequest);
-        } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
-        }
-    }
-
-    public Object sendTan(Optional<String> bankingUrl, SendTanRequest sendTanRequest) {
-        try {
-            checkBankExists(sendTanRequest.getBankCode(), bankingUrl);
-            return new VerifyTanJob().sendTan(sendTanRequest);
-        } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
-        }
-    }
-
-    public void verifyTan(VerifyTanRequest submitVerifyTanRequest) {
-        try {
-            new VerifyTanJob().submit(submitVerifyTanRequest);
-        } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
-        }
-    }
-
-    @Override
-    public void removeBankAccount(Optional<String> bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
         //not needed
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(Optional<String> bankingUrl, LoadBookingsRequest
+    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest
             loadBookingsRequest) {
         try {
             checkBankExists(loadBookingsRequest.getBankCode(), bankingUrl);
@@ -197,7 +178,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBalances(Optional<String> bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+    public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
         try {
             checkBankExists(loadBalanceRequest.getBankCode(), bankingUrl);
             return LoadBalanceJob.loadBalances(loadBalanceRequest);
@@ -206,7 +187,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
-    private HBCIDialog createDialog(Optional<String> bankingUrl, HbciDialogRequest dialogRequest) {
+    public HBCIDialog createDialog(String bankingUrl, HbciDialogRequest dialogRequest) {
         try {
             checkBankExists(dialogRequest.getBankCode(), bankingUrl);
             return HbciDialogFactory.createDialog(null, dialogRequest);
@@ -227,11 +208,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createAccountInformationConsent(Optional<String> bankingUrl, CreateConsentRequest startScaRequest) {
+    public void createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
     }
 
-    private void checkBankExists(String bankCode, Optional<String> bankingUrl) {
-        bankingUrl.ifPresent(s -> {
+    private void checkBankExists(String bankCode, String bankingUrl) {
+        Optional.ofNullable(bankingUrl).ifPresent(s -> {
             BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
             if (bankInfo == null) {
                 bankInfo = new BankInfo();
@@ -243,8 +224,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         });
     }
 
-    private AbstractPaymentJob createPaymentJob(AbstractPayment payment) {
-        switch (payment.getPaymentType()) {
+    private ScaRequiredJob createScaJob(SepaTransaction.TransactionType transactionType) {
+        switch (transactionType) {
             case SINGLE_PAYMENT:
             case FUTURE_PAYMENT:
                 return new SinglePaymentJob();
@@ -254,18 +235,13 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 return new NewStandingOrderJob();
             case RAW_SEPA:
                 return new RawSepaJob();
-        }
-        throw new IllegalArgumentException("invalid payment type " + payment.getPaymentType());
-    }
-
-    private AbstractPaymentJob createDeleteJob(AbstractPayment payment) {
-        switch (payment.getPaymentType()) {
-            case FUTURE_PAYMENT:
+            case FUTURE_PAYMENT_DELETE:
                 return new DeleteFuturePaymentJob();
-            case STANDING_ORDER:
+            case STANDING_ORDER_DELETE:
                 return new DeleteStandingOrderJob();
+            default:
+                throw new IllegalArgumentException("invalid transaction type " + transactionType);
         }
-        throw new IllegalArgumentException("invalid payment type " + payment.getPaymentType());
     }
 
     private RuntimeException handleHbciException(HBCI_Exception e) {

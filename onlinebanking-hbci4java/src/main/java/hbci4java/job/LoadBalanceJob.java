@@ -17,7 +17,7 @@
 package hbci4java.job;
 
 import domain.BankAccount;
-import domain.HBCIProduct;
+import domain.Product;
 import domain.request.LoadBalanceRequest;
 import hbci4java.model.HbciDialogRequest;
 import hbci4java.model.HbciMapping;
@@ -49,8 +49,8 @@ public class LoadBalanceJob {
                 .pin(loadBalanceRequest.getPin())
                 .build();
 
-        dialogRequest.setHbciProduct(Optional.ofNullable(loadBalanceRequest.getHbciProduct())
-                .map(product -> new HBCIProduct(product.getProduct(), product.getVersion()))
+        dialogRequest.setProduct(Optional.ofNullable(loadBalanceRequest.getProduct())
+                .map(product -> new Product(product.getName(), product.getVersion()))
                 .orElse(null));
         dialogRequest.setBpd(loadBalanceRequest.getBpd());
 
@@ -63,7 +63,7 @@ public class LoadBalanceJob {
             jobs.put(createBalanceJob(dialog, account), bankAccount);
         });
 
-        // Let the Handler submit all jobs in one batch
+        // Let the Handler submitAuthorizationCode all jobs in one batch
         HBCIExecStatus status = dialog.execute(true);
         if (!status.isOK()) {
             log.error("Status of balance job not OK " + status);

@@ -23,13 +23,13 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class BulkPayment extends AbstractPayment {
+public class BulkPayment extends SepaTransaction {
 
     private List<SinglePayment> payments;
 
     @Override
-    public PaymentType getPaymentType() {
-        return PaymentType.BULK_PAYMENT;
+    public TransactionType getTransactionType() {
+        return TransactionType.BULK_PAYMENT;
     }
 
     @Override

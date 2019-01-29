@@ -1,18 +1,15 @@
 package hbci4java.job;
 
 import domain.SepaTransaction;
-import domain.RawSepaPayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
-import org.kapott.hbci.GV.GVRawSEPA;
-import org.kapott.hbci.GV.GVUebSEPA;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 
-public class RawSepaJob extends ScaRequiredJob {
+public class EmptyJob extends ScaRequiredJob {
 
     @Override
     String getHbciJobName(SepaTransaction.TransactionType paymentType) {
-        return GVRawSEPA.getLowlevelName();
+        return null;
     }
 
     @Override
@@ -22,12 +19,6 @@ public class RawSepaJob extends ScaRequiredJob {
 
     @Override
     AbstractSEPAGV createSepaJob(SepaTransaction payment, PinTanPassport passport, String sepaPain) {
-        RawSepaPayment singlePayment = (RawSepaPayment) payment;
-
-        GVRawSEPA sepagv = new GVRawSEPA(passport, GVUebSEPA.getLowlevelName(), singlePayment.getSepaPain());
-
-        sepagv.verifyConstraints();
-
-        return sepagv;
+        return null;
     }
 }
