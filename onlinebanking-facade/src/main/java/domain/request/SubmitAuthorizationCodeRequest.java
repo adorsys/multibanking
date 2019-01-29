@@ -28,7 +28,6 @@ import lombok.EqualsAndHashCode;
 public class SubmitAuthorizationCodeRequest extends AbstractRequest {
 
     private AbstractScaTransaction sepaTransaction;
-    private TanTransportType tanTransportType;
     private Object tanSubmit;
     private String pin;
     private String tan;

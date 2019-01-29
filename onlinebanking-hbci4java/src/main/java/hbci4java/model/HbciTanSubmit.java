@@ -17,6 +17,7 @@
 package hbci4java.model;
 
 import domain.TanChallenge;
+import domain.TanTransportType;
 import lombok.Data;
 
 /**
@@ -33,4 +34,5 @@ public class HbciTanSubmit {
     private int originSegVersion;
     private String sepaPain;
     private TanChallenge tanChallenge;
+    private TanTransportType tanTransportType;
 }

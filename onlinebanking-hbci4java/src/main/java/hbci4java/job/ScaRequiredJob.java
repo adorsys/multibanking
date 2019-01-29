@@ -110,6 +110,7 @@ public abstract class ScaRequiredJob {
         hbciTanSubmit.setPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
         hbciTanSubmit.setDialogId(dialog.getDialogID());
         hbciTanSubmit.setMsgNum(dialog.getMsgnum());
+        hbciTanSubmit.setTanTransportType(sepaTransactionRequest.getTanTransportType());
         Optional.ofNullable(sepagv)
                 .ifPresent(abstractSEPAGV -> hbciTanSubmit.setOriginSegVersion(abstractSEPAGV.getSegVersion()));
 
@@ -170,7 +171,7 @@ public abstract class ScaRequiredJob {
         hbciPassport.setPIN(submitAuthorizationCodeRequest.getPin());
 
         HBCITwoStepMechanism hbciTwoStepMechanism =
-                hbciPassport.getBankTwostepMechanisms().get(submitAuthorizationCodeRequest.getTanTransportType().getId());
+                hbciPassport.getBankTwostepMechanisms().get(hbciTanSubmit.getTanTransportType().getId());
         hbciPassport.setCurrentSecMechInfo(hbciTwoStepMechanism);
 
         HBCIDialog hbciDialog = new HBCIDialog(hbciPassport, hbciTanSubmit.getDialogId(), hbciTanSubmit.getMsgNum());
