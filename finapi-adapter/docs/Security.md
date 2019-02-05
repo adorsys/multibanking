@@ -12,12 +12,14 @@ Name | Type | Description | Notes
 **quote** | [**BigDecimal**](BigDecimal.md) | Quote |  [optional]
 **quoteCurrency** | **String** | Currency of quote |  [optional]
 **quoteType** | [**QuoteTypeEnum**](#QuoteTypeEnum) | Type of quote. &#39;PERC&#39; if quote is a percentage value, &#39;ACTU&#39; if quote is the actual amount |  [optional]
-**quoteDate** | **String** | Quote date |  [optional]
+**quoteDate** | **String** | Quote date in the format &#39;YYYY-MM-DD HH:MM:SS.SSS&#39; (german time). |  [optional]
 **quantityNominal** | [**BigDecimal**](BigDecimal.md) | Value of quantity or nominal |  [optional]
 **quantityNominalType** | [**QuantityNominalTypeEnum**](#QuantityNominalTypeEnum) | Type of quantity or nominal value. &#39;UNIT&#39; if value is a quantity, &#39;FAMT&#39; if value is the nominal amount |  [optional]
 **marketValue** | [**BigDecimal**](BigDecimal.md) | Market value |  [optional]
+**marketValueCurrency** | **String** | Currency of market value |  [optional]
 **entryQuote** | [**BigDecimal**](BigDecimal.md) | Entry quote |  [optional]
 **entryQuoteCurrency** | **String** | Currency of entry quote |  [optional]
+**profitOrLoss** | [**BigDecimal**](BigDecimal.md) | Current profit or loss |  [optional]
 
 
 <a name="QuoteTypeEnum"></a>

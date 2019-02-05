@@ -4,8 +4,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**labels** | [**List&lt;InlineResponse20012Labels&gt;**](InlineResponse20012Labels.md) | Data of labels | 
-**paging** | [**InlineResponse2002Paging**](InlineResponse2002Paging.md) |  |  [optional]
+**labels** | [**List&lt;Label&gt;**](Label.md) | Data of labels | 
+**paging** | [**Paging**](Paging.md) | Information for pagination | 
 
 
 

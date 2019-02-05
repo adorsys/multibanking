@@ -1,6 +1,6 @@
 # BanksApi
 
-All URIs are relative to *https://localhost/*
+All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -11,7 +11,7 @@ Method | HTTP request | Description
 
 <a name="getAndSearchAllBanks"></a>
 # **getAndSearchAllBanks**
-> InlineResponse2006 getAndSearchAllBanks(ids, search, isSupported, supportedDataSources, page, perPage, order)
+> PageableBankList getAndSearchAllBanks(ids, search, isSupported, pinsAreVolatile, supportedDataSources, location, isTestBank, page, perPage, order)
 
 Get and search all banks
 
@@ -34,14 +34,17 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 
 BanksApi apiInstance = new BanksApi();
 List<Long> ids = Arrays.asList(56L); // List<Long> | A comma-separated list of bank identifiers. If specified, then only banks whose identifier match any of the given identifiers will be regarded. The maximum number of identifiers is 1000.
-String search = "search_example"; // String | If specified, then only those banks will be contained in the result whose 'name', 'blz' or 'bic' contains the given search string (the matching works case-insensitive). If no banks contain the search string in any of these fields, then the result will be an empty list. NOTE: If the given search string consists of several terms (separated by whitespace), then ALL of these terms must be contained in the searched fields in order for a bank to get included into the result.
+String search = "search_example"; // String | If specified, then only those banks will be contained in the result whose 'name', 'blz', 'bic' or 'city' contains the given search string (the matching works case-insensitive). If no banks contain the search string in any of the regarded fields, then the result will be an empty list. Note that you may also pass an IBAN in this field, in which case finAPI will try to find the related bank in its database and regard only this bank for the search. Also note: If the given search string consists of several terms (separated by whitespace), then ALL of these terms must apply to a bank in order for it to get included into the result.
 Boolean isSupported = true; // Boolean | If specified, then only supported (in case of 'true' value) or unsupported (in case of 'false' value) banks will be regarded.
+Boolean pinsAreVolatile = true; // Boolean | If specified, then only those banks will be regarded that have the given value (true or false) for their 'pinsAreVolatile' field.
 List<String> supportedDataSources = Arrays.asList("supportedDataSources_example"); // List<String> | Comma-separated list of data sources. Possible values: WEB_SCRAPER,FINTS_SERVER. If this parameter is specified, then only those banks will be regarded in the search that support ALL of the given data sources. Note that this does NOT imply that those data sources must be the only data sources that are supported by a bank.
+List<String> location = Arrays.asList("location_example"); // List<String> | Comma-separated list of two-letter country codes (ISO 3166 ALPHA-2). If set, then only those banks will be regarded in the search that are located in the specified countries. Notes: Banks which do not have a location set (i.e. international institutes) will ALWAYS be regarded in the search, independent of what you specify for this field. When you pass a country code that doesn't exist in the ISO 3166 ALPHA-2 standard, then the service will respond with 400 BAD_REQUEST.
+Boolean isTestBank = true; // Boolean | If specified, then only those banks will be regarded that have the given value (true or false) for their 'isTestBank' field.
 Integer page = 1; // Integer | Result page that you want to retrieve.
 Integer perPage = 20; // Integer | Maximum number of records per page. Can be at most 500. NOTE: Due to its validation and visualization, the swagger frontend might show very low performance, or even crashes, when a service responds with a lot of data. It is recommended to use a HTTP client like Postman or DHC instead of our swagger frontend for service calls with large page sizes.
-List<String> order = Arrays.asList("order_example"); // List<String> | Determines the order of the results. You can order the results by id, name, blz or bic. The default order for all services is 'id,asc'. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: '/banks?order=name,desc&order=id,asc' will return banks ordered by 'name' (descending), where banks with the same 'name' are ordered by 'id' (ascending). The general format is: 'property[,asc|desc]', with 'asc' being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC). 
+List<String> order = Arrays.asList("order_example"); // List<String> | Determines the order of the results. You can order the results by 'id', 'name', 'blz', 'bic' or 'popularity'. The default order for all services is 'id,asc'. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: '/banks?order=name,desc&order=id,asc' will return banks ordered by 'name' (descending), where banks with the same 'name' are ordered by 'id' (ascending). The general format is: 'property[,asc|desc]', with 'asc' being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC). 
 try {
-    InlineResponse2006 result = apiInstance.getAndSearchAllBanks(ids, search, isSupported, supportedDataSources, page, perPage, order);
+    PageableBankList result = apiInstance.getAndSearchAllBanks(ids, search, isSupported, pinsAreVolatile, supportedDataSources, location, isTestBank, page, perPage, order);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling BanksApi#getAndSearchAllBanks");
@@ -54,16 +57,19 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ids** | [**List&lt;Long&gt;**](Long.md)| A comma-separated list of bank identifiers. If specified, then only banks whose identifier match any of the given identifiers will be regarded. The maximum number of identifiers is 1000. | [optional]
- **search** | **String**| If specified, then only those banks will be contained in the result whose &#39;name&#39;, &#39;blz&#39; or &#39;bic&#39; contains the given search string (the matching works case-insensitive). If no banks contain the search string in any of these fields, then the result will be an empty list. NOTE: If the given search string consists of several terms (separated by whitespace), then ALL of these terms must be contained in the searched fields in order for a bank to get included into the result. | [optional]
+ **search** | **String**| If specified, then only those banks will be contained in the result whose &#39;name&#39;, &#39;blz&#39;, &#39;bic&#39; or &#39;city&#39; contains the given search string (the matching works case-insensitive). If no banks contain the search string in any of the regarded fields, then the result will be an empty list. Note that you may also pass an IBAN in this field, in which case finAPI will try to find the related bank in its database and regard only this bank for the search. Also note: If the given search string consists of several terms (separated by whitespace), then ALL of these terms must apply to a bank in order for it to get included into the result. | [optional]
  **isSupported** | **Boolean**| If specified, then only supported (in case of &#39;true&#39; value) or unsupported (in case of &#39;false&#39; value) banks will be regarded. | [optional]
+ **pinsAreVolatile** | **Boolean**| If specified, then only those banks will be regarded that have the given value (true or false) for their &#39;pinsAreVolatile&#39; field. | [optional]
  **supportedDataSources** | [**List&lt;String&gt;**](String.md)| Comma-separated list of data sources. Possible values: WEB_SCRAPER,FINTS_SERVER. If this parameter is specified, then only those banks will be regarded in the search that support ALL of the given data sources. Note that this does NOT imply that those data sources must be the only data sources that are supported by a bank. | [optional]
+ **location** | [**List&lt;String&gt;**](String.md)| Comma-separated list of two-letter country codes (ISO 3166 ALPHA-2). If set, then only those banks will be regarded in the search that are located in the specified countries. Notes: Banks which do not have a location set (i.e. international institutes) will ALWAYS be regarded in the search, independent of what you specify for this field. When you pass a country code that doesn&#39;t exist in the ISO 3166 ALPHA-2 standard, then the service will respond with 400 BAD_REQUEST. | [optional]
+ **isTestBank** | **Boolean**| If specified, then only those banks will be regarded that have the given value (true or false) for their &#39;isTestBank&#39; field. | [optional]
  **page** | **Integer**| Result page that you want to retrieve. | [optional] [default to 1]
  **perPage** | **Integer**| Maximum number of records per page. Can be at most 500. NOTE: Due to its validation and visualization, the swagger frontend might show very low performance, or even crashes, when a service responds with a lot of data. It is recommended to use a HTTP client like Postman or DHC instead of our swagger frontend for service calls with large page sizes. | [optional] [default to 20]
- **order** | [**List&lt;String&gt;**](String.md)| Determines the order of the results. You can order the results by id, name, blz or bic. The default order for all services is &#39;id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: &#39;/banks?order&#x3D;name,desc&amp;order&#x3D;id,asc&#39; will return banks ordered by &#39;name&#39; (descending), where banks with the same &#39;name&#39; are ordered by &#39;id&#39; (ascending). The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC).  | [optional]
+ **order** | [**List&lt;String&gt;**](String.md)| Determines the order of the results. You can order the results by &#39;id&#39;, &#39;name&#39;, &#39;blz&#39;, &#39;bic&#39; or &#39;popularity&#39;. The default order for all services is &#39;id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: &#39;/banks?order&#x3D;name,desc&amp;order&#x3D;id,asc&#39; will return banks ordered by &#39;name&#39; (descending), where banks with the same &#39;name&#39; are ordered by &#39;id&#39; (ascending). The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC).  | [optional]
 
 ### Return type
 
-[**InlineResponse2006**](InlineResponse2006.md)
+[**PageableBankList**](PageableBankList.md)
 
 ### Authorization
 
@@ -76,7 +82,7 @@ Name | Type | Description  | Notes
 
 <a name="getBank"></a>
 # **getBank**
-> InlineResponse2005Bank getBank(id)
+> Bank getBank(id)
 
 Get a bank
 
@@ -100,7 +106,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 BanksApi apiInstance = new BanksApi();
 Long id = 789L; // Long | Identifier of requested bank
 try {
-    InlineResponse2005Bank result = apiInstance.getBank(id);
+    Bank result = apiInstance.getBank(id);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling BanksApi#getBank");
@@ -116,7 +122,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2005Bank**](InlineResponse2005Bank.md)
+[**Bank**](Bank.md)
 
 ### Authorization
 
@@ -129,7 +135,7 @@ Name | Type | Description  | Notes
 
 <a name="getMultipleBanks"></a>
 # **getMultipleBanks**
-> InlineResponse2007 getMultipleBanks(ids)
+> BankList getMultipleBanks(ids)
 
 Get multiple banks
 
@@ -153,7 +159,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 BanksApi apiInstance = new BanksApi();
 List<Long> ids = Arrays.asList(56L); // List<Long> | Comma-separated list of identifiers of requested banks
 try {
-    InlineResponse2007 result = apiInstance.getMultipleBanks(ids);
+    BankList result = apiInstance.getMultipleBanks(ids);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling BanksApi#getMultipleBanks");
@@ -169,7 +175,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2007**](InlineResponse2007.md)
+[**BankList**](BankList.md)
 
 ### Authorization
 

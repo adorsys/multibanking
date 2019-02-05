@@ -1,6 +1,6 @@
 # LabelsApi
 
-All URIs are relative to *https://localhost/*
+All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -15,7 +15,7 @@ Method | HTTP request | Description
 
 <a name="createLabel"></a>
 # **createLabel**
-> InlineResponse20012Labels createLabel(body)
+> Label createLabel(body)
 
 Create a new label
 
@@ -37,9 +37,9 @@ OAuth finapi_auth = (OAuth) defaultClient.getAuthentication("finapi_auth");
 finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 
 LabelsApi apiInstance = new LabelsApi();
-Body8 body = new Body8(); // Body8 | Label's name
+LabelParams body = new LabelParams(); // LabelParams | Label's name
 try {
-    InlineResponse20012Labels result = apiInstance.createLabel(body);
+    Label result = apiInstance.createLabel(body);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling LabelsApi#createLabel");
@@ -51,11 +51,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**Body8**](Body8.md)| Label&#39;s name |
+ **body** | [**LabelParams**](LabelParams.md)| Label&#39;s name |
 
 ### Return type
 
-[**InlineResponse20012Labels**](InlineResponse20012Labels.md)
+[**Label**](Label.md)
 
 ### Authorization
 
@@ -68,7 +68,7 @@ Name | Type | Description  | Notes
 
 <a name="deleteAllLabels"></a>
 # **deleteAllLabels**
-> InlineResponse2001 deleteAllLabels()
+> IdentifierList deleteAllLabels()
 
 Delete all labels
 
@@ -91,7 +91,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 
 LabelsApi apiInstance = new LabelsApi();
 try {
-    InlineResponse2001 result = apiInstance.deleteAllLabels();
+    IdentifierList result = apiInstance.deleteAllLabels();
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling LabelsApi#deleteAllLabels");
@@ -104,7 +104,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse2001**](InlineResponse2001.md)
+[**IdentifierList**](IdentifierList.md)
 
 ### Authorization
 
@@ -169,7 +169,7 @@ null (empty response body)
 
 <a name="editLabel"></a>
 # **editLabel**
-> InlineResponse20012Labels editLabel(id, body)
+> Label editLabel(id, body)
 
 Edit a label
 
@@ -192,9 +192,9 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 
 LabelsApi apiInstance = new LabelsApi();
 Long id = 789L; // Long | Label's identifier
-Body9 body = new Body9(); // Body9 | Label's new name
+LabelParams body = new LabelParams(); // LabelParams | Label's new name
 try {
-    InlineResponse20012Labels result = apiInstance.editLabel(id, body);
+    Label result = apiInstance.editLabel(id, body);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling LabelsApi#editLabel");
@@ -207,11 +207,11 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **id** | **Long**| Label&#39;s identifier |
- **body** | [**Body9**](Body9.md)| Label&#39;s new name |
+ **body** | [**LabelParams**](LabelParams.md)| Label&#39;s new name |
 
 ### Return type
 
-[**InlineResponse20012Labels**](InlineResponse20012Labels.md)
+[**Label**](Label.md)
 
 ### Authorization
 
@@ -224,7 +224,7 @@ Name | Type | Description  | Notes
 
 <a name="getAndSearchAllLabels"></a>
 # **getAndSearchAllLabels**
-> InlineResponse20012 getAndSearchAllLabels(ids, search, page, perPage, order)
+> PageableLabelList getAndSearchAllLabels(ids, search, page, perPage, order)
 
 Get and search all labels
 
@@ -250,9 +250,9 @@ List<Long> ids = Arrays.asList(56L); // List<Long> | A comma-separated list of l
 String search = "search_example"; // String | If specified, then only those labels will be contained in the result whose 'name' contains the given search string (the matching works case-insensitive). If no labels contain the search string in their name, then the result will be an empty list. NOTE: If the given search string consists of several terms (separated by whitespace), then ALL of these terms must be contained in the name in order for a label to get included into the result.
 Integer page = 1; // Integer | Result page that you want to retrieve
 Integer perPage = 20; // Integer | Maximum number of records per page. Can be at most 500. NOTE: Due to its validation and visualization, the swagger frontend might show very low performance, or even crashes, when a service responds with a lot of data. It is recommended to use a HTTP client like Postman or DHC instead of our swagger frontend for service calls with large page sizes.
-List<String> order = Arrays.asList("order_example"); // List<String> | Determines the order of the results. You can order the results by id or name. The default order for all services is 'id,asc'. Since both fields (id and name) are unique, ordering by multiple fields is pointless. The general format is: 'property[,asc|desc]', with 'asc' being the default value. 
+List<String> order = Arrays.asList("order_example"); // List<String> | Determines the order of the results. You can order the results by 'id' or 'name'. The default order for all services is 'id,asc'. Since both fields (id and name) are unique, ordering by multiple fields is pointless. The general format is: 'property[,asc|desc]', with 'asc' being the default value. 
 try {
-    InlineResponse20012 result = apiInstance.getAndSearchAllLabels(ids, search, page, perPage, order);
+    PageableLabelList result = apiInstance.getAndSearchAllLabels(ids, search, page, perPage, order);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling LabelsApi#getAndSearchAllLabels");
@@ -268,11 +268,11 @@ Name | Type | Description  | Notes
  **search** | **String**| If specified, then only those labels will be contained in the result whose &#39;name&#39; contains the given search string (the matching works case-insensitive). If no labels contain the search string in their name, then the result will be an empty list. NOTE: If the given search string consists of several terms (separated by whitespace), then ALL of these terms must be contained in the name in order for a label to get included into the result. | [optional]
  **page** | **Integer**| Result page that you want to retrieve | [optional] [default to 1]
  **perPage** | **Integer**| Maximum number of records per page. Can be at most 500. NOTE: Due to its validation and visualization, the swagger frontend might show very low performance, or even crashes, when a service responds with a lot of data. It is recommended to use a HTTP client like Postman or DHC instead of our swagger frontend for service calls with large page sizes. | [optional] [default to 20]
- **order** | [**List&lt;String&gt;**](String.md)| Determines the order of the results. You can order the results by id or name. The default order for all services is &#39;id,asc&#39;. Since both fields (id and name) are unique, ordering by multiple fields is pointless. The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value.  | [optional]
+ **order** | [**List&lt;String&gt;**](String.md)| Determines the order of the results. You can order the results by &#39;id&#39; or &#39;name&#39;. The default order for all services is &#39;id,asc&#39;. Since both fields (id and name) are unique, ordering by multiple fields is pointless. The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value.  | [optional]
 
 ### Return type
 
-[**InlineResponse20012**](InlineResponse20012.md)
+[**PageableLabelList**](PageableLabelList.md)
 
 ### Authorization
 
@@ -285,7 +285,7 @@ Name | Type | Description  | Notes
 
 <a name="getLabel"></a>
 # **getLabel**
-> InlineResponse20012Labels getLabel(id)
+> Label getLabel(id)
 
 Get a label
 
@@ -309,7 +309,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 LabelsApi apiInstance = new LabelsApi();
 Long id = 789L; // Long | Identifier of requested label
 try {
-    InlineResponse20012Labels result = apiInstance.getLabel(id);
+    Label result = apiInstance.getLabel(id);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling LabelsApi#getLabel");
@@ -325,7 +325,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse20012Labels**](InlineResponse20012Labels.md)
+[**Label**](Label.md)
 
 ### Authorization
 
@@ -338,7 +338,7 @@ Name | Type | Description  | Notes
 
 <a name="getMultipleLabels"></a>
 # **getMultipleLabels**
-> InlineResponse20013 getMultipleLabels(ids)
+> LabelList getMultipleLabels(ids)
 
 Get multiple labels
 
@@ -362,7 +362,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 LabelsApi apiInstance = new LabelsApi();
 List<Long> ids = Arrays.asList(56L); // List<Long> | Comma-separated list of identifiers of requested labels
 try {
-    InlineResponse20013 result = apiInstance.getMultipleLabels(ids);
+    LabelList result = apiInstance.getMultipleLabels(ids);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling LabelsApi#getMultipleLabels");
@@ -378,7 +378,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse20013**](InlineResponse20013.md)
+[**LabelList**](LabelList.md)
 
 ### Authorization
 

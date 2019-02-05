@@ -1,25 +1,27 @@
 # CategoriesApi
 
-All URIs are relative to *https://localhost/*
+All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**createCategory**](CategoriesApi.md#createCategory) | **POST** /api/v1/categories | Create a new category
 [**deleteAllCategories**](CategoriesApi.md#deleteAllCategories) | **DELETE** /api/v1/categories | Delete all categories
 [**deleteCategory**](CategoriesApi.md#deleteCategory) | **DELETE** /api/v1/categories/{id} | Delete a category
+[**editCategory**](CategoriesApi.md#editCategory) | **PATCH** /api/v1/categories/{id} | Edit a category
 [**getAndSearchAllCategories**](CategoriesApi.md#getAndSearchAllCategories) | **GET** /api/v1/categories | Get and search all categories
 [**getCashFlows**](CategoriesApi.md#getCashFlows) | **GET** /api/v1/categories/cashFlows | Get cash flows
 [**getCategory**](CategoriesApi.md#getCategory) | **GET** /api/v1/categories/{id} | Get a category
 [**getMultipleCategories**](CategoriesApi.md#getMultipleCategories) | **GET** /api/v1/categories/{ids} | Get multiple categories
+[**trainCategorization**](CategoriesApi.md#trainCategorization) | **POST** /api/v1/categories/trainCategorization | Train categorization
 
 
 <a name="createCategory"></a>
 # **createCategory**
-> InlineResponse2008Categories createCategory(body)
+> Category createCategory(body)
 
 Create a new category
 
-Create a new custom category for the authorized user. Must pass the user&#39;s access_token.
+Create a new custom transaction category for the authorized user, that can then be assigned to transactions via PATCH /transactions, and that will also be regarded in finAPI&#39;s automatic transactions categorization process. Must pass the user&#39;s access_token.
 
 ### Example
 ```java
@@ -37,9 +39,9 @@ OAuth finapi_auth = (OAuth) defaultClient.getAuthentication("finapi_auth");
 finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 
 CategoriesApi apiInstance = new CategoriesApi();
-Body6 body = new Body6(); // Body6 | Parameters of the new category
+CategoryParams body = new CategoryParams(); // CategoryParams | Parameters of the new category
 try {
-    InlineResponse2008Categories result = apiInstance.createCategory(body);
+    Category result = apiInstance.createCategory(body);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling CategoriesApi#createCategory");
@@ -51,11 +53,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**Body6**](Body6.md)| Parameters of the new category | [optional]
+ **body** | [**CategoryParams**](CategoryParams.md)| Parameters of the new category | [optional]
 
 ### Return type
 
-[**InlineResponse2008Categories**](InlineResponse2008Categories.md)
+[**Category**](Category.md)
 
 ### Authorization
 
@@ -68,7 +70,7 @@ Name | Type | Description  | Notes
 
 <a name="deleteAllCategories"></a>
 # **deleteAllCategories**
-> InlineResponse2001 deleteAllCategories()
+> IdentifierList deleteAllCategories()
 
 Delete all categories
 
@@ -91,7 +93,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 
 CategoriesApi apiInstance = new CategoriesApi();
 try {
-    InlineResponse2001 result = apiInstance.deleteAllCategories();
+    IdentifierList result = apiInstance.deleteAllCategories();
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling CategoriesApi#deleteAllCategories");
@@ -104,7 +106,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse2001**](InlineResponse2001.md)
+[**IdentifierList**](IdentifierList.md)
 
 ### Authorization
 
@@ -167,9 +169,64 @@ null (empty response body)
  - **Content-Type**: Not defined
  - **Accept**: Not defined
 
+<a name="editCategory"></a>
+# **editCategory**
+> Category editCategory(id, body)
+
+Edit a category
+
+Change the name of a custom transaction category belonging to the authorized user. Must pass the user&#39;s access_token.
+
+### Example
+```java
+// Import classes:
+//import io.swagger.client.ApiClient;
+//import io.swagger.client.ApiException;
+//import io.swagger.client.Configuration;
+//import io.swagger.client.auth.*;
+//import io.swagger.client.api.CategoriesApi;
+
+ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+// Configure OAuth2 access token for authorization: finapi_auth
+OAuth finapi_auth = (OAuth) defaultClient.getAuthentication("finapi_auth");
+finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
+
+CategoriesApi apiInstance = new CategoriesApi();
+Long id = 789L; // Long | Identifier of the category to edit
+EditCategoryParams body = new EditCategoryParams(); // EditCategoryParams | New category name
+try {
+    Category result = apiInstance.editCategory(id, body);
+    System.out.println(result);
+} catch (ApiException e) {
+    System.err.println("Exception when calling CategoriesApi#editCategory");
+    e.printStackTrace();
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **id** | **Long**| Identifier of the category to edit |
+ **body** | [**EditCategoryParams**](EditCategoryParams.md)| New category name | [optional]
+
+### Return type
+
+[**Category**](Category.md)
+
+### Authorization
+
+[finapi_auth](../README.md#finapi_auth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
 <a name="getAndSearchAllCategories"></a>
 # **getAndSearchAllCategories**
-> InlineResponse2008 getAndSearchAllCategories(ids, search, isCustom, page, perPage, order)
+> PageableCategoryList getAndSearchAllCategories(ids, search, isCustom, page, perPage, order)
 
 Get and search all categories
 
@@ -198,7 +255,7 @@ Integer page = 1; // Integer | Result page that you want to retrieve.
 Integer perPage = 20; // Integer | Maximum number of records per page. Can be at most 500. NOTE: Due to its validation and visualization, the swagger frontend might show very low performance, or even crashes, when a service responds with a lot of data. It is recommended to use a HTTP client like Postman or DHC instead of our swagger frontend for service calls with large page sizes.
 List<String> order = Arrays.asList("order_example"); // List<String> | Determines the order of the results. You can order the results by 'id', 'name' and 'isCustom'. The default order is 'id,asc'. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: '/categories?order=isCustom,desc&order=name' will return all custom categories followed by all default categories. Both groups are ordered ascending by name. The general format is: 'property[,asc|desc]', with 'asc' being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC). 
 try {
-    InlineResponse2008 result = apiInstance.getAndSearchAllCategories(ids, search, isCustom, page, perPage, order);
+    PageableCategoryList result = apiInstance.getAndSearchAllCategories(ids, search, isCustom, page, perPage, order);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling CategoriesApi#getAndSearchAllCategories");
@@ -219,7 +276,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2008**](InlineResponse2008.md)
+[**PageableCategoryList**](PageableCategoryList.md)
 
 ### Authorization
 
@@ -232,7 +289,7 @@ Name | Type | Description  | Notes
 
 <a name="getCashFlows"></a>
 # **getCashFlows**
-> InlineResponse2009 getCashFlows(search, counterpart, accountIds, minBankBookingDate, maxBankBookingDate, minFinapiBookingDate, maxFinapiBookingDate, minAmount, maxAmount, direction, labelIds, categoryIds, isNew, minImportDate, maxImportDate, includeSubCashFlows, order)
+> CashFlowList getCashFlows(search, counterpart, purpose, accountIds, minBankBookingDate, maxBankBookingDate, minFinapiBookingDate, maxFinapiBookingDate, minAmount, maxAmount, direction, labelIds, categoryIds, isNew, minImportDate, maxImportDate, includeSubCashFlows, order)
 
 Get cash flows
 
@@ -256,6 +313,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 CategoriesApi apiInstance = new CategoriesApi();
 String search = "search_example"; // String | If specified, then only transactions that contain the search term in their purpose or counterpart fields will be contained in the result. Note that the search is case insensitive.
 String counterpart = "counterpart_example"; // String | The counterpart is the person or institution that received your payment, or that you made the payment to. If this parameter is specified, then only transactions that contain the given term in one (or more) of their counterpart fields ('counterpartName', 'counterpartAccountNumber', 'counterpartIban', 'counterpartBic' or 'counterpartBlz') will be contained in the result. Note that the search is case insensitive.
+String purpose = "purpose_example"; // String | If specified, then only those transactions will be contained in the result whose purpose field contains the given search string. Note that the search is case insensitive.NOTE: If the given search string consists of several terms (separated by whitespace), then ALL of these terms must be contained in the purpose in order for a transaction to get included into the result.
 List<Long> accountIds = Arrays.asList(56L); // List<Long> | A comma-separated list of account identifiers. If specified, then only transactions that relate to the given accounts will be regarded. If not specified, then all accounts will be regarded.
 String minBankBookingDate = "minBankBookingDate_example"; // String | Lower bound for a transaction's booking date as returned by the bank (= original booking date), in the format 'YYYY-MM-DD' (e.g. '2016-01-01'). If specified, then only transactions whose 'bankBookingDate' is equal to or later than the given date will be regarded.
 String maxBankBookingDate = "maxBankBookingDate_example"; // String | Upper bound for a transaction's booking date as returned by the bank (= original booking date), in the format 'YYYY-MM-DD' (e.g. '2016-01-01'). If specified, then only transactions whose 'bankBookingDate' is equal to or earlier than the given date will be regarded.
@@ -269,10 +327,10 @@ List<Long> categoryIds = Arrays.asList(56L); // List<Long> | If specified, then 
 Boolean isNew = true; // Boolean | If specified, then only transactions that have their 'isNew' flag set to true/false will be regarded for the cash flow calculations.
 String minImportDate = "minImportDate_example"; // String | Lower bound for a transaction's import date, in the format 'YYYY-MM-DD' (e.g. '2016-01-01'). If specified, then only transactions whose 'importDate' is equal to or later than the given date will be regarded.
 String maxImportDate = "maxImportDate_example"; // String | Upper bound for a transaction's import date, in the format 'YYYY-MM-DD' (e.g. '2016-01-01'). If specified, then only transactions whose 'importDate' is equal to or earlier than the given date will be regarded.
-Boolean includeSubCashFlows = true; // Boolean | If it is true, then the income, spending and balance of a main category results from all transactions that have either this (main) category or any of its subcategories assigned (of course all transactions depends from the other filtering settings); If it is false, then the income, spending and balance of a main category only results from the transactions that have exactly this (main) category assigned. Default value for this parameter is 'true'.
-List<String> order = Arrays.asList("order_example"); // List<String> | Determines the order of the results. You can order the results by income, spending, balance, category.id or category.name. The default order for this service is 'category.id,asc'. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: '/cashFlows?order=income,desc&order=spending,asc&balance,desc' will return as first result the category with the highest income. If two categories have the same income, it returns the category with the highest spending first (because spending is a negative value) and so on. The general format is: 'property[,asc|desc]', with 'asc' being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC). 
+Boolean includeSubCashFlows = true; // Boolean | If it is true, then the income, spending, balance and count of transactions of a main category results from all transactions that have either this (main) category or any of its subcategories assigned (of course all transactions depends from the other filtering settings); If it is false, then the income, spending, balance and count of transactions of a main category only results from the transactions that have exactly this (main) category assigned. Default value for this parameter is 'true'.
+List<String> order = Arrays.asList("order_example"); // List<String> | Determines the order of the results. You can order the results by 'income', 'spending', 'balance', 'category.id' or 'category.name'. The default order for this service is 'category.id,asc'. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: '/cashFlows?order=income,desc&order=spending,asc&balance,desc' will return as first result the category with the highest income. If two categories have the same income, it returns the category with the highest spending first (because spending is a negative value) and so on. The general format is: 'property[,asc|desc]', with 'asc' being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC). 
 try {
-    InlineResponse2009 result = apiInstance.getCashFlows(search, counterpart, accountIds, minBankBookingDate, maxBankBookingDate, minFinapiBookingDate, maxFinapiBookingDate, minAmount, maxAmount, direction, labelIds, categoryIds, isNew, minImportDate, maxImportDate, includeSubCashFlows, order);
+    CashFlowList result = apiInstance.getCashFlows(search, counterpart, purpose, accountIds, minBankBookingDate, maxBankBookingDate, minFinapiBookingDate, maxFinapiBookingDate, minAmount, maxAmount, direction, labelIds, categoryIds, isNew, minImportDate, maxImportDate, includeSubCashFlows, order);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling CategoriesApi#getCashFlows");
@@ -286,6 +344,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **search** | **String**| If specified, then only transactions that contain the search term in their purpose or counterpart fields will be contained in the result. Note that the search is case insensitive. | [optional]
  **counterpart** | **String**| The counterpart is the person or institution that received your payment, or that you made the payment to. If this parameter is specified, then only transactions that contain the given term in one (or more) of their counterpart fields (&#39;counterpartName&#39;, &#39;counterpartAccountNumber&#39;, &#39;counterpartIban&#39;, &#39;counterpartBic&#39; or &#39;counterpartBlz&#39;) will be contained in the result. Note that the search is case insensitive. | [optional]
+ **purpose** | **String**| If specified, then only those transactions will be contained in the result whose purpose field contains the given search string. Note that the search is case insensitive.NOTE: If the given search string consists of several terms (separated by whitespace), then ALL of these terms must be contained in the purpose in order for a transaction to get included into the result. | [optional]
  **accountIds** | [**List&lt;Long&gt;**](Long.md)| A comma-separated list of account identifiers. If specified, then only transactions that relate to the given accounts will be regarded. If not specified, then all accounts will be regarded. | [optional]
  **minBankBookingDate** | **String**| Lower bound for a transaction&#39;s booking date as returned by the bank (&#x3D; original booking date), in the format &#39;YYYY-MM-DD&#39; (e.g. &#39;2016-01-01&#39;). If specified, then only transactions whose &#39;bankBookingDate&#39; is equal to or later than the given date will be regarded. | [optional]
  **maxBankBookingDate** | **String**| Upper bound for a transaction&#39;s booking date as returned by the bank (&#x3D; original booking date), in the format &#39;YYYY-MM-DD&#39; (e.g. &#39;2016-01-01&#39;). If specified, then only transactions whose &#39;bankBookingDate&#39; is equal to or earlier than the given date will be regarded. | [optional]
@@ -299,12 +358,12 @@ Name | Type | Description  | Notes
  **isNew** | **Boolean**| If specified, then only transactions that have their &#39;isNew&#39; flag set to true/false will be regarded for the cash flow calculations. | [optional]
  **minImportDate** | **String**| Lower bound for a transaction&#39;s import date, in the format &#39;YYYY-MM-DD&#39; (e.g. &#39;2016-01-01&#39;). If specified, then only transactions whose &#39;importDate&#39; is equal to or later than the given date will be regarded. | [optional]
  **maxImportDate** | **String**| Upper bound for a transaction&#39;s import date, in the format &#39;YYYY-MM-DD&#39; (e.g. &#39;2016-01-01&#39;). If specified, then only transactions whose &#39;importDate&#39; is equal to or earlier than the given date will be regarded. | [optional]
- **includeSubCashFlows** | **Boolean**| If it is true, then the income, spending and balance of a main category results from all transactions that have either this (main) category or any of its subcategories assigned (of course all transactions depends from the other filtering settings); If it is false, then the income, spending and balance of a main category only results from the transactions that have exactly this (main) category assigned. Default value for this parameter is &#39;true&#39;. | [optional] [default to true]
- **order** | [**List&lt;String&gt;**](String.md)| Determines the order of the results. You can order the results by income, spending, balance, category.id or category.name. The default order for this service is &#39;category.id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: &#39;/cashFlows?order&#x3D;income,desc&amp;order&#x3D;spending,asc&amp;balance,desc&#39; will return as first result the category with the highest income. If two categories have the same income, it returns the category with the highest spending first (because spending is a negative value) and so on. The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC).  | [optional]
+ **includeSubCashFlows** | **Boolean**| If it is true, then the income, spending, balance and count of transactions of a main category results from all transactions that have either this (main) category or any of its subcategories assigned (of course all transactions depends from the other filtering settings); If it is false, then the income, spending, balance and count of transactions of a main category only results from the transactions that have exactly this (main) category assigned. Default value for this parameter is &#39;true&#39;. | [optional] [default to true]
+ **order** | [**List&lt;String&gt;**](String.md)| Determines the order of the results. You can order the results by &#39;income&#39;, &#39;spending&#39;, &#39;balance&#39;, &#39;category.id&#39; or &#39;category.name&#39;. The default order for this service is &#39;category.id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. Example: &#39;/cashFlows?order&#x3D;income,desc&amp;order&#x3D;spending,asc&amp;balance,desc&#39; will return as first result the category with the highest income. If two categories have the same income, it returns the category with the highest spending first (because spending is a negative value) and so on. The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC).  | [optional]
 
 ### Return type
 
-[**InlineResponse2009**](InlineResponse2009.md)
+[**CashFlowList**](CashFlowList.md)
 
 ### Authorization
 
@@ -317,7 +376,7 @@ Name | Type | Description  | Notes
 
 <a name="getCategory"></a>
 # **getCategory**
-> InlineResponse2008Categories getCategory(id)
+> Category getCategory(id)
 
 Get a category
 
@@ -341,7 +400,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 CategoriesApi apiInstance = new CategoriesApi();
 Long id = 789L; // Long | Category identifier
 try {
-    InlineResponse2008Categories result = apiInstance.getCategory(id);
+    Category result = apiInstance.getCategory(id);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling CategoriesApi#getCategory");
@@ -357,7 +416,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse2008Categories**](InlineResponse2008Categories.md)
+[**Category**](Category.md)
 
 ### Authorization
 
@@ -370,7 +429,7 @@ Name | Type | Description  | Notes
 
 <a name="getMultipleCategories"></a>
 # **getMultipleCategories**
-> InlineResponse20010 getMultipleCategories(ids)
+> CategoryList getMultipleCategories(ids)
 
 Get multiple categories
 
@@ -394,7 +453,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 CategoriesApi apiInstance = new CategoriesApi();
 List<Long> ids = Arrays.asList(56L); // List<Long> | Comma-separated list of identifiers of requested categories
 try {
-    InlineResponse20010 result = apiInstance.getMultipleCategories(ids);
+    CategoryList result = apiInstance.getMultipleCategories(ids);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling CategoriesApi#getMultipleCategories");
@@ -410,7 +469,59 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse20010**](InlineResponse20010.md)
+[**CategoryList**](CategoryList.md)
+
+### Authorization
+
+[finapi_auth](../README.md#finapi_auth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: Not defined
+
+<a name="trainCategorization"></a>
+# **trainCategorization**
+> trainCategorization(body)
+
+Train categorization
+
+This service allows you to create user-specific categorization rules (for the user that is authorized by the access_token). Pass a categorization sample (&#x3D;set of transaction data and a target category), and finAPI will train the user&#39;s categorization rules so that similar transactions will be categorized accordingly in future. Basically, this service behaves the same as when assigning categories to existing transactions via the &#39;Edit a transaction&#39; service, with the difference that you can directly pass transaction data to this service, without the need of having any transactions actually imported in finAPI. Must pass the user&#39;s access_token.
+
+### Example
+```java
+// Import classes:
+//import io.swagger.client.ApiClient;
+//import io.swagger.client.ApiException;
+//import io.swagger.client.Configuration;
+//import io.swagger.client.auth.*;
+//import io.swagger.client.api.CategoriesApi;
+
+ApiClient defaultClient = Configuration.getDefaultApiClient();
+
+// Configure OAuth2 access token for authorization: finapi_auth
+OAuth finapi_auth = (OAuth) defaultClient.getAuthentication("finapi_auth");
+finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
+
+CategoriesApi apiInstance = new CategoriesApi();
+TrainCategorizationData body = new TrainCategorizationData(); // TrainCategorizationData | Categorization sample
+try {
+    apiInstance.trainCategorization(body);
+} catch (ApiException e) {
+    System.err.println("Exception when calling CategoriesApi#trainCategorization");
+    e.printStackTrace();
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **body** | [**TrainCategorizationData**](TrainCategorizationData.md)| Categorization sample | [optional]
+
+### Return type
+
+null (empty response body)
 
 ### Authorization
 

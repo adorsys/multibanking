@@ -1,6 +1,6 @@
 # NotificationRulesApi
 
-All URIs are relative to *https://localhost/*
+All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -13,11 +13,11 @@ Method | HTTP request | Description
 
 <a name="createNotificationRule"></a>
 # **createNotificationRule**
-> InlineResponse20016NotificationRules createNotificationRule(body)
+> NotificationRule createNotificationRule(body)
 
 Create a new notification rule
 
-Create a new notification rule for a specific user. Must pass the user&#39;s access_token.&lt;br/&gt;&lt;br/&gt;Setting up notification rules for a user allows your client application to get notified about changes in the user&#39;s data, e.g. when new transactions were downloaded, an account&#39;s balance has changed, or the user&#39;s banking credentials are no longer correct. Note that currently, this feature is implemented only for finAPI&#39;s automatic batch update, i.e. notification rules are only relevant when the user has activated the automatic updates (and when the automatic batch update is activated in general for your client).&lt;br/&gt;&lt;br/&gt;There are different kinds of notification rules. The kind of a rule is depicted by the &#39;triggerEvent&#39;. The trigger event specifies what data you have to pass when creating a rule (specifically, the contents of the &#39;params&#39; field), on which events finAPI will send notifications to your client application, as well as what data is contained in those notifications. The specifics of the different trigger events are documented in the following article on our Dev Portal: &lt;a href&#x3D;&#39;https://finapi.zendesk.com/hc/en-us/articles/232324608-How-to-create-notification-rules-and-receive-notifications&#39;&gt;How to create notification rules and receive notifications&lt;/a&gt;
+Create a new notification rule for a specific user. Must pass the user&#39;s access_token.&lt;br/&gt;&lt;br/&gt;Setting up notification rules for a user allows your client application to get notified about changes in the user&#39;s data, e.g. when new transactions were downloaded, an account&#39;s balance has changed, or the user&#39;s banking credentials are no longer correct. Note that currently, this feature is implemented only for finAPI&#39;s automatic batch update, i.e. notification rules are only relevant when the user has activated the automatic updates (and when the automatic batch update is activated in general for your client).&lt;br/&gt;&lt;br/&gt;There are different kinds of notification rules. The kind of a rule is depicted by the &#39;triggerEvent&#39;. The trigger event specifies what data you have to pass when creating a rule (specifically, the contents of the &#39;params&#39; field), on which events finAPI will send notifications to your client application, as well as what data is contained in those notifications. The specifics of the different trigger events are documented in the following article on our Dev Portal: &lt;a href&#x3D;&#39;https://finapi.zendesk.com/hc/en-us/articles/232324608-How-to-create-notification-rules-and-receive-notifications&#39; target&#x3D;&#39;_blank&#39;&gt;How to create notification rules and receive notifications&lt;/a&gt;
 
 ### Example
 ```java
@@ -35,9 +35,9 @@ OAuth finapi_auth = (OAuth) defaultClient.getAuthentication("finapi_auth");
 finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 
 NotificationRulesApi apiInstance = new NotificationRulesApi();
-Body11 body = new Body11(); // Body11 | Notification rule parameters
+NotificationRuleParams body = new NotificationRuleParams(); // NotificationRuleParams | Notification rule parameters
 try {
-    InlineResponse20016NotificationRules result = apiInstance.createNotificationRule(body);
+    NotificationRule result = apiInstance.createNotificationRule(body);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling NotificationRulesApi#createNotificationRule");
@@ -49,11 +49,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**Body11**](Body11.md)| Notification rule parameters |
+ **body** | [**NotificationRuleParams**](NotificationRuleParams.md)| Notification rule parameters |
 
 ### Return type
 
-[**InlineResponse20016NotificationRules**](InlineResponse20016NotificationRules.md)
+[**NotificationRule**](NotificationRule.md)
 
 ### Authorization
 
@@ -66,7 +66,7 @@ Name | Type | Description  | Notes
 
 <a name="deleteAllNotificationRules"></a>
 # **deleteAllNotificationRules**
-> InlineResponse2001 deleteAllNotificationRules()
+> IdentifierList deleteAllNotificationRules()
 
 Delete all notification rules
 
@@ -89,7 +89,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 
 NotificationRulesApi apiInstance = new NotificationRulesApi();
 try {
-    InlineResponse2001 result = apiInstance.deleteAllNotificationRules();
+    IdentifierList result = apiInstance.deleteAllNotificationRules();
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling NotificationRulesApi#deleteAllNotificationRules");
@@ -102,7 +102,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse2001**](InlineResponse2001.md)
+[**IdentifierList**](IdentifierList.md)
 
 ### Authorization
 
@@ -167,7 +167,7 @@ null (empty response body)
 
 <a name="getAndSearchAllNotificationRules"></a>
 # **getAndSearchAllNotificationRules**
-> InlineResponse20016 getAndSearchAllNotificationRules(ids, triggerEvent, includeDetails)
+> NotificationRuleList getAndSearchAllNotificationRules(ids, triggerEvent, includeDetails)
 
 Get and search all notification rules
 
@@ -193,7 +193,7 @@ List<Long> ids = Arrays.asList(56L); // List<Long> | A comma-separated list of n
 String triggerEvent = "triggerEvent_example"; // String | If specified, then only notification rules with given trigger event will be regarded.
 Boolean includeDetails = true; // Boolean | If specified, then only notification rules that include or not include details will be regarded.
 try {
-    InlineResponse20016 result = apiInstance.getAndSearchAllNotificationRules(ids, triggerEvent, includeDetails);
+    NotificationRuleList result = apiInstance.getAndSearchAllNotificationRules(ids, triggerEvent, includeDetails);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling NotificationRulesApi#getAndSearchAllNotificationRules");
@@ -206,12 +206,12 @@ try {
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **ids** | [**List&lt;Long&gt;**](Long.md)| A comma-separated list of notification rule identifiers. If specified, then only notification rules whose identifier match any of the given identifiers will be regarded. The maximum number of identifiers is 1000. | [optional]
- **triggerEvent** | **String**| If specified, then only notification rules with given trigger event will be regarded. | [optional] [enum: NEW_ACCOUNT_BALANCE, NEW_TRANSACTIONS, BANK_LOGIN_ERROR, FOREIGN_MONEY_TRANSFER, LOW_ACCOUNT_BALANCE, HIGH_TRANSACTION_AMOUNT, CATEGORY_CASH_FLOW]
+ **triggerEvent** | **String**| If specified, then only notification rules with given trigger event will be regarded. | [optional] [enum: NEW_ACCOUNT_BALANCE, NEW_TRANSACTIONS, BANK_LOGIN_ERROR, FOREIGN_MONEY_TRANSFER, LOW_ACCOUNT_BALANCE, HIGH_TRANSACTION_AMOUNT, CATEGORY_CASH_FLOW, NEW_TERMS_AND_CONDITIONS]
  **includeDetails** | **Boolean**| If specified, then only notification rules that include or not include details will be regarded. | [optional]
 
 ### Return type
 
-[**InlineResponse20016**](InlineResponse20016.md)
+[**NotificationRuleList**](NotificationRuleList.md)
 
 ### Authorization
 
@@ -224,7 +224,7 @@ Name | Type | Description  | Notes
 
 <a name="getNotificationRule"></a>
 # **getNotificationRule**
-> InlineResponse20016NotificationRules getNotificationRule(id)
+> NotificationRule getNotificationRule(id)
 
 Get a notification rule
 
@@ -248,7 +248,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 NotificationRulesApi apiInstance = new NotificationRulesApi();
 Long id = 789L; // Long | Identifier of requested notification rule
 try {
-    InlineResponse20016NotificationRules result = apiInstance.getNotificationRule(id);
+    NotificationRule result = apiInstance.getNotificationRule(id);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling NotificationRulesApi#getNotificationRule");
@@ -264,7 +264,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse20016NotificationRules**](InlineResponse20016NotificationRules.md)
+[**NotificationRule**](NotificationRule.md)
 
 ### Authorization
 

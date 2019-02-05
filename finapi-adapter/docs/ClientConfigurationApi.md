@@ -1,6 +1,6 @@
 # ClientConfigurationApi
 
-All URIs are relative to *https://localhost/*
+All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -10,7 +10,7 @@ Method | HTTP request | Description
 
 <a name="editClientConfiguration"></a>
 # **editClientConfiguration**
-> InlineResponse20011 editClientConfiguration(body)
+> ClientConfiguration editClientConfiguration(body)
 
 Edit client configuration
 
@@ -32,9 +32,9 @@ OAuth finapi_auth = (OAuth) defaultClient.getAuthentication("finapi_auth");
 finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 
 ClientConfigurationApi apiInstance = new ClientConfigurationApi();
-Body7 body = new Body7(); // Body7 | Client configuration parameters
+ClientConfigurationParams body = new ClientConfigurationParams(); // ClientConfigurationParams | Client configuration parameters
 try {
-    InlineResponse20011 result = apiInstance.editClientConfiguration(body);
+    ClientConfiguration result = apiInstance.editClientConfiguration(body);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling ClientConfigurationApi#editClientConfiguration");
@@ -46,11 +46,11 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **body** | [**Body7**](Body7.md)| Client configuration parameters | [optional]
+ **body** | [**ClientConfigurationParams**](ClientConfigurationParams.md)| Client configuration parameters | [optional]
 
 ### Return type
 
-[**InlineResponse20011**](InlineResponse20011.md)
+[**ClientConfiguration**](ClientConfiguration.md)
 
 ### Authorization
 
@@ -63,7 +63,7 @@ Name | Type | Description  | Notes
 
 <a name="getClientConfiguration"></a>
 # **getClientConfiguration**
-> InlineResponse20011 getClientConfiguration()
+> ClientConfiguration getClientConfiguration()
 
 Get client configuration
 
@@ -86,7 +86,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 
 ClientConfigurationApi apiInstance = new ClientConfigurationApi();
 try {
-    InlineResponse20011 result = apiInstance.getClientConfiguration();
+    ClientConfiguration result = apiInstance.getClientConfiguration();
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling ClientConfigurationApi#getClientConfiguration");
@@ -99,7 +99,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**InlineResponse20011**](InlineResponse20011.md)
+[**ClientConfiguration**](ClientConfiguration.md)
 
 ### Authorization
 

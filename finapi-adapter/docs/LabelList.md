@@ -4,7 +4,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**labels** | [**List&lt;InlineResponse20012Labels&gt;**](InlineResponse20012Labels.md) | Data of labels | 
+**labels** | [**List&lt;Label&gt;**](Label.md) | Data of labels | 
 
 
 

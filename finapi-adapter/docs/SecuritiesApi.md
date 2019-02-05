@@ -1,6 +1,6 @@
 # SecuritiesApi
 
-All URIs are relative to *https://localhost/*
+All URIs are relative to *https://localhost*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -11,7 +11,7 @@ Method | HTTP request | Description
 
 <a name="getAndSearchAllSecurities"></a>
 # **getAndSearchAllSecurities**
-> InlineResponse20017 getAndSearchAllSecurities(ids, search, accountIds, page, perPage, order)
+> PageableSecurityList getAndSearchAllSecurities(ids, search, accountIds, page, perPage, order)
 
 Get and search all securities
 
@@ -38,9 +38,9 @@ String search = "search_example"; // String | If specified, then only those secu
 List<Long> accountIds = Arrays.asList(56L); // List<Long> | Comma-separated list of identifiers of accounts
 Integer page = 1; // Integer | Result page that you want to retrieve.
 Integer perPage = 20; // Integer | Maximum number of records per page. Can be at most 500. NOTE: Due to its validation and visualization, the swagger frontend might show very low performance, or even crashes, when a service responds with a lot of data. It is recommended to use a HTTP client like Postman or DHC instead of our swagger frontend for service calls with large page sizes.
-List<String> order = Arrays.asList("order_example"); // List<String> | Determines the order of the results. You can order the results by next fields: id, name, isin, wkn, quote, quantityNominal, marketValue and entryQuote. The default order for all services is 'id,asc'. You can also order by multiple properties. In that case the order of the parameters passed is important. The general format is: 'property[,asc|desc]', with 'asc' being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC). 
+List<String> order = Arrays.asList("order_example"); // List<String> | Determines the order of the results. You can order the results by next fields: 'id', 'name', 'isin', 'wkn', 'quote', 'quantityNominal', 'marketValue' and 'entryQuote'. The default order for all services is 'id,asc'. You can also order by multiple properties. In that case the order of the parameters passed is important. The general format is: 'property[,asc|desc]', with 'asc' being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC). 
 try {
-    InlineResponse20017 result = apiInstance.getAndSearchAllSecurities(ids, search, accountIds, page, perPage, order);
+    PageableSecurityList result = apiInstance.getAndSearchAllSecurities(ids, search, accountIds, page, perPage, order);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling SecuritiesApi#getAndSearchAllSecurities");
@@ -57,11 +57,11 @@ Name | Type | Description  | Notes
  **accountIds** | [**List&lt;Long&gt;**](Long.md)| Comma-separated list of identifiers of accounts | [optional]
  **page** | **Integer**| Result page that you want to retrieve. | [optional] [default to 1]
  **perPage** | **Integer**| Maximum number of records per page. Can be at most 500. NOTE: Due to its validation and visualization, the swagger frontend might show very low performance, or even crashes, when a service responds with a lot of data. It is recommended to use a HTTP client like Postman or DHC instead of our swagger frontend for service calls with large page sizes. | [optional] [default to 20]
- **order** | [**List&lt;String&gt;**](String.md)| Determines the order of the results. You can order the results by next fields: id, name, isin, wkn, quote, quantityNominal, marketValue and entryQuote. The default order for all services is &#39;id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC).  | [optional]
+ **order** | [**List&lt;String&gt;**](String.md)| Determines the order of the results. You can order the results by next fields: &#39;id&#39;, &#39;name&#39;, &#39;isin&#39;, &#39;wkn&#39;, &#39;quote&#39;, &#39;quantityNominal&#39;, &#39;marketValue&#39; and &#39;entryQuote&#39;. The default order for all services is &#39;id,asc&#39;. You can also order by multiple properties. In that case the order of the parameters passed is important. The general format is: &#39;property[,asc|desc]&#39;, with &#39;asc&#39; being the default value. Please note that ordering by multiple fields is not supported in our swagger frontend, but you can test this feature with any HTTP tool of your choice (e.g. postman or DHC).  | [optional]
 
 ### Return type
 
-[**InlineResponse20017**](InlineResponse20017.md)
+[**PageableSecurityList**](PageableSecurityList.md)
 
 ### Authorization
 
@@ -74,7 +74,7 @@ Name | Type | Description  | Notes
 
 <a name="getMultipleSecurities"></a>
 # **getMultipleSecurities**
-> InlineResponse20018 getMultipleSecurities(ids)
+> SecurityList getMultipleSecurities(ids)
 
 Get multiple securities
 
@@ -98,7 +98,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 SecuritiesApi apiInstance = new SecuritiesApi();
 List<Long> ids = Arrays.asList(56L); // List<Long> | Comma-separated list of identifiers of requested securities
 try {
-    InlineResponse20018 result = apiInstance.getMultipleSecurities(ids);
+    SecurityList result = apiInstance.getMultipleSecurities(ids);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling SecuritiesApi#getMultipleSecurities");
@@ -114,7 +114,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse20018**](InlineResponse20018.md)
+[**SecurityList**](SecurityList.md)
 
 ### Authorization
 
@@ -127,7 +127,7 @@ Name | Type | Description  | Notes
 
 <a name="getSecurity"></a>
 # **getSecurity**
-> InlineResponse20017Securities getSecurity(id)
+> Security getSecurity(id)
 
 Get a security
 
@@ -151,7 +151,7 @@ finapi_auth.setAccessToken("YOUR ACCESS TOKEN");
 SecuritiesApi apiInstance = new SecuritiesApi();
 Long id = 789L; // Long | Security identifier
 try {
-    InlineResponse20017Securities result = apiInstance.getSecurity(id);
+    Security result = apiInstance.getSecurity(id);
     System.out.println(result);
 } catch (ApiException e) {
     System.err.println("Exception when calling SecuritiesApi#getSecurity");
@@ -167,7 +167,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**InlineResponse20017Securities**](InlineResponse20017Securities.md)
+[**Security**](Security.md)
 
 ### Authorization
 
