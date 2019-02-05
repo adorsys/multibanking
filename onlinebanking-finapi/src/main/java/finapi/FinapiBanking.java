@@ -84,7 +84,7 @@ public class FinapiBanking implements OnlineBankingService {
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
 
         try {
-            new UsersApi(createApiClient()).createUser(new UserCreateParamsImpl().email(bankAccess.getBankLogin() +
+            new UsersApi(createApiClient()).createUser(new UserCreateParams().email(bankAccess.getBankLogin() +
                     "@admb.de").password(password).id(bankAccess.getBankLogin()));
         } catch (ApiException e) {
             throw new RuntimeException(e);
@@ -196,7 +196,7 @@ public class FinapiBanking implements OnlineBankingService {
 
             while (nextPage == null || transactionsResponse.getPaging().getPage() < transactionsResponse.getPaging().getPageCount()) {
                 transactionsResponse = new TransactionsApi(apiClient).getAndSearchAllTransactions("bankView", null,
-                        null, null, accountIds, null, null, null, null, null, null, null, null, null, null, null,
+                        null, null, null, accountIds, null, null, null, null, null, null, null, null, null, null, null,
                         null, null, null, null, nextPage, null, order);
                 nextPage = transactionsResponse.getPaging().getPage() + 1;
                 bookingList.addAll(transactionsResponse.getTransactions().stream().map(transaction -> {
