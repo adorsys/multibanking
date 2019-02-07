@@ -26,7 +26,8 @@ public class MockBanking implements OnlineBankingService {
     private String mockConnectionUrl = null;
 
     public MockBanking() {
-        mockConnectionUrl = EnvProperties.getEnvOrSysProp("mockConnectionUrl", "https://multibanking-datev-mock.cloud.adorsys.de");
+        mockConnectionUrl = EnvProperties.getEnvOrSysProp("mockConnectionUrl", "https://multibanking-datev-mock.cloud" +
+                ".adorsys.de");
     }
 
     @Override
@@ -50,12 +51,12 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public ScaMethodsResponse initiatePayment(String bankingUrl, SepaTransactionRequest paymentRequest) {
+    public ScaMethodsResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
 
     @Override
-    public Object requestAuthorizationCode(String bankingUrl, SepaTransactionRequest paymentRequest) {
+    public Object requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
 
@@ -95,13 +96,13 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl, LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
+                                                           LoadAccountInformationRequest loadAccountInformationRequest) {
         RestTemplate restTemplate = getRestTemplate(loadAccountInformationRequest.getBankAccess().getBankLogin(),
                 loadAccountInformationRequest.getBankAccess().getBankCode(), loadAccountInformationRequest.getPin());
 
         BankAccount[] bankAccounts = restTemplate.getForObject(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts",
                 BankAccount[].class, loadAccountInformationRequest.getBankCode());
-
 
         for (BankAccount bankAccount : bankAccounts) {
             bankAccount.bankName(loadAccountInformationRequest.getBankAccess().getBankName());
@@ -112,10 +113,10 @@ public class MockBanking implements OnlineBankingService {
                 .build();
     }
 
-
     @Override
     public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
-        // getRestTemplate(bankApiUser.getApiUserId()).delete(mockConnectionUrl+"/bankaccesses/{bankcode}/accounts/{iban}",bankAccount.getBlz(),bankAccount.getIban());
+        // getRestTemplate(bankApiUser.getApiUserId()).delete
+        // (mockConnectionUrl+"/bankaccesses/{bankcode}/accounts/{iban}",bankAccount.getBlz(),bankAccount.getIban());
     }
 
     @Override
@@ -123,7 +124,9 @@ public class MockBanking implements OnlineBankingService {
         BankAccess bankAccess = loadBookingsRequest.getBankAccess();
         BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 
-        List<Booking> bookingList = getRestTemplate(bankAccess.getBankLogin(), loadBookingsRequest.getBankCode(), loadBookingsRequest.getPin()).exchange(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/bookings",
+        List<Booking> bookingList = getRestTemplate(bankAccess.getBankLogin(), loadBookingsRequest.getBankCode(),
+                loadBookingsRequest.getPin()).exchange(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban" +
+                        "}/bookings",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<Booking>>() {
@@ -168,10 +171,9 @@ public class MockBanking implements OnlineBankingService {
         return new BalancesReport().readyHbciBalance(account.getBalances().getReadyHbciBalance());
     }
 
-
-
     public RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {
-        String basicToken = new Base64().encodeAsString((bankLogin + "_" + bankCode + ":" + pin).getBytes(Charset.forName("UTF-8")));
+        String basicToken =
+                new Base64().encodeAsString((bankLogin + "_" + bankCode + ":" + pin).getBytes(Charset.forName("UTF-8")));
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getInterceptors().add(new BasicAuthorizationInterceptor(basicToken));
         return restTemplate;

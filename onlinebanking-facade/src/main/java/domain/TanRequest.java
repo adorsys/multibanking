@@ -16,7 +16,7 @@ public class TanRequest extends AbstractScaTransaction {
     }
 
     @Override
-    public String getSepaPain() {
+    public String getRawData() {
         return null;
     }
 

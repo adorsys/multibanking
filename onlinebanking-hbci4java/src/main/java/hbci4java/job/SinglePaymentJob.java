@@ -31,10 +31,10 @@ import org.kapott.hbci.structures.Value;
 public class SinglePaymentJob extends ScaRequiredJob {
 
     @Override
-    protected AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport, String sepaPain) {
-        SinglePayment singlePayment = (SinglePayment) sepaTransaction;
+    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport, String rawData) {
+        SinglePayment singlePayment = (SinglePayment) transaction;
 
-        Konto src = getDebtorAccount(sepaTransaction, passport);
+        Konto src = getDebtorAccount(transaction, passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();
@@ -43,10 +43,10 @@ public class SinglePaymentJob extends ScaRequiredJob {
 
         AbstractSEPAGV sepagv;
         if (singlePayment instanceof FuturePayment) {
-            sepagv = new GVTermUebSEPA(passport, GVTermUebSEPA.getLowlevelName(), sepaPain);
+            sepagv = new GVTermUebSEPA(passport, GVTermUebSEPA.getLowlevelName(), rawData);
             sepagv.setParam("date", ((FuturePayment) singlePayment).getExecutionDate().toString());
         } else {
-            sepagv = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName(), sepaPain);
+            sepagv = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName(), rawData);
         }
 
         sepagv.setParam("src", src);

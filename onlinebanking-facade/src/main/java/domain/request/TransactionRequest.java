@@ -24,11 +24,11 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class SepaTransactionRequest extends AbstractRequest {
+public class TransactionRequest extends AbstractRequest {
 
     private BankApiUser bankApiUser;
     private TanTransportType tanTransportType;
-    private AbstractScaTransaction sepaTransaction;
+    private AbstractScaTransaction transaction;
     private BankAccess bankAccess;
     private String bankCode;
     private String pin;

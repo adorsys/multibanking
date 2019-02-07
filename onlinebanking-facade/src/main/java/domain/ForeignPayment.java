@@ -3,19 +3,25 @@ package domain;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
+
+/**
+ * Created by alexg on 19.10.17.
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class RawSepaPayment extends AbstractScaTransaction {
+public class ForeignPayment extends AbstractScaTransaction {
 
-    private String painXml;
+    private String dtazv;
 
     @Override
     public TransactionType getTransactionType() {
-        return TransactionType.RAW_SEPA;
+        return TransactionType.FOREIGN_PAYMENT;
     }
 
     @Override
     public String getRawData() {
-        return painXml;
+        return dtazv;
     }
+
 }

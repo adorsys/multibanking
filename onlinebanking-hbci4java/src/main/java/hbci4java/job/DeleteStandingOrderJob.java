@@ -31,17 +31,17 @@ import org.kapott.hbci.structures.Value;
 public class DeleteStandingOrderJob extends ScaRequiredJob {
 
     @Override
-    protected AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport, String sepaPain) {
-        StandingOrder standingOrder = (StandingOrder) sepaTransaction;
+    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport, String rawData) {
+        StandingOrder standingOrder = (StandingOrder) transaction;
 
-        Konto src = getDebtorAccount(sepaTransaction, passport);
+        Konto src = getDebtorAccount(transaction, passport);
 
         Konto dst = new Konto();
         dst.name = standingOrder.getOtherAccount().getOwner();
         dst.iban = standingOrder.getOtherAccount().getIban();
         dst.bic = standingOrder.getOtherAccount().getBic();
 
-        GVDauerSEPADel gvDauerSEPADel = new GVDauerSEPADel(passport, sepaPain);
+        GVDauerSEPADel gvDauerSEPADel = new GVDauerSEPADel(passport, rawData);
 
         gvDauerSEPADel.setParam("src", src);
         gvDauerSEPADel.setParam("dst", dst);

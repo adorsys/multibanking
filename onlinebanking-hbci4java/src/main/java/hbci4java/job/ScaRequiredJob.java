@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import domain.AbstractScaTransaction;
 import domain.Product;
 import domain.TanChallenge;
-import domain.request.SepaTransactionRequest;
+import domain.request.TransactionRequest;
 import domain.request.SubmitAuthorizationCodeRequest;
 import exception.HbciException;
 import hbci4java.model.HbciCallback;
@@ -14,7 +14,6 @@ import hbci4java.model.HbciPassport;
 import hbci4java.model.HbciTanSubmit;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
-import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.manager.ChallengeInfo;
@@ -41,9 +40,9 @@ public abstract class ScaRequiredJob {
         return objectMapper;
     }
 
-    public HbciTanSubmit requestAuthorizationCode(SepaTransactionRequest sepaTransactionRequest) {
+    public HbciTanSubmit requestAuthorizationCode(TransactionRequest sepaTransactionRequest) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
-        Optional.ofNullable(sepaTransactionRequest.getSepaTransaction())
+        Optional.ofNullable(sepaTransactionRequest.getTransaction())
                 .ifPresent(sepaTransaction -> hbciTanSubmit.setOriginJobName(getHbciJobName(sepaTransaction.getTransactionType())));
 
         HbciCallback hbciCallback = new HbciCallback() {
@@ -85,16 +84,16 @@ public abstract class ScaRequiredJob {
 
         dialog.getPassport().setCurrentSecMechInfo(hbciTwoStepMechanism);
 
-        AbstractSEPAGV sepagv = createSepaJob(sepaTransactionRequest.getSepaTransaction(), dialog.getPassport(), null);
+        AbstractHBCIJob hbciJob = createHbciJob(sepaTransactionRequest.getTransaction(), dialog.getPassport(), null);
 
         GVTAN2Step hktan = new GVTAN2Step(dialog.getPassport());
         hktan.setSegVersion(hbciTwoStepMechanism.getSegversion());
 
         if (hbciTwoStepMechanism.getProcess() == 1) {
-            hbciTanSubmit.setSepaPain(hktanProcess1(hbciTwoStepMechanism, sepagv, hktan));
+            hbciTanSubmit.setSepaPain(hktanProcess1(hbciTwoStepMechanism, hbciJob, hktan));
             dialog.addTask(hktan, false);
         } else {
-            hktanProcess2(dialog, sepagv, getDebtorAccount(sepaTransactionRequest.getSepaTransaction(),
+            hktanProcess2(dialog, hbciJob, getDebtorAccount(sepaTransactionRequest.getTransaction(),
                     dialog.getPassport()), hktan);
         }
 
@@ -111,13 +110,13 @@ public abstract class ScaRequiredJob {
         hbciTanSubmit.setDialogId(dialog.getDialogID());
         hbciTanSubmit.setMsgNum(dialog.getMsgnum());
         hbciTanSubmit.setTanTransportType(sepaTransactionRequest.getTanTransportType());
-        Optional.ofNullable(sepagv)
+        Optional.ofNullable(hbciJob)
                 .ifPresent(abstractSEPAGV -> hbciTanSubmit.setOriginSegVersion(abstractSEPAGV.getSegVersion()));
 
         return hbciTanSubmit;
     }
 
-    public String hktanProcess1(HBCITwoStepMechanism hbciTwoStepMechanism, AbstractSEPAGV sepagv, GVTAN2Step hktan) {
+    public String hktanProcess1(HBCITwoStepMechanism hbciTwoStepMechanism, AbstractHBCIJob sepagv, GVTAN2Step hktan) {
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
         hktan.setParam("process", hbciTwoStepMechanism.getProcess());
@@ -130,10 +129,10 @@ public abstract class ScaRequiredJob {
             cinfo.applyParams(sepagv, hktan, hbciTwoStepMechanism);
         }
 
-        return sepagv.getPainXml();
+        return sepagv.getRawData();
     }
 
-    public void hktanProcess2(HBCIDialog dialog, AbstractSEPAGV sepagv, Konto orderAccount, GVTAN2Step hktan) {
+    public void hktanProcess2(HBCIDialog dialog, AbstractHBCIJob sepagv, Konto orderAccount, GVTAN2Step hktan) {
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         hktan.setParam("process", "4");
@@ -196,7 +195,7 @@ public abstract class ScaRequiredJob {
             hbciPassport, HBCIDialog hbciDialog) {
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
-        AbstractHBCIJob uebSEPAJob = createSepaJob(transaction, hbciPassport, hbciTanSubmit.getSepaPain());
+        AbstractHBCIJob uebSEPAJob = createHbciJob(transaction, hbciPassport, hbciTanSubmit.getSepaPain());
         hbciDialog.addTask(uebSEPAJob);
         return uebSEPAJob;
     }
@@ -243,6 +242,6 @@ public abstract class ScaRequiredJob {
 
     abstract String orderIdFromJobResult(HBCIJobResult jobResult);
 
-    abstract AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport,
-                                          String sepaPain);
+    abstract AbstractHBCIJob createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
+                                           String rawData);
 }

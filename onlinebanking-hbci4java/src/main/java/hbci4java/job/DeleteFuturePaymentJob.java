@@ -33,10 +33,10 @@ public class DeleteFuturePaymentJob extends ScaRequiredJob {
     private String jobName;
 
     @Override
-    protected AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport, String sepaPain) {
-        FuturePayment singlePayment = (FuturePayment) sepaTransaction;
+    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport, String rawData) {
+        FuturePayment singlePayment = (FuturePayment) transaction;
 
-        Konto src = getDebtorAccount(sepaTransaction, passport);
+        Konto src = getDebtorAccount(transaction, passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();
@@ -45,7 +45,7 @@ public class DeleteFuturePaymentJob extends ScaRequiredJob {
 
         jobName = GVTermUebSEPADel.getLowlevelName();
 
-        GVTermUebSEPADel sepadelgv = new GVTermUebSEPADel(passport, jobName, sepaPain);
+        GVTermUebSEPADel sepadelgv = new GVTermUebSEPADel(passport, jobName, rawData);
 
         sepadelgv.setParam("orderid", singlePayment.getOrderId());
         sepadelgv.setParam("date", singlePayment.getExecutionDate().toString());

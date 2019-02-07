@@ -10,7 +10,7 @@ public abstract class AbstractScaTransaction {
 
     public abstract TransactionType getTransactionType();
 
-    public abstract String getSepaPain();
+    public abstract String getRawData();
 
     public void delete(boolean delete) {
         if (delete) {
@@ -20,6 +20,7 @@ public abstract class AbstractScaTransaction {
 
     public enum TransactionType {
         SINGLE_PAYMENT,
+        FOREIGN_PAYMENT,
         FUTURE_PAYMENT,
         FUTURE_PAYMENT_DELETE,
         BULK_PAYMENT,

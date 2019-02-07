@@ -282,12 +282,12 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public ScaMethodsResponse initiatePayment(String bankingUrl, SepaTransactionRequest paymentRequest) {
+    public ScaMethodsResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
 
     @Override
-    public Object requestAuthorizationCode(String bankingUrl, SepaTransactionRequest paymentRequest) {
+    public Object requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
 

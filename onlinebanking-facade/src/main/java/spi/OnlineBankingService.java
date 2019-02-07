@@ -38,9 +38,9 @@ public interface OnlineBankingService {
 
     boolean bookingsCategorized();
 
-    ScaMethodsResponse initiatePayment(String bankingUrl, SepaTransactionRequest paymentRequest);
+    ScaMethodsResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest);
 
-    Object requestAuthorizationCode(String bankingUrl, SepaTransactionRequest paymentRequest);
+    Object requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest);
 
     String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
 

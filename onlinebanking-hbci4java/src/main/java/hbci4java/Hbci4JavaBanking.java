@@ -117,7 +117,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public ScaMethodsResponse initiatePayment(String bankingUrl, SepaTransactionRequest paymentRequest) {
+    public ScaMethodsResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
         LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
                 .pin(paymentRequest.getPin())
                 .bankCode(paymentRequest.getBankCode())
@@ -134,15 +134,15 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public Object requestAuthorizationCode(String bankingUrl,
-                                           SepaTransactionRequest sepaTransactionRequest) {
+                                           TransactionRequest transactionRequest) {
         try {
-            checkBankExists(sepaTransactionRequest.getBankCode(), bankingUrl);
+            checkBankExists(transactionRequest.getBankCode(), bankingUrl);
 
-            ScaRequiredJob scaJob = Optional.ofNullable(sepaTransactionRequest.getSepaTransaction())
+            ScaRequiredJob scaJob = Optional.ofNullable(transactionRequest.getTransaction())
                     .map(sepaTransaction -> createScaJob(sepaTransaction.getTransactionType()))
                     .orElse(new EmptyJob());
 
-            return scaJob.requestAuthorizationCode(sepaTransactionRequest);
+            return scaJob.requestAuthorizationCode(transactionRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -229,6 +229,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             case SINGLE_PAYMENT:
             case FUTURE_PAYMENT:
                 return new SinglePaymentJob();
+            case FOREIGN_PAYMENT:
+                return new ForeignPaymentJob();
             case BULK_PAYMENT:
                 return new BulkPaymentJob();
             case STANDING_ORDER:

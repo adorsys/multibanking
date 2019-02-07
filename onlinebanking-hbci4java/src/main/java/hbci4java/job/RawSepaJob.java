@@ -22,12 +22,12 @@ public class RawSepaJob extends ScaRequiredJob {
     }
 
     @Override
-    AbstractSEPAGV createSepaJob(AbstractScaTransaction sepaTransaction, PinTanPassport passport, String sepaPain) {
-        RawSepaPayment singlePayment = (RawSepaPayment) sepaTransaction;
+    AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport, String rawData) {
+        RawSepaPayment singlePayment = (RawSepaPayment) transaction;
 
-        Konto src = getDebtorAccount(sepaTransaction, passport);
+        Konto src = getDebtorAccount(transaction, passport);
 
-        GVRawSEPA sepagv = new GVRawSEPA(passport, GVUebSEPA.getLowlevelName(), singlePayment.getSepaPain());
+        GVRawSEPA sepagv = new GVRawSEPA(passport, GVUebSEPA.getLowlevelName(), singlePayment.getRawData());
         sepagv.setParam("src", src);
 
         sepagv.verifyConstraints();

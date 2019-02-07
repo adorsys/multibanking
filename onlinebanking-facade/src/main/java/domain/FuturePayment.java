@@ -26,7 +26,7 @@ public class FuturePayment extends SinglePayment {
     }
 
     @Override
-    public String getSepaPain() {
+    public String getRawData() {
         return null;
     }
 
