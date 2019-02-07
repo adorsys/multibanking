@@ -118,23 +118,26 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public ScaMethodsResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
-        LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
-                .pin(paymentRequest.getPin())
-                .bankCode(paymentRequest.getBankCode())
-                .bankAccess(paymentRequest.getBankAccess())
-                .updateTanTransportTypes(true)
-                .build();
-
-        LoadAccountInformationResponse loadAccountInformationResponse = loadBankAccounts(bankingUrl, request);
-
-        return ScaMethodsResponse.builder()
-                .tanTransportTypes(loadAccountInformationResponse.getBankAccess().getTanTransportTypes().get(BankApi.HBCI))
-                .build();
+        return null;
     }
 
     @Override
     public Object requestAuthorizationCode(String bankingUrl,
                                            TransactionRequest transactionRequest) {
+//        LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
+//                .pin(paymentRequest.getPin())
+//                .bankCode(paymentRequest.getBankCode())
+//                .bankAccess(paymentRequest.getBankAccess())
+//                .updateTanTransportTypes(true)
+//                .build();
+//
+//        LoadAccountInformationResponse loadAccountInformationResponse = loadBankAccounts(bankingUrl, request);
+//
+//        return ScaMethodsResponse.builder()
+//                .tanTransportTypes(loadAccountInformationResponse.getBankAccess().getTanTransportTypes().get(BankApi.HBCI))
+//                .build();
+
+
         try {
             checkBankExists(transactionRequest.getBankCode(), bankingUrl);
 
