@@ -187,7 +187,9 @@ public abstract class ScaRequiredJob {
         if (!status.isOK()) {
             throw new HbciException(status.getDialogStatus().getErrorString());
         } else {
-            return orderIdFromJobResult(paymentGV.getJobResult());
+            return Optional.ofNullable(paymentGV)
+                    .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
+                    .orElse(null);
         }
     }
 
