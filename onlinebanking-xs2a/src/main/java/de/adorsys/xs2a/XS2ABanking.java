@@ -5,9 +5,14 @@ import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.psd2.client.ApiClient;
 import de.adorsys.psd2.client.ApiException;
 import de.adorsys.psd2.client.api.AccountInformationServiceAisApi;
+import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.*;
-import domain.*;
+import domain.BankAccess;
+import domain.BankAccount;
+import domain.BankApi;
+import domain.BankApiUser;
 import domain.request.*;
+import domain.response.InitiatePaymentResponse;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import domain.response.ScaMethodsResponse;
@@ -20,6 +25,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class XS2ABanking implements OnlineBankingService {
+
+    public static final String PS_UIP_ADDRESS = "127.0.0.1";
 
     @Override
     public BankApi bankApi() {
@@ -53,7 +60,7 @@ public class XS2ABanking implements OnlineBankingService {
             bankApiUser.setBankApi(BankApi.XS2A);
             bankApiUser.setProperties(new HashMap<>());
             bankApiUser.getProperties().put("allAccountsConsentId",
-                    createConsent(bankingUrl, bankAccess, pin, consents).getConsentId());
+                                            createConsent(bankingUrl, bankAccess, pin, consents).getConsentId());
 
             return bankApiUser;
         } catch (Exception e) {
@@ -78,17 +85,17 @@ public class XS2ABanking implements OnlineBankingService {
         String consentId = loadAccountInformationRequest.getBankApiUser().getProperties().get("allAccountsConsentId");
         try {
             AccountList accountList = ais.getAccountList(UUID.randomUUID(), consentId, false,
-                    null, null, null,
-                    null, "127.0.0.1", null, null,
-                    null, null,
-                    null, null, null, null);
+                                                         null, null, null,
+                                                         null, PS_UIP_ADDRESS, null, null,
+                                                         null, null,
+                                                         null, null, null, null);
 
             return LoadAccountInformationResponse.builder()
-                    .bankAccounts(accountList.getAccounts()
-                            .stream()
-                            .map(XS2AMapping::toBankAccount)
-                            .collect(Collectors.toList()))
-                    .build();
+                           .bankAccounts(accountList.getAccounts()
+                                                 .stream()
+                                                 .map(XS2AMapping::toBankAccount)
+                                                 .collect(Collectors.toList()))
+                           .build();
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
@@ -116,8 +123,8 @@ public class XS2ABanking implements OnlineBankingService {
                     null);
 
             return LoadBookingsResponse.builder()
-                    .bookings(XS2AMapping.toBookings(transactionList))
-                    .build();
+                           .bookings(XS2AMapping.toBookings(transactionList))
+                           .build();
 
         } catch (ApiException e) {
 
@@ -141,8 +148,36 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public ScaMethodsResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
-        return null;
+    public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
+        ApiClient apiClient = createApiClient(bankingUrl, "application/xml");
+        PaymentInitiationServicePisApi initiationService = new PaymentInitiationServicePisApi(apiClient);
+        UUID xRequestId = UUID.randomUUID();
+        Map<String, Object> response;
+        try {
+            response = (Map<String, Object>) initiationService.initiatePayment(
+                    paymentRequest.getTransaction().getRawData().getBytes(),
+                    "payments",
+                    "pain.001-sepa-credit-transfers",
+                    xRequestId,
+                    PS_UIP_ADDRESS,
+                    null, null, null, null, null, null,
+                    null, null, null, null, null,
+                    null, null, null, null, null,
+                    null, null, null, null, null);
+        } catch (ApiException e) {
+//            todo: added logging here
+            throw new RuntimeException(e);
+        }
+
+        InitiatePaymentResponse paymentResponse = getInitiatePaymentResponse(response);
+        return paymentResponse;
+    }
+
+    private InitiatePaymentResponse getInitiatePaymentResponse(Map<String, Object> response) {
+        String transactionStatus = (String) response.get("transactionStatus");
+        String paymentId = (String) response.get("paymentId");
+        Map<String, String> links = (Map<String, String>) response.get("_links");
+        return new InitiatePaymentResponse(transactionStatus, paymentId, links);
     }
 
     @Override
@@ -199,16 +234,16 @@ public class XS2ABanking implements OnlineBankingService {
 
         ConsentsResponse201 consent = ais.createConsent(
                 session, consents, null, null, null, bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(),
-                null, "false", null, null, null, "127.0.0.1",
+                null, "false", null, null, null, PS_UIP_ADDRESS,
                 null,
                 null, null, null, null, null, null, null, null
         );
 
         StartScaprocessResponse startScaprocessResponse = ais.startConsentAuthorisation(consent.getConsentId(),
-                session, null, null, null,
-                bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, null, null,
-                null, null, null, null, null,
-                null, null, null);
+                                                                                        session, null, null, null,
+                                                                                        bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, null, null,
+                                                                                        null, null, null, null, null,
+                                                                                        null, null, null);
 
         String authorisationLink =
                 startScaprocessResponse.getLinks().get("startAuthorisationWithPsuAuthentication").toString();
@@ -216,27 +251,27 @@ public class XS2ABanking implements OnlineBankingService {
 
         UpdatePsuAuthentication updatePsuAuthentication = new UpdatePsuAuthentication();
         updatePsuAuthentication.psuData(new PsuData()
-                .password(pin));
+                                                .password(pin));
 
         Map<String, Object> updatePsuResponse =
                 (Map<String, Object>) ais.updateConsentsPsuData(consent.getConsentId(), authorizationId, session,
-                        updatePsuAuthentication, null, null,
-                        null, bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, null,
-                        null, null, null, null, null, null,
-                        null, null, null);
+                                                                updatePsuAuthentication, null, null,
+                                                                null, bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, null,
+                                                                null, null, null, null, null, null,
+                                                                null, null, null);
 
         List<Map> scaMethods = (List<Map>) updatePsuResponse.get("scaMethods");
         String otp = (String) scaMethods
-                .stream()
-                .map(x -> x.get("authenticationMethodId"))
-                .filter(x -> "901".equals(x)).findFirst().get(); //TODO hardcoded SMS
+                                      .stream()
+                                      .map(x -> x.get("authenticationMethodId"))
+                                      .filter(x -> "901".equals(x)).findFirst().get(); //TODO hardcoded SMS
 
         SelectPsuAuthenticationMethod selectPsuAuthenticationMethod = new SelectPsuAuthenticationMethod();
         selectPsuAuthenticationMethod.setAuthenticationMethodId(otp);
 
         updatePsuResponse = (Map<String, Object>) ais.updateConsentsPsuData(
                 consent.getConsentId(), authorizationId, session, selectPsuAuthenticationMethod, null, null, null,
-                bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, "127.0.0.1", null, null, null,
+                bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, PS_UIP_ADDRESS, null, null, null,
                 null, null, null, null, null,
                 null
         );
@@ -247,7 +282,7 @@ public class XS2ABanking implements OnlineBankingService {
 
         updatePsuResponse = (Map<String, Object>) ais.updateConsentsPsuData(
                 consent.getConsentId(), authorizationId, session, transactionAuthorisation, null, null, null,
-                bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, "127.0.0.1", null, null, null,
+                bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, PS_UIP_ADDRESS, null, null, null,
                 null, null, null, null, null,
                 null
         );
@@ -255,8 +290,15 @@ public class XS2ABanking implements OnlineBankingService {
         return consent;
     }
 
-    private ApiClient createApiClient(String bankingUrl) {
-        ApiClient apiClient = new ApiClient();
+    private ApiClient createApiClient(String bankingUrl, String contentType) {
+        ApiClient apiClient = new ApiClient() {
+            @Override
+            public String selectHeaderContentType(String[] contentTypes) {
+                return Optional.ofNullable(contentType)
+                               .orElseGet(() -> super.selectHeaderContentType(contentTypes));
+            }
+        };
+
         OkHttpClient client = new OkHttpClient();
         client.interceptors().add(
                 new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -267,6 +309,10 @@ public class XS2ABanking implements OnlineBankingService {
                 .ifPresent(url -> apiClient.setBasePath(url));
 
         return apiClient;
+    }
+
+    private ApiClient createApiClient(String bankingUrl) {
+        return createApiClient(bankingUrl, null);
     }
 
 }

@@ -5,6 +5,7 @@ import domain.BankAccount;
 import domain.BankApi;
 import domain.BankApiUser;
 import domain.request.*;
+import domain.response.InitiatePaymentResponse;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import domain.response.ScaMethodsResponse;
@@ -27,7 +28,6 @@ public interface OnlineBankingService {
 
     LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
                                                     LoadAccountInformationRequest loadAccountInformationRequest);
-
     void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser);
 
     LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest);
@@ -38,7 +38,7 @@ public interface OnlineBankingService {
 
     boolean bookingsCategorized();
 
-    ScaMethodsResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest);
+    InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest);
 
     Object requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest);
 
