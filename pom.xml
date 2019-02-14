@@ -5,7 +5,7 @@
 
     <groupId>de.adorsys.multibanking</groupId>
     <artifactId>multibanking</artifactId>
-    <version>4.3.3-SNAPSHOT</version>
+    <version>4.3.3-BG.6-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Multibanking</name>
     <url>https://github.com/adorsys/multibanking</url>
@@ -332,12 +332,12 @@
     </profiles>
     <distributionManagement>
         <repository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+            <id>bg-releases</id>
+            <url>https://bg-nexus.cloud.adorsys.de/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
-            <id>sonatype</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <id>bg-snapshots</id>
+            <url>https://bg-nexus.cloud.adorsys.de/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 

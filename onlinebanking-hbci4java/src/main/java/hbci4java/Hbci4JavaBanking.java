@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import domain.*;
 import domain.request.*;
+import domain.response.InitiatePaymentResponse;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import domain.response.ScaMethodsResponse;
@@ -117,7 +118,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public ScaMethodsResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
+    public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
 

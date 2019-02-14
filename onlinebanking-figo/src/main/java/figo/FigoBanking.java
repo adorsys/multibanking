@@ -2,6 +2,7 @@ package figo;
 
 import domain.*;
 import domain.request.*;
+import domain.response.InitiatePaymentResponse;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.LoadBookingsResponse;
 import domain.response.ScaMethodsResponse;
@@ -102,7 +103,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public ScaMethodsResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
+    public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
 
