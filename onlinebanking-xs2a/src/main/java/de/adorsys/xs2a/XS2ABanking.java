@@ -7,10 +7,7 @@ import de.adorsys.psd2.client.ApiException;
 import de.adorsys.psd2.client.api.AccountInformationServiceAisApi;
 import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.*;
-import domain.BankAccess;
-import domain.BankAccount;
-import domain.BankApi;
-import domain.BankApiUser;
+import domain.*;
 import domain.request.*;
 import domain.response.InitiatePaymentResponse;
 import domain.response.LoadAccountInformationResponse;
@@ -149,28 +146,65 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
-        ApiClient apiClient = createApiClient(bankingUrl, "application/xml");
-        PaymentInitiationServicePisApi initiationService = new PaymentInitiationServicePisApi(apiClient);
         UUID xRequestId = UUID.randomUUID();
-        Map<String, Object> response;
+        String paymentProduct;
+        String contentType;
+        Object paymentBody;
+
+        Optional<String> rawData = Optional.ofNullable(paymentRequest.getTransaction().getRawData());
+        if (rawData.isPresent()) {
+            paymentBody = rawData.get().getBytes();
+            paymentProduct = "pain.001-sepa-credit-transfers";
+            contentType = "application/xml";
+        } else {
+            paymentBody = convertToPaymentInitiation(paymentRequest);
+            paymentProduct = "sepa-credit-transfers";
+            contentType = "application/json";
+        }
+        ApiClient apiClient = createApiClient(bankingUrl, contentType);
+        PaymentInitiationServicePisApi initiationService = new PaymentInitiationServicePisApi(apiClient);
+
         try {
-            response = (Map<String, Object>) initiationService.initiatePayment(
-                    paymentRequest.getTransaction().getRawData().getBytes(),
+            Map<String, Object> response = (Map<String, Object>) initiationService.initiatePayment(
+                    paymentBody,
                     "payments",
-                    "pain.001-sepa-credit-transfers",
+                    paymentProduct,
                     xRequestId,
                     PS_UIP_ADDRESS,
                     null, null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null);
+
+            return getInitiatePaymentResponse(response);
+
         } catch (ApiException e) {
 //            todo: added logging here
             throw new RuntimeException(e);
         }
+    }
 
-        InitiatePaymentResponse paymentResponse = getInitiatePaymentResponse(response);
-        return paymentResponse;
+    //todo: replace by mapper
+    private PaymentInitiationSctJson convertToPaymentInitiation(TransactionRequest paymentRequest) {
+        SinglePayment paymentBodyObj = (SinglePayment) paymentRequest.getTransaction();
+        PaymentInitiationSctJson paymentInitiation = new PaymentInitiationSctJson();
+        AccountReference debtorAccountReference = new AccountReference();
+        debtorAccountReference.setIban(paymentBodyObj.getDebtorBankAccount().getIban());
+
+        AccountReference creditorAccountReference = new AccountReference();
+        creditorAccountReference.setIban(paymentBodyObj.getReceiverIban());
+
+        Amount amount = new Amount();
+        amount.setAmount(paymentBodyObj.getAmount().toString());
+        //todo: @age currency is missing in SinglePayment
+        amount.setCurrency("EUR");
+
+        paymentInitiation.setDebtorAccount(debtorAccountReference);
+        paymentInitiation.setCreditorAccount(creditorAccountReference);
+        paymentInitiation.setInstructedAmount(amount);
+        paymentInitiation.setCreditorName(paymentBodyObj.getReceiver());
+        paymentInitiation.setRemittanceInformationUnstructured(paymentBodyObj.getPurpose());
+        return paymentInitiation;
     }
 
     private InitiatePaymentResponse getInitiatePaymentResponse(Map<String, Object> response) {
