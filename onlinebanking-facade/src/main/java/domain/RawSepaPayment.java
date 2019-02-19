@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 public class RawSepaPayment extends AbstractScaTransaction {
 
     private String painXml;
+    private TransactionType sepaTransactionType;
 
     @Override
     public TransactionType getTransactionType() {
