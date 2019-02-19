@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class AuthenticatePsuRequest extends AbstractRequest {
 
+    private String paymentId;
     private String bankCode;
     private String customerId;
     private String login;

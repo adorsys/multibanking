@@ -7,10 +7,13 @@ import de.adorsys.psd2.client.ApiException;
 import de.adorsys.psd2.client.api.AccountInformationServiceAisApi;
 import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.*;
+import de.adorsys.xs2a.error.XS2AClientException;
 import domain.*;
 import domain.request.*;
 import domain.response.*;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 
 import java.time.LocalDate;
@@ -20,7 +23,11 @@ import java.util.stream.Collectors;
 
 public class XS2ABanking implements OnlineBankingService {
 
-    public static final String PS_UIP_ADDRESS = "127.0.0.1";
+    private static final Logger logger = LoggerFactory.getLogger(XS2ABanking.class);
+
+    static final String PS_UIP_ADDRESS = "127.0.0.1";
+    static final String SINGLE_PAYMENT_SERVICE = "payments";
+    static final String SEPA_CREDIT_TRANSFERS = "sepa-credit-transfers";
 
     @Override
     public BankApi bankApi() {
@@ -68,7 +75,64 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+        ApiClient apiClient = createApiClient(bankingUrl);
+        PaymentInitiationServicePisApi service = createPaymentInitiationServicePisApi(apiClient);
+
+        UUID xRequestId = UUID.randomUUID();
+        String paymentId = authenticatePsuRequest.getPaymentId();
+        String corporateId = authenticatePsuRequest.getCustomerId();
+        String psuId = authenticatePsuRequest.getLogin();
+        String password = authenticatePsuRequest.getPin();
+        UpdatePsuAuthentication psuBody = buildUpdatePsuAuthorisationBody(password);
+
+        try {
+            StartScaprocessResponse response;
+            response = service.startPaymentAuthorisation(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, xRequestId, psuId,
+                                                         null, null, null, null, null, null, PS_UIP_ADDRESS,
+                                                         null, null, null, null, null, null, null, null, null);
+            String authorisationId = getAuthorizationId(response);
+            StartScaprocessResponse updatePsu = (StartScaprocessResponse) service.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, authorisationId, xRequestId, psuBody,
+                                                                                                       null, null, null, psuId, null, corporateId,
+                                                                                                       null, PS_UIP_ADDRESS, null, null,
+                                                                                                       null, null, null,
+                                                                                                       null, null, null, null);
+            return buildPsuAuthenticationResponse(updatePsu, authorisationId);
+        } catch (ApiException e) {
+            logger.error("Authorise PSU failed", e);
+            throw new XS2AClientException(e);
+        }
+    }
+
+    PaymentInitiationServicePisApi createPaymentInitiationServicePisApi(ApiClient apiClient) {
+        return new PaymentInitiationServicePisApi(apiClient);
+    }
+
+    private UpdatePsuAuthentication buildUpdatePsuAuthorisationBody(String password) {
+        UpdatePsuAuthentication updatePsuAuthentication = new UpdatePsuAuthentication();
+        updatePsuAuthentication.psuData(new PsuData()
+                                                .password(password));
+        return updatePsuAuthentication;
+    }
+
+    private String getAuthorizationId(StartScaprocessResponse response) {
+        String psuAuthentication = (String) response.getLinks().get("startAuthorisationWithPsuAuthentication");
+        if (StringUtils.isNotBlank(psuAuthentication)) {
+            int index = psuAuthentication.lastIndexOf('/') + 1;
+            return psuAuthentication.substring(index);
+        }
         return null;
+    }
+
+    private ScaMethodsResponse buildPsuAuthenticationResponse(StartScaprocessResponse response, String authorisationId) {
+        List<TanTransportType> transportTypes = response.getScaMethods().stream()
+                                                        .map(this::createTanType).collect(Collectors.toList());
+        return ScaMethodsResponse.builder()
+                       .authorizationId(authorisationId)
+                       .tanTransportTypes(transportTypes).build();
+    }
+
+    private TanTransportType createTanType(AuthenticationObject method) {
+        return new TanTransportType(method.getAuthenticationMethodId(), method.getName(), method.getAuthenticationVersion(), method.getExplanation());
     }
 
     @Override
@@ -155,16 +219,16 @@ public class XS2ABanking implements OnlineBankingService {
             contentType = "application/xml";
         } else {
             paymentBody = convertToPaymentInitiation(paymentRequest);
-            paymentProduct = "sepa-credit-transfers";
+            paymentProduct = SEPA_CREDIT_TRANSFERS;
             contentType = "application/json";
         }
         ApiClient apiClient = createApiClient(bankingUrl, contentType);
-        PaymentInitiationServicePisApi initiationService = new PaymentInitiationServicePisApi(apiClient);
+        PaymentInitiationServicePisApi initiationService = createPaymentInitiationServicePisApi(apiClient);
 
         try {
             Map<String, Object> response = (Map<String, Object>) initiationService.initiatePayment(
                     paymentBody,
-                    "payments",
+                    SINGLE_PAYMENT_SERVICE,
                     paymentProduct,
                     xRequestId,
                     PS_UIP_ADDRESS,
@@ -176,9 +240,8 @@ public class XS2ABanking implements OnlineBankingService {
             return getInitiatePaymentResponse(response);
 
         } catch (ApiException e) {
-//            todo: added logging here
-            throw new RuntimeException(e);
-        }
+            logger.error("Initiate payment failed", e);
+            throw new XS2AClientException(e);        }
     }
 
     //todo: replace by mapper
@@ -280,9 +343,7 @@ public class XS2ABanking implements OnlineBankingService {
                 startScaprocessResponse.getLinks().get("startAuthorisationWithPsuAuthentication").toString();
         String authorizationId = StringUtils.substringAfterLast(authorisationLink, "/");
 
-        UpdatePsuAuthentication updatePsuAuthentication = new UpdatePsuAuthentication();
-        updatePsuAuthentication.psuData(new PsuData()
-                                                .password(pin));
+        UpdatePsuAuthentication updatePsuAuthentication = buildUpdatePsuAuthorisationBody(pin);
 
         Map<String, Object> updatePsuResponse =
                 (Map<String, Object>) ais.updateConsentsPsuData(consent.getConsentId(), authorizationId, session,
@@ -342,7 +403,7 @@ public class XS2ABanking implements OnlineBankingService {
         return apiClient;
     }
 
-    private ApiClient createApiClient(String bankingUrl) {
+    ApiClient createApiClient(String bankingUrl) {
         return createApiClient(bankingUrl, null);
     }
 
