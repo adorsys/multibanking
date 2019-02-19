@@ -29,6 +29,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class ScaMethodsResponse extends AbstractRequest {
 
+    private String authorizationId;
     private List<TanTransportType> tanTransportTypes;
 
 }
