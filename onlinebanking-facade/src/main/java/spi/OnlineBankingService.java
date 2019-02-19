@@ -5,10 +5,7 @@ import domain.BankAccount;
 import domain.BankApi;
 import domain.BankApiUser;
 import domain.request.*;
-import domain.response.InitiatePaymentResponse;
-import domain.response.LoadAccountInformationResponse;
-import domain.response.LoadBookingsResponse;
-import domain.response.ScaMethodsResponse;
+import domain.response.*;
 
 import java.util.List;
 
@@ -40,7 +37,7 @@ public interface OnlineBankingService {
 
     InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest);
 
-    Object requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest);
+    AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest);
 
     String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
 

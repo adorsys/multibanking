@@ -33,6 +33,5 @@ public class HbciTanSubmit {
     private String originJobName;
     private int originSegVersion;
     private String sepaPain;
-    private TanChallenge tanChallenge;
     private TanTransportType tanTransportType;
 }
