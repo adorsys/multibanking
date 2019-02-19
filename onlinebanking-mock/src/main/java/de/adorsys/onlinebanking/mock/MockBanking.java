@@ -2,10 +2,7 @@ package de.adorsys.onlinebanking.mock;
 
 import domain.*;
 import domain.request.*;
-import domain.response.InitiatePaymentResponse;
-import domain.response.LoadAccountInformationResponse;
-import domain.response.LoadBookingsResponse;
-import domain.response.ScaMethodsResponse;
+import domain.response.*;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.core.ParameterizedTypeReference;
@@ -57,7 +54,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
+    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
 

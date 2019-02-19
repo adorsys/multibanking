@@ -2,10 +2,7 @@ package figo;
 
 import domain.*;
 import domain.request.*;
-import domain.response.InitiatePaymentResponse;
-import domain.response.LoadAccountInformationResponse;
-import domain.response.LoadBookingsResponse;
-import domain.response.ScaMethodsResponse;
+import domain.response.*;
 import exception.HbciException;
 import exception.InvalidPinException;
 import me.figo.FigoConnection;
@@ -108,7 +105,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
+    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
 
