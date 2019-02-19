@@ -7,10 +7,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import domain.*;
 import domain.request.*;
-import domain.response.InitiatePaymentResponse;
-import domain.response.LoadAccountInformationResponse;
-import domain.response.LoadBookingsResponse;
-import domain.response.ScaMethodsResponse;
+import domain.response.*;
 import exception.InvalidPinException;
 import hbci4java.job.*;
 import hbci4java.model.HbciCallback;
@@ -92,7 +89,22 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
-        throw new RuntimeException("not supported");
+        BankAccess bankAccess = new BankAccess();
+        bankAccess.setBankCode(authenticatePsuRequest.getBankCode());
+        bankAccess.setBankLogin(authenticatePsuRequest.getLogin());
+        bankAccess.setBankLogin2(authenticatePsuRequest.getCustomerId());
+
+        LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
+                .bankAccess(bankAccess)
+                .pin(authenticatePsuRequest.getPin())
+                .updateTanTransportTypes(true)
+                .build();
+
+        LoadAccountInformationResponse loadAccountInformationResponse = this.loadBankAccounts(bankingUrl, request);
+
+        return ScaMethodsResponse.builder()
+                .tanTransportTypes(loadAccountInformationResponse.getBankAccess().getTanTransportTypes().get(BankApi.HBCI))
+                .build();
     }
 
     @Override
@@ -123,22 +135,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object requestAuthorizationCode(String bankingUrl,
-                                           TransactionRequest transactionRequest) {
-//        LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
-//                .pin(paymentRequest.getPin())
-//                .bankCode(paymentRequest.getBankCode())
-//                .bankAccess(paymentRequest.getBankAccess())
-//                .updateTanTransportTypes(true)
-//                .build();
-//
-//        LoadAccountInformationResponse loadAccountInformationResponse = loadBankAccounts(bankingUrl, request);
-//
-//        return ScaMethodsResponse.builder()
-//                .tanTransportTypes(loadAccountInformationResponse.getBankAccess().getTanTransportTypes().get(BankApi.HBCI))
-//                .build();
-
-
+    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl,
+                                                              TransactionRequest transactionRequest) {
         try {
             checkBankExists(transactionRequest.getBankCode(), bankingUrl);
 

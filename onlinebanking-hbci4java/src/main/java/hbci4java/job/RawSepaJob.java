@@ -27,6 +27,7 @@ public class RawSepaJob extends ScaRequiredJob {
 
         Konto src = getDebtorAccount(transaction, passport);
 
+        //TODO evaluate correct sepa transaction name, default "UebSEPA|HKCCS"
         GVRawSEPA sepagv = new GVRawSEPA(passport, GVUebSEPA.getLowlevelName(), singlePayment.getRawData());
         sepagv.setParam("src", src);
 

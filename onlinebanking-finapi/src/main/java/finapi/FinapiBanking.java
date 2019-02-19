@@ -2,10 +2,7 @@ package finapi;
 
 import domain.*;
 import domain.request.*;
-import domain.response.InitiatePaymentResponse;
-import domain.response.LoadAccountInformationResponse;
-import domain.response.LoadBookingsResponse;
-import domain.response.ScaMethodsResponse;
+import domain.response.*;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
 import io.swagger.client.api.*;
@@ -288,7 +285,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public Object requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
+    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
 

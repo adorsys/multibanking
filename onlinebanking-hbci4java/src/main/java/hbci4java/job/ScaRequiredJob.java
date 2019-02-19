@@ -5,8 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import domain.AbstractScaTransaction;
 import domain.Product;
 import domain.TanChallenge;
-import domain.request.TransactionRequest;
 import domain.request.SubmitAuthorizationCodeRequest;
+import domain.request.TransactionRequest;
+import domain.response.AuthorisationCodeResponse;
 import exception.HbciException;
 import hbci4java.model.HbciCallback;
 import hbci4java.model.HbciDialogRequest;
@@ -40,8 +41,12 @@ public abstract class ScaRequiredJob {
         return objectMapper;
     }
 
-    public HbciTanSubmit requestAuthorizationCode(TransactionRequest sepaTransactionRequest) {
+    public AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest sepaTransactionRequest) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
+
+        AuthorisationCodeResponse response = new AuthorisationCodeResponse();
+        response.setTanSubmit(hbciTanSubmit);
+
         Optional.ofNullable(sepaTransactionRequest.getTransaction())
                 .ifPresent(sepaTransaction -> hbciTanSubmit.setOriginJobName(getHbciJobName(sepaTransaction.getTransactionType())));
 
@@ -53,7 +58,7 @@ public abstract class ScaRequiredJob {
                 //needed later for submitAuthorizationCode
                 hbciTanSubmit.setOrderRef(orderRef);
                 if (challenge != null) {
-                    hbciTanSubmit.setTanChallenge(TanChallenge.builder()
+                    response.setChallenge(TanChallenge.builder()
                             .title(challenge)
                             .data(challenge_hhd_uc)
                             .build());
@@ -113,7 +118,7 @@ public abstract class ScaRequiredJob {
         Optional.ofNullable(hbciJob)
                 .ifPresent(abstractSEPAGV -> hbciTanSubmit.setOriginSegVersion(abstractSEPAGV.getSegVersion()));
 
-        return hbciTanSubmit;
+        return response;
     }
 
     public String hktanProcess1(HBCITwoStepMechanism hbciTwoStepMechanism, AbstractHBCIJob sepagv, GVTAN2Step hktan) {

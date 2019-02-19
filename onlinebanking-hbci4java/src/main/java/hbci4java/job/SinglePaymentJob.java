@@ -16,8 +16,8 @@
 
 package hbci4java.job;
 
-import domain.FuturePayment;
 import domain.AbstractScaTransaction;
+import domain.FuturePayment;
 import domain.SinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTermUebSEPA;
@@ -31,7 +31,8 @@ import org.kapott.hbci.structures.Value;
 public class SinglePaymentJob extends ScaRequiredJob {
 
     @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport, String rawData) {
+    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
+                                           String rawData) {
         SinglePayment singlePayment = (SinglePayment) transaction;
 
         Konto src = getDebtorAccount(transaction, passport);

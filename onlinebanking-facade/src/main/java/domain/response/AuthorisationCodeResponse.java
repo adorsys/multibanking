@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package hbci4java.model;
+package domain.response;
 
 import domain.TanChallenge;
-import domain.TanTransportType;
 import lombok.Data;
 
-/**
- * Created by alexg on 16.11.17.
- */
 @Data
-public class HbciTanSubmit {
+public class AuthorisationCodeResponse {
 
-    private String dialogId;
-    private long msgNum;
-    private String orderRef;
-    private String passportState;
-    private String originJobName;
-    private int originSegVersion;
-    private String sepaPain;
-    private TanTransportType tanTransportType;
+    private Object tanSubmit;
+    private TanChallenge challenge;
 }

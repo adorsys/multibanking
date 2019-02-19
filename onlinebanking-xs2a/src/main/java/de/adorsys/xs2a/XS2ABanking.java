@@ -9,10 +9,7 @@ import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.*;
 import domain.*;
 import domain.request.*;
-import domain.response.InitiatePaymentResponse;
-import domain.response.LoadAccountInformationResponse;
-import domain.response.LoadBookingsResponse;
-import domain.response.ScaMethodsResponse;
+import domain.response.*;
 import org.apache.commons.lang3.StringUtils;
 import spi.OnlineBankingService;
 
@@ -270,7 +267,7 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public Object requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
+    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
 
