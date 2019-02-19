@@ -7,10 +7,13 @@ import de.adorsys.psd2.client.ApiException;
 import de.adorsys.psd2.client.api.AccountInformationServiceAisApi;
 import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.*;
+import de.adorsys.xs2a.error.XS2AClientException;
 import domain.*;
 import domain.request.*;
 import domain.response.*;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 
 import java.time.LocalDate;
@@ -20,9 +23,11 @@ import java.util.stream.Collectors;
 
 public class XS2ABanking implements OnlineBankingService {
 
-    private static final String PS_UIP_ADDRESS = "127.0.0.1";
-    private static final String SINGLE_PAYMENT_SERVICE = "payments";
-    private static final String SEPA_CREDIT_TRANSFERS = "sepa-credit-transfers";
+    private static final Logger logger = LoggerFactory.getLogger(XS2ABanking.class);
+
+    static final String PS_UIP_ADDRESS = "127.0.0.1";
+    static final String SINGLE_PAYMENT_SERVICE = "payments";
+    static final String SEPA_CREDIT_TRANSFERS = "sepa-credit-transfers";
 
     @Override
     public BankApi bankApi() {
@@ -70,16 +75,16 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
-        UUID xRequestId = UUID.randomUUID();
         ApiClient apiClient = createApiClient(bankingUrl);
+        PaymentInitiationServicePisApi service = createPaymentInitiationServicePisApi(apiClient);
 
+        UUID xRequestId = UUID.randomUUID();
         String paymentId = authenticatePsuRequest.getPaymentId();
         String corporateId = authenticatePsuRequest.getCustomerId();
         String psuId = authenticatePsuRequest.getLogin();
         String password = authenticatePsuRequest.getPin();
         UpdatePsuAuthentication psuBody = buildUpdatePsuAuthorisationBody(password);
 
-        PaymentInitiationServicePisApi service = new PaymentInitiationServicePisApi(apiClient);
         try {
             StartScaprocessResponse response;
             response = service.startPaymentAuthorisation(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, xRequestId, psuId,
@@ -93,9 +98,13 @@ public class XS2ABanking implements OnlineBankingService {
                                                                                                        null, null, null, null);
             return buildPsuAuthenticationResponse(updatePsu, authorisationId);
         } catch (ApiException e) {
-//            todo: added logging here
-            throw new RuntimeException(e);
+            logger.error("Authorise PSU failed", e);
+            throw new XS2AClientException(e);
         }
+    }
+
+    PaymentInitiationServicePisApi createPaymentInitiationServicePisApi(ApiClient apiClient) {
+        return new PaymentInitiationServicePisApi(apiClient);
     }
 
     private UpdatePsuAuthentication buildUpdatePsuAuthorisationBody(String password) {
@@ -214,7 +223,7 @@ public class XS2ABanking implements OnlineBankingService {
             contentType = "application/json";
         }
         ApiClient apiClient = createApiClient(bankingUrl, contentType);
-        PaymentInitiationServicePisApi initiationService = new PaymentInitiationServicePisApi(apiClient);
+        PaymentInitiationServicePisApi initiationService = createPaymentInitiationServicePisApi(apiClient);
 
         try {
             Map<String, Object> response = (Map<String, Object>) initiationService.initiatePayment(
@@ -231,9 +240,8 @@ public class XS2ABanking implements OnlineBankingService {
             return getInitiatePaymentResponse(response);
 
         } catch (ApiException e) {
-//            todo: added logging here
-            throw new RuntimeException(e);
-        }
+            logger.error("Initiate payment failed", e);
+            throw new XS2AClientException(e);        }
     }
 
     //todo: replace by mapper
@@ -395,7 +403,7 @@ public class XS2ABanking implements OnlineBankingService {
         return apiClient;
     }
 
-    private ApiClient createApiClient(String bankingUrl) {
+    ApiClient createApiClient(String bankingUrl) {
         return createApiClient(bankingUrl, null);
     }
 
