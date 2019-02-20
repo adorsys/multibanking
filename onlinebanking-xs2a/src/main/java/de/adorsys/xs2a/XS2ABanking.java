@@ -28,6 +28,11 @@ public class XS2ABanking implements OnlineBankingService {
     static final String PS_UIP_ADDRESS = "127.0.0.1";
     static final String SINGLE_PAYMENT_SERVICE = "payments";
     static final String SEPA_CREDIT_TRANSFERS = "sepa-credit-transfers";
+    static final String SCA_AUTHENTICATION_METHOD_ID = "authenticationMethodId";
+    static final String SCA_NAME = "name";
+    static final String SCA_AUTHENTICATION_VERSION = "authenticationVersion";
+    static final String SCA_EXPLANATION = "explanation";
+    static final String SCA_METHODS = "scaMethods";
 
     @Override
     public BankApi bankApi() {
@@ -91,11 +96,11 @@ public class XS2ABanking implements OnlineBankingService {
                                                          null, null, null, null, null, null, PS_UIP_ADDRESS,
                                                          null, null, null, null, null, null, null, null, null);
             String authorisationId = getAuthorizationId(response);
-            StartScaprocessResponse updatePsu = (StartScaprocessResponse) service.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, authorisationId, xRequestId, psuBody,
-                                                                                                       null, null, null, psuId, null, corporateId,
-                                                                                                       null, PS_UIP_ADDRESS, null, null,
-                                                                                                       null, null, null,
-                                                                                                       null, null, null, null);
+            Map<String, Object>  updatePsu = (Map<String, Object>) service.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, authorisationId, xRequestId, psuBody,
+                                                                                                null, null, null, psuId, null, corporateId,
+                                                                                                null, PS_UIP_ADDRESS, null, null,
+                                                                                                null, null, null,
+                                                                                                null, null, null, null);
             return buildPsuAuthenticationResponse(updatePsu, authorisationId);
         } catch (ApiException e) {
             logger.error("Authorise PSU failed", e);
@@ -123,16 +128,18 @@ public class XS2ABanking implements OnlineBankingService {
         return null;
     }
 
-    private ScaMethodsResponse buildPsuAuthenticationResponse(StartScaprocessResponse response, String authorisationId) {
-        List<TanTransportType> transportTypes = response.getScaMethods().stream()
-                                                        .map(this::createTanType).collect(Collectors.toList());
+    private ScaMethodsResponse buildPsuAuthenticationResponse(Map<String, Object> response, String authorisationId) {
+        List<TanTransportType> transportTypes = ((List<Map<String, String>>) response.getOrDefault(SCA_METHODS, Collections.EMPTY_LIST))
+                                                        .stream()
+                                                        .map(this::createTanType)
+                                                        .collect(Collectors.toList());
         return ScaMethodsResponse.builder()
                        .authorizationId(authorisationId)
                        .tanTransportTypes(transportTypes).build();
     }
 
-    private TanTransportType createTanType(AuthenticationObject method) {
-        return new TanTransportType(method.getAuthenticationMethodId(), method.getName(), method.getAuthenticationVersion(), method.getExplanation());
+    private TanTransportType createTanType(Map<String, String> map) {
+        return new TanTransportType(map.get(SCA_AUTHENTICATION_METHOD_ID), map.get(SCA_NAME), map.get(SCA_AUTHENTICATION_VERSION), map.get(SCA_EXPLANATION));
     }
 
     @Override
@@ -352,7 +359,7 @@ public class XS2ABanking implements OnlineBankingService {
                                                                 null, null, null, null, null, null,
                                                                 null, null, null);
 
-        List<Map> scaMethods = (List<Map>) updatePsuResponse.get("scaMethods");
+        List<Map> scaMethods = (List<Map>) updatePsuResponse.get(SCA_METHODS);
         String otp = (String) scaMethods
                                       .stream()
                                       .map(x -> x.get("authenticationMethodId"))

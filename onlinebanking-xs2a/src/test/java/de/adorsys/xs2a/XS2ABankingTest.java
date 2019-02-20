@@ -19,7 +19,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static de.adorsys.xs2a.XS2ABanking.*;
@@ -29,6 +31,11 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class XS2ABankingTest {
+
+    private static final String SCA_NAME_VALUE = "Photo Tan";
+    private static final String SCA_AUTHENTICATION_VERSION_VALUE = "v1.0";
+    private static final String SCA_EXPLANATION_VALUE = "some explanation";
+    private static final String SCA_METHOD_ID_VALUE = "111";
 
     private XS2ABanking xs2aBanking;
 
@@ -70,15 +77,6 @@ public class XS2ABankingTest {
                                                  .build();
 
         StartScaprocessResponse scaProcessResponse = new StartScaprocessResponse();
-        ScaMethods scaMethods = new ScaMethods();
-        AuthenticationObject method = new AuthenticationObject();
-        method.setAuthenticationMethodId("111");
-        method.setAuthenticationType(AuthenticationType.PHOTO_OTP);
-        method.setAuthenticationVersion("v1.0");
-        method.setExplanation("some explanation");
-        method.setName("Photo Tan");
-        scaMethods.add(method);
-        scaProcessResponse.setScaMethods(scaMethods);
         Map<String, String> links = new HashMap<>();
         links.put("startAuthorisationWithPsuAuthentication", "https://bkv-xs2a-dev.cloud.adorsys.de/v1/payments/sepa-credit-transfers/" + authorisationId);
         scaProcessResponse.setLinks(links);
@@ -102,7 +100,7 @@ public class XS2ABankingTest {
                                                                  isNull(), isNull(), isNull(),
                                                                  isNull(), isNull(),
                                                                  isNull(), isNull(), isNull())
-        ).thenReturn(scaProcessResponse);
+        ).thenReturn(buildUpdatePsuDataResponse());
 
         ScaMethodsResponse response = xs2aBanking.authenticatePsu("bankUrl", request);
 
@@ -111,14 +109,27 @@ public class XS2ABankingTest {
 
         TanTransportType tanTransportType = response.getTanTransportTypes().get(0);
 
-        assertThat(method.getAuthenticationMethodId()).isEqualTo(tanTransportType.getId());
-        assertThat(method.getAuthenticationVersion()).isEqualTo(tanTransportType.getMedium());
-        assertThat(method.getName()).isEqualTo(tanTransportType.getName());
-        assertThat(method.getExplanation()).isEqualTo(tanTransportType.getInputInfo());
+        assertThat(SCA_METHOD_ID_VALUE).isEqualTo(tanTransportType.getId());
+        assertThat(SCA_AUTHENTICATION_VERSION_VALUE).isEqualTo(tanTransportType.getMedium());
+        assertThat(SCA_NAME_VALUE).isEqualTo(tanTransportType.getName());
+        assertThat(SCA_EXPLANATION_VALUE).isEqualTo(tanTransportType.getInputInfo());
 
         UpdatePsuAuthentication psuAuthentication = psuBodyCaptor.getValue();
 
         assertThat(psuAuthentication.getPsuData().getPassword()).isEqualTo(pin);
+    }
+
+    private Map<String, Object> buildUpdatePsuDataResponse() {
+        Map<String, Object> response = new HashMap<>();
+        List<Map<String, String>> methods = new ArrayList<>();
+        HashMap<String, String> method = new HashMap<>();
+        method.put(SCA_AUTHENTICATION_METHOD_ID, SCA_METHOD_ID_VALUE);
+        method.put(SCA_NAME, SCA_NAME_VALUE);
+        method.put(SCA_AUTHENTICATION_VERSION, SCA_AUTHENTICATION_VERSION_VALUE);
+        method.put(SCA_EXPLANATION, SCA_EXPLANATION_VALUE);
+        methods.add(method);
+        response.put(SCA_METHODS, methods);
+        return response;
     }
 
     @Test(expected = XS2AClientException.class)
