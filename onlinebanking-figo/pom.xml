@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>de.adorsys.multibanking</groupId>
 		<artifactId>multibanking</artifactId>
-		<version>4.3.4-BG.96-SNAPSHOT</version>
+		<version>4.3.4-BG-100-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>onlinebanking-figo</artifactId>
@@ -14,7 +14,7 @@
 		<dependency>
 			<groupId>de.adorsys.multibanking</groupId>
 			<artifactId>onlinebanking-facade</artifactId>
-			<version>4.3.4-BG.96-SNAPSHOT</version>
+			<version>4.3.4-BG-100-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
