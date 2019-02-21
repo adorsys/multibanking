@@ -8,6 +8,7 @@ import de.adorsys.psd2.client.api.AccountInformationServiceAisApi;
 import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.*;
 import de.adorsys.xs2a.error.XS2AClientException;
+import de.adorsys.xs2a.model.Xs2aTanSubmit;
 import domain.*;
 import domain.request.*;
 import domain.response.*;
@@ -96,11 +97,11 @@ public class XS2ABanking implements OnlineBankingService {
                                                          null, null, null, null, null, null, PS_UIP_ADDRESS,
                                                          null, null, null, null, null, null, null, null, null);
             String authorisationId = getAuthorizationId(response);
-            Map<String, Object>  updatePsu = (Map<String, Object>) service.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, authorisationId, xRequestId, psuBody,
-                                                                                                null, null, null, psuId, null, corporateId,
-                                                                                                null, PS_UIP_ADDRESS, null, null,
-                                                                                                null, null, null,
-                                                                                                null, null, null, null);
+            Map<String, Object> updatePsu = (Map<String, Object>) service.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, authorisationId, xRequestId, psuBody,
+                                                                                               null, null, null, psuId, null, corporateId,
+                                                                                               null, PS_UIP_ADDRESS, null, null,
+                                                                                               null, null, null,
+                                                                                               null, null, null, null);
             return buildPsuAuthenticationResponse(updatePsu, authorisationId);
         } catch (ApiException e) {
             logger.error("Authorise PSU failed", e);
@@ -248,7 +249,8 @@ public class XS2ABanking implements OnlineBankingService {
 
         } catch (ApiException e) {
             logger.error("Initiate payment failed", e);
-            throw new XS2AClientException(e);        }
+            throw new XS2AClientException(e);
+        }
     }
 
     //todo: replace by mapper
@@ -283,7 +285,55 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
-        return null;
+        ApiClient apiClient = createApiClient(bankingUrl);
+        PaymentInitiationServicePisApi service = createPaymentInitiationServicePisApi(apiClient);
+
+        String paymentId = paymentRequest.getTransaction().getPaymentId();
+        String authorisationId = paymentRequest.getAuthorisationId();
+
+        UUID xRequestId = UUID.randomUUID();
+        String psuId = paymentRequest.getBankAccess().getBankLogin();
+        String corporateId = paymentRequest.getBankAccess().getBankLogin2();
+        SelectPsuAuthenticationMethod body = buildSelectPsuAuthenticationMethod(paymentRequest);
+        Xs2aTanSubmit tanSubmit = new Xs2aTanSubmit(bankingUrl, paymentId, authorisationId, psuId, corporateId);
+
+        try {
+            Map<String, Object> updatePsuData = (Map<String, Object>) service.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS,
+                                                                                                   paymentId, authorisationId,
+                                                                                                   xRequestId, body,
+                                                                                                   null, null,
+                                                                                                   null, psuId,
+                                                                                                   null, corporateId,
+                                                                                                   null, null,
+                                                                                                   null, null,
+                                                                                                   null, null,
+                                                                                                   null, null,
+                                                                                                   null, null, null);
+
+            return buildAuthorisationCodeResponse(updatePsuData, tanSubmit);
+        } catch (ApiException e) {
+            logger.error("Initiate payment failed", e);
+            throw new XS2AClientException(e);
+        }
+    }
+
+    private AuthorisationCodeResponse buildAuthorisationCodeResponse(Map<String, Object> updatePsuData, Xs2aTanSubmit tanSubmit) {
+        AuthorisationCodeResponse response = new AuthorisationCodeResponse();
+        response.setTanSubmit(tanSubmit);
+        Map<String,String> map = (Map<String, String>) updatePsuData.get("challengeData");
+        TanChallenge challenge = new TanChallenge();
+        challenge.setData(map.get("data"));
+        challenge.setFormat(map.get("otpFormat"));
+        challenge.setTitle(map.get("additionalInformation"));
+        response.setChallenge(challenge);
+        return response;
+    }
+
+    private SelectPsuAuthenticationMethod buildSelectPsuAuthenticationMethod(TransactionRequest paymentRequest) {
+        String methodId = paymentRequest.getTanTransportType().getId();
+        SelectPsuAuthenticationMethod selectPsuAuthenticationMethod = new SelectPsuAuthenticationMethod();
+        selectPsuAuthenticationMethod.setAuthenticationMethodId(methodId);
+        return selectPsuAuthenticationMethod;
     }
 
     @Override
