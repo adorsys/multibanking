@@ -222,6 +222,7 @@ public class XS2ABanking implements OnlineBankingService {
         UUID xRequestId = UUID.randomUUID();
         String paymentProduct;
         String contentType;
+        String psuId = paymentRequest.getBankAccess().getBankLogin();
         Object paymentBody;
 
         Optional<String> rawData = Optional.ofNullable(paymentRequest.getTransaction().getRawData());
@@ -244,7 +245,7 @@ public class XS2ABanking implements OnlineBankingService {
                     paymentProduct,
                     xRequestId,
                     PS_UIP_ADDRESS,
-                    null, null, null, null, null, null,
+                    null, null, null, psuId, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null);

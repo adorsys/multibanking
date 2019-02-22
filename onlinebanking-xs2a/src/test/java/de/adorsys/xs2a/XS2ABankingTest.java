@@ -206,9 +206,11 @@ public class XS2ABankingTest {
         SinglePayment transaction = new SinglePayment();
         BankAccount bankAccount = new BankAccount();
         bankAccount.setIban(IBAN);
+        BankAccess bankAccess = new BankAccess();
+        bankAccess.setBankLogin(PSU_ID);
         transaction.setDebtorBankAccount(bankAccount);
         transaction.setAmount(new BigDecimal(1));
-        TransactionRequest request = TransactionRequest.builder().authorisationId(AUTHORISATION_ID).pin(PIN).transaction(transaction).build();
+        TransactionRequest request = TransactionRequest.builder().bankAccess(bankAccess).authorisationId(AUTHORISATION_ID).pin(PIN).transaction(transaction).build();
         ArgumentCaptor<PaymentInitiationSctJson> initiation = ArgumentCaptor.forClass(PaymentInitiationSctJson.class);
 
         when(paymentInitiationServicePisApi.initiatePayment(
@@ -218,7 +220,7 @@ public class XS2ABankingTest {
                 any(),
                 eq(PS_UIP_ADDRESS),
                 isNull(), isNull(),
-                isNull(), isNull(),
+                isNull(), eq(PSU_ID),
                 isNull(), isNull(),
                 isNull(), isNull(),
                 isNull(), isNull(),
@@ -238,7 +240,7 @@ public class XS2ABankingTest {
                 any(),
                 eq(PS_UIP_ADDRESS),
                 isNull(), isNull(),
-                isNull(), isNull(),
+                isNull(), eq(PSU_ID),
                 isNull(), isNull(),
                 isNull(), isNull(),
                 isNull(), isNull(),
@@ -259,9 +261,11 @@ public class XS2ABankingTest {
         SinglePayment transaction = new SinglePayment();
         BankAccount bankAccount = new BankAccount();
         bankAccount.setIban(IBAN);
+        BankAccess bankAccess = new BankAccess();
+        bankAccess.setBankLogin(PSU_ID);
         transaction.setDebtorBankAccount(bankAccount);
         transaction.setAmount(new BigDecimal(1));
-        TransactionRequest request = TransactionRequest.builder().authorisationId(AUTHORISATION_ID).pin(PIN).transaction(transaction).build();
+        TransactionRequest request = TransactionRequest.builder().bankAccess(bankAccess).authorisationId(AUTHORISATION_ID).pin(PIN).transaction(transaction).build();
         ArgumentCaptor<PaymentInitiationSctJson> initiation = ArgumentCaptor.forClass(PaymentInitiationSctJson.class);
 
         when(paymentInitiationServicePisApi.initiatePayment(
@@ -271,7 +275,7 @@ public class XS2ABankingTest {
                 any(),
                 eq(PS_UIP_ADDRESS),
                 isNull(), isNull(),
-                isNull(), isNull(),
+                isNull(), eq(PSU_ID),
                 isNull(), isNull(),
                 isNull(), isNull(),
                 isNull(), isNull(),
