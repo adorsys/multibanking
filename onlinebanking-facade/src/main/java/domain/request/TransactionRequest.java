@@ -30,6 +30,7 @@ public class TransactionRequest extends AbstractRequest {
     private TanTransportType tanTransportType;
     private AbstractScaTransaction transaction;
     private BankAccess bankAccess;
+    private String authorisationId;
     private String bankCode;
     private String pin;
 
