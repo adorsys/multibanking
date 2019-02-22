@@ -34,6 +34,10 @@ public class XS2ABanking implements OnlineBankingService {
     static final String SCA_AUTHENTICATION_VERSION = "authenticationVersion";
     static final String SCA_EXPLANATION = "explanation";
     static final String SCA_METHODS = "scaMethods";
+    static final String CHALLENGE_DATA = "data";
+    static final String CHALLENGE_OTP_FORMAT = "otpFormat";
+    static final String CHALLENGE_ADDITIONAL_INFORMATION = "additionalInformation";
+    static final String CHALLENGE = "challengeData";
 
     @Override
     public BankApi bankApi() {
@@ -126,7 +130,7 @@ public class XS2ABanking implements OnlineBankingService {
             int index = psuAuthentication.lastIndexOf('/') + 1;
             return psuAuthentication.substring(index);
         }
-        return null;
+        throw new XS2AClientException("startAuthorisationWithPsuAuthentication property was not found in the response");
     }
 
     private ScaMethodsResponse buildPsuAuthenticationResponse(Map<String, Object> response, String authorisationId) {
@@ -304,7 +308,7 @@ public class XS2ABanking implements OnlineBankingService {
                                                                                                    null, null,
                                                                                                    null, psuId,
                                                                                                    null, corporateId,
-                                                                                                   null, null,
+                                                                                                   null, PS_UIP_ADDRESS,
                                                                                                    null, null,
                                                                                                    null, null,
                                                                                                    null, null,
@@ -320,11 +324,11 @@ public class XS2ABanking implements OnlineBankingService {
     private AuthorisationCodeResponse buildAuthorisationCodeResponse(Map<String, Object> updatePsuData, Xs2aTanSubmit tanSubmit) {
         AuthorisationCodeResponse response = new AuthorisationCodeResponse();
         response.setTanSubmit(tanSubmit);
-        Map<String,String> map = (Map<String, String>) updatePsuData.get("challengeData");
+        Map<String,String> map = (Map<String, String>) updatePsuData.get(CHALLENGE);
         TanChallenge challenge = new TanChallenge();
-        challenge.setData(map.get("data"));
-        challenge.setFormat(map.get("otpFormat"));
-        challenge.setTitle(map.get("additionalInformation"));
+        challenge.setData(map.get(CHALLENGE_DATA));
+        challenge.setFormat(map.get(CHALLENGE_OTP_FORMAT));
+        challenge.setTitle(map.get(CHALLENGE_ADDITIONAL_INFORMATION));
         response.setChallenge(challenge);
         return response;
     }
