@@ -231,8 +231,8 @@ export class AnalyticsPage {
       return period.amount;
     }
 
-    if (periodStart.isSame(moment(), "month")) {
-        console.log();
+    if (group.contract && group.contract.cancelled) {
+      return 0;
     }
 
     if (group.amount && moment().isSameOrBefore(periodStart, 'day')) {
