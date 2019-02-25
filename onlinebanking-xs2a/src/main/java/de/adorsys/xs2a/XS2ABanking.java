@@ -343,7 +343,32 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
-        return null;
+        Xs2aTanSubmit tanSubmit = (Xs2aTanSubmit) submitPaymentRequest.getTanSubmit();
+        String bankingUrl = tanSubmit.getBankingUrl();
+        ApiClient apiClient = createApiClient(bankingUrl);
+        PaymentInitiationServicePisApi pis = createPaymentInitiationServicePisApi(apiClient);
+
+        String paymentId = tanSubmit.getPaymentId();
+        String authorisationId = tanSubmit.getAuthorisationId();
+        UUID xRequestId = UUID.randomUUID();
+
+        String tan = submitPaymentRequest.getTan();
+        TransactionAuthorisation transactionAuthorisation = new TransactionAuthorisation();
+        transactionAuthorisation.setScaAuthenticationData(tan);
+
+        String psuId = tanSubmit.getPsuId();
+        String psuCorporateId = tanSubmit.getPsuCorporateId();
+
+        try {
+            pis.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, authorisationId,
+                    xRequestId, transactionAuthorisation, null, null, null, psuId, null, psuCorporateId, null,
+                    PS_UIP_ADDRESS, null, null, null, null, null, null, null, null, null);
+        } catch (ApiException e) {
+            logger.error("Submit authorisation code failed", e);
+            throw new XS2AClientException(e);
+        }
+
+        return paymentId;
     }
 
     @Override
