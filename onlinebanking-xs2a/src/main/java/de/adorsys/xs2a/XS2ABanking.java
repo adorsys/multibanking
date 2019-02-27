@@ -6,6 +6,7 @@ import de.adorsys.psd2.client.ApiClient;
 import de.adorsys.psd2.client.ApiException;
 import de.adorsys.psd2.client.api.AccountInformationServiceAisApi;
 import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
+import de.adorsys.psd2.client.model.AccountReference;
 import de.adorsys.psd2.client.model.*;
 import de.adorsys.xs2a.error.XS2AClientException;
 import de.adorsys.xs2a.model.Xs2aTanSubmit;
@@ -377,35 +378,67 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public void createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
-        String newConsent = createDedicatedAccountConsent(bankingUrl, startScaRequest, startScaRequest.getBankAccess());
-        startScaRequest.getBankApiUser().getProperties().put("consentId-" + startScaRequest.getIban(), newConsent);
+    public CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest request) {
+        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
+
+        Consents consents = toConsents(request);
+        BankAccess bankAccess = request.getBankAccess();
+        ConsentsResponse201 response;
+        try {
+            response = ais.createConsent(UUID.randomUUID(), consents, null, null, null, bankAccess.getBankLogin(), null,
+                    bankAccess.getBankLogin2(), null, "false", null, null, null, PS_UIP_ADDRESS, null, null, null, null,
+                    null, null, null, null, null);
+        } catch (ApiException e) {
+            logger.error("Create consent failed", e);
+            throw new XS2AClientException(e);
+        }
+
+        // The consent object to be retrieved by the GET Consent Request will contain the adjusted date
+        // NextGenPSD2 Access to Account Interoperability Framework - Implementation Guidelines V1.3_20181019.pdf
+        // 6.4.1.1
+        String consentId = response.getConsentId();
+        ConsentInformationResponse200Json consentInformation;
+        try {
+            consentInformation = ais.getConsentInformation(consentId, UUID.randomUUID(), null, null, null,
+                    PS_UIP_ADDRESS, null, null, null, null, null, null, null, null, null);
+        } catch (ApiException e) {
+            logger.error("Get consent failed", e);
+            throw new XS2AClientException(e);
+        }
+
+        return CreateConsentResponse.builder()
+                .consentId(consentId)
+                .validUntil(consentInformation.getValidUntil())
+                .build();
     }
 
-    private String createDedicatedAccountConsent(String bankingUrl, CreateConsentRequest startScaRequest,
-                                                 BankAccess bankAccess) {
+    private Consents toConsents(CreateConsentRequest request) {
         Consents consents = new Consents();
-        consents.setValidUntil(LocalDate.now().plusYears(1));
-        consents.setFrequencyPerDay(100);
+        consents.setAccess(toAccountAccess(request));
+        consents.setRecurringIndicator(request.isRecurringIndicator());
+        consents.setValidUntil(request.getValidUntil());
+        consents.setFrequencyPerDay(request.getFrequencyPerDay());
+        consents.setCombinedServiceIndicator(request.isCombinedServiceIndicator());
+        return consents;
+    }
 
-        AccountReference accountReferenceIban = new AccountReference();
-        accountReferenceIban.setIban(startScaRequest.getIban());
-        accountReferenceIban.setCurrency("EUR");
-        List<AccountReference> accounts = Arrays.asList(accountReferenceIban);
-
+    private AccountAccess toAccountAccess(CreateConsentRequest request) {
         AccountAccess accountAccess = new AccountAccess();
-        accountAccess.setTransactions(accounts);
-        accountAccess.setAccounts(accounts);
-        accountAccess.setBalances(accounts);
-        consents.setAccess(accountAccess);
+        accountAccess.setAccounts(toAccountReferences(request.getAccounts()));
+        accountAccess.setBalances(toAccountReferences(request.getBalances()));
+        accountAccess.setTransactions(toAccountReferences(request.getTransactions()));
+        return accountAccess;
+    }
 
-        consents.setRecurringIndicator(true);
-
-        try {
-            return createConsent(bankingUrl, bankAccess, startScaRequest.getPin(), consents).getConsentId();
-        } catch (ApiException e) {
-            throw new RuntimeException(e);
+    private List<AccountReference> toAccountReferences(List<domain.AccountReference> accounts) {
+        ArrayList<AccountReference> accountReferences = new ArrayList<>();
+        for (domain.AccountReference account: accounts) {
+            AccountReference accountReference = new AccountReference();
+            accountReference.setIban(account.getIban());
+            accountReference.setCurrency(account.getCurrency());
+            accountReferences.add(accountReference);
         }
+        return accountReferences;
     }
 
     private ConsentsResponse201 createConsent(String bankingUrl, BankAccess bankAccess, String pin,

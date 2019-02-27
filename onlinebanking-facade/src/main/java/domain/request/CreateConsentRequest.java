@@ -16,10 +16,14 @@
 
 package domain.request;
 
+import domain.AccountReference;
 import domain.BankAccess;
 import domain.BankApiUser;
 import lombok.Builder;
 import lombok.Data;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -27,7 +31,17 @@ public class CreateConsentRequest {
 
     private BankApiUser bankApiUser;
     private BankAccess bankAccess;
-    private String iban;
-    private String pin;
 
+    // Requested access services for a consent.
+    /** Is asking for detailed account information. */
+    private List<AccountReference> accounts;
+    /** Is asking for balances of the account. */
+    private List<AccountReference> balances;
+    /** Is asking for transactions of the account */
+    private List<AccountReference> transactions;
+
+    private boolean recurringIndicator;
+    private LocalDate validUntil;
+    private int frequencyPerDay;
+    private boolean combinedServiceIndicator;
 }

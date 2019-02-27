@@ -300,8 +300,9 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
+    public CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
 
+        return null;
     }
 
     private ApiClient createApiClient() {

@@ -43,6 +43,6 @@ public interface OnlineBankingService {
 
     boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference);
 
-    void createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest);
+    CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest);
 
 }
