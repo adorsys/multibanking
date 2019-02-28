@@ -16,45 +16,34 @@
 
 package hbci4java.job;
 
-import domain.FuturePayment;
 import domain.AbstractScaTransaction;
-import org.kapott.hbci.GV.AbstractSEPAGV;
-import org.kapott.hbci.GV.GVTermUebSEPADel;
+import domain.FutureBulkPayment;
+import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV.GVTermMultiUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
-import org.kapott.hbci.structures.Value;
 
 /**
  * Only for future payment (GVTermUebSEPA)
  */
-public class DeleteFuturePaymentJob extends ScaRequiredJob {
+public class DeleteFutureBulkPaymentJob extends ScaRequiredJob {
 
     private String jobName;
 
     @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport, String rawData) {
-        FuturePayment singlePayment = (FuturePayment) transaction;
+    protected AbstractHBCIJob createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
+                                            String rawData) {
+        FutureBulkPayment futureBulkPayment = (FutureBulkPayment) transaction;
 
         Konto src = getDebtorAccount(transaction, passport);
 
-        Konto dst = new Konto();
-        dst.name = singlePayment.getReceiver();
-        dst.iban = singlePayment.getReceiverIban();
-        dst.bic = singlePayment.getReceiverBic();
+        jobName = GVTermMultiUebSEPADel.getLowlevelName();
 
-        jobName = GVTermUebSEPADel.getLowlevelName();
+        GVTermMultiUebSEPADel sepadelgv = new GVTermMultiUebSEPADel(passport, jobName);
 
-        GVTermUebSEPADel sepadelgv = new GVTermUebSEPADel(passport, jobName, rawData);
-
-        sepadelgv.setParam("orderid", singlePayment.getOrderId());
-        sepadelgv.setParam("date", singlePayment.getExecutionDate().toString());
-
+        sepadelgv.setParam("orderid", futureBulkPayment.getOrderId());
         sepadelgv.setParam("src", src);
-        sepadelgv.setParam("dst", dst);
-        sepadelgv.setParam("btg", new Value(singlePayment.getAmount()));
-        sepadelgv.setParam("usage", singlePayment.getPurpose());
-
         sepadelgv.verifyConstraints();
 
         return sepadelgv;

@@ -22,9 +22,11 @@ public abstract class AbstractScaTransaction {
     public enum TransactionType {
         SINGLE_PAYMENT,
         FOREIGN_PAYMENT,
-        FUTURE_PAYMENT,
-        FUTURE_PAYMENT_DELETE,
+        FUTURE_SINGLE_PAYMENT,
+        FUTURE_SINGLE_PAYMENT_DELETE,
         BULK_PAYMENT,
+        FUTURE_BULK_PAYMENT,
+        FUTURE_BULK_PAYMENT_DELETE,
         STANDING_ORDER,
         STANDING_ORDER_DELETE,
         RAW_SEPA,

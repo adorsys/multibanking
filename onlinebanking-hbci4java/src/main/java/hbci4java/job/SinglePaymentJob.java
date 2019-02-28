@@ -17,7 +17,7 @@
 package hbci4java.job;
 
 import domain.AbstractScaTransaction;
-import domain.FuturePayment;
+import domain.FutureSinglePayment;
 import domain.SinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTermUebSEPA;
@@ -43,9 +43,9 @@ public class SinglePaymentJob extends ScaRequiredJob {
         dst.bic = singlePayment.getReceiverBic();
 
         AbstractSEPAGV sepagv;
-        if (singlePayment instanceof FuturePayment) {
+        if (singlePayment instanceof FutureSinglePayment) {
             sepagv = new GVTermUebSEPA(passport, GVTermUebSEPA.getLowlevelName(), rawData);
-            sepagv.setParam("date", ((FuturePayment) singlePayment).getExecutionDate().toString());
+            sepagv.setParam("date", ((FutureSinglePayment) singlePayment).getExecutionDate().toString());
         } else {
             sepagv = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName(), rawData);
         }
@@ -62,7 +62,7 @@ public class SinglePaymentJob extends ScaRequiredJob {
 
     @Override
     protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
-        if (paymentType == AbstractScaTransaction.TransactionType.FUTURE_PAYMENT) {
+        if (paymentType == AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT) {
             return GVTermUebSEPA.getLowlevelName();
         }
         return GVUebSEPA.getLowlevelName();

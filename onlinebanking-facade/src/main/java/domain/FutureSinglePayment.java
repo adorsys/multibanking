@@ -10,7 +10,7 @@ import java.time.LocalDate;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class FuturePayment extends SinglePayment {
+public class FutureSinglePayment extends SinglePayment {
 
     private LocalDate executionDate;
     private boolean delete;
@@ -22,12 +22,10 @@ public class FuturePayment extends SinglePayment {
 
     @Override
     public TransactionType getTransactionType() {
-        return TransactionType.FUTURE_PAYMENT;
-    }
-
-    @Override
-    public String getRawData() {
-        return null;
+        if (delete) {
+            return TransactionType.FUTURE_SINGLE_PAYMENT_DELETE;
+        }
+        return TransactionType.FUTURE_SINGLE_PAYMENT;
     }
 
 }

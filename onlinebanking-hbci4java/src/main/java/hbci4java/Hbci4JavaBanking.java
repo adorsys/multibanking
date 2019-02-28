@@ -230,18 +230,21 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     private ScaRequiredJob createScaJob(AbstractScaTransaction.TransactionType transactionType) {
         switch (transactionType) {
             case SINGLE_PAYMENT:
-            case FUTURE_PAYMENT:
+            case FUTURE_SINGLE_PAYMENT:
                 return new SinglePaymentJob();
             case FOREIGN_PAYMENT:
                 return new ForeignPaymentJob();
             case BULK_PAYMENT:
+            case FUTURE_BULK_PAYMENT:
                 return new BulkPaymentJob();
             case STANDING_ORDER:
                 return new NewStandingOrderJob();
             case RAW_SEPA:
                 return new RawSepaJob();
-            case FUTURE_PAYMENT_DELETE:
-                return new DeleteFuturePaymentJob();
+            case FUTURE_SINGLE_PAYMENT_DELETE:
+                return new DeleteFutureSinglePaymentJob();
+            case FUTURE_BULK_PAYMENT_DELETE:
+                return new DeleteFutureBulkPaymentJob();
             case STANDING_ORDER_DELETE:
                 return new DeleteStandingOrderJob();
             case TAN_REQUEST:

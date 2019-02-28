@@ -18,10 +18,10 @@ package hbci4java.job;
 
 import domain.AbstractScaTransaction;
 import domain.BulkPayment;
+import domain.FutureBulkPayment;
 import domain.SinglePayment;
-import org.kapott.hbci.GV.AbstractSEPAGV;
-import org.kapott.hbci.GV.GVMultiUebSEPA;
-import org.kapott.hbci.GV.GVUebSEPA;
+import org.kapott.hbci.GV.*;
+import org.kapott.hbci.GV_Result.GVRTermUeb;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
@@ -30,13 +30,21 @@ import org.kapott.hbci.structures.Value;
 public class BulkPaymentJob extends ScaRequiredJob {
 
     @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport, String rawData) {
+    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
+                                           String rawData) {
         BulkPayment bulkPayment = (BulkPayment) transaction;
 
         Konto src = getDebtorAccount(transaction, passport);
 
-        GVUebSEPA uebSEPA = new GVMultiUebSEPA(passport, GVMultiUebSEPA.getLowlevelName(), rawData);
-        uebSEPA.setParam("src", src);
+        AbstractSEPAGV sepagv;
+        if (bulkPayment instanceof FutureBulkPayment) {
+            sepagv = new GVTermMultiUebSEPA(passport, GVTermMultiUebSEPA.getLowlevelName(), rawData);
+            sepagv.setParam("date", ((FutureBulkPayment) bulkPayment).getExecutionDate().toString());
+        } else {
+            sepagv = new GVMultiUebSEPA(passport, GVUebSEPA.getLowlevelName(), rawData);
+        }
+
+        sepagv.setParam("src", src);
 
         for (int i = 0; i < bulkPayment.getPayments().size(); i++) {
             SinglePayment payment = bulkPayment.getPayments().get(i);
@@ -46,23 +54,26 @@ public class BulkPaymentJob extends ScaRequiredJob {
             dst.iban = payment.getReceiverIban();
             dst.bic = payment.getReceiverBic();
 
-            uebSEPA.setParam("dst", i, dst);
-            uebSEPA.setParam("btg", i, new Value(payment.getAmount()));
-            uebSEPA.setParam("usage", i, payment.getPurpose());
+            sepagv.setParam("dst", i, dst);
+            sepagv.setParam("btg", i, new Value(payment.getAmount()));
+            sepagv.setParam("usage", i, payment.getPurpose());
         }
 
-        uebSEPA.verifyConstraints();
+        sepagv.verifyConstraints();
 
-        return uebSEPA;
+        return sepagv;
     }
 
     @Override
     protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
+        if (paymentType == AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT) {
+            return "TermMultiUebSEPA";
+        }
         return "MultiUebSEPA";
     }
 
     @Override
     protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
-        return null; // no orderId for bulk payment
+        return paymentGV instanceof GVRTermUeb ? ((GVRTermUeb) paymentGV).getOrderId() : null;
     }
 }

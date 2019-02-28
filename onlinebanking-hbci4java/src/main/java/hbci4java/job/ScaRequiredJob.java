@@ -194,7 +194,7 @@ public abstract class ScaRequiredJob {
         } else {
             return Optional.ofNullable(paymentGV)
                     .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
-                    .orElse(null);
+                    .orElse(hbciTanSubmit.getOrderRef());
         }
     }
 
