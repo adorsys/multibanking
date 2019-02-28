@@ -69,8 +69,9 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
+    public CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
 
+        return null;
     }
 
     @Override

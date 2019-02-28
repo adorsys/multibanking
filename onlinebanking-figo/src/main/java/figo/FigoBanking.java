@@ -321,8 +321,9 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
+    public CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
 
+        return null;
     }
 
     private TaskStatusResponse submitPin(String taskToken, String pin, FigoSession session) throws FigoException,

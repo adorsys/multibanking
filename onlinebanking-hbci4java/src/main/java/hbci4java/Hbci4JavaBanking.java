@@ -210,7 +210,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
+    public CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
+        return null;
     }
 
     private void checkBankExists(String bankCode, String bankingUrl) {
