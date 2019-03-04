@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 public class AuthenticatePsuRequest extends AbstractRequest {
 
     private String paymentId;
+    private String consentId;
     private String bankCode;
     private String customerId;
     private String login;

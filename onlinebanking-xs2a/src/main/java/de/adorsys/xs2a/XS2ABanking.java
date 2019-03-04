@@ -87,6 +87,20 @@ public class XS2ABanking implements OnlineBankingService {
     @Override
     public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
         ApiClient apiClient = createApiClient(bankingUrl);
+
+        if (authenticatePsuRequest.getPaymentId() != null && authenticatePsuRequest.getConsentId() != null) {
+            throw new IllegalArgumentException("Either payment or consent id should be set");
+        }
+        if (authenticatePsuRequest.getPaymentId() != null) {
+            return authenticatePsuForPayment(authenticatePsuRequest, apiClient);
+        }
+        if (authenticatePsuRequest.getConsentId() != null) {
+            return authenticatePsuForAccountInformationConsent(authenticatePsuRequest, apiClient);
+        }
+        throw new IllegalArgumentException("Neither payment nor consent id was set");
+    }
+
+    private ScaMethodsResponse authenticatePsuForPayment(AuthenticatePsuRequest authenticatePsuRequest, ApiClient apiClient) {
         PaymentInitiationServicePisApi service = createPaymentInitiationServicePisApi(apiClient);
 
         UUID xRequestId = UUID.randomUUID();
@@ -118,6 +132,42 @@ public class XS2ABanking implements OnlineBankingService {
         return new PaymentInitiationServicePisApi(apiClient);
     }
 
+    private ScaMethodsResponse authenticatePsuForAccountInformationConsent(
+            AuthenticatePsuRequest authenticatePsuRequest, ApiClient apiClient) {
+        AccountInformationServiceAisApi ais = createAccountInformationServiceAisApi(apiClient);
+        String consentId = authenticatePsuRequest.getConsentId();
+        String psuId = authenticatePsuRequest.getLogin();
+        String corporatePsuId = authenticatePsuRequest.getCustomerId();
+        StartScaprocessResponse startScaprocessResponse;
+        try {
+            startScaprocessResponse = ais.startConsentAuthorisation(consentId,
+                    UUID.randomUUID(), null, null, null, psuId, null, corporatePsuId, null, PS_UIP_ADDRESS, null, null,
+                    null, null, null, null, null, null, null);
+        } catch (ApiException e) {
+            logger.error("Failed to start consent authorisation", e);
+            throw new XS2AClientException(e);
+        }
+
+        String authorisationId = getAuthorizationId(startScaprocessResponse);
+        Object body = buildUpdatePsuAuthorisationBody(authenticatePsuRequest.getPin());
+
+        Object response;
+        try {
+            response = ais.updateConsentsPsuData(consentId, authorisationId, UUID.randomUUID(), body, null, null, null,
+                    psuId, null, corporatePsuId, null, PS_UIP_ADDRESS, null, null, null, null, null, null, null, null,
+                    null);
+        } catch (ApiException e) {
+            logger.error("Failed to update consent authorisation", e);
+            throw new XS2AClientException(e);
+        }
+
+        return buildPsuAuthenticationResponse((Map<String, Object>) response, authorisationId);
+    }
+
+    AccountInformationServiceAisApi createAccountInformationServiceAisApi(ApiClient apiClient) {
+        return new AccountInformationServiceAisApi(apiClient);
+    }
+
     private UpdatePsuAuthentication buildUpdatePsuAuthorisationBody(String password) {
         UpdatePsuAuthentication updatePsuAuthentication = new UpdatePsuAuthentication();
         updatePsuAuthentication.psuData(new PsuData()
@@ -126,12 +176,15 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     private String getAuthorizationId(StartScaprocessResponse response) {
-        String psuAuthentication = (String) response.getLinks().get("startAuthorisationWithPsuAuthentication");
-        if (StringUtils.isNotBlank(psuAuthentication)) {
-            int index = psuAuthentication.lastIndexOf('/') + 1;
-            return psuAuthentication.substring(index);
+        String link = (String) response.getLinks().get("startAuthorisationWithPsuAuthentication");
+        if (StringUtils.isBlank(link)) {
+            link = (String) response.getLinks().get("startAuthorisationWithPsuIdentification");
         }
-        throw new XS2AClientException("startAuthorisationWithPsuAuthentication property was not found in the response");
+        if (StringUtils.isNotBlank(link)) {
+            int index = link.lastIndexOf('/') + 1;
+            return link.substring(index);
+        }
+        throw new XS2AClientException("authorisation id was not found in the response");
     }
 
     private ScaMethodsResponse buildPsuAuthenticationResponse(Map<String, Object> response, String authorisationId) {
