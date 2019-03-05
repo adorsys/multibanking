@@ -30,6 +30,7 @@ public abstract class AbstractScaTransaction {
         STANDING_ORDER,
         STANDING_ORDER_DELETE,
         RAW_SEPA,
-        TAN_REQUEST
+        TAN_REQUEST,
+        DEDICATED_CONSENT
     }
 }
