@@ -23,6 +23,8 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static domain.AbstractScaTransaction.TransactionType.DEDICATED_CONSENT;
+
 public class XS2ABanking implements OnlineBankingService {
 
     private static final Logger logger = LoggerFactory.getLogger(XS2ABanking.class);
@@ -343,8 +345,15 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
+    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest request) {
         ApiClient apiClient = createApiClient(bankingUrl);
+        if (request.getTransaction().getTransactionType() == DEDICATED_CONSENT) {
+            return requestAuthorizationCodeForAccountInformationConsent(request, apiClient);
+        }
+        return requestAuthorizationCodeForPayment(bankingUrl, request, apiClient);
+    }
+
+    private AuthorisationCodeResponse requestAuthorizationCodeForPayment(String bankingUrl, TransactionRequest paymentRequest, ApiClient apiClient) {
         PaymentInitiationServicePisApi service = createPaymentInitiationServicePisApi(apiClient);
 
         String paymentId = paymentRequest.getTransaction().getPaymentId();
@@ -353,7 +362,7 @@ public class XS2ABanking implements OnlineBankingService {
         UUID xRequestId = UUID.randomUUID();
         String psuId = paymentRequest.getBankAccess().getBankLogin();
         String corporateId = paymentRequest.getBankAccess().getBankLogin2();
-        SelectPsuAuthenticationMethod body = buildSelectPsuAuthenticationMethod(paymentRequest);
+        SelectPsuAuthenticationMethod body = buildSelectPsuAuthenticationMethod(paymentRequest.getTanTransportType().getId());
         Xs2aTanSubmit tanSubmit = new Xs2aTanSubmit(bankingUrl, paymentId, authorisationId, psuId, corporateId);
 
         try {
@@ -388,11 +397,32 @@ public class XS2ABanking implements OnlineBankingService {
         return response;
     }
 
-    private SelectPsuAuthenticationMethod buildSelectPsuAuthenticationMethod(TransactionRequest paymentRequest) {
-        String methodId = paymentRequest.getTanTransportType().getId();
+    private SelectPsuAuthenticationMethod buildSelectPsuAuthenticationMethod(String methodId) {
         SelectPsuAuthenticationMethod selectPsuAuthenticationMethod = new SelectPsuAuthenticationMethod();
         selectPsuAuthenticationMethod.setAuthenticationMethodId(methodId);
         return selectPsuAuthenticationMethod;
+    }
+
+    private AuthorisationCodeResponse requestAuthorizationCodeForAccountInformationConsent(TransactionRequest request,
+                                                                                           ApiClient apiClient) {
+        AccountInformationServiceAisApi ais = createAccountInformationServiceAisApi(apiClient);
+        String consentId = request.getTransaction().getOrderId();
+        String authorisationId = request.getAuthorisationId();
+        Object body = buildSelectPsuAuthenticationMethod(request.getTanTransportType().getId());
+        String psuId = request.getBankAccess().getBankLogin();
+        String psuCorporateId = request.getBankAccess().getBankLogin2();
+        Object response;
+        try {
+            response = ais.updateConsentsPsuData(consentId, authorisationId, UUID.randomUUID(), body, null, null, null,
+                    psuId, null, psuCorporateId, null, PS_UIP_ADDRESS, null, null, null, null, null, null, null, null,
+                    null);
+        } catch (ApiException e) {
+            logger.error("Failed to request authorization code", e);
+            throw new XS2AClientException(e);
+        }
+
+        return buildAuthorisationCodeResponse((Map<String, Object>) response, new Xs2aTanSubmit(apiClient.getBasePath(),
+                consentId, authorisationId, psuId, psuCorporateId));
     }
 
     @Override
@@ -402,7 +432,7 @@ public class XS2ABanking implements OnlineBankingService {
         ApiClient apiClient = createApiClient(bankingUrl);
         PaymentInitiationServicePisApi pis = createPaymentInitiationServicePisApi(apiClient);
 
-        String paymentId = tanSubmit.getPaymentId();
+        String paymentId = tanSubmit.getTransactionId();
         String authorisationId = tanSubmit.getAuthorisationId();
         UUID xRequestId = UUID.randomUUID();
 

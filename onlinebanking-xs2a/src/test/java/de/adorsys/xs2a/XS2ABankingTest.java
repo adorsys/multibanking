@@ -341,7 +341,7 @@ public class XS2ABankingTest {
         Xs2aTanSubmit tanSubmit = (Xs2aTanSubmit) response.getTanSubmit();
         assertThat(tanSubmit.getAuthorisationId()).isEqualTo(AUTHORISATION_ID);
         assertThat(tanSubmit.getBankingUrl()).isEqualTo(BANKING_URL);
-        assertThat(tanSubmit.getPaymentId()).isEqualTo(PAYMENT_ID);
+        assertThat(tanSubmit.getTransactionId()).isEqualTo(PAYMENT_ID);
         assertThat(tanSubmit.getPsuId()).isEqualTo(PSU_ID);
         assertThat(tanSubmit.getPsuCorporateId()).isEqualTo(CORPORATE_ID);
 

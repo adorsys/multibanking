@@ -18,7 +18,7 @@ package de.adorsys.xs2a.model;
 
 public class Xs2aTanSubmit {
     private String bankingUrl;
-    private String paymentId;
+    private String transactionId;
     private String authorisationId;
     private String psuId;
     private String psuCorporateId;
@@ -26,9 +26,9 @@ public class Xs2aTanSubmit {
     public Xs2aTanSubmit() {
     }
 
-    public Xs2aTanSubmit(String bankingUrl, String paymentId, String authorisationId, String psuId, String psuCorporateId) {
+    public Xs2aTanSubmit(String bankingUrl, String transactionId, String authorisationId, String psuId, String psuCorporateId) {
         this.bankingUrl = bankingUrl;
-        this.paymentId = paymentId;
+        this.transactionId = transactionId;
         this.authorisationId = authorisationId;
         this.psuId = psuId;
         this.psuCorporateId = psuCorporateId;
@@ -42,12 +42,12 @@ public class Xs2aTanSubmit {
         this.bankingUrl = bankingUrl;
     }
 
-    public String getPaymentId() {
-        return paymentId;
+    public String getTransactionId() {
+        return transactionId;
     }
 
-    public void setPaymentId(String paymentId) {
-        this.paymentId = paymentId;
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 
     public String getAuthorisationId() {
