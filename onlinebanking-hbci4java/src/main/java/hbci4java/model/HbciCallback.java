@@ -35,7 +35,7 @@ public class HbciCallback implements HBCICallback {
                 break;
             }
             case HBCICallback.WRONG_PIN: {
-                throw new InvalidPinException();
+                throw new InvalidPinException(msg);
             }
             // No need to tell when we may open or close our internet connection
             case HBCICallback.NEED_CONNECTION:
