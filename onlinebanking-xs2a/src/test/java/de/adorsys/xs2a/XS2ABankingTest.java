@@ -5,10 +5,17 @@ import de.adorsys.psd2.client.ApiException;
 import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.*;
 import de.adorsys.xs2a.error.XS2AClientException;
+import de.adorsys.xs2a.executor.ConsentUpdateRequestExecutor;
+import de.adorsys.xs2a.executor.ConsentUpdateRequestExecutorTest;
+import de.adorsys.xs2a.executor.PaymentUpdateRequestExecutor;
+import de.adorsys.xs2a.executor.UpdateRequestExecutor;
+import de.adorsys.xs2a.model.ConsentXS2AUpdateRequest;
+import de.adorsys.xs2a.model.XS2AUpdateRequest;
 import de.adorsys.xs2a.model.Xs2aTanSubmit;
 import domain.*;
 import domain.request.AuthenticatePsuRequest;
 import domain.request.LoadAccountInformationRequest;
+import domain.request.SubmitAuthorizationCodeRequest;
 import domain.request.TransactionRequest;
 import domain.response.AuthorisationCodeResponse;
 import domain.response.InitiatePaymentResponse;
@@ -47,6 +54,7 @@ public class XS2ABankingTest {
     private static final String PSU_ID = "login";
     private static final String CORPORATE_ID = "custId";
     private static final String PIN = "pin";
+    public static final String TAN = "tan";
 
     private XS2ABanking xs2aBanking;
 
@@ -55,6 +63,9 @@ public class XS2ABankingTest {
 
     @Mock
     private PaymentInitiationServicePisApi paymentInitiationServicePisApi;
+
+    @Mock
+    private UpdateRequestExecutor executor;
 
     @Before
     public void setUp() {
@@ -68,6 +79,11 @@ public class XS2ABankingTest {
             @Override
             PaymentInitiationServicePisApi createPaymentInitiationServicePisApi(ApiClient apiClient) {
                 return paymentInitiationServicePisApi;
+            }
+
+            @Override
+            UpdateRequestExecutor createUpdateRequestExecutor(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+                return executor;
             }
         };
     }
@@ -91,7 +107,7 @@ public class XS2ABankingTest {
         when(paymentInitiationServicePisApi.startPaymentAuthorisation(eq(SINGLE_PAYMENT_SERVICE), eq(SEPA_CREDIT_TRANSFERS),
                                                                       eq(PAYMENT_ID), any(), eq(PSU_ID), isNull(), isNull(),
                                                                       isNull(), isNull(), isNull(),
-                                                                      isNull(), eq(PS_UIP_ADDRESS),
+                                                                      isNull(), eq(PSU_IP_ADDRESS),
                                                                       isNull(), isNull(),
                                                                       isNull(), isNull(),
                                                                       isNull(), isNull(),
@@ -102,7 +118,7 @@ public class XS2ABankingTest {
                                                                  eq(AUTHORISATION_ID), any(), psuBodyCaptor.capture(),
                                                                  isNull(), isNull(), isNull(),
                                                                  eq(PSU_ID), isNull(), eq(CORPORATE_ID),
-                                                                 isNull(), eq(PS_UIP_ADDRESS), isNull(),
+                                                                 isNull(), eq(PSU_IP_ADDRESS), isNull(),
                                                                  isNull(), isNull(), isNull(),
                                                                  isNull(), isNull(),
                                                                  isNull(), isNull(), isNull())
@@ -113,7 +129,7 @@ public class XS2ABankingTest {
         verify(paymentInitiationServicePisApi, times(1)).startPaymentAuthorisation(eq(SINGLE_PAYMENT_SERVICE), eq(SEPA_CREDIT_TRANSFERS),
                                                                                    eq(PAYMENT_ID), any(), eq(PSU_ID), isNull(), isNull(),
                                                                                    isNull(), isNull(), isNull(),
-                                                                                   isNull(), eq(PS_UIP_ADDRESS),
+                                                                                   isNull(), eq(PSU_IP_ADDRESS),
                                                                                    isNull(), isNull(),
                                                                                    isNull(), isNull(),
                                                                                    isNull(), isNull(),
@@ -123,7 +139,7 @@ public class XS2ABankingTest {
                                                                               eq(AUTHORISATION_ID), any(), psuBodyCaptor.capture(),
                                                                               isNull(), isNull(), isNull(),
                                                                               eq(PSU_ID), isNull(), eq(CORPORATE_ID),
-                                                                              isNull(), eq(PS_UIP_ADDRESS), isNull(),
+                                                                              isNull(), eq(PSU_IP_ADDRESS), isNull(),
                                                                               isNull(), isNull(), isNull(),
                                                                               isNull(), isNull(),
                                                                               isNull(), isNull(), isNull());
@@ -174,7 +190,7 @@ public class XS2ABankingTest {
         when(paymentInitiationServicePisApi.startPaymentAuthorisation(eq(SINGLE_PAYMENT_SERVICE), eq(SEPA_CREDIT_TRANSFERS),
                                                                       eq(paymentId), any(), eq(psuId), isNull(), isNull(),
                                                                       isNull(), isNull(), isNull(),
-                                                                      isNull(), eq(PS_UIP_ADDRESS),
+                                                                      isNull(), eq(PSU_IP_ADDRESS),
                                                                       isNull(), isNull(),
                                                                       isNull(), isNull(),
                                                                       isNull(), isNull(),
@@ -218,7 +234,7 @@ public class XS2ABankingTest {
                 eq(SINGLE_PAYMENT_SERVICE),
                 eq(SEPA_CREDIT_TRANSFERS),
                 any(),
-                eq(PS_UIP_ADDRESS),
+                eq(PSU_IP_ADDRESS),
                 isNull(), isNull(),
                 isNull(), eq(PSU_ID),
                 isNull(), isNull(),
@@ -238,7 +254,7 @@ public class XS2ABankingTest {
                 eq(SINGLE_PAYMENT_SERVICE),
                 eq(SEPA_CREDIT_TRANSFERS),
                 any(),
-                eq(PS_UIP_ADDRESS),
+                eq(PSU_IP_ADDRESS),
                 isNull(), isNull(),
                 isNull(), eq(PSU_ID),
                 isNull(), isNull(),
@@ -255,6 +271,7 @@ public class XS2ABankingTest {
         assertThat(response.getLinks()).hasSize(1);
         assertThat(response.getLinks().get("self")).isEqualTo(BANKING_URL);
     }
+
     @Test(expected = XS2AClientException.class)
     public void initiatePaymentWithApiException() throws ApiException {
 
@@ -273,7 +290,7 @@ public class XS2ABankingTest {
                 eq(SINGLE_PAYMENT_SERVICE),
                 eq(SEPA_CREDIT_TRANSFERS),
                 any(),
-                eq(PS_UIP_ADDRESS),
+                eq(PSU_IP_ADDRESS),
                 isNull(), isNull(),
                 isNull(), eq(PSU_ID),
                 isNull(), isNull(),
@@ -316,7 +333,7 @@ public class XS2ABankingTest {
                                                                  eq(AUTHORISATION_ID), any(), bodyCaptor.capture(),
                                                                  isNull(), isNull(), isNull(),
                                                                  eq(PSU_ID), isNull(), eq(CORPORATE_ID),
-                                                                 isNull(), eq(PS_UIP_ADDRESS), isNull(),
+                                                                 isNull(), eq(PSU_IP_ADDRESS), isNull(),
                                                                  isNull(), isNull(), isNull(),
                                                                  isNull(), isNull(),
                                                                  isNull(), isNull(), isNull())
@@ -328,7 +345,7 @@ public class XS2ABankingTest {
                                                                               eq(AUTHORISATION_ID), any(), bodyCaptor.capture(),
                                                                               isNull(), isNull(), isNull(),
                                                                               eq(PSU_ID), isNull(), eq(CORPORATE_ID),
-                                                                              isNull(), eq(PS_UIP_ADDRESS), isNull(),
+                                                                              isNull(), eq(PSU_IP_ADDRESS), isNull(),
                                                                               isNull(), isNull(), isNull(),
                                                                               isNull(), isNull(),
                                                                               isNull(), isNull(), isNull());
@@ -365,13 +382,74 @@ public class XS2ABankingTest {
                                                                  eq(AUTHORISATION_ID), any(), any(),
                                                                  isNull(), isNull(), isNull(),
                                                                  eq(PSU_ID), isNull(), eq(CORPORATE_ID),
-                                                                 isNull(), eq(PS_UIP_ADDRESS), isNull(),
+                                                                 isNull(), eq(PSU_IP_ADDRESS), isNull(),
                                                                  isNull(), isNull(), isNull(),
                                                                  isNull(), isNull(),
                                                                  isNull(), isNull(), isNull())
         ).thenThrow(ApiException.class);
 
         xs2aBanking.requestAuthorizationCode(BANKING_URL, request);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void submitAuthorizationCode() throws ApiException {
+        String trxId = "transactionId";
+        SubmitAuthorizationCodeRequest submitPaymentRequest = buildSubmitAuthorizationCodeRequest();
+        XS2AUpdateRequest updateRequest = mock(XS2AUpdateRequest.class);
+
+        when(executor.buildRequest(submitPaymentRequest)).thenReturn(updateRequest);
+        when(executor.execute(updateRequest, apiClient)).thenReturn(trxId);
+
+        String transactionId = xs2aBanking.submitAuthorizationCode(submitPaymentRequest);
+
+        verify(executor, times(1)).buildRequest(submitPaymentRequest);
+        verify(executor, times(1)).execute(updateRequest, apiClient);
+
+        assertThat(transactionId).isEqualTo(trxId);
+    }
+
+    @Test(expected = XS2AClientException.class)
+    public void submitAuthorizationCodeWithException() throws ApiException {
+        SubmitAuthorizationCodeRequest submitPaymentRequest = buildSubmitAuthorizationCodeRequest();
+        XS2AUpdateRequest updateRequest = mock(XS2AUpdateRequest.class);
+
+        when(executor.buildRequest(submitPaymentRequest)).thenReturn(updateRequest);
+        when(executor.execute(updateRequest, apiClient)).thenThrow(ApiException.class);
+
+        xs2aBanking.submitAuthorizationCode(submitPaymentRequest);
+
+        verify(executor, times(1)).buildRequest(submitPaymentRequest);
+    }
+
+    @Test
+    public void createUpdateRequestExecutor() {
+        XS2ABanking banking = new XS2ABanking();
+        SubmitAuthorizationCodeRequest submitPaymentRequest = buildSubmitAuthorizationCodeRequest();
+
+        UpdateRequestExecutor executor = banking.createUpdateRequestExecutor(submitPaymentRequest);
+
+        assertThat(executor).isInstanceOf(PaymentUpdateRequestExecutor.class);
+
+        SinglePayment payment = new SinglePayment() {
+            @Override
+            public TransactionType getTransactionType() {
+                return TransactionType.DEDICATED_CONSENT;
+            }
+        };
+        submitPaymentRequest.setSepaTransaction(payment);
+
+        executor = banking.createUpdateRequestExecutor(submitPaymentRequest);
+
+        assertThat(executor).isInstanceOf(ConsentUpdateRequestExecutor.class);
+
+    }
+
+    private SubmitAuthorizationCodeRequest buildSubmitAuthorizationCodeRequest() {
+        Xs2aTanSubmit tanSubmit = new Xs2aTanSubmit();
+        tanSubmit.setBankingUrl(BANKING_URL);
+        SinglePayment payment = new SinglePayment();
+        return SubmitAuthorizationCodeRequest.builder().tanSubmit(tanSubmit).sepaTransaction(payment).build();
     }
 
     private Map<String, Object> buildAuthorisationCodeResponse() {

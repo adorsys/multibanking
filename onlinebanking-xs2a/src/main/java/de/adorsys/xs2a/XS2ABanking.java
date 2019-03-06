@@ -9,6 +9,10 @@ import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.AccountReference;
 import de.adorsys.psd2.client.model.*;
 import de.adorsys.xs2a.error.XS2AClientException;
+import de.adorsys.xs2a.executor.ConsentUpdateRequestExecutor;
+import de.adorsys.xs2a.executor.PaymentUpdateRequestExecutor;
+import de.adorsys.xs2a.executor.UpdateRequestExecutor;
+import de.adorsys.xs2a.model.XS2AUpdateRequest;
 import de.adorsys.xs2a.model.Xs2aTanSubmit;
 import domain.*;
 import domain.request.*;
@@ -29,9 +33,9 @@ public class XS2ABanking implements OnlineBankingService {
 
     private static final Logger logger = LoggerFactory.getLogger(XS2ABanking.class);
 
-    static final String PS_UIP_ADDRESS = "127.0.0.1";
-    static final String SINGLE_PAYMENT_SERVICE = "payments";
-    static final String SEPA_CREDIT_TRANSFERS = "sepa-credit-transfers";
+    public static final String PSU_IP_ADDRESS = "127.0.0.1";
+    public static final String SINGLE_PAYMENT_SERVICE = "payments";
+    public static final String SEPA_CREDIT_TRANSFERS = "sepa-credit-transfers";
     static final String SCA_AUTHENTICATION_METHOD_ID = "authenticationMethodId";
     static final String SCA_NAME = "name";
     static final String SCA_AUTHENTICATION_VERSION = "authenticationVersion";
@@ -115,12 +119,12 @@ public class XS2ABanking implements OnlineBankingService {
         try {
             StartScaprocessResponse response;
             response = service.startPaymentAuthorisation(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, xRequestId, psuId,
-                                                         null, null, null, null, null, null, PS_UIP_ADDRESS,
+                                                         null, null, null, null, null, null, PSU_IP_ADDRESS,
                                                          null, null, null, null, null, null, null, null, null);
             String authorisationId = getAuthorizationId(response);
             Map<String, Object> updatePsu = (Map<String, Object>) service.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, authorisationId, xRequestId, psuBody,
                                                                                                null, null, null, psuId, null, corporateId,
-                                                                                               null, PS_UIP_ADDRESS, null, null,
+                                                                                               null, PSU_IP_ADDRESS, null, null,
                                                                                                null, null, null,
                                                                                                null, null, null, null);
             return buildPsuAuthenticationResponse(updatePsu, authorisationId);
@@ -143,8 +147,8 @@ public class XS2ABanking implements OnlineBankingService {
         StartScaprocessResponse startScaprocessResponse;
         try {
             startScaprocessResponse = ais.startConsentAuthorisation(consentId,
-                    UUID.randomUUID(), null, null, null, psuId, null, corporatePsuId, null, PS_UIP_ADDRESS, null, null,
-                    null, null, null, null, null, null, null);
+                                                                    UUID.randomUUID(), null, null, null, psuId, null, corporatePsuId, null, PSU_IP_ADDRESS, null, null,
+                                                                    null, null, null, null, null, null, null);
         } catch (ApiException e) {
             logger.error("Failed to start consent authorisation", e);
             throw new XS2AClientException(e);
@@ -156,8 +160,8 @@ public class XS2ABanking implements OnlineBankingService {
         Object response;
         try {
             response = ais.updateConsentsPsuData(consentId, authorisationId, UUID.randomUUID(), body, null, null, null,
-                    psuId, null, corporatePsuId, null, PS_UIP_ADDRESS, null, null, null, null, null, null, null, null,
-                    null);
+                                                 psuId, null, corporatePsuId, null, PSU_IP_ADDRESS, null, null, null, null, null, null, null, null,
+                                                 null);
         } catch (ApiException e) {
             logger.error("Failed to update consent authorisation", e);
             throw new XS2AClientException(e);
@@ -212,7 +216,7 @@ public class XS2ABanking implements OnlineBankingService {
         try {
             AccountList accountList = ais.getAccountList(UUID.randomUUID(), consentId, false,
                                                          null, null, null,
-                                                         null, PS_UIP_ADDRESS, null, null,
+                                                         null, PSU_IP_ADDRESS, null, null,
                                                          null, null,
                                                          null, null, null, null);
 
@@ -300,7 +304,7 @@ public class XS2ABanking implements OnlineBankingService {
                     SINGLE_PAYMENT_SERVICE,
                     paymentProduct,
                     xRequestId,
-                    PS_UIP_ADDRESS,
+                    PSU_IP_ADDRESS,
                     null, null, null, psuId, null, null,
                     null, null, null, null, null,
                     null, null, null, null, null,
@@ -372,7 +376,7 @@ public class XS2ABanking implements OnlineBankingService {
                                                                                                    null, null,
                                                                                                    null, psuId,
                                                                                                    null, corporateId,
-                                                                                                   null, PS_UIP_ADDRESS,
+                                                                                                   null, PSU_IP_ADDRESS,
                                                                                                    null, null,
                                                                                                    null, null,
                                                                                                    null, null,
@@ -388,7 +392,7 @@ public class XS2ABanking implements OnlineBankingService {
     private AuthorisationCodeResponse buildAuthorisationCodeResponse(Map<String, Object> updatePsuData, Xs2aTanSubmit tanSubmit) {
         AuthorisationCodeResponse response = new AuthorisationCodeResponse();
         response.setTanSubmit(tanSubmit);
-        Map<String,String> map = (Map<String, String>) updatePsuData.get(CHALLENGE);
+        Map<String, String> map = (Map<String, String>) updatePsuData.get(CHALLENGE);
         TanChallenge challenge = new TanChallenge();
         challenge.setData(map.get(CHALLENGE_DATA));
         challenge.setFormat(map.get(CHALLENGE_OTP_FORMAT));
@@ -414,45 +418,42 @@ public class XS2ABanking implements OnlineBankingService {
         Object response;
         try {
             response = ais.updateConsentsPsuData(consentId, authorisationId, UUID.randomUUID(), body, null, null, null,
-                    psuId, null, psuCorporateId, null, PS_UIP_ADDRESS, null, null, null, null, null, null, null, null,
-                    null);
+                                                 psuId, null, psuCorporateId, null, PSU_IP_ADDRESS, null, null, null, null, null, null, null, null,
+                                                 null);
         } catch (ApiException e) {
             logger.error("Failed to request authorization code", e);
             throw new XS2AClientException(e);
         }
 
         return buildAuthorisationCodeResponse((Map<String, Object>) response, new Xs2aTanSubmit(apiClient.getBasePath(),
-                consentId, authorisationId, psuId, psuCorporateId));
+                                                                                                consentId, authorisationId, psuId, psuCorporateId));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
         Xs2aTanSubmit tanSubmit = (Xs2aTanSubmit) submitPaymentRequest.getTanSubmit();
         String bankingUrl = tanSubmit.getBankingUrl();
         ApiClient apiClient = createApiClient(bankingUrl);
-        PaymentInitiationServicePisApi pis = createPaymentInitiationServicePisApi(apiClient);
 
-        String paymentId = tanSubmit.getTransactionId();
-        String authorisationId = tanSubmit.getAuthorisationId();
-        UUID xRequestId = UUID.randomUUID();
-
-        String tan = submitPaymentRequest.getTan();
-        TransactionAuthorisation transactionAuthorisation = new TransactionAuthorisation();
-        transactionAuthorisation.setScaAuthenticationData(tan);
-
-        String psuId = tanSubmit.getPsuId();
-        String psuCorporateId = tanSubmit.getPsuCorporateId();
-
+        UpdateRequestExecutor executor = createUpdateRequestExecutor(submitPaymentRequest);
+        XS2AUpdateRequest request = executor.buildRequest(submitPaymentRequest);
         try {
-            pis.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId, authorisationId,
-                    xRequestId, transactionAuthorisation, null, null, null, psuId, null, psuCorporateId, null,
-                    PS_UIP_ADDRESS, null, null, null, null, null, null, null, null, null);
+            return executor.execute(request, apiClient);
         } catch (ApiException e) {
             logger.error("Submit authorisation code failed", e);
             throw new XS2AClientException(e);
         }
+    }
 
-        return paymentId;
+    UpdateRequestExecutor createUpdateRequestExecutor(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+        UpdateRequestExecutor executor;
+        if (submitPaymentRequest.getSepaTransaction().getTransactionType() == DEDICATED_CONSENT) {
+            executor = new ConsentUpdateRequestExecutor();
+        } else {
+            executor = new PaymentUpdateRequestExecutor();
+        }
+        return executor;
     }
 
     @Override
@@ -469,8 +470,8 @@ public class XS2ABanking implements OnlineBankingService {
         ConsentsResponse201 response;
         try {
             response = ais.createConsent(UUID.randomUUID(), consents, null, null, null, bankAccess.getBankLogin(), null,
-                    bankAccess.getBankLogin2(), null, "false", null, null, null, PS_UIP_ADDRESS, null, null, null, null,
-                    null, null, null, null, null);
+                                         bankAccess.getBankLogin2(), null, "false", null, null, null, PSU_IP_ADDRESS, null, null, null, null,
+                                         null, null, null, null, null);
         } catch (ApiException e) {
             logger.error("Create consent failed", e);
             throw new XS2AClientException(e);
@@ -483,16 +484,16 @@ public class XS2ABanking implements OnlineBankingService {
         ConsentInformationResponse200Json consentInformation;
         try {
             consentInformation = ais.getConsentInformation(consentId, UUID.randomUUID(), null, null, null,
-                    PS_UIP_ADDRESS, null, null, null, null, null, null, null, null, null);
+                                                           PSU_IP_ADDRESS, null, null, null, null, null, null, null, null, null);
         } catch (ApiException e) {
             logger.error("Get consent failed", e);
             throw new XS2AClientException(e);
         }
 
         return CreateConsentResponse.builder()
-                .consentId(consentId)
-                .validUntil(consentInformation.getValidUntil())
-                .build();
+                       .consentId(consentId)
+                       .validUntil(consentInformation.getValidUntil())
+                       .build();
     }
 
     private Consents toConsents(CreateConsentRequest request) {
@@ -515,7 +516,7 @@ public class XS2ABanking implements OnlineBankingService {
 
     private List<AccountReference> toAccountReferences(List<domain.AccountReference> accounts) {
         ArrayList<AccountReference> accountReferences = new ArrayList<>();
-        for (domain.AccountReference account: accounts) {
+        for (domain.AccountReference account : accounts) {
             AccountReference accountReference = new AccountReference();
             accountReference.setIban(account.getIban());
             accountReference.setCurrency(account.getCurrency());
@@ -531,7 +532,7 @@ public class XS2ABanking implements OnlineBankingService {
 
         ConsentsResponse201 consent = ais.createConsent(
                 session, consents, null, null, null, bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(),
-                null, "false", null, null, null, PS_UIP_ADDRESS,
+                null, "false", null, null, null, PSU_IP_ADDRESS,
                 null,
                 null, null, null, null, null, null, null, null
         );
@@ -566,7 +567,7 @@ public class XS2ABanking implements OnlineBankingService {
 
         updatePsuResponse = (Map<String, Object>) ais.updateConsentsPsuData(
                 consent.getConsentId(), authorizationId, session, selectPsuAuthenticationMethod, null, null, null,
-                bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, PS_UIP_ADDRESS, null, null, null,
+                bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, PSU_IP_ADDRESS, null, null, null,
                 null, null, null, null, null,
                 null
         );
@@ -577,7 +578,7 @@ public class XS2ABanking implements OnlineBankingService {
 
         updatePsuResponse = (Map<String, Object>) ais.updateConsentsPsuData(
                 consent.getConsentId(), authorizationId, session, transactionAuthorisation, null, null, null,
-                bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, PS_UIP_ADDRESS, null, null, null,
+                bankAccess.getBankLogin(), null, bankAccess.getBankLogin2(), null, PSU_IP_ADDRESS, null, null, null,
                 null, null, null, null, null,
                 null
         );
