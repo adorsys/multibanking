@@ -169,8 +169,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest
-            loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         try {
             checkBankExists(loadBookingsRequest.getBankCode(), bankingUrl);
             return LoadBookingsJob.loadBookings(loadBookingsRequest);
@@ -210,7 +209,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest) {
+    public CreateConsentResponse createAccountInformationConsent(String bankingUrl,
+                                                                 CreateConsentRequest startScaRequest) {
         return null;
     }
 
@@ -248,6 +248,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             case STANDING_ORDER_DELETE:
                 return new DeleteStandingOrderJob();
             case TAN_REQUEST:
+            case DEDICATED_CONSENT:
                 return new EmptyJob();
             default:
                 throw new IllegalArgumentException("invalid transaction type " + transactionType);
