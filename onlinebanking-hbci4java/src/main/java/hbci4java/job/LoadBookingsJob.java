@@ -24,10 +24,7 @@ import hbci4java.model.HbciMapping;
 import hbci4java.model.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.kapott.hbci.GV.AbstractHBCIJob;
-import org.kapott.hbci.GV.GVDauerSEPAList;
-import org.kapott.hbci.GV.GVKUmsAll;
-import org.kapott.hbci.GV.GVSaldoReq;
+import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
@@ -98,7 +95,7 @@ public class LoadBookingsJob {
         ArrayList<Booking> bookingList = null;
         String raw = null;
         GVRKUms bookingsResult = (GVRKUms) bookingsJob.getJobResult();
-        if (loadBookingsRequest.isRaw()) {
+        if (loadBookingsRequest.getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
             bookingList = HbciMapping.createBookings(bookingsResult).stream()
@@ -137,7 +134,16 @@ public class LoadBookingsJob {
 
     private static AbstractHBCIJob createBookingsJob(HBCIDialog dialog, LoadBookingsRequest loadBookingsRequest,
                                                      Konto account) {
-        AbstractHBCIJob bookingsJob = new GVKUmsAll(dialog.getPassport());
+        AbstractHBCIJob bookingsJob = Optional.ofNullable(loadBookingsRequest.getRawResponseType())
+                .map(rawResponseType -> {
+                    if (rawResponseType == LoadBookingsRequest.RawResponseType.CAMT) {
+                        return new GVKUmsAllCamt(dialog.getPassport());
+                    } else {
+                        return new GVKUmsAll(dialog.getPassport());
+                    }
+                })
+                .orElseGet(() -> new GVKUmsAll(dialog.getPassport()));
+
         bookingsJob.setParam("my", account);
 
         Optional.ofNullable(loadBookingsRequest.getDateFrom())

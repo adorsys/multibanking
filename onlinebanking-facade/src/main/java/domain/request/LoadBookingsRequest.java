@@ -33,13 +33,17 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false)
 public class LoadBookingsRequest extends AbstractRequest {
 
+    public enum RawResponseType {
+        CAMT, MT940
+    }
+
     private BankApiUser bankApiUser;
     private BankAccount bankAccount;
     private BankAccess bankAccess;
     private String bankCode;
     private String pin;
 
-    private boolean raw;
+    private RawResponseType rawResponseType;
     private LocalDate dateFrom;
     private LocalDate dateTo;
 
