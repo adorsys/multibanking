@@ -333,7 +333,7 @@ public class FigoBanking implements OnlineBankingService {
         Status status = waitForFinish(session, taskToken);
 
         if (status != Status.OK && status != Status.TAN) {
-            throw new InvalidPinException();
+            throw new InvalidPinException(response.getMessage());
         }
         return response;
     }
@@ -404,7 +404,7 @@ public class FigoBanking implements OnlineBankingService {
 
         if (taskStatus.isErroneous()) {
             if (taskStatus.getError().getCode() == 10000 || taskStatus.getError().getCode() == 10001) {
-                throw new InvalidPinException();
+                throw new InvalidPinException(taskStatus.getError().getMessage());
             }
             throw new RuntimeException(taskStatus.getError().getMessage());
         }
