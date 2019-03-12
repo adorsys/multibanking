@@ -243,12 +243,14 @@ public class XS2ABanking implements OnlineBankingService {
 
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
         String resourceId = loadBookingsRequest.getBankAccount().getExternalIdMap().get(BankApi.XS2A);
+        LocalDate dateFrom = loadBookingsRequest.getDateFrom();
+        LocalDate dateTo = loadBookingsRequest.getDateTo();
         try {
             TransactionsResponse200Json transactionList = ais.getTransactionList(
                     resourceId, "booked", UUID.randomUUID(),
-                    consentId, null, null, null, null,
+                    consentId, dateFrom, dateTo, null, null,
                     null, null, null, null, null,
-                    "127.0.0.1", null, null, null,
+                    PSU_IP_ADDRESS, null, null, null,
                     null, null, null, null,
                     null);
 
