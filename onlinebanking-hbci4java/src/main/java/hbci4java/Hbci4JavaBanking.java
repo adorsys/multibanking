@@ -131,7 +131,14 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
-        return null;
+        try {
+            checkBankExists(paymentRequest.getBankCode(), bankingUrl);
+            TransferJob transferJob = new TransferJob();
+            transferJob.requestTransfer(paymentRequest);
+            return null;
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
     }
 
     @Override
