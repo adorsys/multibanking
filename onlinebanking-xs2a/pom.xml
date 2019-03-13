@@ -33,6 +33,10 @@
 			<groupId>de.adorsys.envutils</groupId>
 			<artifactId>envutils4j</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.iban4j</groupId>
+			<artifactId>iban4j</artifactId>
+		</dependency>
 
         <!-- test -->
         <dependency>
