@@ -26,28 +26,28 @@ public class BalancesReport {
     @ApiModelProperty(value = "Used balance")
     private Balance usedBalance;
 
-    public BalancesReport readyHbciBalance(Balance readyHbciBalance) {
-        this.readyBalance = readyHbciBalance;
+    public BalancesReport readyBalance(Balance readyBalance) {
+        this.readyBalance = readyBalance;
         return this;
     }
 
-    public BalancesReport unreadyHbciBalance(Balance unreadyHbciBalance) {
-        this.unreadyBalance = unreadyHbciBalance;
+    public BalancesReport unreadyBalance(Balance unreadyBalance) {
+        this.unreadyBalance = unreadyBalance;
         return this;
     }
 
-    public BalancesReport creditHbciBalance(Balance creditHbciBalance) {
-        this.creditBalance = creditHbciBalance;
+    public BalancesReport creditBalance(Balance creditBalance) {
+        this.creditBalance = creditBalance;
         return this;
     }
 
-    public BalancesReport availableHbciBalance(Balance availableHbciBalance) {
-        this.availableBalance = availableHbciBalance;
+    public BalancesReport availableBalance(Balance availableBalance) {
+        this.availableBalance = availableBalance;
         return this;
     }
 
-    public BalancesReport usedHbciBalance(Balance usedHbciBalance) {
-        this.usedBalance = usedHbciBalance;
+    public BalancesReport usedBalance(Balance usedBalance) {
+        this.usedBalance = usedBalance;
         return this;
     }
 }

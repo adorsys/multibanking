@@ -240,7 +240,7 @@ public class FigoBanking implements OnlineBankingService {
         try {
             Account account = figoSession.getAccount(accountId);
             AccountBalance accountBalance = account.getBalance();
-            return new BalancesReport().readyHbciBalance(Balance.builder().amount(accountBalance.getBalance()).build());
+            return new BalancesReport().readyBalance(Balance.builder().amount(accountBalance.getBalance()).build());
         } catch (IOException | FigoException e) {
             throw new RuntimeException(e);
         }

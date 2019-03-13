@@ -151,7 +151,7 @@ public class FinapiBanking implements OnlineBankingService {
                             .blz(bankAccess.getBankCode())
                             .type(BankAccountType.fromFinapiType(account.getAccountTypeId().intValue()))
                             .bankAccountBalance(new BalancesReport()
-                                    .readyHbciBalance(Balance.builder().amount(account.getBalance()).build())))
+                                    .readyBalance(Balance.builder().amount(account.getBalance()).build())))
                     .collect(Collectors.toList()))
                     .build();
         } catch (ApiException e) {
@@ -232,7 +232,7 @@ public class FinapiBanking implements OnlineBankingService {
             LOG.info("loaded [{}] bookings for account [{}]", bookingList.size(), bankAccount.getAccountNumber());
 
             return LoadBookingsResponse.builder()
-                    .bankAccountBalance(new BalancesReport().readyHbciBalance(Balance.builder().amount(account.getBalance()).build()))
+                    .bankAccountBalance(new BalancesReport().readyBalance(Balance.builder().amount(account.getBalance()).build()))
                     .bookings(bookingList)
                     .build();
         } catch (ApiException e) {
