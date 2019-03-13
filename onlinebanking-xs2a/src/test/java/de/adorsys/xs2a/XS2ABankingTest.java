@@ -506,8 +506,8 @@ public class XS2ABankingTest {
         assertThat(bankAccount.getAccountNumber()).isEqualTo(Iban.valueOf(IBAN).getAccountNumber());
         BalancesReport balances = bankAccount.getBalances();
 
-        checkReadyBalance(balances.getReadyHbciBalance());
-        checkReadyBalance(balances.getUnreadyHbciBalance());
+        checkReadyBalance(balances.getReadyBalance());
+        checkReadyBalance(balances.getUnreadyBalance());
     }
 
     @Test(expected = XS2AClientException.class)

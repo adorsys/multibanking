@@ -167,7 +167,7 @@ public class MockBanking implements OnlineBankingService {
                         BankAccount.class,
                         ba.getBankCode(),
                         iban);
-        return new BalancesReport().readyHbciBalance(account.getBalances().getReadyHbciBalance());
+        return new BalancesReport().readyHbciBalance(account.getBalances().getReadyBalance());
     }
 
     public RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {

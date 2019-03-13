@@ -318,10 +318,10 @@ public class XS2ABanking implements OnlineBankingService {
             BalanceType balanceType = balance.getBalanceType();
             switch (balanceType) {
                 case CLOSINGBOOKED:
-                    balancesReport.setReadyHbciBalance(toMultibankingBalance(balance));
+                    balancesReport.setReadyBalance(toMultibankingBalance(balance));
                     break;
                 case EXPECTED:
-                    balancesReport.setUnreadyHbciBalance(toMultibankingBalance(balance));
+                    balancesReport.setUnreadyBalance(toMultibankingBalance(balance));
                     break;
                 default:
                     logger.warn("Unexpected {} balance", balanceType);

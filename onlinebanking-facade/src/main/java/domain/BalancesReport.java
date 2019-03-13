@@ -12,42 +12,42 @@ import lombok.Data;
 public class BalancesReport {
 
     @ApiModelProperty(value = "Ready account balance")
-    private Balance readyHbciBalance;
+    private Balance readyBalance;
 
     @ApiModelProperty(value = "Unreleased account balance")
-    private Balance unreadyHbciBalance;
+    private Balance unreadyBalance;
 
     @ApiModelProperty(value = "Credit balance")
-    private Balance creditHbciBalance;
+    private Balance creditBalance;
 
     @ApiModelProperty(value = "Available balance")
-    private Balance availableHbciBalance;
+    private Balance availableBalance;
 
     @ApiModelProperty(value = "Used balance")
-    private Balance usedHbciBalance;
+    private Balance usedBalance;
 
     public BalancesReport readyHbciBalance(Balance readyHbciBalance) {
-        this.readyHbciBalance = readyHbciBalance;
+        this.readyBalance = readyHbciBalance;
         return this;
     }
 
     public BalancesReport unreadyHbciBalance(Balance unreadyHbciBalance) {
-        this.unreadyHbciBalance = unreadyHbciBalance;
+        this.unreadyBalance = unreadyHbciBalance;
         return this;
     }
 
     public BalancesReport creditHbciBalance(Balance creditHbciBalance) {
-        this.creditHbciBalance = creditHbciBalance;
+        this.creditBalance = creditHbciBalance;
         return this;
     }
 
     public BalancesReport availableHbciBalance(Balance availableHbciBalance) {
-        this.availableHbciBalance = availableHbciBalance;
+        this.availableBalance = availableHbciBalance;
         return this;
     }
 
     public BalancesReport usedHbciBalance(Balance usedHbciBalance) {
-        this.usedHbciBalance = usedHbciBalance;
+        this.usedBalance = usedHbciBalance;
         return this;
     }
 }
