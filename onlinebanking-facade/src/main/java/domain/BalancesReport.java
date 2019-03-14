@@ -12,42 +12,42 @@ import lombok.Data;
 public class BalancesReport {
 
     @ApiModelProperty(value = "Ready account balance")
-    private Balance readyHbciBalance;
+    private Balance readyBalance;
 
     @ApiModelProperty(value = "Unreleased account balance")
-    private Balance unreadyHbciBalance;
+    private Balance unreadyBalance;
 
     @ApiModelProperty(value = "Credit balance")
-    private Balance creditHbciBalance;
+    private Balance creditBalance;
 
     @ApiModelProperty(value = "Available balance")
-    private Balance availableHbciBalance;
+    private Balance availableBalance;
 
     @ApiModelProperty(value = "Used balance")
-    private Balance usedHbciBalance;
+    private Balance usedBalance;
 
-    public BalancesReport readyHbciBalance(Balance readyHbciBalance) {
-        this.readyHbciBalance = readyHbciBalance;
+    public BalancesReport readyBalance(Balance readyBalance) {
+        this.readyBalance = readyBalance;
         return this;
     }
 
-    public BalancesReport unreadyHbciBalance(Balance unreadyHbciBalance) {
-        this.unreadyHbciBalance = unreadyHbciBalance;
+    public BalancesReport unreadyBalance(Balance unreadyBalance) {
+        this.unreadyBalance = unreadyBalance;
         return this;
     }
 
-    public BalancesReport creditHbciBalance(Balance creditHbciBalance) {
-        this.creditHbciBalance = creditHbciBalance;
+    public BalancesReport creditBalance(Balance creditBalance) {
+        this.creditBalance = creditBalance;
         return this;
     }
 
-    public BalancesReport availableHbciBalance(Balance availableHbciBalance) {
-        this.availableHbciBalance = availableHbciBalance;
+    public BalancesReport availableBalance(Balance availableBalance) {
+        this.availableBalance = availableBalance;
         return this;
     }
 
-    public BalancesReport usedHbciBalance(Balance usedHbciBalance) {
-        this.usedHbciBalance = usedHbciBalance;
+    public BalancesReport usedBalance(Balance usedBalance) {
+        this.usedBalance = usedBalance;
         return this;
     }
 }

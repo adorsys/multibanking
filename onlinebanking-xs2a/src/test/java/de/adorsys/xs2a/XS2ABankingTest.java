@@ -2,25 +2,25 @@ package de.adorsys.xs2a;
 
 import de.adorsys.psd2.client.ApiClient;
 import de.adorsys.psd2.client.ApiException;
+import de.adorsys.psd2.client.api.AccountInformationServiceAisApi;
 import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.*;
+import de.adorsys.psd2.client.model.AccountReference;
+import de.adorsys.psd2.client.model.Balance;
 import de.adorsys.xs2a.error.XS2AClientException;
 import de.adorsys.xs2a.executor.ConsentUpdateRequestExecutor;
-import de.adorsys.xs2a.executor.ConsentUpdateRequestExecutorTest;
 import de.adorsys.xs2a.executor.PaymentUpdateRequestExecutor;
 import de.adorsys.xs2a.executor.UpdateRequestExecutor;
-import de.adorsys.xs2a.model.ConsentXS2AUpdateRequest;
 import de.adorsys.xs2a.model.XS2AUpdateRequest;
 import de.adorsys.xs2a.model.Xs2aTanSubmit;
 import domain.*;
-import domain.request.AuthenticatePsuRequest;
-import domain.request.LoadAccountInformationRequest;
-import domain.request.SubmitAuthorizationCodeRequest;
-import domain.request.TransactionRequest;
+import domain.request.*;
 import domain.response.AuthorisationCodeResponse;
 import domain.response.InitiatePaymentResponse;
 import domain.response.LoadAccountInformationResponse;
 import domain.response.ScaMethodsResponse;
+import org.iban4j.CountryCode;
+import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,10 +30,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 import static de.adorsys.xs2a.XS2ABanking.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,13 +46,14 @@ public class XS2ABankingTest {
     private static final String SCA_EXPLANATION_VALUE = "some explanation";
     private static final String SCA_METHOD_ID_VALUE = "111";
     private static final String BANKING_URL = "bankingUrl";
-    private static final String IBAN = "iban";
+    private static final String IBAN = Iban.random(CountryCode.DE).toString();
     private static final String AUTHORISATION_ID = "xs2a-authorisationId";
     private static final String PAYMENT_ID = "paymentId";
     private static final String PSU_ID = "login";
     private static final String CORPORATE_ID = "custId";
     private static final String PIN = "pin";
     public static final String TAN = "tan";
+    public static final String ACCOUNT_NUMBER = "accountNumber";
 
     private XS2ABanking xs2aBanking;
 
@@ -65,7 +64,12 @@ public class XS2ABankingTest {
     private PaymentInitiationServicePisApi paymentInitiationServicePisApi;
 
     @Mock
+    private AccountInformationServiceAisApi accountInformationServiceAisApi;
+
+    @Mock
     private UpdateRequestExecutor executor;
+    public static final String CONSENT_ID = "consentId";
+    public static final LocalDate REFERENCE_DATE = LocalDate.now();
 
     @Before
     public void setUp() {
@@ -79,6 +83,11 @@ public class XS2ABankingTest {
             @Override
             PaymentInitiationServicePisApi createPaymentInitiationServicePisApi(ApiClient apiClient) {
                 return paymentInitiationServicePisApi;
+            }
+
+            @Override
+            AccountInformationServiceAisApi createAccountInformationServiceAisApi(ApiClient apiClient) {
+                return accountInformationServiceAisApi;
             }
 
             @Override
@@ -471,5 +480,97 @@ public class XS2ABankingTest {
         tanSubmit.put("psuId", PSU_ID);
         tanSubmit.put("psuCorporateId", CORPORATE_ID);
         return tanSubmit;
+    }
+
+    @Test
+    public void loadBalances() throws ApiException {
+        when(accountInformationServiceAisApi.getBalances(eq(ACCOUNT_NUMBER), any(), eq(CONSENT_ID), isNull(), isNull(),
+                                                         isNull(), eq(PSU_IP_ADDRESS), isNull(),
+                                                         isNull(), isNull(), isNull(),
+                                                         isNull(), isNull(), isNull(),
+                                                         isNull(), isNull()))
+                .thenReturn(buildReadAccountBalanceResponse());
+
+        List<BankAccount> bankAccounts = xs2aBanking.loadBalances(BANKING_URL, buildLoadBalanceRequest());
+
+        verify(accountInformationServiceAisApi, times(1)).getBalances(eq(ACCOUNT_NUMBER), any(),
+                                                                      eq(CONSENT_ID), isNull(), isNull(),
+                                                                      isNull(), eq(PSU_IP_ADDRESS), isNull(),
+                                                                      isNull(), isNull(), isNull(),
+                                                                      isNull(), isNull(), isNull(),
+                                                                      isNull(), isNull());
+
+        assertThat(bankAccounts).hasSize(1);
+        BankAccount bankAccount = bankAccounts.get(0);
+        assertThat(bankAccount.getIban()).isEqualTo(IBAN);
+        assertThat(bankAccount.getAccountNumber()).isEqualTo(Iban.valueOf(IBAN).getAccountNumber());
+        BalancesReport balances = bankAccount.getBalances();
+
+        checkReadyBalance(balances.getReadyBalance());
+        checkReadyBalance(balances.getUnreadyBalance());
+    }
+
+    @Test(expected = XS2AClientException.class)
+    public void loadBalancesWithError() throws ApiException {
+        when(accountInformationServiceAisApi.getBalances(eq(ACCOUNT_NUMBER), any(), eq(CONSENT_ID), isNull(), isNull(),
+                                                         isNull(), eq(PSU_IP_ADDRESS), isNull(),
+                                                         isNull(), isNull(), isNull(),
+                                                         isNull(), isNull(), isNull(),
+                                                         isNull(), isNull()))
+                .thenThrow(ApiException.class);
+
+        xs2aBanking.loadBalances(BANKING_URL, buildLoadBalanceRequest());
+    }
+
+
+    @Test
+    public void loadBalancesBankAccountIsAbsent() {
+        LoadBalanceRequest request = LoadBalanceRequest.builder().bankAccounts(Collections.EMPTY_LIST).build();
+        List<BankAccount> bankAccounts = xs2aBanking.loadBalances(BANKING_URL, request);
+
+        assertThat(bankAccounts).isEmpty();
+    }
+
+    private void checkReadyBalance(domain.Balance balance) {
+        assertThat(balance.getAmount()).isEqualTo(new BigDecimal("123.321"));
+        assertThat(balance.getCurrency()).isEqualTo("EUR");
+        assertThat(balance.getDate()).isEqualTo(REFERENCE_DATE);
+    }
+
+    private LoadBalanceRequest buildLoadBalanceRequest() {
+        BankAccount account = new BankAccount();
+        account.setIban(IBAN);
+        account.setAccountNumber(ACCOUNT_NUMBER);
+        return LoadBalanceRequest.builder()
+                       .bankAccounts(Collections.singletonList(account))
+                       .bankApiUser(new Xs2aBankApiUser(CONSENT_ID))
+                       .build();
+    }
+
+    private ReadAccountBalanceResponse200 buildReadAccountBalanceResponse() {
+        ReadAccountBalanceResponse200 response = new ReadAccountBalanceResponse200();
+        BalanceList balances = new BalanceList();
+
+
+        AccountReference reference = new AccountReference();
+        reference.setIban(IBAN);
+
+        response.setAccount(reference);
+        response.setBalances(balances);
+        balances.add(createBalance(BalanceType.CLOSINGBOOKED));
+        balances.add(createBalance(BalanceType.EXPECTED));
+        balances.add(createBalance(BalanceType.OPENINGBOOKED));
+        return response;
+    }
+
+    private Balance createBalance(BalanceType type) {
+        Amount amount = new Amount();
+        amount.setAmount("123.321");
+        amount.setCurrency("EUR");
+        Balance balance1 = new Balance();
+        balance1.setBalanceType(type);
+        balance1.setReferenceDate(REFERENCE_DATE);
+        balance1.setBalanceAmount(amount);
+        return balance1;
     }
 }

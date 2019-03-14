@@ -30,7 +30,6 @@ import org.kapott.hbci.structures.Saldo;
 import org.kapott.hbci.structures.Value;
 import utils.Utils;
 
-import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,19 +49,19 @@ public final class HbciMapping {
             GVRSaldoReq.Info[] infos = gvSaldoReq.getEntries();
             if (infos.length > 0) {
                 if (infos[0] != null && infos[0].ready != null && infos[0].ready.value != null) {
-                    result.setReadyHbciBalance(createBalance(infos[0].ready));
+                    result.setReadyBalance(createBalance(infos[0].ready));
                 }
                 if (infos[0] != null && infos[0].available != null) {
-                    result.setAvailableHbciBalance(createBalance(infos[0].available));
+                    result.setAvailableBalance(createBalance(infos[0].available));
                 }
                 if (infos[0] != null && infos[0].kredit != null) {
-                    result.setCreditHbciBalance(createBalance(infos[0].kredit));
+                    result.setCreditBalance(createBalance(infos[0].kredit));
                 }
                 if (infos[0] != null && infos[0].unready != null && infos[0].unready.value != null) {
-                    result.setUnreadyHbciBalance(createBalance(infos[0].unready));
+                    result.setUnreadyBalance(createBalance(infos[0].unready));
                 }
                 if (infos[0] != null && infos[0].used != null) {
-                    result.setUsedHbciBalance(createBalance(infos[0].used));
+                    result.setUsedBalance(createBalance(infos[0].used));
                 }
             }
         }

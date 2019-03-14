@@ -58,7 +58,7 @@ public class FigoMapping {
                 .iban(account.getIBAN())
                 .type(BankAccountType.fromFigoType(account.getType()))
                 .bankAccountBalance(new BalancesReport()
-                        .readyHbciBalance(Balance.builder().amount(account.getBalance().getBalance()).build()));
+                        .readyBalance(Balance.builder().amount(account.getBalance().getBalance()).build()));
     }
 
     public static Booking mapBooking(Transaction transaction, BankApi bankApi) {

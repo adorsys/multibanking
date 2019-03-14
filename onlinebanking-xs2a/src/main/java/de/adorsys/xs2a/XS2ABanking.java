@@ -7,6 +7,7 @@ import de.adorsys.psd2.client.ApiException;
 import de.adorsys.psd2.client.api.AccountInformationServiceAisApi;
 import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.AccountReference;
+import de.adorsys.psd2.client.model.Balance;
 import de.adorsys.psd2.client.model.*;
 import de.adorsys.xs2a.error.XS2AClientException;
 import de.adorsys.xs2a.executor.ConsentUpdateRequestExecutor;
@@ -18,10 +19,12 @@ import domain.*;
 import domain.request.*;
 import domain.response.*;
 import org.apache.commons.lang3.StringUtils;
+import org.iban4j.Iban;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -237,9 +240,8 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
-        String consentId =
-                Optional.ofNullable(loadBookingsRequest.getBankApiUser().getProperties().get("consentId-" + loadBookingsRequest.getBankAccount().getIban()))
-                        .orElseThrow(() -> new MissingConsentException("missing consent for transactions request"));
+        String iban = loadBookingsRequest.getBankAccount().getIban();
+        String consentId = retrieveConsentId(loadBookingsRequest.getBankApiUser(), iban);
 
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
         String resourceId = loadBookingsRequest.getBankAccount().getExternalIdMap().get(BankApi.XS2A);
@@ -266,7 +268,84 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
-        return null;
+        List<BankAccount> bankAccounts = loadBalanceRequest.getBankAccounts();
+        if (bankAccounts.isEmpty()) {
+            return Collections.EMPTY_LIST;
+        }
+        if (bankAccounts.size() > 1) {
+            logger.warn("Only first bank account will be processed");
+        }
+        //todo: load balances for list of accounts
+        BankAccount account = bankAccounts.get(0);
+        String accountNumber = account.getAccountNumber();
+        UUID xRequestId = UUID.randomUUID();
+
+        String consentId = retrieveConsentId(loadBalanceRequest.getBankApiUser(), account.getIban());
+
+        AccountInformationServiceAisApi ais = createAccountInformationServiceAisApi(createApiClient(bankingUrl));
+
+        try {
+            ReadAccountBalanceResponse200 balances = ais.getBalances(accountNumber, xRequestId, consentId, null,
+                                                                     null, null,
+                                                                     PSU_IP_ADDRESS, null, null,
+                                                                     null, null,
+                                                                     null, null,
+                                                                     null, null, null);
+            return Collections.singletonList(convertToBankAccount(balances));
+        } catch (ApiException e) {
+            logger.error("Loading balances failed", e);
+            throw new XS2AClientException(e);
+        }
+    }
+
+    private String retrieveConsentId(BankApiUser bankApiUser, String iban) {
+        Optional<String> consent;
+        if (bankApiUser instanceof Xs2aBankApiUser) {
+            consent = Optional.ofNullable(((Xs2aBankApiUser) bankApiUser).getConsentId());
+        } else {
+            // deprecated version
+            consent = Optional.ofNullable(bankApiUser.getProperties().get("consentId-" + iban));
+        }
+        return consent.orElseThrow(() -> new MissingConsentException("missing consent for transactions request"));
+
+    }
+
+    private BankAccount convertToBankAccount(ReadAccountBalanceResponse200 balances) {
+        BankAccount bankAccount = toBankAccount(balances.getAccount());
+        BalancesReport balancesReport = bankAccount.getBalances();
+
+        for (Balance balance : balances.getBalances()) {
+            BalanceType balanceType = balance.getBalanceType();
+            switch (balanceType) {
+                case CLOSINGBOOKED:
+                    balancesReport.setReadyBalance(toMultibankingBalance(balance));
+                    break;
+                case EXPECTED:
+                    balancesReport.setUnreadyBalance(toMultibankingBalance(balance));
+                    break;
+                default:
+                    logger.warn("Unexpected {} balance", balanceType);
+            }
+        }
+
+        return bankAccount;
+    }
+
+    private static BankAccount toBankAccount(AccountReference reference) {
+        String iban = reference.getIban();
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setIban(iban);
+        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
+        bankAccount.setBalances(new BalancesReport());
+        return bankAccount;
+    }
+
+    private domain.Balance toMultibankingBalance(Balance balance) {
+        BigDecimal amount = new BigDecimal(balance.getBalanceAmount().getAmount());
+        String currency = balance.getBalanceAmount().getCurrency();
+        LocalDate referenceDate = balance.getReferenceDate();
+
+        return new domain.Balance(referenceDate, amount, currency);
     }
 
     @Override
