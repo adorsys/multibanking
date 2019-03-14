@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2018 adorsys GmbH & Co KG
+ * Copyright 2018-2019 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package hbci4java.job;
+package de.adorsys.hbci4java.job;
 
 import domain.*;
 import domain.request.LoadBookingsRequest;
 import domain.response.LoadBookingsResponse;
-import hbci4java.model.HbciDialogRequest;
-import hbci4java.model.HbciMapping;
-import hbci4java.model.HbciPassport;
+import de.adorsys.hbci4java.model.HbciDialogRequest;
+import de.adorsys.hbci4java.model.HbciMapping;
+import de.adorsys.hbci4java.model.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.*;
@@ -38,38 +38,38 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static hbci4java.job.AccountInformationJob.extractTanTransportTypes;
-import static hbci4java.model.HbciDialogFactory.createDialog;
+import static de.adorsys.hbci4java.job.AccountInformationJob.extractTanTransportTypes;
+import static de.adorsys.hbci4java.model.HbciDialogFactory.createDialog;
 
 @Slf4j
 public class LoadBookingsJob {
 
-    public static LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+    public static LoadBookingsResponse loadBookings(LoadBookingsRequest request) {
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
-                .bankCode(loadBookingsRequest.getBankCode() != null ? loadBookingsRequest.getBankCode() :
-                        loadBookingsRequest.getBankAccess().getBankCode())
-                .customerId(loadBookingsRequest.getBankAccess().getBankLogin())
-                .login(loadBookingsRequest.getBankAccess().getBankLogin2())
-                .hbciPassportState(loadBookingsRequest.getBankAccess().getHbciPassportState())
-                .pin(loadBookingsRequest.getPin())
+                .bankCode(request.getBankCode() != null ? request.getBankCode() :
+                        request.getBankAccess().getBankCode())
+                .customerId(request.getBankAccess().getBankLogin())
+                .login(request.getBankAccess().getBankLogin2())
+                .hbciPassportState(request.getBankAccess().getHbciPassportState())
+                .pin(request.getPin())
                 .build();
 
-        dialogRequest.setProduct(Optional.ofNullable(loadBookingsRequest.getProduct())
+        dialogRequest.setProduct(Optional.ofNullable(request.getProduct())
                 .map(product -> new Product(product.getName(), product.getVersion()))
                 .orElse(null));
-        dialogRequest.setBpd(loadBookingsRequest.getBpd());
+        dialogRequest.setBpd(request.getBpd());
 
         HBCIDialog dialog = createDialog(null, dialogRequest);
 
-        Konto account = createAccount(dialog, loadBookingsRequest.getBankAccount());
+        Konto account = createAccount(dialog, request.getBankAccount());
 
-        AbstractHBCIJob bookingsJob = createBookingsJob(dialog, loadBookingsRequest, account);
+        AbstractHBCIJob bookingsJob = createBookingsJob(dialog, request, account);
 
-        Optional<AbstractHBCIJob> balanceJob = loadBookingsRequest.isWithBalance() ?
+        Optional<AbstractHBCIJob> balanceJob = request.isWithBalance() ?
                 Optional.of(createBalanceJob(dialog, account)) :
                 Optional.empty();
 
-        Optional<AbstractHBCIJob> standingOrdersJob = loadBookingsRequest.isWithStandingOrders() ?
+        Optional<AbstractHBCIJob> standingOrdersJob = request.isWithStandingOrders() ?
                 Optional.of(createStandingOrdersJob(dialog, account)) :
                 Optional.empty();
 
@@ -95,7 +95,7 @@ public class LoadBookingsJob {
         ArrayList<Booking> bookingList = null;
         String raw = null;
         GVRKUms bookingsResult = (GVRKUms) bookingsJob.getJobResult();
-        if (loadBookingsRequest.getRawResponseType() != null) {
+        if (request.getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
             bookingList = HbciMapping.createBookings(bookingsResult).stream()
@@ -103,13 +103,10 @@ public class LoadBookingsJob {
                             () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
         }
 
-        if (loadBookingsRequest.isWithTanTransportTypes()) {
-            extractTanTransportTypes(dialog.getPassport()).ifPresent(tanTransportTypes -> {
-                if (loadBookingsRequest.getBankAccess().getTanTransportTypes() == null) {
-                    loadBookingsRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
-                }
-                loadBookingsRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI, tanTransportTypes);
-            });
+        if (request.isWithTanTransportTypes()) {
+            request.getBankAccess().setTanTransportTypes(new HashMap<>());
+            request.getBankAccess().getTanTransportTypes().put(BankApi.HBCI,
+                    extractTanTransportTypes(dialog.getPassport()));
         }
 
         return LoadBookingsResponse.builder()

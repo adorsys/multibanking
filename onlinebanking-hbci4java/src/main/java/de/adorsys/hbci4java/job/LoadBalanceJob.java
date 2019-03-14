@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2018 adorsys GmbH & Co KG
+ * Copyright 2018-2019 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package hbci4java.job;
+package de.adorsys.hbci4java.job;
 
+import de.adorsys.hbci4java.model.HbciDialogFactory;
+import de.adorsys.hbci4java.model.HbciDialogRequest;
+import de.adorsys.hbci4java.model.HbciMapping;
 import domain.BankAccount;
 import domain.Product;
 import domain.request.LoadBalanceRequest;
-import hbci4java.model.HbciDialogRequest;
-import hbci4java.model.HbciMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -33,8 +34,6 @@ import org.kapott.hbci.structures.Konto;
 
 import java.util.*;
 import java.util.stream.Stream;
-
-import static hbci4java.model.HbciDialogFactory.createDialog;
 
 @Slf4j
 public class LoadBalanceJob {
@@ -54,7 +53,7 @@ public class LoadBalanceJob {
                 .orElse(null));
         dialogRequest.setBpd(loadBalanceRequest.getBpd());
 
-        HBCIDialog dialog = createDialog(null, dialogRequest);
+        HBCIDialog dialog = HbciDialogFactory.createDialog(null, dialogRequest);
 
         Map<AbstractHBCIJob, BankAccount> jobs = new HashMap<>();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2018 adorsys GmbH & Co KG
+ * Copyright 2018-2019 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package hbci4java.model;
+package de.adorsys.hbci4java.model;
 
-import domain.TanChallenge;
-import domain.TanTransportType;
+import domain.request.AbstractRequest;
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-/**
- * Created by alexg on 16.11.17.
- */
 @Data
-public class HbciTanSubmit {
+@Builder
+@EqualsAndHashCode(callSuper = false)
+public class HbciDialogRequest extends AbstractRequest {
 
-    private String dialogId;
-    private long msgNum;
-    private String orderRef;
-    private String passportState;
-    private String originJobName;
-    private int originSegVersion;
-    private String sepaPain;
-    private TanTransportType tanTransportType;
+    private HbciCallback callback;
+    private String hbciPassportState;
+    private String bankCode;
+    private String customerId;
+    private String login;
+    private String pin;
 }

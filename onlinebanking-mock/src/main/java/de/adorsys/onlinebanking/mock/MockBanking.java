@@ -54,6 +54,10 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
+    public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
+    }
+
+    @Override
     public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }

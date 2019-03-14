@@ -399,6 +399,10 @@ public class XS2ABanking implements OnlineBankingService {
         }
     }
 
+    @Override
+    public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
+    }
+
     //todo: replace by mapper
     private PaymentInitiationSctJson convertToPaymentInitiation(TransactionRequest paymentRequest) {
         SinglePayment paymentBodyObj = (SinglePayment) paymentRequest.getTransaction();

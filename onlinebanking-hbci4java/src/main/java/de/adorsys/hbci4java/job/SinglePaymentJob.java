@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2018 adorsys GmbH & Co KG
+ * Copyright 2018-2019 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,50 +14,46 @@
  * limitations under the License.
  */
 
-package hbci4java.job;
+package de.adorsys.hbci4java.job;
 
 import domain.AbstractScaTransaction;
-import domain.BulkPayment;
-import domain.FutureBulkPayment;
+import domain.FutureSinglePayment;
 import domain.SinglePayment;
-import org.kapott.hbci.GV.*;
+import org.kapott.hbci.GV.AbstractSEPAGV;
+import org.kapott.hbci.GV.GVTermUebSEPA;
+import org.kapott.hbci.GV.GVUebSEPA;
 import org.kapott.hbci.GV_Result.GVRTermUeb;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-public class BulkPaymentJob extends ScaRequiredJob {
+public class SinglePaymentJob extends ScaRequiredJob {
 
     @Override
     protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
                                            String rawData) {
-        BulkPayment bulkPayment = (BulkPayment) transaction;
+        SinglePayment singlePayment = (SinglePayment) transaction;
 
         Konto src = getDebtorAccount(transaction, passport);
 
+        Konto dst = new Konto();
+        dst.name = singlePayment.getReceiver();
+        dst.iban = singlePayment.getReceiverIban();
+        dst.bic = singlePayment.getReceiverBic();
+
         AbstractSEPAGV sepagv;
-        if (bulkPayment instanceof FutureBulkPayment) {
-            sepagv = new GVTermMultiUebSEPA(passport, GVTermMultiUebSEPA.getLowlevelName(), rawData);
-            sepagv.setParam("date", ((FutureBulkPayment) bulkPayment).getExecutionDate().toString());
+        if (singlePayment instanceof FutureSinglePayment) {
+            sepagv = new GVTermUebSEPA(passport, GVTermUebSEPA.getLowlevelName(), rawData);
+            sepagv.setParam("date", ((FutureSinglePayment) singlePayment).getExecutionDate().toString());
         } else {
-            sepagv = new GVMultiUebSEPA(passport, GVUebSEPA.getLowlevelName(), rawData);
+            sepagv = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName(), rawData);
         }
 
         sepagv.setParam("src", src);
-
-        for (int i = 0; i < bulkPayment.getPayments().size(); i++) {
-            SinglePayment payment = bulkPayment.getPayments().get(i);
-
-            Konto dst = new Konto();
-            dst.name = payment.getReceiver();
-            dst.iban = payment.getReceiverIban();
-            dst.bic = payment.getReceiverBic();
-
-            sepagv.setParam("dst", i, dst);
-            sepagv.setParam("btg", i, new Value(payment.getAmount()));
-            sepagv.setParam("usage", i, payment.getPurpose());
-        }
+        sepagv.setParam("dst", dst);
+        sepagv.setParam("btg", new Value(singlePayment.getAmount()));
+        sepagv.setParam("usage", singlePayment.getPurpose());
 
         sepagv.verifyConstraints();
 
@@ -66,14 +62,15 @@ public class BulkPaymentJob extends ScaRequiredJob {
 
     @Override
     protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
-        if (paymentType == AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT) {
-            return "TermMultiUebSEPA";
+        if (paymentType == AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT) {
+            return GVTermUebSEPA.getLowlevelName();
         }
-        return "MultiUebSEPA";
+        return GVUebSEPA.getLowlevelName();
     }
 
     @Override
     protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
-        return paymentGV instanceof GVRTermUeb ? ((GVRTermUeb) paymentGV).getOrderId() : null;
+        return paymentGV instanceof GVRTermUeb ? ((GVRTermUeb) paymentGV).getOrderId() : null; // no order id for
+        // single payment
     }
 }

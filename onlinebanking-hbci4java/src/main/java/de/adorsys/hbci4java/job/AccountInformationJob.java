@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2018 adorsys GmbH & Co KG
+ * Copyright 2018-2019 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package hbci4java.job;
+package de.adorsys.hbci4java.job;
 
+import de.adorsys.hbci4java.model.*;
 import domain.BankAccount;
 import domain.BankApi;
 import domain.Product;
@@ -23,10 +24,10 @@ import domain.TanTransportType;
 import domain.request.LoadAccountInformationRequest;
 import domain.response.LoadAccountInformationResponse;
 import exception.HbciException;
-import hbci4java.model.HbciCallback;
-import hbci4java.model.HbciDialogRequest;
-import hbci4java.model.HbciMapping;
-import hbci4java.model.HbciPassport;
+import de.adorsys.hbci4java.model.HbciCallback;
+import de.adorsys.hbci4java.model.HbciDialogRequest;
+import de.adorsys.hbci4java.model.HbciMapping;
+import de.adorsys.hbci4java.model.HbciPassport;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVSEPAInfo;
 import org.kapott.hbci.GV.GVTANMediaList;
@@ -37,8 +38,6 @@ import org.kapott.hbci.structures.Konto;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static hbci4java.model.HbciDialogFactory.createDialog;
 
 @Slf4j
 public class AccountInformationJob {
@@ -61,7 +60,7 @@ public class AccountInformationJob {
                 .orElse(null));
         dialogRequest.setBpd(request.getBpd());
 
-        HBCIDialog dialog = createDialog(null, dialogRequest);
+        HBCIDialog dialog = HbciDialogFactory.createDialog(null, dialogRequest);
 
         if (!dialog.getPassport().jobSupported("SEPAInfo"))
             throw new RuntimeException("SEPAInfo job not supported");
@@ -93,12 +92,9 @@ public class AccountInformationJob {
         }
 
         if (request.isUpdateTanTransportTypes()) {
-            extractTanTransportTypes(dialog.getPassport()).ifPresent(tanTransportTypes -> {
-                if (request.getBankAccess().getTanTransportTypes() == null) {
-                    request.getBankAccess().setTanTransportTypes(new HashMap<>());
-                }
-                request.getBankAccess().getTanTransportTypes().put(BankApi.HBCI, tanTransportTypes);
-            });
+            request.getBankAccess().setTanTransportTypes(new HashMap<>());
+            request.getBankAccess().getTanTransportTypes().put(BankApi.HBCI,
+                    extractTanTransportTypes(dialog.getPassport()));
         }
 
         request.getBankAccess().setHbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
@@ -108,20 +104,19 @@ public class AccountInformationJob {
                 .build();
     }
 
-    public static Optional<List<TanTransportType>> extractTanTransportTypes(PinTanPassport hbciPassport) {
-        return Optional.ofNullable(hbciPassport.getUPD())
-                .map(upd -> hbciPassport.getUserTwostepMechanisms()
-                        .stream()
-                        .map(id -> hbciPassport.getBankTwostepMechanisms().get(id))
-                        .filter(Objects::nonNull)
-                        .map(hbciTwoStepMechanism -> TanTransportType.builder()
-                                .id(hbciTwoStepMechanism.getSecfunc())
-                                .name(hbciTwoStepMechanism.getName())
-                                .inputInfo(hbciTwoStepMechanism.getInputinfo())
-                                .medium(hbciPassport.getTanMedia(hbciTwoStepMechanism.getId()) != null ?
-                                        hbciPassport.getTanMedia(hbciTwoStepMechanism.getId()).mediaName : null)
-                                .build())
-                        .collect(Collectors.toList()));
+    public static List<TanTransportType> extractTanTransportTypes(PinTanPassport hbciPassport) {
+        return hbciPassport.getUserTwostepMechanisms()
+                .stream()
+                .map(id -> hbciPassport.getBankTwostepMechanisms().get(id))
+                .filter(Objects::nonNull)
+                .map(hbciTwoStepMechanism -> TanTransportType.builder()
+                        .id(hbciTwoStepMechanism.getSecfunc())
+                        .name(hbciTwoStepMechanism.getName())
+                        .inputInfo(hbciTwoStepMechanism.getInputinfo())
+                        .medium(hbciPassport.getTanMedia(hbciTwoStepMechanism.getId()) != null ?
+                                hbciPassport.getTanMedia(hbciTwoStepMechanism.getId()).mediaName : null)
+                        .build())
+                .collect(Collectors.toList());
 
     }
 }

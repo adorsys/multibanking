@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2018 adorsys GmbH & Co KG
+ * Copyright 2018-2019 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package hbci4java.job;
+package de.adorsys.hbci4java.job;
 
+import de.adorsys.hbci4java.model.HbciMapping;
 import domain.AbstractScaTransaction;
 import domain.StandingOrder;
-import hbci4java.model.HbciMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVDauerSEPANew;

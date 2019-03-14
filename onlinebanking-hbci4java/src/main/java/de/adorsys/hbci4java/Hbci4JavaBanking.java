@@ -1,19 +1,36 @@
-package hbci4java;
+/*
+ * Copyright 2018-2019 adorsys GmbH & Co KG
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.adorsys.hbci4java;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import de.adorsys.hbci4java.job.*;
+import de.adorsys.hbci4java.model.HbciCallback;
+import de.adorsys.hbci4java.model.HbciDialogFactory;
+import de.adorsys.hbci4java.model.HbciDialogRequest;
 import domain.*;
 import domain.request.*;
 import domain.response.*;
 import exception.InvalidPinException;
-import hbci4java.job.*;
-import hbci4java.model.HbciCallback;
-import hbci4java.model.HbciDialogFactory;
-import hbci4java.model.HbciDialogRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIDialog;
@@ -23,24 +40,37 @@ import spi.OnlineBankingService;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static de.adorsys.hbci4java.job.AccountInformationJob.extractTanTransportTypes;
 
 @Slf4j
 public class Hbci4JavaBanking implements OnlineBankingService {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private Map<String, Map<String, String>> bpdCache;
 
     public Hbci4JavaBanking() {
-        this(null);
+        this(null, false);
     }
 
-    public Hbci4JavaBanking(InputStream customBankConfigInput) {
+    public Hbci4JavaBanking(boolean cacheBpd) {
+        this(null, cacheBpd);
+    }
+
+    public Hbci4JavaBanking(InputStream customBankConfigInput, boolean cacheBpd) {
+        if (cacheBpd) {
+            bpdCache = new HashMap<>();
+        }
+
         try (InputStream inputStream = Optional.ofNullable(customBankConfigInput)
                 .orElseGet(this::getDefaultBanksInput)) {
             HBCIUtils.refreshBLZList(inputStream);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
 
         OBJECT_MAPPER.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
@@ -55,7 +85,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                     try {
                         return url.openStream();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        throw new IllegalStateException(e);
                     }
                 })
                 .orElseThrow(() -> new RuntimeException("blz.properties not exists in classpath"));
@@ -89,21 +119,27 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
-        BankAccess bankAccess = new BankAccess();
-        bankAccess.setBankCode(authenticatePsuRequest.getBankCode());
-        bankAccess.setBankLogin(authenticatePsuRequest.getLogin());
-        bankAccess.setBankLogin2(authenticatePsuRequest.getCustomerId());
-
-        LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
-                .bankAccess(bankAccess)
+        HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
+                .bankCode(authenticatePsuRequest.getBankCode())
+                .login(authenticatePsuRequest.getLogin())
+                .customerId(authenticatePsuRequest.getCustomerId())
                 .pin(authenticatePsuRequest.getPin())
-                .updateTanTransportTypes(true)
                 .build();
 
-        LoadAccountInformationResponse loadAccountInformationResponse = this.loadBankAccounts(bankingUrl, request);
+        Optional.ofNullable(bpdCache)
+                .ifPresent(cache -> dialogRequest.setCallback(new HbciCallback() {
+                    @Override
+                    public void status(int statusTag, Object o) {
+                        if (statusTag == HBCICallback.STATUS_INST_BPD_INIT_DONE) {
+                            cache.put(authenticatePsuRequest.getBankCode(), (Map<String, String>) o);
+                        }
+                    }
+                }));
+
+        HBCIDialog dialog = createDialog(null, dialogRequest);
 
         return ScaMethodsResponse.builder()
-                .tanTransportTypes(loadAccountInformationResponse.getBankAccess().getTanTransportTypes().get(BankApi.HBCI))
+                .tanTransportTypes(extractTanTransportTypes(dialog.getPassport()))
                 .build();
     }
 
@@ -116,8 +152,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
                                                            LoadAccountInformationRequest request,
                                                            HbciCallback callback) {
+        checkBankExists(request.getBankCode(), bankingUrl);
+        Optional.ofNullable(bpdCache)
+                .ifPresent(cache -> request.setBpd(cache.get(request.getBankCode())));
         try {
-            checkBankExists(request.getBankCode(), bankingUrl);
             return AccountInformationJob.loadBankAccounts(request, callback);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
@@ -131,11 +169,18 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
+        return null;
+    }
+
+    @Override
+    public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
+        checkBankExists(paymentRequest.getBankCode(), bankingUrl);
+        Optional.ofNullable(bpdCache)
+                .ifPresent(cache -> paymentRequest.setBpd(cache.get(paymentRequest.getBankCode())));
+
         try {
-            checkBankExists(paymentRequest.getBankCode(), bankingUrl);
             TransferJob transferJob = new TransferJob();
             transferJob.requestTransfer(paymentRequest);
-            return null;
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -144,8 +189,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl,
                                                               TransactionRequest transactionRequest) {
+        checkBankExists(transactionRequest.getBankCode(), bankingUrl);
+        Optional.ofNullable(bpdCache)
+                .ifPresent(cache -> transactionRequest.setBpd(cache.get(transactionRequest.getBankCode())));
         try {
-            checkBankExists(transactionRequest.getBankCode(), bankingUrl);
 
             ScaRequiredJob scaJob = Optional.ofNullable(transactionRequest.getTransaction())
                     .map(sepaTransaction -> createScaJob(sepaTransaction.getTransactionType()))
@@ -177,8 +224,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+        checkBankExists(loadBookingsRequest.getBankCode(), bankingUrl);
+        Optional.ofNullable(bpdCache)
+                .ifPresent(cache -> loadBookingsRequest.setBpd(cache.get(loadBookingsRequest.getBankCode())));
+
         try {
-            checkBankExists(loadBookingsRequest.getBankCode(), bankingUrl);
             return LoadBookingsJob.loadBookings(loadBookingsRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
@@ -187,8 +237,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
+        checkBankExists(loadBalanceRequest.getBankCode(), bankingUrl);
+        Optional.ofNullable(bpdCache)
+                .ifPresent(cache -> loadBalanceRequest.setBpd(cache.get(loadBalanceRequest.getBankCode())));
         try {
-            checkBankExists(loadBalanceRequest.getBankCode(), bankingUrl);
             return LoadBalanceJob.loadBalances(loadBalanceRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
@@ -196,8 +248,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     public HBCIDialog createDialog(String bankingUrl, HbciDialogRequest dialogRequest) {
+        checkBankExists(dialogRequest.getBankCode(), bankingUrl);
+        Optional.ofNullable(bpdCache)
+                .ifPresent(cache -> dialogRequest.setBpd(cache.get(dialogRequest.getBankCode())));
         try {
-            checkBankExists(dialogRequest.getBankCode(), bankingUrl);
             return HbciDialogFactory.createDialog(null, dialogRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
@@ -268,7 +322,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             processException = processException.getCause();
         }
 
-        if (processException.getCause() != null && processException.getCause() instanceof InvalidPinException) {
+        if (processException.getCause() instanceof InvalidPinException) {
             return (InvalidPinException) processException.getCause();
         }
 

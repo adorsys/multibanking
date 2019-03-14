@@ -1,4 +1,20 @@
-package hbci4java.job;
+/*
+ * Copyright 2018-2019 adorsys GmbH & Co KG
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.adorsys.hbci4java.job;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,10 +25,10 @@ import domain.request.SubmitAuthorizationCodeRequest;
 import domain.request.TransactionRequest;
 import domain.response.AuthorisationCodeResponse;
 import exception.HbciException;
-import hbci4java.model.HbciCallback;
-import hbci4java.model.HbciDialogRequest;
-import hbci4java.model.HbciPassport;
-import hbci4java.model.HbciTanSubmit;
+import de.adorsys.hbci4java.model.HbciCallback;
+import de.adorsys.hbci4java.model.HbciDialogRequest;
+import de.adorsys.hbci4java.model.HbciPassport;
+import de.adorsys.hbci4java.model.HbciTanSubmit;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
@@ -28,8 +44,8 @@ import org.kapott.hbci.structures.Konto;
 import java.util.List;
 import java.util.Optional;
 
-import static hbci4java.model.HbciDialogFactory.createDialog;
-import static hbci4java.model.HbciDialogFactory.createPassport;
+import static de.adorsys.hbci4java.model.HbciDialogFactory.createDialog;
+import static de.adorsys.hbci4java.model.HbciDialogFactory.createPassport;
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 public abstract class ScaRequiredJob {

@@ -37,6 +37,8 @@ public interface OnlineBankingService {
 
     InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest);
 
+    void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest);
+
     AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest);
 
     String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
