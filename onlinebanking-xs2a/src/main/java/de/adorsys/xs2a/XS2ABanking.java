@@ -76,13 +76,9 @@ public class XS2ABanking implements OnlineBankingService {
         consents.setRecurringIndicator(true);
 
         try {
-            BankApiUser bankApiUser = new BankApiUser();
+            String consentId = createConsent(bankingUrl, bankAccess, pin, consents).getConsentId();
+            BankApiUser bankApiUser = new Xs2aBankApiUser(consentId);
             bankApiUser.setApiUserId(bankAccess.getBankLogin());
-            bankApiUser.setBankApi(BankApi.XS2A);
-            bankApiUser.setProperties(new HashMap<>());
-            bankApiUser.getProperties().put("allAccountsConsentId",
-                                            createConsent(bankingUrl, bankAccess, pin, consents).getConsentId());
-
             return bankApiUser;
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -215,7 +211,7 @@ public class XS2ABanking implements OnlineBankingService {
                                                            LoadAccountInformationRequest loadAccountInformationRequest) {
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
 
-        String consentId = loadAccountInformationRequest.getBankApiUser().getProperties().get("allAccountsConsentId");
+        String consentId = retrieveConsentId(loadAccountInformationRequest.getBankApiUser(), null);
         try {
             AccountList accountList = ais.getAccountList(UUID.randomUUID(), consentId, false,
                                                          null, null, null,
@@ -277,7 +273,7 @@ public class XS2ABanking implements OnlineBankingService {
         }
         //todo: load balances for list of accounts
         BankAccount account = bankAccounts.get(0);
-        String accountNumber = account.getAccountNumber();
+        String accountId = account.getExternalIdMap().get(BankApi.XS2A);
         UUID xRequestId = UUID.randomUUID();
 
         String consentId = retrieveConsentId(loadBalanceRequest.getBankApiUser(), account.getIban());
@@ -285,7 +281,7 @@ public class XS2ABanking implements OnlineBankingService {
         AccountInformationServiceAisApi ais = createAccountInformationServiceAisApi(createApiClient(bankingUrl));
 
         try {
-            ReadAccountBalanceResponse200 balances = ais.getBalances(accountNumber, xRequestId, consentId, null,
+            ReadAccountBalanceResponse200 balances = ais.getBalances(accountId, xRequestId, consentId, null,
                                                                      null, null,
                                                                      PSU_IP_ADDRESS, null, null,
                                                                      null, null,

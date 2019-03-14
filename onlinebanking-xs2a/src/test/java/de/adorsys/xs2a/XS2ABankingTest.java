@@ -540,7 +540,7 @@ public class XS2ABankingTest {
     private LoadBalanceRequest buildLoadBalanceRequest() {
         BankAccount account = new BankAccount();
         account.setIban(IBAN);
-        account.setAccountNumber(ACCOUNT_NUMBER);
+        account.getExternalIdMap().put(domain.BankApi.XS2A, ACCOUNT_NUMBER);
         return LoadBalanceRequest.builder()
                        .bankAccounts(Collections.singletonList(account))
                        .bankApiUser(new Xs2aBankApiUser(CONSENT_ID))
