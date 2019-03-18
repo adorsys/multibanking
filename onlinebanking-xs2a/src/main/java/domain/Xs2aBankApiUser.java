@@ -21,10 +21,12 @@ import java.util.HashMap;
 public class Xs2aBankApiUser extends BankApiUser {
 
     public Xs2aBankApiUser(String consentId) {
+        this();
         setConsentId(consentId);
     }
 
     public Xs2aBankApiUser() {
+        setBankApi(BankApi.XS2A);
     }
 
     private static final String CONSENT_ID = "CONSENT_ID";
