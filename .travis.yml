@@ -28,6 +28,12 @@ deploy:
   -
     skip_cleanup: true
     provider: script
+    script: mvn sonar:sonar -Dsonar.host.url=$SONAR_HOST -Dsonar.login=$SONAR_TOKEN
+    on:
+      branch: develop
+  -
+    skip_cleanup: true
+    provider: script
     script: /bin/bash .travis/deploy.sh
     on:
       tags: true
