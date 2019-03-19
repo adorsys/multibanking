@@ -21,8 +21,6 @@ script:
   - /bin/bash .travis/build.sh
 
 before_deploy:
-  - gpg --delete-secret-key 5585BE3F
-  - gpg --delete-key 5585BE3F
   - echo $GPG_SECRET_KEY | base64 --decode | $GPG_EXECUTABLE --import
   - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
 
