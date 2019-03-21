@@ -24,7 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 
+import javax.net.ssl.SSLContext;
 import java.math.BigDecimal;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -613,6 +615,11 @@ public class XS2ABanking implements OnlineBankingService {
                 new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
         );
         client.setReadTimeout(600, TimeUnit.SECONDS);
+        try {
+            client.setSslSocketFactory(SSLContext.getDefault().getSocketFactory());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
         apiClient.setHttpClient(client);
         Optional.ofNullable(bankingUrl)
                 .ifPresent(url -> apiClient.setBasePath(url));
