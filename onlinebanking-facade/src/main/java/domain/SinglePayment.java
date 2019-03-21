@@ -19,6 +19,7 @@ public class SinglePayment extends AbstractScaTransaction {
     private String receiverAccountNumber;
     private String purpose;
     private BigDecimal amount;
+    private String currency;
 
     @Override
     public TransactionType getTransactionType() {

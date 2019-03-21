@@ -20,6 +20,7 @@ public class StandingOrder extends AbstractScaTransaction {
     private LocalDate firstExecutionDate;
     private LocalDate lastExecutionDate;
     private BigDecimal amount;
+    private String currency;
     private BankAccount otherAccount;
     private String usage;
     private boolean delete;

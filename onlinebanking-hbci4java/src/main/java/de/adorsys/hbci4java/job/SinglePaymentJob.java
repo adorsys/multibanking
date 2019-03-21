@@ -52,7 +52,7 @@ public class SinglePaymentJob extends ScaRequiredJob {
 
         sepagv.setParam("src", src);
         sepagv.setParam("dst", dst);
-        sepagv.setParam("btg", new Value(singlePayment.getAmount()));
+        sepagv.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
         sepagv.setParam("usage", singlePayment.getPurpose());
 
         sepagv.verifyConstraints();

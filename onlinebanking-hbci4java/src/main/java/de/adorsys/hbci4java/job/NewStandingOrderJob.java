@@ -46,7 +46,7 @@ public class NewStandingOrderJob extends ScaRequiredJob {
 
         gvDauerSEPANew.setParam("src", src);
         gvDauerSEPANew.setParam("dst", dst);
-        gvDauerSEPANew.setParam("btg", new Value(standingOrder.getAmount()));
+        gvDauerSEPANew.setParam("btg", new Value(standingOrder.getAmount(), standingOrder.getCurrency()));
         gvDauerSEPANew.setParam("usage", standingOrder.getUsage());
 
 

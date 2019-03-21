@@ -50,8 +50,9 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
         Query query = Query.query(Criteria.where("_id").is(id));
         query.fields().include("bankCode");
 
-        BankAccess found = mongoTemplate.findOne(query, BankAccessEntity.class);
-        return found != null ? found.getBankCode() : null;
+        return Optional.ofNullable(mongoTemplate.findOne(query, BankAccessEntity.class))
+                .map(BankAccess::getBankCode)
+                .orElse(null);
     }
 
     @Override

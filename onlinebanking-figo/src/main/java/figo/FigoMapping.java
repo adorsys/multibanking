@@ -108,7 +108,7 @@ public class FigoMapping {
         }
 
         figoPayment.setAmount(payment.getAmount());
-        figoPayment.setCurrency("EUR");
+        figoPayment.setCurrency(payment.getCurrency());
         figoPayment.setType(FIGO_TRANSFER.get(payment.getTransactionType()));
         figoPayment.setName(payment.getReceiver());
         figoPayment.setPurpose(payment.getPurpose());

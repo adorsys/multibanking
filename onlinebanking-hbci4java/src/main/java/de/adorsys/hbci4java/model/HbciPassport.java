@@ -42,6 +42,7 @@ public class HbciPassport extends PinTanPassport {
         super(hbciversion, properties, hbciCallback != null ? hbciCallback : new HbciCallback(), hbciProduct);
     }
 
+    @Override
     public HbciPassport clone() {
         HbciPassport passport = new HbciPassport(this.getHBCIVersion(), getProperties(), null, this.getHbciProduct());
         passport.setCountry(this.getCountry());
@@ -113,7 +114,7 @@ public class HbciPassport extends PinTanPassport {
             try {
                 return OBJECT_MAPPER.readValue(s, State.class);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         }
 
@@ -135,7 +136,7 @@ public class HbciPassport extends PinTanPassport {
             try {
                 return OBJECT_MAPPER.writeValueAsString(this);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         }
     }

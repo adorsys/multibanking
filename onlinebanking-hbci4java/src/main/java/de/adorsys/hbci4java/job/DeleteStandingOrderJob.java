@@ -45,7 +45,7 @@ public class DeleteStandingOrderJob extends ScaRequiredJob {
 
         gvDauerSEPADel.setParam("src", src);
         gvDauerSEPADel.setParam("dst", dst);
-        gvDauerSEPADel.setParam("btg", new Value(standingOrder.getAmount()));
+        gvDauerSEPADel.setParam("btg", new Value(standingOrder.getAmount(), standingOrder.getCurrency()));
         gvDauerSEPADel.setParam("usage", standingOrder.getUsage());
 
         gvDauerSEPADel.setParam("orderid", standingOrder.getOrderId());
