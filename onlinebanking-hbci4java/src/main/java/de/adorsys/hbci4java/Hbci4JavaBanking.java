@@ -136,7 +136,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                     }
                 }));
 
-        HBCIDialog dialog = createDialog(null, dialogRequest);
+        HBCIDialog dialog = createDialog(bankingUrl, dialogRequest);
 
         return ScaMethodsResponse.builder()
                 .tanTransportTypes(extractTanTransportTypes(dialog.getPassport()))
