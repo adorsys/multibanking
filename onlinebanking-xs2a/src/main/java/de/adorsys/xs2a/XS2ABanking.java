@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import spi.OnlineBankingService;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
@@ -49,6 +50,25 @@ public class XS2ABanking implements OnlineBankingService {
     static final String CHALLENGE_ADDITIONAL_INFORMATION = "additionalInformation";
     static final String CHALLENGE = "challengeData";
     private static final Logger logger = LoggerFactory.getLogger(XS2ABanking.class);
+    private SSLSocketFactory sslSocketFactory;
+
+    public XS2ABanking() {
+        this(defaultSslSocketFactory());
+    }
+
+    private static SSLSocketFactory defaultSslSocketFactory() {
+        SSLContext sslContext = null;
+        try {
+            sslContext = SSLContext.getDefault();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        return sslContext.getSocketFactory();
+    }
+
+    public XS2ABanking(SSLSocketFactory sslSocketFactory) {
+        this.sslSocketFactory = sslSocketFactory;
+    }
 
     private static BankAccount toBankAccount(AccountReference reference) {
         String iban = reference.getIban();
@@ -615,11 +635,7 @@ public class XS2ABanking implements OnlineBankingService {
                 new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
         );
         client.setReadTimeout(600, TimeUnit.SECONDS);
-        try {
-            client.setSslSocketFactory(SSLContext.getDefault().getSocketFactory());
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        client.setSslSocketFactory(sslSocketFactory);
         apiClient.setHttpClient(client);
         Optional.ofNullable(bankingUrl)
                 .ifPresent(url -> apiClient.setBasePath(url));
