@@ -18,7 +18,6 @@ package de.adorsys.xs2a.executor;
 
 import de.adorsys.psd2.client.ApiClient;
 import de.adorsys.psd2.client.ApiException;
-import de.adorsys.psd2.client.model.TransactionAuthorisation;
 import de.adorsys.xs2a.model.XS2AUpdateRequest;
 import domain.request.SubmitAuthorizationCodeRequest;
 

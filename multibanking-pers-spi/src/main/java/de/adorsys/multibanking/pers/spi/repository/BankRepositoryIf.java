@@ -1,7 +1,6 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
 import de.adorsys.multibanking.domain.BankEntity;
-import domain.Bank;
 
 import java.util.List;
 import java.util.Optional;

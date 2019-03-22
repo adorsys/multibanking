@@ -1,17 +1,12 @@
 package de.adorsys.multibanking.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.adorsys.multibanking.encrypt.Encrypted;
-import domain.BankAccess;
 import domain.Contract;
-import domain.Cycle;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;

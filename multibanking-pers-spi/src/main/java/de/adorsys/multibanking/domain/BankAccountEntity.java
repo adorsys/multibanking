@@ -11,8 +11,6 @@ import de.adorsys.multibanking.encrypt.Encrypted;
 import domain.BankAccount;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
  * Created by alexg on 07.02.17.
  */

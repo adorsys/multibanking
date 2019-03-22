@@ -17,7 +17,6 @@
 package domain.request;
 
 import domain.AbstractScaTransaction;
-import domain.TanTransportType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

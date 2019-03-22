@@ -16,7 +16,6 @@
 
 package de.adorsys.hbci4java.model;
 
-import domain.TanChallenge;
 import domain.TanTransportType;
 import lombok.Data;
 
