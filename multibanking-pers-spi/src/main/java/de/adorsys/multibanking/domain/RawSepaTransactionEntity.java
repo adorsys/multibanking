@@ -1,7 +1,6 @@
 package de.adorsys.multibanking.domain;
 
 import de.adorsys.multibanking.encrypt.Encrypted;
-import domain.RawSepaPayment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;

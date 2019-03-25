@@ -71,7 +71,8 @@ public class WebAuth {
                 submitLogin = pageLogin.getFirstByXPath("//input[@id='buttonlogin']");
             } else {
                 if (pageLoginUrl.toString().indexOf("wartung") == -1) {
-                    throw new Exception("Login-Formular kann aufgrund einer unbekannten Login-URL nicht gesetzt werden. Bitte informieren Sie den Entwickler");
+                    throw new Exception("Login-Formular kann aufgrund einer unbekannten Login-URL nicht gesetzt " +
+                            "werden. Bitte informieren Sie den Entwickler");
                 }
 
                 WebUtils.checkResponse(pageLoginXML, pageLogin, "Login");
@@ -79,10 +80,12 @@ public class WebAuth {
 
             if (submitLogin == null) {
                 LOG.trace("... bei der Seite mit dem Such-Button handelt es sich um diese im XML-Format: \n" + pageLogin.asXml());
-                throw new Exception("Fehler beim Setzen des Loginbutton (dieser ist NULL - Bitte den Entwickler im Forum informieren)");
+                throw new Exception("Fehler beim Setzen des Loginbutton (dieser ist NULL - Bitte den Entwickler im " +
+                        "Forum informieren)");
             }
         } catch (Exception var27) {
-            throw new Exception("Fehler beim Setzen des Login-Formulars oder der Felder (siehe Log - Bitte den Entwickler im Forum informieren)\nLog-Eintrag: " + ExceptionUtils.getStackTrace(var27));
+            throw new Exception("Fehler beim Setzen des Login-Formulars oder der Felder (siehe Log - Bitte den " +
+                    "Entwickler im Forum informieren)\nLog-Eintrag: " + ExceptionUtils.getStackTrace(var27));
         }
         return submitLogin;
     }
@@ -95,7 +98,6 @@ public class WebAuth {
         String postLoginXML = postLoginPage.asXml();
         WebUtils.checkResponse(postLoginXML, postLoginPage, "Login");
 
-
         if (postLoginPage == null) {
             throw new Exception("Die Login-Folgeseite konnte nicht aufgerufen werden!");
         }
@@ -107,7 +109,8 @@ public class WebAuth {
             LOG.debug("Somit wurde die neue Banking-Version geladen (muss mit JS)");
         } else {
             if (postLoginURL.toString().indexOf("/dkb") == -1) {
-                throw new Exception("Seite nach Login kann aufgrund einer unbekannten URL nicht auf Login-Formular hin geprüft werden. Bitte informieren Sie den Entwickler");
+                throw new Exception("Seite nach Login kann aufgrund einer unbekannten URL nicht auf Login-Formular " +
+                        "hin geprüft werden. Bitte informieren Sie den Entwickler");
             }
 
             LOG.debug("Somit wurde die alte Version geladen");
@@ -116,10 +119,10 @@ public class WebAuth {
         if (!postLoginXML.contains("class=\"anmeldung\"") && !postLoginXML.contains("id=\"login\"")) {
             return postLoginPage;
         } else {
-            throw new Exception("Die Loginseite wird trotz keinem bekannten Fehler noch immer angezeigt. Informieren Sie bitte den Entwickler im Forum");
+            throw new Exception("Die Loginseite wird trotz keinem bekannten Fehler noch immer angezeigt. Informieren " +
+                    "Sie bitte den Entwickler im Forum");
         }
     }
-
 
     public static void logout(WebClient syncWebClient) throws Exception {
         boolean isSelfException = false;
@@ -135,7 +138,8 @@ public class WebAuth {
                 LOG.debug("PostLogoutPage: " + postLogoutPage);
             } catch (Exception var21) {
                 isSelfException = true;
-                throw new Exception("Der Server antwortet nicht oder es existiert keine Internertverbindung (siehe Log)\nLog-Eintrag: " + ExceptionUtils.getStackTrace(var21));
+                throw new Exception("Der Server antwortet nicht oder es existiert keine Internertverbindung (siehe " +
+                        "Log)\nLog-Eintrag: " + ExceptionUtils.getStackTrace(var21));
             }
 
             postLogoutPageXML = postLogoutPage.asXml();

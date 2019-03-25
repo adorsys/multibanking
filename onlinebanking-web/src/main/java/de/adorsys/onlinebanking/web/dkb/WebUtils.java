@@ -18,29 +18,36 @@ public class WebUtils {
         String errorMessage = null;
 
         if (responseContentAsString.contains("PIN ändern")) {
-            errorMessage = "Es ist notwendig dass Sie Ihre Zugangs-PIN ändern. \n\nBitte melden Sie sich im Online-Baning an und folgen dort den Anweisungen.";
+            errorMessage = "Es ist notwendig dass Sie Ihre Zugangs-PIN ändern. \n\nBitte melden Sie sich im " +
+                    "Online-Baning an und folgen dort den Anweisungen.";
             errorMessage = StringUtils.shrinkString(errorMessage);
             throw new Exception(errorMessage);
-        } else if (!responseContentAsString.contains("Online-Sperre aufheben") && !responseContentAsString.contains("PIN-Sperre aufheben")) {
+        } else if (!responseContentAsString.contains("Online-Sperre aufheben") && !responseContentAsString.contains(
+                "PIN-Sperre aufheben")) {
             if (!responseContentAsString.contains("errorMessage") && !responseContentAsString.contains("remarkBox\">") && !responseContentAsString.contains("class=\"msg")) {
                 if (responseContentAsString.contains("wurden automatisch vom System abgemeldet")) {
                     throw new Exception("Die Sitzung wurde von der Bank beendet. Bitte melden Sie sich erneut an");
                 } else if ((!responseContentAsString.contains("Aus technischen Gründen") || !responseContentAsString.contains("leider nicht zur Verfügung")) && (!responseContentAsString.contains("us technischen Gr&uuml;nden") || !responseContentAsString.contains("leider nicht zur Verf&uuml;gung")) && (!responseContentAsString.contains("Achtung! Wichtiger Hinweis") || !responseContentAsString.contains("mit Hochdruck daran")) && (!responseContentAsString.contains("Wichtiger Hinweis") || !responseContentAsString.contains("Banking zurzeit leider nicht zur"))) {
-                    if (responseContentAsString.contains("Bitte melden Sie sich erneut mit Ihrer Kontonummer und Ihrer PIN an")) {
+                    if (responseContentAsString.contains("Bitte melden Sie sich erneut mit Ihrer Kontonummer und " +
+                            "Ihrer PIN an")) {
                         throw new Exception("Die Sitzung wurde von der Bank beendet. Bitte melden Sie sich erneut an");
                     } else if (responseContentAsString.contains("Beim Online-Banking ist ein Fehler aufgetreten") && responseContentAsString.contains("Ihre Session") && responseContentAsString.contains("beendet")) {
-                        throw new Exception("Beim Online-Banking ist ein Fehler aufgetreten. Ihre Session wurde möglicherweise aus Sicherheitsgründen beendet");
+                        throw new Exception("Beim Online-Banking ist ein Fehler aufgetreten. Ihre Session wurde " +
+                                "möglicherweise aus Sicherheitsgründen beendet");
                     } else if (!siteType.equals("Login")) {
                         if (!responseContentAsString.contains("class=\"anmeldung\"") && !responseContentAsString.contains("id=\"login\"")) {
                             return errorMessage;
                         } else {
-                            throw new Exception("Die Loginseite wird wieder angezeigt. Informieren Sie bitte den Entwickler im Forum");
+                            throw new Exception("Die Loginseite wird wieder angezeigt. Informieren Sie bitte den " +
+                                    "Entwickler im Forum");
                         }
                     } else {
                         return null;
                     }
                 } else {
-                    throw new Exception("Aus technischen Gründen steht das Internet-Banking zurzeit leider nicht zur Verfügung. Wir arbeiten mit Hochdruck daran, dass Sie sich in Kürze wieder einloggen können");
+                    throw new Exception("Aus technischen Gründen steht das Internet-Banking zurzeit leider nicht zur " +
+                            "Verfügung. Wir arbeiten mit Hochdruck daran, dass Sie sich in Kürze wieder einloggen " +
+                            "können");
                 }
             } else {
                 errorResponse = responsePage.getWebResponse().getContentAsString();
@@ -60,7 +67,8 @@ public class WebUtils {
                     return null;
                 } else if (!responseContentAsString.contains("class=\"msgwarning") && !responseContentAsString.contains("class=\"clearfix successBox remarkBox")) {
                     if (responseContentAsString.contains("remarkBox\">")) {
-                        if (siteType.equals("DataPage") && errorMessage.equals("Für den angegebenen Zeitraum sind keine Umsätze vorhanden.")) {
+                        if (siteType.equals("DataPage") && errorMessage.equals("Für den angegebenen Zeitraum sind " +
+                                "keine Umsätze vorhanden.")) {
                             return null;
                         } else if (siteType.equals("DataPageAfterSearch")) {
                             return null;
@@ -91,7 +99,8 @@ public class WebUtils {
                 }
             }
         } else {
-            errorMessage = "Ihr Zugang zum Online-Banking ist gesperrt. \n\nFür die Freischaltung melden Sie sich im Online-Banking an und folgen dort den Anweisungen.\n";
+            errorMessage = "Ihr Zugang zum Online-Banking ist gesperrt. \n\nFür die Freischaltung melden Sie sich im " +
+                    "Online-Banking an und folgen dort den Anweisungen.\n";
             errorMessage = StringUtils.shrinkString(errorMessage);
             throw new Exception(errorMessage);
         }
@@ -106,7 +115,8 @@ public class WebUtils {
             int ErrorTextIDXStart;
             if (!contentStringToParse.contains("errorMessage") && !contentStringToParse.contains("remarkBox\">")) {
                 if (!contentStringToParse.contains("class=\"msg")) {
-                    throw new Exception("Fehlernachrichten konnten nun doch nicht gefunden werden?! Somit kein auslesen möglich");
+                    throw new Exception("Fehlernachrichten konnten nun doch nicht gefunden werden?! Somit kein " +
+                            "auslesen möglich");
                 }
 
                 ErrorIDXstart = contentStringToParse.indexOf("class=\"msg");

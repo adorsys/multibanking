@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.domain;
 
-import domain.Bank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
@@ -25,7 +24,7 @@ public class BankEntity extends Bank {
     @Id
     private String id;
     private String blzHbci;
-    
+
     @Indexed
     private List<String> searchIndex;
 

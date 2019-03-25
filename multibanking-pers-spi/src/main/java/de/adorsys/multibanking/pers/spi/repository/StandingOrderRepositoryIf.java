@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
-import de.adorsys.multibanking.domain.ContractEntity;
 import de.adorsys.multibanking.domain.StandingOrderEntity;
 
 import java.util.List;

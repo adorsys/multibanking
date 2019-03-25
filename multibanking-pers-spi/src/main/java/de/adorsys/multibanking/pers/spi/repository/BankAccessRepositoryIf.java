@@ -1,9 +1,9 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
+import de.adorsys.multibanking.domain.BankAccessEntity;
+
 import java.util.List;
 import java.util.Optional;
-
-import de.adorsys.multibanking.domain.BankAccessEntity;
 
 /**
  * @author alexg on 07.02.17
@@ -17,7 +17,7 @@ public interface BankAccessRepositoryIf {
 
     List<BankAccessEntity> findByUserId(String userId);
 
-	BankAccessEntity save(BankAccessEntity bankAccess);
+    BankAccessEntity save(BankAccessEntity bankAccess);
 
     String getBankCode(String id);
 

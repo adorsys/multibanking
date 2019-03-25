@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.domain;
 
-import domain.Rule;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;

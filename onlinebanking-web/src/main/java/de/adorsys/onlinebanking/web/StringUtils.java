@@ -2,30 +2,15 @@ package de.adorsys.onlinebanking.web;
 
 import com.gargoylesoftware.htmlunit.html.HtmlRadioButtonInput;
 import com.opencsv.CSVReader;
-import de.adorsys.onlinebanking.web.dkb.WebAuth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -166,7 +151,8 @@ public class StringUtils {
         if (one == null && two == null) {
             return true;
         } else {
-            return (one != null || two == null) && (one == null || two != null) && one.size() == two.size() ? one.equals(two) : false;
+            return (one != null || two == null) && (one == null || two != null) && one.size() == two.size() ?
+                    one.equals(two) : false;
         }
     }
 
@@ -226,7 +212,8 @@ public class StringUtils {
 
                 for (int arrayrowcount = 0; arrayrowcount < matrixDataArray.size(); ++arrayrowcount) {
                     String[] nextLine = (String[]) matrixDataArray.get(arrayrowcount);
-                    LOG.trace("[WebSync:StringUtils] DataReader-NextLine Nr. " + arrayrowcount + " enthält das String-Array: " + Arrays.toString(nextLine));
+                    LOG.trace("[WebSync:StringUtils] DataReader-NextLine Nr. " + arrayrowcount + " enthält das " +
+                            "String-Array: " + Arrays.toString(nextLine));
                     matrixStringArray[arrayrowcount] = new String[nextLine.length];
 
                     for (int arraycolumncount = 0; arraycolumncount < nextLine.length; ++arraycolumncount) {
@@ -236,7 +223,8 @@ public class StringUtils {
 
                 datareader.close();
             } catch (Exception var13) {
-                LOG.debug("[WebSync:StringUtils] Fehler beim Zusammenfügen der Zeilen des Kontoabrufs in ein Matrix-Array: " + var13);
+                LOG.debug("[WebSync:StringUtils] Fehler beim Zusammenfügen der Zeilen des Kontoabrufs in ein " +
+                        "Matrix-Array: " + var13);
             }
         } catch (Exception var14) {
             LOG.debug("[WebSync:StringUtils] Allgemeiner Fehler beim Umwandeln des Kontoabrufs in ein Array: " + var14.getStackTrace().toString());
@@ -250,7 +238,8 @@ public class StringUtils {
         String urlRegex = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
         Pattern pattern = Pattern.compile(urlRegex, 2);
 
-        for (Matcher urlMatcher = pattern.matcher(text); urlMatcher.find(); containedUrl = text.substring(urlMatcher.start(0), urlMatcher.end(0))) {
+        for (Matcher urlMatcher = pattern.matcher(text); urlMatcher.find(); containedUrl =
+                text.substring(urlMatcher.start(0), urlMatcher.end(0))) {
             ;
         }
 

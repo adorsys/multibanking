@@ -11,6 +11,16 @@ import java.util.Date;
 @NoArgsConstructor
 public class KeyEntryAttributesEntity {
 
+    private String alias;
+    private Date createdAt;
+    private Date notBefore;
+    private Date notAfter;
+    private Date expireAt;
+    private Long validityInterval;
+    private Long legacyInterval;
+    private State state;
+    private KeyUsage keyUsage;
+
     public enum KeyUsage {
         Encryption,
         Signature,
@@ -23,18 +33,4 @@ public class KeyEntryAttributesEntity {
         LEGACY,
         EXPIRED;
     }
-
-    private String alias;
-
-    private Date createdAt;
-    private Date notBefore;
-    private Date notAfter;
-    private Date expireAt;
-
-    private Long validityInterval;
-    private Long legacyInterval;
-
-    private State state;
-
-    private KeyUsage keyUsage;
 }

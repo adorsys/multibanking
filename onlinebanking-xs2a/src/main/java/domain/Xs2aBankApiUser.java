@@ -16,9 +16,14 @@
 
 package domain;
 
+import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.BankApiUser;
+
 import java.util.HashMap;
 
 public class Xs2aBankApiUser extends BankApiUser {
+
+    private static final String CONSENT_ID = "CONSENT_ID";
 
     public Xs2aBankApiUser(String consentId) {
         this();
@@ -28,8 +33,6 @@ public class Xs2aBankApiUser extends BankApiUser {
     public Xs2aBankApiUser() {
         setBankApi(BankApi.XS2A);
     }
-
-    private static final String CONSENT_ID = "CONSENT_ID";
 
     public String getConsentId() {
         return getProperties().get(CONSENT_ID);

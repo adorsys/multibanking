@@ -1,10 +1,8 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
-import de.adorsys.multibanking.domain.AccountAnalyticsEntity;
 import de.adorsys.multibanking.domain.ContractEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author alexg on 04.09.17

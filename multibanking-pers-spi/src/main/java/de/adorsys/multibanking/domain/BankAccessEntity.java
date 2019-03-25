@@ -2,7 +2,6 @@ package de.adorsys.multibanking.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import de.adorsys.multibanking.encrypt.Encrypted;
-import domain.BankAccess;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;

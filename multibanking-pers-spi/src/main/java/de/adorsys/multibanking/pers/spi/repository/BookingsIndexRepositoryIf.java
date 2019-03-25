@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
-import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.BookingsIndexEntity;
 
 import java.util.List;

@@ -16,6 +16,8 @@
 
 package domain;
 
+import de.adorsys.multibanking.domain.AbstractScaTransaction;
+
 public class DedicatedAccountInformationConsent extends AbstractScaTransaction {
 
     public DedicatedAccountInformationConsent() {

@@ -1,6 +1,5 @@
 package de.adorsys.onlinebanking.web;
 
-import domain.*;
 import spi.OnlineBankingService;
 
 import java.util.List;
@@ -35,7 +34,8 @@ public class ScreenScrappingBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, String pin, boolean storePin) {
+    public List<BankAccount> loadBankAccounts(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode,
+                                              String pin, boolean storePin) {
         return null;
     }
 
@@ -45,7 +45,8 @@ public class ScreenScrappingBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin) {
+    public LoadBookingsResponse loadBookings(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode,
+                                             BankAccount bankAccount, String pin) {
         return null;
     }
 
@@ -60,7 +61,8 @@ public class ScreenScrappingBanking implements OnlineBankingService {
     }
 
     @Override
-    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode, BankAccount bankAccount, String pin, Payment payment) {
+    public void createPayment(BankApiUser bankApiUser, BankAccess bankAccess, String bankCode,
+                              BankAccount bankAccount, String pin, Payment payment) {
 
     }
 

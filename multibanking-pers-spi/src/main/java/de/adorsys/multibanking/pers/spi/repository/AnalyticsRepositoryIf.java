@@ -1,9 +1,9 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
+import de.adorsys.multibanking.domain.AccountAnalyticsEntity;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
-
-import de.adorsys.multibanking.domain.AccountAnalyticsEntity;
 
 /**
  * @author alexg on 07.02.17
@@ -15,7 +15,7 @@ public interface AnalyticsRepositoryIf {
 
     Optional<LocalDateTime> findLastAnalyticsDateByUserIdAndAccountId(String userId, String bankAccountId);
 
-	void save(AccountAnalyticsEntity accountAnalyticsEntity);
+    void save(AccountAnalyticsEntity accountAnalyticsEntity);
 
     void deleteByAccountId(String id);
 }

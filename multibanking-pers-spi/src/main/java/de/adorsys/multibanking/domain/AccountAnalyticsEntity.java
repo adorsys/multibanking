@@ -1,7 +1,6 @@
 package de.adorsys.multibanking.domain;
 
 import de.adorsys.multibanking.encrypt.Encrypted;
-import domain.BookingGroup;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;

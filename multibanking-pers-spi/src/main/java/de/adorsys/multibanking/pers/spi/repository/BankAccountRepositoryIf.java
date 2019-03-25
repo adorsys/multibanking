@@ -1,10 +1,10 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.BankAccountEntity;
+
 import java.util.List;
 import java.util.Optional;
-
-import de.adorsys.multibanking.domain.BankAccountEntity;
-import domain.BankAccount;
 
 /**
  * @author alexg on 07.02.17
@@ -12,23 +12,23 @@ import domain.BankAccount;
  */
 public interface BankAccountRepositoryIf {
 
-	List<BankAccountEntity> findByUserId(String userId);
+    List<BankAccountEntity> findByUserId(String userId);
 
     List<BankAccountEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId);
 
     Optional<BankAccountEntity> findByUserIdAndId(String userId, String id);
 
-	boolean exists(String accountId);
+    boolean exists(String accountId);
 
-	void save(List<BankAccountEntity> bankAccounts);
+    void save(List<BankAccountEntity> bankAccounts);
 
-	void save(BankAccountEntity bankAccount);
+    void save(BankAccountEntity bankAccount);
 
-	BankAccount.SyncStatus getSyncStatus(String accountId);
+    BankAccount.SyncStatus getSyncStatus(String accountId);
 
-	void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus);
+    void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus);
 
     List<BankAccountEntity> deleteByBankAccess(String accessId);
 
-	Optional<BankAccountEntity> findOne(String accountId);
+    Optional<BankAccountEntity> findOne(String accountId);
 }
