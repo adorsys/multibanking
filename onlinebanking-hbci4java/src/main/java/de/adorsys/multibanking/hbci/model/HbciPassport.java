@@ -28,7 +28,6 @@ import org.kapott.hbci.passport.PinTanPassport;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +64,6 @@ public class HbciPassport extends PinTanPassport {
         private String host;
         private int port;
         private String sysId;
-        private HashMap<String, String> upd;
 
         private List<String> allowedTwostepMechanisms;
         private List<GVRTANMediaList.TANMediaInfo> tanMedias;
@@ -85,7 +83,6 @@ public class HbciPassport extends PinTanPassport {
             hbciVersion = passport.getHBCIVersion();
             customerId = passport.getCustomerId();
             allowedTwostepMechanisms = passport.getUserTwostepMechanisms();
-            upd = (HashMap<String, String>) passport.getUPD();
             tanMedias = passport.getTanMedias();
             currentSecMechInfo = passport.getCurrentSecMechInfo();
             hbciProduct = passport.getHbciProduct();
@@ -105,7 +102,6 @@ public class HbciPassport extends PinTanPassport {
             passport.setPort(port);
             passport.setUserId(userId);
             passport.setSysId(sysId);
-            passport.setUPD(upd == null ? null : (Map<String, String>) upd.clone());
             passport.setCustomerId(customerId);
             passport.setUserTwostepMechanisms(new ArrayList<>(allowedTwostepMechanisms));
             passport.setTanMedias(tanMedias);
