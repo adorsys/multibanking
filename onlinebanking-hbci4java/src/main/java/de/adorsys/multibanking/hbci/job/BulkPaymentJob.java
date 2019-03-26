@@ -44,7 +44,7 @@ public class BulkPaymentJob extends ScaRequiredJob {
             sepagv = new GVTermMultiUebSEPA(passport, GVTermMultiUebSEPA.getLowlevelName(), rawData);
             sepagv.setParam("date", ((FutureBulkPayment) bulkPayment).getExecutionDate().toString());
         } else {
-            sepagv = new GVMultiUebSEPA(passport, GVUebSEPA.getLowlevelName(), rawData);
+            sepagv = new GVMultiUebSEPA(passport, GVMultiUebSEPA.getLowlevelName(), rawData);
         }
 
         sepagv.setParam("src", src);
