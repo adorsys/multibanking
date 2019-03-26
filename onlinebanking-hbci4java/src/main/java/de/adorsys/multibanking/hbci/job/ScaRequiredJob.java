@@ -131,6 +131,7 @@ public abstract class ScaRequiredJob {
         hbciTanSubmit.setTwoStepMechanism(hbciTwoStepMechanism);
         Optional.ofNullable(hbciJob)
                 .ifPresent(abstractSEPAGV -> {
+                    hbciTanSubmit.setOriginLowLevelName(abstractSEPAGV.getJobName());
                     hbciTanSubmit.setOriginSegVersion(abstractSEPAGV.getSegVersion());
                     hbciTanSubmit.setHbciJobName(abstractSEPAGV.getHBCICode());
                 });
@@ -245,7 +246,7 @@ public abstract class ScaRequiredJob {
     private HbciPassport createPassport(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest,
                                         HbciTanSubmit hbciTanSubmit) {
         Map<String, String> bpd = new HashMap<>();
-        bpd.put("Params." + hbciTanSubmit.getOriginJobName() + "Par" + hbciTanSubmit.getOriginSegVersion() +
+        bpd.put("Params." + hbciTanSubmit.getOriginLowLevelName() + "Par" + hbciTanSubmit.getOriginSegVersion() +
                 ".SegHead.code", hbciTanSubmit.getHbciJobName());
         bpd.put("Params.TAN2StepPar" + hbciTanSubmit.getTwoStepMechanism().getSegversion() + ".SegHead.code", "HKTAN");
         bpd.put("BPA.numgva", "100"); //dummy value

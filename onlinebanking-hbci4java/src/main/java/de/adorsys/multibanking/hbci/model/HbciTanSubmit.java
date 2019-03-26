@@ -30,9 +30,10 @@ public class HbciTanSubmit {
     private long msgNum;
     private String orderRef;
     private String passportState;
-    private String hbciJobName;
-    private String originJobName;
-    private int originSegVersion;
+    private String hbciJobName; //eg. HKCCS
+    private String originJobName; //"org.kapott.hbci.GV.GV" + jobname
+    private String originLowLevelName; //key for hbci-300.xml
+    private int originSegVersion; //segment version
     private String sepaPain;
     private HBCITwoStepMechanism twoStepMechanism;
 }
