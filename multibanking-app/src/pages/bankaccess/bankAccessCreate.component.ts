@@ -25,7 +25,8 @@ export class BankAccessCreatePage {
     storePin: true,
     storeBookings: true,
     categorizeBookings: true,
-    storeAnalytics: true
+    storeAnalytics: true,
+    provideDataForMachineLearning: false
   };
   parent;
 

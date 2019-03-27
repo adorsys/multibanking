@@ -40,6 +40,7 @@ export interface BankAccess {
     storeAnonymizedBookings?: boolean;
     storeBookings?: boolean;
     storePin?: boolean;
+    provideDataForMachineLearning?: boolean;
     /**
      * Supported tan transport types
      */
