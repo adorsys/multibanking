@@ -21,9 +21,9 @@ import de.adorsys.psd2.client.model.Amount;
 import de.adorsys.psd2.client.model.BulkPaymentInitiationSctJson;
 import de.adorsys.psd2.client.model.PaymentInitiationSctBulkElementJson;
 import de.adorsys.xs2a.pis.PaymentInitiationBodyBuilder;
-import domain.AbstractScaTransaction;
-import domain.BulkPayment;
-import domain.SinglePayment;
+import de.adorsys.multibanking.domain.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.BulkPayment;
+import de.adorsys.multibanking.domain.SinglePayment;
 
 import java.util.ArrayList;
 

@@ -19,6 +19,7 @@ import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.AccountReference;
 import de.adorsys.psd2.client.model.Balance;
 import de.adorsys.psd2.client.model.*;
+import de.adorsys.xs2a.pis.PaymentProductType;
 import domain.Xs2aBankApiUser;
 import org.iban4j.CountryCode;
 import org.iban4j.Iban;
@@ -233,6 +234,7 @@ public class XS2ABankingTest {
         BankAccess bankAccess = new BankAccess();
         bankAccess.setBankLogin(PSU_ID);
         transaction.setDebtorBankAccount(bankAccount);
+        transaction.setProduct(PaymentProductType.SEPA_CREDIT_TRANSFERS.getType());
         transaction.setAmount(new BigDecimal(1));
         TransactionRequest request =
                 TransactionRequest.builder().bankAccess(bankAccess).authorisationId(AUTHORISATION_ID).pin(PIN).transaction(transaction).build();
@@ -291,6 +293,7 @@ public class XS2ABankingTest {
         bankAccess.setBankLogin(PSU_ID);
         transaction.setDebtorBankAccount(bankAccount);
         transaction.setAmount(new BigDecimal(1));
+        transaction.setProduct(PaymentProductType.SEPA_CREDIT_TRANSFERS.getType());
         TransactionRequest request =
                 TransactionRequest.builder().bankAccess(bankAccess).authorisationId(AUTHORISATION_ID).pin(PIN).transaction(transaction).build();
         ArgumentCaptor<PaymentInitiationSctJson> initiation = ArgumentCaptor.forClass(PaymentInitiationSctJson.class);

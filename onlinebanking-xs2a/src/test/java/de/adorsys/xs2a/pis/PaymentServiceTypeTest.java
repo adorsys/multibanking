@@ -1,10 +1,10 @@
 package de.adorsys.xs2a.pis;
 
-import de.adorsys.xs2a.error.XS2AClientException;
-import domain.BulkPayment;
-import domain.FutureBulkPayment;
-import domain.FutureSinglePayment;
-import domain.SinglePayment;
+import de.adorsys.multibanking.xs2a.error.XS2AClientException;
+import de.adorsys.multibanking.domain.BulkPayment;
+import de.adorsys.multibanking.domain.FutureBulkPayment;
+import de.adorsys.multibanking.domain.FutureSinglePayment;
+import de.adorsys.multibanking.domain.SinglePayment;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

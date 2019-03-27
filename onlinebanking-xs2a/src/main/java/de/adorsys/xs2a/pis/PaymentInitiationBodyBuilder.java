@@ -16,7 +16,7 @@
 
 package de.adorsys.xs2a.pis;
 
-import domain.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.AbstractScaTransaction;
 
 public interface PaymentInitiationBodyBuilder<T> {
 

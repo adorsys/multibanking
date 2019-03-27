@@ -16,7 +16,7 @@
 
 package de.adorsys.xs2a.pis;
 
-import de.adorsys.xs2a.error.XS2AClientException;
+import de.adorsys.multibanking.xs2a.error.XS2AClientException;
 
 import java.util.Arrays;
 

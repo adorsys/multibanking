@@ -16,11 +16,11 @@
 
 package de.adorsys.xs2a.pis;
 
-import de.adorsys.xs2a.error.XS2AClientException;
-import domain.AbstractScaTransaction;
-import domain.BulkPayment;
-import domain.FutureSinglePayment;
-import domain.SinglePayment;
+import de.adorsys.multibanking.xs2a.error.XS2AClientException;
+import de.adorsys.multibanking.domain.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.BulkPayment;
+import de.adorsys.multibanking.domain.FutureSinglePayment;
+import de.adorsys.multibanking.domain.SinglePayment;
 
 import java.util.Arrays;
 

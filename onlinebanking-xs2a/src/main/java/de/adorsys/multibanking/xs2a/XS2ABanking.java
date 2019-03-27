@@ -19,19 +19,11 @@ import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.AccountReference;
 import de.adorsys.psd2.client.model.Balance;
 import de.adorsys.psd2.client.model.*;
-import de.adorsys.xs2a.error.XS2AClientException;
-import de.adorsys.xs2a.executor.ConsentUpdateRequestExecutor;
-import de.adorsys.xs2a.executor.PaymentUpdateRequestExecutor;
-import de.adorsys.xs2a.executor.UpdateRequestExecutor;
-import de.adorsys.xs2a.model.XS2AUpdateRequest;
-import de.adorsys.xs2a.model.Xs2aTanSubmit;
 import de.adorsys.xs2a.pis.PaymentInitiationBuilderStrategy;
 import de.adorsys.xs2a.pis.PaymentInitiationBuilderStrategyImpl;
 import de.adorsys.xs2a.pis.PaymentProductType;
 import de.adorsys.xs2a.pis.PaymentServiceType;
-import domain.*;
-import domain.request.*;
-import domain.response.*;
+import domain.Xs2aBankApiUser;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
 import org.slf4j.Logger;
@@ -46,7 +38,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static domain.AbstractScaTransaction.TransactionType.DEDICATED_CONSENT;
+import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.DEDICATED_CONSENT;
 
 public class XS2ABanking implements OnlineBankingService {
 
@@ -450,16 +442,16 @@ public class XS2ABanking implements OnlineBankingService {
         try {
             Map<String, Object> updatePsuData =
                     (Map<String, Object>) service.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS,
-                            paymentId, authorisationId,
-                            xRequestId, body,
-                            null, null,
-                            null, psuId,
-                            null, corporateId,
-                            null, PSU_IP_ADDRESS,
-                            null, null,
-                            null, null,
-                            null, null,
-                            null, null, null);
+                                                                       paymentId, authorisationId,
+                                                                       xRequestId, body,
+                                                                       null, null,
+                                                                       null, psuId,
+                                                                       null, corporateId,
+                                                                       null, PSU_IP_ADDRESS,
+                                                                       null, null,
+                                                                       null, null,
+                                                                       null, null,
+                                                                       null, null, null);
 
             return buildAuthorisationCodeResponse(updatePsuData, tanSubmit);
         } catch (ApiException e) {

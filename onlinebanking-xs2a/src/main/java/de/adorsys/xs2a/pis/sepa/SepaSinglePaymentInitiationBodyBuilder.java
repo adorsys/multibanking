@@ -20,8 +20,8 @@ import de.adorsys.psd2.client.model.AccountReference;
 import de.adorsys.psd2.client.model.Amount;
 import de.adorsys.psd2.client.model.PaymentInitiationSctJson;
 import de.adorsys.xs2a.pis.PaymentInitiationBodyBuilder;
-import domain.AbstractScaTransaction;
-import domain.SinglePayment;
+import de.adorsys.multibanking.domain.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.SinglePayment;
 
 public class SepaSinglePaymentInitiationBodyBuilder implements PaymentInitiationBodyBuilder<PaymentInitiationSctJson> {
     @Override

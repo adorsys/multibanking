@@ -16,14 +16,12 @@
 
 package de.adorsys.xs2a.pis.sepa;
 
+import de.adorsys.multibanking.domain.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.FutureSinglePayment;
 import de.adorsys.psd2.client.model.AccountReference;
 import de.adorsys.psd2.client.model.Amount;
 import de.adorsys.psd2.client.model.PeriodicPaymentInitiationSctJson;
 import de.adorsys.xs2a.pis.PaymentInitiationBodyBuilder;
-import domain.AbstractScaTransaction;
-import domain.FutureBulkPayment;
-import domain.FutureSinglePayment;
-import domain.SinglePayment;
 
 public class SepaPeriodicPaymentInitiationBodyBuilder implements PaymentInitiationBodyBuilder<PeriodicPaymentInitiationSctJson> {
     @Override
