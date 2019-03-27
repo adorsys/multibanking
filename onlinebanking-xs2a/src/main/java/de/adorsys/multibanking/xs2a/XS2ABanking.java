@@ -416,14 +416,15 @@ public class XS2ABanking implements OnlineBankingService {
         PaymentInitiationSctJson paymentInitiation = new PaymentInitiationSctJson();
         AccountReference debtorAccountReference = new AccountReference();
         debtorAccountReference.setIban(paymentBodyObj.getDebtorBankAccount().getIban());
+        debtorAccountReference.setCurrency(paymentBodyObj.getDebtorBankAccount().getCurrency());
 
         AccountReference creditorAccountReference = new AccountReference();
         creditorAccountReference.setIban(paymentBodyObj.getReceiverIban());
+        creditorAccountReference.setCurrency(paymentBodyObj.getReceiverAccountCurrency());
 
         Amount amount = new Amount();
         amount.setAmount(paymentBodyObj.getAmount().toString());
-        //todo: @age currency is missing in SinglePayment
-        amount.setCurrency("EUR");
+        amount.setCurrency(paymentBodyObj.getCurrency());
 
         paymentInitiation.setDebtorAccount(debtorAccountReference);
         paymentInitiation.setCreditorAccount(creditorAccountReference);
