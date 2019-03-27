@@ -14,44 +14,28 @@
  * limitations under the License.
  */
 
-package de.adorsys.xs2a.pis.sepa;
+package de.adorsys.multibanking.xs2a.pis.sepa;
 
-import de.adorsys.psd2.client.model.AccountReference;
-import de.adorsys.psd2.client.model.Amount;
-import de.adorsys.psd2.client.model.BulkPaymentInitiationSctJson;
-import de.adorsys.psd2.client.model.PaymentInitiationSctBulkElementJson;
-import de.adorsys.xs2a.pis.PaymentInitiationBodyBuilder;
 import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.BulkPayment;
 import de.adorsys.multibanking.domain.SinglePayment;
+import de.adorsys.psd2.client.model.BulkPaymentInitiationSctJson;
+import de.adorsys.psd2.client.model.PaymentInitiationSctBulkElementJson;
 
-import java.util.ArrayList;
-
-public class SepaBulkPaymentInitiationBodyBuilder implements PaymentInitiationBodyBuilder<BulkPaymentInitiationSctJson> {
+public class SepaBulkPaymentInitiationBodyBuilder extends AbstractPaymentInitiationBodyBuilder<BulkPaymentInitiationSctJson> {
     @Override
     public BulkPaymentInitiationSctJson buildBody(AbstractScaTransaction transaction) {
         BulkPayment bulkPayment = (BulkPayment) transaction;
         BulkPaymentInitiationSctJson bulk = new BulkPaymentInitiationSctJson();
-        AccountReference debtorAccountReference = new AccountReference();
-        debtorAccountReference.setIban(bulkPayment.getDebtorBankAccount().getIban());
-        bulk.setDebtorAccount(debtorAccountReference);
-        ArrayList<PaymentInitiationSctBulkElementJson> payments = new ArrayList<>();
-        bulk.setPayments(payments);
+        bulk.setDebtorAccount(buildDebtorAccountReference(transaction));
 
         for (SinglePayment payment : bulkPayment.getPayments()) {
             PaymentInitiationSctBulkElementJson bulkElementJson = new PaymentInitiationSctBulkElementJson();
-            AccountReference creditorAccountReference = new AccountReference();
-            creditorAccountReference.setIban(payment.getReceiverIban());
-
-            Amount amount = new Amount();
-            amount.setAmount(payment.getAmount().toString());
-            amount.setCurrency(payment.getCurrency());
-
-            bulkElementJson.setCreditorAccount(creditorAccountReference);
-            bulkElementJson.setInstructedAmount(amount);
+            bulkElementJson.setCreditorAccount(buildCreditorAccountReference(payment));
+            bulkElementJson.setInstructedAmount(buildAmount(payment));
             bulkElementJson.setCreditorName(payment.getReceiver());
             bulkElementJson.setRemittanceInformationUnstructured(payment.getPurpose());
-            payments.add(bulkElementJson);
+            bulk.addPaymentsItem(bulkElementJson);
         }
         return bulk;
     }

@@ -19,10 +19,10 @@ import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.AccountReference;
 import de.adorsys.psd2.client.model.Balance;
 import de.adorsys.psd2.client.model.*;
-import de.adorsys.xs2a.pis.PaymentInitiationBuilderStrategy;
-import de.adorsys.xs2a.pis.PaymentInitiationBuilderStrategyImpl;
-import de.adorsys.xs2a.pis.PaymentProductType;
-import de.adorsys.xs2a.pis.PaymentServiceType;
+import de.adorsys.multibanking.xs2a.pis.PaymentInitiationBuilderStrategy;
+import de.adorsys.multibanking.xs2a.pis.PaymentInitiationBuilderStrategyImpl;
+import de.adorsys.multibanking.xs2a.pis.PaymentProductType;
+import de.adorsys.multibanking.xs2a.pis.PaymentServiceType;
 import domain.Xs2aBankApiUser;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
@@ -43,8 +43,6 @@ import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionT
 public class XS2ABanking implements OnlineBankingService {
 
     public static final String PSU_IP_ADDRESS = "127.0.0.1";
-    public static final String SINGLE_PAYMENT_SERVICE = "payments";
-    public static final String SEPA_CREDIT_TRANSFERS = "sepa-credit-transfers";
     static final String SCA_AUTHENTICATION_METHOD_ID = "authenticationMethodId";
     static final String SCA_NAME = "name";
     static final String SCA_AUTHENTICATION_VERSION = "authenticationVersion";
@@ -139,17 +137,17 @@ public class XS2ABanking implements OnlineBankingService {
 
         try {
             StartScaprocessResponse response;
-            response = service.startPaymentAuthorisation(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS, paymentId,
-                    xRequestId, psuId,
-                    null, null, null, null, null, null, PSU_IP_ADDRESS,
-                    null, null, null, null, null, null, null, null, null);
+            response = service.startPaymentAuthorisation(authenticatePsuRequest.getPaymentService(), authenticatePsuRequest.getPaymentProduct(), paymentId,
+                                                         xRequestId, psuId,
+                                                         null, null, null, null, null, null, PSU_IP_ADDRESS,
+                                                         null, null, null, null, null, null, null, null, null);
             String authorisationId = getAuthorizationId(response);
-            Map<String, Object> updatePsu = (Map<String, Object>) service.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE
-                    , SEPA_CREDIT_TRANSFERS, paymentId, authorisationId, xRequestId, psuBody,
-                    null, null, null, psuId, null, corporateId,
-                    null, PSU_IP_ADDRESS, null, null,
-                    null, null, null,
-                    null, null, null, null);
+            Map<String, Object> updatePsu = (Map<String, Object>) service.updatePaymentPsuData(authenticatePsuRequest.getPaymentService()
+                    , authenticatePsuRequest.getPaymentProduct(), paymentId, authorisationId, xRequestId, psuBody,
+                                                                                               null, null, null, psuId, null, corporateId,
+                                                                                               null, PSU_IP_ADDRESS, null, null,
+                                                                                               null, null, null,
+                                                                                               null, null, null, null);
             return buildPsuAuthenticationResponse(updatePsu, authorisationId);
         } catch (ApiException e) {
             logger.error("Authorise PSU failed", e);
@@ -376,9 +374,9 @@ public class XS2ABanking implements OnlineBankingService {
         UUID xRequestId = UUID.randomUUID();
         AbstractScaTransaction payment = paymentRequest.getTransaction();
         PaymentProductType paymentProduct = PaymentProductType.resolve(payment.getProduct());
+        PaymentServiceType paymentService = PaymentServiceType.resolve(payment.getClass());
         String contentType = "application/" + (paymentProduct.isRaw() ? "xml" : "json");
         String psuId = paymentRequest.getBankAccess().getBankLogin();
-        PaymentServiceType paymentService = PaymentServiceType.resolve(payment.getClass());
         Object paymentBody;
         paymentBody = initiationBuilderStrategy.resolve(paymentProduct, paymentService).buildBody(payment);
         ApiClient apiClient = createApiClient(bankingUrl, contentType);
@@ -429,7 +427,11 @@ public class XS2ABanking implements OnlineBankingService {
                                                                          ApiClient apiClient) {
         PaymentInitiationServicePisApi service = createPaymentInitiationServicePisApi(apiClient);
 
-        String paymentId = paymentRequest.getTransaction().getPaymentId();
+        AbstractScaTransaction payment = paymentRequest.getTransaction();
+        PaymentProductType paymentProduct = PaymentProductType.resolve(payment.getProduct());
+        PaymentServiceType paymentService = PaymentServiceType.resolve(payment.getClass());
+
+        String paymentId = payment.getPaymentId();
         String authorisationId = paymentRequest.getAuthorisationId();
 
         UUID xRequestId = UUID.randomUUID();
@@ -438,10 +440,12 @@ public class XS2ABanking implements OnlineBankingService {
         SelectPsuAuthenticationMethod body =
                 buildSelectPsuAuthenticationMethod(paymentRequest.getTanTransportType().getId());
         Xs2aTanSubmit tanSubmit = new Xs2aTanSubmit(bankingUrl, paymentId, authorisationId, psuId, corporateId);
+        tanSubmit.setPaymentProduct(paymentProduct.getType());
+        tanSubmit.setPaymentService(paymentService.getType());
 
         try {
             Map<String, Object> updatePsuData =
-                    (Map<String, Object>) service.updatePaymentPsuData(SINGLE_PAYMENT_SERVICE, SEPA_CREDIT_TRANSFERS,
+                    (Map<String, Object>) service.updatePaymentPsuData(paymentService.getType(), paymentProduct.getType(),
                                                                        paymentId, authorisationId,
                                                                        xRequestId, body,
                                                                        null, null,

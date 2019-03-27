@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package de.adorsys.xs2a.pis;
+package de.adorsys.multibanking.xs2a.pis;
 
 import de.adorsys.multibanking.xs2a.error.XS2AClientException;
-import de.adorsys.xs2a.pis.sepa.SepaBulkPaymentInitiationBodyBuilder;
-import de.adorsys.xs2a.pis.sepa.SepaPeriodicPaymentInitiationBodyBuilder;
-import de.adorsys.xs2a.pis.sepa.SepaSinglePaymentInitiationBodyBuilder;
+import de.adorsys.multibanking.xs2a.pis.sepa.SepaBulkPaymentInitiationBodyBuilder;
+import de.adorsys.multibanking.xs2a.pis.sepa.SepaPeriodicPaymentInitiationBodyBuilder;
+import de.adorsys.multibanking.xs2a.pis.sepa.SepaSinglePaymentInitiationBodyBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.adorsys.xs2a.pis.PaymentProductType.SEPA_CREDIT_TRANSFERS;
-import static de.adorsys.xs2a.pis.PaymentServiceType.*;
+import static de.adorsys.multibanking.xs2a.pis.PaymentProductType.SEPA;
+import static de.adorsys.multibanking.xs2a.pis.PaymentServiceType.*;
 
 public class PaymentInitiationBuilderStrategyImpl implements PaymentInitiationBuilderStrategy {
 
@@ -35,9 +35,9 @@ public class PaymentInitiationBuilderStrategyImpl implements PaymentInitiationBu
 
     public PaymentInitiationBuilderStrategyImpl() {
         builders = new HashMap<>(3);
-        builders.put(buildKey(SEPA_CREDIT_TRANSFERS, SINGLE), new SepaSinglePaymentInitiationBodyBuilder());
-        builders.put(buildKey(SEPA_CREDIT_TRANSFERS, BULK), new SepaBulkPaymentInitiationBodyBuilder());
-        builders.put(buildKey(SEPA_CREDIT_TRANSFERS, PERIODIC), new SepaPeriodicPaymentInitiationBodyBuilder());
+        builders.put(buildKey(SEPA, SINGLE), new SepaSinglePaymentInitiationBodyBuilder());
+        builders.put(buildKey(SEPA, BULK), new SepaBulkPaymentInitiationBodyBuilder());
+        builders.put(buildKey(SEPA, PERIODIC), new SepaPeriodicPaymentInitiationBodyBuilder());
     }
 
     private String buildKey(PaymentProductType productType, PaymentServiceType serviceType) {

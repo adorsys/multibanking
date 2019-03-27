@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package de.adorsys.xs2a.pis;
+package de.adorsys.multibanking.xs2a.pis;
 
 import de.adorsys.multibanking.xs2a.error.XS2AClientException;
 
 import java.util.Arrays;
 
 public enum PaymentProductType {
-    SEPA_CREDIT_TRANSFERS("sepa-credit-transfers"),
-    INSTANT_SEPA_CREDIT_TRANSFERS("instant-sepa-credit-transfers"),
+    SEPA("sepa-credit-transfers"),
+    INSTANT_SEPA("instant-sepa-credit-transfers"),
     TARGET_2_PAYMENTS("target-2-payments"),
-    CROSS_BORDER_CREDIT_TRANSFERS("cross-border-credit-transfers"),
-    PAIN_001_SEPA_CREDIT_TRANSFERS("pain.001-sepa-credit-transfers", true),
-    PAIN_001_INSTANT_SEPA_CREDIT_TRANSFERS("pain.001-instant-sepa-credit-transfers", true),
+    CROSS_BORDER("cross-border-credit-transfers"),
+    PAIN_001_SEPA("pain.001-sepa-credit-transfers", true),
+    PAIN_001_INSTANT_SEPA("pain.001-instant-sepa-credit-transfers", true),
     PAIN_001_TARGET_2_PAYMENTS("pain.001-target-2-payments", true),
-    PAIN_001_CROSS_BORDER_CREDIT_TRANSFERS("pain.001-cross-border-credit-transfers", true);
+    PAIN_001_CROSS_BORDER("pain.001-cross-border-credit-transfers", true);
 
     private String type;
     private boolean isRaw;

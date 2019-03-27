@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.adorsys.xs2a.pis;
+package de.adorsys.multibanking.xs2a.pis;
 
 public interface PaymentInitiationBuilderStrategy {
 

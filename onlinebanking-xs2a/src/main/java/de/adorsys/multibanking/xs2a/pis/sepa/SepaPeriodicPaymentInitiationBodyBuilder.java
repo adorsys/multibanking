@@ -14,35 +14,30 @@
  * limitations under the License.
  */
 
-package de.adorsys.xs2a.pis.sepa;
+package de.adorsys.multibanking.xs2a.pis.sepa;
 
 import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.FutureSinglePayment;
-import de.adorsys.psd2.client.model.AccountReference;
-import de.adorsys.psd2.client.model.Amount;
+import de.adorsys.psd2.client.model.DayOfExecution;
 import de.adorsys.psd2.client.model.PeriodicPaymentInitiationSctJson;
-import de.adorsys.xs2a.pis.PaymentInitiationBodyBuilder;
 
-public class SepaPeriodicPaymentInitiationBodyBuilder implements PaymentInitiationBodyBuilder<PeriodicPaymentInitiationSctJson> {
+import java.time.LocalDate;
+
+public class SepaPeriodicPaymentInitiationBodyBuilder extends AbstractPaymentInitiationBodyBuilder<PeriodicPaymentInitiationSctJson> {
     @Override
     public PeriodicPaymentInitiationSctJson buildBody(AbstractScaTransaction transaction) {
         FutureSinglePayment paymentBodyObj = (FutureSinglePayment) transaction;
+
         PeriodicPaymentInitiationSctJson periodic = new PeriodicPaymentInitiationSctJson();
-        AccountReference debtorAccountReference = new AccountReference();
-        debtorAccountReference.setIban(paymentBodyObj.getDebtorBankAccount().getIban());
-
-        AccountReference creditorAccountReference = new AccountReference();
-        creditorAccountReference.setIban(paymentBodyObj.getReceiverIban());
-
-        Amount amount = new Amount();
-        amount.setAmount(paymentBodyObj.getAmount().toString());
-        amount.setCurrency(paymentBodyObj.getCurrency());
-
-        periodic.setDebtorAccount(debtorAccountReference);
-        periodic.setCreditorAccount(creditorAccountReference);
-        periodic.setInstructedAmount(amount);
+        periodic.setDebtorAccount(buildDebtorAccountReference(paymentBodyObj));
+        periodic.setCreditorAccount(buildCreditorAccountReference(paymentBodyObj));
+        periodic.setInstructedAmount(buildAmount(paymentBodyObj));
         periodic.setCreditorName(paymentBodyObj.getReceiver());
         periodic.setRemittanceInformationUnstructured(paymentBodyObj.getPurpose());
+
+        //todo: check if execution date was correct populated
+        LocalDate executionDate = paymentBodyObj.getExecutionDate();
+        periodic.setDayOfExecution(DayOfExecution.fromValue(String.valueOf(executionDate.getDayOfMonth())));
         return periodic;
     }
 }

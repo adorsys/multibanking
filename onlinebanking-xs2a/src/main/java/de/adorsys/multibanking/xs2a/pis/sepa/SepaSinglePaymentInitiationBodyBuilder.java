@@ -14,35 +14,27 @@
  * limitations under the License.
  */
 
-package de.adorsys.xs2a.pis.sepa;
+package de.adorsys.multibanking.xs2a.pis.sepa;
 
-import de.adorsys.psd2.client.model.AccountReference;
-import de.adorsys.psd2.client.model.Amount;
-import de.adorsys.psd2.client.model.PaymentInitiationSctJson;
-import de.adorsys.xs2a.pis.PaymentInitiationBodyBuilder;
 import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.SinglePayment;
+import de.adorsys.psd2.client.model.PaymentInitiationSctJson;
 
-public class SepaSinglePaymentInitiationBodyBuilder implements PaymentInitiationBodyBuilder<PaymentInitiationSctJson> {
+public class SepaSinglePaymentInitiationBodyBuilder extends AbstractPaymentInitiationBodyBuilder<PaymentInitiationSctJson> {
+
     @Override
     public PaymentInitiationSctJson buildBody(AbstractScaTransaction transaction) {
-        SinglePayment paymentBodyObj = (SinglePayment) transaction;
+        return buildPaymentInitiation((SinglePayment) transaction);
+    }
+
+    private PaymentInitiationSctJson buildPaymentInitiation(SinglePayment paymentBodyObj) {
         PaymentInitiationSctJson paymentInitiation = new PaymentInitiationSctJson();
-        AccountReference debtorAccountReference = new AccountReference();
-        debtorAccountReference.setIban(paymentBodyObj.getDebtorBankAccount().getIban());
-
-        AccountReference creditorAccountReference = new AccountReference();
-        creditorAccountReference.setIban(paymentBodyObj.getReceiverIban());
-
-        Amount amount = new Amount();
-        amount.setAmount(paymentBodyObj.getAmount().toString());
-        amount.setCurrency(paymentBodyObj.getCurrency());
-
-        paymentInitiation.setDebtorAccount(debtorAccountReference);
-        paymentInitiation.setCreditorAccount(creditorAccountReference);
-        paymentInitiation.setInstructedAmount(amount);
+        paymentInitiation.setDebtorAccount(buildDebtorAccountReference(paymentBodyObj));
+        paymentInitiation.setCreditorAccount(buildCreditorAccountReference(paymentBodyObj));
+        paymentInitiation.setInstructedAmount(buildAmount(paymentBodyObj));
         paymentInitiation.setCreditorName(paymentBodyObj.getReceiver());
         paymentInitiation.setRemittanceInformationUnstructured(paymentBodyObj.getPurpose());
         return paymentInitiation;
     }
+
 }

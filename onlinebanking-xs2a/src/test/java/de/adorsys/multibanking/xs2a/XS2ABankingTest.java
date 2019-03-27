@@ -19,7 +19,7 @@ import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.AccountReference;
 import de.adorsys.psd2.client.model.Balance;
 import de.adorsys.psd2.client.model.*;
-import de.adorsys.xs2a.pis.PaymentProductType;
+import de.adorsys.multibanking.xs2a.pis.PaymentProductType;
 import domain.Xs2aBankApiUser;
 import org.iban4j.CountryCode;
 import org.iban4j.Iban;
@@ -42,6 +42,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class XS2ABankingTest {
 
+    private static final String SINGLE_PAYMENT_SERVICE = "payments";
+    private static final String SEPA_CREDIT_TRANSFERS = "sepa-credit-transfers";
     private static final String ACCOUNT_NUMBER = "accountNumber";
     private static final String CONSENT_ID = "consentId";
     private static final LocalDate REFERENCE_DATE = LocalDate.now();
@@ -99,6 +101,8 @@ public class XS2ABankingTest {
                 .customerId(CORPORATE_ID)
                 .login(PSU_ID)
                 .paymentId(PAYMENT_ID)
+                .paymentProduct(SEPA_CREDIT_TRANSFERS)
+                .paymentService(SINGLE_PAYMENT_SERVICE)
                 .pin(PIN)
                 .build();
 
@@ -108,8 +112,8 @@ public class XS2ABankingTest {
         scaProcessResponse.setLinks(links);
         ArgumentCaptor<UpdatePsuAuthentication> psuBodyCaptor = ArgumentCaptor.forClass(UpdatePsuAuthentication.class);
 
-        when(paymentInitiationServicePisApi.startPaymentAuthorisation(eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS),
+        when(paymentInitiationServicePisApi.startPaymentAuthorisation(eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS),
                 eq(PAYMENT_ID), any(), eq(PSU_ID), isNull(), isNull(),
                 isNull(), isNull(), isNull(),
                 isNull(), eq(XS2ABanking.PSU_IP_ADDRESS),
@@ -119,8 +123,8 @@ public class XS2ABankingTest {
                 isNull(), isNull(), isNull())
         ).thenReturn(scaProcessResponse);
 
-        when(paymentInitiationServicePisApi.updatePaymentPsuData(eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS), eq(PAYMENT_ID),
+        when(paymentInitiationServicePisApi.updatePaymentPsuData(eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS), eq(PAYMENT_ID),
                 eq(AUTHORISATION_ID), any(), psuBodyCaptor.capture(),
                 isNull(), isNull(), isNull(),
                 eq(PSU_ID), isNull(), eq(CORPORATE_ID),
@@ -132,8 +136,8 @@ public class XS2ABankingTest {
 
         ScaMethodsResponse response = xs2aBanking.authenticatePsu(BANKING_URL, request);
 
-        verify(paymentInitiationServicePisApi, times(1)).startPaymentAuthorisation(eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS),
+        verify(paymentInitiationServicePisApi, times(1)).startPaymentAuthorisation(eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS),
                 eq(PAYMENT_ID), any(), eq(PSU_ID), isNull(), isNull(),
                 isNull(), isNull(), isNull(),
                 isNull(), eq(XS2ABanking.PSU_IP_ADDRESS),
@@ -142,8 +146,8 @@ public class XS2ABankingTest {
                 isNull(), isNull(),
                 isNull(), isNull(), isNull());
 
-        verify(paymentInitiationServicePisApi, times(1)).updatePaymentPsuData(eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS), eq(PAYMENT_ID),
+        verify(paymentInitiationServicePisApi, times(1)).updatePaymentPsuData(eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS), eq(PAYMENT_ID),
                 eq(AUTHORISATION_ID), any(), psuBodyCaptor.capture(),
                 isNull(), isNull(), isNull(),
                 eq(PSU_ID), isNull(), eq(CORPORATE_ID),
@@ -192,11 +196,13 @@ public class XS2ABankingTest {
                 .customerId(custId)
                 .login(psuId)
                 .paymentId(paymentId)
+                .paymentProduct(SEPA_CREDIT_TRANSFERS)
+                .paymentService(SINGLE_PAYMENT_SERVICE)
                 .pin(pin)
                 .build();
 
-        when(paymentInitiationServicePisApi.startPaymentAuthorisation(eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS),
+        when(paymentInitiationServicePisApi.startPaymentAuthorisation(eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS),
                 eq(paymentId), any(), eq(psuId), isNull(), isNull(),
                 isNull(), isNull(), isNull(),
                 isNull(), eq(XS2ABanking.PSU_IP_ADDRESS),
@@ -234,7 +240,7 @@ public class XS2ABankingTest {
         BankAccess bankAccess = new BankAccess();
         bankAccess.setBankLogin(PSU_ID);
         transaction.setDebtorBankAccount(bankAccount);
-        transaction.setProduct(PaymentProductType.SEPA_CREDIT_TRANSFERS.getType());
+        transaction.setProduct(PaymentProductType.SEPA.getType());
         transaction.setAmount(new BigDecimal(1));
         TransactionRequest request =
                 TransactionRequest.builder().bankAccess(bankAccess).authorisationId(AUTHORISATION_ID).pin(PIN).transaction(transaction).build();
@@ -242,8 +248,8 @@ public class XS2ABankingTest {
 
         when(paymentInitiationServicePisApi.initiatePayment(
                 initiation.capture(),
-                eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS),
+                eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS),
                 any(),
                 eq(XS2ABanking.PSU_IP_ADDRESS),
                 isNull(), isNull(),
@@ -262,8 +268,8 @@ public class XS2ABankingTest {
 
         verify(paymentInitiationServicePisApi, times(1)).initiatePayment(
                 initiation.capture(),
-                eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS),
+                eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS),
                 any(),
                 eq(XS2ABanking.PSU_IP_ADDRESS),
                 isNull(), isNull(),
@@ -293,15 +299,15 @@ public class XS2ABankingTest {
         bankAccess.setBankLogin(PSU_ID);
         transaction.setDebtorBankAccount(bankAccount);
         transaction.setAmount(new BigDecimal(1));
-        transaction.setProduct(PaymentProductType.SEPA_CREDIT_TRANSFERS.getType());
+        transaction.setProduct(PaymentProductType.SEPA.getType());
         TransactionRequest request =
                 TransactionRequest.builder().bankAccess(bankAccess).authorisationId(AUTHORISATION_ID).pin(PIN).transaction(transaction).build();
         ArgumentCaptor<PaymentInitiationSctJson> initiation = ArgumentCaptor.forClass(PaymentInitiationSctJson.class);
 
         when(paymentInitiationServicePisApi.initiatePayment(
                 initiation.capture(),
-                eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS),
+                eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS),
                 any(),
                 eq(XS2ABanking.PSU_IP_ADDRESS),
                 isNull(), isNull(),
@@ -335,17 +341,24 @@ public class XS2ABankingTest {
         String selectedSCAMethodId = "901";
         SinglePayment singlePayment = new SinglePayment();
         singlePayment.setPaymentId(PAYMENT_ID);
+        singlePayment.setProduct(SEPA_CREDIT_TRANSFERS);
         BankAccess bankAccess = new BankAccess();
         bankAccess.setBankLogin(PSU_ID);
         bankAccess.setBankLogin2(CORPORATE_ID);
         TransactionRequest request =
-                TransactionRequest.builder().authorisationId(AUTHORISATION_ID).pin(PIN).transaction(singlePayment).bankAccess(bankAccess).tanTransportType(TanTransportType.builder().id(selectedSCAMethodId).build()).build();
+                TransactionRequest.builder()
+                        .authorisationId(AUTHORISATION_ID)
+                        .pin(PIN)
+                        .transaction(singlePayment)
+                        .bankAccess(bankAccess)
+                        .tanTransportType(TanTransportType.builder().id(selectedSCAMethodId).build())
+                        .build();
 
         ArgumentCaptor<SelectPsuAuthenticationMethod> bodyCaptor =
                 ArgumentCaptor.forClass(SelectPsuAuthenticationMethod.class);
 
-        when(paymentInitiationServicePisApi.updatePaymentPsuData(eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS), eq(PAYMENT_ID),
+        when(paymentInitiationServicePisApi.updatePaymentPsuData(eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS), eq(PAYMENT_ID),
                 eq(AUTHORISATION_ID), any(), bodyCaptor.capture(),
                 isNull(), isNull(), isNull(),
                 eq(PSU_ID), isNull(), eq(CORPORATE_ID),
@@ -357,8 +370,8 @@ public class XS2ABankingTest {
 
         AuthorisationCodeResponse response = xs2aBanking.requestAuthorizationCode(BANKING_URL, request);
 
-        verify(paymentInitiationServicePisApi, times(1)).updatePaymentPsuData(eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS), eq(PAYMENT_ID),
+        verify(paymentInitiationServicePisApi, times(1)).updatePaymentPsuData(eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS), eq(PAYMENT_ID),
                 eq(AUTHORISATION_ID), any(), bodyCaptor.capture(),
                 isNull(), isNull(), isNull(),
                 eq(PSU_ID), isNull(), eq(CORPORATE_ID),
@@ -376,6 +389,8 @@ public class XS2ABankingTest {
         assertThat(tanSubmit.getAuthorisationId()).isEqualTo(AUTHORISATION_ID);
         assertThat(tanSubmit.getBankingUrl()).isEqualTo(BANKING_URL);
         assertThat(tanSubmit.getTransactionId()).isEqualTo(PAYMENT_ID);
+        assertThat(tanSubmit.getPaymentProduct()).isEqualTo(SEPA_CREDIT_TRANSFERS);
+        assertThat(tanSubmit.getPaymentService()).isEqualTo(SINGLE_PAYMENT_SERVICE);
         assertThat(tanSubmit.getPsuId()).isEqualTo(PSU_ID);
         assertThat(tanSubmit.getPsuCorporateId()).isEqualTo(CORPORATE_ID);
 
@@ -390,14 +405,15 @@ public class XS2ABankingTest {
         String selectedSCAMethodId = "901";
         SinglePayment singlePayment = new SinglePayment();
         singlePayment.setPaymentId(PAYMENT_ID);
+        singlePayment.setProduct(SEPA_CREDIT_TRANSFERS);
         BankAccess bankAccess = new BankAccess();
         bankAccess.setBankLogin(PSU_ID);
         bankAccess.setBankLogin2(CORPORATE_ID);
         TransactionRequest request =
                 TransactionRequest.builder().authorisationId(AUTHORISATION_ID).pin(PIN).transaction(singlePayment).bankAccess(bankAccess).tanTransportType(TanTransportType.builder().id(selectedSCAMethodId).build()).build();
 
-        when(paymentInitiationServicePisApi.updatePaymentPsuData(eq(XS2ABanking.SINGLE_PAYMENT_SERVICE),
-                eq(XS2ABanking.SEPA_CREDIT_TRANSFERS), eq(PAYMENT_ID),
+        when(paymentInitiationServicePisApi.updatePaymentPsuData(eq(SINGLE_PAYMENT_SERVICE),
+                eq(SEPA_CREDIT_TRANSFERS), eq(PAYMENT_ID),
                 eq(AUTHORISATION_ID), any(), any(),
                 isNull(), isNull(), isNull(),
                 eq(PSU_ID), isNull(), eq(CORPORATE_ID),
