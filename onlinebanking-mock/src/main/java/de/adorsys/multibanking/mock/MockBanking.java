@@ -14,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -172,7 +173,7 @@ public class MockBanking implements OnlineBankingService {
                         BankAccount.class,
                         ba.getBankCode(),
                         iban);
-        return new BalancesReport().readyBalance(account.getBalances().getReadyBalance());
+        return account.getBalances();
     }
 
     public RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {
