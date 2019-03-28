@@ -588,9 +588,13 @@ public class XS2ABanking implements OnlineBankingService {
             throw new XS2AClientException(e);
         }
 
+        @SuppressWarnings("unchecked")
+        Map<String, String> links = response.getLinks();
+
         return CreateConsentResponse.builder()
                 .consentId(consentId)
                 .validUntil(consentInformation.getValidUntil())
+                .links(links)
                 .build();
     }
 
