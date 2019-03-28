@@ -16,11 +16,8 @@
 
 package de.adorsys.multibanking.xs2a.pis;
 
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.xs2a.error.XS2AClientException;
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.BulkPayment;
-import de.adorsys.multibanking.domain.FutureSinglePayment;
-import de.adorsys.multibanking.domain.SinglePayment;
 
 import java.util.Arrays;
 
@@ -31,6 +28,7 @@ public enum PaymentServiceType {
 
     private String type;
     private Class<? extends AbstractScaTransaction> clazz;
+
     PaymentServiceType(String type, Class<? extends AbstractScaTransaction> clazz) {
         this.type = type;
         this.clazz = clazz;
@@ -48,13 +46,22 @@ public enum PaymentServiceType {
         return Arrays.stream(values())
                        .filter(s -> s.type.equalsIgnoreCase(service))
                        .findFirst()
-                       .orElseThrow(() -> new XS2AClientException(service + " service doesn't support by the system"));
+                       .orElseThrow(() -> new XS2AClientException(service + " service type not supported by the system"));
     }
 
-    public static PaymentServiceType resolve(Class<? extends AbstractScaTransaction> paymentClass) {
+    public static <P extends AbstractScaTransaction> PaymentServiceType resolve(P payment) {
+        if (payment == null) {
+            throw new XS2AClientException("Payment object can't be null");
+        }
+        if (payment instanceof RawSepaPayment) {
+            if (payment.getRawData() == null) {
+                throw new XS2AClientException("Payment body is absent");
+            }
+            return resolve(((RawSepaPayment) payment).getService());
+        }
         return Arrays.stream(values())
-                       .filter(s -> s.clazz == paymentClass)
+                       .filter(s -> s.clazz == payment.getClass())
                        .findFirst()
-                       .orElseThrow(() -> new XS2AClientException(paymentClass.getName() + " service doesn't support by the system"));
+                       .orElseThrow(() -> new XS2AClientException(payment.getClass().getName() + " service class not supported by the system"));
     }
 }

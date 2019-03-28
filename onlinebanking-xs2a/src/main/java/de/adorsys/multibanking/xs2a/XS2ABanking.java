@@ -374,7 +374,7 @@ public class XS2ABanking implements OnlineBankingService {
         UUID xRequestId = UUID.randomUUID();
         AbstractScaTransaction payment = paymentRequest.getTransaction();
         PaymentProductType paymentProduct = PaymentProductType.resolve(payment.getProduct());
-        PaymentServiceType paymentService = PaymentServiceType.resolve(payment.getClass());
+        PaymentServiceType paymentService = PaymentServiceType.resolve(payment);
         String contentType = "application/" + (paymentProduct.isRaw() ? "xml" : "json");
         String psuId = paymentRequest.getBankAccess().getBankLogin();
         Object paymentBody;
@@ -429,7 +429,7 @@ public class XS2ABanking implements OnlineBankingService {
 
         AbstractScaTransaction payment = paymentRequest.getTransaction();
         PaymentProductType paymentProduct = PaymentProductType.resolve(payment.getProduct());
-        PaymentServiceType paymentService = PaymentServiceType.resolve(payment.getClass());
+        PaymentServiceType paymentService = PaymentServiceType.resolve(payment);
 
         String paymentId = payment.getPaymentId();
         String authorisationId = paymentRequest.getAuthorisationId();

@@ -54,6 +54,6 @@ public enum PaymentProductType {
         return Arrays.stream(values())
                        .filter(p -> p.type.equalsIgnoreCase(type))
                        .findFirst()
-                       .orElseThrow(() -> new XS2AClientException(type + " product type doesn't support by the system"));
+                       .orElseThrow(() -> new XS2AClientException(type + " product type not supported by the system"));
     }
 }
