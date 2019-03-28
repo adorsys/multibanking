@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 adorsys GmbH & Co KG
+ * Copyright 2018-2018 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,11 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.xs2a.pis;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import de.adorsys.multibanking.domain.AbstractScaTransaction;
 
-@Data
-@Builder
-@EqualsAndHashCode(callSuper = false)
-public class AuthenticatePsuRequest extends AbstractRequest {
+public interface PaymentInitiationBodyBuilder<T> {
 
-    private String paymentId;
-    private String paymentProduct;
-    private String paymentService;
-    private String consentId;
-    private String bankCode;
-    private String customerId;
-    private String login;
-    private String pin;
+    T buildBody(AbstractScaTransaction transaction);
 }

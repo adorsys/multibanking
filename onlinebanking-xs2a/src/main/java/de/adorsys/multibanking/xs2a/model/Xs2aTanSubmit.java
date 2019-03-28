@@ -19,6 +19,8 @@ package de.adorsys.multibanking.xs2a.model;
 public class Xs2aTanSubmit {
     private String bankingUrl;
     private String transactionId;
+    private String paymentProduct;
+    private String paymentService;
     private String authorisationId;
     private String psuId;
     private String psuCorporateId;
@@ -73,5 +75,21 @@ public class Xs2aTanSubmit {
 
     public void setPsuCorporateId(String psuCorporateId) {
         this.psuCorporateId = psuCorporateId;
+    }
+
+    public String getPaymentProduct() {
+        return paymentProduct;
+    }
+
+    public void setPaymentProduct(String paymentProduct) {
+        this.paymentProduct = paymentProduct;
+    }
+
+    public String getPaymentService() {
+        return paymentService;
+    }
+
+    public void setPaymentService(String paymentService) {
+        this.paymentService = paymentService;
     }
 }
