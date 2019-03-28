@@ -23,6 +23,8 @@ public class SepaSinglePaymentInitiationBodyBuilderTest extends AbstractSepaPaym
         assertThat(body.getDebtorAccount().getIban()).isEqualTo(IBAN);
         assertThat(body.getInstructedAmount().getAmount()).isEqualTo(String.valueOf(AMOUNT_VALUE));
         assertThat(body.getInstructedAmount().getCurrency()).isEqualTo(CURRENCY);
+        assertThat(body.getDebtorAccount().getCurrency()).isEqualTo(CURRENCY);
+        assertThat(body.getCreditorAccount().getCurrency()).isEqualTo(CURRENCY);
     }
 
 }

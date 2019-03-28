@@ -34,12 +34,14 @@ abstract class AbstractPaymentInitiationBodyBuilder<T> implements PaymentInitiat
     AccountReference buildDebtorAccountReference(AbstractScaTransaction transaction) {
         AccountReference debtorAccountReference = new AccountReference();
         debtorAccountReference.setIban(transaction.getDebtorBankAccount().getIban());
+        debtorAccountReference.setCurrency(transaction.getDebtorBankAccount().getCurrency());
         return debtorAccountReference;
     }
 
     AccountReference buildCreditorAccountReference(SinglePayment transaction) {
         AccountReference creditorAccountReference = new AccountReference();
         creditorAccountReference.setIban(transaction.getReceiverIban());
+        creditorAccountReference.setCurrency(transaction.getReceiverAccountCurrency());
         return creditorAccountReference;
     }
 }

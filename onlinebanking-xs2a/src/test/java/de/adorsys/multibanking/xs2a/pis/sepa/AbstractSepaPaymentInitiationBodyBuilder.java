@@ -34,6 +34,7 @@ abstract class AbstractSepaPaymentInitiationBodyBuilder {
     BankAccount buildBankAccount() {
         BankAccount bankAccount = new BankAccount();
         bankAccount.setIban(IBAN);
+        bankAccount.setCurrency(CURRENCY);
         return bankAccount;
     }
 
@@ -46,6 +47,7 @@ abstract class AbstractSepaPaymentInitiationBodyBuilder {
         payment.setPurpose(INFORMATION);
         payment.setReceiverIban(IBAN);
         payment.setCurrency(CURRENCY);
+        payment.setReceiverAccountCurrency(CURRENCY);
         return payment;
     }
 }

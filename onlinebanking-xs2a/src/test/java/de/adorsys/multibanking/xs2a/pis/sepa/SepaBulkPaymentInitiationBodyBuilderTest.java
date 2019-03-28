@@ -27,8 +27,10 @@ public class SepaBulkPaymentInitiationBodyBuilderTest extends AbstractSepaPaymen
         assertThat(payment.getCreditorName()).isEqualTo(CREDITOR_NAME);
         assertThat(payment.getRemittanceInformationUnstructured()).isEqualTo(INFORMATION);
         assertThat(payment.getCreditorAccount().getIban()).isEqualTo(IBAN);
+        assertThat(payment.getCreditorAccount().getCurrency()).isEqualTo(CURRENCY);
         assertThat(payment.getInstructedAmount().getAmount()).isEqualTo(String.valueOf(AMOUNT_VALUE));
         assertThat(payment.getInstructedAmount().getCurrency()).isEqualTo(CURRENCY);
+        assertThat(body.getDebtorAccount().getCurrency()).isEqualTo(CURRENCY);
     }
 
     private BulkPayment buildBulkPayment() {

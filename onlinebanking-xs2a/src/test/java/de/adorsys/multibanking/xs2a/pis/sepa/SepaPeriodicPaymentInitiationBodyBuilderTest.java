@@ -27,6 +27,8 @@ public class SepaPeriodicPaymentInitiationBodyBuilderTest extends AbstractSepaPa
         assertThat(body.getInstructedAmount().getAmount()).isEqualTo(String.valueOf(AMOUNT_VALUE));
         assertThat(body.getInstructedAmount().getCurrency()).isEqualTo(CURRENCY);
         assertThat(body.getDayOfExecution()).isEqualTo(DayOfExecution._1);
+        assertThat(body.getDebtorAccount().getCurrency()).isEqualTo(CURRENCY);
+        assertThat(body.getCreditorAccount().getCurrency()).isEqualTo(CURRENCY);
     }
 
     private FutureSinglePayment buildPeriodicPayment() {
@@ -38,6 +40,7 @@ public class SepaPeriodicPaymentInitiationBodyBuilderTest extends AbstractSepaPa
         payment.setPurpose(INFORMATION);
         payment.setReceiverIban(IBAN);
         payment.setCurrency(CURRENCY);
+        payment.setReceiverAccountCurrency(CURRENCY);
         payment.setExecutionDate(LocalDate.MIN);
         return payment;
     }
