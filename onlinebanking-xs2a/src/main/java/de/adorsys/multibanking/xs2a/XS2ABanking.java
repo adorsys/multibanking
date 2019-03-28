@@ -54,11 +54,10 @@ public class XS2ABanking implements OnlineBankingService {
     static final String CHALLENGE = "challengeData";
     private static final Logger logger = LoggerFactory.getLogger(XS2ABanking.class);
     private SSLSocketFactory sslSocketFactory;
-    private PaymentInitiationBuilderStrategy initiationBuilderStrategy;
+    private PaymentInitiationBuilderStrategy initiationBuilderStrategy = new PaymentInitiationBuilderStrategyImpl();
 
     public XS2ABanking() {
         this(defaultSslSocketFactory());
-        initiationBuilderStrategy = new PaymentInitiationBuilderStrategyImpl();
     }
 
     public XS2ABanking(SSLSocketFactory sslSocketFactory) {
