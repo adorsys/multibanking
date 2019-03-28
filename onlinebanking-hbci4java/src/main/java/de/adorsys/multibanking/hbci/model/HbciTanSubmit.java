@@ -16,7 +16,6 @@
 
 package de.adorsys.multibanking.hbci.model;
 
-import de.adorsys.multibanking.domain.TanTransportType;
 import lombok.Data;
 import org.kapott.hbci.manager.HBCITwoStepMechanism;
 
@@ -33,6 +32,7 @@ public class HbciTanSubmit {
     private String hbciJobName; //eg. HKCCS
     private String originJobName; //"org.kapott.hbci.GV.GV" + jobname
     private String originLowLevelName; //key for hbci-300.xml
+    private String hktanProcess;
     private int originSegVersion; //segment version
     private String sepaPain;
     private HBCITwoStepMechanism twoStepMechanism;

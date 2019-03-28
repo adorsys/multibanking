@@ -25,6 +25,7 @@ import de.adorsys.multibanking.domain.exception.HbciException;
 import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.hbci.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -162,7 +163,7 @@ public abstract class ScaRequiredJob {
         hktan.setParam("orderaccount", orderAccount);
 
         Optional<List<AbstractHBCIJob>> messages = Optional.ofNullable(sepagv)
-                .map(abstractSEPAGV -> dialog.addTask(abstractSEPAGV));
+                .map(dialog::addTask);
 
         if (messages.isPresent()) {
             messages.get().add(hktan);
@@ -171,7 +172,7 @@ public abstract class ScaRequiredJob {
         }
     }
 
-    public String sumbitAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
+    public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
         HbciTanSubmit hbciTanSubmit = evaluateTanSubmit(submitAuthorizationCodeRequest);
 
         HbciPassport hbciPassport = createPassport(submitAuthorizationCodeRequest, hbciTanSubmit);
@@ -190,9 +191,7 @@ public abstract class ScaRequiredJob {
         if (!status.isOK()) {
             throw new HbciException(status.getDialogStatus().getErrorString());
         } else {
-            return Optional.ofNullable(paymentGV)
-                    .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
-                    .orElse(hbciTanSubmit.getOrderRef());
+            return createResponse(hbciTanSubmit, paymentGV, status);
         }
     }
 
@@ -205,7 +204,7 @@ public abstract class ScaRequiredJob {
         return uebSEPAJob;
     }
 
-    public AbstractHBCIJob submitProcess2(HbciTanSubmit hbciTanSubmit, HBCIDialog hbciDialog) {
+    private AbstractHBCIJob submitProcess2(HbciTanSubmit hbciTanSubmit, HBCIDialog hbciDialog) {
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         AbstractHBCIJob originJob = Optional.ofNullable(hbciTanSubmit.getOriginJobName())
@@ -218,7 +217,7 @@ public abstract class ScaRequiredJob {
         GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport());
         hktan.setOriginJob(originJob);
         hktan.setParam("orderref", hbciTanSubmit.getOrderRef());
-        hktan.setParam("process", "2");
+        hktan.setParam("process", hbciTanSubmit.getHktanProcess() != null ? hbciTanSubmit.getHktanProcess() : "2");
         hktan.setParam("notlasttan", "N");
         hbciDialog.addTask(hktan, false);
         return originJob;
@@ -276,6 +275,19 @@ public abstract class ScaRequiredJob {
         } else {
             return deserializeTanSubmit((byte[]) submitAuthorizationCodeRequest.getTanSubmit());
         }
+    }
+
+    private SubmitAuthorizationCodeResponse createResponse(HbciTanSubmit hbciTanSubmit, AbstractHBCIJob paymentGV, HBCIExecStatus status) {
+        String transactionId = Optional.ofNullable(paymentGV)
+                .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
+                .orElse(hbciTanSubmit.getOrderRef());
+
+        SubmitAuthorizationCodeResponse response = new SubmitAuthorizationCodeResponse();
+        response.setTransactionId(transactionId);
+        if (status.getDialogStatus().msgStatusList.size() > 0) {
+            response.setStatus(status.getDialogStatus().msgStatusList.get(0).segStatus.toString());
+        }
+        return response;
     }
 
     abstract String getHbciJobName(AbstractScaTransaction.TransactionType paymentType);

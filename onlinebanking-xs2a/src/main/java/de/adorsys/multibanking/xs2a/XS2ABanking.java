@@ -506,7 +506,7 @@ public class XS2ABanking implements OnlineBankingService {
 
     @SuppressWarnings("unchecked")
     @Override
-    public String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
         Xs2aTanSubmit tanSubmit = (Xs2aTanSubmit) submitPaymentRequest.getTanSubmit();
         String bankingUrl = tanSubmit.getBankingUrl();
         ApiClient apiClient = createApiClient(bankingUrl);
@@ -514,7 +514,9 @@ public class XS2ABanking implements OnlineBankingService {
         UpdateRequestExecutor executor = createUpdateRequestExecutor(submitPaymentRequest);
         XS2AUpdateRequest request = executor.buildRequest(submitPaymentRequest);
         try {
-            return executor.execute(request, apiClient);
+            SubmitAuthorizationCodeResponse response = new SubmitAuthorizationCodeResponse();
+            response.setTransactionId(executor.execute(request, apiClient));
+            return response;
         } catch (ApiException e) {
             logger.error("Submit authorisation code failed", e);
             throw new XS2AClientException(e);

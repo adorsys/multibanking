@@ -2,10 +2,7 @@ package de.adorsys.multibanking.xs2a;
 
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.request.*;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
-import de.adorsys.multibanking.domain.response.InitiatePaymentResponse;
-import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
-import de.adorsys.multibanking.domain.response.ScaMethodsResponse;
+import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.xs2a.error.XS2AClientException;
 import de.adorsys.multibanking.xs2a.executor.ConsentUpdateRequestExecutor;
 import de.adorsys.multibanking.xs2a.executor.PaymentUpdateRequestExecutor;
@@ -436,12 +433,12 @@ public class XS2ABankingTest {
         when(executor.buildRequest(submitPaymentRequest)).thenReturn(updateRequest);
         when(executor.execute(updateRequest, apiClient)).thenReturn(trxId);
 
-        String transactionId = xs2aBanking.submitAuthorizationCode(submitPaymentRequest);
+        SubmitAuthorizationCodeResponse response = xs2aBanking.submitAuthorizationCode(submitPaymentRequest);
 
         verify(executor, times(1)).buildRequest(submitPaymentRequest);
         verify(executor, times(1)).execute(updateRequest, apiClient);
 
-        assertThat(transactionId).isEqualTo(trxId);
+        assertThat(response.getTransactionId()).isEqualTo(trxId);
     }
 
     @Test(expected = XS2AClientException.class)
