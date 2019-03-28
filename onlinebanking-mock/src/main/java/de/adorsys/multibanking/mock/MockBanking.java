@@ -63,7 +63,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
         return null;
     }
 
@@ -172,7 +172,7 @@ public class MockBanking implements OnlineBankingService {
                         BankAccount.class,
                         ba.getBankCode(),
                         iban);
-        return new BalancesReport().readyBalance(account.getBalances().getReadyBalance());
+        return account.getBalances();
     }
 
     public RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {

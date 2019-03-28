@@ -294,7 +294,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
         return null;
     }
 

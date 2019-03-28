@@ -20,10 +20,13 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @Builder
 public class CreateConsentResponse {
     private String consentId;
     private LocalDate validUntil;
+    private Map<String, String> links = new HashMap<>();
 }

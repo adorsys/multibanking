@@ -193,7 +193,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         Optional.ofNullable(bpdCache)
                 .ifPresent(cache -> transactionRequest.setBpd(cache.get(transactionRequest.getBankCode())));
         try {
-
             ScaRequiredJob scaJob = Optional.ofNullable(transactionRequest.getTransaction())
                     .map(sepaTransaction -> createScaJob(sepaTransaction.getTransactionType()))
                     .orElse(new EmptyJob());
@@ -205,7 +204,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
+    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
         try {
             ScaRequiredJob scaJob = Optional.ofNullable(submitAuthorizationCodeRequest.getSepaTransaction())
                     .map(sepaTransaction -> createScaJob(sepaTransaction.getTransactionType()))

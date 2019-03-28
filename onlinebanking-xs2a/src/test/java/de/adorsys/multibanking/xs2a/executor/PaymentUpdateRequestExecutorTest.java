@@ -71,6 +71,8 @@ public class PaymentUpdateRequestExecutorTest {
     public void createRequest() {
         Xs2aTanSubmit tanSubmit = new Xs2aTanSubmit();
         tanSubmit.setTransactionId(PAYMENT_ID);
+        tanSubmit.setPaymentService(SINGLE_PAYMENT_SERVICE);
+        tanSubmit.setPaymentProduct(SEPA_CREDIT_TRANSFERS);
         PaymentXS2AUpdateRequest request = executor.createRequest(tanSubmit);
 
         assertThat(request.getPaymentId()).isEqualTo(PAYMENT_ID);

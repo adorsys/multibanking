@@ -24,6 +24,7 @@ public abstract class AbstractScaTransaction {
     private BankAccount debtorBankAccount;
     private String orderId;
     private String paymentId;
+    private String product;
 
     public abstract TransactionType getTransactionType();
 
