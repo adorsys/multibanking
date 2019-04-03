@@ -22,19 +22,16 @@ import de.adorsys.psd2.client.ApiClient;
 import de.adorsys.psd2.client.ApiException;
 import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 
-import static de.adorsys.multibanking.xs2a.XS2ABanking.SEPA_CREDIT_TRANSFERS;
-import static de.adorsys.multibanking.xs2a.XS2ABanking.SINGLE_PAYMENT_SERVICE;
-
 public class PaymentUpdateRequestExecutor extends AbstractUpdateRequestExecutor<PaymentXS2AUpdateRequest> {
     @Override
     public String execute(PaymentXS2AUpdateRequest req, ApiClient apiClient) throws ApiException {
         PaymentInitiationServicePisApi pis = createApiClient(apiClient);
         pis.updatePaymentPsuData(req.getService(), req.getProduct(), req.getPaymentId(), req.getAuthorisationId(),
-                req.getRequestId(), req.getBody(), null, null, null,
-                req.getPsuId(), null, req.getPsuCorporateId(), null,
-                req.getPsuIpAddress(), null, null, null,
-                null, null, null, null,
-                null, null);
+                                 req.getRequestId(), req.getBody(), null, null, null,
+                                 req.getPsuId(), null, req.getPsuCorporateId(), null,
+                                 req.getPsuIpAddress(), null, null, null,
+                                 null, null, null, null,
+                                 null, null);
         return req.getPaymentId();
     }
 
@@ -42,8 +39,8 @@ public class PaymentUpdateRequestExecutor extends AbstractUpdateRequestExecutor<
     PaymentXS2AUpdateRequest createRequest(Xs2aTanSubmit tanSubmit) {
         PaymentXS2AUpdateRequest request = new PaymentXS2AUpdateRequest();
         request.setPaymentId(tanSubmit.getTransactionId());
-        request.setService(SINGLE_PAYMENT_SERVICE);
-        request.setProduct(SEPA_CREDIT_TRANSFERS);
+        request.setService(tanSubmit.getPaymentService());
+        request.setProduct(tanSubmit.getPaymentProduct());
         return request;
     }
 

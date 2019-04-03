@@ -14,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -64,7 +63,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
         return null;
     }
 

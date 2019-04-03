@@ -42,7 +42,7 @@ public interface OnlineBankingService {
 
     AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest);
 
-    String submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
+    SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
 
     boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference);
 
