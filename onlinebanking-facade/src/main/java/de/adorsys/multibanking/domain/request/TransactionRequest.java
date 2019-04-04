@@ -36,5 +36,6 @@ public class TransactionRequest extends AbstractRequest {
     private String authorisationId;
     private String bankCode;
     private String pin;
-
+    private Boolean multilevelScaFirstUser;
+    private Boolean multilevelScaSecondUser;
 }

@@ -31,4 +31,6 @@ public class SubmitAuthorizationCodeRequest extends AbstractRequest {
     private Object tanSubmit;
     private String pin;
     private String tan;
+    private Boolean multilevelScaFirstUser;
+    private Boolean multilevelScaSecondUser;
 }

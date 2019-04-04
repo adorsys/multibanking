@@ -27,22 +27,21 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.hbci.model.*;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.kapott.hbci.GV.AbstractHBCIJob;
-import org.kapott.hbci.GV.GVTAN2Step;
+import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.manager.ChallengeInfo;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.manager.HHDVersion;
+
+import org.kapott.hbci.passport.HBCIPassportInternal;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.createDialog;
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
@@ -117,6 +116,15 @@ public abstract class ScaRequiredJob {
                     dialog.getPassport()), hktan);
         }
 
+        if (BooleanUtils.isTrue(sepaTransactionRequest.getMultilevelScaSecondUser())) {
+            HBCIPassportInternal passport = dialog.getPassport();
+            passport.getBPD().put("Params.VeuEmptySignatureHeaderPar1.SegHead.code", "BNLSK");
+            passport.getBPD().put("Params.VeuEmptySignatureCloserPar1.SegHead.code", "BNLSA");
+
+            dialog.getMessages().get(0).add(0, new GVVeuEmptySignatureHeader(passport));
+            dialog.getMessages().get(0).add(3, new GVVeuEmptySignatureCloser(passport));
+        }
+
         if (dialog.getPassport().tanMediaNeeded()) {
             hktan.setParam("tanmedia", sepaTransactionRequest.getTanTransportType().getMedium());
         }
@@ -187,6 +195,21 @@ public abstract class ScaRequiredJob {
             paymentGV = submitProcess2(hbciTanSubmit, hbciDialog);
         }
 
+        if (BooleanUtils.isTrue(submitAuthorizationCodeRequest.getMultilevelScaSecondUser())) {
+            GVVeuStep veuStep = new GVVeuStep(hbciPassport);
+            veuStep.setParam("orderid", submitAuthorizationCodeRequest.getSepaTransaction().getOrderId());
+            veuStep.setParam("src.number", submitAuthorizationCodeRequest.getSepaTransaction().getDebtorBankAccount().getAccountNumber());
+            veuStep.setParam("src.country", hbciPassport.getCountry());
+            veuStep.setParam("src.blz", submitAuthorizationCodeRequest.getBankCode());
+            hbciDialog.getMessages().get(0).add(veuStep);
+        }
+
+        if (BooleanUtils.isTrue(submitAuthorizationCodeRequest.getMultilevelScaFirstUser()) ||
+                BooleanUtils.isTrue(submitAuthorizationCodeRequest.getMultilevelScaSecondUser())) {
+            hbciDialog.getMessages().get(0).add(0, new GVVeuEmptySignatureHeader(hbciPassport));
+            hbciDialog.getMessages().get(0).add(hbciDialog.getMessages().get(0).size(), new GVVeuEmptySignatureCloser(hbciPassport));
+        }
+
         HBCIExecStatus status = hbciDialog.execute(true);
         if (!status.isOK()) {
             throw new HbciException(status.getDialogStatus().getErrorString());
@@ -248,6 +271,9 @@ public abstract class ScaRequiredJob {
         bpd.put("Params." + hbciTanSubmit.getOriginLowLevelName() + "Par" + hbciTanSubmit.getOriginSegVersion() +
                 ".SegHead.code", hbciTanSubmit.getHbciJobName());
         bpd.put("Params.TAN2StepPar" + hbciTanSubmit.getTwoStepMechanism().getSegversion() + ".SegHead.code", "HKTAN");
+        bpd.put("Params.VeuStepPar1.SegHead.code", "BKTAS");
+        bpd.put("Params.VeuEmptySignatureHeaderPar1.SegHead.code", "BNLSK");
+        bpd.put("Params.VeuEmptySignatureCloserPar1.SegHead.code", "BNLSA");
         bpd.put("BPA.numgva", "100"); //dummy value
 
         HbciPassport.State state = HbciPassport.State.fromJson(hbciTanSubmit.getPassportState());
