@@ -30,6 +30,7 @@ public class BankAccessEntity extends BankAccess {
     private boolean categorizeBookings;
     private boolean storeAnalytics;
     private boolean storeAnonymizedBookings;
+    private boolean provideDataForMachineLearning;
 
     public BankAccessEntity id(String id) {
         this.id = id;

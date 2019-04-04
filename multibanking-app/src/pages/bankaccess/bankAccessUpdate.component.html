@@ -39,6 +39,11 @@
         <ion-label>Save Analytics</ion-label>
         <ion-toggle [(ngModel)]="bankAccess.storeAnalytics" [ngModelOptions]="{standalone: true}"></ion-toggle>
       </ion-item>
+
+      <ion-item>
+        <ion-label>Provide data for machine learning</ion-label>
+        <ion-toggle [(ngModel)]="bankAccess.provideDataForMachineLearning" [ngModelOptions]="{standalone: true}"></ion-toggle>
+      </ion-item>
     </ion-item-group>
 
     <button ion-button color="primary" block type="submit">Submit</button>
