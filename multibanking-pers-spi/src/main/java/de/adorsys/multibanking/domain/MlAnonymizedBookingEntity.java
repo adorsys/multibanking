@@ -9,18 +9,18 @@ import lombok.Data;
 @Data
 @Document
 public class MlAnonymizedBookingEntity {
-	
+
 	@Id
-    private String id;
+	private String id;
 	@Indexed
 	private final String userId;
-    private final String transactionPurpose;
-    private final String amountBin;
-    private final String amountRemainder;
-    private final String creditorId;
-    private final String referenceName;
-    private final String executionDate;
-    private final String mainCategory;
-    private final String subCategory;
-    private final String specification;
+	private final String transactionPurpose;
+	private final String amountBin;
+	private final String amountRemainder;
+	private final String creditorId;
+	private final String referenceName;
+	private final String executionDate;
+	private final String mainCategory;
+	private final String subCategory;
+	private final String specification;
 }
