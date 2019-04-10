@@ -36,8 +36,4 @@ public class BankAccountEntity extends BankAccount {
         return this;
     }
 
-    public BankAccountEntity bankAccessId(String bankAccessId) {
-        this.bankAccessId = bankAccessId;
-        return this;
-    }
 }

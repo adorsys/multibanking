@@ -1,7 +1,7 @@
 import { Component } from "@angular/core";
 import { NavController, NavParams, LoadingController, AlertController, ToastController } from "ionic-angular";
 import { PaymentService } from "../../services/payment.service";
-import { BankAccess, Payment, ResourceBankAccount, ResourcePaymentEntity, TanTransportType } from "../../model/multibanking/models";
+import { BankAccess, ResourceBankAccount, ResourcePaymentEntity, TanTransportType, SinglePayment } from "../../model/multibanking/models";
 import { BankService } from "../../services/bank.service";
 
 @Component({
@@ -13,7 +13,7 @@ export class PaymentCreatePage {
   bankAccess: BankAccess;
   bankAccount: ResourceBankAccount;
   tanTransportType: TanTransportType;
-  payment: Payment = { receiver: "", purpose: "", amount: undefined };
+  payment: SinglePayment = { receiver: "", purpose: "", amount: undefined };
   pin: string;
 
   constructor(public navCtrl: NavController,
@@ -34,7 +34,6 @@ export class PaymentCreatePage {
         let tanTransportTypes = this.bankAccess.tanTransportTypes[bank.bankApi];
         if (tanTransportTypes) {
           this.tanTransportType = tanTransportTypes[0];
-          this.payment.tanMedia = this.tanTransportType;
         } else {
           this.showMissingTanTransportTypeError();
         }
@@ -120,7 +119,7 @@ export class PaymentCreatePage {
     this.paymentService.getPayment(paymentLocation).subscribe(
       payment => {
         let alert = this.alertCtrl.create({
-          title: payment.paymentChallenge.title,
+          title: '', //TODO challenge
           inputs: [
             {
               name: 'tan',
@@ -152,7 +151,7 @@ export class PaymentCreatePage {
   submitPayment(payment: ResourcePaymentEntity, tan: string) {
     this.paymentService.submitPayment(this.bankAccess.id, this.bankAccount.id, payment.id, { pin: this.pin, tan: tan }).subscribe(
       response => {
-        this.payment = { receiver: "", purpose: "", receiverIban: "", amount: undefined, tanMedia: this.tanTransportType };
+        this.payment = { receiver: "", purpose: "", receiverIban: "", amount: undefined };
         this.toastCtrl.create({
           message: 'Payment successful',
           showCloseButton: true,

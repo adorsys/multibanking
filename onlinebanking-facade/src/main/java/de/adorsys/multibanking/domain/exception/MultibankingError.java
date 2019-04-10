@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.exception;
 
-import lombok.Builder;
-import lombok.Data;
+public enum MultibankingError {
 
-@Data
-@Builder
-public class AccountReference {
-    private String iban;
-    private String currency;
+    HBCI_ERROR,
+    INVALID_PAYMENT,
+    INVALID_SCA_METHOD,
+    INVALID_CONSENT,
+    INVALID_PIN,
+    INVALID_TAN
+
 }

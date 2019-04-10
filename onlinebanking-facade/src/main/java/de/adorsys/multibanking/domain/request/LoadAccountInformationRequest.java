@@ -27,6 +27,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class LoadAccountInformationRequest extends AbstractRequest {
 
+    private String consentId;
     private BankApiUser bankApiUser;
     private BankAccess bankAccess;
     private String bankCode;

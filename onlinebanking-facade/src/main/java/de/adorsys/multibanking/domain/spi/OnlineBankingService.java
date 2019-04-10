@@ -44,8 +44,8 @@ public interface OnlineBankingService {
 
     SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
 
-    boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference);
+    boolean accountInformationConsentRequired();
 
-    CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest startScaRequest);
+    CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest createConsentRequest);
 
 }

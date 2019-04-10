@@ -281,8 +281,12 @@ export class BookingListPage {
     loading.present();
 
     this.bankAccountService.syncBookings(this.bankAccess.id, this.bankAccount.id, pin).subscribe(
-      response => {
+      consent => {
         loading.dismiss();
+        if (consent) {
+          console.log(consent.authUrl+'&successUrl='+location.href);
+          location.href = consent.authUrl+'&successUrl='+location.href;
+        }
       },
       messages => {
         if (messages instanceof Array) {

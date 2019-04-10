@@ -23,5 +23,5 @@ import io.swagger.annotations.ApiModel;
  */
 @ApiModel(description = "The banking access backend", value = "BankApi")
 public enum BankApi {
-    HBCI, FIGO, FINAPI, XS2A, MOCK, FIGO_ALTERNATIVE, SCREEN_SCRAPPING
+    HBCI, FIGO, FINAPI, XS2A, BANKING_GATEWAY, MOCK, FIGO_ALTERNATIVE, SCREEN_SCRAPPING
 }

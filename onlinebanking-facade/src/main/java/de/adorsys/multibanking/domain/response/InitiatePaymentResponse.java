@@ -27,5 +27,5 @@ import java.util.Map;
 public class InitiatePaymentResponse {
     private String transactionStatus;
     private String paymentId;
-    private Map<String, String> links = new HashMap<>();
+    private String authorisationUrl;
 }

@@ -9,6 +9,7 @@ import de.adorsys.multibanking.xs2a.executor.PaymentUpdateRequestExecutor;
 import de.adorsys.multibanking.xs2a.executor.UpdateRequestExecutor;
 import de.adorsys.multibanking.xs2a.model.XS2AUpdateRequest;
 import de.adorsys.multibanking.xs2a.model.Xs2aTanSubmit;
+import de.adorsys.multibanking.xs2a.pis.PaymentProductType;
 import de.adorsys.psd2.client.ApiClient;
 import de.adorsys.psd2.client.ApiException;
 import de.adorsys.psd2.client.api.AccountInformationServiceAisApi;
@@ -16,7 +17,6 @@ import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.AccountReference;
 import de.adorsys.psd2.client.model.Balance;
 import de.adorsys.psd2.client.model.*;
-import de.adorsys.multibanking.xs2a.pis.PaymentProductType;
 import domain.Xs2aBankApiUser;
 import org.iban4j.CountryCode;
 import org.iban4j.Iban;
@@ -94,18 +94,18 @@ public class XS2ABankingTest {
     @Test
     public void authenticatePsu() throws ApiException {
         AuthenticatePsuRequest request = AuthenticatePsuRequest.builder()
+                .paymentService(SINGLE_PAYMENT_SERVICE)
+                .paymentProduct(SEPA_CREDIT_TRANSFERS)
                 .bankCode("08098")
                 .customerId(CORPORATE_ID)
                 .login(PSU_ID)
                 .paymentId(PAYMENT_ID)
-                .paymentProduct(SEPA_CREDIT_TRANSFERS)
-                .paymentService(SINGLE_PAYMENT_SERVICE)
                 .pin(PIN)
                 .build();
 
         StartScaprocessResponse scaProcessResponse = new StartScaprocessResponse();
-        Map<String, String> links = new HashMap<>();
-        links.put("startAuthorisationWithPsuAuthentication", BANKING_URL + "/" + AUTHORISATION_ID);
+        Map<String, Map<String, String>> links = new HashMap<>();
+        links.put("startAuthorisationWithPsuAuthentication", Collections.singletonMap("href",  BANKING_URL + "/" + AUTHORISATION_ID));
         scaProcessResponse.setLinks(links);
         ArgumentCaptor<UpdatePsuAuthentication> psuBodyCaptor = ArgumentCaptor.forClass(UpdatePsuAuthentication.class);
 
@@ -189,12 +189,12 @@ public class XS2ABankingTest {
         String pin = "pin";
 
         AuthenticatePsuRequest request = AuthenticatePsuRequest.builder()
+                .paymentService(SINGLE_PAYMENT_SERVICE)
+                .paymentProduct(SEPA_CREDIT_TRANSFERS)
                 .bankCode("08098")
                 .customerId(custId)
                 .login(psuId)
                 .paymentId(paymentId)
-                .paymentProduct(SEPA_CREDIT_TRANSFERS)
-                .paymentService(SINGLE_PAYMENT_SERVICE)
                 .pin(pin)
                 .build();
 
@@ -282,8 +282,7 @@ public class XS2ABankingTest {
 
         assertThat(response.getPaymentId()).isEqualTo(PAYMENT_ID);
         assertThat(response.getTransactionStatus()).isEqualTo(TransactionStatus.RCVD.name());
-        assertThat(response.getLinks()).hasSize(1);
-        assertThat(response.getLinks().get("self")).isEqualTo(BANKING_URL);
+        assertThat(response.getAuthorisationUrl()).isEqualTo(BANKING_URL + "/" + AUTHORISATION_ID);
     }
 
     @Test(expected = XS2AClientException.class)
@@ -326,8 +325,10 @@ public class XS2ABankingTest {
         Map<String, Object> map = new HashMap<>();
         map.put("transactionStatus", TransactionStatus.RCVD.name());
         map.put("paymentId", PAYMENT_ID);
-        HashMap<String, String> links = new HashMap<>();
-        links.put("self", BANKING_URL);
+
+        HashMap<String, Map<String, String>> links = new HashMap<>();
+        links.put("self", Collections.singletonMap("href", BANKING_URL));
+        links.put("scaRedirect", Collections.singletonMap("href", BANKING_URL + "/" + AUTHORISATION_ID));
         map.put("_links", links);
         return map;
     }

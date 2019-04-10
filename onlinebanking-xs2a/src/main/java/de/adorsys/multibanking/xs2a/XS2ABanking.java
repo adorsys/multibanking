@@ -3,6 +3,7 @@ package de.adorsys.multibanking.xs2a;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
@@ -12,6 +13,10 @@ import de.adorsys.multibanking.xs2a.executor.PaymentUpdateRequestExecutor;
 import de.adorsys.multibanking.xs2a.executor.UpdateRequestExecutor;
 import de.adorsys.multibanking.xs2a.model.XS2AUpdateRequest;
 import de.adorsys.multibanking.xs2a.model.Xs2aTanSubmit;
+import de.adorsys.multibanking.xs2a.pis.PaymentInitiationBuilderStrategy;
+import de.adorsys.multibanking.xs2a.pis.PaymentInitiationBuilderStrategyImpl;
+import de.adorsys.multibanking.xs2a.pis.PaymentProductType;
+import de.adorsys.multibanking.xs2a.pis.PaymentServiceType;
 import de.adorsys.psd2.client.ApiClient;
 import de.adorsys.psd2.client.ApiException;
 import de.adorsys.psd2.client.api.AccountInformationServiceAisApi;
@@ -19,10 +24,6 @@ import de.adorsys.psd2.client.api.PaymentInitiationServicePisApi;
 import de.adorsys.psd2.client.model.AccountReference;
 import de.adorsys.psd2.client.model.Balance;
 import de.adorsys.psd2.client.model.*;
-import de.adorsys.multibanking.xs2a.pis.PaymentInitiationBuilderStrategy;
-import de.adorsys.multibanking.xs2a.pis.PaymentInitiationBuilderStrategyImpl;
-import de.adorsys.multibanking.xs2a.pis.PaymentProductType;
-import de.adorsys.multibanking.xs2a.pis.PaymentServiceType;
 import domain.Xs2aBankApiUser;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
@@ -65,11 +66,11 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     private static SSLSocketFactory defaultSslSocketFactory() {
-        SSLContext sslContext = null;
+        SSLContext sslContext;
         try {
             sslContext = SSLContext.getDefault();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         return sslContext.getSocketFactory();
     }
@@ -105,6 +106,7 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -123,6 +125,7 @@ public class XS2ABanking implements OnlineBankingService {
         throw new IllegalArgumentException("Neither payment nor consent id was set");
     }
 
+    @SuppressWarnings("unchecked")
     private ScaMethodsResponse authenticatePsuForPayment(AuthenticatePsuRequest authenticatePsuRequest,
                                                          ApiClient apiClient) {
         PaymentInitiationServicePisApi service = createPaymentInitiationServicePisApi(apiClient);
@@ -136,17 +139,19 @@ public class XS2ABanking implements OnlineBankingService {
 
         try {
             StartScaprocessResponse response;
-            response = service.startPaymentAuthorisation(authenticatePsuRequest.getPaymentService(), authenticatePsuRequest.getPaymentProduct(), paymentId,
-                                                         xRequestId, psuId,
-                                                         null, null, null, null, null, null, PSU_IP_ADDRESS,
-                                                         null, null, null, null, null, null, null, null, null);
+            response = service.startPaymentAuthorisation(authenticatePsuRequest.getPaymentService(),
+                    authenticatePsuRequest.getPaymentProduct(), paymentId,
+                    xRequestId, psuId,
+                    null, null, null, null, null, null, PSU_IP_ADDRESS,
+                    null, null, null, null, null, null, null, null, null);
             String authorisationId = getAuthorizationId(response);
-            Map<String, Object> updatePsu = (Map<String, Object>) service.updatePaymentPsuData(authenticatePsuRequest.getPaymentService()
+            Map<String, Object> updatePsu =
+                    (Map<String, Object>) service.updatePaymentPsuData(authenticatePsuRequest.getPaymentService()
                     , authenticatePsuRequest.getPaymentProduct(), paymentId, authorisationId, xRequestId, psuBody,
-                                                                                               null, null, null, psuId, null, corporateId,
-                                                                                               null, PSU_IP_ADDRESS, null, null,
-                                                                                               null, null, null,
-                                                                                               null, null, null, null);
+                    null, null, null, psuId, null, corporateId,
+                    null, PSU_IP_ADDRESS, null, null,
+                    null, null, null,
+                    null, null, null, null);
             return buildPsuAuthenticationResponse(updatePsu, authorisationId);
         } catch (ApiException e) {
             logger.error("Authorise PSU failed", e);
@@ -158,6 +163,7 @@ public class XS2ABanking implements OnlineBankingService {
         return new PaymentInitiationServicePisApi(apiClient);
     }
 
+    @SuppressWarnings("unchecked")
     private ScaMethodsResponse authenticatePsuForAccountInformationConsent(
             AuthenticatePsuRequest authenticatePsuRequest, ApiClient apiClient) {
         AccountInformationServiceAisApi ais = createAccountInformationServiceAisApi(apiClient);
@@ -201,10 +207,13 @@ public class XS2ABanking implements OnlineBankingService {
         return updatePsuAuthentication;
     }
 
+    @SuppressWarnings("unchecked")
     private String getAuthorizationId(StartScaprocessResponse response) {
-        String link = (String) response.getLinks().get("startAuthorisationWithPsuAuthentication");
+        Map<String, Map<String, String>> links = response.getLinks();
+
+        String link = links.get("startAuthorisationWithPsuAuthentication").get("href");
         if (StringUtils.isBlank(link)) {
-            link = (String) response.getLinks().get("startAuthorisationWithPsuIdentification");
+            link = links.get("startAuthorisationWithPsuIdentification").get("href");
         }
         if (StringUtils.isNotBlank(link)) {
             int index = link.lastIndexOf('/') + 1;
@@ -213,9 +222,10 @@ public class XS2ABanking implements OnlineBankingService {
         throw new XS2AClientException("authorisation id was not found in the response");
     }
 
+    @SuppressWarnings("unchecked")
     private ScaMethodsResponse buildPsuAuthenticationResponse(Map<String, Object> response, String authorisationId) {
         List<TanTransportType> transportTypes = ((List<Map<String, String>>) response.getOrDefault(SCA_METHODS,
-                Collections.EMPTY_LIST))
+                Collections.emptyList()))
                 .stream()
                 .map(this::createTanType)
                 .collect(Collectors.toList());
@@ -249,12 +259,13 @@ public class XS2ABanking implements OnlineBankingService {
                             .collect(Collectors.toList()))
                     .build();
         } catch (ApiException e) {
-            throw new RuntimeException(e);
+            throw new MultibankingException(e);
         }
     }
 
     @Override
     public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -280,8 +291,7 @@ public class XS2ABanking implements OnlineBankingService {
                     .build();
 
         } catch (ApiException e) {
-
-            throw new RuntimeException(e);
+            throw new MultibankingException(e);
         }
     }
 
@@ -289,7 +299,7 @@ public class XS2ABanking implements OnlineBankingService {
     public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
         List<BankAccount> bankAccounts = loadBalanceRequest.getBankAccounts();
         if (bankAccounts.isEmpty()) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
         if (bankAccounts.size() > 1) {
             logger.warn("Only first bank account will be processed");
@@ -368,6 +378,7 @@ public class XS2ABanking implements OnlineBankingService {
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
         UUID xRequestId = UUID.randomUUID();
@@ -403,13 +414,15 @@ public class XS2ABanking implements OnlineBankingService {
 
     @Override
     public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
+        throw new UnsupportedOperationException();
     }
 
+    @SuppressWarnings("unchecked")
     private InitiatePaymentResponse getInitiatePaymentResponse(Map<String, Object> response) {
         String transactionStatus = (String) response.get("transactionStatus");
         String paymentId = (String) response.get("paymentId");
-        Map<String, String> links = (Map<String, String>) response.get("_links");
-        return new InitiatePaymentResponse(transactionStatus, paymentId, links);
+        Map<String, Map<String, String>> links = (Map<String, Map<String, String>>) response.get("_links");
+        return new InitiatePaymentResponse(transactionStatus, paymentId, links.get("scaRedirect").get("href"));
     }
 
     @Override
@@ -421,6 +434,7 @@ public class XS2ABanking implements OnlineBankingService {
         return requestAuthorizationCodeForPayment(bankingUrl, request, apiClient);
     }
 
+    @SuppressWarnings("unchecked")
     private AuthorisationCodeResponse requestAuthorizationCodeForPayment(String bankingUrl,
                                                                          TransactionRequest paymentRequest,
                                                                          ApiClient apiClient) {
@@ -444,17 +458,18 @@ public class XS2ABanking implements OnlineBankingService {
 
         try {
             Map<String, Object> updatePsuData =
-                    (Map<String, Object>) service.updatePaymentPsuData(paymentService.getType(), paymentProduct.getType(),
-                                                                       paymentId, authorisationId,
-                                                                       xRequestId, body,
-                                                                       null, null,
-                                                                       null, psuId,
-                                                                       null, corporateId,
-                                                                       null, PSU_IP_ADDRESS,
-                                                                       null, null,
-                                                                       null, null,
-                                                                       null, null,
-                                                                       null, null, null);
+                    (Map<String, Object>) service.updatePaymentPsuData(paymentService.getType(),
+                            paymentProduct.getType(),
+                            paymentId, authorisationId,
+                            xRequestId, body,
+                            null, null,
+                            null, psuId,
+                            null, corporateId,
+                            null, PSU_IP_ADDRESS,
+                            null, null,
+                            null, null,
+                            null, null,
+                            null, null, null);
 
             return buildAuthorisationCodeResponse(updatePsuData, tanSubmit);
         } catch (ApiException e) {
@@ -463,6 +478,7 @@ public class XS2ABanking implements OnlineBankingService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private AuthorisationCodeResponse buildAuthorisationCodeResponse(Map<String, Object> updatePsuData,
                                                                      Xs2aTanSubmit tanSubmit) {
         AuthorisationCodeResponse response = new AuthorisationCodeResponse();
@@ -482,6 +498,7 @@ public class XS2ABanking implements OnlineBankingService {
         return selectPsuAuthenticationMethod;
     }
 
+    @SuppressWarnings("unchecked")
     private AuthorisationCodeResponse requestAuthorizationCodeForAccountInformationConsent(TransactionRequest request,
                                                                                            ApiClient apiClient) {
         AccountInformationServiceAisApi ais = createAccountInformationServiceAisApi(apiClient);
@@ -534,16 +551,17 @@ public class XS2ABanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference) {
-        return !Optional.ofNullable(bankApiUser.getProperties().get("consentId-" + accountReference)).isPresent();
+    public boolean accountInformationConsentRequired() {
+        return true;
     }
 
     @Override
-    public CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest request) {
+    public CreateConsentResponse createAccountInformationConsent(String bankingUrl,
+                                                                 CreateConsentRequest createConsentRequest) {
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(createApiClient(bankingUrl));
 
-        Consents consents = toConsents(request);
-        BankAccess bankAccess = request.getBankAccess();
+        Consents consents = toConsents(createConsentRequest);
+        BankAccess bankAccess = createConsentRequest.getBankAccess();
         ConsentsResponse201 response;
         try {
             response = ais.createConsent(UUID.randomUUID(), consents, null, null, null, bankAccess.getBankLogin(), null,
@@ -568,12 +586,12 @@ public class XS2ABanking implements OnlineBankingService {
         }
 
         @SuppressWarnings("unchecked")
-        Map<String, String> links = response.getLinks();
+        Map<String, Map<String, String>> links = response.getLinks();
 
         return CreateConsentResponse.builder()
                 .consentId(consentId)
                 .validUntil(consentInformation.getValidUntil())
-                .links(links)
+                .authorisationUrl(links.get("scaRedirect").get("href"))
                 .build();
     }
 
@@ -595,9 +613,9 @@ public class XS2ABanking implements OnlineBankingService {
         return accountAccess;
     }
 
-    private List<AccountReference> toAccountReferences(List<de.adorsys.multibanking.domain.AccountReference> accounts) {
+    private List<AccountReference> toAccountReferences(List<BankAccount> accounts) {
         ArrayList<AccountReference> accountReferences = new ArrayList<>();
-        for (de.adorsys.multibanking.domain.AccountReference account : accounts) {
+        for (BankAccount account : accounts) {
             AccountReference accountReference = new AccountReference();
             accountReference.setIban(account.getIban());
             accountReference.setCurrency(account.getCurrency());
@@ -623,7 +641,7 @@ public class XS2ABanking implements OnlineBankingService {
         client.setSslSocketFactory(sslSocketFactory);
         apiClient.setHttpClient(client);
         Optional.ofNullable(bankingUrl)
-                .ifPresent(url -> apiClient.setBasePath(url));
+                .ifPresent(apiClient::setBasePath);
 
         return apiClient;
     }

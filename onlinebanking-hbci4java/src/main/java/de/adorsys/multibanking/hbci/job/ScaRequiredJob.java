@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.Product;
 import de.adorsys.multibanking.domain.TanChallenge;
-import de.adorsys.multibanking.domain.exception.HbciException;
+import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
@@ -44,6 +44,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_SCA_METHOD;
 import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.createDialog;
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
@@ -68,14 +70,14 @@ public abstract class ScaRequiredJob {
         HbciCallback hbciCallback = new HbciCallback() {
 
             @Override
-            public void tanChallengeCallback(String orderRef, String challenge, String challenge_hhd_uc,
+            public void tanChallengeCallback(String orderRef, String challenge, String challengeHhdUc,
                                              HHDVersion.Type type) {
                 //needed later for submitAuthorizationCode
                 hbciTanSubmit.setOrderRef(orderRef);
                 if (challenge != null) {
                     response.setChallenge(TanChallenge.builder()
                             .title(challenge)
-                            .data(challenge_hhd_uc)
+                            .data(challengeHhdUc)
                             .build());
                 }
             }
@@ -100,7 +102,8 @@ public abstract class ScaRequiredJob {
         HBCITwoStepMechanism hbciTwoStepMechanism =
                 dialog.getPassport().getBankTwostepMechanisms().get(sepaTransactionRequest.getTanTransportType().getId());
         if (hbciTwoStepMechanism == null)
-            throw new HbciException("inavalid two stem mechanism: " + sepaTransactionRequest.getTanTransportType().getId());
+            throw new MultibankingException(INVALID_SCA_METHOD,
+                    "inavalid two stem mechanism: " + sepaTransactionRequest.getTanTransportType().getId());
 
         dialog.getPassport().setCurrentSecMechInfo(hbciTwoStepMechanism);
 
@@ -123,7 +126,7 @@ public abstract class ScaRequiredJob {
 
         HBCIExecStatus status = dialog.execute(false);
         if (!status.isOK()) {
-            throw new HbciException(status.getDialogStatus().getErrorString());
+            throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorString());
         }
 
         hbciTanSubmit.setPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
@@ -189,7 +192,7 @@ public abstract class ScaRequiredJob {
 
         HBCIExecStatus status = hbciDialog.execute(true);
         if (!status.isOK()) {
-            throw new HbciException(status.getDialogStatus().getErrorString());
+            throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorString());
         } else {
             return createResponse(hbciTanSubmit, paymentGV, status);
         }
@@ -277,14 +280,15 @@ public abstract class ScaRequiredJob {
         }
     }
 
-    private SubmitAuthorizationCodeResponse createResponse(HbciTanSubmit hbciTanSubmit, AbstractHBCIJob paymentGV, HBCIExecStatus status) {
+    private SubmitAuthorizationCodeResponse createResponse(HbciTanSubmit hbciTanSubmit, AbstractHBCIJob paymentGV,
+                                                           HBCIExecStatus status) {
         String transactionId = Optional.ofNullable(paymentGV)
                 .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
                 .orElse(hbciTanSubmit.getOrderRef());
 
         SubmitAuthorizationCodeResponse response = new SubmitAuthorizationCodeResponse();
         response.setTransactionId(transactionId);
-        if (status.getDialogStatus().msgStatusList.size() > 0) {
+        if (!status.getDialogStatus().msgStatusList.isEmpty()) {
             response.setStatus(status.getDialogStatus().msgStatusList.get(0).segStatus.toString());
         }
         return response;

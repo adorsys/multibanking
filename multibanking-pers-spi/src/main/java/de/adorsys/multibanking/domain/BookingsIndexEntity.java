@@ -33,7 +33,7 @@ public class BookingsIndexEntity {
         new LinkedList<>(bookings)
                 .descendingIterator()
                 .forEachRemaining(booking -> {
-                    List<String> search = new ArrayList();
+                    List<String> search = new ArrayList<>();
                     if (booking.getBookingCategory() != null) {
                         if (StringUtils.hasText(booking.getBookingCategory().getReceiver())) {
                             search.add(booking.getBookingCategory().getReceiver());

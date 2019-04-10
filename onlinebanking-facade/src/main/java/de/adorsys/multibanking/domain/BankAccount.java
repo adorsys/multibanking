@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,9 @@ import java.util.Map;
 public class BankAccount {
 
     @ApiModelProperty(hidden = true)
-    private Map<BankApi, String> externalIdMap = new HashMap<>();
+    private Map<BankApi, String> externalIdMap = new EnumMap<>(BankApi.class);
+    @ApiModelProperty(value = "SCA consent")
+    private Consent dedicatedConsent;
     @ApiModelProperty(value = "Bank account balances")
     private BalancesReport balances;
     @ApiModelProperty(value = "Name of the account owner", example = "EDEKA")

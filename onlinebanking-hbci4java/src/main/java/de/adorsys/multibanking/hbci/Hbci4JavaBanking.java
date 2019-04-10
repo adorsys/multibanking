@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.exception.InvalidPinException;
+import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
@@ -126,15 +126,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 .pin(authenticatePsuRequest.getPin())
                 .build();
 
-        Optional.ofNullable(bpdCache)
-                .ifPresent(cache -> dialogRequest.setCallback(new HbciCallback() {
-                    @Override
-                    public void status(int statusTag, Object o) {
-                        if (statusTag == HBCICallback.STATUS_INST_BPD_INIT_DONE) {
-                            cache.put(authenticatePsuRequest.getBankCode(), (Map<String, String>) o);
-                        }
-                    }
-                }));
+        HbciCallback bpdCacheCallback = setRequestBpdAndCreateCallback(dialogRequest.getBankCode(), dialogRequest);
+        dialogRequest.setCallback(bpdCacheCallback);
 
         HBCIDialog dialog = createDialog(bankingUrl, dialogRequest);
 
@@ -146,7 +139,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
                                                            LoadAccountInformationRequest request) {
-        return loadBankAccounts(bankingUrl, request, null);
+        HbciCallback bpdCacheCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
+        return loadBankAccounts(bankingUrl, request, bpdCacheCallback);
     }
 
     public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
@@ -156,7 +150,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         Optional.ofNullable(bpdCache)
                 .ifPresent(cache -> request.setBpd(cache.get(request.getBankCode())));
         try {
-            return AccountInformationJob.loadBankAccounts(request, callback);
+            return new AccountInformationJob().loadBankAccounts(request, callback);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -223,6 +217,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
+    public boolean accountInformationConsentRequired() {
+        return false;
+    }
+
+    @Override
     public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
         //not needed
     }
@@ -230,14 +229,30 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
         checkBankExists(loadBookingsRequest.getBankCode(), bankingUrl);
-        Optional.ofNullable(bpdCache)
-                .ifPresent(cache -> loadBookingsRequest.setBpd(cache.get(loadBookingsRequest.getBankCode())));
+
+        HbciCallback bpdCacheCallback = setRequestBpdAndCreateCallback(loadBookingsRequest.getBankCode(), loadBookingsRequest);
 
         try {
-            return LoadBookingsJob.loadBookings(loadBookingsRequest);
+            return new LoadBookingsJob().loadBookings(loadBookingsRequest, bpdCacheCallback);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private HbciCallback setRequestBpdAndCreateCallback(String bankCode, AbstractRequest request) {
+        return Optional.ofNullable(bpdCache)
+                .map(cache -> {
+                    request.setBpd(cache.get(bankCode));
+                    return new HbciCallback() {
+                        @Override
+                        public void status(int statusTag, Object o) {
+                            if (statusTag == HBCICallback.STATUS_INST_BPD_INIT_DONE) {
+                                cache.put(bankCode, (Map<String, String>) o);
+                            }
+                        }
+                    };
+                }).orElse(null);
     }
 
     @Override
@@ -270,13 +285,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference) {
-        return false;
-    }
-
-    @Override
     public CreateConsentResponse createAccountInformationConsent(String bankingUrl,
-                                                                 CreateConsentRequest startScaRequest) {
+                                                                 CreateConsentRequest createConsentRequest) {
         return null;
     }
 
@@ -323,12 +333,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     private RuntimeException handleHbciException(HBCI_Exception e) {
         Throwable processException = e;
-        while (processException.getCause() != null && !(processException.getCause() instanceof InvalidPinException)) {
+        while (processException.getCause() != null && !(processException.getCause() instanceof MultibankingException)) {
             processException = processException.getCause();
         }
 
-        if (processException.getCause() instanceof InvalidPinException) {
-            return (InvalidPinException) processException.getCause();
+        if (processException.getCause() instanceof MultibankingException) {
+            return (MultibankingException) processException.getCause();
         }
 
         return e;

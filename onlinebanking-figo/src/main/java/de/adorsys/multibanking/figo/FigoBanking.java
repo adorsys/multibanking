@@ -1,8 +1,7 @@
 package de.adorsys.multibanking.figo;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.exception.HbciException;
-import de.adorsys.multibanking.domain.exception.InvalidPinException;
+import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
@@ -26,6 +25,8 @@ import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_TAN;
 import static de.adorsys.multibanking.domain.utils.Utils.getSecureRandom;
 
 /**
@@ -321,13 +322,13 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference) {
+    public boolean accountInformationConsentRequired() {
         return false;
     }
 
     @Override
     public CreateConsentResponse createAccountInformationConsent(String bankingUrl,
-                                                                 CreateConsentRequest startScaRequest) {
+                                                                 CreateConsentRequest createConsentRequest) {
 
         return null;
     }
@@ -339,7 +340,7 @@ public class FigoBanking implements OnlineBankingService {
         Status status = waitForFinish(session, taskToken);
 
         if (status != Status.OK && status != Status.TAN) {
-            throw new InvalidPinException(response.getMessage());
+            throw new MultibankingException(INVALID_PIN, response.getMessage());
         }
         return response;
     }
@@ -353,12 +354,11 @@ public class FigoBanking implements OnlineBankingService {
         Status status = waitForFinish(session, taskToken);
 
         if (status != Status.OK) {
-            throw new HbciException("figo tan error");
+            throw new MultibankingException(INVALID_TAN);
         }
     }
 
-    private void updateTanTransportTypes(BankAccess bankAccess, List<Account> accounts) throws FigoException,
-            IOException {
+    private void updateTanTransportTypes(BankAccess bankAccess, List<Account> accounts) {
         List<TanTransportType> tanTransportTypes = accounts
                 .stream()
                 .map(Account::getSupportedTanSchemes)
@@ -410,7 +410,7 @@ public class FigoBanking implements OnlineBankingService {
 
         if (taskStatus.isErroneous()) {
             if (taskStatus.getError().getCode() == 10000 || taskStatus.getError().getCode() == 10001) {
-                throw new InvalidPinException(taskStatus.getError().getMessage());
+                throw new MultibankingException(INVALID_PIN, taskStatus.getError().getMessage());
             }
             throw new RuntimeException(taskStatus.getError().getMessage());
         }
