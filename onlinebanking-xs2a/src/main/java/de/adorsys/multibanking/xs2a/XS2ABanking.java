@@ -422,7 +422,8 @@ public class XS2ABanking implements OnlineBankingService {
         String transactionStatus = (String) response.get("transactionStatus");
         String paymentId = (String) response.get("paymentId");
         Map<String, Map<String, String>> links = (Map<String, Map<String, String>>) response.get("_links");
-        return new InitiatePaymentResponse(transactionStatus, paymentId, links.get("scaRedirect").get("href"));
+        String scaRedirect = links.get("scaRedirect") != null ? links.get("scaRedirect").get("href") : null;
+        return new InitiatePaymentResponse(transactionStatus, paymentId, scaRedirect);
     }
 
     @Override
@@ -587,11 +588,12 @@ public class XS2ABanking implements OnlineBankingService {
 
         @SuppressWarnings("unchecked")
         Map<String, Map<String, String>> links = response.getLinks();
+        String scaRedirect = links.get("scaRedirect") != null ? links.get("scaRedirect").get("href") : null;
 
         return CreateConsentResponse.builder()
                 .consentId(consentId)
                 .validUntil(consentInformation.getValidUntil())
-                .authorisationUrl(links.get("scaRedirect").get("href"))
+                .authorisationUrl(scaRedirect)
                 .build();
     }
 
