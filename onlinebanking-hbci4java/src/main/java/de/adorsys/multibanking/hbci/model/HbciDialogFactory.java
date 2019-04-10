@@ -67,7 +67,7 @@ public class HbciDialogFactory {
                 state.getHbciProduct(), callback);
     }
 
-    public static HbciPassport createPassport(String hbciVersion, String bankCode, String customerId, String login,
+    private static HbciPassport createPassport(String hbciVersion, String bankCode, String customerId, String login,
                                               HBCIProduct hbciProduct, HbciCallback callback) {
         HashMap<String, String> properties = new HashMap<>();
         properties.put("kernel.rewriter", "InvalidSegment,WrongStatusSegOrder,WrongSequenceNumbers,MissingMsgRef," +

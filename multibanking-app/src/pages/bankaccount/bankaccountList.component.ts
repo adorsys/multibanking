@@ -5,7 +5,6 @@ import { BookingTabsPage } from "../booking-tabs/booking-tabs.component";
 import { BankAccessService } from "../../services/bankAccess.service";
 import { BankAccess, BankAccount } from "../../model/multibanking/models";
 
-
 @Component({
   selector: 'page-bankaccountList',
   templateUrl: 'bankaccountList.component.html'

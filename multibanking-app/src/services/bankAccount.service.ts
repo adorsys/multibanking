@@ -3,7 +3,8 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from "rxjs";
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
-import { ResourceBankAccount, ResourceBooking } from '../model/multibanking/models';
+import { ResourceBankAccount } from '../model/multibanking/models';
+import { Consent } from '../model/multibanking/consent';
 
 @Injectable()
 export class BankAccountService {
@@ -19,10 +20,15 @@ export class BankAccountService {
       .catch(this.handleError);
   }
 
-  syncBookings(accessId: string, accountId: string, pin: string): Observable<Array<ResourceBooking>> {
+  syncBookings(accessId: string, accountId: string, pin: string): Observable<Consent> {
     return this.http.put(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/sync`, pin)
-      .map((res: Response) => {
-        this.bookingsChangedObservable.next(true);
+      .map((consent: Consent) => {
+        if (consent) {
+          return consent;
+        } else {
+          this.bookingsChangedObservable.next(true);
+        }
+        
       })
       .catch(this.handleError);
   }

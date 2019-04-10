@@ -4,6 +4,7 @@ import { Subject } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ENV } from "../env/env";
 import { ResourceBankAccess } from '../model/multibanking/models';
+import { Consent } from '../model/multibanking/consent';
 
 @Injectable()
 export class BankAccessService {
@@ -21,8 +22,8 @@ export class BankAccessService {
       .catch(this.handleError);
   }
 
-  createBankAcccess(bankaccess: ResourceBankAccess): Observable<Object> {
-    return this.http.post(`${ENV.api_url}/bankaccesses`, bankaccess, { responseType: 'text' })
+  createBankAcccess(bankaccess: ResourceBankAccess): Observable<Consent> {
+    return this.http.post(`${ENV.api_url}/bankaccesses`, bankaccess)
       .catch(this.handleError);
   }
 

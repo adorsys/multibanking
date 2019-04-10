@@ -33,6 +33,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class LoadBalanceRequest extends AbstractRequest {
 
+    private String consentId;
     private BankApiUser bankApiUser;
     private List<BankAccount> bankAccounts;
     private BankAccess bankAccess;

@@ -8,7 +8,14 @@
   <ion-auto-complete [dataProvider]="bankAutoCompleteService" [options]="{placeholder : 'Bank name or bank code'}" #autocomplete></ion-auto-complete>
   <form (ngSubmit)="createBankAccess()" #createForm="ngForm" *ngIf="selectedBank">
 
-    <ion-item-group>
+    <ion-item-group *ngIf="selectedBank.ibanRequired">
+      <ion-item-divider color="light">IBAN</ion-item-divider>
+      <ion-item>
+        <ion-label floating>IBAN</ion-label>
+        <ion-input type="text" name="iban" [(ngModel)]="bankAccess.iban" required></ion-input>
+      </ion-item>
+    </ion-item-group>
+    <ion-item-group *ngIf="selectedBank.loginSettings.credentials">
       <ion-item-divider color="light">{{selectedBank.loginSettings.advice ? selectedBank.loginSettings.advice :'Bank login data'}}</ion-item-divider>
       <ion-item *ngFor="let item of selectedBank.loginSettings.credentials">
         <ion-label floating>{{item.label}}</ion-label>

@@ -4,6 +4,7 @@ import { BankAccessService } from "../../services/bankAccess.service";
 import { AutoCompleteComponent } from "ionic2-auto-complete";
 import { BankAutoCompleteService } from "../../services/bankAutoComplete.service";
 import { BankAccess, Bank } from "../../model/multibanking/models";
+import { Consent } from "../../model/multibanking/consent";
 
 @Component({
   selector: 'page-bankaccess-create',
@@ -18,6 +19,7 @@ export class BankAccessCreatePage {
   userId: string;
   bankAccess: BankAccess = {
     bankCode: '',
+    iban: '',
     bankLogin: '',
     bankLogin2: '',
     pin: '',
@@ -66,27 +68,33 @@ export class BankAccessCreatePage {
 
     this.bankAccess.bankCode = this.selectedBank.bankCode;
 
-    for (let i = 0; i < this.selectedBank.loginSettings.credentials.length; i++) {
-      let credentials: any = this.selectedBank.loginSettings.credentials[i];
-
-      if (i == 0) {
-        this.bankAccess.bankLogin = credentials.input;
-      }
-      else if (i == 1) {
-        if (!this.selectedBank.loginSettings.credentials[i].masked) {
-          this.bankAccess.bankLogin2 = credentials.input;
-        } else {
+    if (this.selectedBank.loginSettings.credentials) {
+      for (let i = 0; i < this.selectedBank.loginSettings.credentials.length; i++) {
+        let credentials: any = this.selectedBank.loginSettings.credentials[i];
+  
+        if (i == 0) {
+          this.bankAccess.bankLogin = credentials.input;
+        }
+        else if (i == 1) {
+          if (!this.selectedBank.loginSettings.credentials[i].masked) {
+            this.bankAccess.bankLogin2 = credentials.input;
+          } else {
+            this.bankAccess.pin = credentials.input;
+          }
+        }
+        else if (i == 2) {
           this.bankAccess.pin = credentials.input;
         }
       }
-      else if (i == 2) {
-        this.bankAccess.pin = credentials.input;
-      }
     }
-
+    
     this.bankAccessService.createBankAcccess(this.bankAccess).subscribe(
-      response => {
+      consent => {
         loading.dismiss();
+        if (consent &&  consent.authUrl) {
+          console.log(consent.authUrl+'&successUrl='+location.href);
+          location.href = consent.authUrl+'&successUrl='+location.href;
+        }
 
         this.parent.bankAccessesChanged();
         this.navCtrl.pop();

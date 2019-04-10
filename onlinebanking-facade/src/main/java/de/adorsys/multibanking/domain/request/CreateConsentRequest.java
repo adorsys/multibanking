@@ -16,8 +16,8 @@
 
 package de.adorsys.multibanking.domain.request;
 
-import de.adorsys.multibanking.domain.AccountReference;
 import de.adorsys.multibanking.domain.BankAccess;
+import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApiUser;
 import lombok.Builder;
 import lombok.Data;
@@ -32,19 +32,21 @@ public class CreateConsentRequest {
     private BankApiUser bankApiUser;
     private BankAccess bankAccess;
 
+    private boolean availableAccountsConsent;
+
     // Requested access services for a consent.
     /**
      * Is asking for detailed account information.
      */
-    private List<AccountReference> accounts;
+    private List<BankAccount> accounts;
     /**
      * Is asking for balances of the account.
      */
-    private List<AccountReference> balances;
+    private List<BankAccount> balances;
     /**
      * Is asking for transactions of the account
      */
-    private List<AccountReference> transactions;
+    private List<BankAccount> transactions;
 
     private boolean recurringIndicator;
     private LocalDate validUntil;

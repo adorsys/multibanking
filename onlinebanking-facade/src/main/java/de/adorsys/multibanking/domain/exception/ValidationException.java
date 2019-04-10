@@ -1,4 +1,4 @@
-package exception;
+package de.adorsys.multibanking.domain.exception;
 
 public class ValidationException extends RuntimeException {
     private static final long serialVersionUID = -4776870901880281649L;

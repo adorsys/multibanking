@@ -4,7 +4,7 @@ import { BankAccountListPage } from "../bankaccount/bankaccountList.component";
 import { BankAccessCreatePage } from "./bankAccessCreate.component";
 import { BankAccessService } from "../../services/bankAccess.service";
 import { BankAccessUpdatePage } from "./bankAccessUpdate.component";
-import { BankAccess } from '../../model/multibanking/models';
+import { ResourceBankAccess } from '../../model/multibanking/models';
 
 @Component({
   selector: 'page-bankaccessList',
@@ -12,7 +12,7 @@ import { BankAccess } from '../../model/multibanking/models';
 })
 export class BankAccessListPage {
 
-  bankaccesses: Array<BankAccess>;
+  bankaccesses: Array<ResourceBankAccess>;
 
   constructor(public navCtrl: NavController,
     private bankAccessService: BankAccessService) {

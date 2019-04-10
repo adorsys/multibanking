@@ -68,13 +68,13 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean accountInformationConsentRequired(BankApiUser bankApiUser, String accountReference) {
+    public boolean accountInformationConsentRequired() {
         return false;
     }
 
     @Override
     public CreateConsentResponse createAccountInformationConsent(String bankingUrl,
-                                                                 CreateConsentRequest startScaRequest) {
+                                                                 CreateConsentRequest createConsentRequest) {
 
         return null;
     }
