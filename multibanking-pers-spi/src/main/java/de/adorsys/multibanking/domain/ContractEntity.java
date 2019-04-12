@@ -10,9 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 
-/**
- * Created by alexg on 07.02.17.
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Document
@@ -26,10 +23,5 @@ public class ContractEntity extends Contract {
     private String id;
     private String userId;
     private String accountId;
-    private BigDecimal amount;
-    private String mainCategory;
-    private String subCategory;
-    private String specification;
-    private String provider;
 
 }

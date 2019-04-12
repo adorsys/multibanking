@@ -11,7 +11,7 @@ export class ContractService {
 
   getContracts(accessId: string, accountId: string): Observable<Array<ContractEntity>> {
     return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/contracts`)
-      .map((res: any) => res._embedded ? res._embedded.contractEntityList : [])
+      .map((res: any) => res._embedded ? res._embedded.contractList : [])
       .catch(this.handleError);
   }
 

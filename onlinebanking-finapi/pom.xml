@@ -21,6 +21,12 @@
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>finapi-adapter</artifactId>
             <version>4.4.2-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.swagger</groupId>
+                    <artifactId>swagger-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

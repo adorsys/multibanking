@@ -10,9 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * Created by alexg on 08.05.17.
- */
 @Data
 @Document
 @Encrypted(exclude = {"_id", "accountId", "userId", "analyticsDate"})
@@ -26,7 +23,7 @@ public class AccountAnalyticsEntity {
     private String accountId;
     private String userId;
 
-    private LocalDateTime analyticsDate = LocalDateTime.now().now();
+    private LocalDateTime analyticsDate = LocalDateTime.now();
 
     private List<BookingGroup> bookingGroups;
 

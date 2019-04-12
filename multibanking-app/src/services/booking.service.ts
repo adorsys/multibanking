@@ -19,7 +19,7 @@ export class BookingService {
     });
 
     return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings`, { params: params })
-      .map((res: any) => res._embedded != null ? res._embedded.bookingEntityList : [])
+      .map((res: any) => res._embedded != null ? res._embedded.bookingList : [])
       .catch(this.handleError);
   }
 
@@ -35,7 +35,7 @@ export class BookingService {
 
   getBooking(accessId, accountId, bookingId): Observable<ResourceBooking> {
     return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/${bookingId}`)
-      .map((res: any) => res._embedded != null ? res._embedded.bookingEntityList : [])
+      .map((res: any) => res._embedded != null ? res._embedded.bookingList : [])
       .catch(this.handleError);
   }
 

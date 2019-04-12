@@ -87,7 +87,7 @@ export class BookingListPage {
     this.bookingService.getBookings(this.bankAccess.id, this.bankAccount.id).subscribe(
       response => {
         this.pageable = response;
-        this.bookingsLoaded(response._embedded ? response._embedded.bookingEntityList : []);
+        this.bookingsLoaded(response._embedded ? response._embedded.bookingList : []);
         this.loadAnalytics();
         this.bookingAutoCompleteService.loadSearchIndex(this.bankAccess.id, this.bankAccount.id);
       },
@@ -220,7 +220,7 @@ export class BookingListPage {
     if (this.pageable._links.next) {
       this.bookingService.getNextBookings(this.pageable._links.next.href).subscribe(response => {
         this.pageable = response;
-        this.bookingsLoaded(response._embedded.bookingEntityList);
+        this.bookingsLoaded(response._embedded.bookingList);
 
         infiniteScroll.complete();
       });

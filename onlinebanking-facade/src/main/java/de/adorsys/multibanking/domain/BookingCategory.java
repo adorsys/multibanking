@@ -24,9 +24,6 @@ import lombok.NoArgsConstructor;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * Created by alexg on 18.05.17.
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
@@ -34,12 +31,7 @@ import java.util.Set;
 public class BookingCategory extends Contract {
 
     private Set<String> rules;
-
-    private String mainCategory;
-    private String subCategory;
-    private String specification;
     private String receiver;
-
     private Map<String, String> custom;
 
 }

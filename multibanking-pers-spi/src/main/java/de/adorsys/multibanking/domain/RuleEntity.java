@@ -9,9 +9,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by alexg on 05.09.17.
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Document

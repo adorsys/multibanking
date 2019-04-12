@@ -21,9 +21,6 @@ import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 
-/**
- * Created by alexg on 19.10.17.
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class SinglePayment extends AbstractScaTransaction {
