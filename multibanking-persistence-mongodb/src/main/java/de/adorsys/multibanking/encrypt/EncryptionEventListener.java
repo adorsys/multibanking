@@ -1,9 +1,9 @@
 package de.adorsys.multibanking.encrypt;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.springframework.beans.factory.BeanCreationException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
@@ -17,20 +17,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Created by alexg on 09.05.17.
- */
+@RequiredArgsConstructor
 @Component
 public class EncryptionEventListener extends AbstractMongoEventListener<Object> {
 
     private static final String ENCRYPTION_METHOD = "AES";
     private static final String ENCRYPTION_FIELD = "encrypted";
     private static final String ID_FIELD = "_id";
-
+    private final UserSecret userSecret;
     @Value("${db_secret}")
     private String databaseSecret;
-    @Autowired
-    private UserSecret userSecret;
 
     @Override
     public void onBeforeSave(BeforeSaveEvent<Object> event) {

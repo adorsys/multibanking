@@ -3,7 +3,7 @@ package de.adorsys.multibanking.impl;
 import de.adorsys.multibanking.domain.BookingsIndexEntity;
 import de.adorsys.multibanking.pers.spi.repository.BookingsIndexRepositoryIf;
 import de.adorsys.multibanking.repository.BookingsIndexRepositoryMongodb;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -12,15 +12,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@AllArgsConstructor
 @Profile({"mongo", "fongo"})
 @Service
 public class BookingsIndexRepositoryImpl implements BookingsIndexRepositoryIf {
 
-    @Autowired
-    private BookingsIndexRepositoryMongodb repositoryMongodb;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private final BookingsIndexRepositoryMongodb repositoryMongodb;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public void save(BookingsIndexEntity entity) {

@@ -4,7 +4,7 @@ import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.repository.BankAccountRepositoryMongodb;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,15 +15,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Profile({"mongo", "fongo"})
 @Service
 public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 
-    @Autowired
-    private BankAccountRepositoryMongodb bankAccountRepository;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private final BankAccountRepositoryMongodb bankAccountRepository;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public List<BankAccountEntity> findByUserId(String userId) {

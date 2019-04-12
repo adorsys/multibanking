@@ -5,7 +5,7 @@ import de.adorsys.multibanking.domain.BookingEntity;
 import de.adorsys.multibanking.pers.spi.repository.BookingRepositoryIf;
 import de.adorsys.multibanking.repository.BookingPageableRepositoryMongodb;
 import de.adorsys.multibanking.repository.BookingRepositoryMongodb;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
@@ -17,14 +17,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@AllArgsConstructor
 @Profile({"mongo", "fongo"})
 @Service
 public class BookingRepositoryImpl implements BookingRepositoryIf {
 
-    @Autowired
-    private BookingRepositoryMongodb bookingRepository;
-    @Autowired
-    private BookingPageableRepositoryMongodb bookingPageableRepositoryMongodb;
+    private final BookingRepositoryMongodb bookingRepository;
+    private final BookingPageableRepositoryMongodb bookingPageableRepositoryMongodb;
 
     @Override
     public Page<BookingEntity> findPageableByUserIdAndAccountIdAndBankApi(Pageable pageable, String userId,

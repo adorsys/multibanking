@@ -3,18 +3,18 @@ package de.adorsys.multibanking.impl;
 import de.adorsys.multibanking.domain.PaymentEntity;
 import de.adorsys.multibanking.pers.spi.repository.SinglePaymentRepositoryIf;
 import de.adorsys.multibanking.repository.PaymentRepositoryMongodb;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@AllArgsConstructor
 @Profile({"mongo", "fongo"})
 @Service
 public class SinglePaymentRepositoryImpl implements SinglePaymentRepositoryIf {
 
-    @Autowired
-    private PaymentRepositoryMongodb paymentRepository;
+    private final PaymentRepositoryMongodb paymentRepository;
 
     @Override
     public Optional<PaymentEntity> findByUserIdAndId(String userId, String id) {

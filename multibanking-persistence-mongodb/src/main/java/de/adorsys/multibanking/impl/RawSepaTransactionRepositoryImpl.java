@@ -3,18 +3,18 @@ package de.adorsys.multibanking.impl;
 import de.adorsys.multibanking.domain.RawSepaTransactionEntity;
 import de.adorsys.multibanking.pers.spi.repository.RawSepaTransactionRepositoryIf;
 import de.adorsys.multibanking.repository.RawSepaTransactionRepositoryMongodb;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@AllArgsConstructor
 @Profile({"mongo", "fongo"})
 @Service
 public class RawSepaTransactionRepositoryImpl implements RawSepaTransactionRepositoryIf {
 
-    @Autowired
-    private RawSepaTransactionRepositoryMongodb paymentRepository;
+    private final RawSepaTransactionRepositoryMongodb paymentRepository;
 
     @Override
     public Optional<RawSepaTransactionEntity> findByUserIdAndId(String userId, String id) {

@@ -3,7 +3,7 @@ package de.adorsys.multibanking.impl;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.multibanking.repository.BankRepositoryMongodb;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -12,15 +12,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@AllArgsConstructor
 @Profile({"mongo", "fongo"})
 @Service
 public class BankRepositoryImpl implements BankRepositoryIf {
 
-    @Autowired
-    private BankRepositoryMongodb bankRepositoryMongodb;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private final BankRepositoryMongodb bankRepositoryMongodb;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public Optional<String> findBankingUrl(String bankCode) {

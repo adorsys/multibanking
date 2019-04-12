@@ -3,18 +3,18 @@ package de.adorsys.multibanking.impl;
 import de.adorsys.multibanking.domain.StandingOrderEntity;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
 import de.adorsys.multibanking.repository.StandingOrderRepositoryMongodb;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@AllArgsConstructor
 @Profile({"mongo", "fongo"})
 @Service
 public class StandingOrderRepositoryImpl implements StandingOrderRepositoryIf {
 
-    @Autowired
-    private StandingOrderRepositoryMongodb standingOrderRepositoryMongodb;
+    private final StandingOrderRepositoryMongodb standingOrderRepositoryMongodb;
 
     @Override
     public List<StandingOrderEntity> findByUserIdAndAccountId(String userId, String accountId) {
