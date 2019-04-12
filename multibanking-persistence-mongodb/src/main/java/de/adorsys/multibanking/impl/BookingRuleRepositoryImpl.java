@@ -3,7 +3,7 @@ package de.adorsys.multibanking.impl;
 import de.adorsys.multibanking.domain.RuleEntity;
 import de.adorsys.multibanking.pers.spi.repository.BookingRuleRepositoryIf;
 import de.adorsys.multibanking.repository.BookingRuleRepositoryMongodb;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,15 +14,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@AllArgsConstructor
 @Profile({"mongo", "fongo"})
 @Service
 public class BookingRuleRepositoryImpl implements BookingRuleRepositoryIf {
 
-    @Autowired
-    private BookingRuleRepositoryMongodb ruleRepository;
-
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private final BookingRuleRepositoryMongodb ruleRepository;
+    private final MongoTemplate mongoTemplate;
 
     @Override
     public List<RuleEntity> findByUserId(String userId) {

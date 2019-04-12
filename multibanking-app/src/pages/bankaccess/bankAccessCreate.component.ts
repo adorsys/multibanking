@@ -4,7 +4,6 @@ import { BankAccessService } from "../../services/bankAccess.service";
 import { AutoCompleteComponent } from "ionic2-auto-complete";
 import { BankAutoCompleteService } from "../../services/bankAutoComplete.service";
 import { BankAccess, Bank } from "../../model/multibanking/models";
-import { Consent } from "../../model/multibanking/consent";
 
 @Component({
   selector: 'page-bankaccess-create',

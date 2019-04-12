@@ -8,9 +8,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-/**
- * Created by alexg on 07.02.17.
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Document

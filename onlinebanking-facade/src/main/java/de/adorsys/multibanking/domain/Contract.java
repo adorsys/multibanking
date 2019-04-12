@@ -21,9 +21,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * Created by alexg on 18.05.17.
- */
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -37,4 +36,10 @@ public class Contract {
     private String mandateReference;
     private Cycle interval;
     private boolean cancelled;
+
+    private BigDecimal amount;
+    private String mainCategory;
+    private String subCategory;
+    private String specification;
+    private String provider;
 }

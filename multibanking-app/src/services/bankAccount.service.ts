@@ -16,7 +16,7 @@ export class BankAccountService {
 
   getBankAccounts(accessId: string): Observable<Array<ResourceBankAccount>> {
     return this.http.get(`${ENV.api_url}/bankaccesses/${accessId}/accounts`)
-      .map((res: any) => res._embedded.bankAccountEntityList)
+      .map((res: any) => res._embedded.bankAccountList)
       .catch(this.handleError);
   }
 

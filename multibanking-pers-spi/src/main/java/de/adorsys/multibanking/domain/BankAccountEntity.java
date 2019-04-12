@@ -9,9 +9,6 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-/**
- * Created by alexg on 07.02.17.
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Document
@@ -26,14 +23,5 @@ public class BankAccountEntity extends BankAccount {
     private String id;
     private String bankAccessId;
     private String userId;
-
-    public String getId() {
-        return id;
-    }
-
-    public BankAccountEntity id(String id) {
-        this.id = id;
-        return this;
-    }
 
 }
