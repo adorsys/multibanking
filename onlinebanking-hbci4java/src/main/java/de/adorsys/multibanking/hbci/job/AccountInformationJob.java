@@ -27,6 +27,7 @@ import de.adorsys.multibanking.hbci.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVSEPAInfo;
 import org.kapott.hbci.GV.GVTANMediaList;
+import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
@@ -80,7 +81,8 @@ public class AccountInformationJob {
             throw new MultibankingException(HBCI_ERROR, "SEPAInfo job not supported");
 
         log.info("fetching SEPA informations");
-        dialog.addTask(new GVSEPAInfo(dialog.getPassport()));
+        GVSEPAInfo gvsepaInfo = new GVSEPAInfo(dialog.getPassport());
+        dialog.addTask(gvsepaInfo);
 
         // TAN-Medien abrufen
         if (request.isUpdateTanTransportTypes() && dialog.getPassport().jobSupported("TANMediaList")) {
@@ -88,10 +90,10 @@ public class AccountInformationJob {
             dialog.addTask(new GVTANMediaList(dialog.getPassport()));
         }
 
-        HBCIExecStatus status = dialog.execute(true);
+        dialog.execute(true);
 
-        if (!status.isOK()) {
-            throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorString());
+        if (gvsepaInfo.getJobResult().getJobStatus().hasErrors()) {
+            throw new MultibankingException(HBCI_ERROR, gvsepaInfo.getJobResult().getJobStatus().getErrorString());
         }
 
         request.getBankAccess().setBankName(dialog.getPassport().getInstName());
