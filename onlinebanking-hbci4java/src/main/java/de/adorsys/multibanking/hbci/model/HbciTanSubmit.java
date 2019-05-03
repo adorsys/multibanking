@@ -19,9 +19,6 @@ package de.adorsys.multibanking.hbci.model;
 import lombok.Data;
 import org.kapott.hbci.manager.HBCITwoStepMechanism;
 
-/**
- * Created by alexg on 16.11.17.
- */
 @Data
 public class HbciTanSubmit {
 
