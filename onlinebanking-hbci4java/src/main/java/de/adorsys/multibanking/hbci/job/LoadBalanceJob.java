@@ -57,7 +57,7 @@ public class LoadBalanceJob {
 
         Map<AbstractHBCIJob, BankAccount> jobs = new HashMap<>();
 
-        loadBalanceRequest.getBankAccounts().stream().forEach(bankAccount -> {
+        loadBalanceRequest.getBankAccounts().forEach(bankAccount -> {
             Konto account = createAccount(dialog, bankAccount);
             jobs.put(createBalanceJob(dialog, account), bankAccount);
         });
@@ -73,7 +73,7 @@ public class LoadBalanceJob {
         }
 
         List<BankAccount> bankAccounts = new ArrayList<>();
-        jobs.keySet().stream().forEach(job -> {
+        jobs.keySet().forEach(job -> {
             if (job.getJobResult().getJobStatus().hasErrors()) {
                 log.error("Balance job not OK");
                 throw new HBCI_Exception(job.getJobResult().getJobStatus().getErrorString());
@@ -96,6 +96,8 @@ public class LoadBalanceJob {
         Konto account = dialog.getPassport().findAccountByAccountNumber(bankAccount.getAccountNumber());
         account.iban = bankAccount.getIban();
         account.bic = bankAccount.getBic();
+        account.curr = bankAccount.getCurrency();
+        account.country = bankAccount.getCountry();
         return account;
     }
 
