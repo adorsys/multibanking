@@ -71,7 +71,7 @@ export class RulesStaticPage {
   loadRules() {
     this.rulesService.getRules(this.custom).subscribe(response => {
       this.pageable = response;
-      this.rules = response._embedded ? response._embedded.ruleEntityList : [];
+      this.rules = response._embedded ? response._embedded.ruleList : [];
 
       this.selectedRule = undefined;
 
@@ -86,9 +86,9 @@ export class RulesStaticPage {
       this.rulesService.getNextRules(this.pageable._links.next.href).subscribe(response => {
         this.pageable = response;
         if (this.custom) {
-          this.rules = this.rules.concat(response._embedded.customRuleEntityList);
+          this.rules = this.rules.concat(response._embedded.ruleList);
         } else {
-          this.rules = this.rules.concat(response._embedded.ruleEntityList);
+          this.rules = this.rules.concat(response._embedded.ruleList);
         }
 
         infiniteScroll.complete();

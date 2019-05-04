@@ -25,7 +25,7 @@ export class RulesStaticAutoCompleteService implements AutoCompleteService {
 
     return this.http.get(url)
       .map((res: any) => {
-        return res._embedded != null ? res._embedded.ruleEntityList : [];
+        return res._embedded != null ? res._embedded.ruleList : [];
       })
       .catch(this.handleError);
   }
