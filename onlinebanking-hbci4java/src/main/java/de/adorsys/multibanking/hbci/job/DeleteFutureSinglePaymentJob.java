@@ -54,7 +54,9 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob {
         sepadelgv.setParam("src", src);
         sepadelgv.setParam("dst", dst);
         sepadelgv.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
-        sepadelgv.setParam("usage", singlePayment.getPurpose());
+        if (singlePayment.getPurpose() != null) {
+            sepadelgv.setParam("usage", singlePayment.getPurpose());
+        }
 
         sepadelgv.verifyConstraints();
 
