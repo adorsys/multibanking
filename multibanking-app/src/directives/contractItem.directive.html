@@ -1,4 +1,4 @@
-<ion-item>
+<ion-item [ngClass]="{'cancelled': contract.cancelled}">
   <ion-avatar item-start>
     <img [src]="getLogo(contract.logo)" item-left/>
   </ion-avatar>

@@ -90,7 +90,9 @@ public class TransferJob {
         sepagv.setParam("src", src);
         sepagv.setParam("dst", dst);
         sepagv.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
-        sepagv.setParam("usage", singlePayment.getPurpose());
+        if (singlePayment.getPurpose() != null) {
+            sepagv.setParam("usage", singlePayment.getPurpose());
+        }
 
         sepagv.verifyConstraints();
 

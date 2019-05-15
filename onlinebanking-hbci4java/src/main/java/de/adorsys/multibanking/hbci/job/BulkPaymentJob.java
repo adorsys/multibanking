@@ -58,7 +58,9 @@ public class BulkPaymentJob extends ScaRequiredJob {
 
             sepagv.setParam("dst", i, dst);
             sepagv.setParam("btg", i, new Value(payment.getAmount(), payment.getCurrency()));
-            sepagv.setParam("usage", i, payment.getPurpose());
+            if (payment.getPurpose() != null) {
+                sepagv.setParam("usage", i, payment.getPurpose());
+            }
         }
 
         sepagv.verifyConstraints();

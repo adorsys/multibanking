@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { AutoCompleteService } from "ionic2-auto-complete";
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
@@ -26,7 +25,7 @@ export class RulesStaticAutoCompleteService implements AutoCompleteService {
 
     return this.http.get(url)
       .map((res: any) => {
-        return res._embedded != null ? res._embedded.ruleEntityList : [];
+        return res._embedded != null ? res._embedded.ruleList : [];
       })
       .catch(this.handleError);
   }
