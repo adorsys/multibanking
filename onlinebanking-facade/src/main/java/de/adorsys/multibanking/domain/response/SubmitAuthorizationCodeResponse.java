@@ -1,9 +1,11 @@
 package de.adorsys.multibanking.domain.response;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class SubmitAuthorizationCodeResponse {
+@EqualsAndHashCode(callSuper = false)
+public class SubmitAuthorizationCodeResponse extends AbstractResponse {
 
     private String status;
     private String transactionId;

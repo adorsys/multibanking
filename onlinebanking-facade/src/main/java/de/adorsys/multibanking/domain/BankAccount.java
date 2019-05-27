@@ -20,7 +20,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -42,7 +41,7 @@ public class BankAccount {
     private SyncStatus syncStatus;
     private LocalDateTime lastSync;
 
-    public BankAccount bankAccountBalance(BalancesReport bankAccountBalance) {
+    public BankAccount balances(BalancesReport bankAccountBalance) {
         this.balances = bankAccountBalance;
         return this;
     }
@@ -94,7 +93,7 @@ public class BankAccount {
 
     public BankAccount externalId(BankApi bankApi, String externalId) {
         if (externalIdMap == null) {
-            externalIdMap = new HashMap<>();
+            externalIdMap = new EnumMap<>(BankApi.class);
         }
         externalIdMap.put(bankApi, externalId);
         return this;

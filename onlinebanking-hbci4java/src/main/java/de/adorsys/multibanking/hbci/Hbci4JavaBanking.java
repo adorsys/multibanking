@@ -130,6 +130,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         dialogRequest.setCallback(bpdCacheCallback);
 
         HBCIDialog dialog = createDialog(bankingUrl, dialogRequest);
+        dialog.getMessages();
 
         return ScaMethodsResponse.builder()
                 .tanTransportTypes(extractTanTransportTypes(dialog.getPassport()))

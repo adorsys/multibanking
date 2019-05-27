@@ -32,8 +32,7 @@ import org.kapott.hbci.structures.Value;
 public class NewStandingOrderJob extends ScaRequiredJob {
 
     @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
-                                           String rawData) {
+    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
         StandingOrder standingOrder = (StandingOrder) transaction;
 
         Konto src = getDebtorAccount(transaction, passport);
@@ -43,7 +42,7 @@ public class NewStandingOrderJob extends ScaRequiredJob {
         dst.iban = standingOrder.getOtherAccount().getIban();
         dst.bic = standingOrder.getOtherAccount().getBic();
 
-        GVDauerSEPANew gvDauerSEPANew = new GVDauerSEPANew(passport, rawData);
+        GVDauerSEPANew gvDauerSEPANew = new GVDauerSEPANew(passport);
 
         gvDauerSEPANew.setParam("src", src);
         gvDauerSEPANew.setParam("dst", dst);

@@ -20,9 +20,6 @@ import lombok.Data;
 
 import java.util.Map;
 
-/**
- * Created by alexg on 17.05.17.
- */
 @Data
 public class BankApiUser {
 

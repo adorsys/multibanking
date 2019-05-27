@@ -26,8 +26,7 @@ import org.kapott.hbci.structures.Konto;
 public class ForeignPaymentJob extends ScaRequiredJob {
 
     @Override
-    protected AbstractHBCIJob createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
-                                            String rawData) {
+    protected AbstractHBCIJob createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
         Konto src = getDebtorAccount(transaction, passport);
 
         GVDTAZV gv = new GVDTAZV(passport, GVDTAZV.getLowlevelName());

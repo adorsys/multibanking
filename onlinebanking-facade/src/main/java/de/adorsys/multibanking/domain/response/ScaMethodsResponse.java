@@ -17,7 +17,6 @@
 package de.adorsys.multibanking.domain.response;
 
 import de.adorsys.multibanking.domain.TanTransportType;
-import de.adorsys.multibanking.domain.request.AbstractRequest;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,7 +26,7 @@ import java.util.List;
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = false)
-public class ScaMethodsResponse extends AbstractRequest {
+public class ScaMethodsResponse extends AbstractResponse {
 
     private String authorizationId;
     private List<TanTransportType> tanTransportTypes;

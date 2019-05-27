@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -29,17 +32,24 @@ import java.util.stream.Collectors;
 import static de.adorsys.multibanking.bg.BankingGatewayMapping.toConsents;
 import static de.adorsys.multibanking.bg.model.MessageCode400AIS.CONSENT_UNKNOWN;
 import static de.adorsys.multibanking.bg.model.MessageCode401AIS.CONSENT_INVALID;
-import static de.adorsys.multibanking.bg.model.MessageCode429AIS.EXCEEDED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
 
 public class BankingGatewayAdapter implements OnlineBankingService {
 
     private static final String PSU_IP_ADDRESS = "127.0.0.1";
-
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
+    private String bgCertificate;
     private PaymentInitiationBuilderStrategy initiationBuilderStrategy = new PaymentInitiationBuilderStrategyImpl();
     private ObjectMapper objectMapper = new ObjectMapper();
+
+    public BankingGatewayAdapter() {
+        bgCertificate = Optional.ofNullable(System.getenv("bg-cert"))
+                .map(this::readBankingGatewayCertficate)
+                .orElseGet(() -> {
+                    logger.warn("Missing env property bg-cert");
+                    return null;
+                });
+    }
 
     @Override
     public BankApi bankApi() {
@@ -327,6 +337,9 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             }
 
         };
+
+        Optional.ofNullable(bgCertificate)
+                .ifPresent(cert -> apiClient.addDefaultHeader("tpp-qwac-certificate", cert));
         apiClient.setHttpClient(client);
         apiClient.setBasePath(url);
         return apiClient;
@@ -381,4 +394,15 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
         throw new MultibankingException(e);
     }
+
+    private String readBankingGatewayCertficate(String path) {
+        try {
+            byte[] encoded = Files.readAllBytes(Paths.get(path));
+            return new String(encoded, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new IllegalStateException("Error loading bg certificate", e);
+        }
+
+    }
 }
+

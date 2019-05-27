@@ -1,27 +1,13 @@
 package de.adorsys.multibanking.domain;
 
-import de.adorsys.multibanking.encrypt.Encrypted;
 import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.CompoundIndex;
-import org.springframework.data.mongodb.core.index.CompoundIndexes;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
-/**
- * Created by alexg on 08.05.17.
- */
 @Data
-@Document
-@Encrypted(exclude = {"_id", "accountId", "userId"})
-@CompoundIndexes({
-        @CompoundIndex(name = "account_index", def = "{'userId': 1, 'accountId': 1}")
-})
 public class BookingsIndexEntity {
 
-    @Id
     private String id;
     private String accountId;
     private String userId;
@@ -35,15 +21,15 @@ public class BookingsIndexEntity {
                 .forEachRemaining(booking -> {
                     List<String> search = new ArrayList<>();
                     if (booking.getBookingCategory() != null) {
-                        if (StringUtils.hasText(booking.getBookingCategory().getReceiver())) {
+                        if (StringUtils.isNotBlank(booking.getBookingCategory().getReceiver())) {
                             search.add(booking.getBookingCategory().getReceiver());
                         }
                     }
                     if (booking.getOtherAccount() != null) {
-                        if (StringUtils.hasText(booking.getOtherAccount().getName())) {
+                        if (StringUtils.isNotBlank(booking.getOtherAccount().getName())) {
                             search.add(booking.getOtherAccount().getName());
                         }
-                        if (StringUtils.hasText(booking.getOtherAccount().getOwner())) {
+                        if (StringUtils.isNotBlank(booking.getOtherAccount().getOwner())) {
                             search.add(booking.getOtherAccount().getOwner());
                         }
                     }

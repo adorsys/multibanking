@@ -34,7 +34,7 @@ public class EmptyJob extends ScaRequiredJob {
     }
 
     @Override
-    AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport, String rawData) {
+    AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
         return null;
     }
 }

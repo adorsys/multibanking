@@ -18,13 +18,14 @@ package de.adorsys.multibanking.domain.response;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
-import java.util.Map;
 
 @Data
 @Builder
-public class CreateConsentResponse {
+@EqualsAndHashCode(callSuper = false)
+public class CreateConsentResponse extends AbstractResponse {
     private String consentId;
     private LocalDate validUntil;
     private String authorisationUrl;

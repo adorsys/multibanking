@@ -18,9 +18,11 @@ package de.adorsys.multibanking.domain.response;
 
 import de.adorsys.multibanking.domain.TanChallenge;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class AuthorisationCodeResponse {
+@EqualsAndHashCode(callSuper = false)
+public class AuthorisationCodeResponse extends AbstractResponse {
 
     private Object tanSubmit;
     private TanChallenge challenge;

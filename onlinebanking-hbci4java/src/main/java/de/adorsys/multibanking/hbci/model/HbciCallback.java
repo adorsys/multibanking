@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.manager.HHDVersion;
 
+import java.util.List;
+
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 
 /**
@@ -30,7 +32,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID
 public class HbciCallback implements HBCICallback {
 
     @Override
-    public void callback(int reason, String msg, int datatype, StringBuilder retData) {
+    public void callback(int reason, List<String> msg, int datatype, StringBuilder retData) {
         switch (reason) {
             case HBCICallback.NEED_PT_PHOTOTAN: {
                 String hhduc = retData.toString();

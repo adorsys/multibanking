@@ -21,15 +21,14 @@ import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.StandingOrder;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-/**
- * Created by alexg on 05.09.17.
- */
 @Data
 @Builder
-public class LoadBookingsResponse {
+@EqualsAndHashCode(callSuper = false)
+public class LoadBookingsResponse extends AbstractResponse {
 
     private String rawData;
     private List<Booking> bookings;

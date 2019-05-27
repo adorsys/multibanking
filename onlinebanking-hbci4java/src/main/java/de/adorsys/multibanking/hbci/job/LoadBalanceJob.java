@@ -18,22 +18,22 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.Product;
+import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadBalanceRequest;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
 import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
-import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 
 import java.util.*;
-import java.util.stream.Stream;
+
+import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
 @Slf4j
 public class LoadBalanceJob {
@@ -62,13 +62,12 @@ public class LoadBalanceJob {
             jobs.put(createBalanceJob(dialog, account), bankAccount);
         });
 
-        // Let the Handler submitAuthorizationCode all jobs in one batch
         HBCIExecStatus status = dialog.execute(true);
         if (!status.isOK()) {
             log.error("Status of balance job not OK " + status);
 
             if (initFailed(status)) {
-                throw new HBCI_Exception(status.getErrorString());
+                throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorMessages());
             }
         }
 
@@ -76,7 +75,7 @@ public class LoadBalanceJob {
         jobs.keySet().forEach(job -> {
             if (job.getJobResult().getJobStatus().hasErrors()) {
                 log.error("Balance job not OK");
-                throw new HBCI_Exception(job.getJobResult().getJobStatus().getErrorString());
+                throw new MultibankingException(HBCI_ERROR, job.getJobResult().getJobStatus().getErrorList());
             }
             BankAccount bankAccount = jobs.get(job);
             bankAccount.setBalances(HbciMapping.createBalance((GVRSaldoReq) job.getJobResult()));
@@ -102,7 +101,7 @@ public class LoadBalanceJob {
     }
 
     private static boolean initFailed(HBCIExecStatus status) {
-        return Stream.of(StringUtils.split(status.getErrorString(), System.getProperty("line.separator")))
+        return status.getErrorMessages().stream()
                 .anyMatch(line -> line.charAt(0) == '9');
     }
 }
