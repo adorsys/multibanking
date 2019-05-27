@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate.ddl-auto: create-drop # see data.sql
+    properties.hibernate.jdbc.lob.non_contextual_creation: true
+    show-sql: true
+  liquibase:
+    enabled: false
+    change-log: classpath:/liquibase/changelog-master.xml
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://localhost:5432/mbs2
+    username: mbs
+    password: mbs
+
+logging.level.org.hibernate.SQL: debug
+logging.level.org.hibernate.type.descriptor.sql: trace

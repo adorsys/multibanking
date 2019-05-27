@@ -59,6 +59,7 @@
 
     <modules>
         <module>multibanking-persistence-mongodb</module>
+        <module>multibanking-persistence-jpa</module>
         <module>onlinebanking-facade</module>
         <module>finapi-adapter</module>
         <module>onlinebanking-figo</module>
