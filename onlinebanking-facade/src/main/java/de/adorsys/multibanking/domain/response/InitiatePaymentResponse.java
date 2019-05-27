@@ -18,13 +18,12 @@ package de.adorsys.multibanking.domain.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.HashMap;
-import java.util.Map;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @AllArgsConstructor
-public class InitiatePaymentResponse {
+public class InitiatePaymentResponse extends AbstractResponse {
     private String transactionStatus;
     private String paymentId;
     private String authorisationUrl;

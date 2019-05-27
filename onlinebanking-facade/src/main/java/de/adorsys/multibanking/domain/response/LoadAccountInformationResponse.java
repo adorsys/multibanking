@@ -20,12 +20,14 @@ import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankAccount;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
 @Builder
-public class LoadAccountInformationResponse {
+@EqualsAndHashCode(callSuper = false)
+public class LoadAccountInformationResponse extends AbstractResponse {
 
     private BankAccess bankAccess;
     private List<BankAccount> bankAccounts;

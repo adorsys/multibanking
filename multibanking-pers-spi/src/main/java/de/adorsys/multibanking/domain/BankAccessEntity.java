@@ -1,23 +1,15 @@
 package de.adorsys.multibanking.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import de.adorsys.multibanking.encrypt.Encrypted;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Document
 @JsonIgnoreProperties(value = {"pin", "pin2", "hbciPassportState"}, allowSetters = true)
-@Encrypted(exclude = {"_id", "userId", "bankCode"})
 public class BankAccessEntity extends BankAccess {
 
-    @Id
     private String id;
-    @Indexed
     private String userId;
     private String pin;
     private String pin2;

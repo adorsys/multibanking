@@ -32,8 +32,7 @@ public class DeleteFutureBulkPaymentJob extends ScaRequiredJob {
     private String jobName;
 
     @Override
-    protected AbstractHBCIJob createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
-                                            String rawData) {
+    protected AbstractHBCIJob createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
         FutureBulkPayment futureBulkPayment = (FutureBulkPayment) transaction;
 
         Konto src = getDebtorAccount(transaction, passport);

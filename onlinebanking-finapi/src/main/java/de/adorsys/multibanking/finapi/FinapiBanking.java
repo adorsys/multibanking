@@ -150,7 +150,7 @@ public class FinapiBanking implements OnlineBankingService {
                             .iban(account.getIban())
                             .blz(bankAccess.getBankCode())
                             .type(BankAccountType.fromFinapiType(account.getAccountTypeId().intValue()))
-                            .bankAccountBalance(new BalancesReport()
+                            .balances(new BalancesReport()
                                     .readyBalance(Balance.builder().amount(account.getBalance()).build())))
                     .collect(Collectors.toList()))
                     .build();

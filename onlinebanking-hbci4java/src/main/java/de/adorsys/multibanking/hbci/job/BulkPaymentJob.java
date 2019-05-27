@@ -32,18 +32,17 @@ import org.kapott.hbci.structures.Value;
 public class BulkPaymentJob extends ScaRequiredJob {
 
     @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
-                                           String rawData) {
+    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
         BulkPayment bulkPayment = (BulkPayment) transaction;
 
         Konto src = getDebtorAccount(transaction, passport);
 
         AbstractSEPAGV sepagv;
         if (bulkPayment instanceof FutureBulkPayment) {
-            sepagv = new GVTermMultiUebSEPA(passport, GVTermMultiUebSEPA.getLowlevelName(), rawData);
+            sepagv = new GVTermMultiUebSEPA(passport, GVTermMultiUebSEPA.getLowlevelName());
             sepagv.setParam("date", ((FutureBulkPayment) bulkPayment).getExecutionDate().toString());
         } else {
-            sepagv = new GVMultiUebSEPA(passport, GVMultiUebSEPA.getLowlevelName(), rawData);
+            sepagv = new GVMultiUebSEPA(passport, GVMultiUebSEPA.getLowlevelName());
         }
 
         sepagv.setParam("src", src);

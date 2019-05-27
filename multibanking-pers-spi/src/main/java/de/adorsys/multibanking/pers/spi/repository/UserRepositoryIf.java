@@ -18,7 +18,7 @@ public interface UserRepositoryIf {
 
     Optional<LocalDateTime> getRulesLastChangeDate(String id);
 
-    Optional<UserEntity> setRulesLastChangeDate(String id, LocalDateTime dateTime);
+    void setRulesLastChangeDate(String id, LocalDateTime dateTime);
 
     boolean exists(String userId);
 

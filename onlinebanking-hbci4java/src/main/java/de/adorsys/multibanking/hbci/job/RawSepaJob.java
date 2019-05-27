@@ -18,13 +18,24 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.RawSepaPayment;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVDauerSEPANew;
 import org.kapott.hbci.GV.GVRawSEPA;
 import org.kapott.hbci.GV.GVUebSEPA;
+import org.kapott.hbci.GV.parsers.ISEPAParser;
+import org.kapott.hbci.GV.parsers.SEPAParserFactory;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.comm.CommPinTan;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.structures.Konto;
+import org.kapott.hbci.sepa.SepaVersion;
+
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class RawSepaJob extends ScaRequiredJob {
 
@@ -39,10 +50,8 @@ public class RawSepaJob extends ScaRequiredJob {
     }
 
     @Override
-    AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport, String rawData) {
+    AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
         RawSepaPayment sepaPayment = (RawSepaPayment) transaction;
-
-        Konto src = getDebtorAccount(transaction, passport);
 
         String jobName;
         switch (sepaPayment.getSepaTransactionType()) {
@@ -60,11 +69,49 @@ public class RawSepaJob extends ScaRequiredJob {
         }
 
         GVRawSEPA sepagv = new GVRawSEPA(passport, jobName, sepaPayment.getRawData());
-        sepagv.setParam("src", src);
+        sepagv.setParam("src", getDebtorAccount(transaction, passport));
+
+        appendPainValues(sepaPayment, sepagv);
 
         sepagv.verifyConstraints();
 
         return sepagv;
+    }
+
+    private void appendPainValues(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {
+        String creditorIban = "";
+        BigDecimal amount = new BigDecimal(0);
+        String currency = "";
+
+        List<Map<String, String>> result = parsePain(sepaPayment, sepagv);
+        for (Map<String, String> resultMap : result) {
+            creditorIban = resultMap.get("dst.iban");
+            amount = amount.add(NumberUtils.createBigDecimal(resultMap.get("value")));
+
+            String tempCurrency = resultMap.get("curr");
+            if (currency.length() > 0 && !currency.equals(tempCurrency)) {
+                throw new IllegalArgumentException("mixed currencies in bulk payment");
+            }
+            currency = tempCurrency;
+        }
+
+        if (result.size() > 1) {
+            sepagv.setLowlevelParam(sepagv.getName() + ".sepa.dst.iban", creditorIban);
+        }
+
+        sepagv.setLowlevelParam(sepagv.getName() + ".sepa.btg.value", amount.toString());
+        sepagv.setLowlevelParam(sepagv.getName() + ".sepa.btg.curr", currency);
+    }
+
+    private List<Map<String, String>> parsePain(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {
+        List<Map<String, String>> sepaResults = new ArrayList<>();
+        ISEPAParser<List<Map<String, String>>> parser = SEPAParserFactory.get(SepaVersion.autodetect(sepaPayment.getPainXml()));
+        try {
+            parser.parse(new ByteArrayInputStream(sepaPayment.getPainXml().getBytes(CommPinTan.ENCODING)), sepaResults);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalArgumentException(e);
+        }
+        return sepaResults;
     }
 
     public enum PaymentType {

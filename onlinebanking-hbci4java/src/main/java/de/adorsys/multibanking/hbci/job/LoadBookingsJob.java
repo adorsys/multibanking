@@ -17,6 +17,7 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.hbci.model.HbciCallback;
@@ -28,7 +29,6 @@ import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
-import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
@@ -37,6 +37,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.hbci.job.AccountInformationJob.extractTanTransportTypes;
 import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.createDialog;
 
@@ -126,12 +127,12 @@ public class LoadBookingsJob {
         // Let the Handler submitAuthorizationCode all jobs in one batch
         HBCIExecStatus dialogStatus = dialog.execute(true);
         if (!dialogStatus.isOK()) {
-            log.warn(dialogStatus.getErrorString());
+            log.warn(dialogStatus.getErrorMessages().toString());
         }
 
         if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
-            throw new HBCI_Exception(bookingsJob.getJobResult().getJobStatus().getErrorString());
+            throw new MultibankingException(HBCI_ERROR, bookingsJob.getJobResult().getJobStatus().getErrorList());
         }
 
         List<StandingOrder> standingOrders = standingOrdersJob

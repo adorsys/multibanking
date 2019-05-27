@@ -354,7 +354,7 @@ public class FigoBanking implements OnlineBankingService {
         Status status = waitForFinish(session, taskToken);
 
         if (status != Status.OK) {
-            throw new MultibankingException(INVALID_TAN);
+            throw new MultibankingException(INVALID_TAN, Collections.emptyList());
         }
     }
 

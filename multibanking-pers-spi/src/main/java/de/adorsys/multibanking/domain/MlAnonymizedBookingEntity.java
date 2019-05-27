@@ -1,26 +1,22 @@
 package de.adorsys.multibanking.domain;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data
-@Document
 public class MlAnonymizedBookingEntity {
 
-	@Id
-	private String id;
-	@Indexed
-	private final String userId;
-	private final String transactionPurpose;
-	private final String amountBin;
-	private final String amountRemainder;
-	private final String creditorId;
-	private final String referenceName;
-	private final String executionDate;
-	private final String mainCategory;
-	private final String subCategory;
-	private final String specification;
+    private String id;
+    private String userId;
+    private String transactionPurpose;
+    private String amountBin;
+    private String amountRemainder;
+    private String creditorId;
+    private String referenceName;
+    private String executionDate;
+    private String mainCategory;
+    private String subCategory;
+    private String specification;
+
 }

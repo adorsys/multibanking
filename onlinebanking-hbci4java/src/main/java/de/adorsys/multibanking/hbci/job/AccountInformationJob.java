@@ -27,10 +27,8 @@ import de.adorsys.multibanking.hbci.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVSEPAInfo;
 import org.kapott.hbci.GV.GVTANMediaList;
-import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 
 import java.util.*;
@@ -93,7 +91,7 @@ public class AccountInformationJob {
         dialog.execute(true);
 
         if (gvsepaInfo.getJobResult().getJobStatus().hasErrors()) {
-            throw new MultibankingException(HBCI_ERROR, gvsepaInfo.getJobResult().getJobStatus().getErrorString());
+            throw new MultibankingException(HBCI_ERROR, gvsepaInfo.getJobResult().getJobStatus().getErrorList());
         }
 
         request.getBankAccess().setBankName(dialog.getPassport().getInstName());

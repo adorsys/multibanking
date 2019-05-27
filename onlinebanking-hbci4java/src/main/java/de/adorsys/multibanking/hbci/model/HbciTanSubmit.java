@@ -32,5 +32,6 @@ public class HbciTanSubmit {
     private String hktanProcess;
     private int originSegVersion; //segment version
     private String sepaPain;
+    private String painVersion;
     private HBCITwoStepMechanism twoStepMechanism;
 }

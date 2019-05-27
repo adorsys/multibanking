@@ -5,10 +5,6 @@ import de.adorsys.multibanking.domain.BankAccessEntity;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author alexg on 07.02.17
- * @author fpo on 21.05.2017
- */
 public interface BankAccessRepositoryIf {
 
     Optional<BankAccessEntity> findOne(String id);
@@ -17,7 +13,7 @@ public interface BankAccessRepositoryIf {
 
     List<BankAccessEntity> findByUserId(String userId);
 
-    BankAccessEntity save(BankAccessEntity bankAccess);
+    void save(BankAccessEntity bankAccess);
 
     String getBankCode(String id);
 

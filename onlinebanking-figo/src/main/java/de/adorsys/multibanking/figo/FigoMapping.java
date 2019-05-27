@@ -57,7 +57,7 @@ public class FigoMapping {
                 .blz(account.getBankCode())
                 .iban(account.getIBAN())
                 .type(BankAccountType.fromFigoType(account.getType()))
-                .bankAccountBalance(new BalancesReport()
+                .balances(new BalancesReport()
                         .readyBalance(Balance.builder().amount(account.getBalance().getBalance()).build()));
     }
 

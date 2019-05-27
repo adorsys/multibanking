@@ -18,7 +18,7 @@ public interface BookingRuleRepositoryIf {
 
     List<RuleEntity> findAll();
 
-    RuleEntity createOrUpdateRule(RuleEntity ruleEntity);
+    void createOrUpdateRule(RuleEntity ruleEntity);
 
     List<RuleEntity> search(String query);
 

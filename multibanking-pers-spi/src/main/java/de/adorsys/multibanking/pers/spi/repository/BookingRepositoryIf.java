@@ -8,10 +8,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author alexg on 07.02.17
- * @author fpo on 21.05.2017
- */
 public interface BookingRepositoryIf {
 
     Page<BookingEntity> findPageableByUserIdAndAccountIdAndBankApi(Pageable pageable, String userId,
@@ -23,7 +19,7 @@ public interface BookingRepositoryIf {
 
     Iterable<BookingEntity> findByUserIdAndIds(String name, List<String> ids);
 
-    List<BookingEntity> save(List<BookingEntity> bookingEntities);
+    void save(List<BookingEntity> bookingEntities);
 
     void deleteByAccountId(String id);
 
