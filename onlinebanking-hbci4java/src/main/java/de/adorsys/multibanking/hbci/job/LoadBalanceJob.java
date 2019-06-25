@@ -23,6 +23,8 @@ import de.adorsys.multibanking.domain.request.LoadBalanceRequest;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
 import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSaldoReq;
@@ -36,6 +38,7 @@ import java.util.*;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LoadBalanceJob {
 
     public static List<BankAccount> loadBalances(LoadBalanceRequest loadBalanceRequest) {
@@ -78,7 +81,8 @@ public class LoadBalanceJob {
                 throw new MultibankingException(HBCI_ERROR, job.getJobResult().getJobStatus().getErrorList());
             }
             BankAccount bankAccount = jobs.get(job);
-            bankAccount.setBalances(HbciMapping.createBalance((GVRSaldoReq) job.getJobResult()));
+            bankAccount.setBalances(HbciMapping.createBalance((GVRSaldoReq) job.getJobResult(),
+                    bankAccount.getAccountNumber()));
             bankAccounts.add(bankAccount);
         });
         return bankAccounts;
