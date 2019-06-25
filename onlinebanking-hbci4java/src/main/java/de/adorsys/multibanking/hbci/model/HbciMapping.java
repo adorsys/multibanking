@@ -42,29 +42,36 @@ import static de.adorsys.multibanking.domain.utils.Utils.extractIban;
 @Slf4j
 public final class HbciMapping {
 
-    public static BalancesReport createBalance(GVRSaldoReq gvSaldoReq) {
-        BalancesReport result = new BalancesReport();
+    public static BalancesReport createBalance(GVRSaldoReq gvSaldoReq, String accountNumber) {
         if (gvSaldoReq.isOK()) {
-            GVRSaldoReq.Info[] infos = gvSaldoReq.getEntries();
-            if (infos.length > 0) {
-                if (infos[0] != null && infos[0].ready != null && infos[0].ready.value != null) {
-                    result.setReadyBalance(createBalance(infos[0].ready));
-                }
-                if (infos[0] != null && infos[0].available != null) {
-                    result.setAvailableBalance(createBalance(infos[0].available));
-                }
-                if (infos[0] != null && infos[0].kredit != null) {
-                    result.setCreditBalance(createBalance(infos[0].kredit));
-                }
-                if (infos[0] != null && infos[0].unready != null && infos[0].unready.value != null) {
-                    result.setUnreadyBalance(createBalance(infos[0].unready));
-                }
-                if (infos[0] != null && infos[0].used != null) {
-                    result.setUsedBalance(createBalance(infos[0].used));
-                }
-            }
+            return gvSaldoReq.getEntries().stream()
+                    .filter(info -> info.konto.number.equals(accountNumber))
+                    .findAny()
+                    .map(info -> {
+                        BalancesReport result = new BalancesReport();
+                    
+                        if (info.ready != null && info.ready.value != null) {
+                            result.setReadyBalance(createBalance(info.ready));
+                        }
+                        if (info.available != null) {
+                            result.setAvailableBalance(createBalance(info.available));
+                        }
+                        if (info.kredit != null) {
+                            result.setCreditBalance(createBalance(info.kredit));
+                        }
+                        if (info.unready != null && info.unready.value != null) {
+                            result.setUnreadyBalance(createBalance(info.unready));
+                        }
+                        if (info.used != null) {
+                            result.setUsedBalance(createBalance(info.used));
+                        }
+
+                        return result;
+                    })
+                    .orElse(null);
+
         }
-        return result;
+        return null;
     }
 
     private static Balance createBalance(Value value) {

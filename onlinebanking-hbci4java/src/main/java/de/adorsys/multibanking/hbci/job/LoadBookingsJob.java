@@ -140,7 +140,7 @@ public class LoadBookingsJob {
                 .orElse(null);
 
         BalancesReport bankAccountBalance = balanceJob
-                .map(abstractHBCIJob -> HbciMapping.createBalance((GVRSaldoReq) abstractHBCIJob.getJobResult()))
+                .map(abstractHBCIJob -> HbciMapping.createBalance((GVRSaldoReq) abstractHBCIJob.getJobResult(), account.number))
                 .orElse(null);
 
         ArrayList<Booking> bookingList = null;
