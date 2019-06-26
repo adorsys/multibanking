@@ -5,7 +5,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>4.4.7-SNAPSHOT</version>
+        <version>4.5.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>onlinebanking-hbci4java</artifactId>
@@ -15,12 +15,12 @@
         <dependency>
             <groupId>de.adorsys</groupId>
             <artifactId>hbci4j-adorsys</artifactId>
-            <version>3.4.17</version>
+            <version>3.4.19</version>
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-facade</artifactId>
-            <version>4.4.7-SNAPSHOT</version>
+            <version>4.5.3-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

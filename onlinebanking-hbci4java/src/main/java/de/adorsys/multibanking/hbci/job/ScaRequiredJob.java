@@ -135,7 +135,8 @@ public abstract class ScaRequiredJob {
         hbciTanSubmit.setTwoStepMechanism(hbciTwoStepMechanism);
         Optional.ofNullable(hbciJob)
                 .ifPresent(abstractSEPAGV -> {
-                    hbciTanSubmit.setPainVersion(abstractSEPAGV.getPainVersion().getURN());
+                    Optional.ofNullable(abstractSEPAGV.getPainVersion())
+                            .ifPresent(painVersion -> hbciTanSubmit.setPainVersion(painVersion.getURN()));
                     hbciTanSubmit.setOriginLowLevelName(abstractSEPAGV.getJobName());
                     hbciTanSubmit.setOriginSegVersion(abstractSEPAGV.getSegVersion());
                     hbciTanSubmit.setHbciJobName(abstractSEPAGV.getHBCICode());
@@ -144,7 +145,7 @@ public abstract class ScaRequiredJob {
         return response;
     }
 
-    public String hktanProcess1(HBCITwoStepMechanism hbciTwoStepMechanism, AbstractHBCIJob hbciJob, GVTAN2Step hktan) {
+    private String hktanProcess1(HBCITwoStepMechanism hbciTwoStepMechanism, AbstractHBCIJob hbciJob, GVTAN2Step hktan) {
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
         hktan.setParam("process", hbciTwoStepMechanism.getProcess());

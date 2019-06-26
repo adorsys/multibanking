@@ -83,7 +83,7 @@ public class RawSepaJob extends ScaRequiredJob {
         BigDecimal amount = new BigDecimal(0);
         String currency = "";
 
-        List<Map<String, String>> result = parsePain(sepaPayment, sepagv);
+        List<Map<String, String>> result = parsePain(sepaPayment.getPainXml());
         for (Map<String, String> resultMap : result) {
             creditorIban = resultMap.get("dst.iban");
             amount = amount.add(NumberUtils.createBigDecimal(resultMap.get("value")));
@@ -103,18 +103,16 @@ public class RawSepaJob extends ScaRequiredJob {
         sepagv.setLowlevelParam(sepagv.getName() + ".sepa.btg.curr", currency);
     }
 
-    private List<Map<String, String>> parsePain(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {
+    @SuppressWarnings("unchecked")
+    private List<Map<String, String>> parsePain(String painXml) {
         List<Map<String, String>> sepaResults = new ArrayList<>();
-        ISEPAParser<List<Map<String, String>>> parser = SEPAParserFactory.get(SepaVersion.autodetect(sepaPayment.getPainXml()));
+        ISEPAParser<List<Map<String, String>>> parser =
+                SEPAParserFactory.get(SepaVersion.autodetect(painXml));
         try {
-            parser.parse(new ByteArrayInputStream(sepaPayment.getPainXml().getBytes(CommPinTan.ENCODING)), sepaResults);
+            parser.parse(new ByteArrayInputStream(painXml.getBytes(CommPinTan.ENCODING)), sepaResults);
         } catch (UnsupportedEncodingException e) {
             throw new IllegalArgumentException(e);
         }
         return sepaResults;
-    }
-
-    public enum PaymentType {
-        SINGLE, FUTURE, BULK, PERIODIC
     }
 }
