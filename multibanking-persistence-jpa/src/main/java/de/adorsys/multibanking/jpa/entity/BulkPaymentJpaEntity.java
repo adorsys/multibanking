@@ -14,7 +14,7 @@ import java.util.List;
 public class BulkPaymentJpaEntity {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     private Long id;
     private String userId;
     private Date createdDateTime;

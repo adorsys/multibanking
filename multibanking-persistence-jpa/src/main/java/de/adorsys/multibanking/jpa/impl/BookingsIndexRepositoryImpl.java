@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.jpa.impl;
 
 import de.adorsys.multibanking.domain.BookingsIndexEntity;
+import de.adorsys.multibanking.jpa.mapper.JpaEntityMapper;
 import de.adorsys.multibanking.jpa.repository.BookingsIndexRepositoryJpa;
 import de.adorsys.multibanking.pers.spi.repository.BookingsIndexRepositoryIf;
 import lombok.AllArgsConstructor;
@@ -15,16 +16,18 @@ import java.util.Optional;
 @Service
 public class BookingsIndexRepositoryImpl implements BookingsIndexRepositoryIf {
 
-    private final BookingsIndexRepositoryJpa repositoryMongodb;
+    private final BookingsIndexRepositoryJpa repository;
+    private final JpaEntityMapper entityMapper;
 
     @Override
     public void save(BookingsIndexEntity entity) {
-
+        repository.deleteByUserIdAndAccountId(entity.getUserId(), entity.getAccountId());
+        repository.save(entityMapper.mapToBookingsIndexJpaEntity(entity));
     }
 
     @Override
     public void delete(BookingsIndexEntity entity) {
-
+        repository.deleteById(entity.getId());
     }
 
     @Override
@@ -34,6 +37,7 @@ public class BookingsIndexRepositoryImpl implements BookingsIndexRepositoryIf {
 
     @Override
     public Optional<BookingsIndexEntity> findByUserIdAndAccountId(String userId, String accountId) {
-        return Optional.empty();
+        return repository.findByUserIdAndAccountId(userId, accountId)
+                .map(entityMapper::mapToBookingsIndexEntity);
     }
 }

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 public class StandingOrderJpaEntity {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     private Long id;
     private String accountId;
     private String userId;
@@ -27,8 +27,7 @@ public class StandingOrderJpaEntity {
     private String currency;
     @Embedded
     @AttributeOverride(name = "currency", column = @Column(name = "otherAccountCurrency"))
-    @AttributeOverride(name = "userId", column = @Column(name = "otherAccountUserId"))
-    private BankAccountJpaEntity otherAccount;
+    private BankAccountCommonJpaEntity otherAccount;
     private String usage;
     private boolean delete;
 

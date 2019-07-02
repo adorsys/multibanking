@@ -13,7 +13,7 @@ import javax.persistence.Id;
 public class MlAnonymizedBookingJpaEntity {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     private Long id;
     private String userId;
     private String transactionPurpose;

@@ -16,7 +16,7 @@ import java.util.Date;
 public class PaymentJpaEntity {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     private Long id;
     private String userId;
     private Date createdDateTime;

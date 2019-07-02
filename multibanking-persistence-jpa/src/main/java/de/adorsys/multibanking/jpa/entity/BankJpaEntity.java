@@ -68,7 +68,7 @@ import javax.persistence.Id;
 public class BankJpaEntity {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     private Long id;
     private String blzHbci;
 

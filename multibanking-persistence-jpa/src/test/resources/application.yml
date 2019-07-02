@@ -1,6 +1,6 @@
 spring:
   jpa:
-    hibernate.ddl-auto: create-drop # see data.sql
+    hibernate.ddl-auto: create-drop
     properties.hibernate.jdbc.lob.non_contextual_creation: true
     show-sql: true
   liquibase:
@@ -8,7 +8,7 @@ spring:
     change-log: classpath:/liquibase/changelog-master.xml
   datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5432/mbs2
+    url: jdbc:postgresql://localhost:5432/mbs
     username: mbs
     password: mbs
 

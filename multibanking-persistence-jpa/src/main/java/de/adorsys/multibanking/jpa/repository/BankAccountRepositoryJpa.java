@@ -10,13 +10,13 @@ import java.util.Optional;
 
 @Repository
 @Profile({"jpa"})
-public interface BankAccountRepositoryJpa extends JpaRepository<BankAccountJpaEntity, String> {
+public interface BankAccountRepositoryJpa extends JpaRepository<BankAccountJpaEntity, Long> {
 
     List<BankAccountJpaEntity> findByUserId(String userId);
 
     List<BankAccountJpaEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId);
 
-    Optional<BankAccountJpaEntity> findByUserIdAndId(String userId, String id);
+    Optional<BankAccountJpaEntity> findByUserIdAndId(String userId, Long id);
 
     List<BankAccountJpaEntity> deleteByBankAccessId(String accessId);
 }

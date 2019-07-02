@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 public class AnonymizedBookingJpaEntity {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     private Long id;
     private String creditorId;
     private BigDecimal amount;

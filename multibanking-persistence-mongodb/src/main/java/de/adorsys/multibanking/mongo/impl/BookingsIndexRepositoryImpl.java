@@ -34,7 +34,7 @@ public class BookingsIndexRepositoryImpl implements BookingsIndexRepositoryIf {
 
     @Override
     public void delete(BookingsIndexEntity entity) {
-        repositoryMongodb.delete(entityMapper.mapToBookingsIndexMongoEntity(entity));
+        repositoryMongodb.deleteById(entity.getId());
     }
 
     @Override

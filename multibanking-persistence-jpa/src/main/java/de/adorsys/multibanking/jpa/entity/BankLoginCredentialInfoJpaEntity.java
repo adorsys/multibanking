@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.jpa.entity;
 
 import lombok.Data;
 
+import javax.persistence.Embeddable;
+
 @Data
-public class BankLoginCredentialInfo {
+@Embeddable
+public class BankLoginCredentialInfoJpaEntity {
 
     private String label;
     private boolean masked;

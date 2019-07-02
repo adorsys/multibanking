@@ -16,13 +16,17 @@
 
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.ScaStatus;
 import lombok.Data;
 
-@Data
-public class ConsentEntity {
+import javax.persistence.Embeddable;
+import java.io.Serializable;
 
-    private String consentId;
-    private String authUrl;
-    private ScaStatus scaStatus;
+@Data
+@Embeddable
+public class TanTransportTypeJpaEntity implements Serializable {
+
+    private String id;
+    private String name;
+    private String medium;
+    private String inputInfo;
 }

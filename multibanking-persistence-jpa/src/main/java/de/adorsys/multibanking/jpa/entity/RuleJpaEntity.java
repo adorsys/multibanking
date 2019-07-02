@@ -3,10 +3,7 @@ package de.adorsys.multibanking.jpa.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity(name="analytics_rule")
@@ -15,10 +12,14 @@ import java.util.List;
 public class RuleJpaEntity {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     private Long id;
     private String userId;
     @ElementCollection
+    @CollectionTable(
+            name = "rule_search",
+            joinColumns = @JoinColumn(name = "rule_id")
+    )
     private List<String> searchIndex;
     private String ruleId;
     private String mainCategory;

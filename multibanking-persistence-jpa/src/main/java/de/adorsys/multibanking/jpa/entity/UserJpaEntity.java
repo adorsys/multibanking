@@ -5,19 +5,17 @@ import lombok.Data;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name="mbs_user")
+@Entity(name = "mbs_user")
 @Data
 public class UserJpaEntity {
 
     @Id
-    //@GeneratedValue
-    private Long id;
+    private String id;
     private LocalDateTime expireUser;
     private LocalDateTime rulesLastChangeDate;
     @Embedded

@@ -1,45 +1,33 @@
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankAccountType;
 import de.adorsys.multibanking.domain.BankApi;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import java.time.LocalDateTime;
+import javax.persistence.*;
 import java.util.EnumMap;
 import java.util.Map;
 
-@Entity(name="bank_account")
+@EqualsAndHashCode(callSuper = false)
+@Entity(name = "bank_account")
 @Data
-public class BankAccountJpaEntity {
+public class BankAccountJpaEntity extends BankAccountCommonJpaEntity {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     private Long id;
     private String bankAccessId;
     private String userId;
 
-    @Embedded
+    @ElementCollection
+    @CollectionTable(name = "bankaccount_external_id")
+    @MapKeyEnumerated(EnumType.STRING)
+    @MapKeyColumn(name = "bank_api")
+    @Column(name = "external_id")
     private Map<BankApi, String> externalIdMap = new EnumMap<>(BankApi.class);
     @Embedded
-    private ConsentEntity dedicatedConsent;
+    private ConsentJpaEntity dedicatedConsent;
     @Embedded
     private BalancesReportEntity balances;
-    private String owner;
-    private String country;
-    private String blz;
-    private String bankName;
-    private String accountNumber;
-    private BankAccountType type;
-    private String currency;
-    private String name;
-    private String bic;
-    private String iban;
-    private BankAccount.SyncStatus syncStatus;
-    private LocalDateTime lastSync;
 
 }

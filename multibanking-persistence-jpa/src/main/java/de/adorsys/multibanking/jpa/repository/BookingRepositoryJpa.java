@@ -15,9 +15,11 @@ import java.util.Optional;
 public interface BookingRepositoryJpa extends JpaRepository<BookingJpaEntity, String> {
 
     List<BookingJpaEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId, BankApi bankApi,
-                                                           Sort sort);
+                                                              Sort sort);
 
     Optional<BookingJpaEntity> findByUserIdAndId(String userId, String bookingId);
+
+    List<BookingJpaEntity> findByUserIdAndId(String userId, List<String> bookingIds);
 
     void deleteByAccountId(String id);
 

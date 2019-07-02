@@ -33,13 +33,13 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 
     @Override
     public Optional<BankAccountEntity> findByUserIdAndId(String userId, String id) {
-        return bankAccountRepository.findByUserIdAndId(userId, id)
+        return bankAccountRepository.findByUserIdAndId(userId, new Long(id))
                 .map(entityMapper::mapToBankAccountEntity);
     }
 
     @Override
     public boolean exists(String accountId) {
-        return bankAccountRepository.existsById(accountId);
+        return bankAccountRepository.existsById(new Long(accountId));
     }
 
     @Override
@@ -49,7 +49,7 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 
     @Override
     public void save(BankAccountEntity bankAccount) {
-        bankAccountRepository.save(entityMapper.mapToBankAccountJpaEntity(bankAccount));
+        bankAccount.setId(bankAccountRepository.save(entityMapper.mapToBankAccountJpaEntity(bankAccount)).getId().toString());
     }
 
     @Override
@@ -79,7 +79,7 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 
     @Override
     public Optional<BankAccountEntity> findOne(String accountId) {
-        return bankAccountRepository.findById(accountId)
+        return bankAccountRepository.findById(new Long(accountId))
                 .map(entityMapper::mapToBankAccountEntity);
     }
 }

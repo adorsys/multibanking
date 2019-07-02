@@ -19,20 +19,25 @@ package de.adorsys.multibanking.jpa.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
+import javax.persistence.*;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Embeddable
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class BookingCategoryJpaEntity extends ContractJpaEntity {
 
-    @Embedded
-    private Set<String> rules;
+    @ElementCollection
+    @CollectionTable(
+            name = "booking_categoryrule",
+            joinColumns = @JoinColumn(name = "booking_id")
+    )
+    private List<String> rules;
     private String receiver;
-    @Embedded
+    @ElementCollection
+    @CollectionTable(name = "bookingcategory_custom")
+    @MapKeyColumn(name = "bookingcategory_id")
     private Map<String, String> custom;
 
 }

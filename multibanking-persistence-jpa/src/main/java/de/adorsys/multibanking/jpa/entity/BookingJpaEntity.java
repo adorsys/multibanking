@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BankApi;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,23 +8,20 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity(name="booking")
+@Entity(name = "booking")
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class BookingJpaEntity {
 
     @Id
-    //@GeneratedValue
-    private Long id;
+    private String id;
     private String accountId;
     private String userId;
     private String externalId;
 
-    @AttributeOverride(name = "id", column = @Column(name = "otherAccountId"))
     @AttributeOverride(name = "currency", column = @Column(name = "otherAccountCurrency"))
-    @AttributeOverride(name = "userId", column = @Column(name = "otherAccountUserId"))
     @Embedded
-    private BankAccountEntity otherAccount;
+    private BankAccountCommonJpaEntity otherAccount;
     private LocalDate valutaDate;
     private LocalDate bookingDate;
     private BigDecimal amount;

@@ -11,5 +11,7 @@ import java.util.Optional;
 @Profile({"jpa"})
 public interface BookingsIndexRepositoryJpa extends JpaRepository<BookingsIndexJpaEntity, String> {
 
+    void deleteByUserIdAndAccountId(String userId, String accountId);
+
     Optional<BookingsIndexJpaEntity> findByUserIdAndAccountId(String userId, String accountId);
 }

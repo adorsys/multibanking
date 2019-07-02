@@ -1,11 +1,11 @@
 package de.adorsys.multibanking.jpa.mapper;
 
-import de.adorsys.multibanking.jpa.entity.*;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.jpa.entity.*;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper(componentModel = "spring")
 public interface JpaEntityMapper {
@@ -18,9 +18,13 @@ public interface JpaEntityMapper {
 
     BankAccessEntity mapToBankAccessEntity(BankAccessJpaEntity entity);
 
+    List<TanTransportType> mapToTanTransportTypeList(List<TanTransportTypeJpaEntity> value);
+
     List<BankAccessEntity> mapToBankAccessEntities(List<BankAccessJpaEntity> byUserId);
 
     BankAccessJpaEntity mapToBankAccessJpaEntity(BankAccessEntity bankAccess);
+
+    List<TanTransportTypeJpaEntity> mapToTanTransportTypeJpaEntityList(List<TanTransportType> value);
 
     List<BankAccountEntity> mapToBankAccountEntities(List<BankAccountJpaEntity> byUserId);
 

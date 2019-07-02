@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.jpa.entity;
 
+import de.adorsys.multibanking.domain.ScaStatus;
 import lombok.Data;
 
+import javax.persistence.Embeddable;
+
+@Embeddable
 @Data
-public class BankLoginCredentialInfo {
+public class ConsentJpaEntity {
 
-    private String label;
-    private boolean masked;
-    private boolean optional;
-
+    private String consentId;
+    private String authUrl;
+    private ScaStatus scaStatus;
 }

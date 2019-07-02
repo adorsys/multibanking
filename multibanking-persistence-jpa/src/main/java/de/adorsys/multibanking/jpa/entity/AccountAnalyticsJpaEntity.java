@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.BookingGroup;
 import lombok.Data;
 
 import javax.persistence.Embedded;
@@ -21,6 +20,6 @@ public class AccountAnalyticsJpaEntity {
     private String userId;
     private LocalDateTime analyticsDate = LocalDateTime.now();
     @Embedded
-    private List<BookingGroup> bookingGroups;
+    private List<BookingGroupJpaEntity> bookingGroups;
 
 }

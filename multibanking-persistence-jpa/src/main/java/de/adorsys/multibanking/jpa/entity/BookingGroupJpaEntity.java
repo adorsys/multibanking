@@ -16,23 +16,32 @@
 
 package de.adorsys.multibanking.jpa.entity;
 
+import de.adorsys.multibanking.domain.BookingPeriod;
+import de.adorsys.multibanking.domain.Contract;
+import lombok.Builder;
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Embeddable;
+import java.math.BigDecimal;
 import java.util.List;
 
-@Data
 @Embeddable
-public class BankLoginSettingsJpaEntity {
+@Data
+@Builder
+public class BookingGroupJpaEntity {
 
-    private String icon;
-    @ElementCollection
-    @CollectionTable(
-            name = "bank_credentials_info",
-            joinColumns = @JoinColumn(name = "loging_settings_id")
-    )
-    private List<BankLoginCredentialInfoJpaEntity> credentials;
-    private String authType;
-    @Column(length = 10000)
-    private String advice;
+    private Type type;
+    private String name;
+    private boolean salaryWage;
+    private String mainCategory;
+    private String subCategory;
+    private String specification;
+    private String otherAccount;
+    private BigDecimal amount;
+    private List<BookingPeriod> bookingPeriods;
+    private Contract contract;
+
+    public enum Type {
+        STANDING_ORDER, RECURRENT_INCOME, RECURRENT_SEPA, RECURRENT_NONSEPA, CUSTOM, OTHER_INCOME, OTHER_EXPENSES
+    }
 }

@@ -4,10 +4,7 @@ import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity(name="payment_sepa")
@@ -16,13 +13,13 @@ import java.util.Date;
 public class RawSepaTransactionJpaEntity {
 
     @Id
-    //@GeneratedValue
+    @GeneratedValue
     private Long id;
     private String userId;
     private Date createdDateTime;
     @Lob
     private Object tanSubmitExternal;
-
+    @Column(length = 5000)
     private String painXml;
     private String service;
     private AbstractScaTransaction.TransactionType sepaTransactionType;
