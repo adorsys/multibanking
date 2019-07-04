@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.jpa.impl;
 
-import de.adorsys.multibanking.domain.PaymentEntity;
+import de.adorsys.multibanking.domain.SinglePaymentEntity;
 import de.adorsys.multibanking.jpa.mapper.JpaEntityMapper;
 import de.adorsys.multibanking.jpa.repository.PaymentRepositoryJpa;
 import de.adorsys.multibanking.pers.spi.repository.SinglePaymentRepositoryIf;
@@ -19,13 +19,13 @@ public class SinglePaymentRepositoryImpl implements SinglePaymentRepositoryIf {
     private final JpaEntityMapper entityMapper;
 
     @Override
-    public Optional<PaymentEntity> findByUserIdAndId(String userId, String id) {
+    public Optional<SinglePaymentEntity> findByUserIdAndId(String userId, String id) {
         return paymentRepository.findByUserIdAndId(userId, id)
                 .map(entityMapper::mapToPaymentEntity);
     }
 
     @Override
-    public void save(PaymentEntity paymentEntity) {
+    public void save(SinglePaymentEntity paymentEntity) {
 
     }
 

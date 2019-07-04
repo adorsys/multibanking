@@ -54,7 +54,7 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
 
     @Override
     public List<BookingEntity> findByUserIdAndIds(String name, List<String> ids) {
-        return entityMapper.mapToBookingEntities(bookingRepository.findByUserIdAndId(name, ids));
+        return entityMapper.mapToBookingEntities(bookingRepository.findByUserIdAndIdIn(name, ids));
     }
 
     @Override

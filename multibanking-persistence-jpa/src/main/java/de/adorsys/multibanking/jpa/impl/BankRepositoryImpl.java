@@ -7,7 +7,6 @@ import de.adorsys.multibanking.jpa.repository.BankRepositoryJpa;
 import de.adorsys.multibanking.jpa.repository.HibernateSearchService;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.search.jpa.FullTextQuery;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;

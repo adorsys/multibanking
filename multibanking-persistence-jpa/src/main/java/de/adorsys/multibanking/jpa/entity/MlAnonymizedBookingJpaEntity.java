@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-@Entity(name="ml_anonymized_booking")
+@Entity(name = "ml_anonymized_booking")
 @NoArgsConstructor
 @Data
 public class MlAnonymizedBookingJpaEntity {

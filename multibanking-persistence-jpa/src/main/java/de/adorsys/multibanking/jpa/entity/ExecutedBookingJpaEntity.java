@@ -17,22 +17,22 @@
 package de.adorsys.multibanking.jpa.entity;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import java.time.LocalDate;
 
+@Entity
 @Data
-@Embeddable
-public class BankLoginSettingsJpaEntity {
+@NoArgsConstructor
+public class ExecutedBookingJpaEntity {
 
-    private String icon;
-    @ElementCollection
-    @CollectionTable(
-            name = "bank_credentialsinfo",
-            joinColumns = @JoinColumn(name = "loginsettings_id")
-    )
-    private List<BankLoginCredentialInfoJpaEntity> credentials;
-    private String authType;
-    @Column(length = 10000)
-    private String advice;
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String bookingId;
+    private LocalDate executionDate;
+    private boolean executed;
 }

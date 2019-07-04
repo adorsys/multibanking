@@ -16,20 +16,21 @@
 
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.BookingPeriod;
-import de.adorsys.multibanking.domain.Contract;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Embeddable;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Embeddable
+@Entity
 @Data
-@Builder
+@NoArgsConstructor
 public class BookingGroupJpaEntity {
 
+    @Id
+    @GeneratedValue
+    private Long id;
     private Type type;
     private String name;
     private boolean salaryWage;
@@ -38,8 +39,13 @@ public class BookingGroupJpaEntity {
     private String specification;
     private String otherAccount;
     private BigDecimal amount;
-    private List<BookingPeriod> bookingPeriods;
-    private Contract contract;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "bookinggroup_period",
+            joinColumns = @JoinColumn(name = "bookinggroup_id"))
+    private List<BookingPeriodJpaEntity> bookingPeriods;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "contract_id")
+    private ContractJpaEntity contract;
 
     public enum Type {
         STANDING_ORDER, RECURRENT_INCOME, RECURRENT_SEPA, RECURRENT_NONSEPA, CUSTOM, OTHER_INCOME, OTHER_EXPENSES

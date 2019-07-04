@@ -7,18 +7,14 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity(name="payment_periodic")
+@Entity(name = "payment_periodic")
 @Data
-public class StandingOrderJpaEntity {
+public class StandingOrderJpaEntity extends PaymentCommonJpaEntity {
 
     @Id
     @GeneratedValue
     private Long id;
     private String accountId;
-    private String userId;
-    @Lob
-    private Object tanSubmitExternal;
-
     private Cycle cycle;
     private int executionDay;
     private LocalDate firstExecutionDate;

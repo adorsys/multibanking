@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class PaymentEntity extends SinglePayment {
+public class SinglePaymentEntity extends SinglePayment {
 
     private String id;
     private String userId;

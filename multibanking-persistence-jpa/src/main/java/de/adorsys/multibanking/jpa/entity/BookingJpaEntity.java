@@ -42,7 +42,8 @@ public class BookingJpaEntity {
     private String creditorId;
     private String mandateReference;
     private BankApi bankApi;
-    @Embedded
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "booking_category_id")
     private BookingCategoryJpaEntity bookingCategory;
     private String transactionCode;
 

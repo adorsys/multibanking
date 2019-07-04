@@ -19,7 +19,7 @@ public interface BookingRepositoryJpa extends JpaRepository<BookingJpaEntity, St
 
     Optional<BookingJpaEntity> findByUserIdAndId(String userId, String bookingId);
 
-    List<BookingJpaEntity> findByUserIdAndId(String userId, List<String> bookingIds);
+    List<BookingJpaEntity> findByUserIdAndIdIn(String userId, List<String> bookingIds);
 
     void deleteByAccountId(String id);
 

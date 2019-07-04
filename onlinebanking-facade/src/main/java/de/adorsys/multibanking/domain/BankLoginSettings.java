@@ -18,14 +18,12 @@ package de.adorsys.multibanking.domain;
 
 import lombok.Data;
 
-import java.util.HashMap;
 import java.util.List;
 
 @Data
 public class BankLoginSettings {
 
     private String icon;
-    private HashMap<String, String> additional_icons;
     private List<BankLoginCredentialInfo> credentials;
     private String auth_type;
     private String advice;

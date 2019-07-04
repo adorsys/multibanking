@@ -10,7 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.math.BigDecimal;
 
-@Entity(name="contract")
+@Entity(name = "contract")
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class ContractJpaEntity {

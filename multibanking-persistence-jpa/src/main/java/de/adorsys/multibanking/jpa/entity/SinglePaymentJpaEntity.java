@@ -10,19 +10,14 @@ import javax.persistence.Lob;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Entity(name="payment_single")
+@Entity(name = "payment_single")
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class PaymentJpaEntity {
+public class SinglePaymentJpaEntity extends PaymentCommonJpaEntity {
 
     @Id
     @GeneratedValue
     private Long id;
-    private String userId;
-    private Date createdDateTime;
-    @Lob
-    private Object tanSubmitExternal;
-
     private String receiver;
     private String receiverBic;
     private String receiverIban;

@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import java.math.BigDecimal;
 
 @Data
-@Entity(name="anonymized_booking")
+@Entity(name = "anonymized_booking")
 public class AnonymizedBookingJpaEntity {
 
     @Id

@@ -23,11 +23,14 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Map;
 
-@Embeddable
+@Entity(name = "booking_category")
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class BookingCategoryJpaEntity extends ContractJpaEntity {
 
+    @Id
+    @GeneratedValue
+    private Long id;
     @ElementCollection
     @CollectionTable(
             name = "booking_categoryrule",

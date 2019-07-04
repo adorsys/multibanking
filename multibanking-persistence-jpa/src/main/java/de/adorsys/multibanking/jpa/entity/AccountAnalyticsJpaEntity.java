@@ -2,10 +2,7 @@ package de.adorsys.multibanking.jpa.entity;
 
 import lombok.Data;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +16,9 @@ public class AccountAnalyticsJpaEntity {
     private String accountId;
     private String userId;
     private LocalDateTime analyticsDate = LocalDateTime.now();
-    @Embedded
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "analytics_bookinggroup",
+            joinColumns = @JoinColumn(name = "accountanalytics_id"))
     private List<BookingGroupJpaEntity> bookingGroups;
 
 }

@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository;
 public interface BookingPageableRepositoryJpa extends JpaRepository<BookingJpaEntity, String> {
 
     Page<BookingJpaEntity> findByUserIdAndAccountIdAndBankApi(Pageable pageable, String userId, String bankAccountId,
-                                                           BankApi bankApi);
+                                                              BankApi bankApi);
 
 }

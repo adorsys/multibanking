@@ -2,17 +2,39 @@ package de.adorsys.multibanking.jpa.mapper;
 
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.jpa.entity.*;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
-import java.util.Map;
 
 @Mapper(componentModel = "spring")
 public interface JpaEntityMapper {
 
     AccountAnalyticsEntity mapToAccountAnalyticsEntity(AccountAnalyticsJpaEntity accountAnalyticsEntity);
 
+    @Mapping(source = "periodStart", target = "start")
+    @Mapping(source = "periodEnd", target = "end")
+    BookingPeriod mapToBookingPeriodEntity(BookingPeriodJpaEntity bookingPeriod);
+
     AccountAnalyticsJpaEntity mapToAccountAnalyticsJpaEntity(AccountAnalyticsEntity accountAnalyticsEntity);
+
+    ContractJpaEntity mapToContractJpaEntity(ContractEntity contract);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "accountId", ignore = true)
+    ContractJpaEntity mapToContractJpaEntity(Contract contract);
+
+    @Mapping(target = "id", ignore = true)
+    BookingGroupJpaEntity mapToBookingGroupJpaEntity(BookingGroup bookingGroup);
+
+    @InheritInverseConfiguration
+    @Mapping(target = "id", ignore = true)
+    BookingPeriodJpaEntity mapToBookingPeriodJpaEntity(BookingPeriod bookingPeriod);
+
+    @Mapping(target = "id", ignore = true)
+    ExecutedBookingJpaEntity mapToExecutedBookingJpaEntity(ExecutedBooking executedBooking);
 
     List<AnonymizedBookingJpaEntity> mapToAnonymizedBookingJpaEntities(List<AnonymizedBookingEntity> bookingEntities);
 
@@ -34,17 +56,28 @@ public interface JpaEntityMapper {
 
     BankAccountJpaEntity mapToBankAccountJpaEntity(BankAccountEntity bankAccount);
 
+    @Mapping(source = "loginSettings.authType", target = "loginSettings.auth_type")
+    @Mapping(target = "searchIndex", ignore = true)
     BankEntity mapToBankEntity(BankJpaEntity bankJpaEntity);
 
     List<BankJpaEntity> mapToBankJpaEntities(Iterable<BankEntity> bankEntities);
 
+    @InheritInverseConfiguration
     BankJpaEntity mapToBankJpaEntity(BankEntity bank);
 
+    @Mapping(target = "otherAccount.balances", ignore = true)
+    @Mapping(target = "otherAccount.externalIdMap", ignore = true)
+    @Mapping(target = "otherAccount.dedicatedConsent", ignore = true)
     BookingEntity mapToBookingEntity(BookingJpaEntity bookingJpaEntity);
 
     List<BookingEntity> mapToBookingEntities(List<BookingJpaEntity> valutaDate);
 
     List<BookingJpaEntity> mapToBookingJpaEntities(List<BookingEntity> newEntities);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "accountId", ignore = true)
+    BookingCategoryJpaEntity mapToBookingCategoryJpaEntity(BookingCategory bookingCategory);
 
     List<RuleEntity> mapToRuleEntities(List<RuleJpaEntity> byUserId);
 
@@ -68,15 +101,38 @@ public interface JpaEntityMapper {
 
     MlAnonymizedBookingJpaEntity mapToMlAnonymizedBookingJpaEntity(MlAnonymizedBookingEntity booking);
 
+    @Mapping(target = "debtorBankAccount.balances", ignore = true)
+    @Mapping(target = "debtorBankAccount.externalIdMap", ignore = true)
+    @Mapping(target = "debtorBankAccount.dedicatedConsent", ignore = true)
     RawSepaTransactionEntity mapToRawSepaTransactionEntity(RawSepaTransactionJpaEntity rawSepaTransactionJpaEntity);
 
+    @Mapping(target = "debtorBankAccount.id", ignore = true)
+    @Mapping(target = "debtorBankAccount.bankAccessId", ignore = true)
+    @Mapping(target = "debtorBankAccount.userId", ignore = true)
     RawSepaTransactionJpaEntity mapToRawSepaTransactionJpaEntity(RawSepaTransactionEntity paymentEntity);
 
-    PaymentEntity mapToPaymentEntity(PaymentJpaEntity paymentJpaEntity);
+    @Mapping(target = "debtorBankAccount.balances", ignore = true)
+    @Mapping(target = "debtorBankAccount.externalIdMap", ignore = true)
+    @Mapping(target = "debtorBankAccount.dedicatedConsent", ignore = true)
+    SinglePaymentEntity mapToPaymentEntity(SinglePaymentJpaEntity paymentJpaEntity);
 
-    PaymentJpaEntity mapToPaymentJpaEntity(PaymentEntity paymentJpaEntity);
+    @Mapping(target = "debtorBankAccount.id", ignore = true)
+    @Mapping(target = "debtorBankAccount.bankAccessId", ignore = true)
+    @Mapping(target = "debtorBankAccount.userId", ignore = true)
+    SinglePaymentJpaEntity mapToPaymentJpaEntity(SinglePaymentEntity paymentJpaEntity);
 
+    @Mapping(target = "debtorBankAccount.id", ignore = true)
+    @Mapping(target = "debtorBankAccount.bankAccessId", ignore = true)
+    @Mapping(target = "debtorBankAccount.userId", ignore = true)
     StandingOrderJpaEntity mapToStandingOrderJpaEntity(StandingOrderEntity paymentJpaEntity);
+
+    @Mapping(target = "debtorBankAccount.balances", ignore = true)
+    @Mapping(target = "debtorBankAccount.externalIdMap", ignore = true)
+    @Mapping(target = "debtorBankAccount.dedicatedConsent", ignore = true)
+    @Mapping(target = "otherAccount.balances", ignore = true)
+    @Mapping(target = "otherAccount.externalIdMap", ignore = true)
+    @Mapping(target = "otherAccount.dedicatedConsent", ignore = true)
+    StandingOrderEntity mapToStandingOrderEntity(StandingOrderJpaEntity paymentJpaEntity);
 
     List<StandingOrderEntity> mapToStandingOrderEntities(List<StandingOrderJpaEntity> byUserIdAndAccountId);
 

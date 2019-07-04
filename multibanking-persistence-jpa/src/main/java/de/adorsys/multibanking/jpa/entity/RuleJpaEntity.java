@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 import java.util.List;
 
-@Entity(name="analytics_rule")
+@Entity(name = "analytics_rule")
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class RuleJpaEntity {

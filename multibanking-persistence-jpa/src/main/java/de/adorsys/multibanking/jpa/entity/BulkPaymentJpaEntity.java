@@ -8,7 +8,7 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
 
-@Entity(name="payment_bulk")
+@Entity(name = "payment_bulk")
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class BulkPaymentJpaEntity {

@@ -19,7 +19,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Indexed
-@Entity(name="bank")
+@Entity(name = "bank")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @AnalyzerDefs({
