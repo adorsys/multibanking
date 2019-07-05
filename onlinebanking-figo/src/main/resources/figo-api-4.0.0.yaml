@@ -1,0 +1,4566 @@
+openapi: 3.0.1
+info:
+  title: The figo API
+  version: 4.0.0
+  x-logo:
+    url: logo.png
+    backgroundColor: '#000546'
+  contact:
+    name: figo GmbH
+    email: support@figo.io
+    url: https://www.figo.io
+  description: |-
+    ## Postman
+
+    * [Collection](figo-API-v4-test-server.postman_collection.json)
+    * [Environment](figo-API-v4-test-server.postman_environment.json)
+
+
+    ## Changelog
+    ### [4.0.0-draft-4] - 2019-06-27
+
+    #### Changed
+
+    - The endpoint to respond to an authentication challenge has been changed to `.../{challenge-id}/response`
+      (in singular) in order to reflect the fact that only a single response can be added to any
+      given challenge.
+    - The endpoint to initiate a payment has been renamed to `.../payments/{payment-id}/init`
+    - The polling of an iniated payment process is now handled on the `.../payments/{payment-id}/init/{init-id}`
+      endpoint so that it is more consistent with the respective sync endpoint and also only returns
+      the necessary data for polling the status and not the full payment.
+    - Added query parameter `q` on `/catalog` route to search by bank code, BIC or name
+    - Added `created_at` field to a synchronization
+    - Added `sepa_purpose_code` and `end_to_end_reference` to all `/payments` routes
+    - Changed path parameter `countryCode`on `/catalog` route to query parameter
+    - Changed attribute name `scope` to `scopes` in Consent object to reflect it's an array
+    - Changed type of `challenge-id` from `integer` to `string` in "get synchronization challenge" in the "Strong Customer Authentication" authentication
+    - Changed enum values on `input_format` on challenge to `STRING` and `INTEGER`
+    - Changed attribute name `redirect-uri` to `location` on `RedirectChallenge`
+    - Changed `icon` attribute on `/catalog` route to include URLs to alternative resolutions
+    - Changed status code from `200` to `201` on a successful user creation.
+
+    #### Deleted
+    - Removed `recovery_password` from response on `POST /auth/user`
+    - Removed `text_key` on all `/payments` routes
+    - Removed `recovery-password` from `/auth/user` response
+
+
+    ### [4.0.0-draft-3] - 2019-06-19
+
+    #### Changed
+
+    - The handling of background operations (e.g. synchronization) has been simplified. The state of
+      the operation can either be `QUEUED`, `RUNNING`, `AWAIT_AUTH`, `COMPLETED` or `FAILED`. The
+      former states `started` and `authorized` have been removed. For a detailed description of the
+      state-machine that a background operation can traverse see the "Background operations"
+      paragraph in the [Synchronizations](#tag/Synchronizations) chapter.
+    - When polling the state of a background operation the current authorization challenge is now
+      directly embedded into the response. Furthermore it is not necessary anymore to poll a second
+      endpoint (e.g. `.../syncs/{sync-id}/authorizations/{auth-id}`) in order to solve a challenge.
+      Instead the challenge presented in the poll-response (whenever a background operation is in
+      the `AWAIT_AUTH` state) can be directly forwarded to the end-user.
+    - The authorization challenge response is now provided as a `POST` operation to the
+      `.../challenges/{challenge-id}/responses` endpoint. See [here](#operation/solveSyncChallenge)
+      for further information.
+    - The `.../authorizations` endpoint has been renamed to `.../challenges` and the fields of the
+      embedded `challenge` object are now at top-level. See the response of the [challenge
+      request](#operation/getSyncChallenge) for further information. The schema of the challenge
+      response is equivalent to the embedded challenge in the synchronization poll-response.
+    - The naming of enumeration values has been unified to consistently use uppercase letters.
+    - The field `additional_information` of the embedded challenge has been renamed to
+      `additional_info`.
+    - The field `tan_schemes` of the SCA method [selection challenge](#operation/getSyncChallenge)
+      has been renamed to `auth_methods`.
+    - The field `supported_tan_schems` of the [provider access](#operation/getProviderAccess)
+      response has been renamed to `auth_methods`.
+    - The field `consent_configuration` of the request body to create a provider access has been
+      renamed to `consent` to be consistent with the respective field of the response.
+    - The id of the provider access resource is not a UUID anymore but does conform to the standard
+      format of all other resources (e.g. X12345.6).
+    - The field `in_PSD2_Scope` of the access-method object in the catalog has been renamed to
+      `in_psd2_scope`.
+    - The fields `product_version` and `product_environment` of the `/version`-call have been renamed
+      to `version` and `environment`.
+    - The fields `current_language` and `available_languages` in the `language` sub-object of the
+      catalog items have been renamed to `current` and `avaialable`.
+
+    ### New
+
+    - All authorization challenges are identified by an integer `id` and have a `created_at` field.
+
+    ### Removed
+
+    - The `product_name` field of the `/version` call has been removed.
+
+    ### [4.0.0-draft-2] - 2019-06-13
+    #### Changed
+
+    - Transaction fields `booking_date` and `value_date` renamed to `booked_at` and `settled_at` to
+      stay consistent with naming scheme.
+    - UserDetails field `joined_date` renamed to `joined_at` for above reasons.
+
+    ### Removed
+
+    - Status `started` was removed from AuthorizationStatus
+
+    ### [4.0.0-draft-1] - 2019-05-29
+    ### <div style="color: red">Important</div>
+
+    This is a draft version of the new figo API. It is therefore in general subject to change.
+    However, we do not expect major changes in the endpoint structure itself but most likely in the
+    details (e.g. addition renaming of a field or flag)
+
+    #### New
+
+    - The [`/rest/accesses`](#tag/Accesses) endpoint is introduced and replaces the `POST
+      /rest/accounts` call to create new accesses to the figo API. Use this endpoint to connect your
+      user's accounts with the figo API.
+    - `/rest/accesses` also supersedes the `/rest/banks` route and now includes calls for connected
+      provider accesses
+    - Every resource requiring authorization with a Financial Provider (Banks, ASPSPs etc) now has a
+      subresource of `../authorizations`
+    - Introduced new types for SCA Challenges. The current challenges have been merged into the
+      `EmbeddedChallenge` type.
+
+    #### Extended
+
+    - The [`/rest/catalog`](http://psd2-docs-preview.figo.io/index.html#tag/Catalog) base path has
+      been extended with our new catalog data model fit for PSD2
+
+    #### Changed
+
+    - `/rest/sync` is replaced by `/rest/accesses/{access-id}/syncs`. So a synchronization of
+      accounts is now semantically placed as a subresource of an access since a synchronization is
+      only valid in the context of a given access for a given user and account.
+    - Creating a new Access via `POST /rest/accesses` no longer automatically triggers an Account
+      Synchronization. To schedule a Synchronization after a successfull Access creation, issue a
+      `POST /rest/accesses/{access-id}/syncs` call. This clearer separation of semantics aims to
+      provide greater control to the API consumer.
+    - TANSchemes have been moved from `/rest/accounts` to `/rest/accesses/`
+    - timestamp attributes have been renamed to `<created|deleted|updated|expires>-at`
+    - The `AccessToken`length is now arbitrary.
+
+    #### Removed
+
+    - `POST /rest/accounts` was removed in favor of `POST /rest/accesses` to create a new access for
+      an user
+    - `/task/progress` was removed in favor of a more functional model for processing work items.
+      Instead of having a multi-functional `task/progress` endpoint, we now support specific
+      endpoints for each step of the use-case. For instance, creating a synchronization (`POST
+      /rest/accesses/{access-id}/syncs`) responds with a Synchronization object which itself exposes
+      its current state (see JobStatus) and can be polled for progress tracking. This pattern is
+      equally true for Payments, Authorizations and Standing Orders.
+    - `/rest/banks` was removed in favor of `/rest/accesses`.
+
+
+    ## Introduction
+
+    This is the technical documentation of the figo API. For a general introduction to figo services
+    please visit [https://www.figo.io](https://www.figo.io).
+
+    The figo API offers a unified interface to thousands of banks and numerous payment service
+    providers.  It provides services like retrieving the transaction history, initiating payments,
+    viewing security portfolios, or receiving notifications on changes like incoming transactions.
+
+    ### Request API access
+
+    To request client credentials to use the figo API visit
+    [https://www.figo.io/client-id](https://www.figo.io/client-id).
+
+    ### Demo Bank
+
+    To get acquainted with the API without using a real bank access, figo provides a demo bank. It
+    offers all necessary data for testing and integration in your application.
+
+    | Field          | Value                                  |
+    | --             | --                                     |
+    | IBAN           | DE67900900424711951500                 |
+    | BIC            | DEMODE01                               |
+    | Bank Code      | 90090042                               |
+    | Account number | 4711951500                             |
+    | Username       | demo                                   |
+    | Password       | demo                                   |
+    | TAN            | 111111 (constant for all transactions) |
+
+    ## Technical foundation
+
+    All API access is over HTTPS and all data is sent and received as JSON unless otherwise
+    specified.
+
+    ### Errors
+
+    If an error occurs during a request, the API returns an HTTP status code >=400 and provides more
+    information in the response-body.
+
+    #### Error Object Structure
+
+    | Field         | Description                                                             |
+    | --            | --                                                                      |
+    | `code`        | Numeric representation of the error                                     |
+    | `data`        | Additional error information (validation information and other details) |
+    | `description` | Short summary                                                           |
+    | `group`       | Group of error                                                          |
+    | `message`     | Original message of the bank (only in task errors)                      |
+
+    #### Error Codes
+
+    Error codes are grouped in ranges
+
+    | Range         | Group          |
+    | --            | --             |
+    | 1000 - 1999   | client         |
+    | 10000 - 19999 | user           |
+    | 20000 - 29999 | bank           |
+    | 30000 - 39999 | figo           |
+    | 40000 - 49999 | connectivity   |
+    | 50000 - 59999 | categorization |
+
+    whereas each code has the following meaning
+
+    | Code    | Group  | Description                                      |
+    | ------- | ------ | ------------------------------------------------ |
+    | 1000    | client | Invalid request                                  |
+    | 1001    | client | Entry already exists                             |
+    | 1002    | client | Entity not found                                 |
+    | 1003    | client | Unauthorized                                     |
+    | 1004    | client | Invalid client authorization                     |
+    | 1005    | client | Payment already processed                        |
+    | 1006    | client | Unprocessable entity                             |
+    | 1007    | client | Forbidden                                        |
+    | 1008    | client | Resource busy                                    |
+    | 1010    | client | User locked                                      |
+    | 10000   | user   | Login credentials are invalid                    |
+    | 10001   | user   | PIN is invalid                                   |
+    | 10002   | user   | Online access is blocked                         |
+    | 10003   | user   | TAN scheme not activated                         |
+    | 10004   | user   | TAN is invalid                                   |
+    | 10005   | user   | No authorization for this account                |
+    | 10006   | user   | Transaction rejected                             |
+    | 10007   | user   | PIN change necessary                             |
+    | 10008   | user   | No authorization for this business transaction   |
+    | 10009   | user   | HBCI activation necessary                        |
+    | 10010   | user   | Account is blocked                               |
+    | 10011   | user   | Account no longer exists                         |
+    | 10012   | user   | TAN scheme is blocked                            |
+    | 10013   | user   | Status of transaction inconclusive               |
+    | 10014   | user   | Account not activated for online banking         |
+    | 10015   | user   | Redundant submissions                            |
+    | 20000   | bank   | Processing at the bank not possible              |
+    | 20001   | bank   | Bank / account unknown                           |
+    | 20002   | bank   | Transaction canceled                             |
+    | 20003   | bank   | Maintenance                                      |
+    | 20004   | bank   | Technical migration                              |
+    | 20005   | bank   | Transaction not possible                         |
+    | 20006   | bank   | Login not possible                               |
+    | 20007   | bank   | Pop up                                           |
+    | 30000   | figo   | Processing at figo not possible                  |
+    | 30005   | figo   | Task is expired                                  |
+    | 30006   | figo   | Service temporarily not available                |
+    | 40000   | figo   | Bank not supported                               |
+
+    #### Examples:
+
+    ##### Bad Request - 400
+    ```
+    {
+      "error": {
+        "code": 1000,
+        "data": {
+          "bank_code": ["Not a valid string."],
+          "credentials": ["Credentials must contain at least 2 strings."]
+        },
+        "description": "Request body doesn't match input schema.",
+        "group": "client"
+      }
+    }
+    ```
+
+    ##### Not Found - 404
+    ```
+    {
+      "error": {
+        "code": 1002,
+        "data": {},
+        "description": "Not Found",
+        "group": "client",
+      }
+    }
+    ```
+
+    ## JWE encryption
+
+    The figo API provides the ability to encrypt sensitive information like credentials and
+    authentication challenge responses with [JSON Web Encryption](https://tools.ietf.org/html/rfc7516).
+    This is an additional security mechanism to the usual transport layer encryption of the
+    data.
+
+    A common use-case is when a client application communicates through an intermediate server with
+    the figo API.  To avoid privacy and security issues the sensitive data can be encrypted with
+    [JWE](https://tools.ietf.org/html/rfc7516) on the client application side to conceal them from
+    the intermediate server.
+
+    figo provides an [example library](https://github.com/figo-connect/figo_jwe_example) which
+    implements client-side JWE encryption of the credential fields.
+
+    ### figo public key
+
+    ```
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1qB2hmObbCbAM+lc+ggDauoIZReejEimnvrmeqEs0opeTeZiiietoHT1FkB8HjlgCWrh6UimxrRvBwwvNn/4uiVEqxuPb37ozWRj87bp1R3iwhzIGHBMgkibfFf9v3FxEjtY6CgCvOJ/12+AiotL+4jBCwsUWcqui3phq4/C19bQTWaN8u1Q1ABB0SSExcfqH3Ahg6i4pJfDwY+/khb4rgvmqPpb7a0tHiWuWqAMUxfEO/GJVaDV+Bq4k5vfUNirIcazUtmnLhBVSTBcjw7OEDEIHGckwUHs6prKE0kkQD4Xjm06XupuZW8/H+/oPBdHJBr+Ugv5Kzlsst/81BEyoQIDAQAB
+    ```
+
+    ### Supported algorithms
+
+    | Key encryption | Content encryption |
+    | --             | --                 |
+    | RSA-OAEP       | A128CBC-HS256      |
+    |                | A256CBC-HS512      |
+
+servers:
+  - url: https://api.figo.me
+    description: Production system
+  - url: https://staging.figo.me
+    description: Staging system
+
+tags:
+  - name: Transactions
+    description: |
+      Each financial provider account has a list of transactions associated with it. In general the
+      information provided for each transaction should be roughly similar to the contents of the
+      printed or online transaction statement available from the respective provider. Please note
+      that not all banks provide the same level of detail.
+
+      Fields marked with *HBCI* contain additional data retrieved from banks supporting HBCI and are
+      only present if the respective bank supplies this data.
+
+      To display categories the access token must also include the scope `categories=ro`.
+
+  - name: Securities
+    description: >-
+      Each depot account has a list of securities associated with it. In general the information
+      provided for each security should be roughly similar to the contents of the printed or online
+      depot listings available from the respective bank. Please note that not all banks provide the
+      same level of detail.
+
+  - name: Standing Orders
+    description: |
+      Bank accounts can have standing orders associated with them if supported by the respective bank.
+
+      ## Execution day and interval
+
+      When working with standing orders you have to take some characteristics into account. If a
+      `last_execution_date` is set, the standing order has a limited term and will not run
+      indefinitely.  Its day of month must be the same as that of the first execution.
+
+      If you want to identify the next execution date you have to use the `interval` and `execution_day`
+      parameters to calculate the next execution date. interval defines the regular cycle the
+      standing order gets executed.  On top of it the `execution_day` states the day of execution
+      within the interval.
+
+      This value depends on the `interval` chosen. If the interval is set to `weekly`, possible values
+      for `execution_day` are: `0` (daily), `1` (Monday), `2` (Tuesday) â€¦ `7` (Sunday). Note that
+      not every bank supports the `weekly` interval.
+
+      If the interval is set to one of the other possible values, `execution_day` could be: `1-30`
+      (1st day of the month to 30th day of the month) or `97` (closing of the month minus two), `98`
+      (closing of the month minus one), `99` (closing of the month).
+
+      The same values are used for all the other intervals. That is, you can only specify the day of
+      month of a payment, even for yearly payments. The date of a repeated execution is then
+      computed by adding interval to the month of the date of submission, ignoring
+      `first_execution_date`, and using `execution_day` for day of month.
+
+      #### (Contrived) Example:
+
+      - Submission: 2017-01-20
+      - First execution: 2017-02-10
+      - Interval: half yearly
+      - Execution day: 15
+      - Next execution (computed): 2017-06-15
+
+      To be sure, set the execution day to the day of the first execution and set the first
+      execution date in the current month.
+
+      #### (Realistic) Example:
+
+      - Submission: 2017-02-01
+      - First execution: 2017-02-10
+      - Interval: half yearly
+      - Execution day: 20
+      - Next execution (computed): 2017-07-20
+
+      The minimum lead time (time between submission and first execution) is 2 days, maximum lead
+      time is 180 days.  This means you cannot submit a standing order to be executed on the same
+      day.
+
+      Also note that the actual execution of a standing order may occur later due to weekends or
+      holidays.
+
+  - name: Notifications
+    description: |
+      Whenever an account gets synchronized with the associated financial provider and new data is
+      fetched, your application can asynchronously be notified via webhooks about certain events.
+      For which events your application gets called depends on the notification key used, whose
+      format is described in the following section.
+
+      For a notification to be considered as delivered successfully, the webhook endpoint should
+      return HTTP response codes in the range of `2xx` or `3xx`. Everything else will be
+      assumed an error.
+
+      ## Callback Request Headers
+
+      When a notification is triggerd the configured callback endpoint is called by the figo API
+      setting the `User-Agent` header to `figo-notification/<figo-api-version>`. E.g.
+
+      ```
+      User-Agent: figo-notification/3.6.0
+      ```
+
+      # Observe Keys
+
+      When configuring a new notification you have to specify an observe key which defines the
+      trigger condition for the notification. The observe key is composed of a path and a number of
+      query parameters similar to an URL without scheme and host part.
+
+      A client is only allowed to configure a notification of a certain type if he has the required
+      scope for this specific notification.
+
+      ## Account balance
+
+      Triggered when the respective account balance changes
+
+      | Observe key | `/rest/accounts/{account-id}/balance?inferior_limit=<int>` |
+      | --          | --                                                         |
+      | **Scope**   | `balance=ro`                                               |
+
+      ### Parameters
+
+      | Name           | In    | Description                                               |
+      | --             | --    | --                                                        |
+      | account-id     | path  | figo account ID                                           |
+      | inferior_limit | query | Trigger if the balance of the account is below this value |
+
+      ## Transactions of Account
+
+      Triggered when an account has received new transactions
+
+      | Observe key | `/rest/accounts/{account-id}/transactions?<params>` |
+      | --          | --                                                  |
+      | **Scope**   | `transactions=ro`                                   |
+
+      ### Parameters
+
+      All query-paramters for this observe key can be combined with `include_pending` but not
+      amongst each other.
+
+      | Name                        | In    | Description                                                                      |
+      | --                          | --    | --                                                                               |
+      | account-id                  | path  | figo account ID.                                                                 |
+      | include_pending             | query | Also consider pending transactions.                                              |
+      | more_expenses_then_deposits | query | Trigger if the sum of expenses in the current month exceeds the sum of deposits. |
+      | current_month_expense_goal  | query | Trigger if the sum of expenses in the current month exceeds the provided value.  |
+      | single_expense_goal         | query | Trigger for expense transactions exceeding the provided value.                   |
+      | single_deposit_goal         | query | Trigger for expense transactions exceeding the provided value.                   |
+      | purpose                     | query | Trigger on transactions whose purpose contains the provided value.               |
+      | name                        | query | Trigger on transactions whose sender/receiver name contains the provided value.  |
+
+      ## All transactions
+
+      | Observe key | `/rest/transactions` |
+      | --          | --                   |
+      | **Scope**   | `transactions=ro`    |
+
+      ### Parameters
+
+      All query-paramters for this observe key can be combined with `include_pending` but not
+      amongst each other.
+
+      | Name                        | In    | Description                                                                      |
+      | --                          | --    | --                                                                               |
+      | include_pending             | query | Also consider pending transactions.                                              |
+      | more_expenses_then_deposits | query | Trigger if the sum of expenses in the current month exceeds the sum of deposits. |
+      | current_month_expense_goal  | query | Trigger if the sum of expenses in the current month exceeds the provided value.  |
+      | single_expense_goal         | query | Trigger for expense transactions exceeding the provided value.                   |
+      | single_deposit_goal         | query | Trigger for expense transactions exceeding the provided value.                   |
+      | purpose                     | query | Trigger on transactions whose purpose contains the provided value.               |
+      | name                        | query | Trigger on transactions whose sender/receiver name contains the provided value.  |
+
+      ## Auto-sync error
+
+      Triggered when the saved PIN of a user is not accepted from the corresponding bank while
+      performing an auto sync.
+
+      | Observe key | `/rest/accounts/{account-id}/sync?wrong_pin=1` |
+      | --          | --                                             |
+      | **Scope**   | `balance=ro transactions=ro`                   |
+
+      ### Parameters
+
+      | Name       | In    | Description                                                                 |
+      | --         | --    | --                                                                          |
+      | account-id | path  | figo account ID                                                             |
+      | wrong_pin  | query | Trigger if the PIN of the provider access was reported to be in this state. |
+
+      ## Test-notification
+
+      Triggered immediately. This special notification key can be used to test the delivery of
+      notifications. The notification message will be sent immediately and no registration occurs.
+
+      | Observe key | `rest/notifications/test` |
+      | --          | --                        |
+      | **Scope**   | -                         |
+
+  - name: Payments
+    description: |
+      Each account can contain payments. Payments can be created, updated, deleted and submitted.
+      To initiate a payment, create a payment and submit it.
+
+  - name: Catalog
+    description: |
+      The figo API provides access to many different financial providers, like banks and online
+      payment services. Information on them can be accessed in the catalog, where service details
+      and credentials requirements are listed.
+
+      ## API Calls
+
+      Setting the `Accept-Language` to one of the available language will return results in this
+      language.
+
+  - name: Accounts
+    description: |
+
+  - name: User Management
+    description: |
+      ## One figo user per application user
+
+      If the use case requires to interact with the figo API for one user over an extended period of
+      time, it is recommended to create one figo user per application user. This way the data of
+      each of your users is securely separated.
+
+      In this scenario it is recommended to create the figo users with a username directly mappable
+      from your application user IDs, e.g. using  `<your user ID>@figo.<yourapplication domain>`.
+      That way you do not have to save any additional information and still do not block email
+      address of your user for explicit figo API usage. A similar, but more secure, mapping is
+      recommended for the user's password.
+
+      ## One figo user per application transaction
+
+      It is possible to only integrate the figo API as part of processing a transaction, e.g. to
+      verify account owner information. In this scenario it is recommended to create one figo user
+      per transaction and delete it after the figo API integration part of the transaction
+      processing is completed.
+
+      For the same reasons as in the other case a simple mapping between your transaction and the
+      figo username/password is recommended for this case as well, e.g. `<your transaction
+      ID>@figo.<your application domain>` as username.
+
+      In order to keep transaction processing time as short as possible, we recommend to defer any
+      clean-up activities.
+
+  - name: Synchronizations
+    description: |
+
+      ## Connect a provider access
+
+      In order to be able to fetch financial data from a provider the corresponding access has
+      to be configured first. The configuration procedure is summarized as follows
+
+      1. Lookup the financial provider to be connected in [the catalog](#operation/listCatalog) and
+         select one of the available access methods. Also notice which credentials are required to
+         be used for this provider access.
+      2. Obtain the required login credentials as specified by the access method from the customer.
+      3. Add a new [access](#operation/addProviderAccess) handle.
+      4. Start a [synchronization](#operation/createSync) for the access.
+      5. Guide the customer through the process of strong customer authentication.
+
+      ## Synchronize a provider access
+
+      In order to keep the financial data accessible through the figo API up-to-date the financial
+      provider has to be periodically queried for updates. This process is called synchronization.
+      The figo API performs an automatic synchronization on a daily basis, as long as the customer
+      has given the authorization to store the credentials for the provider access to be
+      synchronized.
+
+      A synchronization that is manually triggerd through the API allows the customer to respond to
+      authorization challenges.
+
+      ## Background operations
+
+      Interactions with a financial service provider are never executed in the scope of an API
+      request but rather performed asynchroneously in the background. A synchronization is an
+      example for such a background operation. The states that a synchronization can traverse during
+      its lifetime are defined by the following state-machine.
+
+      <div class="diagram">
+        graph LR
+        B[QUEUED]
+        B --> C[RUNNING]
+        C --> D[AWAIT_AUTH]
+        D --> |response created| C
+        C --> E[FAILED]
+        D --> E
+        C --> F[COMPLETED]
+      </div>
+
+      Every synchronization starts in the `QUEDED` state and is moved to the `RUNNING` state when it
+      is picked up by the job processing backend. While communicating with the financial service
+      provider an authorization challenge can be issued, in which case the syncrhonization is moved
+      to the `AWAIT_AUTH` state. In this state the end-user's interaction is required in order to
+      [solve the challenge](#operation/solveSyncChallenge). For a detailed description of
+      available challange types see the section [Strong Customer Authentication](#tag/Strong-Customer-Authentication).
+
+      After the challenge has been solved the synchronization switches back to the `RUNNING` state
+      and eventually to the `COMPLETED` state. While processing a syncrhonization multiple
+      authorization challenges can be issued so that the state can toggle between `AWAIT_AUTH` and
+      `RUNNING`. In case of an error the work item's state will be set to `FAILED` and no further
+      processing will take place.
+
+
+  - name: Strong Customer Authentication
+    description: |
+      The PSD2 requires a strong customer authentication for all interactions with a customer's
+      bank. This means that two out of the following three factors have to be used for
+      authentication:
+
+      - Possession
+      - Inherence (Identity)
+      - Knowledge
+
+      An authenticated customer can authorize interactions triggered through the figo API, like
+      e.g. a synchronization of account and transaction data or the submission of a payment.
+
+      The following sections describe the challenge types supported by the figo API.
+
+      ### Decoupled challenges
+
+      In this case the process of strong customer authentication is to be carried out with a
+      device or app that is provided by the financial service provider.
+
+      ### Redirect challenges
+
+      In case of a redirect challenge the authentication is performed at the authentication
+      server of the financial service provider. The customer's user agent has to be redirected to
+      the URI given in the challenge.
+
+      ### Embedded challenges
+
+      In this case the authentication process is embedded into the user interface on the side of
+      the TPP. The following different formats of challenges are available
+
+      | Format | Description                                                                                                                                                                                             |
+      | ---    | ---                                                                                                                                                                                                     |
+      | TEXT   | An instructional text from the service provider describing further steps.                                                                                                                               |
+      | HTML   | Similar to TEXT but with additional markup.                                                                                                                                                             |
+      | HHD    | The data encodes an animated image processable by the users TAN generator. Please [contact us](mailto:developer@figo.io) in case you would like to provide native support for this in your application. |
+      | PHOTO  | An image which should be shown to the user. The image is encoded following [RFC 2397](http://tools.ietf.org/html/rfc2397)                                                                               |
+
+      **Note**: An end user might have multiple SCA methods available to him. In this case a SCA
+      method has to be selected.
+
+x-tagGroups:
+  - name: General
+    tags:
+      - Client Authorization
+      - User Management
+      - Catalog
+      - Accesses
+      - Strong Customer Authentication
+      - Synchronizations
+      - Accounts
+      - Banks
+      - Transactions
+      - Payments
+      - Standing Orders
+      - Securities
+      - Notifications
+      - Version
+
+paths:
+  /auth/token:
+    post:
+      tags:
+        - Client Authorization
+      summary: Create access token
+      operationId: createAccessToken
+      description: |-
+        Access tokens authorize your application to perform operations on the resources of a user.
+        To obtain an access token you can use one of the following grant types:
+
+        | Grant Type           | Description        |
+        | --                   | --                 |
+        | `password`           | User Credentials   |
+        | `refresh_token`      | Refresh Token      |
+        | `authorization_code` | Authorization Code |
+
+        The user has to be [created](#operation/createUser) beforehand.
+      security:
+        - client_auth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/UserCredentialRequest'
+                - $ref: '#/components/schemas/RefreshTokenRequest'
+                - $ref: '#/components/schemas/AuthorizationCodeRequest'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessToken'
+              example:
+                access_token: AoFmNJLDTW8jQtGSJ1iZeeoLiwNZ2ihz3iiCHGpuvE439nppuY
+                expires_in: 3600
+                scope: accounts=ro balance=ro transactions=ro offline
+                token_type: Bearer
+                refresh_token: RTfI2WNyK78NozupDH9ai8GPRbjjdVsXPPt...
+
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+  /rest/accesses:
+    post:
+      summary: Add provider access
+      tags:
+        - Accesses
+      security:
+        - user_auth: []
+      operationId: addProviderAccess
+      responses:
+        '201':
+          $ref: '#/components/responses/AccessDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      requestBody:
+        $ref: '#/components/requestBodies/CreateAccess'
+
+    get:
+      summary: List provider accesses
+      operationId: listProviderAccesses
+      description: |-
+        List all connected provider accesses of user.
+      tags:
+        - Accesses
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ProviderAccessList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/accesses/{access-id}:
+    get:
+      summary: Get provider access
+      operationId: getProviderAccess
+      description: |-
+        Retrieve the details of a specific provider access identified by its ID.
+      tags:
+        - Accesses
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccessID'
+      responses:
+        '200':
+          $ref: '#/components/responses/AccessDetails'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /rest/accesses/{access-id}/remove_pin:
+    post:
+      summary: Remove stored PIN
+      operationId: removePINFromProviderAccess
+      description: |-
+        Remove a PIN from the API backend that has been previously stored for automatic
+        synchronization or ease of use.
+      tags:
+        - Accesses
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccessID'
+      responses:
+        '200':
+          $ref: '#/components/responses/AccessDetails'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /rest/accesses/{access-id}/syncs:
+    post:
+      summary: Start provider synchronization
+      operationId: createSync
+      description: |
+        In order for the figo API to have up-to-date transaction and account information, it needs
+        to query the bank servers, a process which is called synchronization. With this call you can
+        create a new synchronization, synchronizing all (or the specified) accounts with the state
+        returned by the bank.
+      tags:
+        - Synchronizations
+      parameters:
+        - $ref: '#/components/parameters/AccessID'
+      security:
+        - user_auth: []
+      requestBody:
+        $ref: '#/components/requestBodies/CreateSynchronization'
+      responses:
+        '201':
+          $ref: '#/components/responses/Synchronization'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/accesses/{access-id}/syncs/{sync-id}:
+    get:
+      summary: Get synchronization
+      operationId: getSync
+      tags:
+        - Synchronizations
+      parameters:
+        - $ref: '#/components/parameters/AccessID'
+        - $ref: '#/components/parameters/SyncID'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Synchronization'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/accesses/{access-id}/syncs/{sync-id}/challenges:
+    get:
+      summary: List synchronization challenges
+      operationId: listSyncChallenges
+      tags:
+        - Strong Customer Authentication
+      parameters:
+        - $ref: '#/components/parameters/AccessID'
+        - $ref: '#/components/parameters/SyncID'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ChallengeList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/accesses/{access-id}/syncs/{sync-id}/challenges/{challenge-id}:
+    get:
+      summary: Get synchronization challenge
+      operationId: getSyncChallenge
+      tags:
+        - Strong Customer Authentication
+      parameters:
+        - $ref: '#/components/parameters/AccessID'
+        - $ref: '#/components/parameters/SyncID'
+        - $ref: '#/components/parameters/ChallengeID'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Challenge'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/accesses/{access-id}/syncs/{sync-id}/challenges/{challenge-id}/response:
+    post:
+      summary: Solve synchronization challenge
+      operationId: solveSyncChallenge
+      tags:
+        - Strong Customer Authentication
+      parameters:
+        - $ref: '#/components/parameters/AccessID'
+        - $ref: '#/components/parameters/SyncID'
+        - $ref: '#/components/parameters/ChallengeID'
+      security:
+        - user_auth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/AuthMethodSelectResponse'
+                - $ref: '#/components/schemas/ChallengeResponse'
+                - $ref: '#/components/schemas/ChallengeResponseJWE'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/accounts:
+    get:
+      tags:
+        - Accounts
+      summary: List accounts
+      operationId: listAccounts
+      description: |-
+        Get a list of all available accounts to which the user has granted access.
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/AccountList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+  /rest/accounts/{account-id}:
+    get:
+      summary: Get account
+      operationId: getAccount
+      description: |-
+        Retrieve detailed information about an account identified by it's ID.
+      tags:
+        - Accounts
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/CentsQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/AccountDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+    delete:
+      summary: Delete account
+      operationId: deleteAccount
+      description: |-
+        Once the last remaining account of a bank contact has been removed, the provider access
+        will be automatically removed as well.
+      tags:
+        - Accounts
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /rest/accounts/{account-id}/balance:
+    get:
+      summary: Get account balance
+      operationId: getAccountBalance
+      description: |-
+        Retrieve the balance of an account identified by it's ID.
+      tags:
+        - Accounts
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/CentsQuery'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountBalance'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+  /rest/transactions:
+    get:
+      summary: List transactions
+      operationId: listTransactions
+      description: |-
+        Get a list of the transactions of all accounts. You can additionally constrain the amount
+        of transactions being returned by using the query parameters described below as filters.
+      tags:
+        - Transactions
+      parameters:
+        - $ref: '#/components/parameters/AccountsFilter'
+        - $ref: '#/components/parameters/TransactionFilter'
+        - $ref: '#/components/parameters/SyncTaskFilter'
+        - $ref: '#/components/parameters/CountQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/SortQuery'
+        - $ref: '#/components/parameters/SinceQuery'
+        - $ref: '#/components/parameters/UntilQuery'
+        - $ref: '#/components/parameters/TransactionSinceTypeQuery'
+        - $ref: '#/components/parameters/TransactionTypesQuery'
+        - $ref: '#/components/parameters/CentsQuery'
+        - $ref: '#/components/parameters/IncludePendingQuery'
+        - $ref: '#/components/parameters/IncludeStatisticsQuery'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/TransactionList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/accounts/{account-id}/transactions:
+    get:
+      summary: List transactions of account
+      operationId: listTransactionsOfAccount
+      description: |-
+        Get a list of the transactions associated with a specific account. You can additionally
+        constrain the amount of transactions being returned by using the query parameters described
+        below as filters.
+      tags:
+        - Transactions
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/AccountsFilter'
+        - $ref: '#/components/parameters/TransactionFilter'
+        - $ref: '#/components/parameters/CountQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/IncludePendingQuery'
+        - $ref: '#/components/parameters/SortQuery'
+        - $ref: '#/components/parameters/SinceQuery'
+        - $ref: '#/components/parameters/UntilQuery'
+        - $ref: '#/components/parameters/TransactionSinceTypeQuery'
+        - $ref: '#/components/parameters/TransactionTypesQuery'
+        - $ref: '#/components/parameters/CentsQuery'
+        - $ref: '#/components/parameters/IncludeStatisticsQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/TransactionList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /rest/transactions/{transaction-id}:
+    get:
+      summary: Get transaction
+      operationId: getTransaction
+      description: |-
+        Retrieve the details of a single transaction by its ID.
+      tags:
+        - Transactions
+      parameters:
+        - $ref: '#/components/parameters/TransactionID'
+        - $ref: '#/components/parameters/CentsQuery'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/TransactionDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+  /rest/accounts/{account-id}/transactions/{transaction-id}:
+    get:
+      summary: Get transaction of account
+      operationId: getTransctionOfAccount
+      description: |-
+        Retrieve the details of a single transaction by its ID associated to a specific account.
+      security:
+        - user_auth: []
+      tags:
+        - Transactions
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/TransactionID'
+        - $ref: '#/components/parameters/CentsQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/TransactionDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+
+  /rest/securities:
+    get:
+      summary: List securities
+      operationId: listSecurities
+      description: |-
+        Get a list of the securities of all accounts. You can additionally constrain the amount
+        of securities being returned by using the query parameters described below as filters.
+      tags:
+        - Securities
+      parameters:
+        - $ref: '#/components/parameters/AccountsFilter'
+        - $ref: '#/components/parameters/CountQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/SinceQuery'
+        - $ref: '#/components/parameters/SecuritySinceTypeQuery'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SecurityList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+  /rest/accounts/{account-id}/securities:
+    get:
+      summary: List securities of account
+      operationId: listSecuritiesOfAccount
+      description: |-
+        Get a list of the securities associated with a specific account. You can additionally
+        constrain the amount of securities being returned by using the query parameters
+        described below as filters.
+      tags:
+        - Securities
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/CountQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/SinceQuery'
+        - $ref: '#/components/parameters/SecuritySinceTypeQuery'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SecurityList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+  /rest/accounts/{account-id}/securities/{security-id}:
+    get:
+      summary: Get security of account
+      operationId: getSecurityOfAccount
+      description: |-
+        Retrieve a single security associated to a specific account by its `security-id`.
+      tags:
+        - Securities
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/SecurityID'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/SecurityDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+
+  /rest/standing_orders:
+    get:
+      summary: List standing orders
+      operationId: listStandingOrders
+      description: |-
+        Get a list of the standing orders of all accounts. You can additionally constrain the amount
+        of standing orders being returned by using the query parameters described as filters.
+      tags:
+        - Standing Orders
+      parameters:
+        - $ref: '#/components/parameters/AccountsFilter'
+        - $ref: '#/components/parameters/CentsQuery'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/StandingOrderList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+  /rest/accounts/{account-id}/standing_orders:
+    get:
+      summary: List standing orders of account
+      operationId: listStandingOrdersOfAccount
+      description: |-
+        Get a list of the standing orders of a specific account. You can additionally constrain the amount
+        of standing orders being returned by using the query parameters described below as filters.
+      tags:
+        - Standing Orders
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/CentsQuery'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/StandingOrderList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+  /rest/standing_orders/{standing-order-id}:
+    get:
+      summary: Get standing order
+      operationId: getStandingOrder
+      description: |-
+        Retrieve a single standing order by its ID.
+      tags:
+        - Standing Orders
+      parameters:
+        - $ref: '#/components/parameters/StandingOrderID'
+        - $ref: '#/components/parameters/AccountsFilter'
+        - $ref: '#/components/parameters/CentsQuery'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/StandingOrderDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+    delete:
+      summary: Delete standing order
+      operationId: deleteStandingOrder
+      description: |-
+        Delete a standing order from the figo API backend and depending on the `submit` query
+        paramter also from the financial provider.
+      tags:
+        - Standing Orders
+      parameters:
+        - $ref: '#/components/parameters/StandingOrderID'
+        - $ref: '#/components/parameters/SubmitQuery'
+        - $ref: '#/components/parameters/TANSchemeIDQuery'
+        - $ref: '#/components/parameters/ContinueQuery'
+      security:
+        - user_auth: []
+      responses:
+        '202':
+          $ref: '#/components/responses/TaskToken'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /rest/accounts/{account-id}/standing_orders/{standing-order-id}:
+    get:
+      summary: Get standing order of account
+      operationId: getStandingOrderOfAccount
+      description: |-
+        Retrieve a single standing order associated to a specific account by its ID.
+      tags:
+        - Standing Orders
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/StandingOrderID'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/StandingOrderDetails'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+    delete:
+      summary: Delete standing order of account
+      operationId: deleteStandingorderOfAccount
+      description: |-
+        If the query parameter 'submit' is set to `true`, and deleting the standing order from the
+        figo API servers was successful, a task-token will be returned.
+      tags:
+        - Standing Orders
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/StandingOrderID'
+        - $ref: '#/components/parameters/SubmitQuery'
+        - $ref: '#/components/parameters/TANSchemeIDQuery'
+      security:
+        - user_auth: []
+      responses:
+        '202':
+          $ref: '#/components/responses/TaskToken'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '4XX':
+          $ref: '#/components/responses/GenericError'
+
+  /rest/accounts/{account-id}/payments:
+    get:
+      summary: List payments of account
+      operationId: listPaymentsOfAccount
+      description: |-
+        List all payments associated to a specific account.
+      tags:
+        - Payments
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/CountQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/CentsQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    post:
+      summary: Create payment/standing order
+      operationId: createPayment
+      description: |-
+        Create a new payment or a standing order depending on the `type`-field of the request body.
+        In order to initiate the payment it has to be [submitted](#operation/submitPayment) to the
+        payment service provider afterwards.
+      tags:
+        - Payments
+        - Standing Orders
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/ContentTypeJSON'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/PaymentTransfer'
+                - $ref: '#/components/schemas/PaymentSEPA'
+                - $ref: '#/components/schemas/StandingOrderTransfer'
+                - $ref: '#/components/schemas/StandingOrderSEPA'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Modify standing order
+      operationId: updateStandingOrder
+      description: |-
+        To modify an existing standing order, conduct the following steps:
+
+        1. [Synchronize accounts](#operation/createSync), including `standingOrders` in
+           `sync_tasks`.
+        1. `GET /rest/standing_orders` and pick `standing_order_id` of the one to modify.
+        1. `PUT /rest/accounts/{account-id}/payments` with `standing_order_id` and fields to modify.
+            Response contains a `payment-id`.
+        1. `POST /rest/accounts/{account-id}/payments/{payment-id}/init` to submit modified
+           standing order to bank.
+        1. Authorize the payment submission by solving the authentication challenge presented when
+           polling the payment.
+
+      tags:
+        - Standing Orders
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/ContentTypeJSON'
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateStandingOrder'
+      responses:
+        '200':
+          $ref: '#/components/responses/StandingOrderDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /rest/accounts/{account-id}/payments/{payment-id}:
+    get:
+      summary: Get payment of account
+      operationId: getPaymentOfAccount
+      description: |-
+        Retrieve the details of a payment from the given account. The `status`, `challenge` and
+        `error` fields are used in the same way as for synchronization operations when the payment
+        is issued to the service provider.
+      tags:
+        - Payments
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/PaymentID'
+        - $ref: '#/components/parameters/CentsQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentDetails'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Modify a payment
+      operationId: updatePaymentOfAccount
+      description: |-
+        Update the properties of a payment. A payment that has already been submitted to the payment
+        service provider can not be modified.
+      tags:
+        - Payments
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/PaymentID'
+        - $ref: '#/components/parameters/ContentTypeJSON'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      requestBody:
+        $ref: '#/components/requestBodies/UpdatePayment'
+
+    delete:
+      summary: Delete a payment
+      operationId: deletePayment
+      description: |-
+        Delete a payment from the figo API backend.
+      tags:
+        - Payments
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/PaymentID'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /rest/accounts/{account-id}/payments/{payment-id}/init:
+    post:
+      summary: Submit a payment/standing order
+      operationId: submitPayment
+      description: |-
+        Initiate a payment by sending it to the payment service provider. The payment is executed as
+        an asynchronous background operation. The status of this operation can be monitored by
+        polling [the payment](#operations/getPaymentOfAccount) and and tracking the `status` field.
+      tags:
+        - Payments
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/PaymentID'
+        - $ref: '#/components/parameters/ContentTypeJSON'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentInitiation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      requestBody:
+        $ref: '#/components/requestBodies/SubmitPayment'
+
+  /rest/accounts/{account-id}/payments/{payment-id}/init/{init-id}/challenges:
+    get:
+      summary: List payment challenges
+      operationId: listPaymentChallenges
+      tags:
+        - Strong Customer Authentication
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/PaymentID'
+        - $ref: '#/components/parameters/InitiationID'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ChallengeList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/accounts/{account-id}/payments/{payment-id}/init/{init-id}/challenges/{challenge-id}:
+    get:
+      summary: Get payment challenge
+      operationId: getPaymentChallenge
+      tags:
+        - Strong Customer Authentication
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/PaymentID'
+        - $ref: '#/components/parameters/InitiationID'
+        - $ref: '#/components/parameters/ChallengeID'
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/Challenge'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/accounts/{account-id}/payments/{payment-id}/init/{init-id}/challenges/{challenge-id}/response:
+    post:
+      summary: Solve payment challenge
+      operationId: solvePaymentChallenge
+      tags:
+        - Strong Customer Authentication
+      parameters:
+        - $ref: '#/components/parameters/AccountID'
+        - $ref: '#/components/parameters/PaymentID'
+        - $ref: '#/components/parameters/InitiationID'
+        - $ref: '#/components/parameters/ChallengeID'
+      security:
+        - user_auth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/AuthMethodSelectResponse'
+                - $ref: '#/components/schemas/ChallengeResponse'
+                - $ref: '#/components/schemas/ChallengeResponseJWE'
+      responses:
+        '202':
+          $ref: '#/components/responses/Accepted'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /auth/revoke:
+    get:
+      summary: Revoke token
+      tags:
+        - Client Authorization
+      operationId: revokeOAuthToken
+      parameters:
+        - $ref: '#/components/parameters/OAuthTokenQuery'
+      description: |
+        Use this endpoint to invalidate an access token or refresh token. If you want to revoke the
+        refresh token associated with an access token see [here](#operation/revokeOAuthTokenWithCascade).
+      security:
+        - client_auth: []
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    post:
+      summary: Revoke token (cascading)
+      operationId: revokeOAuthTokenWithCascade
+      tags:
+        - Authorization
+      security:
+        - client_auth: []
+      description: |
+        Use this endpoint to invalidate an access token or refresh token.  If you revoke an access
+        token and the `cascade`-flag is set to `true` the associated refresh token is also revoked.
+      parameters:
+        - $ref: '#/components/parameters/ContentTypeJSON'
+      requestBody:
+        $ref: '#/components/requestBodies/RevokeToken'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /auth/user:
+    post:
+      tags:
+        - User Management
+      summary: Create a user
+      description: |-
+        The client has to have the `create_user` scope in order to be able to perfrom this operation.
+      operationId: createUser
+      security:
+        - client_auth: []
+      requestBody:
+        $ref: '#/components/requestBodies/CreateUser'
+      parameters:
+        - $ref: '#/components/parameters/ContentTypeJSON'
+      responses:
+        '201':
+          description: User created
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /version:
+    get:
+      summary: Get version
+      operationId: getVersion
+      description: |-
+        Shows the current version and the environment of the figo API.
+      tags:
+        - Version
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  version:
+                    type: string
+                    example: 3.6.0.0.rc20
+                    description: Version of figo API.
+                  environment:
+                    type: string
+                    example: staging
+                    description: Environment where the API is running.
+
+  /catalog:
+    get:
+      operationId: listCatalogClientAuth
+      summary: List complete catalog (client_auth)
+      description: |
+        The real catalog contains thousands of entries, so expect the call to cause some traffic and
+        delay. The example is only to highlight the data structure.
+
+        *Note*: The client has to have the `accounts=rw` scope in order to retrieve the catalog.
+      tags:
+        - Catalog
+      security:
+        - client_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/CountryCodeQuery'
+        - $ref: '#/components/parameters/ProviderQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/ProviderList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/catalog:
+    get:
+      summary: List complete catalog
+      operationId: listCatalog
+      description: |
+        The real catalog contains thousands of entries, so expect the call to cause some traffic and
+        delay. The example is only to highlight the data structure.
+      tags:
+        - Catalog
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/CountryCodeQuery'
+        - $ref: '#/components/parameters/ProviderQuery'
+
+      responses:
+        '200':
+          $ref: '#/components/responses/ProviderList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/catalog/banks:
+    get:
+      summary: List banks
+      operationId: listBanks
+      description: |-
+        List banks of the provider catalog.
+      tags:
+        - Catalog
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/CountryCodeQuery'
+        - $ref: '#/components/parameters/BankQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/BankList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/catalog/services:
+    get:
+      summary: List services
+      operationId: listServices
+      description: |-
+        List all available services of the provider catalog.
+      parameters:
+        - $ref: '#/components/parameters/AcceptLanguage'
+        - $ref: '#/components/parameters/CountryCodeQuery'
+        - $ref: '#/components/parameters/ServiceQuery'
+      tags:
+        - Catalog
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/ServiceList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/notifications:
+    post:
+      summary: Create notification
+      operationId: createNotification
+      description: |-
+        Create a new notification.
+      tags:
+        - Notifications
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/ContentTypeJSON'
+      requestBody:
+        $ref: '#/components/requestBodies/CreateNotification'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '200':
+          $ref: '#/components/responses/NotificationDetails'
+
+    put:
+      summary: Replace notifications
+      operationId: replaceNotifications
+      description: |-
+        Replace all existing notifiactions with a list of new ones.
+      tags:
+        - Notifications
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/ContentTypeJSON'
+      requestBody:
+        $ref: '#/components/requestBodies/ReplaceNotifications'
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '200':
+          $ref: '#/components/responses/NotificationList'
+
+    get:
+      summary: List notifications
+      operationId: listNotifications
+      description: |-
+        List all available notifications.
+      tags:
+        - Notifications
+      security:
+        - user_auth: []
+      responses:
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '200':
+          $ref: '#/components/responses/NotificationList'
+
+  /rest/notifications/{notification-id}:
+    get:
+      summary: Get notification
+      operationId: getNotification
+      description: |-
+        Get details of a specific notification identified by its ID.
+      tags:
+        - Notifications
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/NotificationID'
+      responses:
+        '200':
+          $ref: '#/components/responses/NotificationDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Modify notification
+      operationId: updateNotification
+      description: |-
+        Update the properties of a notification.
+      tags:
+        - Notifications
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/NotificationID'
+        - $ref: '#/components/parameters/ContentTypeJSON'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notify_uri:
+                  type: string
+                  format: url
+                  example: https://api.figo.me/A12345.6
+                  description: |-
+                    Notification messages will be sent to this URL. The URL schemes https and
+                    http are used for webhooks.
+                state:
+                  $ref: '#/components/schemas/State'
+                observe_key:
+                  type: string
+                  example: rest/notifications/test
+                  description: Notification key
+      responses:
+        '200':
+          $ref: '#/components/responses/NotificationDetails'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete notification
+      operationId: deleteNotification
+      description: |-
+        Delete a notification so that no further events will be triggered for the given condition.
+      tags:
+        - Notifications
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/NotificationID'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /rest/payments:
+    get:
+      summary: List payments
+      operationId: listPayments
+      description: |-
+        View not payments as stored in the figo API backend.
+      tags:
+        - Payments
+      security:
+        - user_auth: []
+      parameters:
+        - $ref: '#/components/parameters/AccountsFilter'
+        - $ref: '#/components/parameters/CountQuery'
+        - $ref: '#/components/parameters/OffsetQuery'
+        - $ref: '#/components/parameters/CentsQuery'
+      responses:
+        '200':
+          $ref: '#/components/responses/PaymentList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /rest/user:
+    get:
+      summary: Get user
+      operationId: getUser
+      description: |-
+        Show details about the user associated with the access token used for authentication.
+      tags:
+        - User Management
+      security:
+        - user_auth: []
+      responses:
+        '200':
+          $ref: '#/components/responses/UserDetails'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    put:
+      summary: Modify user
+      operationId: updateUser
+      description: |-
+        Update details of the user associated with the access token used for authentication.
+      tags:
+        - User Management
+      security:
+        - user_auth: []
+      requestBody:
+        $ref: '#/components/requestBodies/ModifyUser'
+      responses:
+        '200':
+          $ref: '#/components/responses/UserDetails'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    delete:
+      tags:
+        - User Management
+      summary: Delete user
+      operationId: deleteUser
+      description: |-
+        Delete the user associated with the access token used for authentication. This will also
+        completely remove all financial data of the user from the figo API backend.
+      security:
+        - user_auth: []
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    HttpLink:
+      type: object
+      description: A base type of objects representing links to objects.
+      properties:
+        href:
+          description: Any URI that is using http or https protocol
+          type: string
+          format: uri
+        rel:
+          description: Identifies the semantics of the relationship.
+          type: string
+      required:
+        - href
+
+    JobStatus:
+      description: |-
+        The processing state that the work item currently is in.
+      type: string
+      enum:
+        - QUEUED
+        - RUNNING
+        - FAILED
+        - AWAIT_AUTH
+        - COMPLETED
+
+    Account:
+      type: object
+      properties:
+        account_id:
+          $ref: '#/components/schemas/AccountID'
+        account_number:
+          $ref: '#/components/schemas/AccountNumber'
+        bank_code:
+          $ref: '#/components/schemas/BankCode'
+        iban:
+          $ref: '#/components/schemas/IBAN'
+        bic:
+          $ref: '#/components/schemas/BIC'
+        access_id:
+          $ref: '#/components/schemas/AccessID'
+        bank_name:
+          $ref: '#/components/schemas/BankName'
+        icon:
+          $ref: '#/components/schemas/Icon'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        balance:
+          $ref: '#/components/schemas/AccountBalance'
+        type:
+          $ref: '#/components/schemas/AccountType'
+        name:
+          type: string
+          description: Name of the account.
+          example: Giro account
+        owner:
+          type: string
+          description: Name of the account holder.
+          example: John Doe
+        auto_sync:
+          type: boolean
+          description: |-
+            This flag indicates whether the account will be automatically synchronized.
+          example: false
+        save_pin:
+          type: boolean
+          default: false
+          description: |-
+            This flag indicates whether the user has chosen to save the PIN on the figo API backend.
+          example: true
+        supported_payments:
+          type: object
+          properties:
+            SEPA transfer:
+              $ref: '#/components/schemas/PaymentMethod'
+            SEPA standing order:
+              $ref: '#/components/schemas/PaymentMethod'
+          description: Mapping of payment types to payment parameters supported by this account.
+        status:
+          $ref: '#/components/schemas/Status'
+
+    AccessID:
+      type: string
+      example: X12345.6
+      description: figo ID of the provider access.
+
+    AccessMethodID:
+      type: string
+      format: UUID
+      description: figo ID of the provider access method.
+
+    AccountID:
+      type: string
+      example: A12345.6
+      description: figo ID of account.
+
+    InitiationID:
+      type: string
+      format: UUID
+      description: figo ID of the payment initation.
+
+    AccountType:
+      type: string
+      enum:
+        - Giro account
+        - Savings account
+        - Daily savings account
+        - Credit card
+        - Loan account
+        - PayPal
+        - Depot
+        - Unknown
+      description: The account type.
+      example: Giro account
+
+    ChallengeID:
+      type: string
+      example: L12345.3
+      description: figo ID of the challenge.
+
+    TransactionID:
+      type: string
+      description: figo ID of transaction.
+      example: T12345.6
+
+    PaymentID:
+      type: string
+      example: P12345.6
+      description: figo ID of the payment.
+
+    ProviderID:
+      type: string
+      format: UUID
+      description: figo ID of financial service provider.
+
+    SecurityID:
+      type: string
+      example: S12345.6
+      description: figo ID of security.
+
+    StandingOrderID:
+      type: string
+      example: SO12345.6
+      description: figo ID of standing order.
+
+    NotificationID:
+      type: string
+      example: N12345.6
+      description: figo ID of notification.
+
+    ServiceID:
+      type: string
+      example: PayPal
+      description: figo ID of service.
+
+    SyncID:
+      type: string
+      format: UUID
+      description: figo ID of synchronization operation.
+
+    TANSchemeID:
+      type: string
+      example: M12345.6
+      description: figo ID of TAN scheme.
+
+    AccountBalance:
+      type: object
+      properties:
+        balance:
+          type: number
+          format: float
+          description: |-
+            Account balance. This response parameter will be omitted if the balance is not yet
+            known.
+          example: 13.37
+        balance_date:
+          $ref: '#/components/schemas/DateTime'
+          description: |-
+            Bank server timestamp of `balance`. This response parameter will be omitted if the
+            balance is not yet known.
+          example: 2018-04-01T00:00:00.000Z
+        status:
+          $ref: '#/components/schemas/Status'
+
+    AccountIdentifier:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          oneOf:
+            - $ref: '#/components/schemas/IBAN'
+            - $ref: '#/components/schemas/AccountNumber'
+            - $ref: '#/components/schemas/PAN'
+        currency:
+          $ref: '#/components/schemas/Currency'
+
+    PAN:
+      type: string
+      maxLength: 35
+      description: Conditional Primary Account Number (PAN) of a
+        card, can be tokenised by the ASPSP
+        due to PCI DSS requirements.
+
+    AccountNumber:
+      type: string
+      example: 0123456789
+      description: Domestic account identifier.
+
+    AccessDetails:
+      type: object
+      required:
+        - id
+        - created_at
+        - access_method_id
+        - save_credentials
+      properties:
+        id:
+          $ref: '#/components/schemas/AccessID'
+        access_method_id:
+          $ref: '#/components/schemas/AccessMethodID'
+        save_credentials:
+          type: boolean
+          description: Indicates whether your customer agreed to save static credentials.
+        consent:
+          $ref: '#/components/schemas/Consent'
+        created_at:
+          $ref: '#/components/schemas/CreatedAt'
+        auth_methods:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuthMethod'
+          description: List of supported methods for payment initiation and authentication.
+
+    Synchronization:
+      type: object
+      description: |-
+        A handle to refer to a synchronization operation with a financial provider. In the course
+        of the execution of the synchronization updated data (e.g. transaction statement,
+        balance) will be fetched from the provider.
+      properties:
+        id:
+          $ref: '#/components/schemas/SyncID'
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        challenge:
+          $ref: '#/components/schemas/Challenge'
+        error:
+          $ref: '#/components/schemas/AsynchronousError'
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+          description: Time at which the sync was created.
+          example: 2019-08-31T12:13:09.000Z
+        started_at:
+          $ref: '#/components/schemas/DateTime'
+          description: Time at which the sync was started.
+          example: 2019-08-31T12:13:11.000Z
+        ended_at:
+          $ref: '#/components/schemas/DateTime'
+          description: Time at which the sync was ended.
+          example: 2019-08-31T12:13:45.000Z
+
+    PaymentInitiation:
+      type: object
+      description: |-
+        A handle to refer to the processing of an initiated payment.
+      properties:
+        id:
+          $ref: '#/components/schemas/InitiationID'
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        challenge:
+          $ref: '#/components/schemas/Challenge'
+        error:
+          $ref: '#/components/schemas/AsynchronousError'
+        started_at:
+          $ref: '#/components/schemas/DateTime'
+          description: Time at which the payment initation was started.
+          example: 2019-08-31T12:13:11.000Z
+        ended_at:
+          $ref: '#/components/schemas/DateTime'
+          description: Time at which the payment initation was ended.
+          example: 2019-08-31T12:13:45.000Z
+
+    AsynchronousError:
+      type: object
+      description: Error detailing why the background operation failed.
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode'
+        name:
+          type: string
+          description: Error summary.
+        message:
+          type: string
+          example:
+          description: Error message as provided by the financial provider.
+        description:
+          type: string
+          description: Human readable description of the error.
+        group:
+          $ref: '#/components/schemas/ErrorGroup'
+
+    AccessToken:
+      type: object
+      description: tbd
+      properties:
+        access_token:
+          type: string
+          description: The access token for the current user as JSON Web Token according to RFC7519
+          example: AoFmNJLDTW8jQtGSJ1iZeeoLiwNZ2ihz3iiCHGpuvE439nppuY
+        expires_in:
+          type: integer
+          description: The remaining lifetime of the access token in seconds.
+          example: 3600
+        scope:
+          $ref: '#/components/schemas/Scope'
+        token_type:
+          type: string
+          enum:
+            - Bearer
+          description: The type of the issued token.
+          example: Bearer
+        refresh_token:
+          type: string
+          example: RTfI2WNyK78NozupDH9ai8GPRbjjdVsXPPt...
+          description: |-
+            A refresh token is only included in the response if client credentials have scope
+            `offline`.
+
+    Icon:
+      type: object
+      properties:
+        url:
+          format: url
+          description: URL to provider icon.
+          example: https://api.figo.me/assets/images/accounts/default.png
+        resolutions:
+          type: object
+          description: |-
+            A mapping of icon resolutions in the format `resxres` to their respective icon URLs.
+          properties:
+            48x48:
+              type: string
+              format: url
+              description: URL to provider icon in aspect ratio 48x48px.
+              example: https://api.figo.me/assets/images/accounts/default_48.png
+            60x60:
+              type: string
+              format: url
+              description: URL to provider icon in aspect ratio 60x60px.
+              example: https://api.figo.me/assets/images/accounts/default_60.png
+            72x72:
+              type: string
+              format: url
+              description: URL to provider icon in aspect ratio 72x72px.
+              example: https://api.figo.me/assets/images/accounts/default_72.png
+            84x84:
+              type: string
+              format: url
+              description: URL to provider icon in aspect ratio 84x84px.
+              example: https://api.figo.me/assets/images/accounts/default_84.png
+            96x96:
+              type: string
+              format: url
+              description: URL to provider icon in aspect ratio 96x96px.
+              example: https://api.figo.me/assets/images/accounts/default_96.png
+            120x120:
+              type: string
+              format: url
+              description: URL to provider icon in aspect ratio 120x120px.
+              example: https://api.figo.me/assets/images/accounts/default_120.png
+            144x144:
+              type: string
+              format: url
+              description: URL to provider icon in aspect ratio 144x144px.
+              example: https://api.figo.me/assets/images/accounts/default_144.png
+            192x192:
+              type: string
+              format: url
+              description: URL to provider icon in aspect ratio 192x192px.
+              example: https://api.figo.me/assets/images/accounts/default_192.png
+            256x256:
+              type: string
+              format: url
+              description: URL to provider icon in aspect ratio 256x256px.
+              example: https://api.figo.me/assets/images/accounts/default_256.png
+
+    MoneyAmount:
+      type: number
+      example: 23.99
+      minimum: 0.01
+      description: Monetary value.
+
+    BankCode:
+      type: string
+      example: "90090042"
+      description: Domestic bank code.
+
+    BIC:
+      type: string
+      format: ISO 9362:2014
+      example: DEMOBANKXXX
+      description: Business Identifier Code (SWIFT-BIC).
+
+    IBAN:
+      type: string
+      format: ISO 13616:2007
+      example: DE99012345678910020030
+      description: International Bank Account Number (IBAN).
+
+    BankName:
+      type: string
+      description: Name of bank or financial provider.
+      example: Deutsche Bank
+
+    Currency:
+      type: string
+      format: ISO 4217:2015
+      default: EUR
+      description: Three-letter currency code.
+
+    Language:
+      type: string
+      format: ISO 639-1:2002
+      example: de
+      description: Two-letter language code.
+
+    Country:
+      type: string
+      format: ISO 3166-1 alpha-2
+      example: DE
+      description: |-
+        Two-letter country code.
+
+    FullName:
+      type: string
+      example: John Doe
+      description: Full name of the figo account user.
+
+    Password:
+      type: string
+      example: hunter2
+      description: The figo account password.
+
+    DTATextKey:
+      type: integer
+      example: 51
+      description: DTA text key.
+
+    DTATextKeyExtension:
+      type: integer
+      example: 0
+      description: DTA text key extension.
+
+    Date:
+      type: string
+      format: date
+      example: 2019-09-14
+
+    DateTime:
+      type: string
+      format: date-time
+      example: 2018-08-30T00:00:00.000Z
+
+    CreatedAt:
+      $ref: '#/components/schemas/DateTime'
+      description: Entity creation timestamp.
+      example: 2018-08-30T00:00:00.000Z
+
+    ModifiedAt:
+      $ref: '#/components/schemas/DateTime'
+      description: Entity modification timestamp.
+      example: 2018-08-31T00:00:00.000Z
+
+    SubmittedAt:
+      $ref: '#/components/schemas/DateTime'
+      description: |-
+        Timestamp of submission to the bank server. `null` if payment has not been
+        submitted yet.
+      example: 2018-09-01T00:00:00.000Z
+
+    EmailAddress:
+      type: string
+      format: email
+      example: user@example.com
+      description: E-mail address/figo account username.
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              $ref: '#/components/schemas/ErrorCode'
+            data:
+              type: object
+              description: Additional data.
+            description:
+              type: string
+              description: Human readable description of the error.
+            group:
+              $ref: '#/components/schemas/ErrorGroup'
+          required:
+            - code
+            - description
+            - group
+      required:
+        - error
+      example:
+        error:
+          code: 1000
+          data:
+            id:
+              - Missing data for required field.
+          description: Invalid query-string parameters.
+          group: client
+
+    ErrorGroup:
+      type: string
+      description: The source of the error.
+      enum:
+        - client
+        - user
+        - bank
+        - figo
+
+    ErrorCode:
+      type: integer
+      x-extensible-enum:
+        - 1000
+        - 1001
+        - 1002
+        - 1003
+        - 1004
+        - 1005
+        - 1006
+        - 1007
+        - 1008
+        - 1010
+        - 10000
+        - 10001
+        - 10002
+        - 10003
+        - 10004
+        - 10005
+        - 10006
+        - 10007
+        - 10008
+        - 10009
+        - 10010
+        - 10011
+        - 10012
+        - 10013
+        - 10014
+        - 10015
+        - 20000
+        - 20001
+        - 20002
+        - 20003
+        - 20004
+        - 20005
+        - 20006
+        - 20007
+        - 30000
+        - 30001
+        - 30002
+        - 30003
+        - 30004
+        - 30005
+        - 40000
+
+      description: |
+        | Code    | Group  | Description                                      |
+        | ------- | ------ | ------------------------------------------------ |
+        | 1000    | client | Invalid request                                  |
+        | 1001    | client | Entry already exists                             |
+        | 1002    | client | Entity not found                                 |
+        | 1003    | client | Unauthorized                                     |
+        | 1004    | client | Invalid client authorization                     |
+        | 1005    | client | Payment already processed                        |
+        | 1006    | client | Unprocessable entity                             |
+        | 1007    | client | Forbidden                                        |
+        | 1008    | client | Resource busy                                    |
+        | 1010    | client | User locked                                      |
+        | 10000   | user   | Login credentials are invalid                    |
+        | 10001   | user   | PIN is invalid                                   |
+        | 10002   | user   | Online access is blocked                         |
+        | 10003   | user   | TAN scheme not activated                         |
+        | 10004   | user   | TAN is invalid                                   |
+        | 10005   | user   | No authorization for this account                |
+        | 10006   | user   | Transaction rejected                             |
+        | 10007   | user   | PIN change necessary                             |
+        | 10008   | user   | No authorization for this business transaction   |
+        | 10009   | user   | HBCI activation necessary                        |
+        | 10010   | user   | Account is blocked                               |
+        | 10011   | user   | Account no longer exists                         |
+        | 10012   | user   | TAN scheme is blocked                            |
+        | 10013   | user   | Status of transaction inconclusive               |
+        | 10014   | user   | Account not activated for online banking         |
+        | 10015   | user   | Redundant submissions                            |
+        | 20000   | bank   | Processing at the bank not possible              |
+        | 20001   | bank   | Bank / account unkown                            |
+        | 20002   | bank   | Transaction canceled                             |
+        | 20003   | bank   | Maintenance                                      |
+        | 20004   | bank   | Technical migration                              |
+        | 20005   | bank   | Transaction not possible                         |
+        | 20006   | bank   | Login not possible                               |
+        | 20007   | bank   | Pop up                                           |
+        | 30000   | figo   | Processing at figo not possible                  |
+        | 30005   | figo   | Task is expired                                  |
+        | 30006   | figo   | Service temporarily not available                |
+        | 40000   | figo   | Bank not supported                               |
+
+    UserCredentialRequest:
+      type: object
+      description: |
+      properties:
+        grant_type:
+          type: string
+          example: password
+          enum:
+            - password
+        username:
+          $ref: '#/components/schemas/EmailAddress'
+        password:
+          $ref: '#/components/schemas/Password'
+        scope:
+          $ref: '#/components/schemas/Scope'
+      required:
+        - grant_type
+        - username
+        - password
+
+    AuthorizationCodeRequest:
+      type: object
+      description: tbd
+      properties:
+        grant_type:
+          type: string
+          enum:
+            - authorization_code
+        code:
+          type: string
+          description: |-
+            The authorization code returned after completing the OAuth flow.
+          example: OkA7jUIro6JNmOF7i5f7QmepCLLoIFug6621
+        redirect_uri:
+          type: string
+          format: url
+          description: |-
+            If the callback URL was specified in the initial request, then it must also be included
+            in this request.  The value defaults to the first redirect URI configured for the
+            client.
+          example: https://figo.me/callback
+      required:
+        - grant_type
+        - code
+        - redirect_uri
+
+    RefreshTokenRequest:
+      type: object
+      description: tbd
+      properties:
+        grant_type:
+          type: string
+          enum:
+            - refresh_token
+          example: refresh_token
+        refresh_token:
+          type: string
+          description: |-
+            A refresh token that may be used to request new access tokens. Refresh tokens remain
+            valid until the user revokes access to your application.
+          example: RTfI2WNyK78NozupDH9ai8GPRbjjdVsXPPt...
+        scope:
+          $ref: '#/components/schemas/Scope'
+      required:
+        - grant_type
+        - refresh_token
+
+    TaskToken:
+      type: string
+      example: YIO4UiH7PjdCGdnF36LNAHxbkjPLbizI...
+      description: |-
+        Token to monitor a background task. Use this to call [/task/progress](#tag/Task).
+
+    PaymentSEPA:
+      type: object
+      description: SEPA transfer
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyAmount'
+        name:
+          type: string
+          example: John Doe
+          description: The name of the creditor.
+        purpose:
+          type: string
+          example: Thanks for all the fish.
+          description: The purpose of this payment.
+        iban:
+          $ref: '#/components/schemas/IBAN'
+        type:
+          type: string
+          description: Type of a payment.
+
+    PaymentTransfer:
+      type: object
+      description: Regular transfer
+      properties:
+        amount:
+          $ref: '#/components/schemas/MoneyAmount'
+        name:
+          type: string
+          example: John Doe
+          description: The name of the creditor.
+        purpose:
+          type: string
+          example: Thanks for all the fish.
+          description: The purpose of this payment.
+        account_number:
+          $ref: '#/components/schemas/AccountNumber'
+        bank_code:
+          $ref: '#/components/schemas/BankCode'
+        type:
+          type: string
+          description: Type of a payment.
+
+    StandingOrderTransfer:
+      allOf:
+        - $ref: '#/components/schemas/PaymentTransfer'
+        - type: object
+          description: Regular standing order
+          properties:
+            execution_day:
+              $ref: '#/components/schemas/ExecutionDay'
+            first_execution_date:
+              $ref: '#/components/schemas/FirstExecutionDay'
+            last_execution_date:
+              $ref: '#/components/schemas/LastExecutionDay'
+            interval:
+              $ref: '#/components/schemas/StandingOrderInterval'
+            type:
+              type: string
+              description: Type of a standing order
+
+    StandingOrderSEPA:
+      allOf:
+        - $ref: '#/components/schemas/PaymentSEPA'
+        - type: object
+          description: SEPA standing order
+          properties:
+            execution_day:
+              $ref: '#/components/schemas/ExecutionDay'
+            first_execution_date:
+              $ref: '#/components/schemas/FirstExecutionDay'
+            last_execution_date:
+              $ref: '#/components/schemas/LastExecutionDay'
+            interval:
+              $ref: '#/components/schemas/StandingOrderInterval'
+            type:
+              type: string
+              description: Type of a standing order
+
+    ExecutionDay:
+      type: integer
+      minimum: 1
+      maximum: 99
+      description: |-
+        Value must be in range 1 - 30 and 97 - 99. 99 means last day of the month, 98 means two days
+        before the end of the month.
+
+    FirstExecutionDay:
+      $ref: '#/components/schemas/DateTime'
+      description: First date of execution of the standing order.
+
+    LastExecutionDay:
+      $ref: '#/components/schemas/DateTime'
+      description: |-
+        The last date when the standing order will be executed. The day of month must
+        be the same as that of the first execution.
+
+    StandingOrderInterval:
+      type: string
+      enum:
+        - weekly
+        - monthly
+        - two monthly
+        - quarterly
+        - half yearly
+        - yearly
+      description: The interval for the recurring payment.
+      example: monthly
+
+
+    AccessMethodInputField:
+      type: object
+      properties:
+        key:
+          type: string
+          description: |-
+            Used as reference for this input field when the entered data is submitted to the figo
+            API.
+        label:
+          type: string
+          example: Kontonummer
+          description: Suggested display label.
+        min_length:
+          type: integer
+          description: Minimum length entered text.
+          example: 9
+        max_length:
+          type: integer
+          description: Maximum length of entered text.
+          example: 10
+        is_secret:
+          type: boolean
+          example: false
+          description: |-
+            Indicates whether the data entered in the input field is to be considered secret and
+            should be masked.
+        is_optional:
+          type: boolean
+          example: false
+          description: Indicates whether the input field has to be filled out.
+
+    AccessMethod:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/AccessMethodID'
+        in_psd2_scope:
+          type: boolean
+          description: |-
+            Indicates whether payment accounts falling into the scope of the PSD2 are accessed via
+            this method.
+        type:
+          type: string
+          enum:
+            - API
+            - FINTS
+            - SCRAPING
+        supported_account_types:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountType'
+        configurable_consent:
+          type: boolean
+          description: Indicates whether consent configuration may be provided
+        requires_account_identifiers:
+          type: boolean
+          description: |-
+            Indicates whether account identifiers have to be provided to connect this financial
+            source.
+        customer_authentication_flows:
+          type: array
+          items:
+            type: string
+            enum:
+              - EMBEDDED_1FA
+              - EMBEDDED_2FA
+              - REDIRECT
+              - DECOUPLED
+        advice:
+          type: string
+          description: Any advice useful to instruct the user on what data to provide.
+          example: Bitte beachten Sie, dass ein Login nur Ã¼ber Eingabe der 9- oder 10-stelligen,
+            numerischen Kontonummer und der 5-stelligen PIN mÃ¶glich ist, jedoch nicht Ã¼ber Eingabe
+            von ID und Passwort. Ihre 5-stellige alphanumerische PIN kann neben Buchstaben auch
+            Ziffern beinhalten. Sonderzeichen und Leerstellen sind nicht zulÃ¤ssig.
+        credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccessMethodInputField'
+
+    Credentials:
+      description: |-
+        Credentials used for authentication with the financial service provider.
+      oneOf:
+        - type: object
+          additionalProperties:
+            type: string
+          description: |-
+            Pairs of key/value-items as specified in the access-method of the service provider's
+            catalog entry.
+          example:
+            login_id: user.name
+            password: hunter2
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - encrypted
+            value:
+              type: string
+              description: |-
+                Pairs of key/value-items as specified in the access-method of the service provider's
+                catalog entry encrypted with JSON web encryption.
+              example: eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMtSFM1MTIifQ.aq_baOMnl2WPI7Lf..
+
+    Provider:
+      properties:
+        id:
+          $ref: '#/components/schemas/ProviderID'
+        name:
+          type: string
+          description: Name of the financial service provider.
+          example: Bank XYZ
+        icon:
+          $ref: '#/components/schemas/Icon'
+        supported:
+          type: boolean
+          description: Indicates if access to financial source is supported by the figo API.
+        country:
+          allOf:
+            - $ref: '#/components/schemas/Country'
+          description: Country in which the financial service provider operates.
+        language:
+          type: object
+          description: Language information of catalog item
+          properties:
+            current:
+              allOf:
+                - $ref: '#/components/schemas/Language'
+              description: Current language of catalog item.
+            available:
+              type: array
+              description: List of available languages.
+              items:
+                $ref: '#/components/schemas/Language'
+              example: [de, en]
+        access_methods:
+          type: array
+          description: List of access methods available for this catalog item.
+          items:
+            $ref: '#/components/schemas/AccessMethod'
+
+    Bank:
+      allOf:
+        - $ref: '#/components/schemas/Provider'
+        - type: object
+          properties:
+            bank_code:
+              $ref: '#/components/schemas/BankCode'
+            bic:
+              $ref: '#/components/schemas/BIC'
+          description: Bank, e.g. Sparkasse
+
+    Service:
+      allOf:
+        - $ref: '#/components/schemas/Provider'
+      description: Financial service, e.g. credit card issuer or PayPal
+
+    Notification:
+      type: object
+      properties:
+        notification_id:
+          $ref: '#/components/schemas/NotificationID'
+        notification_uri:
+          type: string
+          format: url
+          example: https://api.figo.me/A12345.6
+          description: |
+            Notification messages will be sent to this URL. The URL schemes https and http are used
+            for webhooks.
+        observe_key:
+          type: string
+          example: /rest/accounts/A12345.6/transactions
+          description: Notification key
+        state:
+          $ref: '#/components/schemas/State'
+      required:
+        - notification_uri
+        - observe_key
+
+    RedirectURI:
+      type: string
+      format: url
+      example: https://figo.example.com/callback
+      description: The URI to which the end user is redirected in OAuth cases.
+
+    Challenge:
+      oneOf:
+        - $ref: '#/components/schemas/AuthMethodSelectChallenge'
+        - $ref: '#/components/schemas/EmbeddedChallenge'
+        - $ref: '#/components/schemas/RedirectChallenge'
+        - $ref: '#/components/schemas/DecoupledChallenge'
+
+    ChallengeBase:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ChallengeID'
+        created_at:
+          $ref: '#/components/schemas/DateTime'
+          description: Time at which the challenge was created.
+          example: 2019-08-31T12:13:11.000Z
+
+    AuthMethodSelectChallenge:
+      allOf:
+        - $ref: '#/components/schemas/ChallengeBase'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [METHOD_SELECTION]
+            auth_methods:
+              type: array
+              items:
+                $ref: '#/components/schemas/AuthMethod'
+
+    EmbeddedChallenge:
+      allOf:
+        - $ref: '#/components/schemas/ChallengeBase'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [EMBEDDED]
+            format:
+              type: string
+              description: Indicates how the `data` field should be interpreted.
+              enum:
+                - PHOTO
+                - HHD
+                - TEXT
+                - HTML
+            version:
+              type: string
+              description: The version of the used challenge type. Left empty if it does not apply.
+            data:
+              type: string
+              description: The format of the data is specified in the `format` field.
+            additional_info:
+              type: string
+              description: Provides additional information text to be displayed to the end-user.
+            label:
+              type: string
+              description: To be used as label for the user input field in UIs.
+            input_format:
+              type: string
+              enum:
+                - STRING
+                - INTEGER
+              description: The expected input format or type for the response to the challenge.
+            max_length:
+              type: integer
+              description: Maximum length of the response to be provided to the challenge.
+            min_length:
+              type: integer
+              description: Minimum length of the response to be provided to the challenge.
+
+    RedirectChallenge:
+      allOf:
+        - $ref: '#/components/schemas/ChallengeBase'
+        - type: object
+          properties:
+            type:
+              type: string
+              enum: [REDIRECT]
+            location:
+              allOf:
+                - $ref: '#/components/schemas/RedirectURI'
+                - description: The location the user should be directed to.
+
+    DecoupledChallenge:
+      allOf:
+        - $ref: '#/components/schemas/ChallengeBase'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/ChallengeID'
+            type:
+              type: string
+              enum: [DECOUPLED]
+            message:
+              type: string
+              description: Instructional text to be displayed to the end-user.
+
+    ChallengeType:
+      type: string
+      enum:
+        - DECOUPLED
+        - REDIRECT
+        - EMBEDDED
+        - METHOD_SELECTION
+
+    Consent:
+      type: object
+      description: Configuration of the PSD2 consents. Is ignored for non-PSD2 accesses.
+      properties:
+        recurring:
+          type: boolean
+          default: false
+          description: Indicates whether the consent is for an ongoing use-case
+        period:
+          type: integer
+          minimum: 1
+          maximum: 90
+          default: 90
+          description: Specify the period in days for which the consent is valid. Ignored if recurring is set to false.
+        scopes:
+          type: array
+          description: Define scope of the consent
+          default: ["ACCOUNTS","BALANCES","TRANSACTIONS"]
+          items:
+            type: string
+            enum:
+              - ACCOUNTS
+              - BALANCES
+              - TRANSACTIONS
+        expires_at:
+          $ref: '#/components/schemas/Date'
+          description: The date at which the consent expires.
+
+    Scope:
+      type: string
+      description: |-
+        A space delimited set of requested permissions. The requested permissions can be narrower
+        but not broader than the permissions agreed during application registration. If this
+        parameter is omitted, the permissions agreed during application registration are used in
+        place.
+      example: accounts=ro balance=ro transactions=ro offline
+
+    Security:
+      type: object
+      properties:
+        account_id:
+          $ref: '#/components/schemas/AccountID'
+        security_id:
+          $ref: '#/components/schemas/SecurityID'
+        amount:
+          allOf:
+            - $ref: '#/components/schemas/MoneyAmount'
+          description: Monetary value in account currency.
+        amount_original_currency:
+          allOf:
+            - $ref: '#/components/schemas/MoneyAmount'
+          description: Monetary value in trading currency.
+        created_at:
+          $ref: '#/components/schemas/CreatedAt'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        exchange_rate:
+          type: number
+          format: float
+          example: 1.181
+          description: Exchange rate between trading and account price.
+        isin:
+          type: string
+          format: 'ISO 6166'
+          description:  International Securities Identification Number.
+          example: DE0005140008
+        market:
+          type: string
+          description: Market the security is traded on.
+          example: NYSE
+        modified_at:
+          $ref: '#/components/schemas/ModifiedAt'
+        name:
+          type: string
+          description: Name of the security.
+          example: Deutsche Bank AG
+        price:
+          type: number
+          format: float
+          description: Trading price.
+          example: 9.380000
+        price_currency:
+          $ref: '#/components/schemas/Currency'
+        purchase_price:
+          type: number
+          format: float
+          description: Purchase price.
+          example: 9.45
+        purchase_price_currency:
+          $ref: '#/components/schemas/Currency'
+        traded_at:
+          type: string
+          format: date-time
+          description: Trading timestamp.
+        wkn:
+          type: string
+          example: '514000'
+          description: Domestic security identification number.
+        quantity:
+          type: number
+          format: float
+          description: Quantity in stock.
+          example: 14.0
+
+    Payment:
+      type: object
+      properties:
+        account_id:
+          $ref: '#/components/schemas/AccountID'
+        payment_id:
+          $ref: '#/components/schemas/PaymentID'
+        type:
+          $ref: '#/components/schemas/PaymentType'
+        amount:
+          $ref: '#/components/schemas/MoneyAmount'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        iban:
+          allOf:
+            - $ref: '#/components/schemas/IBAN'
+          description: IBAN of creditor.
+        bic:
+          allOf:
+            - $ref: '#/components/schemas/BIC'
+          description: BIC of creditor.
+        name:
+          type: string
+          example: John Doe
+          description: Name of creditor.
+        purpose:
+          type: string
+          example: Thanks for all the fish.
+          description: Purpose of the payment.
+        bank_name:
+          type: string
+          example: Demobank
+          description: Bank name of creditor.
+        sepa_purpose_code:
+          type: string
+          description: |
+            HBCI: Additional key to already existing `transaction_key` field, also called "business
+            transaction key"/"TextschlÃ¼sselergÃ¤nzng". It helps to find a finer purpose of a
+            transaction.
+        end_to_end_reference:
+          type: string
+          description: |-
+            *HBCI*: A reference that can be filled by the payer of transaction, e.g. with your
+            customer number.
+          example: fasdGopksdf
+        bank_icon:
+          $ref: '#/components/schemas/Icon'
+        text_key:
+          $ref: '#/components/schemas/DTATextKey'
+        text_key_extension:
+          $ref: '#/components/schemas/DTATextKeyExtension'
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        challenge:
+          $ref: '#/components/schemas/Challenge'
+        error:
+          $ref: '#/components/schemas/AsynchronousError'
+        created_at:
+          $ref: '#/components/schemas/CreatedAt'
+        modified_at:
+          $ref: '#/components/schemas/ModifiedAt'
+        submitted_at:
+          $ref: '#/components/schemas/SubmittedAt'
+
+    PaymentType:
+      type: string
+      enum:
+        - Transfer
+        - SEPA transfer
+      example: SEPA transfer
+      description: Type of a payment.
+
+    PaymentMethod:
+      type: object
+      properties:
+        allowed_recipients:
+          type: array
+          items:
+            type: string
+          description: |-
+            List of account codes. The payment recipient must be one of these accounts. No
+            restriction applies if this field is omitted.
+          example: []
+        can_be_recurring:
+          type: boolean
+          description: |-
+            Indicates whether payments of this type can be recurring. This usually applies for
+            standing orders.
+          example: false
+        can_be_scheduled:
+          type: boolean
+          description: |-
+            Indicates whether payments of this type can be scheduled to be executed on a specific
+            date. This usually applies for standing orders.
+          example: false
+        max_purpose_length:
+          type: integer
+          description: Maximum string length of purpose text.
+          example: 140
+        supported_text_keys:
+          type: array
+          items:
+            type: integer
+          description: List of supported DTA text keys.
+          example: [51, 53]
+
+    StandingOrder:
+      type: object
+      properties:
+        account_id:
+          $ref: '#/components/schemas/AccountID'
+        standing_order_id:
+          $ref: '#/components/schemas/StandingOrderID'
+        iban:
+          $ref: '#/components/schemas/IBAN'
+        amount:
+          $ref: '#/components/schemas/MoneyAmount'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        cents:
+          type: boolean
+          description: If `true` the amount is submitted as cents.
+          example: false
+        name:
+          type: string
+          description: Name of creditor.
+          example: John Doe
+        purpose:
+          type: string
+          description: Purpose of the standing order.
+          example: So long and thanks for all the fish
+        execution_day:
+          $ref: '#/components/schemas/ExecutionDay'
+        first_execution_date:
+          $ref: '#/components/schemas/FirstExecutionDay'
+        last_execution_date:
+          $ref: '#/components/schemas/LastExecutionDay'
+        interval:
+          $ref: '#/components/schemas/StandingOrderInterval'
+        created_at:
+          $ref: '#/components/schemas/CreatedAt'
+        modified_at:
+          $ref: '#/components/schemas/ModifiedAt'
+
+    State:
+      type: string
+      example: 4HgwtQP0jsjdz79h
+      description: |-
+        An arbitrary string to maintain state between this request and the callback, e.g. it might contain a
+        session ID from your application. The value should also contain a random component, which your
+        application checks to prevent cross-site request forgery.
+      minLength: 1
+      maxLength: 1024
+
+    Status:
+      type: object
+      description: Synchronization status
+      properties:
+        synced_at:
+          $ref: '#/components/schemas/DateTime'
+          description: Time of last synchronization.
+        succeeded_at:
+          $ref: '#/components/schemas/DateTime'
+          description: Time of last successful synchronization.
+        message:
+          type: string
+          description: Human-readable error message
+
+    AuthMethod:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/TANSchemeID'
+        medium_name:
+          type: string
+          description: |-
+            Description of the medium used to generate the authentication response.
+          example: 'Mobile phone 1'
+        type:
+          type: string
+          description: Type of authentication method.
+          enum:
+            - SMS_OTP
+            - PUSH_OTP
+            - CHIP_OTP
+            - PHOTO_OTP
+        additional_info:
+          type: object
+          description: |-
+            Additional information on the authentication method as key/value pairs.
+          additionalProperties:
+            type: string
+
+    TransactionList:
+      type: object
+      properties:
+        deleted:
+          type: array
+          items:
+            type: string
+          description: List of transaction IDs marked as deleted.
+          example: [T1.2, T1.4]
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+          description: List of transactions.
+        status:
+          $ref: '#/components/schemas/Status'
+        statistics:
+          description: Statistics on the transactions
+          type: object
+          properties:
+            deposit_sum:
+              type: number
+              description: Sum of deposits
+              example: 27560
+            deposit_max:
+              type: number
+              description: Maximum deposit amount
+              example: 5250
+            expense_max:
+              type: number
+              description: Maximum expense amount
+              example: -1200
+            expense_sum:
+              type: number
+              description: Sum of expenses
+              example: -10821.02
+
+    Transaction:
+      type: object
+      properties:
+        account_id:
+          $ref: '#/components/schemas/AccountID'
+        transaction_id:
+          $ref: '#/components/schemas/TransactionID'
+        amount:
+          $ref: '#/components/schemas/MoneyAmount'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        account_number:
+          $ref: '#/components/schemas/AccountNumber'
+        bank_code:
+          $ref: '#/components/schemas/BankCode'
+        iban:
+          $ref: '#/components/schemas/IBAN'
+        bic:
+          $ref: '#/components/schemas/BIC'
+        bank_name:
+          allOf:
+            - $ref: '#/components/schemas/BankName'
+          description: Bank name of originator or recipient.
+        booked:
+          type: boolean
+          description: Indicates if the transaction has been settled.
+          example: true
+        booked_at:
+          $ref: '#/components/schemas/DateTime'
+          description: The date on which the transaction was booked.
+        settled_at:
+          $ref: '#/components/schemas/DateTime'
+          description: The date on which the transaction was settled.
+        booking_key:
+          type: string
+          description: |-
+            *HBCI*: A key that indicates the purpose of a transaction.
+          example: MSC
+        booking_text:
+          type: string
+          description: Booking text.
+          example: Dauer-Euro-Ãœberweisung
+        categories:
+          description: List of categories.
+          type: array
+          items:
+            type: object
+            properties:
+              parent_id:
+                type: integer
+                nullable: true
+                description: ID of the parent category.
+                example: null
+              id:
+                type: integer
+                description: Category ID.
+                example: 11
+              name:
+                type: string
+                description: Category name.
+                example: Einkommen
+        creditor_id:
+          type: string #todo whats the format?
+          description: |
+            HBCI: SEPA creditor identifier (for SEPA direct debits), must be unique in combination
+            with  `mandate_reference`.
+        end_to_end_reference:
+          type: string
+          description: |-
+            *HBCI*: A reference that can be filled by the payer of transaction, e.g. with your
+            customer number.
+          example: fasdGopksdf
+        mandate_reference:
+          type: string
+          description: |-
+            *HBCI*: SEPA mandate reference (for SEPA direct debits), must be unique in combination
+            with `creditor_id`
+        name:
+          type: string
+          description: Name of originator or recipient.
+          example: figo GmbH
+        prima_nota_number:
+          type: string
+          description: |-
+            *HBCI*: Bank-internal number to group and identify transactions.
+          example: "991302"
+        purpose:
+          type: string
+          description: Purpose of transaction.
+          example: Eref+Test Gehaltszahlung Svwz+Test Dauerauftrag
+        sepa_purpose_code:
+          type: string
+          description: |
+            HBCI: Additional key to already existing `transaction_key` field, also called "business
+            transaction key"/"TextschlÃ¼sselergÃ¤nzng". It helps to find a finer purpose of a
+            transaction.
+        sepa_remittance_info:
+          type: string
+          description: |-
+            *HBCI*: Pure purpose text without other SEPA fields.
+          example: 'Dauerauftrag from 10 464310 to 10464311 Dauerauftrag: 1'
+        transaction_code:
+          type: integer
+          description: Transaction type as `DTA Tx Key` code.
+          example: 117
+        type:
+          $ref: '#/components/schemas/TransactionTypes'
+        additional_info:
+          $ref: '#/components/schemas/TransactionAdditionalInfo'
+        created_at:
+          $ref: '#/components/schemas/CreatedAt'
+        modified_at:
+          $ref: '#/components/schemas/ModifiedAt'
+
+    TransactionTypes:
+      type: string
+      enum:
+        - Transfer
+        - Standing order
+        - Direct debit
+        - Salary or rent
+        - GeldKarte
+        - Charges or interest
+      description: A comma separated list of transaction types used for filtering.
+
+    TransactionAdditionalInfo:
+      type: object
+      description: |
+        Additional info on the transaction, if available.
+      properties:
+        bank_reference:
+          type: string
+          description: |-
+            *HBCI*: Bank reference or instruction ID, can be filled by the payers bank.
+        debitor_id:
+          type: string
+          description: |-
+            *HBCI*: An identifier of the payer.
+        fee:
+          type: number
+          format: float
+          description: Payed fees.
+        gross_amount:
+          type: number
+          format: float
+          description: Gross amount of the transaction.
+        compensation_amount:
+          type: string
+          description: |-
+            *HBCI*: Sum of reimbursement of out-of-pocket expenses plus processing fee in case of a
+            national return / refund debit as well as an optional interest equalization
+            (for SEPA direct debit returns).
+        original_amount:
+          type: string
+          description: |-
+            *HBCI*: Amount of the original direct debit (for SEPA direct debit returns).
+        reference_party_debitor:
+          type: string
+          description: |-
+            *HBCI*: Deviating sender of the transfer.
+        reference_party_creditor:
+          type: string
+          description: |-
+            *HBCI*: Deviating receiver of the transfer.
+      example:
+        fee: 0.5
+        gross_amount: 12.5
+
+    AuthMethodSelectResponse:
+      type: object
+      properties:
+        method_id:
+          $ref: '#/components/schemas/TANSchemeID'
+
+    ChallengeResponse:
+      type: object
+      properties:
+        value:
+          type: string
+          example: '111111'
+          description: |-
+            Response to the auth challenge. The source of the value depends on the selected
+            authentication method.
+
+    ChallengeResponseJWE:
+      type: object
+      properties:
+        type:
+          type: string
+          description: |-
+            The type of the `value`. Always set to the value `"encrypted"`.
+          enum:
+            - encrypted
+        value:
+          type: string
+          example: eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMtSFM1MTIifQ.EdCMnSp7M_0UQEe5mPGuQtNf3hcaPcjQ3tbmfEkjV5wa-6mZMnhCD6Zq0U0anft4iuaBLQha-EAflD-7D2Wl6MfZeFYka_TC9flrV-av-cxDvzP2r4Cj_YedmBj3EOLawz4YRo_s65dX7hvwsdd--uOxXbdx-UXYLvDxykh8E1M1mfjdLFwpeGgVILPhJeURMglWttovrB22cEV8UASNHV7dDfvyqKIfYfecxCqKvr-D6bnyZf6w-Jp49GLNCXz9e6ZgDD521Z_Ci_-bBEwbQdIUkNLuGtFLKUuiv1oMinBzwOrAlREL1zOnem06olXpcSCZE_Esto80ISWHOW0k3w.-0imErCMK7ahidc0d0ivwg.K4_6p6qT6W7jILdLjeZMww.slCawx18gWmPRCSPWOePC46OcweOve_B7DA0Kj6Wkdk
+          description: "[JWE encrypted](#section/JWE-encryption) auth challenge response."
+
+  responses:
+    Accepted:
+      description: Accepted.
+
+    NoContent:
+      description: No content.
+
+    NotFound:
+      description: The specified resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: 1002
+              data: {}
+              description: Not found.
+            group: client
+
+    Unauthorized:
+      description: You are not authorized.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: 1003
+              data: {}
+              description: Unauthorized.
+            group: client
+
+    BadRequest:
+      description: Bad request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: 1000
+              data: {}
+              description: Bad request.
+            group: client
+
+    GenericError:
+      description: Generic error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    AccountDetails:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Account'
+
+    AccountList:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            description: List of accounts
+            properties:
+              accounts:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Account'
+
+    AddressBook:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                account_number:
+                  $ref: '#/components/schemas/AccountNumber'
+                bank_code:
+                  $ref: '#/components/schemas/BankCode'
+                bank_name:
+                  $ref: '#/components/schemas/BankName'
+                icon:
+                  $ref: '#/components/schemas/Icon'
+                name:
+                  type: string
+                  example: John Doe
+
+    UserDetails:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                $ref: '#/components/schemas/EmailAddress'
+              created_at:
+                $ref: '#/components/schemas/DateTime'
+                description: Date of User creation.
+              language:
+                $ref: '#/components/schemas/Language'
+              full_name:
+                $ref: '#/components/schemas/FullName'
+              id:
+                type: string
+                example: U1234
+                description: figo account user id.
+
+    AccessDetails:
+      description: |
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AccessDetails'
+
+    ProviderAccessList:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/AccessDetails'
+
+    NotificationList:
+      description: ''
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              notifications:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Notification'
+                description: List of notifications
+
+    NotificationDetails:
+      description: ''
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Notification'
+
+    RecoveryPassword:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              recovery_password:
+                type: string
+                example: abcd-defg-hijk-lmno
+
+    BankList:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Bank'
+
+    BankDetails:
+      description: |
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Bank'
+
+    ServiceDetails:
+      description: |
+      content:
+        aplication/json:
+          schema:
+            $ref: '#/components/schemas/Service'
+
+    ServiceList:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Service'
+
+    ProviderList:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              banks:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bank'
+                description: List of supported banks
+              services:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+                description: List of supported payment services
+
+    PaymentInitiation:
+      description: |
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInitiation'
+
+    PaymentDetails:
+      description: |
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Payment'
+
+    PaymentList:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              payments:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
+
+    SecurityDetails:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Security'
+
+    SecurityList:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              deleted:
+                type: array
+                items:
+                  type: string
+                description: List of security IDs marked as deleted.
+                example: ["S1.1", "S1.3"]
+              securities:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Security'
+                description: List of securities.
+
+    StandingOrderDetails:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/StandingOrder'
+
+    StandingOrderList:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                $ref: '#/components/schemas/Status'
+              standing_orders:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StandingOrder'
+
+    Synchronization:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Synchronization'
+
+    Challenge:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Challenge'
+
+    ChallengeList:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Challenge'
+
+    TransactionDetails:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Transaction'
+
+    TransactionList:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TransactionList'
+
+    TaskToken:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              task_token:
+                $ref: '#/components/schemas/TaskToken'
+
+  parameters:
+    AccessID:
+      name: access-id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/AccessID'
+
+    AccountID:
+      name: account-id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/AccountID'
+
+    ChallengeID:
+      name: challenge-id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/ChallengeID'
+
+    NotificationID:
+      name: notification-id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/NotificationID'
+
+    PaymentID:
+      name: payment-id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/PaymentID'
+
+    InitiationID:
+      name: init-id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/InitiationID'
+
+    StandingOrderID:
+      name: standing-order-id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/StandingOrderID'
+
+    SecurityID:
+      name: security-id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/SecurityID'
+
+    SyncID:
+      in: path
+      name: sync-id
+      required: true
+      schema:
+        $ref: '#/components/schemas/SyncID'
+
+    TransactionID:
+      name: transaction-id
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/TransactionID'
+
+    CountryCodeQuery:
+      in: query
+      name: country
+      required: false
+      description: |-
+        Two-letter country code. Show only resources within this country. Country code is case-insensitve.
+      schema:
+        $ref: '#/components/schemas/Country'
+
+    BankQuery:
+      in: query
+      name: q
+      required: false
+      description: |-
+        Query for banks. Will match banks on domestic bank code, BIC, name or figo-ID. Only exact matches are returned.
+        A combination of bank code and country code is guaranteed to return a single bank.
+      schema:
+        type: string
+        example: "10020030"
+
+    ServiceQuery:
+      in: query
+      name: q
+      required: false
+      description: |-
+        Query for services. Will match services on name or figo-ID. Only exact matches are returned.
+      schema:
+        $ref: '#/components/schemas/ServiceID'
+
+    ProviderQuery:
+      in: query
+      name: q
+      required: false
+      description: |-
+        Query for the entire catalog. Will match banks on domestic bank code, BIC, name or figo-ID. Will match
+        services based on name or figo-ID. Only exact matches are returned.
+      schema:
+        type: string
+        example: "10020030"
+
+    TANSchemeIDQuery:
+      name: tan_scheme_id
+      in: query
+      schema:
+        $ref: '#/components/schemas/TANSchemeID'
+
+    AccountsFilter:
+      in: query
+      name: accounts
+      schema:
+        type: array
+        items:
+          type: string
+      description: Comma separated list of account IDs.
+      example: A1.1,A1.3
+      explode: true
+
+    SyncTaskFilter:
+      in: query
+      name: task
+      schema:
+        $ref: '#/components/schemas/TaskToken'
+      description: |-
+        Show only those items that have been created by this background task .
+
+    TransactionFilter:
+      in: query
+      name: filter
+      schema:
+        type: string
+      description: >-
+        Filter transactions by given `key:value` combination. Possible keys:
+
+          - date (maps to `booked_at`, please use ISO date here, not datetime)
+          - person (maps to payer/payee name)
+          - purpose
+          - amount
+
+        Values are interpreted using wildcards: `person:John Doe` will match `%John Doe%`.
+      example: date:2017-02-03
+
+    CentsQuery:
+      in: query
+      name: cents
+      schema:
+        type: boolean
+        default: false
+      example: true
+      description: If `true` amounts will be shown in cents.
+
+    ContinueQuery:
+      in: query
+      name: continue
+      schema:
+        type: boolean
+        default: false
+      description: |-
+        If `true`, the standing order will deleted even when it was changed since the last sync.
+        If this parameter is set to `false`, the standing order will not be deleted in case it is
+        not in sync between figo and the corresponding bank.
+
+    CountQuery:
+      in: query
+      name: count
+      schema:
+        type: integer
+        default: 1000
+        example: 100
+      description: |-
+        Limit the number of returned items. In combination with the offset parameter this can be
+        used to paginate the result list.
+
+    OffsetQuery:
+      in: query
+      name: offset
+      schema:
+        type: integer
+        default: 0
+        example: 200
+      description: |-
+        Skip this number of transactions in the response. In combination with the count parameter
+        this can be used to paginate the result list.
+
+    SortQuery:
+      in: query
+      name: sort
+      schema:
+        type:
+          string
+        enum:
+          - asc
+          - desc
+      description: Determines whether results will be sorted in ascending or descending order.
+
+    SinceQuery:
+      in: query
+      name: since
+      schema:
+        $ref: '#/components/schemas/DateTime'
+      description: |-
+        Return only transactions after this date based on `since_type`. This parameter can either
+        be a transaction ID or a date. Given at least one transaction matches the filter
+        criterion, if provided as transaction ID the result will *not* contain this ID. If
+        provided as ISO date, the result *will* contain this date. This behavior may change in the
+        future.
+      example: 2018-01-01T00:00:00.000Z
+
+    UntilQuery:
+      in: query
+      name: until
+      schema:
+        $ref: '#/components/schemas/DateTime'
+      description: |-
+        Return only transactions which were booked on or before this date. Please provide as
+        ISO date. It is not possible to use the `since_type` semantics with `until`.
+      example: 2018-01-01T00:00:00.000Z
+
+    TransactionSinceTypeQuery:
+      in: query
+      name: since_type
+      schema:
+        type: string
+        enum:
+          - booked
+          - created
+          - modified
+        default: created
+      description: This parameter defines how the parameter `since` will be interpreted.
+
+    SecuritySinceTypeQuery:
+      in: query
+      name: since_type
+      schema:
+        type: string
+        enum:
+          - traded
+          - created
+          - modified
+        default: created
+      description: This parameter defines how the parameter `since` will be interpreted.
+
+    SubmitQuery:
+      in: query
+      name: submit
+      schema:
+        type: boolean
+        default: false
+      example: true
+      description:  |-
+        If `true` the standing order will be deleted from the figo API backend and the bank
+        server. It this parameter is set to `false`, the standing order will be deleted from the
+        figo backend only.
+
+    OAuthTokenQuery:
+      in: query
+      name: token
+      description: A refresh token or access token
+      required: true
+      schema:
+        type: string
+      example: ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim
+
+    IncludePendingQuery:
+      in: query
+      name: include_pending
+      schema:
+        type: boolean
+        default: false
+      description: |-
+        This flag indicates whether pending transactions should be included in the response.
+        Pending transactions are always included as a complete set, regardless of the since
+        parameter.
+
+    IncludeStatisticsQuery:
+      in: query
+      name: include_statistics
+      description: |
+        If `true` includes statistics on the returned transactions: maximum deposit, total
+        deposits, maximum expense, total expenses.
+      schema:
+        type: boolean
+        default: false
+      example: true
+
+    TransactionTypesQuery:
+      in: query
+      name: types
+      schema:
+        $ref: '#/components/schemas/TransactionTypes'
+      example: Transfer,Direct debit
+
+    AcceptLanguage:
+      name: Accept-Language
+      in: header
+      description: |-
+        Setting the Accept-Language to one of the available languages will return results in
+        this language.
+      schema:
+        type: string
+      example: de_DE
+
+    ContentTypeJSON:
+      name: Content-Type
+      in: header
+      required: true
+      schema:
+        type: string
+        enum:
+          - application/json
+      description: |-
+        The Content-Type entity header is used to indicate the media type of the request.
+
+  requestBodies:
+    CreateAccess:
+      description: ''
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - access_method_id
+            properties:
+              access_method_id:
+                $ref: '#/components/schemas/AccessMethodID'
+              account_identifier:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountIdentifier'
+              credentials:
+                ####
+                # In the case of Decoupled SCA it would not be ok to ask for client credentials here. This would've to be postponed
+                # until after consent creation. --> This is an edge case scenario currently and is being clarified by Product
+                ####
+                $ref: '#/components/schemas/Credentials'
+              save_credentials:
+                type: boolean
+                default: false
+                description: Indicates whether your customer agreed to save static credentials.
+              ######
+              # AUTOSYNC enabling was removed. We configure this via the PartnerAuthority Service's partner config and make sure only partners
+              # that actually bought the feature will have it enabled. Reasoning: Why should a partner have to enable a bought feature which
+              # runs in the background?
+              ######
+              consent:
+                $ref: '#/components/schemas/Consent'
+
+    CreateSynchronization:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              disable_notifications:
+                type: boolean
+                example: true
+                default: false
+                description: |-
+                  This flag indicates whether notifications should be sent to your application.
+                  Since your application will be notified by the callback URL anyway, you might
+                  want to disable any additional notifications.
+              redirect_uri:
+                $ref: '#/components/schemas/RedirectURI'
+              state:
+                $ref: '#/components/schemas/State'
+              credentials:
+                $ref: '#/components/schemas/Credentials'
+              save_credentials:
+                type: boolean
+                default: false
+                description: Indicates whether your customer agreed to save static credentials.
+
+
+    CreateUser:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                $ref: '#/components/schemas/EmailAddress'
+              language:
+                $ref: '#/components/schemas/Language'
+              full_name:
+                $ref: '#/components/schemas/FullName'
+              password:
+                $ref: '#/components/schemas/Password'
+            required:
+              - email
+              - password
+              - name
+
+    ModifyUser:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                $ref: '#/components/schemas/EmailAddress'
+              language:
+                $ref: '#/components/schemas/Language'
+              full_name:
+                $ref: '#/components/schemas/FullName'
+              new_password:
+                allOf:
+                  - $ref: '#/components/schemas/Password'
+                description: |-
+                  New figo account password. If this field is set, then the field `password` must
+                  be set too.
+              password:
+                allOf:
+                  - $ref: '#/components/schemas/Password'
+                description: Current figo account password.
+
+    UpdatePayment: #todo descriptions
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              type:
+                $ref: '#/components/schemas/PaymentType'
+              notification_recipient:
+                type: string
+                example: ""
+              text_key:
+                $ref: '#/components/schemas/DTATextKey'
+              text_key_extension:
+                $ref: '#/components/schemas/DTATextKeyExtension'
+              account_number:
+                $ref: '#/components/schemas/AccountNumber'
+              amount:
+                $ref: '#/components/schemas/MoneyAmount'
+              bank_code:
+                $ref: '#/components/schemas/BankCode'
+              cents:
+                type: boolean
+                example: false
+                description: If `true`, the amount is interpreted as cents.
+              currency:
+                $ref: '#/components/schemas/Currency'
+              iban:
+                $ref: '#/components/schemas/IBAN'
+              name:
+                type: string
+                example: John Doe
+                description: Name of creditor.
+              purpose:
+                type: string
+                example: New coffee machine
+                description: Purpose of the payment.
+            required:
+              - type
+
+    SubmitPayment:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              redirect_uri:
+                $ref: '#/components/schemas/RedirectURI'
+              state:
+                $ref: '#/components/schemas/State'
+              tan_scheme_id:
+                $ref: '#/components/schemas/TANSchemeID'
+            required:
+              - state
+              - tan_scheme_id
+
+    UpdateStandingOrder:
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/StandingOrderSEPA'
+              - type: object
+                properties:
+                  standing_order_id:
+                    $ref: '#/components/schemas/StandingOrderID'
+
+
+    CreateNotification:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              notify_uri:
+                type: string
+                format: url
+                example: https://api.figo.me/callback
+                description: |-
+                  Notification messages will be sent to this URL. The URL schemes https and
+                  http are used for webhooks.
+              observe_key:
+                type: string
+                example: /rest/transactions
+                description: Notification key
+              state:
+                $ref: '#/components/schemas/State'
+            required:
+              - notify_uri
+              - observe_key
+
+    ReplaceNotifications:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Notification'
+
+    RevokeToken:
+      description: |
+      content:
+        application/json:
+          schema:
+            type: object
+            description: JSON-body for revoking a token
+            properties:
+              token:
+                type: string
+                description: A refresh token or access token.
+                example: ASHWLIkouP2O6_bgA2wWReRhletgWKHYjLqDaqb0LFfamim...
+              cascade:
+                type: boolean
+                description: |
+                  If token is an access token and cascade is set to `true`, the corresponding
+                  **refresh token** will also be revoked. Otherwise **only token** will be revoked.
+            required:
+              - token
+
+  securitySchemes:
+    user_auth:
+      type: http
+      description: |
+        In order to access any information belonging to a user, a client has to
+        authenticate with a token linking itself to the user. This token is called an
+        `access token` and contains information on the client, the user and the level of access
+        the client has to the users data. In order to authenticate using such an access token the
+        HTTP header `Authorization` is set to `Bearer <access token>`. The  `access token` is formatted
+        as a JSON Web Token according to [RFC7519](https://tools.ietf.org/html/rfc7519)
+
+        Such an `access token` is either returned when
+
+        * exchanging an authorization code after a successful OAuth login flow
+        * logging in with the user's credentials
+        * exchanging a refresh token, which is returned at either of the aforementioned points
+
+        ## Authentication errors
+
+        In case of an authentication error a HTTP code 401 response is returned containing further
+        details on the kind of error in the `WWW-Authenticate` header.
+
+        In addition to the below listed scope the flags are used for simple boolean permissions.
+
+        | Flag            | Description                                  |
+        | --              | --                                           |
+        | submit_payments | Allow submission of payments to bank server  |
+        | offline         | Access figo API when the user is not present |
+        | create_user     | Allow creation of figo accounts              |
+
+        ## Example
+
+        The string `"accounts=rw submit_payments"` is URL-encoded and passed as the URL
+        parameter `scope`.
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: app.decode_token
+      x-scopes:
+        accounts=rw: Modify accounts
+        accounts=ro: Read accounts
+        balance=ro: Read account balance
+        securities=ro: Read securities
+        transactions=ro: Read transactions
+        transactions=rw: Modify transactions
+        payments=ro: Read payments
+        payments=rw: Create/modify payments
+        submit_payments: Submit payment to service provider
+        user=ro: Read user information
+        user=rw: Modify user information
+
+    client_auth:
+      x-basicInfoFunc: app.basic_auth
+      type: http
+      scheme: basic
+      description: |-
+        Client authentication is performed via [HTTP Basic Auth](https://en.wikipedia.org/wiki/Basic_access_authentication)
+        with client ID as username and client secret as password.
