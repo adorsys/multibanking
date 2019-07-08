@@ -59,7 +59,7 @@ public class LoadBookingsJob {
         AbstractHBCIJob bookingsJob = Optional.ofNullable(loadBookingsRequest.getRawResponseType())
                 .map(rawResponseType -> {
                     if (rawResponseType == LoadBookingsRequest.RawResponseType.CAMT) {
-                        return new GVKUmsAllCamt(dialog.getPassport());
+                        return new GVKUmsAllCamt(dialog.getPassport(), true);
                     } else {
                         return new GVKUmsAll(dialog.getPassport());
                     }
