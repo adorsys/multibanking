@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.jpa.repository;
 
+import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.jpa.conf.JpaConfig;
 import de.adorsys.multibanking.jpa.conf.MapperConfig;
@@ -46,6 +47,12 @@ public class BankAccountRepositoryJpaTest {
         assertThat(bankAccounts).hasSize(1);
 
         assertThat(bankAccounts.get(0).getBankName()).isEqualTo(bankAccount.getBankName());
+
+        repository.updateSyncStatus(bankAccount.getId(), BankAccount.SyncStatus.SYNC);
+
+        BankAccount.SyncStatus syncStatus = repository.getSyncStatus(bankAccount.getId());
+
+        assertThat(syncStatus).isEqualTo(BankAccount.SyncStatus.SYNC);
     }
 
     public BankAccountEntity createBankAccount() {

@@ -6,6 +6,7 @@ import de.adorsys.multibanking.jpa.mapper.JpaEntityMapper;
 import de.adorsys.multibanking.jpa.repository.BankAccountRepositoryJpa;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -54,22 +55,12 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 
     @Override
     public BankAccount.SyncStatus getSyncStatus(String accountId) {
-//        Query where = Query.query(Criteria.where("id").is(accountId));
-//
-//        where.fields().include("syncStatus");
-//        BankAccountMongoEntity bankAccountEntity = mongoTemplate.findOne(where, BankAccountMongoEntity.class);
-//        if (bankAccountEntity != null) {
-//            return bankAccountEntity.getSyncStatus();
-//        }
-
-        return null;
+        return bankAccountRepository.getSyncStatus(NumberUtils.toLong(accountId));
     }
 
     @Override
     public void updateSyncStatus(String accountId, BankAccount.SyncStatus syncStatus) {
-//        Query where = Query.query(Criteria.where("id").is(accountId));
-//        Update update = new Update().set("syncStatus", syncStatus);
-//        mongoTemplate.updateFirst(where, update, BankAccountMongoEntity.class);
+        bankAccountRepository.updateSyncStatus(syncStatus, NumberUtils.toLong(accountId));
     }
 
     @Override

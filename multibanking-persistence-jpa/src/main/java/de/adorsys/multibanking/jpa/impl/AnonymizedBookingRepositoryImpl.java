@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.jpa.impl;
 
 import de.adorsys.multibanking.domain.AnonymizedBookingEntity;
+import de.adorsys.multibanking.jpa.mapper.JpaEntityMapper;
 import de.adorsys.multibanking.jpa.repository.AnonymizedBookingRepositoryJpa;
 import de.adorsys.multibanking.pers.spi.repository.AnonymizedBookingRepositoryIf;
 import lombok.AllArgsConstructor;
@@ -15,9 +16,10 @@ import java.util.List;
 public class AnonymizedBookingRepositoryImpl implements AnonymizedBookingRepositoryIf {
 
     private final AnonymizedBookingRepositoryJpa anonymizdBookingRepository;
+    private final JpaEntityMapper entityMapper;
 
     @Override
     public void save(List<AnonymizedBookingEntity> bookingEntities) {
-
+        anonymizdBookingRepository.saveAll(entityMapper.mapToAnonymizedBookingJpaEntities(bookingEntities));
     }
 }
