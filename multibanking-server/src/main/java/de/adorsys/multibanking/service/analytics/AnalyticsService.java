@@ -31,7 +31,7 @@ public class AnalyticsService {
     private final AnalyticsRepositoryIf analyticsRepository;
     private final ContractRepositoryIf contractRepository;
     private final SmartAnalyticsIf smartAnalyticsService;
-    private final SmartanalyticsMapper smartAnalyticsMapper;
+    private final SmartAnalyticsMapper smartAnalyticsMapper;
     private final Principal principal;
 
     private static String normalize(String s) {

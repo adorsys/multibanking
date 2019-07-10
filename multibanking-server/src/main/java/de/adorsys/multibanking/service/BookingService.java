@@ -13,7 +13,7 @@ import de.adorsys.multibanking.exception.InvalidPinException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsIf;
-import de.adorsys.multibanking.service.analytics.SmartanalyticsMapper;
+import de.adorsys.multibanking.service.analytics.SmartAnalyticsMapper;
 import de.adorsys.smartanalytics.api.AnalyticsResult;
 import de.adorsys.smartanalytics.api.config.ConfigStatus;
 import lombok.AllArgsConstructor;
@@ -53,7 +53,7 @@ public class BookingService {
     private final UserService userService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
     private final FinTSProductConfig finTSProductConfig;
-    private final SmartanalyticsMapper smartAnalyticsMapper;
+    private final SmartAnalyticsMapper smartAnalyticsMapper;
 
     public String getBookingsCsv(String userId, String accessId, String accountId) {
         List<BookingEntity> bookings = getBookings(userId, accessId, accountId);
