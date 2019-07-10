@@ -1,0 +1,73 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  profiles.include:
+    - fongo
+    - sts-enable
+    - smartanalytics-embedded
+  autoconfigure.exclude:
+    - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+server:
+  port: 8887
+
+logging:
+  level:
+    org.kapott.hbci.comm.CommPinTan: TRACE
+
+sts:
+  audience_name: sts-service-component-example
+  secret_claim_property_key: secretClaim
+  authservers:
+  - name: keycloak-playground
+    issUrl: https://keycloak:8080/auth/realms/moped
+    jwksUrl: https://keycloak:8080/auth/realms/moped/protocol/openid-connect/certs
+    refreshIntervalSeconds: 600
+  persistence:
+    lockExpiry: 30000
+  keymanagement:
+    rotation:
+      checkInterval: 60000
+      encKeyPairs:
+        minKeys: 5
+        enabled: true
+      signKeyPairs:
+        minKeys: 5
+        enabled: true
+      secretKeys:
+        minKeys: 5
+        enabled: true
+#    persistence:
+#      containerName: adsts-container
+#      password: 0123456789ABCDEF
+    keystore:
+      password: FEDCBA9876543210
+      type: UBER
+      name: mbs-keystore
+      alias_prefix: mbs-keystore-
+      keys:
+        encKeyPairs:
+          initialCount: 5
+          algo: RSA
+          sigAlgo: SHA256withRSA
+          size: 2048
+          name: Adorsys MBS ENC
+          validityInterval: 3600000
+          legacyInterval: 86400000
+        signKeyPairs:
+          initialCount: 5
+          algo: RSA
+          sigAlgo: SHA256withRSA
+          size: 2048
+          name: Adorsys MBS SIGN
+          validityInterval: 3600000
+          legacyInterval: 86400000
+        secretKeys:
+          initialCount: 5
+          algo: AES
+          size: 256
+          validityInterval: 3600000
+          legacyInterval: 86400000
+
+db_secret: 1234567890ABCDEF

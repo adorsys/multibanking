@@ -20,3 +20,4 @@ multibanking-app/.history
 pom.xml.versionsBackup
 multibanking-app/.sourcemaps
 multibanking-app/platforms
+multibanking-persistence-jpa/de.adorsys.multibanking.jpa.entity.BankJpaEntity

@@ -1,0 +1,58 @@
+version: '3.1'
+services:
+  postgres_keycloak:
+    image: postgres:9.6
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+  postgres_mbs:
+    image: postgres:9.6
+    environment:
+      POSTGRES_USER: mbs
+      POSTGRES_PASSWORD: mbs
+    ports:
+      - 5432:5432
+  keycloak:
+    image: openshift-registry.adorsys.de/adorsys-multibanking-dev/keycloak:latest
+    environment:
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin123
+      DB_VENDOR: postgres
+      DB_ADDR: postgres_keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: keycloak
+      USER_SECRET_ENCRYPTION_PASSWORD: 123456789
+      STS_RESOURCE_SERVER_LIST: MULTIBANKING
+      STS_RESOURCE_SERVERS_MULTIBANKING_JWKS_URL: http://host.docker.internal:8081/pop
+      STS_RESOURCE_SERVERS_MULTIBANKING_AUDIENCE: Multibanking
+      STS_RESOURCE_SERVERS_MULTIBANKING_USER_SECRET_CLAIM_NAME: Multibanking
+      STS_DEFAULT_AUDIENCE: Multibanking
+    ports:
+      - "8080:8080"
+      - "8787:8787"
+    depends_on:
+      - postgres_keycloak
+    command:
+      "${KEYCLOAK_PARAMS}"
+  mongodb:
+    image: mongo:3
+    ports:
+      - "27017:27017"
+  multibanking:
+    image: adorsys/openjdk-jre-base:8-minideb
+    working_dir: /app
+    volumes:
+      - ./target:/app
+    environment:
+      spring.profiles.active: dev-mongo
+      server.port: 8081
+      mongo.server: mongodb
+      mongo.databaseName: multibanking
+      db_secret: 1234567890123456
+      mockConnectionUrl: http://localhost:8083
+      SMARTANALYTICS_URL: http://localhost:8082
+      SPRING_APPLICATION_JSON: '{"sts":{"authservers":[{"name":"keycloak","iss-url":"http://keycloak:8080/auth/realms/multibanking","jwks-url":"http://keycloak:8080/auth/realms/multibanking/protocol/openid-connect/certs"}]}}'
+    command: java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787 -jar /app/multibanking-server.jar
+    ports:
+      - "8088:8081"
+      - "8788:8787"
