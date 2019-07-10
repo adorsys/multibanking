@@ -1,7 +1,7 @@
 FROM adorsys/java:8
 
-MAINTAINER https://git.adorsys.de/adorsys/multibanking-service
+MAINTAINER https://github.com/adorsys/multibanking
 
 ENV JAVA_OPTS -Xmx1024m
 
-COPY ./target/multibanking-service.jar .
+COPY ./target/multibanking-server.jar .
