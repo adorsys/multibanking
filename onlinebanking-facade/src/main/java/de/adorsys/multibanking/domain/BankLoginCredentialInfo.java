@@ -18,9 +18,6 @@ package de.adorsys.multibanking.domain;
 
 import lombok.Data;
 
-/**
- * Created by alexg on 10.07.17.
- */
 @Data
 public class BankLoginCredentialInfo {
 

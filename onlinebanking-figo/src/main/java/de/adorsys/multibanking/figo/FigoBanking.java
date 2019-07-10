@@ -39,7 +39,7 @@ public class FigoBanking implements OnlineBankingService {
             "-_=+[{]},<>";
     private static SecureRandom random = getSecureRandom();
     private FigoConnection figoConnection;
-    private Logger LOG = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     private String figoTechUser;
     private String figoTechUserCredential;
@@ -59,11 +59,11 @@ public class FigoBanking implements OnlineBankingService {
             secret = EnvProperties.getEnvOrSysProp("FIGO_ALTERNATIVE_SECRETT", secret);
             timeout = EnvProperties.getEnvOrSysProp("FIGO_ALTERNATIVE_TIMEOUT", timeout);
             connectionUrl = EnvProperties.getEnvOrSysProp("FIGO_ALTERNATIVE_CONNECTION_URL", connectionUrl);
-            LOG = LoggerFactory.getLogger("figo.FigoBankingAlternative");
+            logger = LoggerFactory.getLogger("figo.FigoBankingAlternative");
         }
 
         if (clientId == null || secret == null) {
-            LOG.warn("missing env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
+            logger.warn("missing env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
         } else {
             figoConnection = new FigoConnection(clientId, secret, "http://nowhere.here", Integer.parseInt(timeout),
                     connectionUrl);
@@ -72,7 +72,7 @@ public class FigoBanking implements OnlineBankingService {
         figoTechUser = EnvProperties.getEnvOrSysProp("FIGO_TECH_USER", true);
         figoTechUserCredential = EnvProperties.getEnvOrSysProp("FIGO_TECH_USER_CREDENTIAL", true);
         if (figoTechUser == null || figoTechUserCredential == null) {
-            LOG.warn("missing env properties FIGO_TECH_USER and/or FIGO_TECH_USER_CREDENTIAL");
+            logger.warn("missing env properties FIGO_TECH_USER and/or FIGO_TECH_USER_CREDENTIAL");
         }
     }
 
@@ -136,7 +136,7 @@ public class FigoBanking implements OnlineBankingService {
         try {
             figoConnection.addUser(bankAccess.getBankLogin(), bankAccess.getBankLogin() + "@admb.de", password, "de");
         } catch (IOException | FigoException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
 
         BankApiUser bankApiUser = new BankApiUser();
@@ -155,7 +155,7 @@ public class FigoBanking implements OnlineBankingService {
             FigoSession session = createSession(tokenResponse.getAccessToken());
             session.removeUser();
         } catch (IOException | FigoException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -202,7 +202,7 @@ public class FigoBanking implements OnlineBankingService {
                             .collect(Collectors.toList()))
                     .build();
         } catch (IOException | FigoException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -214,7 +214,7 @@ public class FigoBanking implements OnlineBankingService {
             figoBankLoginSettings = figoSession.queryApi("/rest/catalog/banks/de/" + bankCode, null, "GET",
                     BankLoginSettings.class);
         } catch (IOException | FigoException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
         Bank bank = new Bank();
         bank.setName(figoBankLoginSettings.getBankName());
@@ -223,7 +223,6 @@ public class FigoBanking implements OnlineBankingService {
                 new de.adorsys.multibanking.domain.BankLoginSettings();
         bank.setLoginSettings(loginSettings);
 
-        loginSettings.setAdditional_icons(figoBankLoginSettings.getAdditionalIcons());
         loginSettings.setAdvice(figoBankLoginSettings.getAdvice());
         loginSettings.setAuth_type(figoBankLoginSettings.getAuthType());
         loginSettings.setIcon(figoBankLoginSettings.getIcon());
@@ -248,7 +247,7 @@ public class FigoBanking implements OnlineBankingService {
             AccountBalance accountBalance = account.getBalance();
             return new BalancesReport().readyBalance(Balance.builder().amount(accountBalance.getBalance()).build());
         } catch (IOException | FigoException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -261,7 +260,7 @@ public class FigoBanking implements OnlineBankingService {
 
             session.removeAccount(bankAccount.getExternalIdMap().get(bankApi()));
         } catch (IOException | FigoException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -312,7 +311,7 @@ public class FigoBanking implements OnlineBankingService {
                     .build();
 
         } catch (IOException | FigoException | InterruptedException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 
@@ -386,9 +385,9 @@ public class FigoBanking implements OnlineBankingService {
         TaskStatusResponse taskStatus;
         try {
             taskStatus = figoSession.getTaskState(taskToken);
-            LOG.info("figo.getTaskState {} {}", taskStatus.getAccountId(), taskStatus.getMessage());
+            logger.info("figo.getTaskState {} {}", taskStatus.getAccountId(), taskStatus.getMessage());
         } catch (IOException | FigoException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
 
         return resolveStatus(taskStatus);
@@ -412,7 +411,7 @@ public class FigoBanking implements OnlineBankingService {
             if (taskStatus.getError().getCode() == 10000 || taskStatus.getError().getCode() == 10001) {
                 throw new MultibankingException(INVALID_PIN, taskStatus.getError().getMessage());
             }
-            throw new RuntimeException(taskStatus.getError().getMessage());
+            throw new IllegalStateException(taskStatus.getError().getMessage());
         }
 
         return Status.OK;
@@ -445,7 +444,7 @@ public class FigoBanking implements OnlineBankingService {
                 figoConnection.addUser(figoTechUser, username, figoTechUserCredential, "de");
                 accessToken = figoConnection.credentialLogin(username, figoTechUserCredential).getAccessToken();
             } catch (Exception e1) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         }
 

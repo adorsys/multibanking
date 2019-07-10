@@ -5,7 +5,7 @@
 
     <groupId>de.adorsys.multibanking</groupId>
     <artifactId>multibanking</artifactId>
-    <version>4.6.1</version>
+    <version>5.0.0</version>
     <packaging>pom</packaging>
     <name>Multibanking</name>
     <url>https://github.com/adorsys/multibanking</url>
@@ -58,13 +58,14 @@
     </properties>
 
     <modules>
+        <module>multibanking-server</module>
         <module>multibanking-persistence-mongodb</module>
+        <module>multibanking-persistence-jpa</module>
         <module>onlinebanking-facade</module>
         <module>finapi-adapter</module>
         <module>onlinebanking-figo</module>
         <module>onlinebanking-finapi</module>
         <module>onlinebanking-hbci4java</module>
-        <module>onlinebanking-xs2a</module>
         <module>onlinebanking-bankinggateway</module>
         <module>onlinebanking-mock</module>
         <module>multibanking-pers-spi</module>
@@ -139,24 +140,6 @@
                             </path>
                         </annotationProcessorPaths>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>pack-module</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>single</goal>
-                            </goals>
-                            <configuration>
-                                <appendAssemblyId>false</appendAssemblyId>
-                                <descriptors>
-                                    <descriptor>assembly.xml</descriptor>
-                                </descriptors>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>

@@ -1,0 +1,179 @@
+spring:
+  application:
+    name: multibanking-service
+  main:
+    allow-bean-definition-overriding: true
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  jackson.default-property-inclusion: non_null
+
+server:
+  port: 8081
+  use-forward-headers: true
+
+management:
+  context-path: /management
+  security:
+    enabled: false
+
+info:
+  project:
+    artifact: #project.artifactId#
+    name: #project.name#
+    description: #project.description#
+    version: #project.version#
+    timestamp: #maven.build-timestamp#
+    scmBranch: #scmBranch#
+    buildnumber: #buildNumber#
+
+logging:
+  level:
+    org.kapott.hbci.comm.CommPinTan: TRACE
+  pattern:
+    level: '%X{user}:%X{accessId} %5p'
+
+defaultBankApi: HBCI
+
+sts:
+  audience_name: Multibanking
+  secret_claim_property_key: user-secret
+  keymanagement.keystore.password: FEDCBA9876543210
+  keymanagement.keystore.name: multibanking-keystore
+  keymanagement.keystore.alias_prefix: multibanking-
+  keymanagement.keystore.type: UBER
+  keymanagement.keystore.keys.encKeyPairs.initialCount: 5
+  keymanagement.keystore.keys.encKeyPairs.algo: RSA
+  keymanagement.keystore.keys.encKeyPairs.sigAlgo: SHA256withRSA
+  keymanagement.keystore.keys.encKeyPairs.size: 2048
+  keymanagement.keystore.keys.encKeyPairs.name: 'STS Multibanking'
+  keymanagement.keystore.keys.encKeyPairs.validityInterval: 3600000
+  keymanagement.keystore.keys.encKeyPairs.legacyInterval: 86400000
+  keymanagement.keystore.keys.signKeyPairs.initialCount: 5
+  keymanagement.keystore.keys.signKeyPairs.algo: RSA
+  keymanagement.keystore.keys.signKeyPairs.sigAlgo: SHA256withRSA
+  keymanagement.keystore.keys.signKeyPairs.size: 2048
+  keymanagement.keystore.keys.signKeyPairs.name: 'STS Multibanking'
+  keymanagement.keystore.keys.signKeyPairs.validityInterval: 3600000
+  keymanagement.keystore.keys.signKeyPairs.legacyInterval: 86400000
+  keymanagement.keystore.keys.secretKeys.initialCount: 5
+  keymanagement.keystore.keys.secretKeys.algo: AES
+  keymanagement.keystore.keys.secretKeys.size: 256
+  keymanagement.keystore.keys.secretKeys.validityInterval: 3600000
+  keymanagement.keystore.keys.secretKeys.legacyInterval: 86400000
+  keymanagement.rotation.secretKeys.enabled: false
+  keymanagement.rotation.signKeyPairs.enabled: false
+  keymanagement.rotation.encKeyPairs.enabled: false
+
+---
+
+spring:
+  profiles: dev-mongo
+  profiles.include:
+    - swagger
+    - mongo
+    - sts-enable
+    - mongo-persistence
+    - smartanalytics-embedded
+  autoconfigure.exclude:
+    - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+    - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+
+db_secret: 1234567890123456
+mongo.properties.url: classpath:/mongo.properties
+
+swagger.login.url: http://localhost:8080/auth/realms/multibanking/protocol/openid-connect/auth
+
+idp:
+  baseUrl: http://localhost:8080
+  realm: multibanking
+
+sts:
+  authservers:
+    - name: keycloak
+      issUrl: ${idp.baseUrl}/auth/realms/${idp.realm}
+      jwksUrl: ${idp.baseUrl}/auth/realms/${idp.realm}/protocol/openid-connect/certs
+
+---
+
+spring:
+  profiles: dev-jpa
+  profiles.include:
+    - swagger
+    - jpa
+    - sts-enable
+    - smartanalytics-remote
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mbs
+    username: mbs
+    password: mbs
+  jpa:
+    hibernate.ddl-auto: update
+    properties.hibernate.jdbc.lob.non_contextual_creation: true
+  liquibase:
+    enabled: false
+    change-log: classpath:/liquibase/changelog-master.xml
+
+swagger.login.url: http://localhost:8080/auth/realms/multibanking/protocol/openid-connect/auth
+
+idp:
+  baseUrl: http://localhost:8080
+  realm: multibanking
+
+sts:
+  authservers:
+    - name: keycloak
+      issUrl: ${idp.baseUrl}/auth/realms/${idp.realm}
+      jwksUrl: ${idp.baseUrl}/auth/realms/${idp.realm}/protocol/openid-connect/certs
+
+---
+
+spring:
+  profiles: dev-sts-disabled
+  profiles.include:
+    - swagger
+    - mongo
+    - mongo-persistence
+    - smartanalytics-embedded
+
+db_secret: 1234567890123456
+mongo.properties.url: classpath:/mongo.properties
+
+---
+
+spring:
+  profiles: prod
+  profiles.include:
+    - swagger
+    - mongo
+    - sts-enable
+    - mongo-persistence
+    - smartanalytics-embedded
+
+---
+
+spring:
+  profiles: prod-smartanalytics-remote
+  profiles.include:
+    - swagger
+    - mongo
+    - sts-enable
+    - mongo-persistence
+    - smartanalytics-remote
+
+---
+
+spring:
+  profiles: prod-sts-disabled
+  profiles.include:
+    - swagger
+    - mongo
+    - mongo-persistence
+    - smartanalytics-embedded
+

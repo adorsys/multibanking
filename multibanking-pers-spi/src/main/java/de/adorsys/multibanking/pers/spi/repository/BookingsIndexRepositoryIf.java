@@ -5,9 +5,6 @@ import de.adorsys.multibanking.domain.BookingsIndexEntity;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author alexg on 13.07.18
- */
 public interface BookingsIndexRepositoryIf {
 
     void save(BookingsIndexEntity entity);

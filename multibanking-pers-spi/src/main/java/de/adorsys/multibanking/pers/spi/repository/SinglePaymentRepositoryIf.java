@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.pers.spi.repository;
 
-import de.adorsys.multibanking.domain.PaymentEntity;
+import de.adorsys.multibanking.domain.SinglePaymentEntity;
 
 import java.util.Optional;
 
@@ -9,9 +9,9 @@ import java.util.Optional;
  */
 public interface SinglePaymentRepositoryIf {
 
-    Optional<PaymentEntity> findByUserIdAndId(String userId, String id);
+    Optional<SinglePaymentEntity> findByUserIdAndId(String userId, String id);
 
-    void save(PaymentEntity paymentEntity);
+    void save(SinglePaymentEntity paymentEntity);
 
     void delete(String id);
 

@@ -66,9 +66,9 @@ public interface MongoEntityMapper {
 
     RawSepaTransactionMongoEntity mapToRawSepaTransactionMongoEntity(RawSepaTransactionEntity paymentEntity);
 
-    PaymentEntity mapToPaymentEntity(PaymentMongoEntity paymentMongoEntity);
+    SinglePaymentEntity mapToPaymentEntity(PaymentMongoEntity paymentMongoEntity);
 
-    PaymentMongoEntity mapToPaymentMongoEntity(PaymentEntity paymentMongoEntity);
+    PaymentMongoEntity mapToPaymentMongoEntity(SinglePaymentEntity paymentMongoEntity);
 
     StandingOrderMongoEntity mapToStandingOrderMongoEntity(StandingOrderEntity paymentMongoEntity);
 

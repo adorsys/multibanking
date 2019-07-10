@@ -9,6 +9,8 @@ import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Document
@@ -23,5 +25,6 @@ public class StandingOrderMongoEntity extends StandingOrder {
     private String accountId;
     private String userId;
     private Object tanSubmitExternal;
+    private Date createdDateTime;
 
 }
