@@ -12,8 +12,7 @@ import java.util.List;
 public class RuleJpaEntity {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    private String id;
     private String userId;
     @ElementCollection
     @CollectionTable(

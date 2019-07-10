@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -18,7 +17,6 @@ import java.util.Optional;
 @Service
 public class AnalyticsRepositoryImpl implements AnalyticsRepositoryIf {
 
-    private final EntityManager em;
     private final AnalyticsRepositoryJpa analyticsRepository;
     private final JpaEntityMapper entityMapper;
 

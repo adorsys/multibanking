@@ -56,7 +56,7 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 
     @Override
     public boolean deleteByUserIdAndBankAccessId(String userId, String id) {
-        bankAccessRepository.deleteById(new Long(id));
+        bankAccessRepository.deleteByUserIdAndId(userId, new Long(id));
         return true;
     }
 }

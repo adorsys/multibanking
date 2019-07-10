@@ -9,7 +9,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,6 @@ public class UserRepositoryImpl implements UserRepositoryIf {
 
     private final UserRepositoryJpa userRepository;
     private final JpaEntityMapper entityMapper;
-    private final EntityManager entityManager;
 
     @Override
     public Optional<UserEntity> findById(String id) {
@@ -40,14 +38,12 @@ public class UserRepositoryImpl implements UserRepositoryIf {
 
     @Override
     public Optional<LocalDateTime> getRulesLastChangeDate(String id) {
-        return Optional.of(userRepository.getRulesLastChangeDate(id).getRulesLastChangeDate());
+        return Optional.ofNullable(userRepository.getRulesLastChangeDate(id));
     }
 
     @Override
     public void setRulesLastChangeDate(String userId, LocalDateTime dateTime) {
-//        Query where = Query.query(Criteria.where("id").is(userId));
-//        Update update = new Update().set("rulesLastChangeDate", dateTime);
-//        mongoTemplate.updateFirst(where, update, UserMongoEntity.class);
+        userRepository.setRulesLastChangeDate(dateTime, userId);
     }
 
     @Override

@@ -2,12 +2,14 @@ package de.adorsys.multibanking.jpa.entity;
 
 import de.adorsys.multibanking.domain.Cycle;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity(name = "payment_periodic")
+@EqualsAndHashCode(callSuper = false)
 @Data
 public class StandingOrderJpaEntity extends PaymentCommonJpaEntity {
 

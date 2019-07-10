@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.jpa.impl;
 
 import de.adorsys.multibanking.domain.StandingOrderEntity;
+import de.adorsys.multibanking.jpa.mapper.JpaEntityMapper;
 import de.adorsys.multibanking.jpa.repository.StandingOrderRepositoryJpa;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
 import lombok.AllArgsConstructor;
@@ -14,25 +15,27 @@ import java.util.List;
 @Service
 public class StandingOrderRepositoryImpl implements StandingOrderRepositoryIf {
 
-    private final StandingOrderRepositoryJpa standingOrderRepositoryMongodb;
+    private final StandingOrderRepositoryJpa standingOrderRepository;
+    private final JpaEntityMapper entityMapper;
 
     @Override
     public List<StandingOrderEntity> findByUserIdAndAccountId(String userId, String accountId) {
-        return null;
+        return entityMapper.mapToStandingOrderEntities(standingOrderRepository.findByUserIdAndAccountId(userId
+                , accountId));
     }
 
     @Override
     public void save(List<StandingOrderEntity> standingOrders) {
-
+        standingOrderRepository.saveAll(entityMapper.mapToStandingOrderJpaEntities(standingOrders));
     }
 
     @Override
     public void save(StandingOrderEntity standingOrder) {
-
+        standingOrderRepository.save(entityMapper.mapToStandingOrderJpaEntity(standingOrder));
     }
 
     @Override
     public void deleteByAccountId(String accountId) {
-
+        standingOrderRepository.deleteByAccountId(accountId);
     }
 }

@@ -3,6 +3,7 @@ package de.adorsys.multibanking.jpa.repository;
 import de.adorsys.multibanking.jpa.entity.UserJpaEntity;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +19,11 @@ public interface UserRepositoryJpa extends JpaRepository<UserJpaEntity, String> 
 
     List<UserJpaEntity> findByExpireUserLessThan(LocalDateTime date);
 
-    @Query(value = "SELECT rulesLastChangeDate FROM UserJpaEntity WHERE id = ?1", nativeQuery = true)
-    UserJpaEntity getRulesLastChangeDate(String userId);
+    @Query(value = "SELECT rules_last_change_date FROM mbs_user WHERE id = ?1", nativeQuery = true)
+    LocalDateTime getRulesLastChangeDate(String userId);
+
+    @Modifying
+    @Query("update mbs_user user set user.rulesLastChangeDate = ?1 where user.id = ?2")
+    int setRulesLastChangeDate(LocalDateTime changeDate, String id);
 
 }
