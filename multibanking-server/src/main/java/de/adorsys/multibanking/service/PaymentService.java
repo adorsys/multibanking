@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.service;
 
+import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
@@ -25,6 +26,7 @@ public class PaymentService {
     private final RawSepaTransactionRepositoryIf rawSepaTransactionRepository;
     private final SinglePaymentRepositoryIf singlePaymentRepository;
     private final BulkPaymentRepositoryIf bulkPaymentRepository;
+    private final FinTSProductConfig finTSProductConfig;
 
     RawSepaTransactionEntity createSepaRawPayment(BankAccessEntity bankAccess,
                                                   TanTransportType tanTransportType,
@@ -41,15 +43,17 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
+            TransactionRequest request = TransactionRequest.builder()
+                .bankApiUser(bankApiUser)
+                .tanTransportType(tanTransportType)
+                .transaction(payment)
+                .bankAccess(bankAccess)
+                .pin(pin)
+                .bankCode(bankEntity.getBlzHbci())
+                .build();
+            request.setProduct(finTSProductConfig.getProduct());
             Object tanSubmit = bankingService.requestAuthorizationCode(null,
-                TransactionRequest.builder()
-                    .bankApiUser(bankApiUser)
-                    .tanTransportType(tanTransportType)
-                    .transaction(payment)
-                    .bankAccess(bankAccess)
-                    .pin(pin)
-                    .bankCode(bankEntity.getBlzHbci())
-                    .build());
+                request);
 
             RawSepaTransactionEntity target = new RawSepaTransactionEntity();
             BeanUtils.copyProperties(payment, target);
@@ -78,16 +82,18 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
+            TransactionRequest request = TransactionRequest.builder()
+                .bankApiUser(bankApiUser)
+                .tanTransportType(tanTransportType)
+                .transaction(payment)
+                .bankAccess(bankAccess)
+                .pin(pin)
+                .bankCode(bankEntity.getBlzHbci())
+                .build();
+            request.setProduct(finTSProductConfig.getProduct());
             Object tanSubmit =
                 bankingService.requestAuthorizationCode(null,
-                    TransactionRequest.builder()
-                        .bankApiUser(bankApiUser)
-                        .tanTransportType(tanTransportType)
-                        .transaction(payment)
-                        .bankAccess(bankAccess)
-                        .pin(pin)
-                        .bankCode(bankEntity.getBlzHbci())
-                        .build());
+                    request);
 
             SinglePaymentEntity target = new SinglePaymentEntity();
             BeanUtils.copyProperties(payment, target);
@@ -116,16 +122,18 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
+            TransactionRequest request = TransactionRequest.builder()
+                .bankApiUser(bankApiUser)
+                .transaction(payment)
+                .tanTransportType(tanTransportType)
+                .bankAccess(bankAccess)
+                .pin(pin)
+                .bankCode(bankEntity.getBlzHbci())
+                .build();
+            request.setProduct(finTSProductConfig.getProduct());
             Object tanSubmit =
                 bankingService.requestAuthorizationCode(null,
-                    TransactionRequest.builder()
-                        .bankApiUser(bankApiUser)
-                        .transaction(payment)
-                        .tanTransportType(tanTransportType)
-                        .bankAccess(bankAccess)
-                        .pin(pin)
-                        .bankCode(bankEntity.getBlzHbci())
-                        .build());
+                    request);
 
             BulkPaymentEntity target = new BulkPaymentEntity();
             BeanUtils.copyProperties(payment, target);
@@ -150,12 +158,14 @@ public class PaymentService {
         }
 
         try {
-            bankingService.submitAuthorizationCode(SubmitAuthorizationCodeRequest.builder()
+            SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
                 .sepaTransaction(transactionEntity)
                 .tanSubmit(transactionEntity.getTanSubmitExternal())
                 .pin(pin)
                 .tan(tan)
-                .build());
+                .build();
+            request.setProduct(finTSProductConfig.getProduct());
+            bankingService.submitAuthorizationCode(request);
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }
@@ -163,7 +173,8 @@ public class PaymentService {
         rawSepaTransactionRepository.delete(transactionEntity.getId());
     }
 
-    public void submitSinglePayment(SinglePaymentEntity paymentEntity, BankAccessEntity bankAccess, String pin, String tan) {
+    public void submitSinglePayment(SinglePaymentEntity paymentEntity, BankAccessEntity bankAccess, String pin,
+                                    String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         pin = pin == null ? bankAccess.getPin() : pin;
@@ -172,12 +183,14 @@ public class PaymentService {
         }
 
         try {
-            bankingService.submitAuthorizationCode(SubmitAuthorizationCodeRequest.builder()
+            SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
                 .sepaTransaction(paymentEntity)
                 .tanSubmit(paymentEntity.getTanSubmitExternal())
                 .pin(pin)
                 .tan(tan)
-                .build());
+                .build();
+            request.setProduct(finTSProductConfig.getProduct());
+            bankingService.submitAuthorizationCode(request);
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }
@@ -195,12 +208,14 @@ public class PaymentService {
         }
 
         try {
-            bankingService.submitAuthorizationCode(SubmitAuthorizationCodeRequest.builder()
+            SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
                 .sepaTransaction(paymentEntity)
                 .tanSubmit(paymentEntity.getTanSubmitExternal())
                 .pin(pin)
                 .tan(tan)
-                .build());
+                .build();
+            request.setProduct(finTSProductConfig.getProduct());
+            bankingService.submitAuthorizationCode(request);
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }

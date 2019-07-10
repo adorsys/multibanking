@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.service;
 
+import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
@@ -12,7 +13,7 @@ import de.adorsys.multibanking.exception.InvalidPinException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsIf;
-import de.adorsys.multibanking.service.analytics.SmartAnalyticsMapper;
+import de.adorsys.multibanking.service.analytics.SmartanalyticsMapper;
 import de.adorsys.smartanalytics.api.AnalyticsResult;
 import de.adorsys.smartanalytics.api.config.ConfigStatus;
 import lombok.AllArgsConstructor;
@@ -51,7 +52,8 @@ public class BookingService {
     private final BankService bankService;
     private final UserService userService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
-    private final SmartAnalyticsMapper smartAnalyticsMapper;
+    private final FinTSProductConfig finTSProductConfig;
+    private final SmartanalyticsMapper smartAnalyticsMapper;
 
     public String getBookingsCsv(String userId, String accessId, String accountId) {
         List<BookingEntity> bookings = getBookings(userId, accessId, accountId);
@@ -304,7 +306,7 @@ public class BookingService {
                 .withBalance(true)
                 .withStandingOrders(true)
                 .build();
-
+            loadBookingsRequest.setProduct(finTSProductConfig.getProduct());
             return onlineBankingService.loadBookings(bankEntity.getBankingUrl(), loadBookingsRequest);
         } catch (MultibankingException e) {
             return handleMultibankingException(bankAccess, bankAccount, bankApiUser, onlineBankingService, bankEntity
@@ -372,17 +374,19 @@ public class BookingService {
         if (externalAccountId == null) {
             BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
+            LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
+                .bankApiUser(bankApiUser)
+                .bankAccess(bankAccess)
+                .bankCode(bankEntity.getBlzHbci())
+                .updateTanTransportTypes(true)
+                .pin(pin)
+                .storePin(bankAccess.isStorePin())
+                .build();
+            request.setProduct(finTSProductConfig.getProduct());
             List<BankAccount> apiBankAccounts = onlineBankingService
                 .loadBankAccounts(
                     bankEntity.getBankingUrl(),
-                    LoadAccountInformationRequest.builder()
-                        .bankApiUser(bankApiUser)
-                        .bankAccess(bankAccess)
-                        .bankCode(bankEntity.getBlzHbci())
-                        .updateTanTransportTypes(true)
-                        .pin(pin)
-                        .storePin(bankAccess.isStorePin())
-                        .build())
+                    request)
                 .getBankAccounts();
 
             List<BankAccountEntity> dbBankAccounts = bankAccountRepository

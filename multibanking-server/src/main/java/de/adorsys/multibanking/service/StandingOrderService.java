@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.service;
 
+import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
@@ -23,6 +24,7 @@ public class StandingOrderService {
     private final UserService userService;
     private final StandingOrderRepositoryIf standingOrderRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
+    private final FinTSProductConfig finTSProductConfig;
 
     Object createStandingOrder(BankAccessEntity bankAccess, String pin, StandingOrder standingOrder) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
@@ -37,14 +39,16 @@ public class StandingOrderService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
+            TransactionRequest request = TransactionRequest.builder()
+                .bankApiUser(bankApiUser)
+                .transaction(standingOrder)
+                .bankAccess(bankAccess)
+                .pin(pin)
+                .bankCode(bankEntity.getBlzHbci())
+                .build();
+            request.setProduct(finTSProductConfig.getProduct());
             Object tanSubmit = bankingService.requestAuthorizationCode(bankEntity.getBankingUrl(),
-                TransactionRequest.builder()
-                    .bankApiUser(bankApiUser)
-                    .transaction(standingOrder)
-                    .bankAccess(bankAccess)
-                    .pin(pin)
-                    .bankCode(bankEntity.getBlzHbci())
-                    .build());
+                request);
 
             StandingOrderEntity target = new StandingOrderEntity();
             BeanUtils.copyProperties(standingOrder, target);
@@ -69,12 +73,14 @@ public class StandingOrderService {
         }
 
         try {
-            bankingService.submitAuthorizationCode(SubmitAuthorizationCodeRequest.builder()
+            SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
                 .sepaTransaction(standingOrder)
                 .tanSubmit(tanSubmit)
                 .pin(pin)
                 .tan(tan)
-                .build());
+                .build();
+            request.setProduct(finTSProductConfig.getProduct());
+            bankingService.submitAuthorizationCode(request);
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }

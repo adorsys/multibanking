@@ -18,7 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public abstract class SmartAnalyticsMapper {
+public abstract class SmartanalyticsMapper {
 
     public void applyCategories(List<BookingEntity> bookingEntities, AnalyticsResult result) {
         result.getBookings().forEach(categorizedBooking ->
