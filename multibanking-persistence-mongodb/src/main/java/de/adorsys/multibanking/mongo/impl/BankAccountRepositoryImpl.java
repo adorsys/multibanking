@@ -55,7 +55,7 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
 
     @Override
     public void save(BankAccountEntity bankAccount) {
-        bankAccountRepository.save(entityMapper.mapToBankAccountMongoEntity(bankAccount));
+        bankAccount.setId(bankAccountRepository.save(entityMapper.mapToBankAccountMongoEntity(bankAccount)).getId());
     }
 
     @Override

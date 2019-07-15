@@ -6,11 +6,11 @@ spring:
   liquibase:
     enabled: false
     change-log: classpath:/liquibase/changelog-master.xml
-  datasource:
-    platform: postgres
-    url: jdbc:postgresql://localhost:5432/mbs
-    username: mbs
-    password: mbs
+#  datasource:
+#    platform: postgres
+#    url: jdbc:postgresql://localhost:5432/mbs
+#    username: mbs
+#    password: mbs
 
 logging.level.org.hibernate.SQL: debug
 logging.level.org.hibernate.type.descriptor.sql: trace

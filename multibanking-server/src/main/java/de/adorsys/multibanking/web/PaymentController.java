@@ -44,7 +44,7 @@ public class PaymentController {
             })})
     @GetMapping("/{paymentId}")
     public Resource<SinglePaymentEntity> getPayment(@PathVariable String accessId, @PathVariable String accountId,
-                                                    @PathVariable String paymentId) {
+                                              @PathVariable String paymentId) {
         SinglePaymentEntity paymentEntity = paymentRepository.findByUserIdAndId(principal.getName(), paymentId)
             .orElseThrow(() -> new ResourceNotFoundException(SinglePaymentEntity.class, paymentId));
 
@@ -104,7 +104,7 @@ public class PaymentController {
     }
 
     private Resource<SinglePaymentEntity> mapToResource(@PathVariable String accessId, @PathVariable String accountId,
-                                                        SinglePaymentEntity paymentEntity) {
+                                                  SinglePaymentEntity paymentEntity) {
         return new Resource<>(paymentEntity,
             linkTo(methodOn(PaymentController.class).getPayment(accessId, accountId, paymentEntity.getId())).withSelfRel());
     }

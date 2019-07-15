@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.service;
 
+import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.CreateConsentRequest;
@@ -34,6 +35,7 @@ public class BankAccountService {
     private final UserService userService;
     private final BankService bankService;
     private final Principal principal;
+    private final FinTSProductConfig finTSProductConfig;
 
     public List<BankAccountEntity> getBankAccounts(String userId, String accessId) {
         BankAccessEntity bankAccessEntity = bankAccessRepository.findByUserIdAndId(userId, accessId)
@@ -169,17 +171,19 @@ public class BankAccountService {
                                                      OnlineBankingService onlineBankingService,
                                                      BankApiUser bankApiUser, BankEntity bankEntity) {
         try {
+            LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
+                .consentId(bankAccess.getAllAcountsConsent() != null ?
+                    bankAccess.getAllAcountsConsent().getConsentId() : null)
+                .bankApiUser(bankApiUser)
+                .bankAccess(bankAccess)
+                .bankCode(bankEntity.getBlzHbci())
+                .pin(bankAccess.getPin())
+                .storePin(bankAccess.isStorePin())
+                .updateTanTransportTypes(true)
+                .build();
+            request.setProduct(finTSProductConfig.getProduct());
             return onlineBankingService.loadBankAccounts(bankEntity.getBankingUrl(),
-                LoadAccountInformationRequest.builder()
-                    .consentId(bankAccess.getAllAcountsConsent() != null ?
-                        bankAccess.getAllAcountsConsent().getConsentId() : null)
-                    .bankApiUser(bankApiUser)
-                    .bankAccess(bankAccess)
-                    .bankCode(bankEntity.getBlzHbci())
-                    .pin(bankAccess.getPin())
-                    .storePin(bankAccess.isStorePin())
-                    .updateTanTransportTypes(true)
-                    .build())
+                request)
                 .getBankAccounts();
         } catch (MultibankingException e) {
             return handleMultibankingException(bankAccess, bankApiUser, onlineBankingService, bankEntity, e);
