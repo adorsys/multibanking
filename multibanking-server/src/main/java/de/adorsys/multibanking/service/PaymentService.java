@@ -69,7 +69,7 @@ public class PaymentService {
     }
 
     public SinglePaymentEntity createSinglePayment(BankAccessEntity bankAccess, TanTransportType tanTransportType,
-                                                   String pin, SinglePayment payment) {
+                                             String pin, SinglePayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankingService.bankApi());
@@ -173,8 +173,7 @@ public class PaymentService {
         rawSepaTransactionRepository.delete(transactionEntity.getId());
     }
 
-    public void submitSinglePayment(SinglePaymentEntity paymentEntity, BankAccessEntity bankAccess, String pin,
-                                    String tan) {
+    public void submitSinglePayment(SinglePaymentEntity paymentEntity, BankAccessEntity bankAccess, String pin, String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         pin = pin == null ? bankAccess.getPin() : pin;

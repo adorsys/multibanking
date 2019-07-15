@@ -8,14 +8,8 @@ import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;
-import de.adorsys.multibanking.web.mapper.BankAccessMapper;
-import de.adorsys.multibanking.web.mapper.BankAccountMapper;
-import de.adorsys.multibanking.web.mapper.BankApiMapper;
-import de.adorsys.multibanking.web.mapper.BookingMapper;
-import de.adorsys.multibanking.web.model.BankAccessTO;
-import de.adorsys.multibanking.web.model.BankAccountTO;
-import de.adorsys.multibanking.web.model.BankApiTO;
-import de.adorsys.multibanking.web.model.BookingTO;
+import de.adorsys.multibanking.web.mapper.*;
+import de.adorsys.multibanking.web.model.*;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -38,6 +32,8 @@ public class DirectAccessController {
 
     private final BookingMapper bookingMapper;
     private final BankApiMapper bankApiMapper;
+    private final BalancesMapper balancesMapper;
+    private final ConsentMapper consentMapper;
     private final BankAccessMapper bankAccessMapper;
     private final BankAccountMapper bankAccountMapper;
     private final BankAccountService bankAccountService;
@@ -113,31 +109,31 @@ public class DirectAccessController {
             List<BookingEntity> bookings = bookingService.syncBookings(bankAccessEntity, bankAccountEntity,
                 bankApiMapper.toBankApi(bankApi), loadBookingsRequest.getPin());
             loadBookingsResponse.setBookings(bookingMapper.toBookingTOs(bookings));
-            loadBookingsResponse.setBalances(bankAccountEntity.getBalances());
+            loadBookingsResponse.setBalances(balancesMapper.toBalancesReportTO(bankAccountEntity.getBalances()));
 
             return new ResponseEntity<>(loadBookingsResponse, HttpStatus.OK);
         } catch (ExternalAuthorisationRequiredException e) {
-            loadBookingsResponse.setConsent(e.getConsent());
+            loadBookingsResponse.setConsent(consentMapper.toConsentTO(e.getConsent()));
             return new ResponseEntity<>(loadBookingsResponse, HttpStatus.ACCEPTED);
         }
     }
 
     @Data
-    private static class LoadBookingsRequest {
+    public static class LoadBookingsRequest {
         String accessId;
         String accountId;
         String pin;
     }
 
     @Data
-    private static class LoadBookingsResponse {
-        Consent consent;
-        BalancesReport balances;
+    public static class LoadBookingsResponse {
+        ConsentTO consent;
+        BalancesReportTO balances;
         List<BookingTO> bookings;
     }
 
     @Data
-    private static class LoadBankAccountsResponse {
+    public static class LoadBankAccountsResponse {
         Consent consent;
         List<BankAccountTO> bankAccounts;
     }

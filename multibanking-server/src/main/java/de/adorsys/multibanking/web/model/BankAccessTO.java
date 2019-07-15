@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.web.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -9,7 +8,6 @@ import org.springframework.hateoas.core.Relation;
 @Data
 @ApiModel(description = "BankAccess account information", value = "BankAccess")
 @Relation(collectionRelation = "bankAccessList")
-@JsonIgnoreProperties(value = {"pin", "pin2"}, allowSetters = true)
 public class BankAccessTO {
 
     @ApiModelProperty(value = "Internal bank access id")
