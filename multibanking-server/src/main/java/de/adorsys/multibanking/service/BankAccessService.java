@@ -5,7 +5,7 @@ import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.exception.ExternalAuthorisationRequiredException;
+import de.adorsys.multibanking.exception.ConsentAuthorisationRequiredException;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.*;
@@ -14,8 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Slf4j
@@ -31,7 +31,6 @@ public class BankAccessService {
     private final BankAccountRepositoryIf bankAccountRepository;
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BookingRepositoryIf bookingRepository;
-    private final BankService bankService;
     private final BankAccountService bankAccountService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
@@ -46,8 +45,9 @@ public class BankAccessService {
         List<BankAccountEntity> bankAccounts;
         try {
             bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null);
-        } catch (ExternalAuthorisationRequiredException e) {
-            bankAccess.setAllAcountsConsent(e.getConsent());
+        } catch (ConsentAuthorisationRequiredException e) {
+            bankAccess.setPsd2ConsentId(e.getConsent().getConsentId());
+            bankAccess.setPsd2ConsentAuthorisationId(e.getConsent().getConsentAuthorisationId());
             saveBankAccess(bankAccess);
             return bankAccess;
         }
@@ -126,8 +126,7 @@ public class BankAccessService {
                     if (bankingService.userRegistrationRequired()) {
                         BankApiUser bankApiUser =
                             userEntity.getApiUser().stream().filter(apiUser -> apiUser.getBankApi() == bankApi).findFirst().orElseThrow(() -> new ResourceNotFoundException(BankApiUser.class, bankApi.toString()));
-                        bankingService.removeBankAccount(bankService.findBankingUrl(bankAccessEntity.getBankCode()),
-                            bankAccountEntity, bankApiUser);
+                        bankingService.removeBankAccount(bankAccountEntity, bankApiUser);
                     }
                 });
             });

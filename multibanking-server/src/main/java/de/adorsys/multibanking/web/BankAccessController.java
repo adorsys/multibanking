@@ -1,16 +1,20 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.service.BankAccessService;
 import de.adorsys.multibanking.web.mapper.BankAccessMapper;
 import de.adorsys.multibanking.web.model.BankAccessTO;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
+import io.swagger.annotations.AuthorizationScope;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpEntity;
@@ -27,7 +31,9 @@ import java.util.Optional;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
 
+@Api(tags = "Multibanking bankaccess")
 @RequiredArgsConstructor
 @Slf4j
 @UserResource
@@ -40,6 +46,8 @@ public class BankAccessController {
     private final UserRepositoryIf userRepository;
     private final BankAccessService bankAccessService;
     private final Principal principal;
+    @Value("${consent.auth.url}")
+    private String consentAuthUrl;
 
     @ApiOperation(
         value = "Read bank accesses",
@@ -63,20 +71,15 @@ public class BankAccessController {
             @Authorization(value = "multibanking_auth", scopes = {
                 @AuthorizationScope(scope = "openid", description = "")
             })})
-    @ApiResponses({
-        @ApiResponse(code = 201, message = "Created", response = void.class),
-        @ApiResponse(code = 202, message = "Consent authorisation required", response = Consent.class)})
     @PostMapping
-    public ResponseEntity<Consent> createBankAccess(@RequestBody BankAccessTO bankAccess) {
+    public ResponseEntity<Resource<BankAccessTO>> createBankAccess(@RequestBody BankAccessTO bankAccess) {
         BankAccessEntity persistedBankAccess = bankAccessService.createBankAccess(principal.getName(),
             bankAccessMapper.toBankAccessEntity(bankAccess));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(linkTo(methodOn(BankAccessController.class).getBankAccess(persistedBankAccess.getId())).toUri());
 
-        return Optional.ofNullable(persistedBankAccess.getAllAcountsConsent())
-            .map(consent -> new ResponseEntity<>(consent, headers, HttpStatus.ACCEPTED))
-            .orElseGet(() -> new ResponseEntity<>(new Consent(), headers, HttpStatus.CREATED));
+        return new ResponseEntity<>(mapToResource(persistedBankAccess), headers, HttpStatus.CREATED);
     }
 
     @ApiOperation(
@@ -132,9 +135,18 @@ public class BankAccessController {
     }
 
     private Resource<BankAccessTO> mapToResource(BankAccessEntity accessEntity) {
-        return new Resource<>(bankAccessMapper.toBankAccessTO(accessEntity),
+        Resource<BankAccessTO> resource = new Resource<>(bankAccessMapper.toBankAccessTO(accessEntity),
             linkTo(methodOn(BankAccessController.class).getBankAccess(accessEntity.getId())).withSelfRel(),
             linkTo(methodOn(BankAccountController.class).getBankAccounts(accessEntity.getId())).withRel("accounts"));
+
+        Optional.ofNullable(accessEntity.getPsd2ConsentId())
+            .map(consentId -> fromHttpUrl(consentAuthUrl)
+                .buildAndExpand(consentId, accessEntity.getPsd2ConsentAuthorisationId())
+                .toUriString())
+            .map(authUrl -> new Link(authUrl, "authorisation"))
+            .ifPresent(resource::add);
+
+        return resource;
     }
 
 }

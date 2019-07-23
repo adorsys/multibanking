@@ -18,6 +18,8 @@ public class BankAccountJpaEntity extends BankAccountCommonJpaEntity {
     private Long id;
     private String bankAccessId;
     private String userId;
+    private String psd2ConsentId;
+    private String psd2ConsentAuthorisationId;
 
     @ElementCollection
     @CollectionTable(name = "bankaccount_external_id")
@@ -25,8 +27,6 @@ public class BankAccountJpaEntity extends BankAccountCommonJpaEntity {
     @MapKeyColumn(name = "bank_api")
     @Column(name = "external_id")
     private Map<BankApi, String> externalIdMap = new EnumMap<>(BankApi.class);
-    @Embedded
-    private ConsentJpaEntity dedicatedConsent;
     @Embedded
     private BalancesReportEntity balances;
 

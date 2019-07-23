@@ -18,10 +18,36 @@ package de.adorsys.multibanking.domain;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @Data
 public class Consent {
 
     private String consentId;
-    private String authUrl;
+    private String consentAuthorisationId;
+    private String redirectUrl;
+
     private ScaStatus scaStatus;
+
+    private boolean availableAccountsConsent;
+
+    // Requested access services for a consent.
+    /**
+     * Is asking for detailed account information.
+     */
+    private List<BankAccount> accounts;
+    /**
+     * Is asking for balances of the account.
+     */
+    private List<BankAccount> balances;
+    /**
+     * Is asking for transactions of the account
+     */
+    private List<BankAccount> transactions;
+
+    private boolean recurringIndicator;
+    private LocalDate validUntil;
+    private int frequencyPerDay;
+    private boolean combinedServiceIndicator;
 }

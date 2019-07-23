@@ -11,6 +11,7 @@ import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.web.mapper.AnalyticsMapper;
 import de.adorsys.multibanking.web.model.AnalyticsTO;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
+@Api(tags = "Multibanking analytics")
 @RequiredArgsConstructor
 @UserResource
 @RestController

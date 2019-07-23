@@ -2,6 +2,7 @@ package de.adorsys.multibanking.conf;
 
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
+import de.adorsys.banking.repository.config.EnableScaMongoPersistence;
 import de.adorsys.smartanalytics.config.EnableSmartanalyticsMongoPersistence;
 import de.bwaldvogel.mongo.MongoServer;
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
@@ -20,6 +21,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @Configuration
 @EnableMongoRepositories(basePackages = "de.adorsys.multibanking.mongo.repository")
 @EnableSmartanalyticsMongoPersistence
+@EnableScaMongoPersistence
 @Profile({"fongo"})
 public class FongoConfig extends AbstractMongoConfiguration {
 

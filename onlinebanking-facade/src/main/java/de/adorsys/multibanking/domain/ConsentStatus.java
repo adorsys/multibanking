@@ -16,26 +16,14 @@
 
 package de.adorsys.multibanking.domain;
 
-import lombok.Data;
+public enum ConsentStatus {
 
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-
-@Data
-public class BankAccess {
-
-    private String bankName;
-    private String bankLogin;
-    private String bankLogin2;
-    private String bankCode;
-    private String iban;
-    private Map<BankApi, List<TanTransportType>> tanTransportTypes = new EnumMap<>(BankApi.class);
-    private String hbciPassportState;
-    private Map<BankApi, String> externalIdMap = new EnumMap<>(BankApi.class);
-
-    public void externalId(BankApi bankApi, String externalId) {
-        externalIdMap.put(bankApi, externalId);
-    }
-
+    RECEIVED,
+    REJECTED,
+    VALID,
+    REVOKED_BY_PSU,
+    EXPIRED,
+    TERMINATED_BY_TPP,
+    TERMINATED_BY_ASPSP,
+    PARTIALLY_AUTHORISED;
 }

@@ -18,6 +18,8 @@ public class BankAccessMongoEntity extends BankAccess {
 
     @Id
     private String id;
+    private String psd2ConsentId;
+    private String psd2ConsentAuthorisationId;
     @Indexed
     private String userId;
     private String pin;

@@ -35,13 +35,10 @@ public class BankAccessTO {
     private boolean storeAnonymizedBookings;
     @ApiModelProperty(value = "Provide anonymized bookings for machine learning")
     private boolean provideDataForMachineLearning;
-
     @ApiModelProperty(value = "Bank name", example = "Deutsche Bank")
     private String bankName;
-
     @ApiModelProperty(value = "IBAN", required = true, example = "DE51250400903312345678")
     private String iban;
-    @ApiModelProperty(value = "SCA consent")
-    private ConsentTO allAcountsConsent;
+
 
 }

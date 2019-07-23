@@ -21,8 +21,10 @@ import springfox.documentation.swagger.web.SecurityConfiguration;
 import springfox.documentation.swagger.web.SecurityConfigurationBuilder;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -66,13 +68,19 @@ public class SwaggerConfig {
     }
 
     private Predicate<RequestHandler> apis() {
-        Predicate<RequestHandler> mbResourses = RequestHandlerSelectors.withClassAnnotation(UserResource.class);
+        List<Predicate<RequestHandler>> resources = new ArrayList<>();
+
+        resources.add(RequestHandlerSelectors.withClassAnnotation(UserResource.class));
 
         if (environment.acceptsProfiles(Profiles.of("smartanalytics-embedded"))) {
-            return Predicates.or(mbResourses, RequestHandlerSelectors.basePackage("de.adorsys.smartanalytics.web"));
-        } else {
-            return mbResourses;
+            resources.add(RequestHandlerSelectors.basePackage("de.adorsys.smartanalytics.web"));
         }
+
+        if (environment.acceptsProfiles(Profiles.of("bankinggateway-b2c-embedded"))) {
+            resources.add(RequestHandlerSelectors.basePackage("de.adorsys.banking.resource"));
+        }
+
+        return Predicates.or(resources);
     }
 
     private SecurityContext securityContext() {

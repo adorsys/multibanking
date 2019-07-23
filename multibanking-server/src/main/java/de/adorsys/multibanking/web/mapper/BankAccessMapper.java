@@ -19,6 +19,8 @@ public interface BankAccessMapper {
     @Mapping(target = "externalIdMap", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "temporary", ignore = true)
+    @Mapping(target = "psd2ConsentId", ignore = true)
+    @Mapping(target = "psd2ConsentAuthorisationId", ignore = true)
     BankAccessEntity toBankAccessEntity(BankAccessTO bankAccessTO);
 
 }

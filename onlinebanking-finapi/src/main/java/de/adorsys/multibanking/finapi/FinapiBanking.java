@@ -78,7 +78,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
 
         try {
@@ -97,17 +97,12 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(BankApiUser bankApiUser) {
         try {
             new UsersApi(createApiClient()).deleteUnverifiedUser(bankApiUser.getApiUserId());
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
-        return null;
     }
 
     @Override
@@ -160,7 +155,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         ApiClient apiClient = createUserApiClient();
         apiClient.setAccessToken(authorizeUser(bankApiUser));
 
@@ -240,11 +235,6 @@ public class FinapiBanking implements OnlineBankingService {
         }
     }
 
-    @Override
-    public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
-        return null;
-    }
-
     private Account waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {
         Account account =
                 new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
@@ -285,10 +275,6 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
-    }
-
-    @Override
     public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
@@ -299,7 +285,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean accountInformationConsentRequired() {
+    public boolean psd2Scope() {
         return false;
     }
 

@@ -106,10 +106,6 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
-    }
-
-    @Override
     public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
@@ -125,7 +121,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
         if (figoConnection == null) {
             throw new IllegalArgumentException("figo connection not available, check env properties FIGO_CLIENT_ID " +
                     "and/or FIGO_SECRET");
@@ -148,7 +144,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(BankApiUser bankApiUser) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX,
                     bankApiUser.getApiPassword());
@@ -157,11 +153,6 @@ public class FigoBanking implements OnlineBankingService {
         } catch (IOException | FigoException e) {
             throw new IllegalStateException(e);
         }
-    }
-
-    @Override
-    public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
-        return null;
     }
 
     @Override
@@ -252,7 +243,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX,
                     bankApiUser.getApiPassword());
@@ -316,12 +307,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
-        return null;
-    }
-
-    @Override
-    public boolean accountInformationConsentRequired() {
+    public boolean psd2Scope() {
         return false;
     }
 

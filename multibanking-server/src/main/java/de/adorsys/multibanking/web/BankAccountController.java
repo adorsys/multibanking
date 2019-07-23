@@ -4,7 +4,7 @@ import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.Consent;
-import de.adorsys.multibanking.exception.ExternalAuthorisationRequiredException;
+import de.adorsys.multibanking.exception.ConsentAuthorisationRequiredException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.SyncInProgressException;
 import de.adorsys.multibanking.exception.domain.Messages;
@@ -30,9 +30,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-/**
- * Created by alexg on 07.02.17.
- */
+@Api(tags = "Multibanking bankaccount")
 @Slf4j
 @UserResource
 @RestController
@@ -107,7 +105,7 @@ public class BankAccountController {
         try {
             bookingService.syncBookings(bankAccess, bankAccount, null, pin != null ? pin : bankAccess.getPin());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (ExternalAuthorisationRequiredException e) {
+        } catch (ConsentAuthorisationRequiredException e) {
             return new ResponseEntity<>(e.getConsent(), HttpStatus.ACCEPTED);
         }
     }

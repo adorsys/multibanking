@@ -14,8 +14,6 @@ public class BankAccountTO {
 
     @ApiModelProperty(value = "Account ID")
     private String id;
-    @ApiModelProperty(value = "SCA consent")
-    private ConsentTO dedicatedConsent;
     @ApiModelProperty(value = "Bank account balances")
     private BalancesReportTO balances;
     @ApiModelProperty(value = "Name of the account owner", example = "EDEKA")

@@ -11,6 +11,7 @@ import de.adorsys.multibanking.web.mapper.BankApiMapper;
 import de.adorsys.multibanking.web.mapper.BookingMapper;
 import de.adorsys.multibanking.web.model.BankApiTO;
 import de.adorsys.multibanking.web.model.BookingTO;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Api(tags = "Multibanking booking")
 @AllArgsConstructor
 @UserResource
 @RestController

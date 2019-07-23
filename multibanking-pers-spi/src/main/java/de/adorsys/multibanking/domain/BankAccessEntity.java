@@ -11,6 +11,8 @@ public class BankAccessEntity extends BankAccess {
 
     private String id;
     private String userId;
+    private String psd2ConsentId;
+    private String psd2ConsentAuthorisationId;
     private String pin;
     private String pin2;
     private boolean temporary;

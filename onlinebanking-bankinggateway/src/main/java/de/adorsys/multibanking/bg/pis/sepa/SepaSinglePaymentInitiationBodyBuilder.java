@@ -16,20 +16,19 @@
 
 package de.adorsys.multibanking.bg.pis.sepa;
 
-import de.adorsys.multibanking.bg.model.PaymentInitiationSctJson;
+import de.adorsys.multibanking.bg.model.PaymentInitiationJson;
 import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.SinglePayment;
 
-
-public class SepaSinglePaymentInitiationBodyBuilder extends AbstractPaymentInitiationBodyBuilder<PaymentInitiationSctJson> {
+public class SepaSinglePaymentInitiationBodyBuilder extends AbstractPaymentInitiationBodyBuilder<PaymentInitiationJson> {
 
     @Override
-    public PaymentInitiationSctJson buildBody(AbstractScaTransaction transaction) {
+    public PaymentInitiationJson buildBody(AbstractScaTransaction transaction) {
         return buildPaymentInitiation((SinglePayment) transaction);
     }
 
-    private PaymentInitiationSctJson buildPaymentInitiation(SinglePayment paymentBodyObj) {
-        PaymentInitiationSctJson paymentInitiation = new PaymentInitiationSctJson();
+    private PaymentInitiationJson buildPaymentInitiation(SinglePayment paymentBodyObj) {
+        PaymentInitiationJson paymentInitiation = new PaymentInitiationJson();
         paymentInitiation.setDebtorAccount(buildDebtorAccountReference(paymentBodyObj));
         paymentInitiation.setCreditorAccount(buildCreditorAccountReference(paymentBodyObj));
         paymentInitiation.setInstructedAmount(buildAmount(paymentBodyObj));

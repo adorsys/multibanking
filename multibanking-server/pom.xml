@@ -12,6 +12,7 @@
 
     <properties>
         <smartanalytics.version>2.3.5</smartanalytics.version>
+        <banking-gateway-service.version>0.1-SNAPSHOT</banking-gateway-service.version>
         <sts.version>0.26.0</sts.version>
         <swagger.version>2.9.2</swagger.version>
         <mongobee.version>0.12</mongobee.version>
@@ -85,6 +86,13 @@
             <groupId>com.github.mongobee</groupId>
             <artifactId>mongobee</artifactId>
             <version>${mongobee.version}</version>
+        </dependency>
+
+        <!-- banking-gateway -->
+        <dependency>
+            <groupId>de.adorsys.banking</groupId>
+            <artifactId>banking-gateway-rest-server</artifactId>
+            <version>${banking-gateway-service.version}</version>
         </dependency>
 
         <!-- smartanalytics -->

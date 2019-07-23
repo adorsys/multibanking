@@ -1,7 +1,7 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.exception.ExternalAuthorisationRequiredException;
+import de.adorsys.multibanking.exception.ConsentAuthorisationRequiredException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
@@ -10,6 +10,7 @@ import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.web.mapper.*;
 import de.adorsys.multibanking.web.model.*;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -24,6 +25,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
+
+@Api(tags = "Multibanking direct access")
 @UserResource
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +45,8 @@ public class DirectAccessController {
     private final UserRepositoryIf userRepository;
     private final BankAccountRepositoryIf bankAccountRepository;
     private final BankAccessRepositoryIf bankAccessRepository;
-
+    @Value("${consent.auth.url}")
+    private String consentAuthUrl;
     @Value("${threshold_temporaryData:15}")
     private Integer thresholdTemporaryData;
 
@@ -82,8 +87,13 @@ public class DirectAccessController {
             response.setBankAccounts(bankAccountMapper.toBankAccountTOs(bankAccounts));
             return new ResponseEntity<>(response, HttpStatus.OK);
 
-        } catch (ExternalAuthorisationRequiredException e) {
-            response.setConsent(e.getConsent());
+        } catch (ConsentAuthorisationRequiredException e) {
+            String authUrl = e.getConsent().getRedirectUrl() == null
+                ? fromHttpUrl(consentAuthUrl).buildAndExpand(e.getConsent().getConsentId(),
+                e.getConsent().getConsentAuthorisationId()).toUriString()
+                : null;
+
+            response.setConsent(consentMapper.toConsentTO(e.getConsent(), authUrl));
             return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
         }
 
@@ -112,8 +122,13 @@ public class DirectAccessController {
             loadBookingsResponse.setBalances(balancesMapper.toBalancesReportTO(bankAccountEntity.getBalances()));
 
             return new ResponseEntity<>(loadBookingsResponse, HttpStatus.OK);
-        } catch (ExternalAuthorisationRequiredException e) {
-            loadBookingsResponse.setConsent(consentMapper.toConsentTO(e.getConsent()));
+        } catch (ConsentAuthorisationRequiredException e) {
+            String authUrl = e.getConsent().getRedirectUrl() == null
+                ? fromHttpUrl(consentAuthUrl).buildAndExpand(e.getConsent().getConsentId(),
+                e.getConsent().getConsentAuthorisationId()).toUriString()
+                : null;
+
+            loadBookingsResponse.setConsent(consentMapper.toConsentTO(e.getConsent(), authUrl));
             return new ResponseEntity<>(loadBookingsResponse, HttpStatus.ACCEPTED);
         }
     }
@@ -134,7 +149,7 @@ public class DirectAccessController {
 
     @Data
     public static class LoadBankAccountsResponse {
-        Consent consent;
+        ConsentTO consent;
         List<BankAccountTO> bankAccounts;
     }
 

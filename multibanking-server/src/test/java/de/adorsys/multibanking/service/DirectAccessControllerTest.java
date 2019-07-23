@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@Ignore
+//@Ignore
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class, FongoConfig.class, MapperConfig.class}, webEnvironment =
     SpringBootTest.WebEnvironment.RANDOM_PORT)

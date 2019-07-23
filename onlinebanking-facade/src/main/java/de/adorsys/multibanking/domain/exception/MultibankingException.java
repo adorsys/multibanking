@@ -13,6 +13,10 @@ public class MultibankingException extends RuntimeException {
     private List<String> messages;
     private MultibankingError multibankingError;
 
+    public MultibankingException(MultibankingError multibankingError) {
+        this(multibankingError, Collections.emptyList());
+    }
+
     public MultibankingException(MultibankingError multibankingError, String message) {
         this(multibankingError, Collections.singletonList(message));
     }

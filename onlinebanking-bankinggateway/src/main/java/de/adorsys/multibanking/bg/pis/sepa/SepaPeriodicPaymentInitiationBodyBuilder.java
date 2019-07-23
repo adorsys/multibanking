@@ -17,18 +17,18 @@
 package de.adorsys.multibanking.bg.pis.sepa;
 
 import de.adorsys.multibanking.bg.model.DayOfExecution;
-import de.adorsys.multibanking.bg.model.PeriodicPaymentInitiationSctJson;
+import de.adorsys.multibanking.bg.model.PeriodicPaymentInitiationJson;
 import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.FutureSinglePayment;
 
 import java.time.LocalDate;
 
-public class SepaPeriodicPaymentInitiationBodyBuilder extends AbstractPaymentInitiationBodyBuilder<PeriodicPaymentInitiationSctJson> {
+public class SepaPeriodicPaymentInitiationBodyBuilder extends AbstractPaymentInitiationBodyBuilder<PeriodicPaymentInitiationJson> {
     @Override
-    public PeriodicPaymentInitiationSctJson buildBody(AbstractScaTransaction transaction) {
+    public PeriodicPaymentInitiationJson buildBody(AbstractScaTransaction transaction) {
         FutureSinglePayment paymentBodyObj = (FutureSinglePayment) transaction;
 
-        PeriodicPaymentInitiationSctJson periodic = new PeriodicPaymentInitiationSctJson();
+        PeriodicPaymentInitiationJson periodic = new PeriodicPaymentInitiationJson();
         periodic.setDebtorAccount(buildDebtorAccountReference(paymentBodyObj));
         periodic.setCreditorAccount(buildCreditorAccountReference(paymentBodyObj));
         periodic.setInstructedAmount(buildAmount(paymentBodyObj));

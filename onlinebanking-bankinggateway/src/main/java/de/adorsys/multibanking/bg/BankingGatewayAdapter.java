@@ -5,13 +5,13 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.bg.api.AccountInformationServiceAisApi;
 import de.adorsys.multibanking.bg.api.PaymentInitiationServicePisApi;
-import de.adorsys.multibanking.bg.model.Balance;
 import de.adorsys.multibanking.bg.model.*;
 import de.adorsys.multibanking.bg.pis.PaymentInitiationBuilderStrategy;
 import de.adorsys.multibanking.bg.pis.PaymentInitiationBuilderStrategyImpl;
 import de.adorsys.multibanking.bg.pis.PaymentProductType;
 import de.adorsys.multibanking.bg.pis.PaymentServiceType;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.ConsentStatus;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
@@ -20,12 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -38,17 +38,18 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private static final String PSU_IP_ADDRESS = "127.0.0.1";
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private String bgCertificate;
     private PaymentInitiationBuilderStrategy initiationBuilderStrategy = new PaymentInitiationBuilderStrategyImpl();
     private ObjectMapper objectMapper = new ObjectMapper();
 
     public BankingGatewayAdapter() {
         bgCertificate = Optional.ofNullable(System.getenv("bg-cert"))
-                .map(this::readBankingGatewayCertficate)
-                .orElseGet(() -> {
-                    logger.warn("Missing env property bg-cert");
-                    return null;
-                });
+            .map(this::readBankingGatewayCertficate)
+            .orElseGet(() -> {
+                logger.warn("Missing env property bg-cert");
+                return null;
+            });
     }
 
     @Override
@@ -67,19 +68,14 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
         BankApiUser bankApiUser = new BankApiUser();
         bankApiUser.setBankApi(bankApi());
         return bankApiUser;
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+    public void removeUser(BankApiUser bankApiUser) {
         throw new UnsupportedOperationException();
     }
 
@@ -89,26 +85,28 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(apiClient(bankingUrl));
 
         try {
-            AccountList accountList = ais.getAccountList(UUID.randomUUID(),
-                    loadAccountInformationRequest.getConsentId(), false,
-                    null, null, null,
-                    null, PSU_IP_ADDRESS, null, null,
-                    null, null,
-                    null, null, null, null);
+            AccountList accountList = ais.getAccountList(
+                loadAccountInformationRequest.getBankAccess().getBankCode(),
+                UUID.randomUUID(),
+                loadAccountInformationRequest.getConsentId(), false,
+                null, null, null,
+                null, PSU_IP_ADDRESS, null, null,
+                null, null,
+                null, null, null, null);
 
             return LoadAccountInformationResponse.builder()
-                    .bankAccounts(accountList.getAccounts()
-                            .stream()
-                            .map(BankingGatewayMapping::toBankAccount)
-                            .collect(Collectors.toList()))
-                    .build();
+                .bankAccounts(accountList.getAccounts()
+                    .stream()
+                    .map(BankingGatewayMapping::toBankAccount)
+                    .collect(Collectors.toList()))
+                .build();
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }
     }
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         //noop
     }
 
@@ -117,83 +115,25 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(apiClient(bankingUrl));
         String resourceId = loadBookingsRequest.getBankAccount().getExternalIdMap().get(BankApi.XS2A);
         LocalDate dateFrom = loadBookingsRequest.getDateFrom() != null ? loadBookingsRequest.getDateFrom() :
-                LocalDate.now().minusYears(1);
+            LocalDate.now().minusYears(1);
         LocalDate dateTo = loadBookingsRequest.getDateTo();
         try {
             TransactionsResponse200Json transactionList = ais.getTransactionList(
-                    resourceId, "booked", UUID.randomUUID(),
-                    loadBookingsRequest.getConsentId(), dateFrom, dateTo, null, null,
-                    null, null, null, null, null,
-                    PSU_IP_ADDRESS, null, null, null,
-                    null, null, null, null,
-                    null);
+                loadBookingsRequest.getBankAccess().getBankCode(),
+                resourceId, "booked", UUID.randomUUID(),
+                loadBookingsRequest.getConsentId(), dateFrom, dateTo, null, null,
+                null, null, null, null, null,
+                PSU_IP_ADDRESS, null, null, null,
+                null, null, null, null,
+                null);
 
             return LoadBookingsResponse.builder()
-                    .bookings(BankingGatewayMapping.toBookings(transactionList))
-                    .build();
+                .bookings(BankingGatewayMapping.toBookings(transactionList))
+                .build();
 
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }
-    }
-
-    @Override
-    public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
-        List<BankAccount> bankAccounts = loadBalanceRequest.getBankAccounts();
-        if (bankAccounts.isEmpty()) {
-            return Collections.emptyList();
-        }
-        if (bankAccounts.size() > 1) {
-            logger.warn("Only first bank account will be processed");
-        }
-        //todo: load balances for list of accounts
-        BankAccount account = bankAccounts.get(0);
-        String accountId = account.getExternalIdMap().get(BankApi.XS2A);
-        UUID xRequestId = UUID.randomUUID();
-
-        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(apiClient(bankingUrl));
-
-        try {
-            ReadAccountBalanceResponse200 balances = ais.getBalances(accountId, xRequestId,
-                    loadBalanceRequest.getConsentId(), null,
-                    null, null,
-                    PSU_IP_ADDRESS, null, null,
-                    null, null,
-                    null, null,
-                    null, null, null);
-            return Collections.singletonList(convertToBankAccount(balances));
-        } catch (ApiException e) {
-            throw handeAisApiException(e);
-        }
-    }
-
-    private BankAccount convertToBankAccount(ReadAccountBalanceResponse200 balances) {
-        BankAccount bankAccount = BankingGatewayMapping.toBankAccount(balances.getAccount());
-        BalancesReport balancesReport = bankAccount.getBalances();
-
-        for (Balance balance : balances.getBalances()) {
-            BalanceType balanceType = balance.getBalanceType();
-            switch (balanceType) {
-                case CLOSINGBOOKED:
-                    balancesReport.setReadyBalance(toMultibankingBalance(balance));
-                    break;
-                case EXPECTED:
-                    balancesReport.setUnreadyBalance(toMultibankingBalance(balance));
-                    break;
-                default:
-                    logger.warn("Unexpected {} balance", balanceType);
-            }
-        }
-
-        return bankAccount;
-    }
-
-    private de.adorsys.multibanking.domain.Balance toMultibankingBalance(Balance balance) {
-        BigDecimal amount = new BigDecimal(balance.getBalanceAmount().getAmount());
-        String currency = balance.getBalanceAmount().getCurrency();
-        LocalDate referenceDate = balance.getReferenceDate();
-
-        return new de.adorsys.multibanking.domain.Balance(referenceDate, amount, currency);
     }
 
     @Override
@@ -206,7 +146,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
         UUID xRequestId = UUID.randomUUID();
@@ -220,18 +159,17 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         PaymentInitiationServicePisApi initiationService = new PaymentInitiationServicePisApi(apiClient);
 
         try {
-            Map<String, Object> response = (Map<String, Object>) initiationService.initiatePayment(
-                    paymentBody,
-                    xRequestId,
-                    null,
-                    null,
-                    paymentService.getType(),
-                    paymentProduct.getType(),
-                    PSU_IP_ADDRESS,
-                    null, null, null, psuId, null, null,
-                    null, null, null, null, null,
-                    null, null, null, null, null,
-                    null, null, null, null, null);
+            PaymentInitationRequestResponse201 response = initiationService.initiatePayment(
+                paymentBody,
+                paymentRequest.getBankAccess().getBankCode(),
+                xRequestId,
+                PSU_IP_ADDRESS,
+                paymentService.getType(),
+                paymentProduct.getType(),
+                null, null, null, psuId, null, null,
+                null, null, null, null, null,
+                null, null, null, null, null,
+                null, null, null, null, null, null, null, null);
 
             return getInitiatePaymentResponse(response);
 
@@ -240,17 +178,11 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         }
     }
 
-    @Override
-    public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
-        throw new UnsupportedOperationException();
-    }
-
-    @SuppressWarnings("unchecked")
-    private InitiatePaymentResponse getInitiatePaymentResponse(Map<String, Object> response) {
-        String transactionStatus = (String) response.get("transactionStatus");
-        String paymentId = (String) response.get("paymentId");
-        Map<String, Map<String, String>> links = (Map<String, Map<String, String>>) response.get("_links");
-        return new InitiatePaymentResponse(transactionStatus, paymentId, links.get("scaRedirect").get("href"));
+    private InitiatePaymentResponse getInitiatePaymentResponse(PaymentInitationRequestResponse201 response) {
+        String transactionStatus = response.getTransactionStatus().toString();
+        String paymentId = response.getPaymentId();
+        String redirect = response.getLinks().get("scaRedirect").getHref();
+        return new InitiatePaymentResponse(transactionStatus, paymentId, redirect);
     }
 
     @Override
@@ -264,7 +196,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public boolean accountInformationConsentRequired() {
+    public boolean psd2Scope() {
         return true;
     }
 
@@ -278,14 +210,10 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
         ConsentsResponse201 response;
         try {
-            response = ais.createConsent(UUID.randomUUID(),
-                    bankAccess.getIban(),
-                    createConsentRequest.getBankApiUser().getApiUserId(),
-                    consents,
-                    null,
-                    null, null, bankAccess.getBankLogin(), null,
-                    bankAccess.getBankLogin2(), null, "false", null, null, null, PSU_IP_ADDRESS, null, null, null, null,
-                    null, null, null, null, null);
+            response = ais.createConsent(
+                bankAccess.getIban(), UUID.randomUUID(), consents, null, null, null, bankAccess.getBankLogin(), null,
+                bankAccess.getBankLogin2(), null, "false", null, null, null, null, null, PSU_IP_ADDRESS, null, null,
+                null, null, null, null, null, null, null);
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }
@@ -296,20 +224,19 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         String consentId = response.getConsentId();
         ConsentInformationResponse200Json consentInformation;
         try {
-            consentInformation = ais.getConsentInformation(consentId, UUID.randomUUID(), null, null, null,
-                    PSU_IP_ADDRESS, null, null, null, null, null, null, null, null, null);
+            consentInformation = ais.getConsentInformation(bankAccess.getBankCode(), consentId, UUID.randomUUID(),
+                null, null, null,
+                PSU_IP_ADDRESS, null, null, null, null, null, null, null, null, null);
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }
 
-        @SuppressWarnings("unchecked")
-        Map<String, Map<String, String>> links = response.getLinks();
-
         return CreateConsentResponse.builder()
-                .consentId(consentId)
-                .validUntil(consentInformation.getValidUntil())
-                .authorisationUrl(links.get("scaRedirect").get("href"))
-                .build();
+            .consentStatus(ConsentStatus.valueOf(consentInformation.getConsentStatus().getValue()))
+            .consentId(consentId)
+            .validUntil(consentInformation.getValidUntil())
+            .scaRedirectUrl(response.getLinks().get("scaRedirect").getHref())
+            .build();
     }
 
     private ApiClient apiClient(String url) {
@@ -320,26 +247,26 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         OkHttpClient client = new OkHttpClient();
         client.setReadTimeout(600, TimeUnit.SECONDS);
         client.interceptors().add(
-                new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+            new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
         );
 
         ApiClient apiClient = new ApiClient() {
             @Override
             public String selectHeaderAccept(String[] accepts) {
                 return Optional.ofNullable(acceptHeader)
-                        .orElseGet(() -> super.selectHeaderAccept(accepts));
+                    .orElseGet(() -> super.selectHeaderAccept(accepts));
             }
 
             @Override
             public String selectHeaderContentType(String[] contentTypes) {
                 return Optional.ofNullable(contentTypeHeader)
-                        .orElseGet(() -> super.selectHeaderContentType(contentTypes));
+                    .orElseGet(() -> super.selectHeaderContentType(contentTypes));
             }
 
         };
 
         Optional.ofNullable(bgCertificate)
-                .ifPresent(cert -> apiClient.addDefaultHeader("tpp-qwac-certificate", cert));
+            .ifPresent(cert -> apiClient.addDefaultHeader("tpp-qwac-certificate", cert));
         apiClient.setHttpClient(client);
         apiClient.setBasePath(url);
         return apiClient;
@@ -366,7 +293,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private MultibankingException handleAis401Error(ApiException e) throws IOException {
         for (TppMessage401AIS tppMessage :
-                (objectMapper.readValue(e.getResponseBody(), Error401NGAIS.class)).getTppMessages()) {
+            (objectMapper.readValue(e.getResponseBody(), Error401NGAIS.class)).getTppMessages()) {
             if (tppMessage.getCode() == CONSENT_INVALID) {
                 return new MultibankingException(INVALID_CONSENT, tppMessage.getText());
             }
@@ -376,7 +303,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private MultibankingException handleAis400Error(ApiException e) throws IOException {
         for (TppMessage400AIS tppMessage :
-                (objectMapper.readValue(e.getResponseBody(), Error400NGAIS.class)).getTppMessages()) {
+            (objectMapper.readValue(e.getResponseBody(), Error400NGAIS.class)).getTppMessages()) {
             if (tppMessage.getCode() == CONSENT_UNKNOWN) {
                 return new MultibankingException(INVALID_CONSENT, tppMessage.getText());
             }
@@ -387,7 +314,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private MultibankingException handePisApiException(ApiException e) {
         try {
             Error400NGPIS errorMessages = objectMapper.readValue(e.getResponseBody(), Error400NGPIS.class);
-            System.out.println(errorMessages);
         } catch (IOException ex) {
             logger.warn("unable to deserialize ApiException", ex);
         }

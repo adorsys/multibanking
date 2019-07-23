@@ -7,8 +7,6 @@ import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
 
-import java.util.List;
-
 public interface OnlineBankingService {
 
     BankApi bankApi();
@@ -17,34 +15,28 @@ public interface OnlineBankingService {
 
     boolean userRegistrationRequired();
 
-    BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin);
+    BankApiUser registerUser(BankAccess bankAccess, String pin);
 
-    void removeUser(String bankingUrl, BankApiUser bankApiUser);
-
-    ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest);
+    void removeUser(BankApiUser bankApiUser);
 
     LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
                                                     LoadAccountInformationRequest loadAccountInformationRequest);
 
-    void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser);
+    void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
 
     LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest);
-
-    List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest);
 
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
 
-    InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest);
-
-    void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest);
-
     AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest);
 
     SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
 
-    boolean accountInformationConsentRequired();
+    boolean psd2Scope();
+
+    InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest);
 
     CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest createConsentRequest);
 

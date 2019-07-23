@@ -54,10 +54,6 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
-    }
-
-    @Override
     public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
@@ -68,7 +64,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean accountInformationConsentRequired() {
+    public boolean psd2Scope() {
         return false;
     }
 
@@ -85,18 +81,13 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
         //no registration needed
         return null;
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
-    }
-
-    @Override
-    public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
-        return null;
+    public void removeUser(BankApiUser bankApiUser) {
     }
 
     @Override
@@ -118,7 +109,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         // getRestTemplate(bankApiUser.getApiUserId()).delete
         // (mockConnectionUrl+"/bankaccesses/{bankcode}/accounts/{iban}",bankAccount.getBlz(),bankAccount.getIban());
     }
@@ -150,11 +141,6 @@ public class MockBanking implements OnlineBankingService {
                 .build();
     }
 
-    @Override
-    public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
-        return null;
-    }
-
     private List<StandingOrder> getStandingOders(BankAccess ba, String pin, String iban) {
         return getRestTemplate(ba.getBankLogin(), ba.getBankCode(), pin)
                 .exchange(mockConnectionUrl + "/bankaccesses/{bankcode}/accounts/{iban}/standingorders",
@@ -175,7 +161,7 @@ public class MockBanking implements OnlineBankingService {
         return account.getBalances();
     }
 
-    public RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {
+    private RestTemplate getRestTemplate(String bankLogin, String bankCode, String pin) {
         String basicToken =
                 new Base64().encodeAsString((bankLogin + "_" + bankCode + ":" + pin).getBytes(Charset.forName("UTF-8")));
         RestTemplate restTemplate = new RestTemplate();

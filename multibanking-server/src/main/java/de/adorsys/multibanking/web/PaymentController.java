@@ -7,6 +7,7 @@ import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.SinglePaymentRepositoryIf;
 import de.adorsys.multibanking.service.PaymentService;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
@@ -24,6 +25,7 @@ import java.security.Principal;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Api(tags = "Multibanking payment")
 @RequiredArgsConstructor
 @UserResource
 @RestController

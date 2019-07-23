@@ -16,22 +16,21 @@
 
 package de.adorsys.multibanking.bg.pis.sepa;
 
-import de.adorsys.multibanking.bg.model.BulkPaymentInitiationSctJson;
-import de.adorsys.multibanking.bg.model.PaymentInitiationSctBulkElementJson;
+import de.adorsys.multibanking.bg.model.BulkPaymentInitiationJson;
+import de.adorsys.multibanking.bg.model.PaymentInitiationBulkElementJson;
 import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.BulkPayment;
 import de.adorsys.multibanking.domain.SinglePayment;
 
-
-public class SepaBulkPaymentInitiationBodyBuilder extends AbstractPaymentInitiationBodyBuilder<BulkPaymentInitiationSctJson> {
+public class SepaBulkPaymentInitiationBodyBuilder extends AbstractPaymentInitiationBodyBuilder<BulkPaymentInitiationJson> {
     @Override
-    public BulkPaymentInitiationSctJson buildBody(AbstractScaTransaction transaction) {
+    public BulkPaymentInitiationJson buildBody(AbstractScaTransaction transaction) {
         BulkPayment bulkPayment = (BulkPayment) transaction;
-        BulkPaymentInitiationSctJson bulk = new BulkPaymentInitiationSctJson();
+        BulkPaymentInitiationJson bulk = new BulkPaymentInitiationJson();
         bulk.setDebtorAccount(buildDebtorAccountReference(transaction));
 
         for (SinglePayment payment : bulkPayment.getPayments()) {
-            PaymentInitiationSctBulkElementJson bulkElementJson = new PaymentInitiationSctBulkElementJson();
+            PaymentInitiationBulkElementJson bulkElementJson = new PaymentInitiationBulkElementJson();
             bulkElementJson.setCreditorAccount(buildCreditorAccountReference(payment));
             bulkElementJson.setInstructedAmount(buildAmount(payment));
             bulkElementJson.setCreditorName(payment.getReceiver());

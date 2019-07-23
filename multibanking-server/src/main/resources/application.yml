@@ -80,13 +80,16 @@ spring:
     - mongo
     - sts-enable
     - mongo-persistence
+    - sca-persistence-mongodb
     - smartanalytics-embedded
+    - bankinggateway-b2c-embedded
   autoconfigure.exclude:
     - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
     - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 db_secret: 1234567890123456
 mongo.properties.url: classpath:/mongo.properties
+consent.auth.url: http://localhost:8086/v1/consents/{consentId}/authorisations/{authorisationId}
 
 swagger.login.url: http://localhost:8080/auth/realms/multibanking/protocol/openid-connect/auth
 
