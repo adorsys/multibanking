@@ -132,7 +132,7 @@ public class FigoBanking implements OnlineBankingService {
         }
 
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
-        String email = bankAccess.getBankLogin() + RandomStringUtils.randomAlphanumeric(10) + "@admb.de";
+        String email = bankAccess.getBankLogin() + RandomStringUtils.randomAlphanumeric(10) + MAIL_SUFFIX;
 
         try {
             figoConnection.addUser(bankAccess.getBankLogin(), email, password, "de");
