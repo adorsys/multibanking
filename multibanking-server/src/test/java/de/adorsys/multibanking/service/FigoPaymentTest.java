@@ -47,7 +47,6 @@ public class FigoPaymentTest {
         // System.setProperty("FIGO_SECRET", "<use secret>");
         System.setProperty("FIGO_TECH_USER", "figo-user");
         System.setProperty("FIGO_TECH_USER_CREDENTIAL", "test123");
-s
     }
 
     @Before
