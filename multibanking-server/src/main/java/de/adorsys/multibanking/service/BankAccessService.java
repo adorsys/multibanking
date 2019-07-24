@@ -9,6 +9,7 @@ import de.adorsys.multibanking.exception.ConsentAuthorisationRequiredException;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.*;
+import de.adorsys.multibanking.service.bankinggateway.BankingGatewayAuthorisationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -32,6 +34,7 @@ public class BankAccessService {
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BookingRepositoryIf bookingRepository;
     private final BankAccountService bankAccountService;
+    private final BankingGatewayAuthorisationService authorisationService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
     public BankAccessEntity createBankAccess(String userId, BankAccessEntity bankAccess) {
@@ -113,6 +116,9 @@ public class BankAccessService {
 
         return bankAccessRepository.findByUserIdAndId(userId, accessId).map(bankAccessEntity -> {
             bankAccessRepository.deleteByUserIdAndBankAccessId(userId, accessId);
+
+            Optional.ofNullable(bankAccessEntity.getPsd2ConsentId())
+                .ifPresent(authorisationService::revokeConsent);
 
             List<BankAccountEntity> bankAccounts = bankAccountRepository.deleteByBankAccess(accessId);
             bankAccounts.forEach(bankAccountEntity -> {

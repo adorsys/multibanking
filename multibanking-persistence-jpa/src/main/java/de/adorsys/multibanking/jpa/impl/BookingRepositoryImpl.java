@@ -32,8 +32,8 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
     public Page<BookingEntity> findPageableByUserIdAndAccountIdAndBankApi(Pageable pageable, String userId,
                                                                           String bankAccountId, BankApi bankApi) {
         Page<BookingJpaEntity> bookingsPage =
-                bookingPageableRepositoryMongodb.findByUserIdAndAccountIdAndBankApi(pageable, userId, bankAccountId,
-                        bankApi);
+            bookingPageableRepositoryMongodb.findByUserIdAndAccountIdAndBankApi(pageable, userId, bankAccountId,
+                bankApi);
 
         return bookingsPage.map(entityMapper::mapToBookingEntity);
     }
@@ -42,14 +42,14 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
     public List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId,
                                                                   BankApi bankApi) {
         return entityMapper.mapToBookingEntities(bookingRepository.findByUserIdAndAccountIdAndBankApi(userId,
-                bankAccountId, bankApi,
-                new Sort(Sort.Direction.DESC, "valutaDate")));
+            bankAccountId, bankApi,
+            new Sort(Sort.Direction.DESC, "valutaDate")));
     }
 
     @Override
     public Optional<BookingEntity> findByUserIdAndId(String userId, String bookingId) {
         return bookingRepository.findByUserIdAndId(userId, bookingId)
-                .map(entityMapper::mapToBookingEntity);
+            .map(entityMapper::mapToBookingEntity);
     }
 
     @Override
@@ -60,8 +60,8 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
     @Override
     public void save(List<BookingEntity> bookingEntities) {
         bookingEntities.stream()
-                .filter(bookingEntity -> bookingEntity.getId() == null)
-                .forEach(bookingEntity -> bookingEntity.setId(UUID.randomUUID().toString()));
+            .filter(bookingEntity -> bookingEntity.getId() == null)
+            .forEach(bookingEntity -> bookingEntity.setId(UUID.randomUUID().toString()));
 
         bookingRepository.saveAll(entityMapper.mapToBookingJpaEntities(bookingEntities));
     }
@@ -71,8 +71,4 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
         bookingRepository.deleteByAccountId(id);
     }
 
-    @Override
-    public void deleteByUserIdAndAccountId(String userId, String accountId) {
-        bookingRepository.deleteByUserIdAndAccountId(userId, accountId);
-    }
 }

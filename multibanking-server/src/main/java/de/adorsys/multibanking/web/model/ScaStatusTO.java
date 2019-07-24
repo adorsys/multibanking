@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2018 adorsys GmbH & Co KG
+ * Copyright 2018-2019 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.bg.pis;
+package de.adorsys.multibanking.web.model;
 
-public interface PaymentInitiationBuilderStrategy {
+public enum ScaStatusTO {
 
-    PaymentInitiationBodyBuilder resolve(PaymentProductType product, PaymentServiceType service);
+    RECEIVED,
+    REJECTED,
+    VALID,
+    REVOKED_BY_PSU,
+    EXPIRED,
+    TERMINATED_BY_TPP,
+    TERMINATED_BY_ASPSP,
+    PARTIALLY_AUTHORISED;
 }

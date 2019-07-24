@@ -13,8 +13,6 @@ import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpEntity;
@@ -26,12 +24,10 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
-import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
 
 @Api(tags = "Multibanking bankaccess")
 @RequiredArgsConstructor
@@ -46,8 +42,6 @@ public class BankAccessController {
     private final UserRepositoryIf userRepository;
     private final BankAccessService bankAccessService;
     private final Principal principal;
-    @Value("${consent.auth.url}")
-    private String consentAuthUrl;
 
     @ApiOperation(
         value = "Read bank accesses",
@@ -135,18 +129,9 @@ public class BankAccessController {
     }
 
     private Resource<BankAccessTO> mapToResource(BankAccessEntity accessEntity) {
-        Resource<BankAccessTO> resource = new Resource<>(bankAccessMapper.toBankAccessTO(accessEntity),
+        return new Resource<>(bankAccessMapper.toBankAccessTO(accessEntity),
             linkTo(methodOn(BankAccessController.class).getBankAccess(accessEntity.getId())).withSelfRel(),
             linkTo(methodOn(BankAccountController.class).getBankAccounts(accessEntity.getId())).withRel("accounts"));
-
-        Optional.ofNullable(accessEntity.getPsd2ConsentId())
-            .map(consentId -> fromHttpUrl(consentAuthUrl)
-                .buildAndExpand(consentId, accessEntity.getPsd2ConsentAuthorisationId())
-                .toUriString())
-            .map(authUrl -> new Link(authUrl, "authorisation"))
-            .ifPresent(resource::add);
-
-        return resource;
     }
 
 }

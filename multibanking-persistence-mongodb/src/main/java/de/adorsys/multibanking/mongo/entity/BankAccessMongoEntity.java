@@ -13,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @EqualsAndHashCode(callSuper = false)
 @Document
 @JsonIgnoreProperties(value = {"pin", "pin2", "hbciPassportState"}, allowSetters = true)
-@Encrypted(exclude = {"_id", "userId", "bankCode"})
+@Encrypted(exclude = {"_id", "userId", "bankCode", "psd2ConsentId"})
 public class BankAccessMongoEntity extends BankAccess {
 
     @Id

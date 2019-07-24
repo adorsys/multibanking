@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring", implementationName = "MultibankingConsentMapperImpl")
 public interface ConsentMapper {
 
-    @Mapping(target = "authorisationUrl", source = "authorisationUrl")
-    ConsentTO toConsentTO(Consent consent, String authorisationUrl);
+    @Mapping(target = "psuAccountIban", ignore = true)
+    ConsentTO toConsentTO(Consent consent);
 
 }

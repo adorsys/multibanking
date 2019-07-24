@@ -23,6 +23,9 @@ public class BankAccessTO {
     @ApiModelProperty(value = "Bank access second password")
     private String pin2;
 
+    @ApiModelProperty(value = "PSD2 consent id")
+    private String psd2ConsentId;
+
     @ApiModelProperty(value = "Store pin")
     private boolean storePin;
     @ApiModelProperty(value = "Store bookings")

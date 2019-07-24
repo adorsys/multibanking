@@ -23,5 +23,4 @@ public interface BookingRepositoryJpa extends JpaRepository<BookingJpaEntity, St
 
     void deleteByAccountId(String id);
 
-    void deleteByUserIdAndAccountId(String userId, String accountId);
 }

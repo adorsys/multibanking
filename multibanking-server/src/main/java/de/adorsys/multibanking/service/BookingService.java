@@ -8,7 +8,7 @@ import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.utils.Utils;
-import de.adorsys.multibanking.exception.ConsentAuthorisationRequiredException;
+import de.adorsys.multibanking.exception.ConsentRequiredException;
 import de.adorsys.multibanking.exception.InvalidPinException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
@@ -49,7 +49,6 @@ public class BookingService {
     private final SmartAnalyticsIf smartAnalyticsService;
     private final AnalyticsService analyticsService;
     private final AnonymizationService anonymizationService;
-    private final BankAccountService bankAccountService;
     private final BankingGatewayAuthorisationService authorisationService;
     private final BankService bankService;
     private final UserService userService;
@@ -138,11 +137,6 @@ public class BookingService {
             bankAccountRepository.save(bankAccount);
 
             return result;
-        } catch (ConsentAuthorisationRequiredException e) {
-            bankAccount.setPsd2ConsentId(e.getConsent().getConsentId());
-            bankAccount.setPsd2ConsentAuthorisationId(e.getConsent().getConsentAuthorisationId());
-            bankAccountRepository.save(bankAccount);
-            throw e;
         } catch (Exception e) {
             LoggerFactory.getLogger(getClass()).error("sync bookings failed", e);
             throw e;
@@ -292,12 +286,11 @@ public class BookingService {
             bankApi, bankApiUser);
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
-        bankAccountService.checkDedicatedConsent(bankAccess, bankAccount, bankApiUser, onlineBankingService,
-            bankEntity);
+        authorisationService.checkForValidConsent(bankAccess, onlineBankingService);
 
         try {
             LoadBookingsRequest loadBookingsRequest = LoadBookingsRequest.builder()
-                .consentId(bankAccount.getPsd2ConsentId())
+                .consentId(bankAccess.getPsd2ConsentId())
                 .bankApiUser(bankApiUser)
                 .bankAccess(bankAccess)
                 .bankCode(bankEntity.getBlzHbci())
@@ -311,23 +304,20 @@ public class BookingService {
             loadBookingsRequest.setProduct(finTSProductConfig.getProduct());
             return onlineBankingService.loadBookings(bankEntity.getBankingUrl(), loadBookingsRequest);
         } catch (MultibankingException e) {
-            return handleMultibankingException(bankAccess, bankAccount, bankApiUser, onlineBankingService, bankEntity
-                , e);
+            return handleMultibankingException(bankAccess, e);
         }
     }
 
-    private LoadBookingsResponse handleMultibankingException(BankAccessEntity bankAccess,
-                                                             BankAccountEntity bankAccount, BankApiUser bankApiUser,
-                                                             OnlineBankingService onlineBankingService,
-                                                             BankEntity bankEntity, MultibankingException e) {
+    private LoadBookingsResponse handleMultibankingException(BankAccessEntity bankAccess, MultibankingException e) {
         if (e.getMultibankingError() == INVALID_PIN) {
             bankAccess.setPin(null);
             bankAccessRepository.save(bankAccess);
             throw new InvalidPinException(bankAccess.getId());
         } else if (e.getMultibankingError() == INVALID_CONSENT) {
-            Consent dedicatedConsent = authorisationService.createDedicatedConsent(onlineBankingService,
-                bankApiUser, bankAccess, bankAccount, bankEntity);
-            throw new ConsentAuthorisationRequiredException(dedicatedConsent);
+            bankAccess.setPsd2ConsentId(null);
+            bankAccess.setPsd2ConsentAuthorisationId(null);
+            bankAccessRepository.save(bankAccess);
+            throw new ConsentRequiredException();
         }
         throw e;
     }

@@ -13,6 +13,8 @@ public interface BankAccessRepositoryIf {
 
     List<BankAccessEntity> findByUserId(String userId);
 
+    List<BankAccessEntity> findByUserIdAndPsd2ConsentIdNotNull(String userId);
+
     void save(BankAccessEntity bankAccess);
 
     String getBankCode(String id);

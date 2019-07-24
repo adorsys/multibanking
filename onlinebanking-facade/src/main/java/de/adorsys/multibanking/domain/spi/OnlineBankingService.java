@@ -36,8 +36,4 @@ public interface OnlineBankingService {
 
     boolean psd2Scope();
 
-    InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest);
-
-    CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest createConsentRequest);
-
 }

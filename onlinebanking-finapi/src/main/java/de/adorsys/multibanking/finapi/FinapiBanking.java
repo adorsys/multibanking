@@ -270,11 +270,6 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
-        return null;
-    }
-
-    @Override
     public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
         return null;
     }
@@ -287,13 +282,6 @@ public class FinapiBanking implements OnlineBankingService {
     @Override
     public boolean psd2Scope() {
         return false;
-    }
-
-    @Override
-    public CreateConsentResponse createAccountInformationConsent(String bankingUrl,
-                                                                 CreateConsentRequest createConsentRequest) {
-
-        return null;
     }
 
     private ApiClient createApiClient() {

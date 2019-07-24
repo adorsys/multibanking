@@ -4,53 +4,40 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.bg.api.AccountInformationServiceAisApi;
-import de.adorsys.multibanking.bg.api.PaymentInitiationServicePisApi;
 import de.adorsys.multibanking.bg.model.*;
-import de.adorsys.multibanking.bg.pis.PaymentInitiationBuilderStrategy;
-import de.adorsys.multibanking.bg.pis.PaymentInitiationBuilderStrategyImpl;
-import de.adorsys.multibanking.bg.pis.PaymentProductType;
-import de.adorsys.multibanking.bg.pis.PaymentServiceType;
-import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.ConsentStatus;
+import de.adorsys.multibanking.domain.BankAccess;
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.*;
-import de.adorsys.multibanking.domain.response.*;
+import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
+import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
+import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
+import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static de.adorsys.multibanking.bg.BankingGatewayMapping.toConsents;
 import static de.adorsys.multibanking.bg.model.MessageCode400AIS.CONSENT_UNKNOWN;
 import static de.adorsys.multibanking.bg.model.MessageCode401AIS.CONSENT_INVALID;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
 
+@Slf4j
 public class BankingGatewayAdapter implements OnlineBankingService {
 
     private static final String PSU_IP_ADDRESS = "127.0.0.1";
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private String bgCertificate;
-    private PaymentInitiationBuilderStrategy initiationBuilderStrategy = new PaymentInitiationBuilderStrategyImpl();
     private ObjectMapper objectMapper = new ObjectMapper();
-
-    public BankingGatewayAdapter() {
-        bgCertificate = Optional.ofNullable(System.getenv("bg-cert"))
-            .map(this::readBankingGatewayCertficate)
-            .orElseGet(() -> {
-                logger.warn("Missing env property bg-cert");
-                return null;
-            });
-    }
 
     @Override
     public BankApi bankApi() {
@@ -147,45 +134,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
-        UUID xRequestId = UUID.randomUUID();
-        AbstractScaTransaction payment = paymentRequest.getTransaction();
-        PaymentProductType paymentProduct = PaymentProductType.resolve(payment.getProduct());
-        PaymentServiceType paymentService = PaymentServiceType.resolve(payment);
-        String contentType = "application/" + (paymentProduct.isRaw() ? "xml" : "json");
-        String psuId = paymentRequest.getBankAccess().getBankLogin();
-        Object paymentBody = initiationBuilderStrategy.resolve(paymentProduct, paymentService).buildBody(payment);
-        ApiClient apiClient = apiClient(bankingUrl, null, contentType);
-        PaymentInitiationServicePisApi initiationService = new PaymentInitiationServicePisApi(apiClient);
-
-        try {
-            PaymentInitationRequestResponse201 response = initiationService.initiatePayment(
-                paymentBody,
-                paymentRequest.getBankAccess().getBankCode(),
-                xRequestId,
-                PSU_IP_ADDRESS,
-                paymentService.getType(),
-                paymentProduct.getType(),
-                null, null, null, psuId, null, null,
-                null, null, null, null, null,
-                null, null, null, null, null,
-                null, null, null, null, null, null, null, null);
-
-            return getInitiatePaymentResponse(response);
-
-        } catch (ApiException e) {
-            throw handePisApiException(e);
-        }
-    }
-
-    private InitiatePaymentResponse getInitiatePaymentResponse(PaymentInitationRequestResponse201 response) {
-        String transactionStatus = response.getTransactionStatus().toString();
-        String paymentId = response.getPaymentId();
-        String redirect = response.getLinks().get("scaRedirect").getHref();
-        return new InitiatePaymentResponse(transactionStatus, paymentId, redirect);
-    }
-
-    @Override
     public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest request) {
         throw new UnsupportedOperationException();
     }
@@ -198,45 +146,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     @Override
     public boolean psd2Scope() {
         return true;
-    }
-
-    @Override
-    public CreateConsentResponse createAccountInformationConsent(String bankingUrl,
-                                                                 CreateConsentRequest createConsentRequest) {
-        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(apiClient(bankingUrl));
-
-        Consents consents = toConsents(createConsentRequest);
-        BankAccess bankAccess = createConsentRequest.getBankAccess();
-
-        ConsentsResponse201 response;
-        try {
-            response = ais.createConsent(
-                bankAccess.getIban(), UUID.randomUUID(), consents, null, null, null, bankAccess.getBankLogin(), null,
-                bankAccess.getBankLogin2(), null, "false", null, null, null, null, null, PSU_IP_ADDRESS, null, null,
-                null, null, null, null, null, null, null);
-        } catch (ApiException e) {
-            throw handeAisApiException(e);
-        }
-
-        // The consent object to be retrieved by the GET Consent Request will contain the adjusted date
-        // NextGenPSD2 Access to Account Interoperability Framework - Implementation Guidelines V1.3_20181019.pdf
-        // 6.4.1.1
-        String consentId = response.getConsentId();
-        ConsentInformationResponse200Json consentInformation;
-        try {
-            consentInformation = ais.getConsentInformation(bankAccess.getBankCode(), consentId, UUID.randomUUID(),
-                null, null, null,
-                PSU_IP_ADDRESS, null, null, null, null, null, null, null, null, null);
-        } catch (ApiException e) {
-            throw handeAisApiException(e);
-        }
-
-        return CreateConsentResponse.builder()
-            .consentStatus(ConsentStatus.valueOf(consentInformation.getConsentStatus().getValue()))
-            .consentId(consentId)
-            .validUntil(consentInformation.getValidUntil())
-            .scaRedirectUrl(response.getLinks().get("scaRedirect").getHref())
-            .build();
     }
 
     private ApiClient apiClient(String url) {
@@ -265,8 +174,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
         };
 
-        Optional.ofNullable(bgCertificate)
-            .ifPresent(cert -> apiClient.addDefaultHeader("tpp-qwac-certificate", cert));
         apiClient.setHttpClient(client);
         apiClient.setBasePath(url);
         return apiClient;
@@ -285,7 +192,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     throw new MultibankingException(e);
             }
         } catch (IOException ex) {
-            logger.warn("unable to deserialize ApiException", ex);
+            log.warn("unable to deserialize ApiException", ex);
         }
 
         throw new MultibankingException(e);
@@ -309,26 +216,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             }
         }
         return new MultibankingException(e);
-    }
-
-    private MultibankingException handePisApiException(ApiException e) {
-        try {
-            Error400NGPIS errorMessages = objectMapper.readValue(e.getResponseBody(), Error400NGPIS.class);
-        } catch (IOException ex) {
-            logger.warn("unable to deserialize ApiException", ex);
-        }
-
-        throw new MultibankingException(e);
-    }
-
-    private String readBankingGatewayCertficate(String path) {
-        try {
-            byte[] encoded = Files.readAllBytes(Paths.get(path));
-            return new String(encoded, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new IllegalStateException("Error loading bg certificate", e);
-        }
-
     }
 }
 

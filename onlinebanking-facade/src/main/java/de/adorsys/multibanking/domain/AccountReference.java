@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2018 adorsys GmbH & Co KG
+ * Copyright 2018-2019 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.bg.pis;
+package de.adorsys.multibanking.domain;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
+import lombok.Data;
 
-public interface PaymentInitiationBodyBuilder<T> {
+@Data
+public class AccountReference {
 
-    T buildBody(AbstractScaTransaction transaction);
+    private String iban;
 }
