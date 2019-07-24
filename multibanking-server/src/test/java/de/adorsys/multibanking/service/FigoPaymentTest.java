@@ -43,11 +43,11 @@ public class FigoPaymentTest {
     public static void beforeClass() {
         TestConstants.setup();
 
-        System.setProperty("FIGO_CLIENT_ID", "CdunSr9hi4Q6rL65u-l-coQngofLdNbyjACwFoDOd_OU");
-        System.setProperty("FIGO_SECRET", "Sx9FNf1Uze0NZTgXq40ljDeWIpauTJaiZPkhDrc6Vavs");
+        // System.setProperty("FIGO_CLIENT_ID", "<use key>");
+        // System.setProperty("FIGO_SECRET", "<use secret>");
         System.setProperty("FIGO_TECH_USER", "figo-user");
         System.setProperty("FIGO_TECH_USER_CREDENTIAL", "test123");
-
+s
     }
 
     @Before
