@@ -132,7 +132,8 @@ public class FigoBanking implements OnlineBankingService {
         }
 
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
-        String email = bankAccess.getBankLogin() + RandomStringUtils.randomAlphanumeric(10) + MAIL_SUFFIX;
+        String apiUserId = bankAccess.getBankLogin() + RandomStringUtils.randomAlphanumeric(10);
+        String email = apiUserId + MAIL_SUFFIX;
 
         try {
             figoConnection.addUser(bankAccess.getBankLogin(), email, password, "de");
@@ -141,7 +142,7 @@ public class FigoBanking implements OnlineBankingService {
         }
 
         BankApiUser bankApiUser = new BankApiUser();
-        bankApiUser.setApiUserId(bankAccess.getBankLogin());
+        bankApiUser.setApiUserId(apiUserId);
         bankApiUser.setApiPassword(password);
         bankApiUser.setBankApi(bankApi());
 
