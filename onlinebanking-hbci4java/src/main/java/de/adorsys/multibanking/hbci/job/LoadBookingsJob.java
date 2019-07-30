@@ -144,7 +144,7 @@ public class LoadBookingsJob {
                 .orElse(null);
 
         ArrayList<Booking> bookingList = null;
-        String raw = null;
+        List<String> raw = null;
         GVRKUms bookingsResult = (GVRKUms) bookingsJob.getJobResult();
         if (request.getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
