@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ import java.util.UUID;
 @Api(tags = "Multibanking direct access")
 @UserResource
 @RestController
+@Slf4j
 @RequiredArgsConstructor
 @RequestMapping(path = "api/v1/direct")
 public class DirectAccessController {
@@ -67,6 +69,8 @@ public class DirectAccessController {
     @PutMapping("/accounts")
     public ResponseEntity<LoadBankAccountsResponse> loadBankAccounts(@Valid @RequestBody BankAccessTO bankAccess,
                                                                      @RequestParam(required = false) BankApiTO bankApi) {
+        log.debug("process start > load bank account list");
+        log.debug("save temporary user to db");
         //temporary user, will be deleted after x minutes
         UserEntity userEntity = new UserEntity();
         userEntity.setId(UUID.randomUUID().toString());
@@ -80,9 +84,11 @@ public class DirectAccessController {
 
         LoadBankAccountsResponse response = new LoadBankAccountsResponse();
 
+        log.debug("load bank account list from bank");
         List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
             bankApiMapper.toBankApi(bankApi));
 
+        log.debug("save bank account list to db");
         bankAccessEntity.setPin(null);
         bankAccessEntity.setTemporary(true);
         bankAccessEntity.setUserId(userEntity.getId());
@@ -93,6 +99,7 @@ public class DirectAccessController {
             bankAccountRepository.save(account);
         });
 
+        log.debug("process finished < return bank account list");
         response.setBankAccounts(bankAccountMapper.toBankAccountTOs(bankAccounts));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -103,21 +110,26 @@ public class DirectAccessController {
     @PutMapping("/bookings")
     public ResponseEntity<LoadBookingsResponse> loadBookings(@RequestBody LoadBookingsRequest loadBookingsRequest,
                                                              @RequestParam(required = false) BankApiTO bankApi) {
+        log.debug("process start > load booking list");
+        log.debug("load bank access");
         BankAccessEntity bankAccessEntity = bankAccessRepository.findOne(loadBookingsRequest.getAccessId())
             .orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class,
                 loadBookingsRequest.getAccessId()));
 
+        log.debug("load bank account");
         BankAccountEntity bankAccountEntity = bankAccountRepository.findOne(loadBookingsRequest.getAccountId())
             .orElseThrow(() -> new ResourceNotFoundException(BankAccountEntity.class,
                 loadBookingsRequest.getAccountId()));
 
         LoadBookingsResponse loadBookingsResponse = new LoadBookingsResponse();
 
+        log.debug("load booking list from bank");
         List<BookingEntity> bookings = bookingService.syncBookings(bankAccessEntity, bankAccountEntity,
             bankApiMapper.toBankApi(bankApi), loadBookingsRequest.getPin());
         loadBookingsResponse.setBookings(bookingMapper.toBookingTOs(bookings));
         loadBookingsResponse.setBalances(balancesMapper.toBalancesReportTO(bankAccountEntity.getBalances()));
 
+        log.debug("process finished < return booking list");
         return new ResponseEntity<>(loadBookingsResponse, HttpStatus.OK);
     }
 

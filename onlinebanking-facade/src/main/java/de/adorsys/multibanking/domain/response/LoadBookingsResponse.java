@@ -30,7 +30,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class LoadBookingsResponse extends AbstractResponse {
 
-    private String rawData;
+    //possible multiple CAMT files
+    private List<String> rawData;
     private List<Booking> bookings;
     private List<StandingOrder> standingOrders;
     private BalancesReport bankAccountBalance;

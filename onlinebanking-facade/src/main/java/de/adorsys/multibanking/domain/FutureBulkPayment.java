@@ -21,6 +21,9 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 
+import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT;
+import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT_DELETE;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class FutureBulkPayment extends BulkPayment {
@@ -35,10 +38,7 @@ public class FutureBulkPayment extends BulkPayment {
 
     @Override
     public TransactionType getTransactionType() {
-        if (delete) {
-            return TransactionType.FUTURE_BULK_PAYMENT_DELETE;
-        }
-        return TransactionType.FUTURE_BULK_PAYMENT;
+        return delete ? FUTURE_BULK_PAYMENT_DELETE : FUTURE_BULK_PAYMENT;
     }
 
 }

@@ -22,6 +22,9 @@ import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.STANDING_ORDER;
+import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.STANDING_ORDER_DELETE;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class StandingOrder extends AbstractScaTransaction {
@@ -43,7 +46,7 @@ public class StandingOrder extends AbstractScaTransaction {
 
     @Override
     public TransactionType getTransactionType() {
-        return TransactionType.STANDING_ORDER;
+        return delete ? STANDING_ORDER_DELETE : STANDING_ORDER;
     }
 
     @Override
