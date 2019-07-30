@@ -21,6 +21,9 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 
+import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT;
+import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT_DELETE;
+
 /**
  * Created by alexg on 19.10.17.
  */
@@ -38,10 +41,7 @@ public class FutureSinglePayment extends SinglePayment {
 
     @Override
     public TransactionType getTransactionType() {
-        if (delete) {
-            return TransactionType.FUTURE_SINGLE_PAYMENT_DELETE;
-        }
-        return TransactionType.FUTURE_SINGLE_PAYMENT;
+        return delete ? FUTURE_SINGLE_PAYMENT_DELETE : FUTURE_SINGLE_PAYMENT;
     }
 
 }
