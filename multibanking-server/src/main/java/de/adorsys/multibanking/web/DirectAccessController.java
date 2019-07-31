@@ -53,7 +53,7 @@ public class DirectAccessController {
     @ApiOperation(value = "Create consent")
     @ApiResponses({
         @ApiResponse(code = 200, message = "Response", response = ConsentTO.class)})
-    @PutMapping("/consents")
+    @PostMapping("/consents")
     public ResponseEntity<ConsentTO> createConsent(@Valid @RequestBody ConsentTO consent,
                                                    @RequestParam(required = false) BankApiTO bankApi) {
 
@@ -64,8 +64,7 @@ public class DirectAccessController {
 
     @ApiOperation(value = "Read bank accounts")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Response", response = LoadBankAccountsResponse.class),
-        @ApiResponse(code = 202, message = "Consent authorisation required", response = Consent.class)})
+        @ApiResponse(code = 200, message = "Response", response = LoadBankAccountsResponse.class)})
     @PutMapping("/accounts")
     public ResponseEntity<LoadBankAccountsResponse> loadBankAccounts(@Valid @RequestBody BankAccessTO bankAccess,
                                                                      @RequestParam(required = false) BankApiTO bankApi) {
@@ -81,8 +80,6 @@ public class DirectAccessController {
 
         bankAccessEntity.setStorePin(false);
         bankAccessEntity.setUserId(userEntity.getId());
-
-        LoadBankAccountsResponse response = new LoadBankAccountsResponse();
 
         log.debug("load bank account list from bank");
         List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
@@ -100,15 +97,16 @@ public class DirectAccessController {
         });
 
         log.debug("process finished < return bank account list");
+        LoadBankAccountsResponse response = new LoadBankAccountsResponse();
         response.setBankAccounts(bankAccountMapper.toBankAccountTOs(bankAccounts));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @ApiResponses({
-        @ApiResponse(code = 202, message = "Consent authorisation required", response = Consent.class)})
+        @ApiResponse(code = 202, message = "Consent authorisation required", response = LoadBookingsResponse.class)})
     @ApiOperation(value = "Read account bookings")
     @PutMapping("/bookings")
-    public ResponseEntity<LoadBookingsResponse> loadBookings(@RequestBody LoadBookingsRequest loadBookingsRequest,
+    public ResponseEntity<LoadBookingsResponse> loadBookings(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
                                                              @RequestParam(required = false) BankApiTO bankApi) {
         log.debug("process start > load booking list");
         log.debug("load bank access");

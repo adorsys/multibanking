@@ -107,8 +107,6 @@ public interface JpaEntityMapper {
     @Mapping(target = "debtorBankAccount.id", ignore = true)
     @Mapping(target = "debtorBankAccount.bankAccessId", ignore = true)
     @Mapping(target = "debtorBankAccount.userId", ignore = true)
-    @Mapping(target = "debtorBankAccount.psd2ConsentId", ignore = true)
-    @Mapping(target = "debtorBankAccount.psd2ConsentAuthorisationId", ignore = true)
     RawSepaTransactionJpaEntity mapToRawSepaTransactionJpaEntity(RawSepaTransactionEntity paymentEntity);
 
     @Mapping(target = "debtorBankAccount.balances", ignore = true)
@@ -118,15 +116,11 @@ public interface JpaEntityMapper {
     @Mapping(target = "debtorBankAccount.id", ignore = true)
     @Mapping(target = "debtorBankAccount.bankAccessId", ignore = true)
     @Mapping(target = "debtorBankAccount.userId", ignore = true)
-    @Mapping(target = "debtorBankAccount.psd2ConsentId", ignore = true)
-    @Mapping(target = "debtorBankAccount.psd2ConsentAuthorisationId", ignore = true)
     SinglePaymentJpaEntity mapToPaymentJpaEntity(SinglePaymentEntity paymentJpaEntity);
 
     @Mapping(target = "debtorBankAccount.id", ignore = true)
     @Mapping(target = "debtorBankAccount.bankAccessId", ignore = true)
     @Mapping(target = "debtorBankAccount.userId", ignore = true)
-    @Mapping(target = "debtorBankAccount.psd2ConsentId", ignore = true)
-    @Mapping(target = "debtorBankAccount.psd2ConsentAuthorisationId", ignore = true)
     StandingOrderJpaEntity mapToStandingOrderJpaEntity(StandingOrderEntity paymentJpaEntity);
 
     @Mapping(target = "debtorBankAccount.balances", ignore = true)

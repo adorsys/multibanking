@@ -59,7 +59,7 @@ public class HbciSinglePaymentTest {
         when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(hbci4JavaBanking);
 
         bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {
-            BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"));
+            BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"), BankApi.HBCI);
             bankRepository.save(bankEntity);
             return bankEntity;
         });

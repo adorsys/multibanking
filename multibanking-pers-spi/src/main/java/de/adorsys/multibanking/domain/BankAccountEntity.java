@@ -12,7 +12,5 @@ public class BankAccountEntity extends BankAccount {
     private String id;
     private String bankAccessId;
     private String userId;
-    private String psd2ConsentId;
-    private String psd2ConsentAuthorisationId;
 
 }

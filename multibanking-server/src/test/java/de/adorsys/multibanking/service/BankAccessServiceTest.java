@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
@@ -78,7 +79,7 @@ public class BankAccessServiceTest {
         MockitoAnnotations.initMocks(this);
         when(bankingServiceProducer.getBankingService(anyString())).thenReturn(mockBanking);
         bankRepository.findByBankCode("76090500").orElseGet(() -> {
-            BankEntity bankEntity = TestUtil.getBankEntity("Sparda Bank", "76090500");
+            BankEntity bankEntity = TestUtil.getBankEntity("Sparda Bank", "76090500", BankApi.HBCI);
             bankRepository.save(bankEntity);
             return bankEntity;
         });

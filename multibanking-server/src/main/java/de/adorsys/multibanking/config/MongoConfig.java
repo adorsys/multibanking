@@ -1,7 +1,6 @@
 package de.adorsys.multibanking.config;
 
 import com.mongodb.*;
-import de.adorsys.banking.repository.config.EnableScaMongoPersistence;
 import de.adorsys.smartanalytics.config.EnableSmartanalyticsMongoPersistence;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +22,6 @@ import java.util.Optional;
 @Configuration
 @EnableMongoRepositories(basePackages = "de.adorsys.multibanking.mongo.repository")
 @EnableSmartanalyticsMongoPersistence
-@EnableScaMongoPersistence
 @PropertySource(value = "${mongo.properties.url}", ignoreResourceNotFound = true)
 public class MongoConfig extends AbstractMongoConfiguration {
 

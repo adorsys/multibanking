@@ -18,8 +18,6 @@ public class BankAccountJpaEntity extends BankAccountCommonJpaEntity {
     private Long id;
     private String bankAccessId;
     private String userId;
-    private String psd2ConsentId;
-    private String psd2ConsentAuthorisationId;
 
     @ElementCollection
     @CollectionTable(name = "bankaccount_external_id")

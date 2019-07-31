@@ -74,4 +74,6 @@ sts:
 
 db_secret: 1234567890ABCDEF
 
-consent.auth.url: http://localhost:8086/v1/consents/{consentId}/authorisations/{authorisationId}
+bankinggateway:
+  auth.url: http://localhost:8086/v1/consents/{consentId}/authorisations/{authorisationId}
+  consent.url: http://localhost:8086/v1/consents

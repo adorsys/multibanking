@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Encrypted(exclude = {"_id", "bankAccessId", "userId", "syncStatus", "rulesVersion"})
 @JsonIgnoreProperties(value = {"externalIdMap"}, allowSetters = true)
 @CompoundIndexes({
-        @CompoundIndex(name = "account_index", def = "{'userId': 1, 'bankAccessId': 1}")
+    @CompoundIndex(name = "account_index", def = "{'userId': 1, 'bankAccessId': 1}")
 })
 public class BankAccountMongoEntity extends BankAccount {
 
@@ -24,7 +24,5 @@ public class BankAccountMongoEntity extends BankAccount {
     private String id;
     private String bankAccessId;
     private String userId;
-    private String psd2ConsentId;
-    private String psd2ConsentAuthorisationId;
 
 }

@@ -27,8 +27,4 @@ public class MultibankingException extends RuntimeException {
         this.multibankingError = multibankingError;
     }
 
-    public MultibankingException(Throwable cause) {
-        super(cause);
-    }
-
 }

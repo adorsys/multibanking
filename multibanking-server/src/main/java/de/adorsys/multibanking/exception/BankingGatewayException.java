@@ -7,12 +7,12 @@ import org.springframework.http.HttpStatus;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SmartanalyticsException extends RuntimeException {
+public class BankingGatewayException extends RuntimeException {
 
     private final HttpStatus status;
     private final Message errorMessage;
 
-    public SmartanalyticsException(HttpStatus status, Message errorMessage) {
+    public BankingGatewayException(HttpStatus status, Message errorMessage) {
         this.status = status;
         this.errorMessage = errorMessage;
     }

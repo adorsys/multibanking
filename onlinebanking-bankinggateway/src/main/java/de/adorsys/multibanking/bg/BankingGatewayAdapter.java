@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.bg.model.MessageCode400AIS.CONSENT_UNKNOWN;
 import static de.adorsys.multibanking.bg.model.MessageCode401AIS.CONSENT_INVALID;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
 
 @Slf4j
@@ -189,13 +190,13 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 case 429:
                     return new MultibankingException(INVALID_CONSENT, "consent access exceeded");
                 default:
-                    throw new MultibankingException(e);
+                    throw new MultibankingException(INTERNAL_ERROR, e.getMessage());
             }
         } catch (IOException ex) {
             log.warn("unable to deserialize ApiException", ex);
         }
 
-        throw new MultibankingException(e);
+        throw new MultibankingException(INTERNAL_ERROR, e.getMessage());
     }
 
     private MultibankingException handleAis401Error(ApiException e) throws IOException {
@@ -205,7 +206,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 return new MultibankingException(INVALID_CONSENT, tppMessage.getText());
             }
         }
-        return new MultibankingException(e);
+        return new MultibankingException(INTERNAL_ERROR, e.getMessage());
     }
 
     private MultibankingException handleAis400Error(ApiException e) throws IOException {
@@ -215,7 +216,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 return new MultibankingException(INVALID_CONSENT, tppMessage.getText());
             }
         }
-        return new MultibankingException(e);
+        return new MultibankingException(INTERNAL_ERROR, e.getMessage());
     }
 }
 

@@ -45,15 +45,7 @@ public class BankAccessService {
             bankAccess.setBankCode(Iban.valueOf(bankAccess.getIban()).getBankCode());
         }
 
-        List<BankAccountEntity> bankAccounts;
-        try {
-            bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null);
-        } catch (ConsentAuthorisationRequiredException e) {
-            bankAccess.setPsd2ConsentId(e.getConsent().getConsentId());
-            bankAccess.setPsd2ConsentAuthorisationId(e.getConsent().getConsentAuthorisationId());
-            saveBankAccess(bankAccess);
-            return bankAccess;
-        }
+        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null);
 
         if (bankAccounts.isEmpty()) {
             throw new InvalidBankAccessException(bankAccess.getBankCode());

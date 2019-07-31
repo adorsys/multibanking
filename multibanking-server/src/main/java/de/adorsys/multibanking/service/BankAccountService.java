@@ -44,20 +44,14 @@ public class BankAccountService {
         List<BankAccountEntity> bankAccounts = bankAccountRepository.findByUserIdAndBankAccessId(userId, accessId);
 
         if (bankAccounts.isEmpty()) {
+            bankAccounts = loadBankAccountsOnline(bankAccessEntity, null);
+            bankAccounts.forEach(account -> account.setBankAccessId(bankAccessEntity.getId()));
 
-            try {
-                bankAccounts = loadBankAccountsOnline(bankAccessEntity, null);
-                bankAccounts.forEach(account -> account.setBankAccessId(bankAccessEntity.getId()));
+            bankAccountRepository.save(bankAccounts);
+            log.info("[{}] accounts for connection [{}] created.", bankAccounts.size(),
+                bankAccessEntity.getId());
 
-                bankAccountRepository.save(bankAccounts);
-                log.info("[{}] accounts for connection [{}] created.", bankAccounts.size(),
-                    bankAccessEntity.getId());
-            } catch (ConsentAuthorisationRequiredException e) {
-                bankAccessEntity.setPsd2ConsentId(e.getConsent().getConsentId());
-                bankAccessEntity.setPsd2ConsentAuthorisationId(e.getConsent().getConsentAuthorisationId());
-            } finally {
-                bankAccessRepository.save(bankAccessEntity);
-            }
+            bankAccessRepository.save(bankAccessEntity);
         }
         return bankAccounts;
     }
@@ -120,7 +114,6 @@ public class BankAccountService {
             throw new InvalidPinException(bankAccess.getId());
         } else if (e.getMultibankingError() == INVALID_CONSENT) {
             bankAccess.setPsd2ConsentId(null);
-            bankAccess.setPsd2ConsentAuthorisationId(null);
             bankAccessRepository.save(bankAccess);
             throw new ConsentRequiredException();
         }

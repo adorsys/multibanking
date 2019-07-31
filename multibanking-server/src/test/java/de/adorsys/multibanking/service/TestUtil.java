@@ -1,20 +1,22 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.BankEntity;
-import de.adorsys.multibanking.domain.UserEntity;
+import de.adorsys.multibanking.domain.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class TestUtil {
 
-    static BankEntity getBankEntity(String name, String bankCode) {
+    static BankEntity getBankEntity(String name, String bankCode, BankApi bankApi) {
         BankEntity bankEntity = new BankEntity();
         bankEntity.setName(name);
         bankEntity.setBankCode(bankCode);
         bankEntity.setSearchIndex(Arrays.asList(name.toLowerCase(), bankCode));
+        bankEntity.setBankApi(bankApi);
         return bankEntity;
     }
 
@@ -38,6 +40,15 @@ public class TestUtil {
         BankAccountEntity bankAccountEntity = new BankAccountEntity();
         bankAccountEntity.setId(id);
         return bankAccountEntity;
+    }
+
+    static Booking createBooking() {
+        Booking booking = new Booking();
+        booking.setExternalId(UUID.randomUUID().toString());
+        booking.setBookingDate(LocalDate.now());
+        booking.setAmount(new BigDecimal("20"));
+
+        return booking;
     }
 
 }
