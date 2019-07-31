@@ -88,13 +88,6 @@
             <version>${mongobee.version}</version>
         </dependency>
 
-        <!-- banking-gateway -->
-        <dependency>
-            <groupId>de.adorsys.banking</groupId>
-            <artifactId>banking-gateway-rest-server</artifactId>
-            <version>${banking-gateway-service.version}</version>
-        </dependency>
-
         <!-- smartanalytics -->
         <dependency>
             <groupId>de.adorsys.smartanalytics</groupId>
