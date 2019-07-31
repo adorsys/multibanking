@@ -158,7 +158,10 @@ spring:
   autoconfigure.exclude:
     - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
     - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-
+    -
+logging:
+  level:
+    org.kapott.hbci.comm.CommPinTan: INFO
 ---
 
 spring:
