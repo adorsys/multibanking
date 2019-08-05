@@ -4,11 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.bg.api.AccountInformationServiceAisApi;
+import de.adorsys.multibanking.bg.domain.Consent;
+import static de.adorsys.multibanking.bg.domain.ConsentStatus.*;
+
+import de.adorsys.multibanking.bg.exception.ConsentAuthorisationRequiredException;
+import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
 import de.adorsys.multibanking.bg.model.*;
-import de.adorsys.multibanking.domain.BankAccess;
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.domain.BankApiUser;
+import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
@@ -19,10 +22,13 @@ import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisationContainer;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +37,7 @@ import java.util.stream.Collectors;
 import static de.adorsys.multibanking.bg.model.MessageCode400AIS.CONSENT_UNKNOWN;
 import static de.adorsys.multibanking.bg.model.MessageCode401AIS.CONSENT_INVALID;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_AUTHORISATION;
 
 @Slf4j
 public class BankingGatewayAdapter implements OnlineBankingService {
@@ -109,7 +115,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             TransactionsResponse200Json transactionList = ais.getTransactionList(
                 loadBookingsRequest.getBankAccess().getBankCode(),
                 resourceId, "booked", UUID.randomUUID(),
-                loadBookingsRequest.getConsentId(), dateFrom, dateTo, null, null,
+                loadBookingsRequest.getAuthorisation(), dateFrom, dateTo, null, null,
                 null, null, null, null, null,
                 PSU_IP_ADDRESS, null, null, null,
                 null, null, null, null,
@@ -145,8 +151,51 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public boolean psd2Scope() {
-        return true;
+    public StrongCustomerAuthorisable<Consent> getStrongCustomerAuthorisation() {
+        return new StrongCustomerAuthorisable<Consent>() {
+            @Override
+            public void containsValidAuthorisation(StrongCustomerAuthorisationContainer container) {
+                // FIXME get consent id from access
+                Object authorisation = container.getAuthorisation();
+                if (authorisation == null || !(authorisation instanceof Consent)) {
+                    throw new MissingAuthorisationException();
+                }
+                String consentId = ((Consent)authorisation).getConsentId();
+                // FIXME get consent by banking gateway - maybe with a function here
+                Consent consent = null;
+
+                if (consent.getScaStatus() != VALID) {
+                    if (consent.getScaStatus() == RECEIVED || consent.getScaStatus() == PARTIALLY_AUTHORISED) {
+                        throw new ConsentAuthorisationRequiredException(consent);
+                    } else {
+                        throw new ConsentRequiredException();
+                    }
+                }
+            }
+
+            @Override
+            public Consent createAuthorisation(Consent authorisation) {
+                // FIXME create a authorisation by calling the banking gateway
+                return null;
+            }
+
+            @Override
+            public List<Consent> getAuthorisationList() {
+                // for banking gateway there is only the creation of a consent available
+                return null;
+            }
+
+            @Override
+            public Consent getAuthorisation(String authorisationId) {
+                // FIXME get consent from banking gateway?
+                return null;
+            }
+
+            @Override
+            public void revokeAuthorisation(String authorisationId) {
+                // FIXME revoke consent at banking gateway?
+            }
+        };
     }
 
     private ApiClient apiClient(String url) {
@@ -188,7 +237,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 case 401:
                     return handleAis401Error(e);
                 case 429:
-                    return new MultibankingException(INVALID_CONSENT, "consent access exceeded");
+                    return new MultibankingException(INVALID_AUTHORISATION, "consent access exceeded");
                 default:
                     throw new MultibankingException(INTERNAL_ERROR, e.getMessage());
             }
@@ -203,7 +252,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         for (TppMessage401AIS tppMessage :
             (objectMapper.readValue(e.getResponseBody(), Error401NGAIS.class)).getTppMessages()) {
             if (tppMessage.getCode() == CONSENT_INVALID) {
-                return new MultibankingException(INVALID_CONSENT, tppMessage.getText());
+                return new MultibankingException(INVALID_AUTHORISATION, tppMessage.getText());
             }
         }
         return new MultibankingException(INTERNAL_ERROR, e.getMessage());
@@ -213,7 +262,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         for (TppMessage400AIS tppMessage :
             (objectMapper.readValue(e.getResponseBody(), Error400NGAIS.class)).getTppMessages()) {
             if (tppMessage.getCode() == CONSENT_UNKNOWN) {
-                return new MultibankingException(INVALID_CONSENT, tppMessage.getText());
+                return new MultibankingException(INVALID_AUTHORISATION, tppMessage.getText());
             }
         }
         return new MultibankingException(INTERNAL_ERROR, e.getMessage());

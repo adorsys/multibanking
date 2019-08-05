@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.bg.domain;
 
+import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
+
+import de.adorsys.multibanking.domain.AccountReference;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisation;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class Consent {
+public class Consent implements StrongCustomerAuthorisation {
 
     private String consentId;
     private String consentAuthorisationId;
     private String redirectUrl;
 
-    private ScaStatus scaStatus;
+    private ConsentStatus scaStatus;
 
     // Requested access services for a consent.
     /**
@@ -48,4 +52,14 @@ public class Consent {
     private LocalDate validUntil;
     private int frequencyPerDay;
 
+
+    private String authUrl;
+
+    @Override
+    public String toExceptionInfo() {
+        return this.getRedirectUrl() == null
+            ? fromHttpUrl(authUrl).buildAndExpand(this.getConsentId(),
+            this.getConsentAuthorisationId()).toUriString()
+            : null;
+    }
 }

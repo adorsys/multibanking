@@ -3,18 +3,23 @@ package de.adorsys.multibanking.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.Application;
 import de.adorsys.multibanking.bg.BankingGatewayAdapter;
+import de.adorsys.multibanking.bg.domain.Consent;
+import de.adorsys.multibanking.bg.domain.ConsentStatus;
 import de.adorsys.multibanking.conf.FongoConfig;
 import de.adorsys.multibanking.conf.MapperConfig;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.exception.ConsentAuthorisationRequiredException;
-import de.adorsys.multibanking.exception.ConsentRequiredException;
+import de.adorsys.multibanking.bg.exception.ConsentAuthorisationRequiredException;
+import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.exception.ParametrizedMessageException;
+import de.adorsys.multibanking.exception.StrongCustomerAuthorisationException;
 import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
-import de.adorsys.multibanking.service.bankinggateway.BankingGatewayAuthorisationService;
 import de.adorsys.multibanking.web.DirectAccessController;
 import de.adorsys.multibanking.web.model.AccountReferenceTO;
 import de.adorsys.multibanking.web.model.BankAccessTO;
@@ -30,8 +35,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -49,14 +56,16 @@ import static de.adorsys.multibanking.web.model.ScaStatusTO.RECEIVED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class, FongoConfig.class, MapperConfig.class}, webEnvironment =
     SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 public class DirectAccessControllerTest {
+
+    @Value("${bankinggateway.auth.url}")
+    private String consentAuthUrl;
 
     @Autowired
     private BankRepositoryIf bankRepository;
@@ -65,8 +74,6 @@ public class DirectAccessControllerTest {
 
     @MockBean
     private OnlineBankingServiceProducer bankingServiceProducer;
-    @MockBean
-    private BankingGatewayAuthorisationService bankingGatewayAuthorisationService;
     @MockBean
     private BankingGatewayAdapter bankingGatewayAdapter;
 
@@ -121,9 +128,10 @@ public class DirectAccessControllerTest {
     @Test
     public void verifyApiNoConsent() throws Exception {
         prepareBank(bankingGatewayAdapter);
+        StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
+        when(bankingGatewayAdapter.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
 
-        doThrow(new ConsentRequiredException()).when(bankingGatewayAuthorisationService).checkForValidConsent(any(),
-            any());
+        doThrow(new MissingAuthorisationException()).when(authorisationMock).containsValidAuthorisation(any());
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
@@ -133,20 +141,22 @@ public class DirectAccessControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
 
         Messages messages = objectMapper.readValue(response.getBody().print(), Messages.class);
-        assertThat(messages.getMessages().iterator().next().getKey()).isEqualTo("NO_CONSENT");
+        assertThat(messages.getMessages().iterator().next().getKey()).isEqualTo("NO_AUTHORISATION");
     }
 
     @Test
     public void verifyApiConsentStatusReceived() throws IOException {
         prepareBank(bankingGatewayAdapter);
+        StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
+        when(bankingGatewayAdapter.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
 
-        when(bankingGatewayAuthorisationService.createConsent(any())).thenReturn(createConsentResponse(null,
-            ScaStatus.RECEIVED));
+        when(authorisationMock.createAuthorisation(any())).thenReturn(createConsentResponse(null,
+            ConsentStatus.RECEIVED));
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
         request.body(createConsentTO());
-        Response response = request.post("http://localhost:" + port + "/api/v1/direct/consents");
+        Response response = request.post("http://localhost:" + port + "/api/v1/direct/authorisations");
         assertEquals(HttpStatus.CREATED.value(), response.getStatusCode());
 
         ConsentTO consent = objectMapper.readValue(response.getBody().print(), ConsentTO.class);
@@ -154,8 +164,8 @@ public class DirectAccessControllerTest {
         assertThat(consent.getConsentAuthorisationId()).isNotBlank();
         assertThat(consent.getScaStatus()).isEqualTo(RECEIVED);
 
-        doThrow(new ConsentAuthorisationRequiredException(createConsentResponse(null, ScaStatus.RECEIVED), null)).when(bankingGatewayAuthorisationService).checkForValidConsent(any(),
-            any());
+        doThrow(new StrongCustomerAuthorisationException(createConsentResponse(null, ConsentStatus.RECEIVED), null))
+            .when(authorisationMock).containsValidAuthorisation(any());
 
         request.body(createBankAccess());
         response = request.put("http://localhost:" + port + "/api/v1/direct/accounts");
@@ -212,6 +222,7 @@ public class DirectAccessControllerTest {
 
         when(bankingServiceProducer.getBankingService(System.getProperty("blz"))).thenReturn(onlineBankingService);
         when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(onlineBankingService);
+        when(bankingServiceProducer.getBankingService(BankApi.BANKING_GATEWAY)).thenReturn(onlineBankingService);
 
         bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {
             BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"),
@@ -229,7 +240,7 @@ public class DirectAccessControllerTest {
         return request;
     }
 
-    private Consent createConsentResponse(String redirectUrl, ScaStatus scaStatus) {
+    private Consent createConsentResponse(String redirectUrl, ConsentStatus scaStatus) {
         Consent consent = new Consent();
         consent.setAccounts(Collections.singletonList(new AccountReference(System.getProperty("iban"))));
         consent.setBalances(Collections.singletonList(new AccountReference(System.getProperty("iban"))));
@@ -242,6 +253,8 @@ public class DirectAccessControllerTest {
         consent.setConsentId(UUID.randomUUID().toString());
         consent.setConsentAuthorisationId(UUID.randomUUID().toString());
         consent.setRedirectUrl(redirectUrl);
+
+        consent.setAuthUrl(consentAuthUrl);
 
         return consent;
     }

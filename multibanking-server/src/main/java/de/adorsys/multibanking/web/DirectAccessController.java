@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.web;
 
+import de.adorsys.multibanking.bg.domain.Consent;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
@@ -55,14 +56,28 @@ public class DirectAccessController {
     @Value("${threshold_temporaryData:15}")
     private Integer thresholdTemporaryData;
 
-    @ApiOperation(value = "Create consent")
+    @ApiOperation(value = "Create consent (e.g. Banking Gateway)")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Response", response = ConsentTO.class)})
-    @PostMapping("/consents")
+        @ApiResponse(code = 201, message = "Response", response = ConsentTO.class)})
+    @PostMapping("/authorisations")
     public ResponseEntity<ConsentTO> createConsent(@Valid @RequestBody ConsentTO consent,
                                                    @RequestParam(required = false) BankApiTO bankApi) {
 
-        Consent consentResponse = authorisationService.createConsent(consent);
+        // FIXME suggestion to make the creation over the service interface
+        Consent consentInput = consentMapper.toConsent(consent);
+        BankApi bankApiInput = bankApiMapper.toBankApi(bankApi);
+        if (bankApiInput == null) {
+            bankApiInput = BankApi.BANKING_GATEWAY;
+        }
+        OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankApiInput);
+        if (bankingService == null) {
+            return ResponseEntity.notFound().build();
+        }
+        StrongCustomerAuthorisable<Consent> authorisationService = bankingService.getStrongCustomerAuthorisation();
+        if (authorisationService == null) {
+            return ResponseEntity.notFound().build();
+        }
+        Consent consentResponse = authorisationService.createAuthorisation(consentInput);
 
         return new ResponseEntity<>(consentMapper.toConsentTO(consentResponse), HttpStatus.CREATED);
     }
