@@ -12,6 +12,7 @@ import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -310,8 +311,8 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean psd2Scope() {
-        return false;
+    public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
+        return null;
     }
 
     private TaskStatusResponse submitPin(String taskToken, String pin, FigoSession session) throws FigoException,

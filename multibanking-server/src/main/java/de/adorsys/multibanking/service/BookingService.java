@@ -2,6 +2,7 @@ package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
@@ -9,13 +10,13 @@ import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
-import de.adorsys.multibanking.exception.ConsentRequiredException;
+import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
 import de.adorsys.multibanking.exception.InvalidPinException;
+import de.adorsys.multibanking.exception.StrongCustomerAuthorisationException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsIf;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsMapper;
-import de.adorsys.multibanking.service.bankinggateway.BankingGatewayAuthorisationService;
 import de.adorsys.smartanalytics.api.AnalyticsResult;
 import de.adorsys.smartanalytics.api.config.ConfigStatus;
 import lombok.AllArgsConstructor;
@@ -33,7 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_AUTHORISATION;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 
 @Slf4j
@@ -50,7 +51,7 @@ public class BookingService {
     private final SmartAnalyticsIf smartAnalyticsService;
     private final AnalyticsService analyticsService;
     private final AnonymizationService anonymizationService;
-    private final BankingGatewayAuthorisationService authorisationService;
+    private final StrongCustomerAuthorisationService authorisationService;
     private final BankService bankService;
     private final UserService userService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
@@ -315,10 +316,10 @@ public class BookingService {
             bankAccess.setPin(null);
             bankAccessRepository.save(bankAccess);
             throw new InvalidPinException(bankAccess.getId());
-        } else if (e.getMultibankingError() == INVALID_CONSENT) {
-            bankAccess.setPsd2ConsentId(null);
+        } else if (e.getMultibankingError() == INVALID_AUTHORISATION) {
+            bankAccess.setAuthorisation(null);
             bankAccessRepository.save(bankAccess);
-            throw new ConsentRequiredException();
+            throw new MissingAuthorisationException();
         }
         throw e;
     }

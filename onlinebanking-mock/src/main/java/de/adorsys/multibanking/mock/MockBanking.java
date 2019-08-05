@@ -10,6 +10,7 @@ import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
 import org.adorsys.envutils.EnvProperties;
@@ -66,8 +67,8 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean psd2Scope() {
-        return false;
+    public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
+        return null;
     }
 
     @Override

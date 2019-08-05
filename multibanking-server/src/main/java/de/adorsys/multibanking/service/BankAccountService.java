@@ -1,7 +1,9 @@
 package de.adorsys.multibanking.service;
 
+import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
 import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
@@ -9,7 +11,6 @@ import de.adorsys.multibanking.domain.transaction.AccountInformationTransaction;
 import de.adorsys.multibanking.exception.*;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
-import de.adorsys.multibanking.service.bankinggateway.BankingGatewayAuthorisationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -22,7 +23,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_AUTHORISATION;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_BANKACCOUNTS;
 
@@ -34,7 +35,7 @@ public class BankAccountService {
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BankAccountRepositoryIf bankAccountRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
-    private final BankingGatewayAuthorisationService authorisationService;
+    private final StrongCustomerAuthorisationService strongCustomerAuthorisationService;
     private final UserService userService;
     private final BankService bankService;
     private final FinTSProductConfig finTSProductConfig;
@@ -64,7 +65,7 @@ public class BankAccountService {
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         checkBankSupported(bankAccess, onlineBankingService);
-        authorisationService.checkForValidConsent(bankAccess, onlineBankingService);
+        strongCustomerAuthorisationService.checkForValidConsent(bankAccess, onlineBankingService);
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankApi);
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
@@ -115,10 +116,10 @@ public class BankAccountService {
             bankAccess.setPin(null);
             bankAccessRepository.save(bankAccess);
             throw new InvalidPinException(bankAccess.getId());
-        } else if (e.getMultibankingError() == INVALID_CONSENT) {
-            bankAccess.setPsd2ConsentId(null);
+        } else if (e.getMultibankingError() == INVALID_AUTHORISATION) {
+            bankAccess.setAuthorisation(null);
             bankAccessRepository.save(bankAccess);
-            throw new ConsentRequiredException();
+            throw new MissingAuthorisationException();
         }
         throw e;
     }

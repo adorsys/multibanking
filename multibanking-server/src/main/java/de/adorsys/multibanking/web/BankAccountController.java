@@ -3,8 +3,8 @@ package de.adorsys.multibanking.web;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.Consent;
-import de.adorsys.multibanking.exception.ConsentAuthorisationRequiredException;
+import de.adorsys.multibanking.bg.domain.Consent;
+import de.adorsys.multibanking.bg.exception.ConsentAuthorisationRequiredException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.SyncInProgressException;
 import de.adorsys.multibanking.exception.domain.Messages;
@@ -106,7 +106,7 @@ public class BankAccountController {
             bookingService.syncBookings(bankAccess, bankAccount, null, pin != null ? pin : bankAccess.getPin());
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (ConsentAuthorisationRequiredException e) {
-            return new ResponseEntity<>(e.getConsent(), HttpStatus.ACCEPTED);
+            return new ResponseEntity<>(e.getAuthorisation(), HttpStatus.ACCEPTED);
         }
     }
 

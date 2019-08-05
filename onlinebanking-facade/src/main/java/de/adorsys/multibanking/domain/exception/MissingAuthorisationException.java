@@ -16,14 +16,22 @@
 
 package de.adorsys.multibanking.domain.exception;
 
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisation;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class MissingConsentException extends RuntimeException {
+public class MissingAuthorisationException extends RuntimeException {
 
-    public MissingConsentException() {
-        super("missing consent for transactions request");
+    private StrongCustomerAuthorisation authorisation;
+
+    public MissingAuthorisationException() {
+        super("missing authorisation for transactions request");
+    }
+
+    protected MissingAuthorisationException(StrongCustomerAuthorisation authorisation, String message) {
+        super(message);
+        this.authorisation = authorisation;
     }
 }

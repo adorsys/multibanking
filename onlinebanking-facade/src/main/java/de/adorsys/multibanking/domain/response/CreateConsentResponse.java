@@ -16,7 +16,7 @@
 
 package de.adorsys.multibanking.domain.response;
 
-import de.adorsys.multibanking.domain.ConsentStatus;
+import de.adorsys.multibanking.domain.ScaStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
@@ -31,6 +31,6 @@ public class CreateConsentResponse extends AbstractResponse {
     private String consentId;
     private String consentAuthorisationId;
     private String scaRedirectUrl;
-    private ConsentStatus consentStatus;
+    private ScaStatus consentStatus;
     private LocalDate validUntil;
 }

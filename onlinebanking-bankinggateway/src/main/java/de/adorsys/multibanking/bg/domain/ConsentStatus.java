@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.bg.domain;
 
 public enum ConsentStatus {
 
