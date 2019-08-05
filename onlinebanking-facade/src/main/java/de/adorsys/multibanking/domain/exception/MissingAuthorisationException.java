@@ -16,20 +16,22 @@
 
 package de.adorsys.multibanking.domain.exception;
 
-public enum MultibankingError {
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisation;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-    HBCI_ERROR,
-    INVALID_PAYMENT,
-    INVALID_SCA_METHOD,
-    INVALID_AUTHORISATION,
-    INVALID_PIN,
-    INVALID_TAN,
-    AUTHORIZATION_FINALISED,
-    AUTHORIZATION_FAILED,
-    AUTHORIZATION_EXEMPTED,
-    SCA_METHODS_NOT_AVAILABLE,
-    BANK_NOT_SUPPORTED,
-    PAYMENT_NOT_SUPPORTED,
-    INTERNAL_ERROR;
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class MissingAuthorisationException extends RuntimeException {
 
+    private StrongCustomerAuthorisation authorisation;
+
+    public MissingAuthorisationException() {
+        super("missing authorisation for transactions request");
+    }
+
+    protected MissingAuthorisationException(StrongCustomerAuthorisation authorisation, String message) {
+        super(message);
+        this.authorisation = authorisation;
+    }
 }

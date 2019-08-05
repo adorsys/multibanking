@@ -33,7 +33,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false)
 public class LoadBookingsRequest extends AbstractRequest {
 
-    private String consentId;
+    private String authorisation;
     private BankApiUser bankApiUser;
     private BankAccount bankAccount;
     private BankAccess bankAccess;
