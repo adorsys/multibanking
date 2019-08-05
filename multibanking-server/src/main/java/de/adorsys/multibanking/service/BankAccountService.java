@@ -92,6 +92,7 @@ public class BankAccountService {
                                                      BankApiUser bankApiUser, BankEntity bankEntity) {
         try {
             LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .consentId(bankAccess.getPsd2ConsentId())
                 .transaction(new AccountInformationTransaction(LOAD_BANKACCOUNTS))
                 .bankApiUser(bankApiUser)
@@ -102,8 +103,7 @@ public class BankAccountService {
                 .updateTanTransportTypes(true)
                 .build();
             request.setProduct(finTSProductConfig.getProduct());
-            return onlineBankingService.loadBankAccounts(bankEntity.getBankingUrl(),
-                request)
+            return onlineBankingService.loadBankAccounts(request)
                 .getBankAccounts();
         } catch (MultibankingException e) {
             return handleMultibankingException(bankAccess, e);

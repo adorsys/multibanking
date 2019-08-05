@@ -93,8 +93,7 @@ public class DirectAccessControllerTest {
     @Test
     public void verifyCreateBankAccessHbci() throws Exception {
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(hbci4JavaBanking, Iban.valueOf(bankAccess.getIban()).getBankCode(), "http://localhost:8082/hbci" +
-            "-mock/");
+        prepareBank(hbci4JavaBanking, Iban.valueOf(bankAccess.getIban()).getBankCode());
 
         //create bank access
         RequestSpecification request = RestAssured.given();
@@ -182,7 +181,7 @@ public class DirectAccessControllerTest {
         request.contentType(ContentType.JSON);
         request.body(bankAccess);
 
-        when(bankingGatewayAdapter.loadBankAccounts(any(), any()))
+        when(bankingGatewayAdapter.loadBankAccounts(any()))
             .thenReturn(LoadAccountInformationResponse.builder()
                 .bankAccounts(Collections.singletonList(new BankAccount()))
                 .build()
@@ -198,7 +197,7 @@ public class DirectAccessControllerTest {
         assertThat(loadBankAccountsResponse.getBankAccounts()).isNotEmpty();
 
         //load bookings
-        when(bankingGatewayAdapter.loadBookings(any(), any()))
+        when(bankingGatewayAdapter.loadBookings(any()))
             .thenReturn(LoadBookingsResponse.builder()
                 .bookings(Collections.singletonList(createBooking()))
                 .build()
@@ -217,7 +216,7 @@ public class DirectAccessControllerTest {
     }
 
     private void prepareBank(OnlineBankingService onlineBankingService, String bankCode) {
-        prepareBank(onlineBankingService, bankCode, null);
+        prepareBank(onlineBankingService, bankCode, System.getProperty("bankUrl"));
     }
 
     private void prepareBank(OnlineBankingService onlineBankingService, String bankCode, String bankUrl) {
@@ -235,7 +234,7 @@ public class DirectAccessControllerTest {
             return bankEntity;
         });
 
-        if (onlineBankingService instanceof Hbci4JavaBanking) {
+        if (onlineBankingService instanceof Hbci4JavaBanking && HBCIUtils.getBankInfo(bankCode) == null) {
             BankInfo bankInfo = new BankInfo();
             bankInfo.setBlz(test_bank.getBankCode());
             bankInfo.setPinTanAddress(bankUrl);

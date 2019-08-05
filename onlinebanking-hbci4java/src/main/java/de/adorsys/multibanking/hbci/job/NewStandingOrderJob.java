@@ -16,9 +16,11 @@
 
 package de.adorsys.multibanking.hbci.job;
 
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVDauerSEPANew;
@@ -29,14 +31,17 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
+@RequiredArgsConstructor
 @Slf4j
 public class NewStandingOrderJob extends ScaRequiredJob {
 
-    @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        StandingOrder standingOrder = (StandingOrder) transaction;
+    private final TransactionRequest transactionRequest;
 
-        Konto src = getDebtorAccount(transaction, passport);
+    @Override
+    protected AbstractSEPAGV createHbciJob(PinTanPassport passport) {
+        StandingOrder standingOrder = (StandingOrder) transactionRequest.getTransaction();
+
+        Konto src = getDebtorAccount(passport);
 
         Konto dst = new Konto();
         dst.name = standingOrder.getOtherAccount().getOwner();
@@ -75,11 +80,16 @@ public class NewStandingOrderJob extends ScaRequiredJob {
     }
 
     @Override
-    void afterExecute(HBCIDialog dialo) {
+    void afterExecute(HBCIDialog dialog) {
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
         return GVDauerSEPANew.getLowlevelName();
     }
 

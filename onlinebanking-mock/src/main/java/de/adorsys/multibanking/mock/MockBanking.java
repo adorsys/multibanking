@@ -56,7 +56,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
+    public AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest paymentRequest) {
         return null;
     }
 
@@ -86,8 +86,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
-                                                           LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
         RestTemplate restTemplate = getRestTemplate(loadAccountInformationRequest.getBankAccess().getBankLogin(),
             loadAccountInformationRequest.getBankAccess().getBankCode(), loadAccountInformationRequest.getPin());
 
@@ -110,7 +109,7 @@ public class MockBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
         BankAccess bankAccess = loadBookingsRequest.getBankAccess();
         BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 

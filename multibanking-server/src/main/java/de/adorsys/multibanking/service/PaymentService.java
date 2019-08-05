@@ -47,6 +47,7 @@ public class PaymentService {
 
         try {
             TransactionRequest request = TransactionRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .bankApiUser(bankApiUser)
                 .tanTransportType(tanTransportType)
                 .transaction(payment)
@@ -55,8 +56,7 @@ public class PaymentService {
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
             request.setProduct(finTSProductConfig.getProduct());
-            Object tanSubmit = bankingService.requestAuthorizationCode(null,
-                request);
+            Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
             RawSepaTransactionEntity target = new RawSepaTransactionEntity();
             BeanUtils.copyProperties(payment, target);
@@ -86,6 +86,7 @@ public class PaymentService {
 
         try {
             TransactionRequest request = TransactionRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .bankApiUser(bankApiUser)
                 .tanTransportType(tanTransportType)
                 .transaction(payment)
@@ -94,9 +95,8 @@ public class PaymentService {
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
             request.setProduct(finTSProductConfig.getProduct());
-            Object tanSubmit =
-                bankingService.requestAuthorizationCode(null,
-                    request);
+
+            Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
             SinglePaymentEntity target = new SinglePaymentEntity();
             BeanUtils.copyProperties(payment, target);
@@ -126,6 +126,7 @@ public class PaymentService {
 
         try {
             TransactionRequest request = TransactionRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .bankApiUser(bankApiUser)
                 .transaction(payment)
                 .tanTransportType(tanTransportType)
@@ -134,9 +135,8 @@ public class PaymentService {
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
             request.setProduct(finTSProductConfig.getProduct());
-            Object tanSubmit =
-                bankingService.requestAuthorizationCode(null,
-                    request);
+
+            Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
             BulkPaymentEntity target = new BulkPaymentEntity();
             BeanUtils.copyProperties(payment, target);

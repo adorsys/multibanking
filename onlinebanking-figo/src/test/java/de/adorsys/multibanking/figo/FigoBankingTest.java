@@ -86,7 +86,7 @@ public class FigoBankingTest {
             .pin(FIGO_TEST_PIN)
             .build();
 
-        val response = service.loadBankAccounts(null, request);
+        val response = service.loadBankAccounts(request);
 
         assertThat(response, allOf(
             hasProperty("bankAccounts", hasSize(3))
@@ -105,7 +105,7 @@ public class FigoBankingTest {
             .storePin(false)
             .pin(FIGO_TEST_PIN)
             .build();
-        val result2 = service.loadBankAccounts(null, request);
+        val result2 = service.loadBankAccounts(request);
         val request2 = LoadBookingsRequest.builder()
             .bankAccess(bankaccess)
             .bankApiUser(result)
@@ -114,7 +114,7 @@ public class FigoBankingTest {
             .bankAccount(result2.getBankAccounts().get(0))
             .build();
 
-        val response = service.loadBookings(null, request2);
+        val response = service.loadBookings(request2);
 
         assertThat(response, allOf(
             hasProperty("bookings", hasSize(85)),

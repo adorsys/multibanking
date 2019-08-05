@@ -24,7 +24,7 @@ import lombok.experimental.SuperBuilder;
 @Data
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
-public class SubmitAuthorizationCodeRequest extends AbstractRequest {
+public class SubmitAuthorizationCodeRequest extends TransactionRequest {
 
     private String bankCode;
     private AbstractScaTransaction sepaTransaction;

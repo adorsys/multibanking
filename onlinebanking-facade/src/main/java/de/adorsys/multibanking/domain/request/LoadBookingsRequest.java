@@ -28,7 +28,7 @@ import java.time.LocalDate;
 @Data
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
-public class LoadBookingsRequest extends AbstractRequest {
+public class LoadBookingsRequest extends TransactionRequest {
 
     private String consentId;
     private BankApiUser bankApiUser;

@@ -25,18 +25,17 @@ public interface OnlineBankingService {
 
     void removeUser(BankApiUser bankApiUser);
 
-    LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
-                                                    LoadAccountInformationRequest loadAccountInformationRequest);
+    LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest);
 
     void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
 
-    LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest);
+    LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest);
 
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
 
-    AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest);
+    AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest paymentRequest);
 
     SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
 

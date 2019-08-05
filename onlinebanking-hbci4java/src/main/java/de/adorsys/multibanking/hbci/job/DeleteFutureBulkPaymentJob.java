@@ -16,8 +16,10 @@
 
 package de.adorsys.multibanking.hbci.job;
 
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
+import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTermMultiUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -28,15 +30,17 @@ import org.kapott.hbci.structures.Konto;
 /**
  * Only for future payment (GVTermUebSEPA)
  */
+@RequiredArgsConstructor
 public class DeleteFutureBulkPaymentJob extends ScaRequiredJob {
 
+    private final TransactionRequest transactionRequest;
     private String jobName;
 
     @Override
-    protected AbstractHBCIJob createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        FutureBulkPayment futureBulkPayment = (FutureBulkPayment) transaction;
+    protected AbstractHBCIJob createHbciJob(PinTanPassport passport) {
+        FutureBulkPayment futureBulkPayment = (FutureBulkPayment) transactionRequest.getTransaction();
 
-        Konto src = getDebtorAccount(transaction, passport);
+        Konto src = getDebtorAccount(passport);
 
         jobName = GVTermMultiUebSEPADel.getLowlevelName();
 
@@ -54,11 +58,16 @@ public class DeleteFutureBulkPaymentJob extends ScaRequiredJob {
     }
 
     @Override
-    void afterExecute(HBCIDialog dialo) {
+    void afterExecute(HBCIDialog dialog) {
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
         return jobName;
     }
 

@@ -18,6 +18,7 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDTAZV;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -26,16 +27,19 @@ import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 
+@RequiredArgsConstructor
 public class ForeignPaymentJob extends ScaRequiredJob {
 
+    private final TransactionRequest transactionRequest;
+
     @Override
-    protected AbstractHBCIJob createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        Konto src = getDebtorAccount(transaction, passport);
+    protected AbstractHBCIJob createHbciJob(PinTanPassport passport) {
+        Konto src = getDebtorAccount(passport);
 
         GVDTAZV gv = new GVDTAZV(passport, GVDTAZV.getLowlevelName());
 
         gv.setParam("src", src);
-        gv.setParam("dtazv", "B" + transaction.getRawData());
+        gv.setParam("dtazv", "B" + transactionRequest.getTransaction().getRawData());
         gv.verifyConstraints();
 
         return gv;
@@ -46,16 +50,21 @@ public class ForeignPaymentJob extends ScaRequiredJob {
     }
 
     @Override
-    void afterExecute(HBCIDialog dialo) {
+    void afterExecute(HBCIDialog dialog) {
     }
 
     @Override
-    protected HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog, TransactionRequest transactionRequest) {
+    HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog) {
         return dialog.getPassport().getBankTwostepMechanisms().get(transactionRequest.getTanTransportType().getId());
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
         return GVDTAZV.getLowlevelName();
     }
 
@@ -63,4 +72,5 @@ public class ForeignPaymentJob extends ScaRequiredJob {
     protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
         return null;
     }
+
 }

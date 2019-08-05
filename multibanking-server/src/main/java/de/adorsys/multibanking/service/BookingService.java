@@ -291,6 +291,7 @@ public class BookingService {
 
         try {
             LoadBookingsRequest loadBookingsRequest = LoadBookingsRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .consentId(bankAccess.getPsd2ConsentId())
                 .bankApiUser(bankApiUser)
                 .bankAccess(bankAccess)
@@ -303,7 +304,7 @@ public class BookingService {
                 .withStandingOrders(true)
                 .build();
             loadBookingsRequest.setProduct(finTSProductConfig.getProduct());
-            return onlineBankingService.loadBookings(bankEntity.getBankingUrl(), loadBookingsRequest);
+            return onlineBankingService.loadBookings(loadBookingsRequest);
         } catch (MultibankingException e) {
             return handleMultibankingException(bankAccess, e);
         }
@@ -368,6 +369,7 @@ public class BookingService {
             BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
             LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .bankApiUser(bankApiUser)
                 .bankAccess(bankAccess)
                 .bankCode(bankEntity.getBlzHbci())
@@ -376,11 +378,7 @@ public class BookingService {
                 .storePin(bankAccess.isStorePin())
                 .build();
             request.setProduct(finTSProductConfig.getProduct());
-            List<BankAccount> apiBankAccounts = onlineBankingService
-                .loadBankAccounts(
-                    bankEntity.getBankingUrl(),
-                    request)
-                .getBankAccounts();
+            List<BankAccount> apiBankAccounts = onlineBankingService.loadBankAccounts(request).getBankAccounts();
 
             List<BankAccountEntity> dbBankAccounts = bankAccountRepository
                 .findByUserIdAndBankAccessId(bankAccess.getUserId(), bankAccess.getId());
