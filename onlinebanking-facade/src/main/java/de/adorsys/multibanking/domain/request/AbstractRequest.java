@@ -18,12 +18,15 @@ package de.adorsys.multibanking.domain.request;
 
 import de.adorsys.multibanking.domain.Product;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Map;
 
+@SuperBuilder
 @Data
 public abstract class AbstractRequest {
 
     private Product product;
     private Map<String, String> bpd;
+
 }

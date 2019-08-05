@@ -16,16 +16,16 @@
 
 package de.adorsys.multibanking.domain.request;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.TanTransportType;
-import lombok.Builder;
-import lombok.Data;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
-@Data
-@Builder
+@SuperBuilder
+@Getter
 @EqualsAndHashCode(callSuper = false)
 public class TransactionRequest extends AbstractRequest {
 
@@ -33,7 +33,6 @@ public class TransactionRequest extends AbstractRequest {
     private TanTransportType tanTransportType;
     private AbstractScaTransaction transaction;
     private BankAccess bankAccess;
-    private String authorisationId;
     private String bankCode;
     private String pin;
 

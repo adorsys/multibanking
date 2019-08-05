@@ -16,23 +16,17 @@
 
 package de.adorsys.multibanking.domain.request;
 
-import de.adorsys.multibanking.domain.BankAccess;
-import de.adorsys.multibanking.domain.BankApiUser;
-import lombok.Builder;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
-@Data
-@Builder
+@SuperBuilder
+@Getter
 @EqualsAndHashCode(callSuper = false)
-public class LoadAccountInformationRequest extends AbstractRequest {
+public class LoadAccountInformationRequest extends TransactionRequest {
 
     private String consentId;
-    private BankApiUser bankApiUser;
-    private BankAccess bankAccess;
-    private String bankCode;
-    private String pin;
-
     private boolean storePin;
     private boolean updateTanTransportTypes;
+
 }

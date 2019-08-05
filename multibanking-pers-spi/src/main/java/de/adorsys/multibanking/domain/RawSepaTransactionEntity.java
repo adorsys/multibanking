@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.domain;
 
+import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

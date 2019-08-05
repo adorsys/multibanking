@@ -14,34 +14,26 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.transaction;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.LocalDate;
-
-import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT;
-import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT_DELETE;
-
-/**
- * Created by alexg on 19.10.17.
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class FutureSinglePayment extends SinglePayment {
+public class RawSepaPayment extends AbstractScaTransaction {
 
-    private LocalDate executionDate;
-    private boolean delete;
-
-    @Override
-    public void delete(boolean delete) {
-        this.delete = delete;
-    }
+    private String painXml;
+    private String service;
+    private TransactionType sepaTransactionType;
 
     @Override
     public TransactionType getTransactionType() {
-        return delete ? FUTURE_SINGLE_PAYMENT_DELETE : FUTURE_SINGLE_PAYMENT;
+        return TransactionType.RAW_SEPA;
     }
 
+    @Override
+    public String getRawData() {
+        return painXml;
+    }
 }

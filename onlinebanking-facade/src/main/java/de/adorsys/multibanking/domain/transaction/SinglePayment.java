@@ -14,21 +14,30 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.transaction;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Created by alexg on 19.10.17.
- */
+import java.math.BigDecimal;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TanRequest extends AbstractScaTransaction {
+public class SinglePayment extends AbstractScaTransaction {
+
+    private String receiver;
+    private String receiverBic;
+    private String receiverIban;
+    private String receiverBankCode;
+    private String receiverAccountNumber;
+    private String receiverAccountCurrency;
+    private String purpose;
+    private BigDecimal amount;
+    private String currency;
 
     @Override
     public TransactionType getTransactionType() {
-        return TransactionType.TAN_REQUEST;
+        return TransactionType.SINGLE_PAYMENT;
     }
 
     @Override

@@ -9,8 +9,8 @@ import java.text.MessageFormat;
  * Created by alexg on 19.05.17.
  */
 @ResponseStatus(
-        value = HttpStatus.BAD_REQUEST,
-        reason = "SYNC_IN_PROGRESS"
+    value = HttpStatus.BAD_REQUEST,
+    reason = "SYNC_IN_PROGRESS"
 )
 public class SyncInProgressException extends ParametrizedMessageException {
 

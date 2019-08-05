@@ -21,6 +21,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import de.adorsys.multibanking.domain.BankAccess;
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
@@ -30,6 +34,7 @@ import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisationContainer;
 import de.adorsys.multibanking.hbci.domain.TanMethod;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.hbci.job.*;
 import de.adorsys.multibanking.hbci.model.HbciCallback;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
@@ -153,7 +158,19 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         Optional.ofNullable(bpdCache)
             .ifPresent(cache -> request.setBpd(cache.get(request.getBankCode())));
         try {
-            return new AccountInformationJob().loadBankAccounts(request, callback);
+            AccountInformationJob accountInformationJob = new AccountInformationJob(request.getBankAccess(),
+                request.isUpdateTanTransportTypes());
+
+            AuthorisationCodeResponse authorisationCodeResponse =
+                accountInformationJob.execute(request, callback);
+
+            if (authorisationCodeResponse.isAuthorisationRequired()) {
+                return LoadAccountInformationResponse.builder()
+                    .authorisationRequired(true)
+                    .tanTransportTypes(authorisationCodeResponse.getTanTransportTypes())
+                    .build();
+            }
+            return accountInformationJob.createResponse();
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -188,7 +205,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 .map(sepaTransaction -> createScaJob(sepaTransaction.getTransactionType()))
                 .orElse(new EmptyJob());
 
-            return scaJob.requestAuthorizationCode(transactionRequest);
+            return scaJob.execute(transactionRequest, null);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -301,7 +318,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         Optional.ofNullable(bpdCache)
             .ifPresent(cache -> dialogRequest.setBpd(cache.get(dialogRequest.getBankCode())));
         try {
-            return HbciDialogFactory.createDialog(null, dialogRequest);
+            return HbciDialogFactory.startHbciDialog(null, dialogRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -347,7 +364,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             case STANDING_ORDER_DELETE:
                 return new DeleteStandingOrderJob();
             case TAN_REQUEST:
-            case DEDICATED_CONSENT:
                 return new EmptyJob();
             default:
                 throw new IllegalArgumentException("invalid transaction type " + transactionType);

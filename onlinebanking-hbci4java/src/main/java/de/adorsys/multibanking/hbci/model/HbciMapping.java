@@ -17,6 +17,7 @@
 package de.adorsys.multibanking.hbci.model;
 
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -45,30 +46,30 @@ public final class HbciMapping {
     public static BalancesReport createBalance(GVRSaldoReq gvSaldoReq, String accountNumber) {
         if (gvSaldoReq.isOK()) {
             return gvSaldoReq.getEntries().stream()
-                    .filter(info -> info.konto.number.equals(accountNumber))
-                    .findAny()
-                    .map(info -> {
-                        BalancesReport result = new BalancesReport();
-                    
-                        if (info.ready != null && info.ready.value != null) {
-                            result.setReadyBalance(createBalance(info.ready));
-                        }
-                        if (info.available != null) {
-                            result.setAvailableBalance(createBalance(info.available));
-                        }
-                        if (info.kredit != null) {
-                            result.setCreditBalance(createBalance(info.kredit));
-                        }
-                        if (info.unready != null && info.unready.value != null) {
-                            result.setUnreadyBalance(createBalance(info.unready));
-                        }
-                        if (info.used != null) {
-                            result.setUsedBalance(createBalance(info.used));
-                        }
+                .filter(info -> info.konto.number.equals(accountNumber))
+                .findAny()
+                .map(info -> {
+                    BalancesReport result = new BalancesReport();
 
-                        return result;
-                    })
-                    .orElse(null);
+                    if (info.ready != null && info.ready.value != null) {
+                        result.setReadyBalance(createBalance(info.ready));
+                    }
+                    if (info.available != null) {
+                        result.setAvailableBalance(createBalance(info.available));
+                    }
+                    if (info.kredit != null) {
+                        result.setCreditBalance(createBalance(info.kredit));
+                    }
+                    if (info.unready != null && info.unready.value != null) {
+                        result.setUnreadyBalance(createBalance(info.unready));
+                    }
+                    if (info.used != null) {
+                        result.setUsedBalance(createBalance(info.used));
+                    }
+
+                    return result;
+                })
+                .orElse(null);
 
         }
         return null;
@@ -76,17 +77,17 @@ public final class HbciMapping {
 
     private static Balance createBalance(Value value) {
         return Balance.builder()
-                .currency(value.getCurr())
-                .amount(value.getBigDecimalValue().setScale(2))
-                .build();
+            .currency(value.getCurr())
+            .amount(value.getBigDecimalValue().setScale(2))
+            .build();
     }
 
     private static Balance createBalance(Saldo saldo) {
         return Balance.builder()
-                .date(saldo.timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .currency(saldo.value.getCurr())
-                .amount(saldo.value.getBigDecimalValue().setScale(2))
-                .build();
+            .date(saldo.timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+            .currency(saldo.value.getCurr())
+            .amount(saldo.value.getBigDecimalValue().setScale(2))
+            .build();
     }
 
     public static List<StandingOrder> createStandingOrders(GVRDauerList gvrDauerList) {
@@ -99,11 +100,11 @@ public final class HbciMapping {
 
             if (line.firstdate != null) {
                 auftrag.setFirstExecutionDate(
-                        line.firstdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                    line.firstdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
             if (line.lastdate != null) {
                 auftrag.setLastExecutionDate(
-                        line.lastdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+                    line.lastdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
             }
             auftrag.setAmount(line.value.getBigDecimalValue());
             auftrag.setOrderId(line.orderid);
@@ -194,13 +195,13 @@ public final class HbciMapping {
 
                 }
                 booking.setExternalId("B-" + line.valuta.getTime() + "_" + line.value.getLongValue()
-                        + "_" + line.saldo.value.getLongValue());
+                    + "_" + line.saldo.value.getLongValue());
 
                 // die Bank liefert keine strukturierten Verwendungszwecke (gvcode=999).
                 // Daher verwenden wir den gesamten "additional"-Block und zerlegen ihn
                 // in 27-Zeichen lange Haeppchen
                 booking.setUsage(
-                        getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line.additional, 27)));
+                    getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line.additional, 27)));
 
                 booking.setCreditorId((Utils.extractCreditorId(booking.getUsage())));
                 booking.setMandateReference(Utils.extractMandateReference(booking.getUsage()));

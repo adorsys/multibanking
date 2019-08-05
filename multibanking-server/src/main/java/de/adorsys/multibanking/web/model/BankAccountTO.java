@@ -46,7 +46,6 @@ public class BankAccountTO {
     @ApiModelProperty(value = "Last Synchronisation date", example = "2017-12-01")
     private LocalDateTime lastSync;
 
-
     public enum SyncStatusTO {
         PENDING, SYNC, READY
     }

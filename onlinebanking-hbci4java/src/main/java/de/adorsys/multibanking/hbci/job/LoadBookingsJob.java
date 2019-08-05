@@ -20,6 +20,7 @@ import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciCallback;
 import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.hbci.job.AccountInformationJob.extractTanTransportTypes;
-import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.createDialog;
+import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDialog;
 
 @Slf4j
 public class LoadBookingsJob {
@@ -57,24 +58,24 @@ public class LoadBookingsJob {
     private static AbstractHBCIJob createBookingsJob(HBCIDialog dialog, LoadBookingsRequest loadBookingsRequest,
                                                      Konto account) {
         AbstractHBCIJob bookingsJob = Optional.ofNullable(loadBookingsRequest.getRawResponseType())
-                .map(rawResponseType -> {
-                    if (rawResponseType == LoadBookingsRequest.RawResponseType.CAMT) {
-                        return new GVKUmsAllCamt(dialog.getPassport(), true);
-                    } else {
-                        return new GVKUmsAll(dialog.getPassport());
-                    }
-                })
-                .orElseGet(() -> new GVKUmsAll(dialog.getPassport()));
+            .map(rawResponseType -> {
+                if (rawResponseType == LoadBookingsRequest.RawResponseType.CAMT) {
+                    return new GVKUmsAllCamt(dialog.getPassport(), true);
+                } else {
+                    return new GVKUmsAll(dialog.getPassport());
+                }
+            })
+            .orElseGet(() -> new GVKUmsAll(dialog.getPassport()));
 
         bookingsJob.setParam("my", account);
 
         Optional.ofNullable(loadBookingsRequest.getDateFrom())
-                .ifPresent(localDate -> bookingsJob.setParam("startdate",
-                        Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
+            .ifPresent(localDate -> bookingsJob.setParam("startdate",
+                Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
         Optional.ofNullable(loadBookingsRequest.getDateTo())
-                .ifPresent(localDate -> bookingsJob.setParam("enddate",
-                        Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
+            .ifPresent(localDate -> bookingsJob.setParam("enddate",
+                Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
         dialog.addTask(bookingsJob);
         return bookingsJob;
@@ -96,33 +97,33 @@ public class LoadBookingsJob {
 
     public LoadBookingsResponse loadBookings(LoadBookingsRequest request, HbciCallback callback) {
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
-                .bankCode(request.getBankCode() != null ? request.getBankCode() :
-                        request.getBankAccess().getBankCode())
-                .customerId(request.getBankAccess().getBankLogin())
-                .login(request.getBankAccess().getBankLogin2())
-                .hbciPassportState(request.getBankAccess().getHbciPassportState())
-                .pin(request.getPin())
-                .callback(callback)
-                .build();
+            .bankCode(request.getBankCode() != null ? request.getBankCode() :
+                request.getBankAccess().getBankCode())
+            .customerId(request.getBankAccess().getBankLogin())
+            .login(request.getBankAccess().getBankLogin2())
+            .hbciPassportState(request.getBankAccess().getHbciPassportState())
+            .pin(request.getPin())
+            .callback(callback)
+            .build();
 
         dialogRequest.setProduct(Optional.ofNullable(request.getProduct())
-                .map(product -> new Product(product.getName(), product.getVersion()))
-                .orElse(null));
+            .map(product -> new Product(product.getName(), product.getVersion()))
+            .orElse(null));
         dialogRequest.setBpd(request.getBpd());
 
-        HBCIDialog dialog = createDialog(null, dialogRequest);
+        HBCIDialog dialog = startHbciDialog(null, dialogRequest);
 
         Konto account = createAccount(dialog, request.getBankAccount());
 
         AbstractHBCIJob bookingsJob = createBookingsJob(dialog, request, account);
 
         Optional<AbstractHBCIJob> balanceJob = request.isWithBalance() ?
-                Optional.of(createBalanceJob(dialog, account)) :
-                Optional.empty();
+            Optional.of(createBalanceJob(dialog, account)) :
+            Optional.empty();
 
         Optional<AbstractHBCIJob> standingOrdersJob = request.isWithStandingOrders() ?
-                Optional.of(createStandingOrdersJob(dialog, account)) :
-                Optional.empty();
+            Optional.of(createStandingOrdersJob(dialog, account)) :
+            Optional.empty();
 
         // Let the Handler submitAuthorizationCode all jobs in one batch
         HBCIExecStatus dialogStatus = dialog.execute(true);
@@ -136,12 +137,13 @@ public class LoadBookingsJob {
         }
 
         List<StandingOrder> standingOrders = standingOrdersJob
-                .map(abstractHBCIJob -> HbciMapping.createStandingOrders((GVRDauerList) abstractHBCIJob.getJobResult()))
-                .orElse(null);
+            .map(abstractHBCIJob -> HbciMapping.createStandingOrders((GVRDauerList) abstractHBCIJob.getJobResult()))
+            .orElse(null);
 
         BalancesReport bankAccountBalance = balanceJob
-                .map(abstractHBCIJob -> HbciMapping.createBalance((GVRSaldoReq) abstractHBCIJob.getJobResult(), account.number))
-                .orElse(null);
+            .map(abstractHBCIJob -> HbciMapping.createBalance((GVRSaldoReq) abstractHBCIJob.getJobResult(),
+                account.number))
+            .orElse(null);
 
         ArrayList<Booking> bookingList = null;
         List<String> raw = null;
@@ -150,23 +152,23 @@ public class LoadBookingsJob {
             raw = bookingsResult.getRaw();
         } else {
             bookingList = HbciMapping.createBookings(bookingsResult).stream()
-                    .collect(Collectors.collectingAndThen(Collectors.toCollection(
-                            () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
+                .collect(Collectors.collectingAndThen(Collectors.toCollection(
+                    () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
         }
 
         if (request.isWithTanTransportTypes()) {
             request.getBankAccess().setTanTransportTypes(new HashMap<>());
             request.getBankAccess().getTanTransportTypes().put(BankApi.HBCI,
-                    extractTanTransportTypes(dialog.getPassport()));
+                extractTanTransportTypes(dialog.getPassport()));
         }
 
         return LoadBookingsResponse.builder()
-                .hbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson())
-                .bookings(bookingList)
-                .rawData(raw)
-                .bankAccountBalance(bankAccountBalance)
-                .standingOrders(standingOrders)
-                .build();
+            .hbciPassportState(new HbciPassport.State(dialog.getPassport()).toJson())
+            .bookings(bookingList)
+            .rawData(raw)
+            .bankAccountBalance(bankAccountBalance)
+            .standingOrders(standingOrders)
+            .build();
 
     }
 }

@@ -16,14 +16,15 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.FutureSinglePayment;
-import de.adorsys.multibanking.domain.SinglePayment;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTermUebSEPA;
 import org.kapott.hbci.GV.GVUebSEPA;
 import org.kapott.hbci.GV_Result.GVRTermUeb;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
@@ -52,12 +53,20 @@ public class SinglePaymentJob extends ScaRequiredJob {
         sepagv.setParam("src", src);
         sepagv.setParam("dst", dst);
         sepagv.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
-        if ( singlePayment.getPurpose() != null) {
+        if (singlePayment.getPurpose() != null) {
             sepagv.setParam("usage", singlePayment.getPurpose());
         }
         sepagv.verifyConstraints();
 
         return sepagv;
+    }
+
+    @Override
+    void beforeExecute(HBCIDialog dialog) {
+    }
+
+    @Override
+    void afterExecute(HBCIDialog dialo) {
     }
 
     @Override

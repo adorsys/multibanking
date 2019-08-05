@@ -16,9 +16,10 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 
 public class EmptyJob extends ScaRequiredJob {
@@ -36,5 +37,13 @@ public class EmptyJob extends ScaRequiredJob {
     @Override
     AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
         return null;
+    }
+
+    @Override
+    void beforeExecute(HBCIDialog dialog) {
+    }
+
+    @Override
+    void afterExecute(HBCIDialog dialo) {
     }
 }

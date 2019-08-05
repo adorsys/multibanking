@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.mongo.entity;
 
-import de.adorsys.multibanking.domain.StandingOrder;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.mongo.encrypt.Encrypted;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

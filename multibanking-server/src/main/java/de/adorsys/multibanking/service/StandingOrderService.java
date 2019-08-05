@@ -1,11 +1,15 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.config.FinTSProductConfig;
-import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankApiUser;
+import de.adorsys.multibanking.domain.BankEntity;
+import de.adorsys.multibanking.domain.StandingOrderEntity;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.exception.domain.MissingPinException;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
 import lombok.RequiredArgsConstructor;

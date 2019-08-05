@@ -1,6 +1,10 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankAccountEntity;
+import de.adorsys.multibanking.domain.SinglePaymentEntity;
+import de.adorsys.multibanking.domain.TanTransportType;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.exception.PaymentException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
@@ -46,7 +50,7 @@ public class PaymentController {
             })})
     @GetMapping("/{paymentId}")
     public Resource<SinglePaymentEntity> getPayment(@PathVariable String accessId, @PathVariable String accountId,
-                                              @PathVariable String paymentId) {
+                                                    @PathVariable String paymentId) {
         SinglePaymentEntity paymentEntity = paymentRepository.findByUserIdAndId(principal.getName(), paymentId)
             .orElseThrow(() -> new ResourceNotFoundException(SinglePaymentEntity.class, paymentId));
 
@@ -106,7 +110,7 @@ public class PaymentController {
     }
 
     private Resource<SinglePaymentEntity> mapToResource(@PathVariable String accessId, @PathVariable String accountId,
-                                                  SinglePaymentEntity paymentEntity) {
+                                                        SinglePaymentEntity paymentEntity) {
         return new Resource<>(paymentEntity,
             linkTo(methodOn(PaymentController.class).getPayment(accessId, accountId, paymentEntity.getId())).withSelfRel());
     }

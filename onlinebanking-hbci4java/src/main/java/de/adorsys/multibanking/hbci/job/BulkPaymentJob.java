@@ -16,15 +16,16 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.BulkPayment;
-import de.adorsys.multibanking.domain.FutureBulkPayment;
-import de.adorsys.multibanking.domain.SinglePayment;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.BulkPayment;
+import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVMultiUebSEPA;
 import org.kapott.hbci.GV.GVTermMultiUebSEPA;
 import org.kapott.hbci.GV_Result.GVRTermUeb;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
@@ -65,6 +66,14 @@ public class BulkPaymentJob extends ScaRequiredJob {
         sepagv.verifyConstraints();
 
         return sepagv;
+    }
+
+    @Override
+    void beforeExecute(HBCIDialog dialog) {
+    }
+
+    @Override
+    void afterExecute(HBCIDialog dialo) {
     }
 
     @Override

@@ -16,11 +16,11 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.Product;
-import de.adorsys.multibanking.domain.SinglePayment;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -35,7 +35,7 @@ import org.kapott.hbci.structures.Value;
 import java.util.Optional;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
-import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.createDialog;
+import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDialog;
 
 /**
  * Created by cbr on 28.02.19.
@@ -44,20 +44,20 @@ import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.createDialog;
 public class TransferJob {
     public void requestTransfer(TransactionRequest sepaTransactionRequest) {
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
-                .bankCode(sepaTransactionRequest.getBankCode() != null ? sepaTransactionRequest.getBankCode() :
-                        sepaTransactionRequest.getBankAccess().getBankCode())
-                .customerId(sepaTransactionRequest.getBankAccess().getBankLogin())
-                .login(sepaTransactionRequest.getBankAccess().getBankLogin2())
-                .hbciPassportState(sepaTransactionRequest.getBankAccess().getHbciPassportState())
-                .pin(sepaTransactionRequest.getPin())
-                .build();
+            .bankCode(sepaTransactionRequest.getBankCode() != null ? sepaTransactionRequest.getBankCode() :
+                sepaTransactionRequest.getBankAccess().getBankCode())
+            .customerId(sepaTransactionRequest.getBankAccess().getBankLogin())
+            .login(sepaTransactionRequest.getBankAccess().getBankLogin2())
+            .hbciPassportState(sepaTransactionRequest.getBankAccess().getHbciPassportState())
+            .pin(sepaTransactionRequest.getPin())
+            .build();
 
         dialogRequest.setProduct(Optional.ofNullable(sepaTransactionRequest.getProduct())
-                .map(product -> new Product(product.getName(), product.getVersion()))
-                .orElse(null));
+            .map(product -> new Product(product.getName(), product.getVersion()))
+            .orElse(null));
         dialogRequest.setBpd(sepaTransactionRequest.getBpd());
 
-        HBCIDialog dialog = createDialog(null, dialogRequest);
+        HBCIDialog dialog = startHbciDialog(null, dialogRequest);
 
         AbstractHBCIJob hbciJob = createHbciJob(sepaTransactionRequest.getTransaction(), dialog.getPassport(), null);
 
@@ -101,12 +101,12 @@ public class TransferJob {
 
     Konto getDebtorAccount(AbstractScaTransaction sepaTransaction, PinTanPassport passport) {
         return Optional.ofNullable(sepaTransaction.getDebtorBankAccount())
-                .map(bankAccount -> {
-                    Konto konto = passport.findAccountByAccountNumber(bankAccount.getAccountNumber());
-                    konto.iban = bankAccount.getIban();
-                    konto.bic = bankAccount.getBic();
-                    return konto;
-                })
-                .orElse(null);
+            .map(bankAccount -> {
+                Konto konto = passport.findAccountByAccountNumber(bankAccount.getAccountNumber());
+                konto.iban = bankAccount.getIban();
+                konto.bic = bankAccount.getBic();
+                return konto;
+            })
+            .orElse(null);
     }
 }

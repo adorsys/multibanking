@@ -7,6 +7,7 @@ import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.AccountInformationTransaction;
 import de.adorsys.multibanking.exception.*;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
@@ -24,6 +25,7 @@ import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_AUTHORISATION;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
+import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_BANKACCOUNTS;
 
 @Slf4j
 @Service
@@ -92,6 +94,7 @@ public class BankAccountService {
         try {
             LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
                 .consentId(bankAccess.getAuthorisation())
+                .transaction(new AccountInformationTransaction(LOAD_BANKACCOUNTS))
                 .bankApiUser(bankApiUser)
                 .bankAccess(bankAccess)
                 .bankCode(bankEntity.getBlzHbci())

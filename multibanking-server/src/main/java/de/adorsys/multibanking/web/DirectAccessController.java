@@ -27,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -178,8 +179,11 @@ public class DirectAccessController {
 
     @Data
     public static class LoadBookingsRequest {
+        @NotBlank
         String accessId;
+        @NotBlank
         String accountId;
+        @NotBlank
         String pin;
     }
 

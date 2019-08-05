@@ -30,7 +30,7 @@ public class SecretClaimDecryptionService {
 
         if (authentication.getCredentials() instanceof JWTClaimsSet) {
             JWTClaimsSet credentials = (JWTClaimsSet) authentication.getCredentials();
-            JSONObject encryptedSecretClaims =  (JSONObject) credentials.getClaim(secretClaimPropertyKey);
+            JSONObject encryptedSecretClaims = (JSONObject) credentials.getClaim(secretClaimPropertyKey);
             String encryptedSecretClaim = encryptedSecretClaims.getAsString(audience);
 
             if (encryptedSecretClaim == null) {

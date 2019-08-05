@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.domain;
 
+import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

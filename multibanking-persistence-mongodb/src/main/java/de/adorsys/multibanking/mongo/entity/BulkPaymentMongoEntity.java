@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.mongo.entity;
 
-import de.adorsys.multibanking.domain.BulkPayment;
+import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import de.adorsys.multibanking.mongo.encrypt.Encrypted;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

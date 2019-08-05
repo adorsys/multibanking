@@ -47,7 +47,8 @@ public class UserService {
         }
     }
 
-    private BankApiUser registerUser(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService, UserEntity userEntity) {
+    private BankApiUser registerUser(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService,
+                                     UserEntity userEntity) {
         BankApiUser bankApiUser = onlineBankingService.registerUser(bankAccess, bankAccess.getPin());
         userEntity.getApiUser().add(bankApiUser);
         userRepository.save(userEntity);

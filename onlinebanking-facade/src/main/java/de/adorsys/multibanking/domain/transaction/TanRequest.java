@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.response;
+package de.adorsys.multibanking.domain.transaction;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@AllArgsConstructor
-public class InitiatePaymentResponse extends AbstractResponse {
-    private String transactionStatus;
-    private String paymentId;
-    private String authorisationUrl;
+public class TanRequest extends AbstractScaTransaction {
+
+    @Override
+    public TransactionType getTransactionType() {
+        return TransactionType.TAN_REQUEST;
+    }
+
+    @Override
+    public String getRawData() {
+        return null;
+    }
+
 }

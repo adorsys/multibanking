@@ -41,7 +41,7 @@ public class DeleteExpiredUsersScheduled {
                             bankingService.removeUser(bankApiUser);
                         }
                     });
-            userRepository.delete(userId);
+                    userRepository.delete(userId);
                 });
 
             count.incrementAndGet();

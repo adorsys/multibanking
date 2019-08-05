@@ -16,8 +16,8 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.RawSepaPayment;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVDauerSEPANew;
@@ -27,6 +27,7 @@ import org.kapott.hbci.GV.parsers.ISEPAParser;
 import org.kapott.hbci.GV.parsers.SEPAParserFactory;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.comm.CommPinTan;
+import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.sepa.SepaVersion;
 
@@ -78,6 +79,14 @@ public class RawSepaJob extends ScaRequiredJob {
         return sepagv;
     }
 
+    @Override
+    void beforeExecute(HBCIDialog dialog) {
+    }
+
+    @Override
+    void afterExecute(HBCIDialog dialo) {
+    }
+
     private void appendPainValues(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {
         String creditorIban = "";
         BigDecimal amount = new BigDecimal(0);
@@ -107,7 +116,7 @@ public class RawSepaJob extends ScaRequiredJob {
     private List<Map<String, String>> parsePain(String painXml) {
         List<Map<String, String>> sepaResults = new ArrayList<>();
         ISEPAParser<List<Map<String, String>>> parser =
-                SEPAParserFactory.get(SepaVersion.autodetect(painXml));
+            SEPAParserFactory.get(SepaVersion.autodetect(painXml));
         try {
             parser.parse(new ByteArrayInputStream(painXml.getBytes(CommPinTan.ENCODING)), sepaResults);
         } catch (UnsupportedEncodingException e) {

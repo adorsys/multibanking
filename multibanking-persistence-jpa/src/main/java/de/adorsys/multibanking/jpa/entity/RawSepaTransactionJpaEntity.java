@@ -1,11 +1,10 @@
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity(name = "payment_sepa")
 @Data
