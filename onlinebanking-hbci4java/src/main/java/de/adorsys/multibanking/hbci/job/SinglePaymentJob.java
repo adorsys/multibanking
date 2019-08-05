@@ -16,9 +16,11 @@
 
 package de.adorsys.multibanking.hbci.job;
 
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTermUebSEPA;
 import org.kapott.hbci.GV.GVUebSEPA;
@@ -29,13 +31,16 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
+@RequiredArgsConstructor
 public class SinglePaymentJob extends ScaRequiredJob {
 
-    @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        SinglePayment singlePayment = (SinglePayment) transaction;
+    private final TransactionRequest transactionRequest;
 
-        Konto src = getDebtorAccount(transaction, passport);
+    @Override
+    protected AbstractSEPAGV createHbciJob(PinTanPassport passport) {
+        SinglePayment singlePayment = (SinglePayment) transactionRequest.getTransaction();
+
+        Konto src = getDebtorAccount(passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();
@@ -66,12 +71,17 @@ public class SinglePaymentJob extends ScaRequiredJob {
     }
 
     @Override
-    void afterExecute(HBCIDialog dialo) {
+    void afterExecute(HBCIDialog dialog) {
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
-        if (paymentType == AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT) {
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+        if (transactionType == AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT) {
             return GVTermUebSEPA.getLowlevelName();
         }
         return GVUebSEPA.getLowlevelName();

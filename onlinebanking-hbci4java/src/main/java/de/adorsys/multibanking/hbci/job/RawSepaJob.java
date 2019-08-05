@@ -16,8 +16,10 @@
 
 package de.adorsys.multibanking.hbci.job;
 
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVDauerSEPANew;
@@ -38,10 +40,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 public class RawSepaJob extends ScaRequiredJob {
 
+    private final TransactionRequest transactionRequest;
+
     @Override
-    String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
         return GVRawSEPA.getLowlevelName();
     }
 
@@ -51,8 +61,8 @@ public class RawSepaJob extends ScaRequiredJob {
     }
 
     @Override
-    AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        RawSepaPayment sepaPayment = (RawSepaPayment) transaction;
+    AbstractSEPAGV createHbciJob(PinTanPassport passport) {
+        RawSepaPayment sepaPayment = (RawSepaPayment) transactionRequest.getTransaction();
 
         String jobName;
         switch (sepaPayment.getSepaTransactionType()) {
@@ -66,11 +76,11 @@ public class RawSepaJob extends ScaRequiredJob {
                 jobName = GVDauerSEPANew.getLowlevelName();
                 break;
             default:
-                throw new IllegalArgumentException("unsupported raw sepa transaction: " + transaction.getTransactionType());
+                throw new IllegalArgumentException("unsupported raw sepa transaction: " + sepaPayment.getSepaTransactionType());
         }
 
         GVRawSEPA sepagv = new GVRawSEPA(passport, jobName, sepaPayment.getRawData());
-        sepagv.setParam("src", getDebtorAccount(transaction, passport));
+        sepagv.setParam("src", getDebtorAccount(passport));
 
         appendPainValues(sepaPayment, sepagv);
 
@@ -84,7 +94,7 @@ public class RawSepaJob extends ScaRequiredJob {
     }
 
     @Override
-    void afterExecute(HBCIDialog dialo) {
+    void afterExecute(HBCIDialog dialog) {
     }
 
     private void appendPainValues(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {

@@ -33,6 +33,7 @@ public class TransactionRequest extends AbstractRequest {
     private TanTransportType tanTransportType;
     private AbstractScaTransaction transaction;
     private BankAccess bankAccess;
+    //can differ to bankCode in bankAccess
     private String bankCode;
     private String pin;
 

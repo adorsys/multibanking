@@ -44,6 +44,7 @@ public class StandingOrderService {
 
         try {
             TransactionRequest request = TransactionRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .bankApiUser(bankApiUser)
                 .transaction(standingOrder)
                 .bankAccess(bankAccess)
@@ -51,8 +52,7 @@ public class StandingOrderService {
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
             request.setProduct(finTSProductConfig.getProduct());
-            Object tanSubmit = bankingService.requestAuthorizationCode(bankEntity.getBankingUrl(),
-                request);
+            Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
             StandingOrderEntity target = new StandingOrderEntity();
             BeanUtils.copyProperties(standingOrder, target);

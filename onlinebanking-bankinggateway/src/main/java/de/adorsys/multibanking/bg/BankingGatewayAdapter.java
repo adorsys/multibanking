@@ -74,9 +74,8 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
-                                                           LoadAccountInformationRequest loadAccountInformationRequest) {
-        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(apiClient(bankingUrl));
+    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
+        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(apiClient(loadAccountInformationRequest.getBankUrl()));
 
         try {
             AccountList accountList = ais.getAccountList(
@@ -105,8 +104,8 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
-        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(apiClient(bankingUrl));
+    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(apiClient(loadBookingsRequest.getBankUrl()));
         String resourceId = loadBookingsRequest.getBankAccount().getExternalIdMap().get(BankApi.XS2A);
         LocalDate dateFrom = loadBookingsRequest.getDateFrom() != null ? loadBookingsRequest.getDateFrom() :
             LocalDate.now().minusYears(1);
@@ -141,7 +140,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest request) {
+    public AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest request) {
         throw new UnsupportedOperationException();
     }
 

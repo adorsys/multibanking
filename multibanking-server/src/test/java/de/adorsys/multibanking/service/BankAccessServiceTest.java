@@ -98,7 +98,7 @@ public class BankAccessServiceTest {
     @Test
     public void create_bank_access_no_accounts() {
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any(), any())).thenReturn(LoadAccountInformationResponse.builder().build());
+        when(mockBanking.loadBankAccounts(any())).thenReturn(LoadAccountInformationResponse.builder().build());
         thrown.expect(InvalidBankAccessException.class);
 
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500", null);
@@ -110,7 +110,7 @@ public class BankAccessServiceTest {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500", null);
 
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any(), any()))
+        when(mockBanking.loadBankAccounts(any()))
             .thenThrow(new InvalidPinException("access"));
         thrown.expect(InvalidPinException.class);
 
@@ -122,7 +122,7 @@ public class BankAccessServiceTest {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500", null);
 
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any(), any()))
+        when(mockBanking.loadBankAccounts(any()))
             .thenReturn(LoadAccountInformationResponse.builder()
                 .bankAccounts(Collections.singletonList(TestUtil.getBankAccountEntity("account")))
                 .build());

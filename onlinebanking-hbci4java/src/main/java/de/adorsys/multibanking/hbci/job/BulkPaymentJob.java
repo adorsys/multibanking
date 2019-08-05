@@ -16,10 +16,12 @@
 
 package de.adorsys.multibanking.hbci.job;
 
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVMultiUebSEPA;
 import org.kapott.hbci.GV.GVTermMultiUebSEPA;
@@ -30,13 +32,16 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
+@RequiredArgsConstructor
 public class BulkPaymentJob extends ScaRequiredJob {
 
-    @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        BulkPayment bulkPayment = (BulkPayment) transaction;
+    private final TransactionRequest transactionRequest;
 
-        Konto src = getDebtorAccount(transaction, passport);
+    @Override
+    protected AbstractSEPAGV createHbciJob(PinTanPassport passport) {
+        BulkPayment bulkPayment = (BulkPayment) transactionRequest.getTransaction();
+
+        Konto src = getDebtorAccount(passport);
 
         AbstractSEPAGV sepagv;
         if (bulkPayment instanceof FutureBulkPayment) {
@@ -73,12 +78,17 @@ public class BulkPaymentJob extends ScaRequiredJob {
     }
 
     @Override
-    void afterExecute(HBCIDialog dialo) {
+    void afterExecute(HBCIDialog dialog) {
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
-        if (paymentType == AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT) {
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+        if (transactionType == AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT) {
             return "TermMultiUebSEPA";
         }
         return "MultiUebSEPA";
