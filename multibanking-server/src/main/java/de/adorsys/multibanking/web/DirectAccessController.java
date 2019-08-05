@@ -1,13 +1,16 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import de.adorsys.multibanking.hbci.domain.TanMethod;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;
-import de.adorsys.multibanking.service.bankinggateway.BankingGatewayAuthorisationService;
+import de.adorsys.multibanking.service.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.web.mapper.*;
 import de.adorsys.multibanking.web.model.*;
 import io.swagger.annotations.Api;
@@ -26,6 +29,7 @@ import javax.validation.Valid;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Api(tags = "Multibanking direct access")
 @UserResource
@@ -39,10 +43,11 @@ public class DirectAccessController {
     private final BankApiMapper bankApiMapper;
     private final BalancesMapper balancesMapper;
     private final ConsentMapper consentMapper;
+    private final TanMethodMapper tanMethodMapper;
     private final BankAccessMapper bankAccessMapper;
     private final BankAccountMapper bankAccountMapper;
     private final BankAccountService bankAccountService;
-    private final BankingGatewayAuthorisationService authorisationService;
+    private final OnlineBankingServiceProducer bankingServiceProducer;
     private final BookingService bookingService;
     private final UserRepositoryIf userRepository;
     private final BankAccountRepositoryIf bankAccountRepository;
@@ -60,6 +65,31 @@ public class DirectAccessController {
         Consent consentResponse = authorisationService.createConsent(consent);
 
         return new ResponseEntity<>(consentMapper.toConsentTO(consentResponse), HttpStatus.CREATED);
+    }
+
+    @ApiOperation(value = "Get TAN Method (e.g. HBCI)")
+    @ApiResponses({
+        @ApiResponse(code = 200, message = "Response", response = TanMethodTO.class)})
+    @GetMapping("/authorisations")
+    public ResponseEntity<List<TanMethodTO>> getTanMethod(@RequestParam(required = false) BankApiTO bankApi) {
+
+        BankApi bankApiInput = bankApiMapper.toBankApi(bankApi);
+        if (bankApiInput == null) {
+            return ResponseEntity.notFound().build();
+        }
+        OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankApiInput);
+        if (bankingService == null) {
+            return ResponseEntity.notFound().build();
+        }
+        StrongCustomerAuthorisable<TanMethod> authorisationService = bankingService.getStrongCustomerAuthorisation();
+        if (authorisationService == null) {
+            return ResponseEntity.notFound().build();
+        }
+        List<TanMethod> consentResponse = authorisationService.getAuthorisationList();
+
+        return new ResponseEntity<List<TanMethodTO>>(consentResponse.stream()
+            .map(tanMethodMapper::toTanMethodTO)
+            .collect(Collectors.toList()), HttpStatus.OK);
     }
 
     @ApiOperation(value = "Read bank accounts")

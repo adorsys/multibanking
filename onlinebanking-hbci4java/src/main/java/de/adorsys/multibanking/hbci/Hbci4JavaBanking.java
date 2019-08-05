@@ -22,10 +22,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisationContainer;
+import de.adorsys.multibanking.hbci.domain.TanMethod;
 import de.adorsys.multibanking.hbci.job.*;
 import de.adorsys.multibanking.hbci.model.HbciCallback;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
@@ -210,8 +214,40 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean psd2Scope() {
-        return false;
+    public StrongCustomerAuthorisable<TanMethod> getStrongCustomerAuthorisation() {
+        return new StrongCustomerAuthorisable<TanMethod>() {
+            @Override
+            public void containsValidAuthorisation(StrongCustomerAuthorisationContainer container) {
+                Object authorisation = container.getAuthorisation();
+                if (authorisation == null || !(authorisation instanceof TanMethod)) {
+                    throw new MissingAuthorisationException();
+                }
+            }
+
+            @Override
+            public TanMethod createAuthorisation(TanMethod input) {
+                // HBCI doesn't create authorisations
+                return null;
+            }
+
+            @Override
+            public TanMethod getAuthorisation(String authorisationId) {
+                return this.getAuthorisationList().stream()
+                    .filter(authorisation -> authorisation.getId() == authorisationId)
+                    .findFirst().orElse(null);
+            }
+
+            @Override
+            public List<TanMethod> getAuthorisationList() {
+                // FIXME load tan methods with hbci
+                return null;
+            }
+
+            @Override
+            public void revokeAuthorisation(String authorisationId) {
+
+            }
+        };
     }
 
     @Override
