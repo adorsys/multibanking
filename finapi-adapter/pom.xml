@@ -50,11 +50,11 @@
             <artifactId>gson-fire</artifactId>
             <version>${gson-fire-version}</version>
         </dependency>
-            <dependency>
-                <groupId>org.threeten</groupId>
-                <artifactId>threetenbp</artifactId>
-                <version>${threetenbp-version}</version>
-            </dependency>
+        <dependency>
+            <groupId>org.threeten</groupId>
+            <artifactId>threetenbp</artifactId>
+            <version>${threetenbp-version}</version>
+        </dependency>
         <!-- test dependencies -->
         <dependency>
             <groupId>junit</groupId>
