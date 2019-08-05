@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.transaction;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 
-import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT;
-import static de.adorsys.multibanking.domain.AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT_DELETE;
+import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT;
+import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT_DELETE;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

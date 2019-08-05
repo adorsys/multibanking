@@ -1,6 +1,8 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.exception.ConsentAuthorisationRequiredException;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;

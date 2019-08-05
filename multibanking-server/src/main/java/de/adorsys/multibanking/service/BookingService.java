@@ -7,6 +7,7 @@ import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
 import de.adorsys.multibanking.exception.ConsentRequiredException;
 import de.adorsys.multibanking.exception.InvalidPinException;

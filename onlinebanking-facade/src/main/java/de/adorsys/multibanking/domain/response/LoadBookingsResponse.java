@@ -18,15 +18,15 @@ package de.adorsys.multibanking.domain.response;
 
 import de.adorsys.multibanking.domain.BalancesReport;
 import de.adorsys.multibanking.domain.Booking;
-import de.adorsys.multibanking.domain.StandingOrder;
-import lombok.Builder;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Data
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 public class LoadBookingsResponse extends AbstractResponse {
 

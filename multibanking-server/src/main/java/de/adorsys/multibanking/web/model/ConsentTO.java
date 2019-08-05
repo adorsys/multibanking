@@ -13,9 +13,11 @@ public class ConsentTO {
 
     @ApiModelProperty(value = "consent id", readOnly = true, accessMode = ApiModelProperty.AccessMode.READ_ONLY)
     private String consentId;
-    @ApiModelProperty(value = "consent authorisation id", readOnly = true, accessMode = ApiModelProperty.AccessMode.READ_ONLY)
+    @ApiModelProperty(value = "consent authorisation id", readOnly = true, accessMode =
+        ApiModelProperty.AccessMode.READ_ONLY)
     private String consentAuthorisationId;
-    @ApiModelProperty(value = "authorisation redirect url", readOnly = true, accessMode = ApiModelProperty.AccessMode.READ_ONLY)
+    @ApiModelProperty(value = "authorisation redirect url", readOnly = true, accessMode =
+        ApiModelProperty.AccessMode.READ_ONLY)
     private String redirectUrl;
 
     @NotNull
@@ -39,7 +41,8 @@ public class ConsentTO {
     @ApiModelProperty(value = "allowed access frequency per day")
     private int frequencyPerDay;
 
-    @ApiModelProperty(value = "consent authorisation status", readOnly = true, accessMode = ApiModelProperty.AccessMode.READ_ONLY)
+    @ApiModelProperty(value = "consent authorisation status", readOnly = true, accessMode =
+        ApiModelProperty.AccessMode.READ_ONLY)
     private ScaStatusTO scaStatus;
 
 }

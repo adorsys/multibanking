@@ -16,14 +16,15 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.StandingOrder;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVDauerSEPANew;
 import org.kapott.hbci.GV_Result.GVRDauerNew;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
@@ -67,6 +68,14 @@ public class NewStandingOrderJob extends ScaRequiredJob {
         gvDauerSEPANew.verifyConstraints();
 
         return gvDauerSEPANew;
+    }
+
+    @Override
+    void beforeExecute(HBCIDialog dialog) {
+    }
+
+    @Override
+    void afterExecute(HBCIDialog dialo) {
     }
 
     @Override

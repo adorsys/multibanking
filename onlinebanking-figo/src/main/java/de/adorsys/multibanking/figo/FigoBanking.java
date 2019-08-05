@@ -11,6 +11,7 @@ import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;

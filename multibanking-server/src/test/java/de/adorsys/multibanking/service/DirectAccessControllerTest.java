@@ -24,12 +24,14 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.iban4j.CountryCode;
 import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.kapott.hbci.manager.BankInfo;
+import org.kapott.hbci.manager.HBCIUtils;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -48,9 +50,11 @@ import static de.adorsys.multibanking.service.TestUtil.createBooking;
 import static de.adorsys.multibanking.web.model.ScaStatusTO.RECEIVED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.util.MockUtil.isMock;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class, FongoConfig.class, MapperConfig.class}, webEnvironment =
@@ -85,15 +89,17 @@ public class DirectAccessControllerTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    @Ignore
+    //    @Ignore
     @Test
     public void verifyCreateBankAccessHbci() throws Exception {
-        prepareBank(hbci4JavaBanking);
+        BankAccessTO bankAccess = createBankAccess();
+        prepareBank(hbci4JavaBanking, Iban.valueOf(bankAccess.getIban()).getBankCode(), "http://localhost:8082/hbci" +
+            "-mock/");
 
         //create bank access
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
-        request.body(createBankAccess());
+        request.body(bankAccess);
 
         Response response = request.put("http://localhost:" + port + "/api/v1/direct/accounts");
         assertEquals(HttpStatus.OK.value(), response.getStatusCode());
@@ -120,14 +126,15 @@ public class DirectAccessControllerTest {
 
     @Test
     public void verifyApiNoConsent() throws Exception {
-        prepareBank(bankingGatewayAdapter);
+        BankAccessTO bankAccess = createBankAccess();
+        prepareBank(bankingGatewayAdapter, Iban.valueOf(bankAccess.getIban()).getBankCode());
 
         doThrow(new ConsentRequiredException()).when(bankingGatewayAuthorisationService).checkForValidConsent(any(),
             any());
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
-        request.body(createBankAccess());
+        request.body(bankAccess);
 
         Response response = request.put("http://localhost:" + port + "/api/v1/direct/accounts");
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
@@ -138,14 +145,15 @@ public class DirectAccessControllerTest {
 
     @Test
     public void verifyApiConsentStatusReceived() throws IOException {
-        prepareBank(bankingGatewayAdapter);
+        BankAccessTO bankAccess = createBankAccess();
+        prepareBank(bankingGatewayAdapter, Iban.valueOf(bankAccess.getIban()).getBankCode());
 
         when(bankingGatewayAuthorisationService.createConsent(any())).thenReturn(createConsentResponse(null,
             ScaStatus.RECEIVED));
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
-        request.body(createConsentTO());
+        request.body(createConsentTO(bankAccess.getIban()));
         Response response = request.post("http://localhost:" + port + "/api/v1/direct/consents");
         assertEquals(HttpStatus.CREATED.value(), response.getStatusCode());
 
@@ -157,7 +165,7 @@ public class DirectAccessControllerTest {
         doThrow(new ConsentAuthorisationRequiredException(createConsentResponse(null, ScaStatus.RECEIVED), null)).when(bankingGatewayAuthorisationService).checkForValidConsent(any(),
             any());
 
-        request.body(createBankAccess());
+        request.body(bankAccess);
         response = request.put("http://localhost:" + port + "/api/v1/direct/accounts");
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
 
@@ -167,11 +175,12 @@ public class DirectAccessControllerTest {
 
     @Test
     public void verifyApiConsentStatusValid() throws IOException {
-        prepareBank(bankingGatewayAdapter);
+        BankAccessTO bankAccess = createBankAccess();
+        prepareBank(bankingGatewayAdapter, Iban.valueOf(bankAccess.getIban()).getBankCode());
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
-        request.body(createBankAccess());
+        request.body(bankAccess);
 
         when(bankingGatewayAdapter.loadBankAccounts(any(), any()))
             .thenReturn(LoadAccountInformationResponse.builder()
@@ -207,25 +216,39 @@ public class DirectAccessControllerTest {
         assertThat(loadBookingsResponse.getBookings()).isNotEmpty();
     }
 
-    private void prepareBank(OnlineBankingService onlineBankingService) {
-        when(onlineBankingService.bankSupported(any())).thenReturn(true);
+    private void prepareBank(OnlineBankingService onlineBankingService, String bankCode) {
+        prepareBank(onlineBankingService, bankCode, null);
+    }
 
-        when(bankingServiceProducer.getBankingService(System.getProperty("blz"))).thenReturn(onlineBankingService);
-        when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(onlineBankingService);
+    private void prepareBank(OnlineBankingService onlineBankingService, String bankCode, String bankUrl) {
+        if (isMock(onlineBankingService)) {
+            when(onlineBankingService.bankSupported(any())).thenReturn(true);
+        }
 
-        bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {
-            BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"),
-                onlineBankingService.bankApi());
+        when(bankingServiceProducer.getBankingService(bankCode)).thenReturn(onlineBankingService);
+        when(bankingServiceProducer.getBankingService(onlineBankingService.bankApi())).thenReturn(onlineBankingService);
+
+        BankEntity test_bank = bankRepository.findByBankCode(bankCode).orElseGet(() -> {
+            BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", bankCode, onlineBankingService.bankApi());
+            bankEntity.setBankingUrl(bankUrl);
             bankRepository.save(bankEntity);
             return bankEntity;
         });
+
+        if (onlineBankingService instanceof Hbci4JavaBanking) {
+            BankInfo bankInfo = new BankInfo();
+            bankInfo.setBlz(test_bank.getBankCode());
+            bankInfo.setPinTanAddress(bankUrl);
+            bankInfo.setPinTanVersion(HBCI_300);
+            HBCIUtils.addBankInfo(bankInfo);
+        }
     }
 
     private DirectAccessController.LoadBookingsRequest loadBookingsRequest(BankAccountTO bankAccount) {
         DirectAccessController.LoadBookingsRequest request = new DirectAccessController.LoadBookingsRequest();
         request.setAccountId(bankAccount.getId());
         request.setAccessId(bankAccount.getBankAccessId());
-        request.setPin(System.getProperty("pin"));
+        request.setPin(System.getProperty("pin", "12456"));
         return request;
     }
 
@@ -246,9 +269,7 @@ public class DirectAccessControllerTest {
         return consent;
     }
 
-    private ConsentTO createConsentTO() {
-        String iban = System.getProperty("iban", Iban.random().toString());
-
+    private ConsentTO createConsentTO(String iban) {
         ConsentTO consentTO = new ConsentTO();
         consentTO.setAccounts(Collections.singletonList(new AccountReferenceTO(iban)));
         consentTO.setBalances(Collections.singletonList(new AccountReferenceTO(iban)));
@@ -263,10 +284,14 @@ public class DirectAccessControllerTest {
 
     private BankAccessTO createBankAccess() {
         BankAccessTO bankAccessTO = new BankAccessTO();
-        bankAccessTO.setBankCode(System.getProperty("blz"));
-        bankAccessTO.setBankLogin(System.getProperty("login"));
+        bankAccessTO.setIban(System.getProperty("iban",
+            new Iban.Builder()
+                .countryCode(CountryCode.DE)
+                .bankCode("25040090")
+                .buildRandom().toString()));
+        bankAccessTO.setBankLogin(System.getProperty("login", "test-login"));
         bankAccessTO.setBankLogin2(System.getProperty("login2"));
-        bankAccessTO.setPin(System.getProperty("pin"));
+        bankAccessTO.setPin(System.getProperty("pin", "12456"));
         bankAccessTO.setPsd2ConsentId(UUID.randomUUID().toString());
 
         return bankAccessTO;

@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.extern.slf4j.Slf4j;

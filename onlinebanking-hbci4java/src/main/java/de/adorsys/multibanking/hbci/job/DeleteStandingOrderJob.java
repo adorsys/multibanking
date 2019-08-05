@@ -16,13 +16,14 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.StandingOrder;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVDauerSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
@@ -71,6 +72,16 @@ public class DeleteStandingOrderJob extends ScaRequiredJob {
     }
 
     @Override
+    void beforeExecute(HBCIDialog dialog) {
+
+    }
+
+    @Override
+    void afterExecute(HBCIDialog dialo) {
+
+    }
+
+    @Override
     protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
         return GVDauerSEPADel.getLowlevelName();
     }
@@ -79,4 +90,5 @@ public class DeleteStandingOrderJob extends ScaRequiredJob {
     protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
         return null;
     }
+
 }

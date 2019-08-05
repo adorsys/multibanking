@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.transaction;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
+@RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class BulkPayment extends AbstractScaTransaction {
+public class AccountInformationTransaction extends AbstractScaTransaction {
 
-    private List<SinglePayment> payments;
+    private final TransactionType transactionType;
 
     @Override
     public TransactionType getTransactionType() {
-        return TransactionType.BULK_PAYMENT;
+        return transactionType;
     }
 
     @Override

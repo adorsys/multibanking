@@ -51,7 +51,7 @@ public class AsyncConfig implements AsyncConfigurer {
     }
 
     public class ExceptionHandlingAsyncTaskExecutor implements AsyncTaskExecutor,
-            InitializingBean, DisposableBean {
+        InitializingBean, DisposableBean {
 
         private final Logger log = LoggerFactory.getLogger(ExceptionHandlingAsyncTaskExecutor.class);
 

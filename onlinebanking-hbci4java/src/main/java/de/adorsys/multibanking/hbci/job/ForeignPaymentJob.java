@@ -16,10 +16,13 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDTAZV;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.manager.HBCIDialog;
+import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 
@@ -36,6 +39,19 @@ public class ForeignPaymentJob extends ScaRequiredJob {
         gv.verifyConstraints();
 
         return gv;
+    }
+
+    @Override
+    void beforeExecute(HBCIDialog dialog) {
+    }
+
+    @Override
+    void afterExecute(HBCIDialog dialo) {
+    }
+
+    @Override
+    protected HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog, TransactionRequest transactionRequest) {
+        return dialog.getPassport().getBankTwostepMechanisms().get(transactionRequest.getTanTransportType().getId());
     }
 
     @Override

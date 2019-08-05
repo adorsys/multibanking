@@ -12,17 +12,17 @@ import java.util.regex.Pattern;
 public class Utils {
 
     private static Pattern creditorIdRegex = Pattern.compile("([deDE]{2}[0-9]{2,2}[A-Za-z0-9]{3,3}[0]{1}[0-9]{10})",
-            Pattern.CASE_INSENSITIVE);
+        Pattern.CASE_INSENSITIVE);
 
     private static Pattern ibanRegex = Pattern.compile("([A-Z]{2}\\d{2} ?\\d{4} ?\\d{4} ?\\d{4} ?\\d{4} ?[\\d]{0,2})",
-            Pattern.CASE_INSENSITIVE);
+        Pattern.CASE_INSENSITIVE);
 
     private static Pattern mandateReferenceRegex =
-            Pattern.compile("(?:mref|mandatsreferenz|mandatsref|mandat)[:\\+]?\\s*(\\S+?)" +
-                    "(?:\\s+|\\+|CRED|MANDATSDATUM|EINREICHER-ID)", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("(?:mref|mandatsreferenz|mandatsref|mandat)[:\\+]?\\s*(\\S+?)" +
+            "(?:\\s+|\\+|CRED|MANDATSDATUM|EINREICHER-ID)", Pattern.CASE_INSENSITIVE);
 
     private static Pattern abwaRegex =
-            Pattern.compile("(?:abwa\\+)(.*)", Pattern.CASE_INSENSITIVE);
+        Pattern.compile("(?:abwa\\+)(.*)", Pattern.CASE_INSENSITIVE);
 
     public static String extractCreditorId(String input) {
         if (input == null) {
@@ -112,22 +112,22 @@ public class Utils {
 
     public static boolean usageContains(String bookingUsage, String standingOrderUsage) {
         return bookingUsage != null && standingOrderUsage != null
-                && normalizeUsage(bookingUsage).contains(normalizeUsage(standingOrderUsage));
+            && normalizeUsage(bookingUsage).contains(normalizeUsage(standingOrderUsage));
     }
 
     private static String normalizeUsage(String vwz) {
         return normalizeUsageUmlaute(vwz)
-                .replaceAll("\\W", "").toLowerCase();
+            .replaceAll("\\W", "").toLowerCase();
     }
 
     private static String normalizeUsageUmlaute(String vwz) {
         return vwz
-                .replace("Ä", "Ae")
-                .replace("ä", "ae")
-                .replace("Ü", "Ue")
-                .replace("ü", "ue")
-                .replace("Ö", "Oe")
-                .replace("ö", "oe")
-                .replace("ß", "ss");
+            .replace("Ä", "Ae")
+            .replace("ä", "ae")
+            .replace("Ü", "Ue")
+            .replace("ü", "ue")
+            .replace("Ö", "Oe")
+            .replace("ö", "oe")
+            .replace("ß", "ss");
     }
 }

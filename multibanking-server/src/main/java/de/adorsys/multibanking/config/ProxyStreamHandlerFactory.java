@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * ProxyStreamHandlerFactory
  * Erzeugt eine URL-Connection mit Proxy
- *
+ * <p>
  * Format: proxy://proxy_host:proxy_port/http:...
  */
 @Configuration
@@ -28,7 +28,7 @@ public class ProxyStreamHandlerFactory implements URLStreamHandlerFactory {
 
     private Proxy createProxy(String host, int port) {
         return proxyCache.computeIfAbsent(String.format("%s:%d", host, port),
-                proxy -> new Proxy(Type.HTTP, new InetSocketAddress(host, port)));
+            proxy -> new Proxy(Type.HTTP, new InetSocketAddress(host, port)));
     }
 
     @Override

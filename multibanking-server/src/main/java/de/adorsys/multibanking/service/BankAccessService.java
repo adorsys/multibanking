@@ -5,7 +5,6 @@ import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.exception.ConsentAuthorisationRequiredException;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.*;

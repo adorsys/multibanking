@@ -43,20 +43,20 @@ public class LoadBalanceJob {
 
     public static List<BankAccount> loadBalances(LoadBalanceRequest loadBalanceRequest) {
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
-                .bankCode(loadBalanceRequest.getBankCode() != null ? loadBalanceRequest.getBankCode() :
-                        loadBalanceRequest.getBankAccess().getBankCode())
-                .customerId(loadBalanceRequest.getBankAccess().getBankLogin())
-                .login(loadBalanceRequest.getBankAccess().getBankLogin2())
-                .hbciPassportState(loadBalanceRequest.getBankAccess().getHbciPassportState())
-                .pin(loadBalanceRequest.getPin())
-                .build();
+            .bankCode(loadBalanceRequest.getBankCode() != null ? loadBalanceRequest.getBankCode() :
+                loadBalanceRequest.getBankAccess().getBankCode())
+            .customerId(loadBalanceRequest.getBankAccess().getBankLogin())
+            .login(loadBalanceRequest.getBankAccess().getBankLogin2())
+            .hbciPassportState(loadBalanceRequest.getBankAccess().getHbciPassportState())
+            .pin(loadBalanceRequest.getPin())
+            .build();
 
         dialogRequest.setProduct(Optional.ofNullable(loadBalanceRequest.getProduct())
-                .map(product -> new Product(product.getName(), product.getVersion()))
-                .orElse(null));
+            .map(product -> new Product(product.getName(), product.getVersion()))
+            .orElse(null));
         dialogRequest.setBpd(loadBalanceRequest.getBpd());
 
-        HBCIDialog dialog = HbciDialogFactory.createDialog(null, dialogRequest);
+        HBCIDialog dialog = HbciDialogFactory.startHbciDialog(null, dialogRequest);
 
         Map<AbstractHBCIJob, BankAccount> jobs = new HashMap<>();
 
@@ -82,7 +82,7 @@ public class LoadBalanceJob {
             }
             BankAccount bankAccount = jobs.get(job);
             bankAccount.setBalances(HbciMapping.createBalance((GVRSaldoReq) job.getJobResult(),
-                    bankAccount.getAccountNumber()));
+                bankAccount.getAccountNumber()));
             bankAccounts.add(bankAccount);
         });
         return bankAccounts;
@@ -106,6 +106,6 @@ public class LoadBalanceJob {
 
     private static boolean initFailed(HBCIExecStatus status) {
         return status.getErrorMessages().stream()
-                .anyMatch(line -> line.charAt(0) == '9');
+            .anyMatch(line -> line.charAt(0) == '9');
     }
 }

@@ -28,7 +28,8 @@ public class LoggingHandlerInterceptor extends HandlerInterceptorAdapter {
         return super.preHandle(request, response, handler);
     }
 
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
+                           ModelAndView modelAndView) throws Exception {
         super.postHandle(request, response, handler, modelAndView);
         clearMDC();
     }
@@ -81,6 +82,5 @@ public class LoggingHandlerInterceptor extends HandlerInterceptorAdapter {
         MDC.remove(ClassicConstants.REQUEST_USER_AGENT_MDC_KEY);
         MDC.remove(ClassicConstants.REQUEST_X_FORWARDED_FOR);
     }
-
 
 }

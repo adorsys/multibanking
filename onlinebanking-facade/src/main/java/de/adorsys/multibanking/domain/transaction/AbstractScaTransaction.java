@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.transaction;
 
+import de.adorsys.multibanking.domain.BankAccount;
 import lombok.Data;
 
 @Data
@@ -48,6 +49,8 @@ public abstract class AbstractScaTransaction {
         STANDING_ORDER_DELETE,
         RAW_SEPA,
         TAN_REQUEST,
-        DEDICATED_CONSENT
+        LOAD_BANKACCOUNTS,
+        LOAD_BALANCES,
+        LOAD_TRANSACTIONS
     }
 }

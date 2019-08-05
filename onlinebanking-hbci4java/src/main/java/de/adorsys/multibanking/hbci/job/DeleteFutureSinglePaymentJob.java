@@ -16,11 +16,12 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.FutureSinglePayment;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTermUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
@@ -63,6 +64,14 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob {
     }
 
     @Override
+    void beforeExecute(HBCIDialog dialog) {
+    }
+
+    @Override
+    void afterExecute(HBCIDialog dialo) {
+    }
+
+    @Override
     protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
         return jobName;
     }
@@ -71,4 +80,5 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob {
     protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
         return null;
     }
+
 }

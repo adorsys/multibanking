@@ -14,30 +14,41 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.transaction;
 
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.Cycle;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+
+import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.STANDING_ORDER;
+import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.STANDING_ORDER_DELETE;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SinglePayment extends AbstractScaTransaction {
+public class StandingOrder extends AbstractScaTransaction {
 
-    private String receiver;
-    private String receiverBic;
-    private String receiverIban;
-    private String receiverBankCode;
-    private String receiverAccountNumber;
-    private String receiverAccountCurrency;
-    private String purpose;
+    private Cycle cycle;
+    private int executionDay;
+    private LocalDate firstExecutionDate;
+    private LocalDate lastExecutionDate;
     private BigDecimal amount;
     private String currency;
+    private BankAccount otherAccount;
+    private String usage;
+    private boolean delete;
+
+    @Override
+    public void delete(boolean delete) {
+        this.delete = delete;
+    }
 
     @Override
     public TransactionType getTransactionType() {
-        return TransactionType.SINGLE_PAYMENT;
+        return delete ? STANDING_ORDER_DELETE : STANDING_ORDER;
     }
 
     @Override
