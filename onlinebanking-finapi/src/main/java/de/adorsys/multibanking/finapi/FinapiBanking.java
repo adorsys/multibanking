@@ -4,6 +4,7 @@ import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.utils.Utils;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
@@ -280,8 +281,8 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean psd2Scope() {
-        return false;
+    public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
+        return null;
     }
 
     private ApiClient createApiClient() {

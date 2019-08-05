@@ -34,6 +34,6 @@ public interface OnlineBankingService {
 
     SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
 
-    boolean psd2Scope();
+    StrongCustomerAuthorisable getStrongCustomerAuthorisation();
 
 }
