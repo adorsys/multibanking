@@ -10,9 +10,7 @@ import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
-import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
 import de.adorsys.multibanking.exception.InvalidPinException;
-import de.adorsys.multibanking.exception.StrongCustomerAuthorisationException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsIf;
@@ -51,7 +49,7 @@ public class BookingService {
     private final SmartAnalyticsIf smartAnalyticsService;
     private final AnalyticsService analyticsService;
     private final AnonymizationService anonymizationService;
-    private final StrongCustomerAuthorisationService authorisationService;
+    private final ConsentService authorisationService;
     private final BankService bankService;
     private final UserService userService;
     private final OnlineBankingServiceProducer bankingServiceProducer;

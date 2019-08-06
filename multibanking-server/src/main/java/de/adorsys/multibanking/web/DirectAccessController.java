@@ -11,7 +11,7 @@ import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;
-import de.adorsys.multibanking.service.OnlineBankingServiceProducer;
+import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.*;
 import de.adorsys.multibanking.web.model.*;
 import io.swagger.annotations.Api;
@@ -49,7 +49,7 @@ public class DirectAccessController {
     private final BankAccessMapper bankAccessMapper;
     private final BankAccountMapper bankAccountMapper;
     private final BankAccountService bankAccountService;
-    private final OnlineBankingServiceProducer bankingServiceProducer;
+    private final ConsentService consentService;
     private final BookingService bookingService;
     private final UserRepositoryIf userRepository;
     private final BankAccountRepositoryIf bankAccountRepository;
@@ -70,7 +70,7 @@ public class DirectAccessController {
         if (bankApiInput == null) {
             bankApiInput = BankApi.BANKING_GATEWAY;
         }
-        OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankApiInput);
+        OnlineBankingService bankingService = consentService.getBankingService(bankApiInput);
         if (bankingService == null) {
             return ResponseEntity.notFound().build();
         }
@@ -93,7 +93,7 @@ public class DirectAccessController {
         if (bankApiInput == null) {
             return ResponseEntity.notFound().build();
         }
-        OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankApiInput);
+        OnlineBankingService bankingService = consentService.getBankingService(bankApiInput);
         if (bankingService == null) {
             return ResponseEntity.notFound().build();
         }

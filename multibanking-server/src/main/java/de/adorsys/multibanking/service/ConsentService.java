@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class StrongCustomerAuthorisationService {
+public class ConsentService {
 
     @Value("${bankinggateway.auth.url}")
     private String consentAuthUrl;

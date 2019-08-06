@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
 import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
@@ -35,7 +34,7 @@ public class BankAccountService {
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BankAccountRepositoryIf bankAccountRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
-    private final StrongCustomerAuthorisationService strongCustomerAuthorisationService;
+    private final ConsentService consentService;
     private final UserService userService;
     private final BankService bankService;
     private final FinTSProductConfig finTSProductConfig;
@@ -65,7 +64,7 @@ public class BankAccountService {
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         checkBankSupported(bankAccess, onlineBankingService);
-        strongCustomerAuthorisationService.checkForValidConsent(bankAccess, onlineBankingService);
+        consentService.checkForValidConsent(bankAccess, onlineBankingService);
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankApi);
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
