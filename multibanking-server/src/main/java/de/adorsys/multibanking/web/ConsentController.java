@@ -72,7 +72,7 @@ public class ConsentController {
     public Resources<Resource<ConsentTO>> getConsents() {
         List<Consent> consents = bankAccessRepository.findByUserIdAndPsd2ConsentIdNotNull(principal.getName())
             .stream()
-            .map(bankAccessEntity -> getAuthorisationService().getAuthorisation(bankAccessEntity.getAuthorisation()))
+            .map(bankAccessEntity -> getAuthorisationService().getAuthorisation(bankAccessEntity.getConsentId()))
             .collect(toList());
 
         return new Resources<>(mapToResources(consents));

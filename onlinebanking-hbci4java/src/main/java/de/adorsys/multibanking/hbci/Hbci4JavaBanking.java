@@ -253,7 +253,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return new StrongCustomerAuthorisable<TanMethod>() {
             @Override
             public void containsValidAuthorisation(StrongCustomerAuthorisationContainer container) {
-                Object authorisation = container.getAuthorisation();
+                Object authorisation = container.getConsentId();
                 if (authorisation == null || !(authorisation instanceof TanMethod)) {
                     throw new MissingAuthorisationException();
                 }

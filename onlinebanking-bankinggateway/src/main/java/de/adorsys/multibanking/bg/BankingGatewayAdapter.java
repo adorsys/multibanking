@@ -155,7 +155,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             @Override
             public void containsValidAuthorisation(StrongCustomerAuthorisationContainer container) {
                 // FIXME get consent id from access
-                Object authorisation = container.getAuthorisation();
+                Object authorisation = container.getConsentId();
                 if (authorisation == null || !(authorisation instanceof Consent)) {
                     throw new MissingAuthorisationException();
                 }

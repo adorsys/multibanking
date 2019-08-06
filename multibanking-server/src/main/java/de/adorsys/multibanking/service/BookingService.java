@@ -315,7 +315,7 @@ public class BookingService {
             bankAccessRepository.save(bankAccess);
             throw new InvalidPinException(bankAccess.getId());
         } else if (e.getMultibankingError() == INVALID_AUTHORISATION) {
-            bankAccess.setAuthorisation(null);
+            bankAccess.setConsentId(null);
             bankAccessRepository.save(bankAccess);
             throw new MissingAuthorisationException();
         }
