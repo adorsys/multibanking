@@ -6,6 +6,9 @@ import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.BulkPayment;
+import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.exception.domain.MissingPinException;
 import de.adorsys.multibanking.pers.spi.repository.BulkPaymentRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.RawSepaTransactionRepositoryIf;
@@ -44,6 +47,7 @@ public class PaymentService {
 
         try {
             TransactionRequest request = TransactionRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .bankApiUser(bankApiUser)
                 .tanTransportType(tanTransportType)
                 .transaction(payment)
@@ -52,8 +56,7 @@ public class PaymentService {
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
             request.setProduct(finTSProductConfig.getProduct());
-            Object tanSubmit = bankingService.requestAuthorizationCode(null,
-                request);
+            Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
             RawSepaTransactionEntity target = new RawSepaTransactionEntity();
             BeanUtils.copyProperties(payment, target);
@@ -69,7 +72,7 @@ public class PaymentService {
     }
 
     public SinglePaymentEntity createSinglePayment(BankAccessEntity bankAccess, TanTransportType tanTransportType,
-                                             String pin, SinglePayment payment) {
+                                                   String pin, SinglePayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankingService.bankApi());
@@ -83,6 +86,7 @@ public class PaymentService {
 
         try {
             TransactionRequest request = TransactionRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .bankApiUser(bankApiUser)
                 .tanTransportType(tanTransportType)
                 .transaction(payment)
@@ -91,9 +95,8 @@ public class PaymentService {
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
             request.setProduct(finTSProductConfig.getProduct());
-            Object tanSubmit =
-                bankingService.requestAuthorizationCode(null,
-                    request);
+
+            Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
             SinglePaymentEntity target = new SinglePaymentEntity();
             BeanUtils.copyProperties(payment, target);
@@ -123,6 +126,7 @@ public class PaymentService {
 
         try {
             TransactionRequest request = TransactionRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .bankApiUser(bankApiUser)
                 .transaction(payment)
                 .tanTransportType(tanTransportType)
@@ -131,9 +135,8 @@ public class PaymentService {
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
             request.setProduct(finTSProductConfig.getProduct());
-            Object tanSubmit =
-                bankingService.requestAuthorizationCode(null,
-                    request);
+
+            Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
             BulkPaymentEntity target = new BulkPaymentEntity();
             BeanUtils.copyProperties(payment, target);
@@ -173,7 +176,8 @@ public class PaymentService {
         rawSepaTransactionRepository.delete(transactionEntity.getId());
     }
 
-    public void submitSinglePayment(SinglePaymentEntity paymentEntity, BankAccessEntity bankAccess, String pin, String tan) {
+    public void submitSinglePayment(SinglePaymentEntity paymentEntity, BankAccessEntity bankAccess, String pin,
+                                    String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         pin = pin == null ? bankAccess.getPin() : pin;

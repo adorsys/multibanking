@@ -40,6 +40,10 @@
             <groupId>de.adorsys.envutils</groupId>
             <artifactId>envutils4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

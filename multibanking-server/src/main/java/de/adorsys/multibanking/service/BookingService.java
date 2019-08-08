@@ -2,14 +2,17 @@ package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
-import de.adorsys.multibanking.exception.ExternalAuthorisationRequiredException;
+import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
 import de.adorsys.multibanking.exception.InvalidPinException;
+import de.adorsys.multibanking.exception.StrongCustomerAuthorisationException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsIf;
@@ -24,14 +27,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_AUTHORISATION;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 
 @Slf4j
@@ -48,7 +51,7 @@ public class BookingService {
     private final SmartAnalyticsIf smartAnalyticsService;
     private final AnalyticsService analyticsService;
     private final AnonymizationService anonymizationService;
-    private final BankAccountService bankAccountService;
+    private final StrongCustomerAuthorisationService authorisationService;
     private final BankService bankService;
     private final UserService userService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
@@ -110,7 +113,7 @@ public class BookingService {
 
     @Transactional
     public List<BookingEntity> syncBookings(BankAccessEntity bankAccess,
-                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi, String pin) throws ExternalAuthorisationRequiredException {
+                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi, String pin) {
         bankAccountRepository.updateSyncStatus(bankAccount.getId(), BankAccount.SyncStatus.SYNC);
 
         OnlineBankingService onlineBankingService = bankApi != null ?
@@ -136,10 +139,6 @@ public class BookingService {
             bankAccountRepository.save(bankAccount);
 
             return result;
-        } catch (ExternalAuthorisationRequiredException e) {
-            bankAccount.setDedicatedConsent(e.getConsent());
-            bankAccountRepository.save(bankAccount);
-            throw e;
         } catch (Exception e) {
             LoggerFactory.getLogger(getClass()).error("sync bookings failed", e);
             throw e;
@@ -282,20 +281,19 @@ public class BookingService {
     }
 
     private LoadBookingsResponse loadBookingsOnline(@Nullable BankApi bankApi, BankAccessEntity bankAccess,
-                                                    BankAccountEntity bankAccount, String pin) throws ExternalAuthorisationRequiredException {
+                                                    BankAccountEntity bankAccount, String pin) {
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankApi);
         OnlineBankingService onlineBankingService = checkAndGetOnlineBankingService(bankAccess, bankAccount, pin,
             bankApi, bankApiUser);
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
-        bankAccountService.checkDedicatedConsent(bankAccess, bankAccount, bankApiUser, onlineBankingService,
-            bankEntity);
+        authorisationService.checkForValidConsent(bankAccess, onlineBankingService);
 
         try {
             LoadBookingsRequest loadBookingsRequest = LoadBookingsRequest.builder()
-                .consentId(bankAccount.getDedicatedConsent() != null ?
-                    bankAccount.getDedicatedConsent().getConsentId() : null)
+                .bankUrl(bankEntity.getBankingUrl())
+                .consentId(bankAccess.getPsd2ConsentId())
                 .bankApiUser(bankApiUser)
                 .bankAccess(bankAccess)
                 .bankCode(bankEntity.getBlzHbci())
@@ -307,24 +305,21 @@ public class BookingService {
                 .withStandingOrders(true)
                 .build();
             loadBookingsRequest.setProduct(finTSProductConfig.getProduct());
-            return onlineBankingService.loadBookings(bankEntity.getBankingUrl(), loadBookingsRequest);
+            return onlineBankingService.loadBookings(loadBookingsRequest);
         } catch (MultibankingException e) {
-            return handleMultibankingException(bankAccess, bankAccount, bankApiUser, onlineBankingService, bankEntity
-                , e);
+            return handleMultibankingException(bankAccess, e);
         }
     }
 
-    private LoadBookingsResponse handleMultibankingException(BankAccessEntity bankAccess,
-                                                             BankAccountEntity bankAccount, BankApiUser bankApiUser,
-                                                             OnlineBankingService onlineBankingService,
-                                                             BankEntity bankEntity, MultibankingException e) throws ExternalAuthorisationRequiredException {
+    private LoadBookingsResponse handleMultibankingException(BankAccessEntity bankAccess, MultibankingException e) {
         if (e.getMultibankingError() == INVALID_PIN) {
             bankAccess.setPin(null);
             bankAccessRepository.save(bankAccess);
             throw new InvalidPinException(bankAccess.getId());
-        } else if (e.getMultibankingError() == INVALID_CONSENT) {
-            throw new ExternalAuthorisationRequiredException(bankAccountService.createDedicatedConsent(onlineBankingService, bankApiUser, bankAccess, bankAccount,
-                bankEntity));
+        } else if (e.getMultibankingError() == INVALID_AUTHORISATION) {
+            bankAccess.setAuthorisation(null);
+            bankAccessRepository.save(bankAccess);
+            throw new MissingAuthorisationException();
         }
         throw e;
     }
@@ -375,6 +370,7 @@ public class BookingService {
             BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
             LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .bankApiUser(bankApiUser)
                 .bankAccess(bankAccess)
                 .bankCode(bankEntity.getBlzHbci())
@@ -383,11 +379,7 @@ public class BookingService {
                 .storePin(bankAccess.isStorePin())
                 .build();
             request.setProduct(finTSProductConfig.getProduct());
-            List<BankAccount> apiBankAccounts = onlineBankingService
-                .loadBankAccounts(
-                    bankEntity.getBankingUrl(),
-                    request)
-                .getBankAccounts();
+            List<BankAccount> apiBankAccounts = onlineBankingService.loadBankAccounts(request).getBankAccounts();
 
             List<BankAccountEntity> dbBankAccounts = bankAccountRepository
                 .findByUserIdAndBankAccessId(bankAccess.getUserId(), bankAccess.getId());

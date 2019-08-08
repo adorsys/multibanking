@@ -44,6 +44,11 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     }
 
     @Override
+    public List<BankAccessEntity> findByUserIdAndPsd2ConsentIdNotNull(String userId) {
+        return entityMapper.mapToBankAccessEntities(bankAccessRepository.findByUserIdAndPsd2ConsentIdNotNull(userId));
+    }
+
+    @Override
     public void save(BankAccessEntity bankAccess) {
         BankAccessMongoEntity bankAccessMongoEntity = bankAccessRepository.save(entityMapper.mapToBankAccessMongoEntity(bankAccess));
         bankAccess.setId(bankAccessMongoEntity.getId());

@@ -55,6 +55,6 @@ public class MapperConfig {
 
     @Bean
     public ConsentMapper consentMapper() {
-        return Mappers.getMapper(ConsentMapper.class);
+        return new MultibankingConsentMapperImpl();
     }
 }

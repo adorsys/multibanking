@@ -3,7 +3,6 @@ package de.adorsys.multibanking.figo;
 import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
-import de.adorsys.multibanking.domain.request.LoadBalanceRequest;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
 import lombok.val;
 import org.junit.Before;
@@ -14,7 +13,6 @@ import java.math.BigDecimal;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-
 
 /**
  * Created on 2019-07-24.
@@ -39,7 +37,7 @@ public class FigoBankingTest {
     public void registerUser_should_successfully_run() {
         val bankaccess = getFigoTestUser();
 
-        val result = service.registerUser(null, bankaccess, "1234");
+        val result = service.registerUser(bankaccess, "1234");
 
         assertThat(result, allOf(
             hasProperty("apiUserId", notNullValue()),
@@ -53,8 +51,8 @@ public class FigoBankingTest {
     public void registerUser_should_successfully_run_twice() {
         val bankaccess = getFigoTestUser();
 
-        service.registerUser(null, bankaccess, "1234");
-        val result2 = service.registerUser(null, bankaccess, "1234");
+        service.registerUser(bankaccess, "1234");
+        val result2 = service.registerUser(bankaccess, "1234");
 
         assertThat(result2, allOf(
             hasProperty("apiUserId", notNullValue()),
@@ -68,9 +66,9 @@ public class FigoBankingTest {
     @Test
     public void removeUser_should_successfully_run_after_registerUser() {
         val bankaccess = getFigoTestUser();
-        val result = service.registerUser(null, bankaccess, "1234");
+        val result = service.registerUser(bankaccess, "1234");
 
-        service.removeUser(null, result);
+        service.removeUser(result);
 
         // success
     }
@@ -79,7 +77,7 @@ public class FigoBankingTest {
     @Test
     public void loadBankAccounts_should_successfully_run_after_registerUser() {
         val bankaccess = getFigoTestUser();
-        val result = service.registerUser(null, bankaccess, "1234");
+        val result = service.registerUser(bankaccess, "1234");
         val request = LoadAccountInformationRequest.builder()
             .bankAccess(bankaccess)
             .bankApiUser(result)
@@ -88,7 +86,7 @@ public class FigoBankingTest {
             .pin(FIGO_TEST_PIN)
             .build();
 
-        val response = service.loadBankAccounts(null, request);
+        val response = service.loadBankAccounts(request);
 
         assertThat(response, allOf(
             hasProperty("bankAccounts", hasSize(3))
@@ -99,7 +97,7 @@ public class FigoBankingTest {
     @Test
     public void loadBookings_should_successfully_run_after_registerUser() {
         val bankaccess = getFigoTestUser();
-        val result = service.registerUser(null, bankaccess, "1234");
+        val result = service.registerUser(bankaccess, "1234");
         val request = LoadAccountInformationRequest.builder()
             .bankAccess(bankaccess)
             .bankApiUser(result)
@@ -107,7 +105,7 @@ public class FigoBankingTest {
             .storePin(false)
             .pin(FIGO_TEST_PIN)
             .build();
-        val result2= service.loadBankAccounts(null, request);
+        val result2 = service.loadBankAccounts(request);
         val request2 = LoadBookingsRequest.builder()
             .bankAccess(bankaccess)
             .bankApiUser(result)
@@ -116,7 +114,7 @@ public class FigoBankingTest {
             .bankAccount(result2.getBankAccounts().get(0))
             .build();
 
-        val response = service.loadBookings(null, request2);
+        val response = service.loadBookings(request2);
 
         assertThat(response, allOf(
             hasProperty("bookings", hasSize(85)),
@@ -127,23 +125,6 @@ public class FigoBankingTest {
                 ))
             ))
         ));
-    }
-
-    @Ignore("not implemented yet")
-    @Test
-    public void loadBalances_should_successfully_run_after_registerUser() {
-        val bankaccess = getFigoTestUser();
-        val result = service.registerUser(null, bankaccess, "1234");
-        val request = LoadBalanceRequest.builder()
-            .bankAccess(bankaccess)
-            .bankApiUser(result)
-            .bankCode(FIGO_TEST_BANKCODE)
-            .pin(FIGO_TEST_PIN)
-            .build();
-
-        val response = service.loadBalances(null, request);
-
-        assertThat(response, is(notNullValue()));
     }
 
     private BankAccess getFigoTestUser() {

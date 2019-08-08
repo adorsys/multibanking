@@ -5,7 +5,6 @@ import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.exception.ExternalAuthorisationRequiredException;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.*;
@@ -14,9 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,7 +31,6 @@ public class BankAccessService {
     private final BankAccountRepositoryIf bankAccountRepository;
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BookingRepositoryIf bookingRepository;
-    private final BankService bankService;
     private final BankAccountService bankAccountService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
@@ -43,14 +42,7 @@ public class BankAccessService {
             bankAccess.setBankCode(Iban.valueOf(bankAccess.getIban()).getBankCode());
         }
 
-        List<BankAccountEntity> bankAccounts;
-        try {
-            bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null);
-        } catch (ExternalAuthorisationRequiredException e) {
-            bankAccess.setAllAcountsConsent(e.getConsent());
-            saveBankAccess(bankAccess);
-            return bankAccess;
-        }
+        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null);
 
         if (bankAccounts.isEmpty()) {
             throw new InvalidBankAccessException(bankAccess.getBankCode());
@@ -122,12 +114,15 @@ public class BankAccessService {
                 standingOrderRepository.deleteByAccountId(bankAccountEntity.getId());
                 bankAccountEntity.getExternalIdMap().keySet().forEach(bankApi -> {
                     OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankApi);
+                    // FIXME this would mean that there is the same authorisation id for different bank apis? which feels wrong
+                    // remove authorisation if needed by the bank api
+                    Optional.ofNullable(bankingService.getStrongCustomerAuthorisation())
+                        .ifPresent(strongCustomerAuthorisable -> strongCustomerAuthorisable.revokeAuthorisation(bankAccessEntity.getAuthorisation()));
                     //remove remote bank api user
                     if (bankingService.userRegistrationRequired()) {
                         BankApiUser bankApiUser =
                             userEntity.getApiUser().stream().filter(apiUser -> apiUser.getBankApi() == bankApi).findFirst().orElseThrow(() -> new ResourceNotFoundException(BankApiUser.class, bankApi.toString()));
-                        bankingService.removeBankAccount(bankService.findBankingUrl(bankAccessEntity.getBankCode()),
-                            bankAccountEntity, bankApiUser);
+                        bankingService.removeBankAccount(bankAccountEntity, bankApiUser);
                     }
                 });
             });

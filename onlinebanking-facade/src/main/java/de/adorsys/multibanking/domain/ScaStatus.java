@@ -18,5 +18,12 @@ package de.adorsys.multibanking.domain;
 
 public enum ScaStatus {
 
-    STARTED, FINALISED, FAILED
+    RECEIVED,
+    REJECTED,
+    VALID,
+    REVOKED_BY_PSU,
+    EXPIRED,
+    TERMINATED_BY_TPP,
+    TERMINATED_BY_ASPSP,
+    PARTIALLY_AUTHORISED;
 }

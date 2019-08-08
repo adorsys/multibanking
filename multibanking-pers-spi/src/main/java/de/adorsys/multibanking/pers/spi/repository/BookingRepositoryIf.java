@@ -23,5 +23,4 @@ public interface BookingRepositoryIf {
 
     void deleteByAccountId(String id);
 
-    void deleteByUserIdAndAccountId(String userId, String accountId);
 }

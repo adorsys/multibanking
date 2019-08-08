@@ -16,15 +16,15 @@
 
 package de.adorsys.multibanking.domain.request;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import lombok.Builder;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
-public class SubmitAuthorizationCodeRequest extends AbstractRequest {
+public class SubmitAuthorizationCodeRequest extends TransactionRequest {
 
     private String bankCode;
     private AbstractScaTransaction sepaTransaction;

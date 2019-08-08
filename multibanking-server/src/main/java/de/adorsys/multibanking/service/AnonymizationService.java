@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
-public class AnonymizationService {
+class AnonymizationService {
 
     private final AnonymizedBookingRepositoryIf anonymizedBookingRepository;
 

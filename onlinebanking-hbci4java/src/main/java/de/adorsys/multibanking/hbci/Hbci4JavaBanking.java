@@ -21,17 +21,26 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.BankAccess;
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.BankApiUser;
+import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisationContainer;
+import de.adorsys.multibanking.hbci.domain.TanMethod;
 import de.adorsys.multibanking.hbci.job.*;
 import de.adorsys.multibanking.hbci.model.HbciCallback;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
 import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIDialog;
@@ -57,17 +66,17 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         this(null, false);
     }
 
-    public Hbci4JavaBanking(boolean cacheBpd) {
-        this(null, cacheBpd);
+    public Hbci4JavaBanking(boolean cacheBpdUpd) {
+        this(null, cacheBpdUpd);
     }
 
-    public Hbci4JavaBanking(InputStream customBankConfigInput, boolean cacheBpd) {
-        if (cacheBpd) {
+    public Hbci4JavaBanking(InputStream customBankConfigInput, boolean cacheBpdUpd) {
+        if (cacheBpdUpd) {
             bpdCache = new HashMap<>();
         }
 
         try (InputStream inputStream = Optional.ofNullable(customBankConfigInput)
-                .orElseGet(this::getDefaultBanksInput)) {
+            .orElseGet(this::getDefaultBanksInput)) {
             HBCIUtils.refreshBLZList(inputStream);
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -81,14 +90,14 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     private InputStream getDefaultBanksInput() {
         return Optional.ofNullable(HBCIUtils.class.getClassLoader().getResource("blz.properties"))
-                .map(url -> {
-                    try {
-                        return url.openStream();
-                    } catch (IOException e) {
-                        throw new IllegalStateException(e);
-                    }
-                })
-                .orElseThrow(() -> new RuntimeException("blz.properties not exists in classpath"));
+            .map(url -> {
+                try {
+                    return url.openStream();
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
+            })
+            .orElseThrow(() -> new RuntimeException("blz.properties not exists in classpath"));
     }
 
     @Override
@@ -107,51 +116,78 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
         //no registration needed
         return null;
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(BankApiUser bankApiUser) {
         //not needed
     }
 
-    @Override
     public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
-                .bankCode(authenticatePsuRequest.getBankCode())
-                .login(authenticatePsuRequest.getLogin())
-                .customerId(authenticatePsuRequest.getCustomerId())
-                .pin(authenticatePsuRequest.getPin())
-                .build();
+            .bankCode(authenticatePsuRequest.getBankCode())
+            .login(authenticatePsuRequest.getLogin())
+            .customerId(authenticatePsuRequest.getCustomerId())
+            .pin(authenticatePsuRequest.getPin())
+            .build();
 
-        HbciCallback bpdCacheCallback = setRequestBpdAndCreateCallback(dialogRequest.getBankCode(), dialogRequest);
-        dialogRequest.setCallback(bpdCacheCallback);
+        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(dialogRequest.getBankCode(), dialogRequest);
+        dialogRequest.setCallback(hbciCallback);
 
         HBCIDialog dialog = createDialog(bankingUrl, dialogRequest);
-        dialog.getMessages();
 
-        return ScaMethodsResponse.builder()
-                .tanTransportTypes(extractTanTransportTypes(dialog.getPassport()))
-                .build();
+        ScaMethodsResponse response = ScaMethodsResponse.builder()
+            .tanTransportTypes(extractTanTransportTypes(dialog.getPassport()))
+            .build();
+        updateUpd(hbciCallback, response);
+        return response;
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
-                                                           LoadAccountInformationRequest request) {
-        HbciCallback bpdCacheCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
-        return loadBankAccounts(bankingUrl, request, bpdCacheCallback);
+    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest request) {
+        checkBankExists(request.getBankCode(), request.getBankUrl());
+
+        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
+
+        try {
+            AccountInformationJob accountInformationJob = new AccountInformationJob(request);
+            LoadAccountInformationResponse response = accountInformationJob.execute(hbciCallback);
+            updateUpd(hbciCallback, response);
+            return response;
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
     }
 
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
-                                                           LoadAccountInformationRequest request,
-                                                           HbciCallback callback) {
-        checkBankExists(request.getBankCode(), bankingUrl);
-        Optional.ofNullable(bpdCache)
-                .ifPresent(cache -> request.setBpd(cache.get(request.getBankCode())));
+    @Override
+    public LoadBookingsResponse loadBookings(LoadBookingsRequest request) {
+        checkBankExists(request.getBankCode(), request.getBankUrl());
+
+        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
+
         try {
-            return new AccountInformationJob().loadBankAccounts(request, callback);
+            LoadBookingsJob loadBookingsJob = new LoadBookingsJob(request);
+            LoadBookingsResponse response = loadBookingsJob.execute(hbciCallback);
+            updateUpd(hbciCallback, response);
+            return response;
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
+
+    public LoadBalancesResponse loadBalances(String bankingUrl, LoadBalanceRequest request) {
+        checkBankExists(request.getBankCode(), bankingUrl);
+
+        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
+
+        try {
+            LoadBalancesJob loadBalanceJob = new LoadBalancesJob(request);
+            LoadBalancesResponse response = loadBalanceJob.execute(hbciCallback);
+            updateUpd(hbciCallback, response);
+            return response;
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -162,16 +198,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return false;
     }
 
-    @Override
-    public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
-        return null;
-    }
-
-    @Override
     public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
         checkBankExists(paymentRequest.getBankCode(), bankingUrl);
         Optional.ofNullable(bpdCache)
-                .ifPresent(cache -> paymentRequest.setBpd(cache.get(paymentRequest.getBankCode())));
+            .ifPresent(cache -> paymentRequest.setHbciBPD(cache.get(paymentRequest.getBankCode())));
 
         try {
             TransferJob transferJob = new TransferJob();
@@ -182,17 +212,20 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl,
-                                                              TransactionRequest transactionRequest) {
-        checkBankExists(transactionRequest.getBankCode(), bankingUrl);
-        Optional.ofNullable(bpdCache)
-                .ifPresent(cache -> transactionRequest.setBpd(cache.get(transactionRequest.getBankCode())));
+    public AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest transactionRequest) {
+        checkBankExists(transactionRequest.getBankCode(), transactionRequest.getBankUrl());
+        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(transactionRequest.getBankCode(),
+            transactionRequest);
+
         try {
             ScaRequiredJob scaJob = Optional.ofNullable(transactionRequest.getTransaction())
-                    .map(sepaTransaction -> createScaJob(sepaTransaction.getTransactionType()))
-                    .orElse(new EmptyJob());
+                .map(transaction -> createScaJob(transactionRequest))
+                .orElse(new EmptyJob(transactionRequest));
 
-            return scaJob.requestAuthorizationCode(transactionRequest);
+            AuthorisationCodeResponse response = (AuthorisationCodeResponse) scaJob.execute(hbciCallback);
+            updateUpd(hbciCallback, response);
+
+            return response;
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -201,79 +234,79 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
         try {
-            ScaRequiredJob scaJob = Optional.ofNullable(submitAuthorizationCodeRequest.getSepaTransaction())
-                    .map(sepaTransaction -> createScaJob(sepaTransaction.getTransactionType()))
-                    .orElse(new EmptyJob());
-
             Map<String, String> bpd = Optional.ofNullable(bpdCache)
-                    .map(cache -> cache.get(submitAuthorizationCodeRequest.getBankCode()))
-                    .orElse(null);
+                .map(cache -> cache.get(submitAuthorizationCodeRequest.getBankCode()))
+                .orElse(null);
 
-            submitAuthorizationCodeRequest.setBpd(bpd);
+            submitAuthorizationCodeRequest.setHbciBPD(bpd);
 
-            return scaJob.sumbitAuthorizationCode(submitAuthorizationCodeRequest);
+            ScaRequiredJob scaJob = Optional.ofNullable(submitAuthorizationCodeRequest.getTransaction())
+                .map(transaction -> createScaJob(submitAuthorizationCodeRequest))
+                .orElse(new EmptyJob(submitAuthorizationCodeRequest));
+
+            return new SubmitAuthorisationCodeJob(scaJob).sumbitAuthorizationCode(submitAuthorizationCodeRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
     }
 
     @Override
-    public boolean accountInformationConsentRequired() {
-        return false;
+    public StrongCustomerAuthorisable<TanMethod> getStrongCustomerAuthorisation() {
+        return new StrongCustomerAuthorisable<TanMethod>() {
+            @Override
+            public void containsValidAuthorisation(StrongCustomerAuthorisationContainer container) {
+                Object authorisation = container.getAuthorisation();
+                if (authorisation == null || !(authorisation instanceof TanMethod)) {
+                    throw new MissingAuthorisationException();
+                }
+            }
+
+            @Override
+            public TanMethod createAuthorisation(TanMethod input) {
+                // HBCI doesn't create authorisations
+                return null;
+            }
+
+            @Override
+            public TanMethod getAuthorisation(String authorisationId) {
+                return this.getAuthorisationList().stream()
+                    .filter(authorisation -> authorisation.getId() == authorisationId)
+                    .findFirst().orElse(null);
+            }
+
+            @Override
+            public List<TanMethod> getAuthorisationList() {
+                // FIXME load tan methods with hbci
+                return null;
+            }
+
+            @Override
+            public void revokeAuthorisation(String authorisationId) {
+
+            }
+        };
     }
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         //not needed
     }
 
-    @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
-        checkBankExists(loadBookingsRequest.getBankCode(), bankingUrl);
-
-        HbciCallback bpdCacheCallback = setRequestBpdAndCreateCallback(loadBookingsRequest.getBankCode(), loadBookingsRequest);
-
-        try {
-            return new LoadBookingsJob().loadBookings(loadBookingsRequest, bpdCacheCallback);
-        } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
-        }
-    }
-
     @SuppressWarnings("unchecked")
-    private HbciCallback setRequestBpdAndCreateCallback(String bankCode, AbstractRequest request) {
+    private BpdUpdHbciCallback setRequestBpdAndCreateCallback(String bankCode, AbstractRequest request) {
         return Optional.ofNullable(bpdCache)
-                .map(cache -> {
-                    request.setBpd(cache.get(bankCode));
-                    return new HbciCallback() {
-                        @Override
-                        public void status(int statusTag, Object o) {
-                            if (statusTag == HBCICallback.STATUS_INST_BPD_INIT_DONE) {
-                                cache.put(bankCode, (Map<String, String>) o);
-                            }
-                        }
-                    };
-                }).orElse(null);
+            .map(cache -> {
+                request.setHbciBPD(cache.get(bankCode));
+                return new BpdUpdHbciCallback(bankCode, bpdCache);
+            }).orElse(null);
     }
 
-    @Override
-    public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
-        checkBankExists(loadBalanceRequest.getBankCode(), bankingUrl);
-        Optional.ofNullable(bpdCache)
-                .ifPresent(cache -> loadBalanceRequest.setBpd(cache.get(loadBalanceRequest.getBankCode())));
-        try {
-            return LoadBalanceJob.loadBalances(loadBalanceRequest);
-        } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
-        }
-    }
-
-    public HBCIDialog createDialog(String bankingUrl, HbciDialogRequest dialogRequest) {
+    private HBCIDialog createDialog(String bankingUrl, HbciDialogRequest dialogRequest) {
         checkBankExists(dialogRequest.getBankCode(), bankingUrl);
         Optional.ofNullable(bpdCache)
-                .ifPresent(cache -> dialogRequest.setBpd(cache.get(dialogRequest.getBankCode())));
+            .ifPresent(cache -> dialogRequest.setHbciBPD(cache.get(dialogRequest.getBankCode())));
         try {
-            return HbciDialogFactory.createDialog(null, dialogRequest);
+            return HbciDialogFactory.startHbciDialog(null, dialogRequest);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -283,12 +316,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     public boolean bankSupported(String bankCode) {
         BankInfo bankInfo = HBCIUtils.getBankInfo(bankCode);
         return bankInfo != null && bankInfo.getPinTanVersion() != null;
-    }
-
-    @Override
-    public CreateConsentResponse createAccountInformationConsent(String bankingUrl,
-                                                                 CreateConsentRequest createConsentRequest) {
-        return null;
     }
 
     private void checkBankExists(String bankCode, String bankingUrl) {
@@ -304,31 +331,30 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         });
     }
 
-    private ScaRequiredJob createScaJob(AbstractScaTransaction.TransactionType transactionType) {
-        switch (transactionType) {
+    private ScaRequiredJob createScaJob(TransactionRequest transactionRequest) {
+        switch (transactionRequest.getTransaction().getTransactionType()) {
             case SINGLE_PAYMENT:
             case FUTURE_SINGLE_PAYMENT:
-                return new SinglePaymentJob();
+                return new SinglePaymentJob(transactionRequest);
             case FOREIGN_PAYMENT:
-                return new ForeignPaymentJob();
+                return new ForeignPaymentJob(transactionRequest);
             case BULK_PAYMENT:
             case FUTURE_BULK_PAYMENT:
-                return new BulkPaymentJob();
+                return new BulkPaymentJob(transactionRequest);
             case STANDING_ORDER:
-                return new NewStandingOrderJob();
+                return new NewStandingOrderJob(transactionRequest);
             case RAW_SEPA:
-                return new RawSepaJob();
+                return new RawSepaJob(transactionRequest);
             case FUTURE_SINGLE_PAYMENT_DELETE:
-                return new DeleteFutureSinglePaymentJob();
+                return new DeleteFutureSinglePaymentJob(transactionRequest);
             case FUTURE_BULK_PAYMENT_DELETE:
-                return new DeleteFutureBulkPaymentJob();
+                return new DeleteFutureBulkPaymentJob(transactionRequest);
             case STANDING_ORDER_DELETE:
-                return new DeleteStandingOrderJob();
+                return new DeleteStandingOrderJob(transactionRequest);
             case TAN_REQUEST:
-            case DEDICATED_CONSENT:
-                return new EmptyJob();
+                return new EmptyJob(transactionRequest);
             default:
-                throw new IllegalArgumentException("invalid transaction type " + transactionType);
+                throw new IllegalArgumentException("invalid transaction type " + transactionRequest.getTransaction().getTransactionType());
         }
     }
 
@@ -343,5 +369,41 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
 
         return e;
+    }
+
+    private void updateUpd(BpdUpdHbciCallback bpdUpdHbciCallback, AbstractResponse response) {
+        Optional.ofNullable(bpdUpdHbciCallback)
+            .ifPresent(callback -> {
+                response.setHbciUpd(callback.getUpd());
+                response.setHbciSysId(callback.getSysId());
+            });
+    }
+
+    @RequiredArgsConstructor
+    @Data
+    @EqualsAndHashCode(callSuper = false)
+    private static class BpdUpdHbciCallback extends HbciCallback {
+
+        private final String bankCode;
+        private final Map<String, Map<String, String>> bpdCache;
+        private Map<String, String> upd;
+        private String sysId;
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public void status(int statusTag, Object o) {
+            if (statusTag == STATUS_INST_BPD_INIT_DONE) {
+                bpdCache.put(bankCode, (Map<String, String>) o);
+            } else if (statusTag == STATUS_INIT_UPD_DONE) {
+                this.upd = (Map<String, String>) o;
+            }
+        }
+
+        @Override
+        public void status(int statusTag, Object[] o) {
+            if (statusTag == STATUS_INIT_SYSID_DONE) {
+                this.sysId = o[1].toString();
+            }
+        }
     }
 }

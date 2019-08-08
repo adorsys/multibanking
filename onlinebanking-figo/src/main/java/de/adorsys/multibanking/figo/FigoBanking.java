@@ -2,9 +2,17 @@ package de.adorsys.multibanking.figo;
 
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.*;
-import de.adorsys.multibanking.domain.response.*;
+import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
+import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
+import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
+import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -36,7 +44,7 @@ public class FigoBanking implements OnlineBankingService {
 
     private static final String MAIL_SUFFIX = "@admb.de";
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789~!@#%^*()" +
-            "-_=+[{]},<>";
+        "-_=+[{]},<>";
     private static SecureRandom random = getSecureRandom();
     private FigoConnection figoConnection;
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -66,7 +74,7 @@ public class FigoBanking implements OnlineBankingService {
             logger.warn("missing env properties FIGO_CLIENT_ID and/or FIGO_SECRET");
         } else {
             figoConnection = new FigoConnection(clientId, secret, "http://nowhere.here", Integer.parseInt(timeout),
-                    connectionUrl);
+                connectionUrl);
         }
 
         figoTechUser = EnvProperties.getEnvOrSysProp("FIGO_TECH_USER", true);
@@ -90,7 +98,7 @@ public class FigoBanking implements OnlineBankingService {
     public boolean bankSupported(String bankCode) {
         if (figoConnection == null) {
             throw new IllegalArgumentException("figo connection not available, check env properties FIGO_CLIENT_ID " +
-                    "and/or FIGO_SECRET");
+                "and/or FIGO_SECRET");
         }
         return true;
     }
@@ -101,16 +109,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
-        return null;
-    }
-
-    @Override
-    public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
-    }
-
-    @Override
-    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
+    public AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest paymentRequest) {
         return null;
     }
 
@@ -125,10 +124,10 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
         if (figoConnection == null) {
             throw new IllegalArgumentException("figo connection not available, check env properties FIGO_CLIENT_ID " +
-                    "and/or FIGO_SECRET");
+                "and/or FIGO_SECRET");
         }
 
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
@@ -150,10 +149,10 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(BankApiUser bankApiUser) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX,
-                    bankApiUser.getApiPassword());
+                bankApiUser.getApiPassword());
             FigoSession session = createSession(tokenResponse.getAccessToken());
             session.removeUser();
         } catch (IOException | FigoException e) {
@@ -162,33 +161,27 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
-        return null;
-    }
-
-    @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
-                                                           LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
 
         BankApiUser bankApiUser = loadAccountInformationRequest.getBankApiUser();
         BankAccess bankAccess = loadAccountInformationRequest.getBankAccess();
 
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX,
-                    bankApiUser.getApiPassword());
+                bankApiUser.getApiPassword());
             FigoSession session = createSession(tokenResponse.getAccessToken());
 
             TaskTokenResponse response = session.setupNewAccount(
-                    bankAccess.getBankCode(),
-                    "de",
-                    createCredentials(
-                            bankAccess.getBankLogin(),
-                            bankAccess.getBankLogin2(),
-                            loadAccountInformationRequest.getPin()
-                    ),
-                    Collections.singletonList("standingOrders"),
-                    loadAccountInformationRequest.isStorePin(),
-                    true
+                bankAccess.getBankCode(),
+                "de",
+                createCredentials(
+                    bankAccess.getBankLogin(),
+                    bankAccess.getBankLogin2(),
+                    loadAccountInformationRequest.getPin()
+                ),
+                Collections.singletonList("standingOrders"),
+                loadAccountInformationRequest.isStorePin(),
+                true
             );
 
             String taskToken = response.getTaskToken();
@@ -199,10 +192,10 @@ public class FigoBanking implements OnlineBankingService {
             updateTanTransportTypes(bankAccess, session.getAccounts());
 
             return LoadAccountInformationResponse.builder()
-                    .bankAccounts(session.getAccounts().stream()
-                            .map(account -> FigoMapping.mapBankAccount(account, bankApi))
-                            .collect(Collectors.toList()))
-                    .build();
+                .bankAccounts(session.getAccounts().stream()
+                    .map(account -> FigoMapping.mapBankAccount(account, bankApi))
+                    .collect(Collectors.toList()))
+                .build();
         } catch (IOException | FigoException | InterruptedException e) {
             throw new IllegalStateException(e);
         }
@@ -214,7 +207,7 @@ public class FigoBanking implements OnlineBankingService {
         BankLoginSettings figoBankLoginSettings;
         try {
             figoBankLoginSettings = figoSession.queryApi("/rest/catalog/banks/de/" + bankCode, null, "GET",
-                    BankLoginSettings.class);
+                BankLoginSettings.class);
         } catch (IOException | FigoException e) {
             throw new IllegalStateException(e);
         }
@@ -222,7 +215,7 @@ public class FigoBanking implements OnlineBankingService {
         bank.setName(figoBankLoginSettings.getBankName());
 
         de.adorsys.multibanking.domain.BankLoginSettings loginSettings =
-                new de.adorsys.multibanking.domain.BankLoginSettings();
+            new de.adorsys.multibanking.domain.BankLoginSettings();
         bank.setLoginSettings(loginSettings);
 
         loginSettings.setAdvice(figoBankLoginSettings.getAdvice());
@@ -254,10 +247,10 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + MAIL_SUFFIX,
-                    bankApiUser.getApiPassword());
+                bankApiUser.getApiPassword());
             FigoSession session = createSession(tokenResponse.getAccessToken());
 
             session.removeAccount(bankAccount.getExternalIdMap().get(bankApi()));
@@ -267,26 +260,26 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
         BankApiUser bankApiUser = loadBookingsRequest.getBankApiUser();
         BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de",
-                    bankApiUser.getApiPassword());
+                bankApiUser.getApiPassword());
             FigoSession session = createSession(tokenResponse.getAccessToken());
 
             TaskTokenResponse response = session.queryApi("/rest/sync",
-                    new SyncTokenRequest(
-                            RandomStringUtils.randomAlphanumeric(5),
-                            null,
-                            Collections.singletonList("standingOrders"),
-                            Collections.singletonList(bankAccount.getExternalIdMap().get(bankApi())),
-                            true,  // disable_notifications
-                            0,     // if_not_synced_since
-                            false  // auto_continue
-                    ),
-                    "POST", TaskTokenResponse.class);
+                new SyncTokenRequest(
+                    RandomStringUtils.randomAlphanumeric(5),
+                    null,
+                    Collections.singletonList("standingOrders"),
+                    Collections.singletonList(bankAccount.getExternalIdMap().get(bankApi())),
+                    true,  // disable_notifications
+                    0,     // if_not_synced_since
+                    false  // auto_continue
+                ),
+                "POST", TaskTokenResponse.class);
 
             Status status = waitForFinish(session, response.getTaskToken());
             if (status == Status.PIN) {
@@ -294,23 +287,23 @@ public class FigoBanking implements OnlineBankingService {
             }
 
             List<Booking> bookings = session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
-                    .stream()
-                    .map(transaction -> FigoMapping.mapBooking(transaction, bankApi))
-                    .collect(Collectors.toList());
+                .stream()
+                .map(transaction -> FigoMapping.mapBooking(transaction, bankApi))
+                .collect(Collectors.toList());
 
             List<StandingOrder> standingOrders =
-                    session.getStandingOrders(bankAccount.getExternalIdMap().get(bankApi()))
-                            .stream()
-                            .map(FigoMapping::mapStandingOrder)
-                            .collect(Collectors.toList());
+                session.getStandingOrders(bankAccount.getExternalIdMap().get(bankApi()))
+                    .stream()
+                    .map(FigoMapping::mapStandingOrder)
+                    .collect(Collectors.toList());
 
             updateTanTransportTypes(loadBookingsRequest.getBankAccess(), session.getAccounts());
 
             return LoadBookingsResponse.builder()
-                    .bookings(bookings)
-                    .standingOrders(standingOrders)
-                    .bankAccountBalance(getBalance(session, bankAccount.getExternalIdMap().get(bankApi())))
-                    .build();
+                .bookings(bookings)
+                .standingOrders(standingOrders)
+                .bankAccountBalance(getBalance(session, bankAccount.getExternalIdMap().get(bankApi())))
+                .build();
 
         } catch (IOException | FigoException | InterruptedException e) {
             throw new IllegalStateException(e);
@@ -318,26 +311,14 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
-        return null;
-    }
-
-    @Override
-    public boolean accountInformationConsentRequired() {
-        return false;
-    }
-
-    @Override
-    public CreateConsentResponse createAccountInformationConsent(String bankingUrl,
-                                                                 CreateConsentRequest createConsentRequest) {
-
+    public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
         return null;
     }
 
     private TaskStatusResponse submitPin(String taskToken, String pin, FigoSession session) throws FigoException,
-            InterruptedException, IOException {
+        InterruptedException, IOException {
         TaskStatusResponse response = session.queryApi("/task/progress?id=" + taskToken,
-                new TaskStatusRequest(taskToken, pin), "POST", TaskStatusResponse.class);
+            new TaskStatusRequest(taskToken, pin), "POST", TaskStatusResponse.class);
         Status status = waitForFinish(session, taskToken);
 
         if (status != Status.OK && status != Status.TAN) {
@@ -347,7 +328,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     private void submitTan(String taskToken, String tan, FigoSession session) throws FigoException,
-            InterruptedException, IOException {
+        InterruptedException, IOException {
         TaskStatusRequest taskStatusRequest = new TaskStatusRequest(taskToken);
         taskStatusRequest.setResponse(tan);
 
@@ -361,11 +342,11 @@ public class FigoBanking implements OnlineBankingService {
 
     private void updateTanTransportTypes(BankAccess bankAccess, List<Account> accounts) {
         List<TanTransportType> tanTransportTypes = accounts
-                .stream()
-                .map(Account::getSupportedTanSchemes)
-                .flatMap(Collection::stream)
-                .map(FigoMapping::mapTanTransportTypes)
-                .collect(Collectors.toList());
+            .stream()
+            .map(Account::getSupportedTanSchemes)
+            .flatMap(Collection::stream)
+            .map(FigoMapping::mapTanTransportTypes)
+            .collect(Collectors.toList());
         if (bankAccess.getTanTransportTypes() == null) {
             bankAccess.setTanTransportTypes(new HashMap<>());
         }
@@ -374,7 +355,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     private Status waitForFinish(FigoSession session, String taskToken) throws IOException, FigoException,
-            InterruptedException {
+        InterruptedException {
         Status status;
         while ((status = checkState(session, taskToken)) == Status.SYNC) {
             Thread.sleep(1000);
@@ -397,7 +378,7 @@ public class FigoBanking implements OnlineBankingService {
 
     private Status resolveStatus(TaskStatusResponse taskStatus) throws IOException, FigoException {
         if (!taskStatus.isEnded() && !taskStatus.isErroneous() && !taskStatus.isWaitingForPin()
-                && !taskStatus.isWaitingForResponse()) {
+            && !taskStatus.isWaitingForResponse()) {
             return Status.SYNC;
         }
 
@@ -459,8 +440,8 @@ public class FigoBanking implements OnlineBankingService {
 
     private List<String> createCredentials(String... credentials) {
         return Arrays.stream(credentials)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     public enum Status {

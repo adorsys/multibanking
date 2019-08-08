@@ -26,8 +26,6 @@ public class BankAccountJpaEntity extends BankAccountCommonJpaEntity {
     @Column(name = "external_id")
     private Map<BankApi, String> externalIdMap = new EnumMap<>(BankApi.class);
     @Embedded
-    private ConsentJpaEntity dedicatedConsent;
-    @Embedded
     private BalancesReportEntity balances;
 
 }

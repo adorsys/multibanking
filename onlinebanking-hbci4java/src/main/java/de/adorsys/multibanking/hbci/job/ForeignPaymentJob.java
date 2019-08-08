@@ -16,35 +16,62 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDTAZV;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.manager.HBCIDialog;
+import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 
-public class ForeignPaymentJob extends ScaRequiredJob {
+import java.util.Collections;
+import java.util.List;
+
+@RequiredArgsConstructor
+public class ForeignPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+
+    private final TransactionRequest transactionRequest;
 
     @Override
-    protected AbstractHBCIJob createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        Konto src = getDebtorAccount(transaction, passport);
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+        Konto src = getDebtorAccount(passport);
 
         GVDTAZV gv = new GVDTAZV(passport, GVDTAZV.getLowlevelName());
 
         gv.setParam("src", src);
-        gv.setParam("dtazv", "B" + transaction.getRawData());
+        gv.setParam("dtazv", "B" + transactionRequest.getTransaction().getRawData());
         gv.verifyConstraints();
 
-        return gv;
+        return Collections.singletonList(gv);
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
+    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        return response;
+    }
+
+    @Override
+    HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog) {
+        return dialog.getPassport().getBankTwostepMechanisms().get(transactionRequest.getTanTransportType().getId());
+    }
+
+    @Override
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
         return GVDTAZV.getLowlevelName();
     }
 
     @Override
-    protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
+    public String orderIdFromJobResult(HBCIJobResult paymentGV) {
         return null;
     }
+
 }
