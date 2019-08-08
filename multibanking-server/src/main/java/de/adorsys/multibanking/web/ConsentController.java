@@ -1,9 +1,10 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.bg.domain.Consent;
+import de.adorsys.multibanking.domain.spi.Consent;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
+import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.service.OnlineBankingServiceProducer;
 import de.adorsys.multibanking.web.mapper.ConsentMapper;
 import de.adorsys.multibanking.web.model.ConsentTO;
@@ -20,6 +21,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpServerErrorException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.security.Principal;
 import java.util.List;
@@ -36,14 +39,9 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @RequestMapping(path = "api/v1/consents")
 public class ConsentController {
 
-    private final OnlineBankingServiceProducer bankingServiceProducer;
-    private final BankAccessRepositoryIf bankAccessRepository;
+    private final ConsentService consentService;
     private final ConsentMapper consentMapper;
     private final Principal principal;
-
-    private StrongCustomerAuthorisable<Consent> getAuthorisationService() {
-        return bankingServiceProducer.getBankingService(BankApi.BANKING_GATEWAY).getStrongCustomerAuthorisation();
-    }
 
     @ApiOperation(
         value = "Create new consent",
@@ -54,7 +52,7 @@ public class ConsentController {
     @PostMapping
     public ResponseEntity<Resource<ConsentTO>> createConsent(@RequestBody ConsentTO consent) {
         Consent consentInput = consentMapper.toConsent(consent);
-        Consent consentResponse = getAuthorisationService().createAuthorisation(consentInput);
+        Consent consentResponse = consentService.createConsent(consentInput, null);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(linkTo(methodOn(ConsentController.class).getConsent(consentResponse.getConsentId())).toUri());
@@ -70,12 +68,8 @@ public class ConsentController {
             })})
     @GetMapping
     public Resources<Resource<ConsentTO>> getConsents() {
-        List<Consent> consents = bankAccessRepository.findByUserIdAndPsd2ConsentIdNotNull(principal.getName())
-            .stream()
-            .map(bankAccessEntity -> getAuthorisationService().getAuthorisation(bankAccessEntity.getAuthorisation()))
-            .collect(toList());
-
-        return new Resources<>(mapToResources(consents));
+        // FIXME implement
+        throw new NotImplementedException();
     }
 
     @ApiOperation(
@@ -86,7 +80,7 @@ public class ConsentController {
             })})
     @GetMapping("/{consentId}")
     public Resource<ConsentTO> getConsent(@PathVariable("consentId") String consentId) {
-        Consent consent = getAuthorisationService().getAuthorisation(consentId);
+        Consent consent = consentService.getConsent(consentId);
 
         return mapToResource(consent);
     }
@@ -99,7 +93,7 @@ public class ConsentController {
             })})
     @DeleteMapping("/{consentId}")
     public HttpEntity<Void> deleteConsent(@PathVariable String consentId) {
-        getAuthorisationService().revokeAuthorisation(consentId);
+        consentService.revokeConsent(consentId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

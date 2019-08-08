@@ -25,14 +25,14 @@ import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankApiUser;
-import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
+import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
+import de.adorsys.multibanking.domain.spi.Consent;
+import de.adorsys.multibanking.domain.spi.ConsentStatus;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisationContainer;
-import de.adorsys.multibanking.hbci.domain.TanMethod;
 import de.adorsys.multibanking.hbci.job.*;
 import de.adorsys.multibanking.hbci.model.HbciCallback;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
@@ -49,10 +49,7 @@ import org.kapott.hbci.manager.HBCIVersion;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static de.adorsys.multibanking.hbci.job.AccountInformationJob.extractTanTransportTypes;
 
@@ -251,38 +248,64 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public StrongCustomerAuthorisable<TanMethod> getStrongCustomerAuthorisation() {
-        return new StrongCustomerAuthorisable<TanMethod>() {
+    public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
+        return new StrongCustomerAuthorisable() {
+
             @Override
-            public void containsValidAuthorisation(StrongCustomerAuthorisationContainer container) {
-                Object authorisation = container.getAuthorisation();
-                if (authorisation == null || !(authorisation instanceof TanMethod)) {
-                    throw new MissingAuthorisationException();
+            public Consent createConsent(Consent consentTemplate) {
+                consentTemplate.setScaStatus(ConsentStatus.PSU_AUTHORISED);
+                // FIXME we should save the consent somewhere
+                consentTemplate.setConsentId(UUID.randomUUID().toString());
+                return consentTemplate;
+            }
+
+            @Override
+            public Consent getConsent(String consentId) {
+                // FIXME get the consent from the local storage
+                return null;
+            }
+
+            @Override
+            public Consent loginConsent(Consent consent) {
+                // there is no login for HBCI of the consent
+                if (consent.getScaStatus() == ConsentStatus.PARTIALLY_AUTHORISED) {
+                    consent.setScaStatus(ConsentStatus.PSU_AUTHORISED);
                 }
+                // get the List of TAN Methods available
+                // FIXME call HBCI and get the Tan Method List
+//                consent.setScaMethodList(new ArrayList<>());
+                return consent;
             }
 
             @Override
-            public TanMethod createAuthorisation(TanMethod input) {
-                // HBCI doesn't create authorisations
-                return null;
+            public Consent authorizeConsent(Consent consent) {
+                // never call this for HBCI
+                // you need to call the distinct function you want to authorize
+                // it will return the challenge
+                throw new IllegalArgumentException();
             }
 
             @Override
-            public TanMethod getAuthorisation(String authorisationId) {
-                return this.getAuthorisationList().stream()
-                    .filter(authorisation -> authorisation.getId() == authorisationId)
-                    .findFirst().orElse(null);
+            public Consent selectScaMethod(Consent consent) {
+                // there is no server side selection
+                if (consent.getScaStatus() == ConsentStatus.PSU_AUTHORISED) {
+                    consent.setScaStatus(ConsentStatus.SCA_METHOD_SELECTED);
+                }
+                return consent;
             }
 
             @Override
-            public List<TanMethod> getAuthorisationList() {
-                // FIXME load tan methods with hbci
-                return null;
-            }
-
-            @Override
-            public void revokeAuthorisation(String authorisationId) {
-
+            public void validateConsent(String consentId) throws MultibankingException {
+                Consent consent = getConsent(consentId);
+                if (consent == null || consent.getCredentials() == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_PIN);
+                }
+                if (consent.getSelectedScaMethodId() == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
+                }
+                if (consent.getTan() == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_TAN);
+                }
             }
         };
     }

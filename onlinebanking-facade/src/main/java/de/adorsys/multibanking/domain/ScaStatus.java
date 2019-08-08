@@ -25,5 +25,16 @@ public enum ScaStatus {
     EXPIRED,
     TERMINATED_BY_TPP,
     TERMINATED_BY_ASPSP,
-    PARTIALLY_AUTHORISED;
+    PARTIALLY_AUTHORISED,
+    /**
+     * PIN was ok, but SCA method is not selected yet
+     */
+    PSU_AUTHORISED,
+
+    /**
+     * PIN was ok, SCA method is selected but not fulfilled
+     */
+    SCA_METHOD_SELECTED,
+
+
 }

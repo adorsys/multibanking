@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
 import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
@@ -35,7 +34,7 @@ public class BankAccountService {
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BankAccountRepositoryIf bankAccountRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
-    private final StrongCustomerAuthorisationService strongCustomerAuthorisationService;
+    private final ConsentService consentService;
     private final UserService userService;
     private final BankService bankService;
     private final FinTSProductConfig finTSProductConfig;
@@ -65,7 +64,7 @@ public class BankAccountService {
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         checkBankSupported(bankAccess, onlineBankingService);
-        strongCustomerAuthorisationService.checkForValidConsent(bankAccess, onlineBankingService);
+        consentService.validate(bankAccess, onlineBankingService);
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankApi);
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
@@ -94,7 +93,7 @@ public class BankAccountService {
         try {
             LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
                 .bankUrl(bankEntity.getBankingUrl())
-                .consentId(bankAccess.getPsd2ConsentId())
+                .consentId(bankAccess.getConsentId())
                 .transaction(new AccountInformationTransaction(LOAD_BANKACCOUNTS))
                 .bankApiUser(bankApiUser)
                 .bankAccess(bankAccess)
@@ -117,7 +116,7 @@ public class BankAccountService {
             bankAccessRepository.save(bankAccess);
             throw new InvalidPinException(bankAccess.getId());
         } else if (e.getMultibankingError() == INVALID_AUTHORISATION) {
-            bankAccess.setAuthorisation(null);
+            bankAccess.setConsentId(null);
             bankAccessRepository.save(bankAccess);
             throw new MissingAuthorisationException();
         }

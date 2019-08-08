@@ -98,7 +98,7 @@ public class SyncTest {
 
         bankAccountEntity.setId("test-account-id");
 
-        bookingService.syncBookings(bankAccessEntity, bankAccountEntity, BankApi.HBCI, System.getProperty("pin"));
+        bookingService.syncBookings(bankAccessEntity, bankAccountEntity, BankApi.HBCI);
 
         Optional<AccountAnalyticsEntity> analyticsEntity = analyticsRepository.findLastByUserIdAndAccountId("test" +
             "-user-id", "test-account-id");

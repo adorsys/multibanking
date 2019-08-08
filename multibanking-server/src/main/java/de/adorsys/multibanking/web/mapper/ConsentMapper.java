@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.web.mapper;
 
-import de.adorsys.multibanking.bg.domain.Consent;
+import de.adorsys.multibanking.domain.spi.Consent;
 import de.adorsys.multibanking.web.model.ConsentTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -114,10 +114,10 @@ public class BankAccessService {
                 standingOrderRepository.deleteByAccountId(bankAccountEntity.getId());
                 bankAccountEntity.getExternalIdMap().keySet().forEach(bankApi -> {
                     OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankApi);
-                    // FIXME this would mean that there is the same authorisation id for different bank apis? which feels wrong
-                    // remove authorisation if needed by the bank api
+                    // FIXME this would mean that there is the same consentId id for different bank apis? which feels wrong
+                    // remove consentId if needed by the bank api
                     Optional.ofNullable(bankingService.getStrongCustomerAuthorisation())
-                        .ifPresent(strongCustomerAuthorisable -> strongCustomerAuthorisable.revokeAuthorisation(bankAccessEntity.getAuthorisation()));
+                        .ifPresent(strongCustomerAuthorisable -> strongCustomerAuthorisable.revokeAuthorisation(bankAccessEntity.getConsentId()));
                     //remove remote bank api user
                     if (bankingService.userRegistrationRequired()) {
                         BankApiUser bankApiUser =

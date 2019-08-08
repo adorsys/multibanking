@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepositoryIf userRepository;
-    private final BankService bankService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
     BankApiUser checkApiRegistration(BankAccessEntity bankAccess, BankApi bankApi) {

@@ -73,7 +73,7 @@ public class FigoPaymentTest {
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("12324463"))
             .findFirst().get();
 
-        bookingService.syncBookings(bankAccessEntity, bankAccountEntitity, BankApi.FIGO, System.getProperty("pin"));
+        bookingService.syncBookings(bankAccessEntity, bankAccountEntitity, BankApi.FIGO);
 
         SinglePaymentEntity paymentEntity = new SinglePaymentEntity();
         paymentEntity.setReceiverIban("receiver_iban_needed_here");

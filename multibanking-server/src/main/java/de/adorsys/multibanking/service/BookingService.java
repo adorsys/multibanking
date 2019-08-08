@@ -10,9 +10,7 @@ import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
-import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
 import de.adorsys.multibanking.exception.InvalidPinException;
-import de.adorsys.multibanking.exception.StrongCustomerAuthorisationException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsIf;
@@ -51,7 +49,7 @@ public class BookingService {
     private final SmartAnalyticsIf smartAnalyticsService;
     private final AnalyticsService analyticsService;
     private final AnonymizationService anonymizationService;
-    private final StrongCustomerAuthorisationService authorisationService;
+    private final ConsentService consentService;
     private final BankService bankService;
     private final UserService userService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
@@ -113,7 +111,7 @@ public class BookingService {
 
     @Transactional
     public List<BookingEntity> syncBookings(BankAccessEntity bankAccess,
-                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi, String pin) {
+                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi) {
         bankAccountRepository.updateSyncStatus(bankAccount.getId(), BankAccount.SyncStatus.SYNC);
 
         OnlineBankingService onlineBankingService = bankApi != null ?
@@ -121,8 +119,8 @@ public class BookingService {
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         try {
-            LoadBookingsResponse response = loadBookingsOnline(onlineBankingService.bankApi(), bankAccess,
-                bankAccount, pin);
+            LoadBookingsResponse response = loadBookingsOnline(onlineBankingService, bankAccess,
+                bankAccount);
 
             if (!bankAccess.isTemporary()) {
                 //update bankaccess, passportstate changed
@@ -280,25 +278,30 @@ public class BookingService {
         bookingsIndexRepository.save(bookingsIndexEntity);
     }
 
-    private LoadBookingsResponse loadBookingsOnline(@Nullable BankApi bankApi, BankAccessEntity bankAccess,
-                                                    BankAccountEntity bankAccount, String pin) {
+    private LoadBookingsResponse loadBookingsOnline(OnlineBankingService onlineBankingService, BankAccessEntity bankAccess,
+                                                    BankAccountEntity bankAccount) {
 
-        BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankApi);
-        OnlineBankingService onlineBankingService = checkAndGetOnlineBankingService(bankAccess, bankAccount, pin,
-            bankApi, bankApiUser);
+        BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, onlineBankingService.bankApi());
+
+        consentService.validate(bankAccess, onlineBankingService);
+        //external (figo, finapi) account must exist, otherwise loading bookings will not work
+        // FIXME this is a problem! currently we load all accounts for bookings which could cause problems with 2FA in HBCI
+        if (onlineBankingService.externalBankAccountRequired()) {
+            checkExternalBankAccountExists(bankAccess, bankAccount, bankApiUser,
+                onlineBankingService);
+        }
+
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
-
-        authorisationService.checkForValidConsent(bankAccess, onlineBankingService);
 
         try {
             LoadBookingsRequest loadBookingsRequest = LoadBookingsRequest.builder()
                 .bankUrl(bankEntity.getBankingUrl())
-                .consentId(bankAccess.getPsd2ConsentId())
+                .consentId(bankAccess.getConsentId())
                 .bankApiUser(bankApiUser)
                 .bankAccess(bankAccess)
                 .bankCode(bankEntity.getBlzHbci())
                 .bankAccount(bankAccount)
-                .pin(pin)
+                .pin(bankAccess.getPin())
                 .dateFrom(bankAccount.getLastSync() != null ? bankAccount.getLastSync().toLocalDate() : null)
                 .withTanTransportTypes(true)
                 .withBalance(true)
@@ -317,7 +320,7 @@ public class BookingService {
             bankAccessRepository.save(bankAccess);
             throw new InvalidPinException(bankAccess.getId());
         } else if (e.getMultibankingError() == INVALID_AUTHORISATION) {
-            bankAccess.setAuthorisation(null);
+            bankAccess.setConsentId(null);
             bankAccessRepository.save(bankAccess);
             throw new MissingAuthorisationException();
         }
@@ -343,26 +346,9 @@ public class BookingService {
                 new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
     }
 
-    private OnlineBankingService checkAndGetOnlineBankingService(BankAccessEntity bankAccess,
-                                                                 BankAccountEntity bankAccount, String pin,
-                                                                 BankApi bankApi,
-                                                                 BankApiUser bankApiUser) {
-        OnlineBankingService onlineBankingService = bankApi != null ?
-            bankingServiceProducer.getBankingService(bankApi) :
-            bankingServiceProducer.getBankingService(bankAccess.getBankCode());
-
-        //external (figo, finapi) account must exist, otherwise loading bookings will not work
-        if (onlineBankingService.externalBankAccountRequired()) {
-            checkExternalBankAccountExists(bankAccess, bankAccount, pin, bankApiUser,
-                onlineBankingService);
-        }
-
-        return onlineBankingService;
-    }
-
     //only for figo
     private void checkExternalBankAccountExists(BankAccessEntity bankAccess,
-                                                BankAccountEntity bankAccount, String pin, BankApiUser bankApiUser,
+                                                BankAccountEntity bankAccount, BankApiUser bankApiUser,
                                                 OnlineBankingService onlineBankingService) {
         String externalAccountId = bankAccount.getExternalIdMap().get(onlineBankingService.bankApi());
         //account not created by given bank-api, account must be created, otherwise loading bookings will not work
@@ -375,7 +361,7 @@ public class BookingService {
                 .bankAccess(bankAccess)
                 .bankCode(bankEntity.getBlzHbci())
                 .updateTanTransportTypes(true)
-                .pin(pin)
+                .pin(bankAccess.getPin())
                 .storePin(bankAccess.isStorePin())
                 .build();
             request.setHbciProduct(finTSProductConfig.getProduct());
