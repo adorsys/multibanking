@@ -17,27 +17,30 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTermMultiUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Only for future payment (GVTermUebSEPA)
  */
 @RequiredArgsConstructor
-public class DeleteFutureBulkPaymentJob extends ScaRequiredJob {
+public class DeleteFutureBulkPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
 
     private final TransactionRequest transactionRequest;
     private String jobName;
 
     @Override
-    protected AbstractHBCIJob createHbciJob(PinTanPassport passport) {
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         FutureBulkPayment futureBulkPayment = (FutureBulkPayment) transactionRequest.getTransaction();
 
         Konto src = getDebtorAccount(passport);
@@ -50,15 +53,12 @@ public class DeleteFutureBulkPaymentJob extends ScaRequiredJob {
         sepadelgv.setParam("src", src);
         sepadelgv.verifyConstraints();
 
-        return sepadelgv;
+        return Collections.singletonList(sepadelgv);
     }
 
     @Override
-    void beforeExecute(HBCIDialog dialog) {
-    }
-
-    @Override
-    void afterExecute(HBCIDialog dialog) {
+    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        return response;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class DeleteFutureBulkPaymentJob extends ScaRequiredJob {
     }
 
     @Override
-    protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
+    public String orderIdFromJobResult(HBCIJobResult paymentGV) {
         return null;
     }
 }

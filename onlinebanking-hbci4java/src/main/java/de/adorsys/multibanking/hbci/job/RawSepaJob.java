@@ -17,11 +17,12 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.kapott.hbci.GV.AbstractSEPAGV;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDauerSEPANew;
 import org.kapott.hbci.GV.GVRawSEPA;
 import org.kapott.hbci.GV.GVUebSEPA;
@@ -29,7 +30,6 @@ import org.kapott.hbci.GV.parsers.ISEPAParser;
 import org.kapott.hbci.GV.parsers.SEPAParserFactory;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.comm.CommPinTan;
-import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.sepa.SepaVersion;
 
@@ -37,11 +37,12 @@ import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class RawSepaJob extends ScaRequiredJob {
+public class RawSepaJob extends ScaRequiredJob<AuthorisationCodeResponse> {
 
     private final TransactionRequest transactionRequest;
 
@@ -56,12 +57,12 @@ public class RawSepaJob extends ScaRequiredJob {
     }
 
     @Override
-    String orderIdFromJobResult(HBCIJobResult jobResult) {
+    public String orderIdFromJobResult(HBCIJobResult jobResult) {
         return null;
     }
 
     @Override
-    AbstractSEPAGV createHbciJob(PinTanPassport passport) {
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         RawSepaPayment sepaPayment = (RawSepaPayment) transactionRequest.getTransaction();
 
         String jobName;
@@ -86,15 +87,12 @@ public class RawSepaJob extends ScaRequiredJob {
 
         sepagv.verifyConstraints();
 
-        return sepagv;
+        return Collections.singletonList(sepagv);
     }
 
     @Override
-    void beforeExecute(HBCIDialog dialog) {
-    }
-
-    @Override
-    void afterExecute(HBCIDialog dialog) {
+    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        return response;
     }
 
     private void appendPainValues(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {

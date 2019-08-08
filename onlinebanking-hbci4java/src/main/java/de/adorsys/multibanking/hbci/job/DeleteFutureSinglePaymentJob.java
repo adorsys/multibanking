@@ -17,28 +17,31 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import lombok.RequiredArgsConstructor;
-import org.kapott.hbci.GV.AbstractSEPAGV;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTermUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Only for future payment (GVTermUebSEPA)
  */
 @RequiredArgsConstructor
-public class DeleteFutureSinglePaymentJob extends ScaRequiredJob {
+public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
 
     private final TransactionRequest transactionRequest;
     private String jobName;
 
     @Override
-    protected AbstractSEPAGV createHbciJob(PinTanPassport passport) {
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         FutureSinglePayment singlePayment = (FutureSinglePayment) transactionRequest.getTransaction();
 
         Konto src = getDebtorAccount(passport);
@@ -64,15 +67,12 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob {
 
         sepadelgv.verifyConstraints();
 
-        return sepadelgv;
+        return Collections.singletonList(sepadelgv);
     }
 
     @Override
-    void beforeExecute(HBCIDialog dialog) {
-    }
-
-    @Override
-    void afterExecute(HBCIDialog dialog) {
+    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        return response;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob {
     }
 
     @Override
-    protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
+    public String orderIdFromJobResult(HBCIJobResult paymentGV) {
         return null;
     }
 

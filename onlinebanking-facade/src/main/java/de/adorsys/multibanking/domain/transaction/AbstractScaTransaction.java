@@ -22,7 +22,7 @@ import lombok.Data;
 @Data
 public abstract class AbstractScaTransaction {
 
-    private BankAccount debtorBankAccount;
+    private BankAccount psuAccount;
     private String orderId;
     private String paymentId;
     private String product;

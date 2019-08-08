@@ -27,7 +27,9 @@ import java.util.Map;
 public abstract class AbstractRequest {
 
     private String bankUrl;
-    private Product product;
-    private Map<String, String> bpd;
+    private Product hbciProduct;
+    private Map<String, String> hbciBPD;
+    private Map<String, String> hbciUPD;
+    private String hbciSysId;
 
 }

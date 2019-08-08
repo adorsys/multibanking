@@ -22,6 +22,7 @@ import de.adorsys.multibanking.domain.TanTransportType;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
@@ -33,7 +34,6 @@ import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSEPAInfo;
 import org.kapott.hbci.GV.GVTANMediaList;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 
@@ -46,7 +46,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Slf4j
-public class AccountInformationJob extends ScaRequiredJob {
+public class AccountInformationJob extends ScaRequiredJob<LoadAccountInformationResponse> {
 
     private final LoadAccountInformationRequest loadAccountInformationRequest;
 
@@ -68,40 +68,17 @@ public class AccountInformationJob extends ScaRequiredJob {
     }
 
     @Override
-    AbstractHBCIJob createHbciJob(PinTanPassport passport) {
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         if (!passport.jobSupported("SEPAInfo"))
             throw new MultibankingException(HBCI_ERROR, "SEPAInfo job not supported");
 
-        return new GVSEPAInfo(passport);
-    }
-
-    @Override
-    void beforeExecute(HBCIDialog dialog) {
         // TAN-Medien abrufen
-        if (loadAccountInformationRequest.isUpdateTanTransportTypes() && dialog.getPassport().jobSupported(
-            "TANMediaList")) {
+        if (loadAccountInformationRequest.isUpdateTanTransportTypes() && passport.jobSupported("TANMediaList")) {
             log.info("fetching TAN media list");
-            dialog.addTask(new GVTANMediaList(dialog.getPassport()));
-        }
-    }
-
-    @Override
-    void afterExecute(HBCIDialog dialog) {
-        loadAccountInformationRequest.getBankAccess().setBankName(dialog.getPassport().getInstName());
-
-        hbciAccounts = new ArrayList<>();
-        for (Konto konto : dialog.getPassport().getAccounts()) {
-            BankAccount bankAccount = HbciMapping.toBankAccount(konto);
-            bankAccount.externalId(BankApi.HBCI, UUID.randomUUID().toString());
-            bankAccount.bankName(loadAccountInformationRequest.getBankAccess().getBankName());
-            hbciAccounts.add(bankAccount);
+            return Arrays.asList(new GVSEPAInfo(passport), new GVTANMediaList(passport));
         }
 
-        if (loadAccountInformationRequest.isUpdateTanTransportTypes()) {
-            loadAccountInformationRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
-            loadAccountInformationRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI,
-                extractTanTransportTypes(dialog.getPassport()));
-        }
+        return Collections.singletonList(new GVSEPAInfo(passport));
     }
 
     @Override
@@ -115,11 +92,29 @@ public class AccountInformationJob extends ScaRequiredJob {
     }
 
     @Override
-    String orderIdFromJobResult(HBCIJobResult jobResult) {
+    public String orderIdFromJobResult(HBCIJobResult jobResult) {
         return null;
     }
 
-    public LoadAccountInformationResponse createResponse() {
+    @Override
+    public LoadAccountInformationResponse createJobResponse(PinTanPassport passport,
+                                                            AuthorisationCodeResponse response) {
+        loadAccountInformationRequest.getBankAccess().setBankName(passport.getInstName());
+
+        hbciAccounts = new ArrayList<>();
+        for (Konto konto : passport.getAccounts()) {
+            BankAccount bankAccount = HbciMapping.toBankAccount(konto);
+            bankAccount.externalId(BankApi.HBCI, UUID.randomUUID().toString());
+            bankAccount.bankName(loadAccountInformationRequest.getBankAccess().getBankName());
+            hbciAccounts.add(bankAccount);
+        }
+
+        if (loadAccountInformationRequest.isUpdateTanTransportTypes()) {
+            loadAccountInformationRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
+            loadAccountInformationRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI,
+                extractTanTransportTypes(passport));
+        }
+
         return LoadAccountInformationResponse.builder()
             .bankAccess(loadAccountInformationRequest.getBankAccess())
             .bankAccounts(hbciAccounts)

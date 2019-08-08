@@ -35,5 +35,5 @@ public class LoadBookingsResponse extends AbstractResponse {
     private List<Booking> bookings;
     private List<StandingOrder> standingOrders;
     private BalancesReport bankAccountBalance;
-    private String hbciPassportState;
+
 }

@@ -14,26 +14,19 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.hbci.exception;
 
-import de.adorsys.multibanking.domain.BankAccess;
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankApiUser;
+import de.adorsys.multibanking.domain.TanTransportType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Data
-@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
-public class LoadBalanceRequest extends TransactionRequest {
+public class HbciAuthorisationRequiredException extends RuntimeException {
 
-    private String consentId;
-    private BankApiUser bankApiUser;
-    private List<BankAccount> bankAccounts;
-    private BankAccess bankAccess;
-    private String bankCode;
-    private String pin;
+    private final List<TanTransportType> tanTransportTypes;
 }

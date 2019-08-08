@@ -14,37 +14,19 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain.response;
 
-import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankApiUser;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
-public class LoadBookingsRequest extends TransactionRequest {
+public class LoadBalancesResponse extends AbstractResponse {
 
-    private String consentId;
-    private String authorisation;
-    private BankApiUser bankApiUser;
-    private BankAccount bankAccount;
-    private BankAccess bankAccess;
-    private String bankCode;
-    private String pin;
-    private RawResponseType rawResponseType;
-    private LocalDate dateFrom;
-    private LocalDate dateTo;
-    private boolean withBalance;
-    private boolean withStandingOrders;
-    private boolean withTanTransportTypes;
-
-    public enum RawResponseType {
-        CAMT, MT940
-    }
+    private List<BankAccount> bankAccounts;
 }

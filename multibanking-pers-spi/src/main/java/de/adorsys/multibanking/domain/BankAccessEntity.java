@@ -12,6 +12,7 @@ public class BankAccessEntity extends BankAccess implements StrongCustomerAuthor
 
     private String id;
     private String userId;
+    private String psd2ConsentId;
     private String authorisation;
     private String pin;
     private String pin2;

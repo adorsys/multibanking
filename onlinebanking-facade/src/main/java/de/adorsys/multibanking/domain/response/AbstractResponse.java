@@ -1,16 +1,16 @@
 package de.adorsys.multibanking.domain.response;
 
-import de.adorsys.multibanking.domain.TanTransportType;
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.Map;
 
 @SuperBuilder
 @Data
-abstract class AbstractResponse {
+public abstract class AbstractResponse {
 
-    private boolean authorisationRequired;
-    private List<TanTransportType> tanTransportTypes;
+    private String hbciSysId;
+    private Map<String, String> hbciUpd;
     private List<String> messages;
 }

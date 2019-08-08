@@ -22,11 +22,11 @@ import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
-import de.adorsys.multibanking.hbci.model.HbciPassport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.*;
@@ -34,59 +34,41 @@ import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.hbci.job.AccountInformationJob.extractTanTransportTypes;
 
 @RequiredArgsConstructor
 @Slf4j
-public class LoadBookingsJob extends ScaRequiredJob {
+public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
 
     private final LoadBookingsRequest loadBookingsRequest;
 
-    private String hbciPassportState;
     private AbstractHBCIJob bookingsJob;
     private AbstractHBCIJob balanceJob;
     private AbstractHBCIJob standingOrdersJob;
 
     @Override
-    AbstractHBCIJob createHbciJob(PinTanPassport passport) {
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         bookingsJob = createBookingsJob(passport);
-        return bookingsJob;
-    }
-
-    @Override
-    void beforeExecute(HBCIDialog dialog) {
         balanceJob = loadBookingsRequest.isWithBalance()
-            ? createBalanceJob(dialog)
+            ? createBalanceJob(passport)
             : null;
 
         standingOrdersJob = loadBookingsRequest.isWithStandingOrders()
-            ? createStandingOrdersJob(dialog)
+            ? createStandingOrdersJob(passport)
             : null;
-    }
 
-    @Override
-    void afterExecute(HBCIDialog dialog) {
-        if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
-            log.error("Bookings job not OK");
-            throw new MultibankingException(HBCI_ERROR, bookingsJob.getJobResult().getJobStatus().getErrorList());
-        }
-
-        if (loadBookingsRequest.isWithTanTransportTypes()) {
-            loadBookingsRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
-            loadBookingsRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI,
-                extractTanTransportTypes(dialog.getPassport()));
-        }
-
-        hbciPassportState = new HbciPassport.State(dialog.getPassport()).toJson();
+        return Stream.of(bookingsJob, balanceJob, standingOrdersJob)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -100,11 +82,23 @@ public class LoadBookingsJob extends ScaRequiredJob {
     }
 
     @Override
-    String orderIdFromJobResult(HBCIJobResult jobResult) {
+    public String orderIdFromJobResult(HBCIJobResult jobResult) {
         return null;
     }
 
-    public LoadBookingsResponse createResponse() {
+    @Override
+    public LoadBookingsResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
+            log.error("Bookings job not OK");
+            throw new MultibankingException(HBCI_ERROR, bookingsJob.getJobResult().getJobStatus().getErrorList());
+        }
+
+        if (loadBookingsRequest.isWithTanTransportTypes()) {
+            loadBookingsRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
+            loadBookingsRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI,
+                extractTanTransportTypes(passport));
+        }
+
         List<StandingOrder> standingOrders = Optional.ofNullable(standingOrdersJob)
             .map(abstractHBCIJob -> HbciMapping.createStandingOrders((GVRDauerList) abstractHBCIJob.getJobResult()))
             .orElse(null);
@@ -126,7 +120,6 @@ public class LoadBookingsJob extends ScaRequiredJob {
         }
 
         return LoadBookingsResponse.builder()
-            .hbciPassportState(hbciPassportState)
             .bookings(bookingList)
             .rawData(raw)
             .bankAccountBalance(bankAccountBalance)
@@ -134,18 +127,16 @@ public class LoadBookingsJob extends ScaRequiredJob {
             .build();
     }
 
-    private AbstractHBCIJob createStandingOrdersJob(HBCIDialog dialog) {
-        AbstractHBCIJob standingOrdersJob = null;
-        if (dialog.getPassport().jobSupported("DauerSEPAList")) {
-            standingOrdersJob = new GVDauerSEPAList(dialog.getPassport());
-            standingOrdersJob.setParam("src", createAccount());
-            dialog.addTask(standingOrdersJob);
+    private AbstractHBCIJob createStandingOrdersJob(PinTanPassport passport) {
+        if (passport.jobSupported("DauerSEPAList")) {
+            AbstractHBCIJob hbciJob = new GVDauerSEPAList(passport);
+            hbciJob.setParam("src", createAccount());
         }
-        return standingOrdersJob;
+        return null;
     }
 
     private AbstractHBCIJob createBookingsJob(PinTanPassport passport) {
-        AbstractHBCIJob bookingsJob = Optional.ofNullable(loadBookingsRequest.getRawResponseType())
+        AbstractHBCIJob hbciJob = Optional.ofNullable(loadBookingsRequest.getRawResponseType())
             .map(rawResponseType -> {
                 if (rawResponseType == LoadBookingsRequest.RawResponseType.CAMT) {
                     return new GVKUmsAllCamt(passport, true);
@@ -155,24 +146,23 @@ public class LoadBookingsJob extends ScaRequiredJob {
             })
             .orElseGet(() -> new GVKUmsAll(passport));
 
-        bookingsJob.setParam("my", createAccount());
+        hbciJob.setParam("my", createAccount());
 
         Optional.ofNullable(loadBookingsRequest.getDateFrom())
-            .ifPresent(localDate -> bookingsJob.setParam("startdate",
+            .ifPresent(localDate -> hbciJob.setParam("startdate",
                 Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
         Optional.ofNullable(loadBookingsRequest.getDateTo())
-            .ifPresent(localDate -> bookingsJob.setParam("enddate",
+            .ifPresent(localDate -> hbciJob.setParam("enddate",
                 Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
-        return bookingsJob;
+        return hbciJob;
     }
 
-    private AbstractHBCIJob createBalanceJob(HBCIDialog dialog) {
-        AbstractHBCIJob balanceJob = new GVSaldoReq(dialog.getPassport());
-        balanceJob.setParam("my", createAccount());
-        dialog.addTask(balanceJob);
-        return balanceJob;
+    private AbstractHBCIJob createBalanceJob(PinTanPassport passport) {
+        AbstractHBCIJob hbciJob = new GVSaldoReq(passport);
+        hbciJob.setParam("my", createAccount());
+        return hbciJob;
     }
 
     private Konto createAccount() {

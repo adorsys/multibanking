@@ -37,7 +37,7 @@ public class HbciDialogFactory {
             .orElseThrow(() -> new MultibankingException(BANK_NOT_SUPPORTED,
                 "Bank [" + dialogRequest.getBankCode() + "] not supported"));
 
-        HBCIProduct hbciProduct = Optional.ofNullable(dialogRequest.getProduct())
+        HBCIProduct hbciProduct = Optional.ofNullable(dialogRequest.getHbciProduct())
             .map(product -> new HBCIProduct(product.getName(), product.getVersion()))
             .orElse(null);
 
@@ -50,8 +50,14 @@ public class HbciDialogFactory {
         Optional.ofNullable(dialogRequest.getHbciPassportState())
             .ifPresent(s -> HbciPassport.State.fromJson(dialogRequest.getHbciPassportState()).apply(newPassport));
 
-        Optional.ofNullable(dialogRequest.getBpd())
+        Optional.ofNullable(dialogRequest.getHbciBPD())
             .ifPresent(newPassport::setBPD);
+
+        Optional.ofNullable(dialogRequest.getHbciUPD())
+            .ifPresent(newPassport::setUPD);
+
+        Optional.ofNullable(dialogRequest.getHbciSysId())
+            .ifPresent(newPassport::setSysId);
 
         newPassport.setPIN(dialogRequest.getPin());
 

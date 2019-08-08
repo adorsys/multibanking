@@ -37,9 +37,6 @@ import java.util.Optional;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDialog;
 
-/**
- * Created by cbr on 28.02.19.
- */
 @Slf4j
 public class TransferJob {
     public void requestTransfer(TransactionRequest sepaTransactionRequest) {
@@ -52,10 +49,10 @@ public class TransferJob {
             .pin(sepaTransactionRequest.getPin())
             .build();
 
-        dialogRequest.setProduct(Optional.ofNullable(sepaTransactionRequest.getProduct())
+        dialogRequest.setHbciProduct(Optional.ofNullable(sepaTransactionRequest.getHbciProduct())
             .map(product -> new Product(product.getName(), product.getVersion()))
             .orElse(null));
-        dialogRequest.setBpd(sepaTransactionRequest.getBpd());
+        dialogRequest.setHbciBPD(sepaTransactionRequest.getHbciBPD());
 
         HBCIDialog dialog = startHbciDialog(null, dialogRequest);
 
@@ -99,8 +96,8 @@ public class TransferJob {
         return sepagv;
     }
 
-    Konto getDebtorAccount(AbstractScaTransaction sepaTransaction, PinTanPassport passport) {
-        return Optional.ofNullable(sepaTransaction.getDebtorBankAccount())
+    private Konto getDebtorAccount(AbstractScaTransaction sepaTransaction, PinTanPassport passport) {
+        return Optional.ofNullable(sepaTransaction.getPsuAccount())
             .map(bankAccount -> {
                 Konto konto = passport.findAccountByAccountNumber(bankAccount.getAccountNumber());
                 konto.iban = bankAccount.getIban();

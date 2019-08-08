@@ -31,6 +31,7 @@ public class Consent implements StrongCustomerAuthorisation {
     private String consentId;
     private String consentAuthorisationId;
     private String redirectUrl;
+    private String authUrl;
 
     private ConsentStatus scaStatus;
 
@@ -51,9 +52,6 @@ public class Consent implements StrongCustomerAuthorisation {
     private boolean recurringIndicator;
     private LocalDate validUntil;
     private int frequencyPerDay;
-
-
-    private String authUrl;
 
     @Override
     public String toExceptionInfo() {

@@ -17,15 +17,17 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import lombok.RequiredArgsConstructor;
-import org.kapott.hbci.GV.AbstractSEPAGV;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 
+import java.util.List;
+
 @RequiredArgsConstructor
-public class EmptyJob extends ScaRequiredJob {
+public class EmptyJob extends ScaRequiredJob<AuthorisationCodeResponse> {
 
     private final TransactionRequest transactionRequest;
 
@@ -40,20 +42,17 @@ public class EmptyJob extends ScaRequiredJob {
     }
 
     @Override
-    String orderIdFromJobResult(HBCIJobResult jobResult) {
+    public String orderIdFromJobResult(HBCIJobResult jobResult) {
         return null;
     }
 
     @Override
-    AbstractSEPAGV createHbciJob(PinTanPassport passport) {
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         return null;
     }
 
     @Override
-    void beforeExecute(HBCIDialog dialog) {
-    }
-
-    @Override
-    void afterExecute(HBCIDialog dialog) {
+    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        return response;
     }
 }
