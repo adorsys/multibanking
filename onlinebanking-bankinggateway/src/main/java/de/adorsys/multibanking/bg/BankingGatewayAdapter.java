@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.bg.api.AccountInformationServiceAisApi;
-import de.adorsys.multibanking.bg.domain.Consent;
-import static de.adorsys.multibanking.bg.domain.ConsentStatus.*;
+import de.adorsys.multibanking.domain.exception.MultibankingError;
+import de.adorsys.multibanking.domain.spi.Consent;
+import static de.adorsys.multibanking.domain.spi.ConsentStatus.*;
 
 import de.adorsys.multibanking.bg.exception.ConsentAuthorisationRequiredException;
 import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
@@ -150,49 +151,50 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public StrongCustomerAuthorisable<Consent> getStrongCustomerAuthorisation() {
-        return new StrongCustomerAuthorisable<Consent>() {
+    public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
+        return new StrongCustomerAuthorisable() {
             @Override
-            public void containsValidAuthorisation(StrongCustomerAuthorisationContainer container) {
-                // FIXME get consent id from access
-                Object authorisation = container.getConsentId();
-                if (authorisation == null || !(authorisation instanceof Consent)) {
-                    throw new MissingAuthorisationException();
+            public Consent createConsent(Consent consentTemplate) {
+                // FIXME rest call to banking gateway to create consent
+                return null;
+            }
+
+            @Override
+            public Consent getConsent(String consentId) {
+                // FIXME rest call to banking gateway to get consent
+                return null;
+            }
+
+            @Override
+            public Consent loginConsent(Consent consent) {
+                // FIXME rest call to banking gateway to make PSU Authorization
+                return null;
+            }
+
+            @Override
+            public Consent authorizeConsent(Consent consent) {
+                String tan = consent.getTan();
+                // FIXME rest call to banking gateway to make SCA Authorization
+                return null;
+            }
+
+            @Override
+            public Consent selectScaMethod(Consent consent) {
+                String selectedScaMethodId = consent.getSelectedScaMethodId();
+                // FIXME rest call to banking gateway to make SCA Method Selection
+                return null;
+            }
+
+            @Override
+            public void validateConsent(String consentId) throws MultibankingException {
+                Consent consent = getConsent(consentId);
+                switch (consent.getScaStatus()) {
+                    case PARTIALLY_AUTHORISED: throw new MultibankingException(MultibankingError.INVALID_PIN);
+                    case PSU_AUTHORISED: throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
+                    case SCA_METHOD_SELECTED: throw new MultibankingException(MultibankingError.INVALID_TAN);
+                    default:
+                        return;
                 }
-                String consentId = ((Consent)authorisation).getConsentId();
-                // FIXME get consent by banking gateway - maybe with a function here
-                Consent consent = null;
-
-                if (consent.getScaStatus() != VALID) {
-                    if (consent.getScaStatus() == RECEIVED || consent.getScaStatus() == PARTIALLY_AUTHORISED) {
-                        throw new ConsentAuthorisationRequiredException(consent);
-                    } else {
-                        throw new ConsentRequiredException();
-                    }
-                }
-            }
-
-            @Override
-            public Consent createAuthorisation(Consent authorisation) {
-                // FIXME create a authorisation by calling the banking gateway
-                return null;
-            }
-
-            @Override
-            public List<Consent> getAuthorisationList() {
-                // for banking gateway there is only the creation of a consent available
-                return null;
-            }
-
-            @Override
-            public Consent getAuthorisation(String authorisationId) {
-                // FIXME get consent from banking gateway?
-                return null;
-            }
-
-            @Override
-            public void revokeAuthorisation(String authorisationId) {
-                // FIXME revoke consent at banking gateway?
             }
         };
     }

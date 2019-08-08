@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.bg.exception;
 
-import de.adorsys.multibanking.bg.domain.Consent;
+import de.adorsys.multibanking.domain.spi.Consent;
 import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

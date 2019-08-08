@@ -16,9 +16,6 @@ public class ConsentTO {
     @ApiModelProperty(value = "consent authorisation id", readOnly = true, accessMode =
         ApiModelProperty.AccessMode.READ_ONLY)
     private String consentAuthorisationId;
-    @ApiModelProperty(value = "authorisation redirect url", readOnly = true, accessMode =
-        ApiModelProperty.AccessMode.READ_ONLY)
-    private String redirectUrl;
 
     @NotNull
     private String psuAccountIban;
@@ -44,5 +41,27 @@ public class ConsentTO {
     @ApiModelProperty(value = "consent authorisation status", readOnly = true, accessMode =
         ApiModelProperty.AccessMode.READ_ONLY)
     private ScaStatusTO scaStatus;
+
+    @ApiModelProperty(value = "consent authorisation method list", readOnly = true, accessMode =
+        ApiModelProperty.AccessMode.READ_ONLY)
+    private List<TanTransportTypeTO> scaMethodList;
+
+    @ApiModelProperty(value = "selected consent authorisation method", accessMode =
+        ApiModelProperty.AccessMode.READ_WRITE)
+    private String scaMethodId;
+
+    @ApiModelProperty(value = "tan for selected consent authorisation method", accessMode =
+        ApiModelProperty.AccessMode.READ_WRITE)
+    private String tan;
+
+    @ApiModelProperty(value = "challenge for consent authorisation", readOnly = true, accessMode =
+        ApiModelProperty.AccessMode.READ_ONLY)
+    private ChallengeTO challenge;
+
+    // FIXME move to challenge response
+    @Deprecated()
+    @ApiModelProperty(value = "authorisation redirect url", readOnly = true, accessMode =
+        ApiModelProperty.AccessMode.READ_ONLY)
+    private String redirectUrl;
 
 }

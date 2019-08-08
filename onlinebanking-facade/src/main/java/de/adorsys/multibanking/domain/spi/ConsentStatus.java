@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.bg.domain;
+package de.adorsys.multibanking.domain.spi;
 
 public enum ConsentStatus {
 
@@ -25,5 +25,7 @@ public enum ConsentStatus {
     EXPIRED,
     TERMINATED_BY_TPP,
     TERMINATED_BY_ASPSP,
-    PARTIALLY_AUTHORISED;
+    PARTIALLY_AUTHORISED,
+    PSU_AUTHORISED,
+    SCA_METHOD_SELECTED,
 }

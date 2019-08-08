@@ -24,14 +24,10 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class MissingAuthorisationException extends RuntimeException {
 
-    private StrongCustomerAuthorisation authorisation;
+    private Challenge challenge;
 
-    public MissingAuthorisationException() {
+    protected MissingAuthorisationException(Challenge challenge) {
         super("missing authorisation for transactions request");
-    }
-
-    protected MissingAuthorisationException(StrongCustomerAuthorisation authorisation, String message) {
-        super(message);
-        this.authorisation = authorisation;
+        this.challenge = challenge;
     }
 }

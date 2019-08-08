@@ -64,7 +64,7 @@ public class BankAccountService {
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         checkBankSupported(bankAccess, onlineBankingService);
-        consentService.checkForValidConsent(bankAccess, onlineBankingService);
+        consentService.validate(bankAccess, onlineBankingService);
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankApi);
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
@@ -93,7 +93,7 @@ public class BankAccountService {
         try {
             LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
                 .bankUrl(bankEntity.getBankingUrl())
-                .consentId(bankAccess.getPsd2ConsentId())
+                .consentId(bankAccess.getConsentId())
                 .transaction(new AccountInformationTransaction(LOAD_BANKACCOUNTS))
                 .bankApiUser(bankApiUser)
                 .bankAccess(bankAccess)

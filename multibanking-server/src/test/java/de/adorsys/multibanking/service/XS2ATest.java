@@ -97,7 +97,7 @@ public class XS2ATest {
 
         bankAccountEntitity.setId("test-account-id");
 
-        bookingService.syncBookings(bankAccessEntity, bankAccountEntitity, BankApi.HBCI, System.getProperty("pin"));
+        bookingService.syncBookings(bankAccessEntity, bankAccountEntitity, BankApi.HBCI);
 
         AccountAnalyticsEntity analyticsEntity = analyticsRepository.findLastByUserIdAndAccountId("test-user-id",
             "test-account-id")

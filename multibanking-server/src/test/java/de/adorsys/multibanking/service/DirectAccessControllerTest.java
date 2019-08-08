@@ -3,8 +3,8 @@ package de.adorsys.multibanking.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.Application;
 import de.adorsys.multibanking.bg.BankingGatewayAdapter;
-import de.adorsys.multibanking.bg.domain.Consent;
-import de.adorsys.multibanking.bg.domain.ConsentStatus;
+import de.adorsys.multibanking.domain.spi.Consent;
+import de.adorsys.multibanking.domain.spi.ConsentStatus;
 import de.adorsys.multibanking.conf.FongoConfig;
 import de.adorsys.multibanking.conf.MapperConfig;
 import de.adorsys.multibanking.domain.*;
@@ -12,23 +12,18 @@ import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.bg.exception.ConsentAuthorisationRequiredException;
-import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.exception.ParametrizedMessageException;
 import de.adorsys.multibanking.exception.StrongCustomerAuthorisationException;
 import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.multibanking.web.DirectAccessController;
-import de.adorsys.multibanking.web.model.AccountReferenceTO;
-import de.adorsys.multibanking.web.model.BankAccessTO;
-import de.adorsys.multibanking.web.model.BankAccountTO;
-import de.adorsys.multibanking.web.model.ConsentTO;
+import de.adorsys.multibanking.web.model.*;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.assertj.core.api.SoftAssertions;
 import org.iban4j.CountryCode;
 import org.iban4j.Iban;
 import org.junit.Before;
@@ -37,7 +32,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIUtils;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -94,6 +88,109 @@ public class DirectAccessControllerTest {
     @Before
     public void beforeTest() {
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Test
+    public void createConsent_should_return_a_consent_with_method_list_for_HBCI() throws Exception {
+        BankAccessTO access = createBankAccess();
+        setupHBCI(access.getIban());
+        RequestSpecification request = createConsentRequest(access);
+
+        Response response = request.post("http://localhost:" + port + "/api/v1/direct/consents");
+
+        assertConsent(response, HttpStatus.CREATED, ScaStatusTO.PSU_AUTHORISED, 2);
+    }
+
+    @Test
+    public void createConsent_should_return_a_consent_with_method_list_for_BankingGateway() throws Exception {
+        BankAccessTO access = createBankAccess();
+        setupBankingGateway(access.getIban());
+        RequestSpecification request = createConsentRequest(access);
+
+        Response response = request.post("http://localhost:" + port + "/api/v1/direct/consents");
+
+        assertConsent(response, HttpStatus.CREATED, ScaStatusTO.PSU_AUTHORISED, 2);
+    }
+
+    @Test
+    public void createConsent_should_return_a_consent_with_a_challenge_for_BankingGateway_with_one_method() throws Exception {
+        BankAccessTO access = createBankAccess();
+        setupBankingGateway(access.getIban());
+        RequestSpecification request = createConsentRequest(access);
+
+        Response response = request.post("http://localhost:" + port + "/api/v1/direct/consents");
+
+        assertConsent(response, HttpStatus.CREATED, ScaStatusTO.SCA_METHOD_SELECTED, 0, true);
+    }
+
+    private void setupHBCI(String iban) {
+        prepareBank(hbci4JavaBanking, Iban.valueOf(iban).getBankCode());
+    }
+
+    private void setupBankingGateway(String iban) {
+        prepareBank(bankingGatewayAdapter, Iban.valueOf(iban).getBankCode());
+    }
+
+    private RequestSpecification createConsentRequest(BankAccessTO access) {
+        RequestSpecification request = RestAssured.given();
+        request.contentType(ContentType.JSON);
+        request.body(access);
+        return request;
+    }
+
+    private void assertConsent(Response response, HttpStatus httpStatus, ScaStatusTO scaStatus, int scaMethodCount) throws Exception {
+        assertConsent(response, httpStatus, scaStatus, scaMethodCount, false);
+    }
+
+    private void assertConsent(Response response, HttpStatus httpStatus, ScaStatusTO scaStatus, int scaMethodCount, boolean challengeExists) throws Exception {
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(response.getStatusCode()).isEqualTo(httpStatus.value());
+        ConsentTO consentResponse =
+            objectMapper.readValue(response.getBody().print()
+                , ConsentTO.class);
+        softly.assertThat(consentResponse.getScaStatus()).isEqualTo(scaStatus);
+        softly.assertThat(consentResponse.getScaMethodList()).asList().hasSize(scaMethodCount);
+        if (challengeExists) {
+            softly.assertThat(consentResponse.getChallenge()).isNotNull();
+        } else {
+            softly.assertThat(consentResponse.getChallenge()).isNull();
+        }
+        softly.assertAll();
+    }
+
+    @Test
+    public void loadAccountList_should_result_in_a_challenge_for_HBCI() {
+
+    }
+
+    @Test
+    public void loadAccountList_should_result_in_a_challenge_for_BankingGateway_without_a_given_challenge() {
+
+    }
+
+    @Test
+    public void loadAccountList_should_result_in_a_challenge_for_BankingGateway_with_a_given_challenge() {
+
+    }
+
+    @Test
+    public void authorizeTransaction_should_result_in_a_finalized_consent_for_HBCI() {
+
+    }
+
+    @Test
+    public void authorizeTransaction_should_result_in_a_finalized_consent_for_BankingGateway() {
+
+    }
+
+    @Test
+    public void loadAccountList_should_result_in_a_list_of_accounts_for_HBCI_with_a_finalized_consent() {
+
+    }
+
+    @Test
+    public void loadAccountList_should_result_in_a_list_of_accounts_for_BankingGateway_with_a_finalized_consent() {
+
     }
 
     //    @Ignore
