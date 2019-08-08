@@ -304,7 +304,7 @@ public class BookingService {
                 .withBalance(true)
                 .withStandingOrders(true)
                 .build();
-            loadBookingsRequest.setProduct(finTSProductConfig.getProduct());
+            loadBookingsRequest.setHbciProduct(finTSProductConfig.getProduct());
             return onlineBankingService.loadBookings(loadBookingsRequest);
         } catch (MultibankingException e) {
             return handleMultibankingException(bankAccess, e);
@@ -378,7 +378,7 @@ public class BookingService {
                 .pin(pin)
                 .storePin(bankAccess.isStorePin())
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
+            request.setHbciProduct(finTSProductConfig.getProduct());
             List<BankAccount> apiBankAccounts = onlineBankingService.loadBankAccounts(request).getBankAccounts();
 
             List<BankAccountEntity> dbBankAccounts = bankAccountRepository

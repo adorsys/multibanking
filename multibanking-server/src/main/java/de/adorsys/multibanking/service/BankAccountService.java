@@ -103,7 +103,7 @@ public class BankAccountService {
                 .storePin(bankAccess.isStorePin())
                 .updateTanTransportTypes(true)
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
+            request.setHbciProduct(finTSProductConfig.getProduct());
             return onlineBankingService.loadBankAccounts(request)
                 .getBankAccounts();
         } catch (MultibankingException e) {

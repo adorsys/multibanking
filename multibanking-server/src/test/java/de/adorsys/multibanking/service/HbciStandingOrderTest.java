@@ -105,7 +105,7 @@ public class HbciStandingOrderTest {
         standingOrder.setExecutionDay(1);
         standingOrder.setFirstExecutionDate(LocalDate.now().plusMonths(1).with(TemporalAdjusters.firstDayOfMonth()));
         standingOrder.setLastExecutionDate(LocalDate.now().plusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).plusYears(2));
-        standingOrder.setDebtorBankAccount(bankAccountEntitity);
+        standingOrder.setPsuAccount(bankAccountEntitity);
 
         Object tanSubmit = standingOrderService.createStandingOrder(bankAccessEntity, System.getProperty("pin"),
             standingOrder);

@@ -90,7 +90,7 @@ public class HbciBulkPaymentTest {
 
         BulkPayment bulkPayment = new BulkPayment();
         bulkPayment.setPayments(Collections.singletonList(payment));
-        bulkPayment.setDebtorBankAccount(bankAccountEntitity);
+        bulkPayment.setPsuAccount(bankAccountEntitity);
 
         BulkPaymentEntity paymentEntity = paymentService.createBulkPayment(bankAccessEntity,
             tanTransportType, System.getProperty("pin"), bulkPayment);

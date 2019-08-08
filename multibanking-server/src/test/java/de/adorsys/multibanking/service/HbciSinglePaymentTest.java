@@ -92,7 +92,7 @@ public class HbciSinglePaymentTest {
         payment.setReceiver("Alexander Geist");
         payment.setAmount(new BigDecimal(12.00));
         payment.setPurpose("test130");
-        payment.setDebtorBankAccount(bankAccountEntitity);
+        payment.setPsuAccount(bankAccountEntitity);
 
         SinglePaymentEntity paymentEntity = paymentService.createSinglePayment(bankAccessEntity, tanTransportType,
             System.getProperty("pin"), payment);
@@ -138,7 +138,7 @@ public class HbciSinglePaymentTest {
 
         RawSepaPayment payment = new RawSepaPayment();
         payment.setPainXml(painXml);
-        payment.setDebtorBankAccount(bankAccountEntitity);
+        payment.setPsuAccount(bankAccountEntitity);
 
         RawSepaTransactionEntity paymentEntity = paymentService.createSepaRawPayment(bankAccessEntity,
             tanTransportType, System.getProperty("pin"), payment);

@@ -55,7 +55,7 @@ public class PaymentService {
                 .pin(pin)
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
+            request.setHbciProduct(finTSProductConfig.getProduct());
             Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
             RawSepaTransactionEntity target = new RawSepaTransactionEntity();
@@ -94,7 +94,7 @@ public class PaymentService {
                 .pin(pin)
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
+            request.setHbciProduct(finTSProductConfig.getProduct());
 
             Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
@@ -134,7 +134,7 @@ public class PaymentService {
                 .pin(pin)
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
+            request.setHbciProduct(finTSProductConfig.getProduct());
 
             Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
@@ -167,7 +167,7 @@ public class PaymentService {
                 .pin(pin)
                 .tan(tan)
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
+            request.setHbciProduct(finTSProductConfig.getProduct());
             bankingService.submitAuthorizationCode(request);
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
@@ -192,7 +192,7 @@ public class PaymentService {
                 .pin(pin)
                 .tan(tan)
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
+            request.setHbciProduct(finTSProductConfig.getProduct());
             bankingService.submitAuthorizationCode(request);
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
@@ -217,7 +217,7 @@ public class PaymentService {
                 .pin(pin)
                 .tan(tan)
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
+            request.setHbciProduct(finTSProductConfig.getProduct());
             bankingService.submitAuthorizationCode(request);
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
