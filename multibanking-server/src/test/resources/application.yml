@@ -5,6 +5,8 @@ spring:
     - fongo
     - sts-enable
     - smartanalytics-embedded
+    - sca-persistence-mongodb
+    - bankinggateway-b2c-embedded
   autoconfigure.exclude:
     - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
     - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
@@ -71,3 +73,7 @@ sts:
           legacyInterval: 86400000
 
 db_secret: 1234567890ABCDEF
+
+bankinggateway:
+  auth.url: http://localhost:8086/v1/consents/{consentId}/authorisations/{authorisationId}
+  consent.url: http://localhost:8086/v1/consents

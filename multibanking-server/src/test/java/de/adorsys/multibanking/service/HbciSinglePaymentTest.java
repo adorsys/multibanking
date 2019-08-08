@@ -1,7 +1,9 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.exception.ExternalAuthorisationRequiredException;
+import de.adorsys.multibanking.exception.MissingStrongCustomerAuthorisationException;
+import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +61,7 @@ public class HbciSinglePaymentTest {
         when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(hbci4JavaBanking);
 
         bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {
-            BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"));
+            BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"), BankApi.HBCI);
             bankRepository.save(bankEntity);
             return bankEntity;
         });
@@ -90,7 +92,7 @@ public class HbciSinglePaymentTest {
         payment.setReceiver("Alexander Geist");
         payment.setAmount(new BigDecimal(12.00));
         payment.setPurpose("test130");
-        payment.setDebtorBankAccount(bankAccountEntitity);
+        payment.setPsuAccount(bankAccountEntitity);
 
         SinglePaymentEntity paymentEntity = paymentService.createSinglePayment(bankAccessEntity, tanTransportType,
             System.getProperty("pin"), payment);
@@ -100,7 +102,7 @@ public class HbciSinglePaymentTest {
     }
 
     @Test
-    public void testRawPayment() throws ExternalAuthorisationRequiredException {
+    public void testRawPayment() throws MissingStrongCustomerAuthorisationException {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
             System.getProperty("blz"), System.getProperty("pin"));
         bankAccessEntity.setBankLogin(System.getProperty("login"));
@@ -136,7 +138,7 @@ public class HbciSinglePaymentTest {
 
         RawSepaPayment payment = new RawSepaPayment();
         payment.setPainXml(painXml);
-        payment.setDebtorBankAccount(bankAccountEntitity);
+        payment.setPsuAccount(bankAccountEntitity);
 
         RawSepaTransactionEntity paymentEntity = paymentService.createSepaRawPayment(bankAccessEntity,
             tanTransportType, System.getProperty("pin"), payment);

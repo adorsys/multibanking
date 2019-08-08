@@ -19,19 +19,16 @@ package de.adorsys.multibanking.domain.request;
 import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApiUser;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
-/**
- * Created by cbr on 24.10.18
- */
 @Data
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
-public class LoadBalanceRequest extends AbstractRequest {
+public class LoadBalanceRequest extends TransactionRequest {
 
     private String consentId;
     private BankApiUser bankApiUser;

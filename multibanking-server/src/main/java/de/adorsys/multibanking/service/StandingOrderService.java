@@ -1,11 +1,15 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.config.FinTSProductConfig;
-import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankApiUser;
+import de.adorsys.multibanking.domain.BankEntity;
+import de.adorsys.multibanking.domain.StandingOrderEntity;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.exception.domain.MissingPinException;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
 import lombok.RequiredArgsConstructor;
@@ -40,15 +44,15 @@ public class StandingOrderService {
 
         try {
             TransactionRequest request = TransactionRequest.builder()
+                .bankUrl(bankEntity.getBankingUrl())
                 .bankApiUser(bankApiUser)
                 .transaction(standingOrder)
                 .bankAccess(bankAccess)
                 .pin(pin)
                 .bankCode(bankEntity.getBlzHbci())
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
-            Object tanSubmit = bankingService.requestAuthorizationCode(bankEntity.getBankingUrl(),
-                request);
+            request.setHbciProduct(finTSProductConfig.getProduct());
+            Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
             StandingOrderEntity target = new StandingOrderEntity();
             BeanUtils.copyProperties(standingOrder, target);
@@ -79,7 +83,7 @@ public class StandingOrderService {
                 .pin(pin)
                 .tan(tan)
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
+            request.setHbciProduct(finTSProductConfig.getProduct());
             bankingService.submitAuthorizationCode(request);
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());

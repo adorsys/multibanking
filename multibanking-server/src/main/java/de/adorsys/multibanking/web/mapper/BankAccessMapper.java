@@ -19,6 +19,7 @@ public interface BankAccessMapper {
     @Mapping(target = "externalIdMap", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "temporary", ignore = true)
+    @Mapping(target = "bankCode", expression = "java(org.iban4j.Iban.valueOf(bankAccessTO.getIban()).getBankCode())")
     BankAccessEntity toBankAccessEntity(BankAccessTO bankAccessTO);
 
 }

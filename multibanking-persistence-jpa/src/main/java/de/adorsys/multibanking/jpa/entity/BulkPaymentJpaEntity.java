@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.SinglePayment;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

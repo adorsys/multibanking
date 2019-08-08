@@ -33,8 +33,8 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
     public Page<BookingEntity> findPageableByUserIdAndAccountIdAndBankApi(Pageable pageable, String userId,
                                                                           String bankAccountId, BankApi bankApi) {
         Page<BookingMongoEntity> bookingsPage =
-                bookingPageableRepositoryMongodb.findByUserIdAndAccountIdAndBankApi(pageable, userId, bankAccountId,
-                        bankApi);
+            bookingPageableRepositoryMongodb.findByUserIdAndAccountIdAndBankApi(pageable, userId, bankAccountId,
+                bankApi);
 
         return bookingsPage.map(entityMapper::mapToBookingEntity);
     }
@@ -43,14 +43,14 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
     public List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId,
                                                                   BankApi bankApi) {
         return entityMapper.mapToBookingEntities(bookingRepository.findByUserIdAndAccountIdAndBankApi(userId,
-                bankAccountId, bankApi,
-                new Sort(Sort.Direction.DESC, "valutaDate")));
+            bankAccountId, bankApi,
+            new Sort(Sort.Direction.DESC, "valutaDate")));
     }
 
     @Override
     public Optional<BookingEntity> findByUserIdAndId(String userId, String bookingId) {
         return bookingRepository.findByUserIdAndId(userId, bookingId)
-                .map(entityMapper::mapToBookingEntity);
+            .map(entityMapper::mapToBookingEntity);
     }
 
     @Override
@@ -62,15 +62,15 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
     @Override
     public void save(List<BookingEntity> bookingEntities) {
         List<BookingEntity> newEntities = bookingEntities
-                .stream()
-                .filter(bookingEntity -> bookingEntity.getId() == null)
-                .peek(bookingEntity -> bookingEntity.setId(UUID.randomUUID().toString()))
-                .collect(Collectors.toList());
+            .stream()
+            .filter(bookingEntity -> bookingEntity.getId() == null)
+            .peek(bookingEntity -> bookingEntity.setId(UUID.randomUUID().toString()))
+            .collect(Collectors.toList());
 
         List<BookingEntity> existingEntities = bookingEntities
-                .stream()
-                .filter(bookingEntity -> bookingEntity.getId() != null)
-                .collect(Collectors.toList());
+            .stream()
+            .filter(bookingEntity -> bookingEntity.getId() != null)
+            .collect(Collectors.toList());
         try {
             bookingRepository.insert(entityMapper.mapToBookingMongoEntities(newEntities));
         } catch (DuplicateKeyException e) {
@@ -83,11 +83,6 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
     @Override
     public void deleteByAccountId(String id) {
         bookingRepository.deleteByAccountId(id);
-    }
-
-    @Override
-    public void deleteByUserIdAndAccountId(String userId, String accountId) {
-        bookingRepository.deleteByUserIdAndAccountId(userId, accountId);
     }
 
 }

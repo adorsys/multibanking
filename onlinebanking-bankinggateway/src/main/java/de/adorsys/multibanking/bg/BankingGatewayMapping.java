@@ -1,21 +1,22 @@
 package de.adorsys.multibanking.bg;
 
-import de.adorsys.multibanking.bg.model.*;
-import de.adorsys.multibanking.domain.BalancesReport;
+import de.adorsys.multibanking.bg.model.AccountDetails;
+import de.adorsys.multibanking.bg.model.TransactionDetails;
+import de.adorsys.multibanking.bg.model.TransactionsResponse200Json;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.Booking;
-import de.adorsys.multibanking.domain.request.CreateConsentRequest;
-import org.iban4j.Iban;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.BankAccountType.fromXS2AType;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 class BankingGatewayMapping {
 
     static BankAccount toBankAccount(AccountDetails accountDetails) {
@@ -32,20 +33,11 @@ class BankingGatewayMapping {
         return bankAccount;
     }
 
-    static BankAccount toBankAccount(AccountReference reference) {
-        String iban = reference.getIban();
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setIban(iban);
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setBalances(new BalancesReport());
-        return bankAccount;
-    }
-
     static List<Booking> toBookings(TransactionsResponse200Json transactionList) {
         return transactionList.getTransactions().getBooked()
-                .stream()
-                .map(BankingGatewayMapping::toBooking)
-                .collect(Collectors.toList());
+            .stream()
+            .map(BankingGatewayMapping::toBooking)
+            .collect(Collectors.toList());
     }
 
     private static Booking toBooking(TransactionDetails transactionDetails) {
@@ -61,45 +53,10 @@ class BankingGatewayMapping {
         if (transactionDetails.getCreditorName() != null || transactionDetails.getDebtorName() != null) {
             BankAccount bankAccount = new BankAccount();
             bankAccount.setOwner(transactionDetails.getCreditorName() != null ? transactionDetails.getCreditorName()
-                    : transactionDetails.getDebtorName());
+                : transactionDetails.getDebtorName());
             booking.setOtherAccount(bankAccount);
         }
 
         return booking;
-    }
-
-    static Consents toConsents(CreateConsentRequest request) {
-        Consents consents = new Consents();
-        consents.setAccess(toAccountAccess(request));
-        consents.setRecurringIndicator(request.isRecurringIndicator());
-        consents.setValidUntil(request.getValidUntil());
-        consents.setFrequencyPerDay(request.getFrequencyPerDay());
-        consents.setCombinedServiceIndicator(request.isCombinedServiceIndicator());
-        return consents;
-    }
-
-    private static AccountAccess toAccountAccess(CreateConsentRequest request) {
-        AccountAccess accountAccess = new AccountAccess();
-
-        if (request.isAvailableAccountsConsent()) {
-            accountAccess.setAvailableAccounts(AccountAccess.AvailableAccountsEnum.ALLACCOUNTS);
-        } else {
-            accountAccess.setAccounts(toAccountReferences(request.getAccounts()));
-            accountAccess.setBalances(toAccountReferences(request.getBalances()));
-            accountAccess.setTransactions(toAccountReferences(request.getTransactions()));
-        }
-
-        return accountAccess;
-    }
-
-    private static List<AccountReference> toAccountReferences(List<BankAccount> accounts) {
-        ArrayList<AccountReference> accountReferences = new ArrayList<>();
-        for (BankAccount account : accounts) {
-            AccountReference accountReference = new AccountReference();
-            accountReference.setIban(account.getIban());
-            accountReference.setCurrency(account.getCurrency());
-            accountReferences.add(accountReference);
-        }
-        return accountReferences;
     }
 }

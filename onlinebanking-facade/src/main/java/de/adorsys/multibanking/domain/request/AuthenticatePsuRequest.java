@@ -16,12 +16,12 @@
 
 package de.adorsys.multibanking.domain.request;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 @Data
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 public class AuthenticatePsuRequest extends AbstractRequest {
 
@@ -33,4 +33,5 @@ public class AuthenticatePsuRequest extends AbstractRequest {
     private String customerId;
     private String login;
     private String pin;
+
 }

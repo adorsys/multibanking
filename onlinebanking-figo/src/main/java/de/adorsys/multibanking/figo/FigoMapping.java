@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.figo;
 
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.domain.utils.Utils;
 import me.figo.models.StandingOrder;
 import me.figo.models.*;
@@ -30,8 +31,8 @@ public class FigoMapping {
         FIGO_TRANSFER.put(SinglePayment.TransactionType.STANDING_ORDER, "SEPA standing order");
     }
 
-    public static de.adorsys.multibanking.domain.StandingOrder mapStandingOrder(StandingOrder figoStandingOrder) {
-        de.adorsys.multibanking.domain.StandingOrder standingOrder = new de.adorsys.multibanking.domain.StandingOrder();
+    public static de.adorsys.multibanking.domain.transaction.StandingOrder mapStandingOrder(StandingOrder figoStandingOrder) {
+        de.adorsys.multibanking.domain.transaction.StandingOrder standingOrder = new de.adorsys.multibanking.domain.transaction.StandingOrder();
         standingOrder.setOrderId(figoStandingOrder.getStandingOrderId());
         standingOrder.setExecutionDay(figoStandingOrder.getExecutionDay());
         standingOrder.setAmount(figoStandingOrder.getAmount());

@@ -59,7 +59,7 @@ public class Logging {
             while (matcher.find()) {
                 int start = matcher.start("value");
                 int end = matcher.end("value");
-                for (int i=start +1 ; i< end -1; i++) {
+                for (int i = start + 1; i < end - 1; i++) {
                     sb.setCharAt(i, 'x');
                 }
             }

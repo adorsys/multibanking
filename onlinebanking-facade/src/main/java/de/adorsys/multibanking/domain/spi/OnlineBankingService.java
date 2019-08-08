@@ -4,10 +4,14 @@ import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankApiUser;
-import de.adorsys.multibanking.domain.request.*;
-import de.adorsys.multibanking.domain.response.*;
-
-import java.util.List;
+import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
+import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
+import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
+import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 
 public interface OnlineBankingService {
 
@@ -17,35 +21,24 @@ public interface OnlineBankingService {
 
     boolean userRegistrationRequired();
 
-    BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin);
+    BankApiUser registerUser(BankAccess bankAccess, String pin);
 
-    void removeUser(String bankingUrl, BankApiUser bankApiUser);
+    void removeUser(BankApiUser bankApiUser);
 
-    ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest);
+    LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest);
 
-    LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
-                                                    LoadAccountInformationRequest loadAccountInformationRequest);
+    void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
 
-    void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser);
-
-    LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest);
-
-    List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest);
+    LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest);
 
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
 
-    InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest);
-
-    void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest);
-
-    AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest);
+    AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest paymentRequest);
 
     SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
 
-    boolean accountInformationConsentRequired();
-
-    CreateConsentResponse createAccountInformationConsent(String bankingUrl, CreateConsentRequest createConsentRequest);
+    StrongCustomerAuthorisable getStrongCustomerAuthorisation();
 
 }

@@ -18,7 +18,6 @@ package de.adorsys.multibanking.domain;
 
 import lombok.Data;
 
-
 @Data
 public class Bank {
 

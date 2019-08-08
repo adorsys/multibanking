@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.hateoas.core.Relation;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -12,10 +13,12 @@ import java.time.LocalDateTime;
 @ApiModel(description = "The bank account object", value = "BankAccount")
 public class BankAccountTO {
 
+    @NotNull
     @ApiModelProperty(value = "Account ID")
     private String id;
-    @ApiModelProperty(value = "SCA consent")
-    private ConsentTO dedicatedConsent;
+    @NotNull
+    @ApiModelProperty(value = "Bank Access Id")
+    private String bankAccessId;
     @ApiModelProperty(value = "Bank account balances")
     private BalancesReportTO balances;
     @ApiModelProperty(value = "Name of the account owner", example = "EDEKA")
@@ -42,8 +45,6 @@ public class BankAccountTO {
     private SyncStatusTO syncStatus;
     @ApiModelProperty(value = "Last Synchronisation date", example = "2017-12-01")
     private LocalDateTime lastSync;
-    @ApiModelProperty(value = "Bank Access Id")
-    private String bankAccessId;
 
     public enum SyncStatusTO {
         PENDING, SYNC, READY

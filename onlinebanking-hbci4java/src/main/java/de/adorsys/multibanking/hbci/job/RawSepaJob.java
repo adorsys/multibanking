@@ -16,10 +16,13 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.RawSepaPayment;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.kapott.hbci.GV.AbstractSEPAGV;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDauerSEPANew;
 import org.kapott.hbci.GV.GVRawSEPA;
 import org.kapott.hbci.GV.GVUebSEPA;
@@ -34,24 +37,33 @@ import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class RawSepaJob extends ScaRequiredJob {
+@RequiredArgsConstructor
+public class RawSepaJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+
+    private final TransactionRequest transactionRequest;
 
     @Override
-    String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
         return GVRawSEPA.getLowlevelName();
     }
 
     @Override
-    String orderIdFromJobResult(HBCIJobResult jobResult) {
+    public String orderIdFromJobResult(HBCIJobResult jobResult) {
         return null;
     }
 
     @Override
-    AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        RawSepaPayment sepaPayment = (RawSepaPayment) transaction;
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+        RawSepaPayment sepaPayment = (RawSepaPayment) transactionRequest.getTransaction();
 
         String jobName;
         switch (sepaPayment.getSepaTransactionType()) {
@@ -65,17 +77,22 @@ public class RawSepaJob extends ScaRequiredJob {
                 jobName = GVDauerSEPANew.getLowlevelName();
                 break;
             default:
-                throw new IllegalArgumentException("unsupported raw sepa transaction: " + transaction.getTransactionType());
+                throw new IllegalArgumentException("unsupported raw sepa transaction: " + sepaPayment.getSepaTransactionType());
         }
 
         GVRawSEPA sepagv = new GVRawSEPA(passport, jobName, sepaPayment.getRawData());
-        sepagv.setParam("src", getDebtorAccount(transaction, passport));
+        sepagv.setParam("src", getDebtorAccount(passport));
 
         appendPainValues(sepaPayment, sepagv);
 
         sepagv.verifyConstraints();
 
-        return sepagv;
+        return Collections.singletonList(sepagv);
+    }
+
+    @Override
+    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        return response;
     }
 
     private void appendPainValues(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {
@@ -107,7 +124,7 @@ public class RawSepaJob extends ScaRequiredJob {
     private List<Map<String, String>> parsePain(String painXml) {
         List<Map<String, String>> sepaResults = new ArrayList<>();
         ISEPAParser<List<Map<String, String>>> parser =
-                SEPAParserFactory.get(SepaVersion.autodetect(painXml));
+            SEPAParserFactory.get(SepaVersion.autodetect(painXml));
         try {
             parser.parse(new ByteArrayInputStream(painXml.getBytes(CommPinTan.ENCODING)), sepaResults);
         } catch (UnsupportedEncodingException e) {

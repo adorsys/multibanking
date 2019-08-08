@@ -1,16 +1,19 @@
 package de.adorsys.multibanking.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisationContainer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(value = {"pin", "pin2", "hbciPassportState"}, allowSetters = true)
-public class BankAccessEntity extends BankAccess {
+public class BankAccessEntity extends BankAccess implements StrongCustomerAuthorisationContainer {
 
     private String id;
     private String userId;
+    private String psd2ConsentId;
+    private String authorisation;
     private String pin;
     private String pin2;
     private boolean temporary;

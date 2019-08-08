@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>5.0.7</version>
+        <version>5.0.8</version>
     </parent>
 
     <artifactId>finapi-adapter</artifactId>
@@ -50,11 +50,15 @@
             <artifactId>gson-fire</artifactId>
             <version>${gson-fire-version}</version>
         </dependency>
-            <dependency>
-                <groupId>org.threeten</groupId>
-                <artifactId>threetenbp</artifactId>
-                <version>${threetenbp-version}</version>
-            </dependency>
+        <dependency>
+            <groupId>org.threeten</groupId>
+            <artifactId>threetenbp</artifactId>
+            <version>${threetenbp-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
         <!-- test dependencies -->
         <dependency>
             <groupId>junit</groupId>

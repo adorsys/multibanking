@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,7 @@ public class HbciStandingOrderTest {
         when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(new Hbci4JavaBanking());
 
         bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {
-            BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"));
+            BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"), BankApi.HBCI);
             bankRepository.save(bankEntity);
             return bankEntity;
         });
@@ -104,7 +105,7 @@ public class HbciStandingOrderTest {
         standingOrder.setExecutionDay(1);
         standingOrder.setFirstExecutionDate(LocalDate.now().plusMonths(1).with(TemporalAdjusters.firstDayOfMonth()));
         standingOrder.setLastExecutionDate(LocalDate.now().plusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).plusYears(2));
-        standingOrder.setDebtorBankAccount(bankAccountEntitity);
+        standingOrder.setPsuAccount(bankAccountEntitity);
 
         Object tanSubmit = standingOrderService.createStandingOrder(bankAccessEntity, System.getProperty("pin"),
             standingOrder);

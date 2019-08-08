@@ -4,6 +4,7 @@ import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.utils.Utils;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
@@ -78,7 +79,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(String bankingUrl, BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
 
         try {
@@ -97,7 +98,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeUser(String bankingUrl, BankApiUser bankApiUser) {
+    public void removeUser(BankApiUser bankApiUser) {
         try {
             new UsersApi(createApiClient()).deleteUnverifiedUser(bankApiUser.getApiUserId());
         } catch (ApiException e) {
@@ -106,13 +107,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
-        return null;
-    }
-
-    @Override
-    public LoadAccountInformationResponse loadBankAccounts(String bankingUrl,
-                                                           LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
         LOG.info("load bank accounts");
         BankAccess bankAccess = loadAccountInformationRequest.getBankAccess();
 
@@ -160,7 +155,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public void removeBankAccount(String bankingUrl, BankAccount bankAccount, BankApiUser bankApiUser) {
+    public void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser) {
         ApiClient apiClient = createUserApiClient();
         apiClient.setAccessToken(authorizeUser(bankApiUser));
 
@@ -172,7 +167,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(String bankingUrl, LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
         BankAccount bankAccount = loadBookingsRequest.getBankAccount();
 
         //TODO standing orders needed
@@ -240,11 +235,6 @@ public class FinapiBanking implements OnlineBankingService {
         }
     }
 
-    @Override
-    public List<BankAccount> loadBalances(String bankingUrl, LoadBalanceRequest loadBalanceRequest) {
-        return null;
-    }
-
     private Account waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {
         Account account =
                 new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
@@ -280,16 +270,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public InitiatePaymentResponse initiatePayment(String bankingUrl, TransactionRequest paymentRequest) {
-        return null;
-    }
-
-    @Override
-    public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
-    }
-
-    @Override
-    public AuthorisationCodeResponse requestAuthorizationCode(String bankingUrl, TransactionRequest paymentRequest) {
+    public AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest paymentRequest) {
         return null;
     }
 
@@ -299,14 +280,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public boolean accountInformationConsentRequired() {
-        return false;
-    }
-
-    @Override
-    public CreateConsentResponse createAccountInformationConsent(String bankingUrl,
-                                                                 CreateConsentRequest createConsentRequest) {
-
+    public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
         return null;
     }
 

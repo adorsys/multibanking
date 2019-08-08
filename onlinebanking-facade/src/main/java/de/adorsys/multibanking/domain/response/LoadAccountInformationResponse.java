@@ -18,14 +18,14 @@ package de.adorsys.multibanking.domain.response;
 
 import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankAccount;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Data
-@Builder
+@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 public class LoadAccountInformationResponse extends AbstractResponse {
 

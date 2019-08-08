@@ -1,40 +1,43 @@
 package de.adorsys.multibanking.service;
 
+import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
 import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.CreateConsentRequest;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
-import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.AccountInformationTransaction;
 import de.adorsys.multibanking.exception.*;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
-import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_AUTHORISATION;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
+import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_BANKACCOUNTS;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class BankAccountService {
 
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BankAccountRepositoryIf bankAccountRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
+    private final StrongCustomerAuthorisationService strongCustomerAuthorisationService;
     private final UserService userService;
     private final BankService bankService;
-    private final Principal principal;
     private final FinTSProductConfig finTSProductConfig;
 
     public List<BankAccountEntity> getBankAccounts(String userId, String accessId) {
@@ -44,39 +47,16 @@ public class BankAccountService {
         List<BankAccountEntity> bankAccounts = bankAccountRepository.findByUserIdAndBankAccessId(userId, accessId);
 
         if (bankAccounts.isEmpty()) {
-            //check for finalised sca
-            ScaStatus scaStatusStarted = Optional.ofNullable(bankAccessEntity.getAllAcountsConsent())
-                .map(Consent::getScaStatus)
-                .filter(status -> status == ScaStatus.STARTED)
-                .orElse(null);
+            bankAccounts = loadBankAccountsOnline(bankAccessEntity, null);
+            bankAccounts.forEach(account -> account.setBankAccessId(bankAccessEntity.getId()));
 
-            if (scaStatusStarted != null) {
-                try {
-                    bankAccounts = loadBankAccountsOnline(bankAccessEntity, null);
-                    bankAccounts.forEach(account -> account.setBankAccessId(bankAccessEntity.getId()));
+            bankAccountRepository.save(bankAccounts);
+            log.info("[{}] accounts for connection [{}] created.", bankAccounts.size(),
+                bankAccessEntity.getId());
 
-                    bankAccountRepository.save(bankAccounts);
-                    log.info("[{}] accounts for connection [{}] created.", bankAccounts.size(),
-                        bankAccessEntity.getId());
-
-                    bankAccessEntity.getAllAcountsConsent().setScaStatus(ScaStatus.FINALISED);
-                    bankAccessRepository.save(bankAccessEntity);
-                } catch (ExternalAuthorisationRequiredException e) {
-                    bankAccessEntity.setAllAcountsConsent(e.getConsent());
-                    bankAccessRepository.save(bankAccessEntity);
-                    throw e;
-                }
-            }
+            bankAccessRepository.save(bankAccessEntity);
         }
         return bankAccounts;
-    }
-
-    private void checkAvailableAccountsConsent(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService
-        , BankApiUser bankApiUser, BankEntity bankEntity) {
-        if (onlineBankingService.accountInformationConsentRequired() && bankAccess.getAllAcountsConsent() == null) {
-            throw new ExternalAuthorisationRequiredException(createAvailableAccountsConsent(onlineBankingService,
-                bankApiUser, bankAccess, bankEntity));
-        }
     }
 
     public List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi) {
@@ -85,11 +65,10 @@ public class BankAccountService {
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         checkBankSupported(bankAccess, onlineBankingService);
+        strongCustomerAuthorisationService.checkForValidConsent(bankAccess, onlineBankingService);
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankApi);
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
-
-        checkAvailableAccountsConsent(bankAccess, onlineBankingService, bankApiUser, bankEntity);
 
         List<BankAccount> bankAccounts = loadBankAccountsOnline(bankAccess, onlineBankingService, bankApiUser,
             bankEntity);
@@ -109,71 +88,14 @@ public class BankAccountService {
             .collect(Collectors.toList());
     }
 
-    private Consent createAvailableAccountsConsent(OnlineBankingService onlineBankingService,
-                                                   BankApiUser bankApiUser,
-                                                   BankAccessEntity bankAccessEntity,
-                                                   BankEntity bankEntity) {
-        //we assume the user belongs to same identity provider
-        bankApiUser.setApiUserId(principal.getName());
-
-        CreateConsentRequest createConsentRequest = CreateConsentRequest.builder()
-            .bankAccess(bankAccessEntity)
-            .bankApiUser(bankApiUser)
-            .availableAccountsConsent(true)
-            .frequencyPerDay(1)
-            .validUntil(LocalDate.now().plusDays(1))
-            .recurringIndicator(false)
-            .build();
-
-        CreateConsentResponse accountInformationConsent =
-            onlineBankingService.createAccountInformationConsent(bankEntity.getBankingUrl(),
-                createConsentRequest);
-
-        return toConsent(accountInformationConsent);
-    }
-
-    void checkDedicatedConsent(BankAccessEntity bankAccess, BankAccountEntity bankAccount,
-                               BankApiUser bankApiUser, OnlineBankingService onlineBankingService,
-                               BankEntity bankEntity) {
-        if (onlineBankingService.accountInformationConsentRequired() && bankAccount.getDedicatedConsent() == null) {
-            throw new ExternalAuthorisationRequiredException(createDedicatedConsent(onlineBankingService,
-                bankApiUser, bankAccess, bankAccount, bankEntity));
-        }
-    }
-
-    Consent createDedicatedConsent(OnlineBankingService onlineBankingService,
-                                   BankApiUser bankApiUser,
-                                   BankAccessEntity bankAccessEntity,
-                                   BankAccountEntity bankAccountEntity,
-                                   BankEntity bankEntity) {
-        //we assume the user belongs to same identity provider
-        bankApiUser.setApiUserId(principal.getName());
-
-        CreateConsentRequest createConsentRequest = CreateConsentRequest.builder()
-            .bankAccess(bankAccessEntity)
-            .accounts(Collections.singletonList(bankAccountEntity))
-            .balances(Collections.singletonList(bankAccountEntity))
-            .transactions(Collections.singletonList(bankAccountEntity))
-            .bankApiUser(bankApiUser)
-            .frequencyPerDay(5)
-            .validUntil(LocalDate.now().plusYears(1))
-            .recurringIndicator(true)
-            .build();
-
-        CreateConsentResponse accountInformationConsent =
-            onlineBankingService.createAccountInformationConsent(bankEntity.getBankingUrl(),
-                createConsentRequest);
-
-        return toConsent(accountInformationConsent);
-    }
-
     private List<BankAccount> loadBankAccountsOnline(BankAccessEntity bankAccess,
                                                      OnlineBankingService onlineBankingService,
                                                      BankApiUser bankApiUser, BankEntity bankEntity) {
         try {
             LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
-                .consentId(bankAccess.getAllAcountsConsent() != null ?
-                    bankAccess.getAllAcountsConsent().getConsentId() : null)
+                .bankUrl(bankEntity.getBankingUrl())
+                .consentId(bankAccess.getPsd2ConsentId())
+                .transaction(new AccountInformationTransaction(LOAD_BANKACCOUNTS))
                 .bankApiUser(bankApiUser)
                 .bankAccess(bankAccess)
                 .bankCode(bankEntity.getBlzHbci())
@@ -181,25 +103,23 @@ public class BankAccountService {
                 .storePin(bankAccess.isStorePin())
                 .updateTanTransportTypes(true)
                 .build();
-            request.setProduct(finTSProductConfig.getProduct());
-            return onlineBankingService.loadBankAccounts(bankEntity.getBankingUrl(),
-                request)
+            request.setHbciProduct(finTSProductConfig.getProduct());
+            return onlineBankingService.loadBankAccounts(request)
                 .getBankAccounts();
         } catch (MultibankingException e) {
-            return handleMultibankingException(bankAccess, bankApiUser, onlineBankingService, bankEntity, e);
+            return handleMultibankingException(bankAccess, e);
         }
     }
 
-    private List<BankAccount> handleMultibankingException(BankAccessEntity bankAccess, BankApiUser bankApiUser,
-                                                          OnlineBankingService onlineBankingService,
-                                                          BankEntity bankEntity, MultibankingException e) {
+    private List<BankAccount> handleMultibankingException(BankAccessEntity bankAccess, MultibankingException e) {
         if (e.getMultibankingError() == INVALID_PIN) {
             bankAccess.setPin(null);
             bankAccessRepository.save(bankAccess);
             throw new InvalidPinException(bankAccess.getId());
-        } else if (e.getMultibankingError() == INVALID_CONSENT) {
-            throw new ExternalAuthorisationRequiredException(createAvailableAccountsConsent(onlineBankingService,
-                bankApiUser, bankAccess, bankEntity));
+        } else if (e.getMultibankingError() == INVALID_AUTHORISATION) {
+            bankAccess.setAuthorisation(null);
+            bankAccessRepository.save(bankAccess);
+            throw new MissingAuthorisationException();
         }
         throw e;
     }
@@ -236,11 +156,4 @@ public class BankAccountService {
         bankAccess.setBankName(bankAccounts.get(0).getBankName());
     }
 
-    private Consent toConsent(CreateConsentResponse createConsentResponse) {
-        Consent consent = new Consent();
-        consent.setConsentId(createConsentResponse.getConsentId());
-        consent.setAuthUrl(createConsentResponse.getAuthorisationUrl());
-        consent.setScaStatus(ScaStatus.STARTED);
-        return consent;
-    }
 }

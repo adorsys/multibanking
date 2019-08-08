@@ -26,7 +26,6 @@ import java.util.Map;
 public class BankAccount {
 
     private Map<BankApi, String> externalIdMap = new EnumMap<>(BankApi.class);
-    private Consent dedicatedConsent;
     private BalancesReport balances;
     private String owner;
     private String country;

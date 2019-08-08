@@ -1,7 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.exception.ExternalAuthorisationRequiredException;
+import de.adorsys.multibanking.exception.MissingStrongCustomerAuthorisationException;
 import de.adorsys.multibanking.mock.MockBanking;
 import de.adorsys.multibanking.pers.spi.repository.AnalyticsRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
@@ -94,7 +94,7 @@ public class MockBankingTest {
 
         try {
             bookingService.syncBookings(bankAccessEntity, bankAccountEntity, BankApi.MOCK, "12345");
-        } catch (ExternalAuthorisationRequiredException e) {
+        } catch (MissingStrongCustomerAuthorisationException e) {
             fail();
         }
 

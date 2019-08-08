@@ -18,6 +18,7 @@ public class BankAccessJpaEntity {
     @GeneratedValue
     private Long id;
     private String userId;
+    private String psd2ConsentId;
     private String pin;
     private String pin2;
     private boolean temporary;
@@ -29,8 +30,6 @@ public class BankAccessJpaEntity {
     private boolean provideDataForMachineLearning;
 
     private String bankName;
-    @Embedded
-    private ConsentJpaEntity allAcountsConsent;
     private String bankLogin;
     private String bankLogin2;
     private String bankCode;

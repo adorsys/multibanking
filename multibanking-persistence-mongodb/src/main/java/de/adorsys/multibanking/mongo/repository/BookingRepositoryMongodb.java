@@ -23,5 +23,4 @@ public interface BookingRepositoryMongodb extends MongoRepository<BookingMongoEn
 
     void deleteByAccountId(String id);
 
-    void deleteByUserIdAndAccountId(String userId, String accountId);
 }

@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
@@ -78,7 +79,7 @@ public class BankAccessServiceTest {
         MockitoAnnotations.initMocks(this);
         when(bankingServiceProducer.getBankingService(anyString())).thenReturn(mockBanking);
         bankRepository.findByBankCode("76090500").orElseGet(() -> {
-            BankEntity bankEntity = TestUtil.getBankEntity("Sparda Bank", "76090500");
+            BankEntity bankEntity = TestUtil.getBankEntity("Sparda Bank", "76090500", BankApi.HBCI);
             bankRepository.save(bankEntity);
             return bankEntity;
         });
@@ -97,7 +98,7 @@ public class BankAccessServiceTest {
     @Test
     public void create_bank_access_no_accounts() {
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any(), any())).thenReturn(LoadAccountInformationResponse.builder().build());
+        when(mockBanking.loadBankAccounts(any())).thenReturn(LoadAccountInformationResponse.builder().build());
         thrown.expect(InvalidBankAccessException.class);
 
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500", null);
@@ -109,7 +110,7 @@ public class BankAccessServiceTest {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500", null);
 
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any(), any()))
+        when(mockBanking.loadBankAccounts(any()))
             .thenThrow(new InvalidPinException("access"));
         thrown.expect(InvalidPinException.class);
 
@@ -121,7 +122,7 @@ public class BankAccessServiceTest {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500", null);
 
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any(), any()))
+        when(mockBanking.loadBankAccounts(any()))
             .thenReturn(LoadAccountInformationResponse.builder()
                 .bankAccounts(Collections.singletonList(TestUtil.getBankAccountEntity("account")))
                 .build());

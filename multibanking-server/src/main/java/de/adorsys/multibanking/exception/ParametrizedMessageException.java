@@ -18,7 +18,7 @@ public class ParametrizedMessageException extends RuntimeException {
         super(message);
     }
 
-    protected void addParam(String key, String value) {
+    void addParam(String key, String value) {
         this.paramsMap.put(key, value);
     }
 

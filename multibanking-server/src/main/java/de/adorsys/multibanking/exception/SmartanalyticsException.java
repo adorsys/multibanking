@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 @EqualsAndHashCode(callSuper = false)
 public class SmartanalyticsException extends RuntimeException {
 
-    private HttpStatus status;
-    private Message errorMessage;
+    private final HttpStatus status;
+    private final Message errorMessage;
 
     public SmartanalyticsException(HttpStatus status, Message errorMessage) {
         this.status = status;

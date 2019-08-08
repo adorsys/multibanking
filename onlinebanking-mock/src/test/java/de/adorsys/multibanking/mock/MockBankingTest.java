@@ -37,26 +37,27 @@ public class MockBankingTest {
 
     @Test
     public void testLoadBankAccounts() {
-        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(null,
-                LoadAccountInformationRequest.builder()
-                        .bankAccess(bankAccess)
-                        .pin(pin)
-                        .build());
+        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(
+            LoadAccountInformationRequest.builder()
+                .bankAccess(bankAccess)
+                .pin(pin)
+                .build());
         Assert.assertNotNull(loadAccountInformationResponse.getBankAccounts());
         Assert.assertFalse(loadAccountInformationResponse.getBankAccounts().isEmpty());
     }
 
     @Test
     public void testLoadBookings() {
-        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(null,
-                LoadAccountInformationRequest.builder()
-                        .bankAccess(bankAccess)
-                        .pin(pin)
-                        .build());
+        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(
+            LoadAccountInformationRequest.builder()
+                .bankAccess(bankAccess)
+                .pin(pin)
+                .build());
         Assume.assumeNotNull(loadAccountInformationResponse.getBankAccounts());
         Assume.assumeFalse(loadAccountInformationResponse.getBankAccounts().isEmpty());
         BankAccount bankAccount = loadAccountInformationResponse.getBankAccounts().iterator().next();
-        LoadBookingsResponse response = mockBanking.loadBookings(null, LoadBookingsRequest.builder()
+        LoadBookingsResponse response = mockBanking.loadBookings(
+            LoadBookingsRequest.builder()
                 .bankAccess(bankAccess)
                 .bankAccount(bankAccount)
                 .pin(pin)

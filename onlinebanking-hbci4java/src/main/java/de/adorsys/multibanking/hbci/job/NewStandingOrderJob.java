@@ -16,11 +16,14 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.StandingOrder;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV.AbstractSEPAGV;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDauerSEPANew;
 import org.kapott.hbci.GV_Result.GVRDauerNew;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -28,14 +31,20 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
+import java.util.Collections;
+import java.util.List;
+
+@RequiredArgsConstructor
 @Slf4j
-public class NewStandingOrderJob extends ScaRequiredJob {
+public class NewStandingOrderJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+
+    private final TransactionRequest transactionRequest;
 
     @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        StandingOrder standingOrder = (StandingOrder) transaction;
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+        StandingOrder standingOrder = (StandingOrder) transactionRequest.getTransaction();
 
-        Konto src = getDebtorAccount(transaction, passport);
+        Konto src = getDebtorAccount(passport);
 
         Konto dst = new Konto();
         dst.name = standingOrder.getOtherAccount().getOwner();
@@ -66,16 +75,26 @@ public class NewStandingOrderJob extends ScaRequiredJob {
 
         gvDauerSEPANew.verifyConstraints();
 
-        return gvDauerSEPANew;
+        return Collections.singletonList(gvDauerSEPANew);
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
+    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        return response;
+    }
+
+    @Override
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
         return GVDauerSEPANew.getLowlevelName();
     }
 
     @Override
-    protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
+    public String orderIdFromJobResult(HBCIJobResult paymentGV) {
         return ((GVRDauerNew) paymentGV).getOrderId();
     }
 }

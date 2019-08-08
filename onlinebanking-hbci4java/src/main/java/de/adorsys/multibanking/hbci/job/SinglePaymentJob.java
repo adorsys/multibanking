@@ -16,9 +16,13 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.FutureSinglePayment;
-import de.adorsys.multibanking.domain.SinglePayment;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import lombok.RequiredArgsConstructor;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVTermUebSEPA;
 import org.kapott.hbci.GV.GVUebSEPA;
@@ -28,13 +32,19 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-public class SinglePaymentJob extends ScaRequiredJob {
+import java.util.Collections;
+import java.util.List;
+
+@RequiredArgsConstructor
+public class SinglePaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+
+    private final TransactionRequest transactionRequest;
 
     @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        SinglePayment singlePayment = (SinglePayment) transaction;
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+        SinglePayment singlePayment = (SinglePayment) transactionRequest.getTransaction();
 
-        Konto src = getDebtorAccount(transaction, passport);
+        Konto src = getDebtorAccount(passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();
@@ -52,24 +62,34 @@ public class SinglePaymentJob extends ScaRequiredJob {
         sepagv.setParam("src", src);
         sepagv.setParam("dst", dst);
         sepagv.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
-        if ( singlePayment.getPurpose() != null) {
+        if (singlePayment.getPurpose() != null) {
             sepagv.setParam("usage", singlePayment.getPurpose());
         }
         sepagv.verifyConstraints();
 
-        return sepagv;
+        return Collections.singletonList(sepagv);
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
-        if (paymentType == AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT) {
+    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        return response;
+    }
+
+    @Override
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+        if (transactionType == AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT) {
             return GVTermUebSEPA.getLowlevelName();
         }
         return GVUebSEPA.getLowlevelName();
     }
 
     @Override
-    protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
+    public String orderIdFromJobResult(HBCIJobResult paymentGV) {
         return paymentGV instanceof GVRTermUeb ? ((GVRTermUeb) paymentGV).getOrderId() : null; // no order id for
         // single payment
     }

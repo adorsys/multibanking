@@ -16,10 +16,14 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.BulkPayment;
-import de.adorsys.multibanking.domain.FutureBulkPayment;
-import de.adorsys.multibanking.domain.SinglePayment;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.BulkPayment;
+import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import lombok.RequiredArgsConstructor;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVMultiUebSEPA;
 import org.kapott.hbci.GV.GVTermMultiUebSEPA;
@@ -29,13 +33,19 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-public class BulkPaymentJob extends ScaRequiredJob {
+import java.util.Collections;
+import java.util.List;
+
+@RequiredArgsConstructor
+public class BulkPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+
+    private final TransactionRequest transactionRequest;
 
     @Override
-    protected AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport) {
-        BulkPayment bulkPayment = (BulkPayment) transaction;
+    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+        BulkPayment bulkPayment = (BulkPayment) transactionRequest.getTransaction();
 
-        Konto src = getDebtorAccount(transaction, passport);
+        Konto src = getDebtorAccount(passport);
 
         AbstractSEPAGV sepagv;
         if (bulkPayment instanceof FutureBulkPayment) {
@@ -64,19 +74,29 @@ public class BulkPaymentJob extends ScaRequiredJob {
 
         sepagv.verifyConstraints();
 
-        return sepagv;
+        return Collections.singletonList(sepagv);
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType paymentType) {
-        if (paymentType == AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT) {
+    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        return response;
+    }
+
+    @Override
+    TransactionRequest getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+        if (transactionType == AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT) {
             return "TermMultiUebSEPA";
         }
         return "MultiUebSEPA";
     }
 
     @Override
-    protected String orderIdFromJobResult(HBCIJobResult paymentGV) {
+    public String orderIdFromJobResult(HBCIJobResult paymentGV) {
         return paymentGV instanceof GVRTermUeb ? ((GVRTermUeb) paymentGV).getOrderId() : null;
     }
 }

@@ -1,12 +1,11 @@
 package de.adorsys.multibanking.exception;
 
-
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(
-        value = HttpStatus.BAD_REQUEST,
-        reason = "INVALID_RULES"
+    value = HttpStatus.BAD_REQUEST,
+    reason = "INVALID_RULES"
 )
 public class InvalidRulesException extends ParametrizedMessageException {
 

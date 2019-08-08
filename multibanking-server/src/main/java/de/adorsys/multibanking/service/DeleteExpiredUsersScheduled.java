@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.service;
 
+import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ public class DeleteExpiredUsersScheduled {
     private final UserRepositoryIf userRepository;
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BankAccessService bankAccessService;
+    private final OnlineBankingServiceProducer onlineBankingServiceProducer;
 
     @Scheduled(fixedDelay = 2 * 60 * 1000)
     void deleteJob() {
@@ -29,7 +31,19 @@ public class DeleteExpiredUsersScheduled {
 
         userRepository.findExpiredUser().forEach(userId -> {
             bankAccessRepository.findByUserId(userId).forEach(bankAccessEntity -> bankAccessService.deleteBankAccess(userId, bankAccessEntity.getId()));
-            userRepository.delete(userId);
+
+            userRepository.findById(userId)
+                .ifPresent(userEntity -> {
+                    userEntity.getApiUser().forEach(bankApiUser -> {
+                        OnlineBankingService bankingService =
+                            onlineBankingServiceProducer.getBankingService(bankApiUser.getBankApi());
+                        if (bankingService.userRegistrationRequired()) {
+                            bankingService.removeUser(bankApiUser);
+                        }
+                    });
+                    userRepository.delete(userId);
+                });
+
             count.incrementAndGet();
         });
 

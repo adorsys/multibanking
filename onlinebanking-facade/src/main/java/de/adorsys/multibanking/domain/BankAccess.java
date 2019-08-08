@@ -26,7 +26,6 @@ import java.util.Map;
 public class BankAccess {
 
     private String bankName;
-    private Consent allAcountsConsent;
     private String bankLogin;
     private String bankLogin2;
     private String bankCode;
