@@ -100,6 +100,10 @@ public class ConsentService {
     }
 
     public void validate(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService) {
+        if (onlineBankingService.getStrongCustomerAuthorisation() == null) {
+            // Bank API doesn't support SCA so nothing to validate
+            return;
+        }
         try {
             onlineBankingService.getStrongCustomerAuthorisation().validateConsent(bankAccess.getConsentId());
         } catch (MultibankingException e) {
