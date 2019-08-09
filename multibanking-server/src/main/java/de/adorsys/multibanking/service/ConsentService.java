@@ -29,6 +29,7 @@ public class ConsentService {
 
     private final ConsentRepositoryIf consentRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
+    private final BankService bankService;
 
     public CreateConsentResponse createConsent(Consent consent, BankApi bankApi) {
         OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getPsuAccountIban());
@@ -47,7 +48,9 @@ public class ConsentService {
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, updatePsuAuthenticationRequestconsent.getConsentId()));
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
-        return onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequestconsent);
+        Consent consent = onlineBankingService.getStrongCustomerAuthorisation().getConsent(updatePsuAuthenticationRequestconsent.getConsentId());
+        BankEntity bank = bankService.findBank(Iban.valueOf(consent.getPsuAccountIban()).getBankCode());
+        return onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequestconsent, bank.getBankingUrl());
     }
 
     public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethodRequest) {

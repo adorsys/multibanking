@@ -21,20 +21,61 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.BankAccess;
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.BankApiUser;
+import de.adorsys.multibanking.domain.Consent;
+import de.adorsys.multibanking.domain.ScaStatus;
+import de.adorsys.multibanking.domain.TanTransportType;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.*;
-import de.adorsys.multibanking.domain.response.*;
+import de.adorsys.multibanking.domain.request.AbstractRequest;
+import de.adorsys.multibanking.domain.request.AuthenticatePsuRequest;
+import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
+import de.adorsys.multibanking.domain.request.LoadBalanceRequest;
+import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
+import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
+import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
+import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
+import de.adorsys.multibanking.domain.response.AbstractResponse;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.CreateConsentResponse;
+import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
+import de.adorsys.multibanking.domain.response.LoadBalancesResponse;
+import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.domain.response.ScaMethodsResponse;
+import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
+import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.hbci.job.*;
+import de.adorsys.multibanking.hbci.domain.HBCIConsentEntity;
+import de.adorsys.multibanking.hbci.job.AccountInformationJob;
+import de.adorsys.multibanking.hbci.job.BulkPaymentJob;
+import de.adorsys.multibanking.hbci.job.DeleteFutureBulkPaymentJob;
+import de.adorsys.multibanking.hbci.job.DeleteFutureSinglePaymentJob;
+import de.adorsys.multibanking.hbci.job.DeleteStandingOrderJob;
+import de.adorsys.multibanking.hbci.job.EmptyJob;
+import de.adorsys.multibanking.hbci.job.ForeignPaymentJob;
+import de.adorsys.multibanking.hbci.job.LoadBalancesJob;
+import de.adorsys.multibanking.hbci.job.LoadBookingsJob;
+import de.adorsys.multibanking.hbci.job.NewStandingOrderJob;
+import de.adorsys.multibanking.hbci.job.RawSepaJob;
+import de.adorsys.multibanking.hbci.job.ScaRequiredJob;
+import de.adorsys.multibanking.hbci.job.SinglePaymentJob;
+import de.adorsys.multibanking.hbci.job.SubmitAuthorisationCodeJob;
+import de.adorsys.multibanking.hbci.job.TransferJob;
 import de.adorsys.multibanking.hbci.model.HbciCallback;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
 import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
+import de.adorsys.multibanking.hbci.persistance.HBCIConsentRepositoryIf;
+import de.adorsys.multibanking.hbci.persistance.HbciConsentRepositoryImpl;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.iban4j.Iban;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIDialog;
@@ -55,6 +96,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private Map<String, Map<String, String>> bpdCache;
+
+    private HBCIConsentRepositoryIf hbciConsentRepositoryIf = HbciConsentRepositoryImpl.getInstance();
+    private HbciMapper hbciMapper = new HbciMapperImpl();
 
     public Hbci4JavaBanking() {
         this(null, false);
@@ -250,28 +294,33 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             @Override
             public CreateConsentResponse createConsent(Consent consentTemplate) {
-                CreateConsentResponse createConsentResponse = new CreateConsentResponse();
-                createConsentResponse.setConsentId(UUID.randomUUID().toString());
-                createConsentResponse.setAuthorisationId(UUID.randomUUID().toString());
-                return createConsentResponse;
+                HBCIConsentEntity consentEntity = hbciMapper.toConsentEntity(consentTemplate);
+                consentEntity.setAuthorisationId(consentTemplate.getPsuAccountIban());
+                consentEntity.setId(UUID.randomUUID().toString());
+                consentEntity.setAuthorisationId(UUID.randomUUID().toString());
+                consentEntity.setStatus(ScaStatus.STARTED);
+                hbciConsentRepositoryIf.save(consentEntity);
+                return hbciMapper.toCreateConsentResponse(consentEntity);
             }
 
             @Override
             public Consent getConsent(String consentId) {
-                return null;
+                HBCIConsentEntity consentEntity = hbciConsentRepositoryIf.findById(consentId).orElse(null);
+                return hbciMapper.toConsent(consentEntity);
             }
 
             @Override
-            public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication) {
-//                // there is no login for HBCI of the consent
-//                if (updatePsuAuthentication.getScaStatus() == ConsentStatus.PARTIALLY_AUTHORISED) {
-//                    updatePsuAuthentication.setScaStatus(ConsentStatus.PSU_AUTHORISED);
-//                }
-//                // get the List of TAN Methods available
-//                // FIXME call HBCI and get the Tan Method List
-////                consent.setScaMethodList(new ArrayList<>());
-//                return updatePsuAuthentication;
-                return null;
+            public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication, String bankingUrl) {
+                HBCIConsentEntity entity = hbciConsentRepositoryIf
+                    .findById(updatePsuAuthentication.getConsentId())
+                    .orElseThrow(IllegalArgumentException::new);
+                AuthenticatePsuRequest request = hbciMapper.toAuthenticatePsuRequest(updatePsuAuthentication);
+                request.setBankCode(Iban.valueOf(entity.getPsuAccountIban()).getBankCode());
+                ScaMethodsResponse response = authenticatePsu(bankingUrl, request);
+                entity.setTanMethodList(response.getTanTransportTypes());
+                entity.setStatus(ScaStatus.PSUAUTHENTICATED);
+                hbciConsentRepositoryIf.save(entity);
+                return hbciMapper.toUpdateAuthRepsonse(entity);
             }
 
             @Override
@@ -284,22 +333,32 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             @Override
             public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod) {
-//                // there is no server side selection
-//                if (selectPsuAuthenticationMethod.getScaStatus() == ConsentStatus.PSU_AUTHORISED) {
-//                    selectPsuAuthenticationMethod.setScaStatus(ConsentStatus.SCA_METHOD_SELECTED);
-//                }
-//                return selectPsuAuthenticationMethod;
-                return null;
+                HBCIConsentEntity entity = hbciConsentRepositoryIf
+                    .findById(selectPsuAuthenticationMethod.getConsentId())
+                    .orElseThrow(IllegalArgumentException::new);
+                TanTransportType selectedMethod = entity.getTanMethodList().stream()
+                    .filter(tanTransportType -> tanTransportType.getId().equals(selectPsuAuthenticationMethod.getAuthenticationMethodId()))
+                    .findFirst()
+                    .orElseThrow(IllegalArgumentException::new);
+                entity.setSelectedMethod(selectedMethod);
+                entity.setStatus(ScaStatus.SCAMETHODSELECTED);
+                return hbciMapper.toUpdateAuthRepsonse(entity);
             }
 
             @Override
             public void revokeConsent(String consentId) {
-
+                HBCIConsentEntity entity = hbciConsentRepositoryIf.findById(consentId).orElse(null);
+                if (entity != null) {
+                    hbciConsentRepositoryIf.delete(entity);
+                }
             }
 
             @Override
             public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId) {
-                return null;
+                HBCIConsentEntity entity = hbciConsentRepositoryIf
+                    .findById(consentId)
+                    .orElseThrow(IllegalArgumentException::new);
+                return hbciMapper.toUpdateAuthRepsonse(entity);
             }
 
             @Override
