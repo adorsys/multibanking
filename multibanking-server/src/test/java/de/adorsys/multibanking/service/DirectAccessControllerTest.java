@@ -171,7 +171,7 @@ public class DirectAccessControllerTest {
     @Test
     public void verifyCreateBankAccessHbci() throws Exception {
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(hbci4JavaBanking, Iban.valueOf(bankAccess.getIban()).getBankCode());
+        prepareBank(hbci4JavaBanking, bankAccess.getIban());
 
         //create bank access
         RequestSpecification request = RestAssured.given();
@@ -204,7 +204,7 @@ public class DirectAccessControllerTest {
     @Test
     public void verifyApiNoConsent() throws Exception {
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(bankingGatewayAdapterMock, Iban.valueOf(bankAccess.getIban()).getBankCode());
+        prepareBank(bankingGatewayAdapterMock, bankAccess.getIban());
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
 
@@ -224,7 +224,7 @@ public class DirectAccessControllerTest {
     @Test
     public void verifyApiConsentStatusReceived() throws IOException {
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(bankingGatewayAdapterMock, Iban.valueOf(bankAccess.getIban()).getBankCode());
+        prepareBank(bankingGatewayAdapterMock, bankAccess.getIban());
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
 
@@ -255,7 +255,7 @@ public class DirectAccessControllerTest {
     @Test
     public void verifyApiConsentStatusValid() throws IOException {
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(bankingGatewayAdapterMock, Iban.valueOf(bankAccess.getIban()).getBankCode());
+        prepareBank(bankingGatewayAdapterMock, bankAccess.getIban());
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
@@ -295,8 +295,8 @@ public class DirectAccessControllerTest {
         assertThat(loadBookingsResponse.getBookings()).isNotEmpty();
     }
 
-    private void prepareBank(OnlineBankingService onlineBankingService, String bankCode) {
-        prepareBank(onlineBankingService, bankCode, System.getProperty("bankUrl"));
+    private void prepareBank(OnlineBankingService onlineBankingService, String iban) {
+        prepareBank(onlineBankingService, iban, System.getProperty("bankUrl"));
     }
 
     private void prepareBank(OnlineBankingService onlineBankingService, String iban, String bankUrl) {
