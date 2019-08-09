@@ -1,7 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.exception.MissingStrongCustomerAuthorisationException;
+import de.adorsys.multibanking.exception.MissingConsentException;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
@@ -102,7 +102,7 @@ public class HbciSinglePaymentTest {
     }
 
     @Test
-    public void testRawPayment() throws MissingStrongCustomerAuthorisationException {
+    public void testRawPayment() throws MissingConsentException {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
             System.getProperty("blz"), System.getProperty("pin"));
         bankAccessEntity.setBankLogin(System.getProperty("login"));

@@ -11,7 +11,9 @@ import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.exception.InvalidPinException;
+import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
+import de.adorsys.multibanking.exception.MissingConsentAuthorisationSelectionException;
+import de.adorsys.multibanking.exception.MissingConsentException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.model.ConsentTO;
@@ -109,13 +111,11 @@ public class ConsentService {
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
                 case INVALID_PIN:
-                    throw new InvalidPinException(bankAccess.getId());
+                    throw new MissingConsentException();
                 case INVALID_SCA_METHOD:
-                    // FIXME distinct exceptions
-//                    throw new MissingAuthorisationException();
+                    throw new MissingConsentAuthorisationSelectionException();
                 case INVALID_TAN:
-                    // FIXME distinct exceptions
-//                    throw new MissingAuthorisationException();
+                    throw new MissingConsentAuthorisationException();
                 default:
                     throw e;
             }

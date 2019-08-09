@@ -7,6 +7,8 @@ import de.adorsys.multibanking.conf.FongoConfig;
 import de.adorsys.multibanking.conf.MapperConfig;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankEntity;
+import de.adorsys.multibanking.domain.exception.MultibankingError;
+import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
@@ -50,8 +52,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.internal.util.MockUtil.isMock;
 
 @RunWith(SpringRunner.class)
@@ -203,12 +204,24 @@ public class DirectAccessControllerTest {
 
     @Test
     public void verifyApiNoConsent() throws Exception {
+        verifyApiNoConsent(MultibankingError.INVALID_PIN, "NO_AUTHORISATION");
+    }
+    @Test
+    public void verifyApiConsentWithoutSelectedSCA() throws Exception {
+        verifyApiNoConsent(MultibankingError.INVALID_SCA_METHOD, "SELECT_CONSENT_AUTHORISATION");
+    }
+    @Test
+    public void verifyApiConsentWithoutAuthorisedSCA() throws Exception {
+        verifyApiNoConsent(MultibankingError.INVALID_TAN, "AUTHORISE_CONSENT");
+    }
+
+    private void verifyApiNoConsent(MultibankingError error, String messageKey) throws Exception {
         BankAccessTO bankAccess = createBankAccess();
         prepareBank(bankingGatewayAdapterMock, bankAccess.getIban());
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
 
-//        doThrow(new MissingAuthorisationException()).when(authorisationMock).containsValidAuthorisation(any());
+        doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any());
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
@@ -218,38 +231,7 @@ public class DirectAccessControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
 
         Messages messages = objectMapper.readValue(response.getBody().print(), Messages.class);
-        assertThat(messages.getMessages().iterator().next().getKey()).isEqualTo("NO_AUTHORISATION");
-    }
-
-    @Test
-    public void verifyApiConsentStatusReceived() throws IOException {
-        BankAccessTO bankAccess = createBankAccess();
-        prepareBank(bankingGatewayAdapterMock, bankAccess.getIban());
-        StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
-        when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
-
-        when(authorisationMock.createConsent(any())).thenReturn(createConsentResponse(null));
-
-        RequestSpecification request = RestAssured.given();
-        request.contentType(ContentType.JSON);
-        request.body(createConsentTO(bankAccess.getIban()));
-        Response response = request.post("http://localhost:" + port + "/api/v1/direct/authorisations");
-        assertEquals(HttpStatus.CREATED.value(), response.getStatusCode());
-
-        ConsentTO consent = objectMapper.readValue(response.getBody().print(), ConsentTO.class);
-//        assertThat(consent.getConsentId()).isNotBlank();
-//        assertThat(consent.getConsentAuthorisationId()).isNotBlank();
-//        assertThat(consent.getScaStatus()).isEqualTo(RECEIVED);
-
-//        doThrow(new StrongCustomerAuthorisationException(createConsentResponse(null, ConsentStatus.STARTED), null))
-//            .when(authorisationMock).containsValidAuthorisation(any());
-
-        request.body(bankAccess);
-        response = request.put("http://localhost:" + port + "/api/v1/direct/accounts");
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
-
-        Messages messages = objectMapper.readValue(response.getBody().print(), Messages.class);
-        assertThat(messages.getMessages().iterator().next().getKey()).isEqualTo("AUTHORISE_CONSENT");
+        assertThat(messages.getMessages().iterator().next().getKey()).isEqualTo(messageKey);
     }
 
     @Test

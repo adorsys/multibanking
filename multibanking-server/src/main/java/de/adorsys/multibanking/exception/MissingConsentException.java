@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
     code = HttpStatus.BAD_REQUEST,
     reason = "NO_AUTHORISATION"
 )
-public class MissingStrongCustomerAuthorisationException extends ParametrizedMessageException {
-    public MissingStrongCustomerAuthorisationException(String message) {
-        super(message);
+public class MissingConsentException extends ParametrizedMessageException {
+    public MissingConsentException() {
+        super("No authorised consent");
     }
 }
