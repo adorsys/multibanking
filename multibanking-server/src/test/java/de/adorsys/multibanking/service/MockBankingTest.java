@@ -93,7 +93,7 @@ public class MockBankingTest {
         bankAccountEntity.setAccountNumber("765551851");
 
         try {
-            bookingService.syncBookings(bankAccessEntity, bankAccountEntity, BankApi.MOCK, "12345");
+            bookingService.syncBookings(bankAccessEntity, bankAccountEntity, BankApi.MOCK);
         } catch (MissingStrongCustomerAuthorisationException e) {
             fail();
         }

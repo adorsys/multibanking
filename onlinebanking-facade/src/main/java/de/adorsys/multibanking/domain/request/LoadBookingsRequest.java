@@ -31,7 +31,6 @@ import java.time.LocalDate;
 public class LoadBookingsRequest extends TransactionRequest {
 
     private String consentId;
-    private String authorisation;
     private BankApiUser bankApiUser;
     private BankAccount bankAccount;
     private BankAccess bankAccess;

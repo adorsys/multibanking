@@ -2,7 +2,6 @@ package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
@@ -10,6 +9,7 @@ import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
+import de.adorsys.multibanking.exception.InvalidConsentException;
 import de.adorsys.multibanking.exception.InvalidPinException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_AUTHORISATION;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 
 @Slf4j
@@ -278,14 +278,16 @@ public class BookingService {
         bookingsIndexRepository.save(bookingsIndexEntity);
     }
 
-    private LoadBookingsResponse loadBookingsOnline(OnlineBankingService onlineBankingService, BankAccessEntity bankAccess,
+    private LoadBookingsResponse loadBookingsOnline(OnlineBankingService onlineBankingService,
+                                                    BankAccessEntity bankAccess,
                                                     BankAccountEntity bankAccount) {
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, onlineBankingService.bankApi());
 
         consentService.validate(bankAccess, onlineBankingService);
         //external (figo, finapi) account must exist, otherwise loading bookings will not work
-        // FIXME this is a problem! currently we load all accounts for bookings which could cause problems with 2FA in HBCI
+        // FIXME this is a problem! currently we load all accounts for bookings which could cause problems with 2FA
+        //  in HBCI
         if (onlineBankingService.externalBankAccountRequired()) {
             checkExternalBankAccountExists(bankAccess, bankAccount, bankApiUser,
                 onlineBankingService);
@@ -319,10 +321,10 @@ public class BookingService {
             bankAccess.setPin(null);
             bankAccessRepository.save(bankAccess);
             throw new InvalidPinException(bankAccess.getId());
-        } else if (e.getMultibankingError() == INVALID_AUTHORISATION) {
+        } else if (e.getMultibankingError() == INVALID_CONSENT) {
             bankAccess.setConsentId(null);
             bankAccessRepository.save(bankAccess);
-            throw new MissingAuthorisationException();
+            throw new InvalidConsentException();
         }
         throw e;
     }

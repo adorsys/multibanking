@@ -104,7 +104,7 @@ public class ExceptionHandlerAdvice {
             case HBCI_ERROR:
             case INVALID_PAYMENT:
             case INVALID_SCA_METHOD:
-            case INVALID_AUTHORISATION:
+            case INVALID_CONSENT:
             case INVALID_PIN:
             case INVALID_TAN:
             default:

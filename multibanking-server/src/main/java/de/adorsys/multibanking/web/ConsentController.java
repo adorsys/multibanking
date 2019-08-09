@@ -1,17 +1,16 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.domain.spi.Consent;
-import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.domain.Consent;
+import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.service.ConsentService;
-import de.adorsys.multibanking.service.OnlineBankingServiceProducer;
+import de.adorsys.multibanking.web.mapper.BankApiMapper;
 import de.adorsys.multibanking.web.mapper.ConsentMapper;
+import de.adorsys.multibanking.web.model.BankApiTO;
 import de.adorsys.multibanking.web.model.ConsentTO;
+import de.adorsys.multibanking.web.model.CreateConsentResponseTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Resource;
@@ -21,8 +20,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpServerErrorException;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.security.Principal;
 import java.util.List;
@@ -41,43 +38,36 @@ public class ConsentController {
 
     private final ConsentService consentService;
     private final ConsentMapper consentMapper;
+    private final BankApiMapper bankApiMapper;
+    private final BankAccessRepositoryIf bankAccessRepository;
     private final Principal principal;
 
-    @ApiOperation(
-        value = "Create new consent",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @ApiOperation(value = "Create new consent")
     @PostMapping
-    public ResponseEntity<Resource<ConsentTO>> createConsent(@RequestBody ConsentTO consent) {
+    public ResponseEntity<Resource<CreateConsentResponseTO>> createConsent(@RequestBody ConsentTO consent,
+                                                                           @RequestParam(required = false) BankApiTO bankApi) {
         Consent consentInput = consentMapper.toConsent(consent);
-        Consent consentResponse = consentService.createConsent(consentInput, null);
+        CreateConsentResponse createConsentResponse = consentService.createConsent(consentInput,
+            bankApiMapper.toBankApi(bankApi));
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(linkTo(methodOn(ConsentController.class).getConsent(consentResponse.getConsentId())).toUri());
+        headers.setLocation(linkTo(methodOn(ConsentController.class).getConsent(createConsentResponse.getConsentId())).toUri());
 
-        return new ResponseEntity<>(mapToResource(consentResponse), headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(mapToResource(createConsentResponse), headers, HttpStatus.CREATED);
     }
 
-    @ApiOperation(
-        value = "Read user consents",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @ApiOperation(value = "Read user consents")
     @GetMapping
     public Resources<Resource<ConsentTO>> getConsents() {
-        // FIXME implement
-        throw new NotImplementedException();
+        List<Consent> consents = bankAccessRepository.findByUserIdAndConsentId(principal.getName())
+            .stream()
+            .map(bankAccessEntity -> consentService.getConsent(bankAccessEntity.getConsentId()))
+            .collect(toList());
+
+        return new Resources<>(mapToResources(consents));
     }
 
-    @ApiOperation(
-        value = "Read consent",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @ApiOperation(value = "Read consent")
     @GetMapping("/{consentId}")
     public Resource<ConsentTO> getConsent(@PathVariable("consentId") String consentId) {
         Consent consent = consentService.getConsent(consentId);
@@ -85,12 +75,7 @@ public class ConsentController {
         return mapToResource(consent);
     }
 
-    @ApiOperation(
-        value = "Delete consent",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @ApiOperation(value = "Delete consent")
     @DeleteMapping("/{consentId}")
     public HttpEntity<Void> deleteConsent(@PathVariable String consentId) {
         consentService.revokeConsent(consentId);
@@ -108,4 +93,14 @@ public class ConsentController {
         return new Resource<>(consentMapper.toConsentTO(consent),
             linkTo(methodOn(ConsentController.class).getConsent(consent.getConsentId())).withSelfRel());
     }
+
+    private Resource<CreateConsentResponseTO> mapToResource(CreateConsentResponse createConsentResponseconsent) {
+        String consentId = createConsentResponseconsent.getConsentId();
+        String authorisationId = createConsentResponseconsent.getAuthorisationId();
+
+        return new Resource<>(consentMapper.toCreateConsentResponseTO(createConsentResponseconsent),
+            linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId,
+                authorisationId)).withRel("authorisationStatus"));
+    }
+
 }

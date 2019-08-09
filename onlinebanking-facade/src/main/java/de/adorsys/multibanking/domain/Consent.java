@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.spi;
+package de.adorsys.multibanking.domain;
 
-import de.adorsys.multibanking.domain.AccountReference;
-import de.adorsys.multibanking.domain.Credentials;
-import de.adorsys.multibanking.domain.TanTransportType;
+import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisation;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -28,13 +26,8 @@ import java.util.List;
 public class Consent implements StrongCustomerAuthorisation {
 
     private String consentId;
-    private String consentAuthorisationId;
-    private String redirectUrl;
-    private String authUrl;
 
-    private ConsentStatus scaStatus;
-
-    private String iban;
+    private String psuAccountIban;
     // Requested access services for a consent.
     /**
      * Is asking for detailed account information.
@@ -53,8 +46,4 @@ public class Consent implements StrongCustomerAuthorisation {
     private LocalDate validUntil;
     private int frequencyPerDay;
 
-    private List<TanTransportType> scaMethodList;
-    private String selectedScaMethodId;
-    private String tan;
-    private Credentials credentials;
 }

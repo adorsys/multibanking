@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.exception;
+package de.adorsys.multibanking.domain.request;
 
-public enum MultibankingError {
+import lombok.Data;
 
-    HBCI_ERROR,
-    INVALID_PAYMENT,
-    INVALID_SCA_METHOD,
-    INVALID_CONSENT,
-    INVALID_PIN,
-    INVALID_TAN,
-    AUTHORIZATION_FINALISED,
-    AUTHORIZATION_FAILED,
-    AUTHORIZATION_EXEMPTED,
-    SCA_METHODS_NOT_AVAILABLE,
-    BANK_NOT_SUPPORTED,
-    PAYMENT_NOT_SUPPORTED,
-    INTERNAL_ERROR;
+@Data
+public class SelectPsuAuthenticationMethodRequest {
 
+    private String consentId;
+    private String authorisationId;
+
+    private String authenticationMethodId;
 }

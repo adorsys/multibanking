@@ -18,23 +18,5 @@ package de.adorsys.multibanking.web.model;
 
 public enum ScaStatusTO {
 
-    RECEIVED,
-    REJECTED,
-    VALID,
-    REVOKED_BY_PSU,
-    EXPIRED,
-    TERMINATED_BY_TPP,
-    TERMINATED_BY_ASPSP,
-    PARTIALLY_AUTHORISED,
-
-
-    /**
-     * PIN was ok, but SCA method is not selected yet
-     */
-    PSU_AUTHORISED,
-
-    /**
-     * PIN was ok, SCA method is selected but not fulfilled
-     */
-    SCA_METHOD_SELECTED,
+    STARTED, PSUAUTHENTICATED, SCAMETHODSELECTED, FINALISED, FAILED, EXEMPTED;
 }

@@ -2,7 +2,6 @@ package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
@@ -22,7 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_AUTHORISATION;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_BANKACCOUNTS;
 
@@ -115,10 +114,10 @@ public class BankAccountService {
             bankAccess.setPin(null);
             bankAccessRepository.save(bankAccess);
             throw new InvalidPinException(bankAccess.getId());
-        } else if (e.getMultibankingError() == INVALID_AUTHORISATION) {
+        } else if (e.getMultibankingError() == INVALID_CONSENT) {
             bankAccess.setConsentId(null);
             bankAccessRepository.save(bankAccess);
-            throw new MissingAuthorisationException();
+            throw new InvalidConsentException();
         }
         throw e;
     }

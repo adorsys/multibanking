@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.spi;
+package de.adorsys.multibanking.domain.response;
 
-public enum ConsentStatus {
+import de.adorsys.multibanking.domain.ChallengeData;
+import de.adorsys.multibanking.domain.ScaStatus;
+import de.adorsys.multibanking.domain.TanTransportType;
+import lombok.Data;
 
-    RECEIVED,
-    REJECTED,
-    VALID,
-    REVOKED_BY_PSU,
-    EXPIRED,
-    TERMINATED_BY_TPP,
-    TERMINATED_BY_ASPSP,
-    PARTIALLY_AUTHORISED,
-    PSU_AUTHORISED,
-    SCA_METHOD_SELECTED,
+import java.util.List;
+
+@Data
+public class UpdateAuthResponse {
+
+    private List<TanTransportType> scaMethods;
+    private ScaStatus scaStatus;
+    private ChallengeData challenge;
+    private String psuMessage;
 }

@@ -18,7 +18,7 @@ public class BankAccessJpaEntity {
     @GeneratedValue
     private Long id;
     private String userId;
-    private String psd2ConsentId;
+    private String consentId;
     private String pin;
     private String pin2;
     private boolean temporary;

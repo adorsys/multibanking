@@ -90,8 +90,9 @@ spring:
 db_secret: 1234567890123456
 mongo.properties.url: classpath:/mongo.properties
 bankinggateway:
-  auth.url: http://localhost:8086/v1/consents/{consentId}/authorisations/{authorisationId}
-  consent.url: http://localhost:8086/v1/consents
+  base.url: http://localhost:8084
+  consentAuthorisationUrl: ${bankinggateway.baseUrl}/v1/consents/{consentId}/authorisations/{authorisationId}
+  consentIrl: ${bankinggateway.baseUrl}/v1/consents
 
 swagger.login.url: http://localhost:8080/auth/realms/multibanking/protocol/openid-connect/auth
 

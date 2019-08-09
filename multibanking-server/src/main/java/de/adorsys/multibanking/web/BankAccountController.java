@@ -3,8 +3,7 @@ package de.adorsys.multibanking.web;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.spi.Consent;
-import de.adorsys.multibanking.bg.exception.ConsentAuthorisationRequiredException;
+import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.SyncInProgressException;
 import de.adorsys.multibanking.exception.domain.Messages;
@@ -102,12 +101,8 @@ public class BankAccountController {
         if (bankAccount.getSyncStatus() == BankAccount.SyncStatus.SYNC) {
             throw new SyncInProgressException(bankAccount.getId());
         }
-        try {
-            bookingService.syncBookings(bankAccess, bankAccount, null, pin != null ? pin : bankAccess.getPin());
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (ConsentAuthorisationRequiredException e) {
-            return new ResponseEntity<>(e.getAuthorisation(), HttpStatus.ACCEPTED);
-        }
+        bookingService.syncBookings(bankAccess, bankAccount, null);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private List<Resource<BankAccountTO>> mapToResources(List<BankAccountEntity> accountEntities, String accessId) {

@@ -2,69 +2,101 @@ package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
+import de.adorsys.multibanking.domain.Consent;
+import de.adorsys.multibanking.domain.ConsentEntity;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.spi.Consent;
+import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
+import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
+import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
+import de.adorsys.multibanking.domain.response.CreateConsentResponse;
+import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.exception.InvalidPinException;
-import de.adorsys.multibanking.exception.MissingStrongCustomerAuthorisationException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.model.ConsentTO;
 import lombok.RequiredArgsConstructor;
 import org.iban4j.Iban;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class ConsentService {
 
-    @Value("${bankinggateway.auth.url}")
-    private String consentAuthUrl;
-
+    private final ConsentRepositoryIf consentRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
-    public Consent createConsent(Consent consent, BankApi bankApi) {
-        OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getIban());
-        return onlineBankingService.getStrongCustomerAuthorisation().createConsent(consent);
+    public CreateConsentResponse createConsent(Consent consent, BankApi bankApi) {
+        OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getPsuAccountIban());
+        CreateConsentResponse createConsentResponse =
+            onlineBankingService.getStrongCustomerAuthorisation().createConsent(consent);
+
+        consentRepository.save(new ConsentEntity(createConsentResponse.getConsentId(),
+            createConsentResponse.getAuthorisationId(),
+            onlineBankingService.bankApi()));
+
+        return createConsentResponse;
     }
 
-    public Consent refreshConsent(Consent consent, BankApi bankApi) {
-        OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getIban());
-        Consent existingConsent = onlineBankingService.getStrongCustomerAuthorisation().getConsent(consent.getConsentId());
-        consent.setScaStatus(existingConsent.getScaStatus());
-        return consent;
+    public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthenticationRequestconsent) {
+        ConsentEntity internalConsent = consentRepository.findById(updatePsuAuthenticationRequestconsent.getConsentId())
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, updatePsuAuthenticationRequestconsent.getConsentId()));
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+        return onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequestconsent);
     }
 
-    public Consent loginConsent(Consent consent, BankApi bankApi) {
-        OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getIban());
-        return onlineBankingService.getStrongCustomerAuthorisation().loginConsent(consent);
+    public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethodRequest) {
+        ConsentEntity internalConsent = consentRepository.findById(selectPsuAuthenticationMethodRequest.getConsentId())
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, selectPsuAuthenticationMethodRequest.getConsentId()));
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+        return onlineBankingService.getStrongCustomerAuthorisation().selectPsuAuthenticationMethod(selectPsuAuthenticationMethodRequest);
     }
 
-    public Consent authorizeConsent(Consent consent, BankApi bankApi) {
-        OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getIban());
-        return onlineBankingService.getStrongCustomerAuthorisation().authorizeConsent(consent);
+    public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisationRequest) {
+        ConsentEntity internalConsent = consentRepository.findById(transactionAuthorisationRequest.getConsentId())
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, transactionAuthorisationRequest.getConsentId()));
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+        return onlineBankingService.getStrongCustomerAuthorisation().authorizeConsent(transactionAuthorisationRequest);
     }
 
-    public Consent selectScaMethod(Consent consent, BankApi bankApi) {
-        OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getIban());
-        return onlineBankingService.getStrongCustomerAuthorisation().selectScaMethod(consent);
+    public void revokeConsent(String consentId) {
+        ConsentEntity internalConsent = consentRepository.findById(consentId)
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+
+        onlineBankingService.getStrongCustomerAuthorisation().revokeConsent(consentId);
+        throw new ResourceNotFoundException(ConsentTO.class, consentId);
+    }
+
+    public Consent getConsent(String consentId) {
+        ConsentEntity internalConsent = consentRepository.findById(consentId)
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+
+        return Optional.ofNullable(onlineBankingService.getStrongCustomerAuthorisation().getConsent(consentId))
+            .orElse(new Consent());
+    }
+
+    public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId) {
+        ConsentEntity internalConsent = consentRepository.findById(consentId)
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+
+        return onlineBankingService.getStrongCustomerAuthorisation().getAuthorisationStatus(consentId, authorisationId);
     }
 
     private OnlineBankingService getOnlineBankingService(BankApi bankApi, String iban) {
         return bankApi != null ?
             bankingServiceProducer.getBankingService(bankApi) :
             bankingServiceProducer.getBankingService(Iban.valueOf(iban).getBankCode());
-    }
-
-    public void revokeConsent(String consentId) {
-        // FIXME implement
-        throw new ResourceNotFoundException(ConsentTO.class, consentId);
-    }
-
-    public Consent getConsent(String consentId, String iban, BankApi bankApi) {
-        // FIXME implement
-        throw new ResourceNotFoundException(ConsentTO.class, consentId);
     }
 
     public void validate(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService) {
@@ -76,13 +108,14 @@ public class ConsentService {
                     throw new InvalidPinException(bankAccess.getId());
                 case INVALID_SCA_METHOD:
                     // FIXME distinct exceptions
-                    throw new MissingAuthorisationException();
+//                    throw new MissingAuthorisationException();
                 case INVALID_TAN:
                     // FIXME distinct exceptions
-                    throw new MissingAuthorisationException();
+//                    throw new MissingAuthorisationException();
                 default:
                     throw e;
             }
         }
     }
+
 }

@@ -21,16 +21,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
-import de.adorsys.multibanking.domain.BankAccess;
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.domain.BankApiUser;
-import de.adorsys.multibanking.domain.exception.MultibankingError;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
-import de.adorsys.multibanking.domain.spi.Consent;
-import de.adorsys.multibanking.domain.spi.ConsentStatus;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.hbci.job.*;
@@ -49,7 +43,10 @@ import org.kapott.hbci.manager.HBCIVersion;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static de.adorsys.multibanking.hbci.job.AccountInformationJob.extractTanTransportTypes;
 
@@ -252,33 +249,33 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return new StrongCustomerAuthorisable() {
 
             @Override
-            public Consent createConsent(Consent consentTemplate) {
-                consentTemplate.setScaStatus(ConsentStatus.PSU_AUTHORISED);
-                // FIXME we should save the consent somewhere
-                consentTemplate.setConsentId(UUID.randomUUID().toString());
-                return consentTemplate;
+            public CreateConsentResponse createConsent(Consent consentTemplate) {
+                CreateConsentResponse createConsentResponse = new CreateConsentResponse();
+                createConsentResponse.setConsentId(UUID.randomUUID().toString());
+                createConsentResponse.setAuthorisationId(UUID.randomUUID().toString());
+                return createConsentResponse;
             }
 
             @Override
             public Consent getConsent(String consentId) {
-                // FIXME get the consent from the local storage
                 return null;
             }
 
             @Override
-            public Consent loginConsent(Consent consent) {
-                // there is no login for HBCI of the consent
-                if (consent.getScaStatus() == ConsentStatus.PARTIALLY_AUTHORISED) {
-                    consent.setScaStatus(ConsentStatus.PSU_AUTHORISED);
-                }
-                // get the List of TAN Methods available
-                // FIXME call HBCI and get the Tan Method List
-//                consent.setScaMethodList(new ArrayList<>());
-                return consent;
+            public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication) {
+//                // there is no login for HBCI of the consent
+//                if (updatePsuAuthentication.getScaStatus() == ConsentStatus.PARTIALLY_AUTHORISED) {
+//                    updatePsuAuthentication.setScaStatus(ConsentStatus.PSU_AUTHORISED);
+//                }
+//                // get the List of TAN Methods available
+//                // FIXME call HBCI and get the Tan Method List
+////                consent.setScaMethodList(new ArrayList<>());
+//                return updatePsuAuthentication;
+                return null;
             }
 
             @Override
-            public Consent authorizeConsent(Consent consent) {
+            public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
                 // never call this for HBCI
                 // you need to call the distinct function you want to authorize
                 // it will return the challenge
@@ -286,26 +283,37 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
 
             @Override
-            public Consent selectScaMethod(Consent consent) {
-                // there is no server side selection
-                if (consent.getScaStatus() == ConsentStatus.PSU_AUTHORISED) {
-                    consent.setScaStatus(ConsentStatus.SCA_METHOD_SELECTED);
-                }
-                return consent;
+            public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod) {
+//                // there is no server side selection
+//                if (selectPsuAuthenticationMethod.getScaStatus() == ConsentStatus.PSU_AUTHORISED) {
+//                    selectPsuAuthenticationMethod.setScaStatus(ConsentStatus.SCA_METHOD_SELECTED);
+//                }
+//                return selectPsuAuthenticationMethod;
+                return null;
+            }
+
+            @Override
+            public void revokeConsent(String consentId) {
+
+            }
+
+            @Override
+            public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId) {
+                return null;
             }
 
             @Override
             public void validateConsent(String consentId) throws MultibankingException {
-                Consent consent = getConsent(consentId);
-                if (consent == null || consent.getCredentials() == null) {
-                    throw new MultibankingException(MultibankingError.INVALID_PIN);
-                }
-                if (consent.getSelectedScaMethodId() == null) {
-                    throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
-                }
-                if (consent.getTan() == null) {
-                    throw new MultibankingException(MultibankingError.INVALID_TAN);
-                }
+//                Consent consent = getConsent(consentId);
+//                if (consent == null || consent.getCredentials() == null) {
+//                    throw new MultibankingException(MultibankingError.INVALID_PIN);
+//                }
+//                if (consent.getSelectedScaMethodId() == null) {
+//                    throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
+//                }
+//                if (consent.getTan() == null) {
+//                    throw new MultibankingException(MultibankingError.INVALID_TAN);
+//                }
             }
         };
     }

@@ -21,13 +21,15 @@ public class OnlineBankingServiceProducer {
 
     @Value("${defaultBankApi:HBCI}")
     private String defaultBankApi;
+    @Value("${bankinggateway.base.url}")
+    private String bankingGatewayBaseUrl;
 
     private Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
     private FigoBanking figoBanking = new FigoBanking(BankApi.FIGO);
     private FigoBanking figoBankingAlternative = new FigoBanking(BankApi.FIGO_ALTERNATIVE);
     private FinapiBanking finapiBanking = new FinapiBanking();
     private MockBanking mockBanking = new MockBanking();
-    private BankingGatewayAdapter xs2ABanking = new BankingGatewayAdapter();
+    private BankingGatewayAdapter xs2ABanking = new BankingGatewayAdapter(bankingGatewayBaseUrl);
 
     private BankApi getBankApiForBlz(String blz) {
         BankEntity bankInfoEntity = bankRepository.findByBankCode(blz).orElse(null);

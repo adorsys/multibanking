@@ -38,8 +38,8 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     }
 
     @Override
-    public List<BankAccessEntity> findByUserIdAndPsd2ConsentIdNotNull(String userId) {
-        return entityMapper.mapToBankAccessEntities(bankAccessRepository.findByUserIdAndPsd2ConsentIdNotNull(userId));
+    public List<BankAccessEntity> findByUserIdAndConsentId(String userId) {
+        return entityMapper.mapToBankAccessEntities(bankAccessRepository.findByUserIdAndConsentId(userId));
     }
 
     @Override
