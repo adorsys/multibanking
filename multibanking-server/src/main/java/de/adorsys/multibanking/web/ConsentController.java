@@ -59,7 +59,7 @@ public class ConsentController {
     @ApiOperation(value = "Read user consents")
     @GetMapping
     public Resources<Resource<ConsentTO>> getConsents() {
-        List<Consent> consents = bankAccessRepository.findByUserIdAndConsentId(principal.getName())
+        List<Consent> consents = bankAccessRepository.findByUserId(principal.getName())
             .stream()
             .map(bankAccessEntity -> consentService.getConsent(bankAccessEntity.getConsentId()))
             .collect(toList());
