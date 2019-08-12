@@ -325,10 +325,13 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             @Override
             public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
-                // never call this for HBCI
-                // you need to call the distinct function you want to authorize
-                // it will return the challenge
-                throw new IllegalArgumentException();
+                HBCIConsentEntity entity = hbciConsentRepositoryIf
+                    .findById(transactionAuthorisation.getConsentId())
+                    .orElseThrow(IllegalArgumentException::new);
+                entity.setScaAuthenticationData(transactionAuthorisation.getScaAuthenticationData());
+                entity.setStatus(ScaStatus.FINALISED);
+                hbciConsentRepositoryIf.save(entity);
+                return hbciMapper.toUpdateAuthResponse(entity);
             }
 
             @Override
