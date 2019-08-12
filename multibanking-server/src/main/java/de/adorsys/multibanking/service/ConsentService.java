@@ -136,7 +136,7 @@ public class ConsentService {
 
         try {
             onlineBankingService.getStrongCustomerAuthorisation().validateConsent(bankAccess.getConsentId(),
-                consentStatus, internalConsent);
+                consentStatus, internalConsent.getBankApiConsentData());
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
                 case INVALID_PIN:
