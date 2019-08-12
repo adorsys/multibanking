@@ -30,11 +30,11 @@ public class BankAccessTO {
 
     @ApiModelProperty(value = "PSD2 consent id")
     private String consentId;
+    @ApiModelProperty(value = "PSD2 authorisation id")
+    private String authorisationId;
 
     @ApiModelProperty(value = "selected sca method")
     private String scaMethodId;
-    @ApiModelProperty(value = "tan for the selected sca method")
-    private String tan;
 
     @ApiModelProperty(value = "Store pin")
     private boolean storePin;

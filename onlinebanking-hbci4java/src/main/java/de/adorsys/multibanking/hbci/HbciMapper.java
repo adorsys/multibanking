@@ -19,7 +19,7 @@ interface HbciMapper {
 
     @Mapping(target = "scaMethods", source = "tanMethodList")
     @Mapping(target = "scaStatus", source = "status")
-    UpdateAuthResponse toUpdateAuthRepsonse(HBCIConsentEntity entity);
+    UpdateAuthResponse toUpdateAuthResponse(HBCIConsentEntity entity);
 
     @Mapping(target = "login", source = "psuId")
     @Mapping(target = "customerId", source = "psuCustomerId")

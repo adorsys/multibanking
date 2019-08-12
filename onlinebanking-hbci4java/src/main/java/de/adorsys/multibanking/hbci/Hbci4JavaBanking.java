@@ -190,6 +190,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
         BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
 
+        // FIXME this should throw MultibankingException with INVALID_TAN when 2FA is needed
         try {
             AccountInformationJob accountInformationJob = new AccountInformationJob(request);
             LoadAccountInformationResponse response = accountInformationJob.execute(hbciCallback);
@@ -297,7 +298,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 HBCIConsentEntity consentEntity = hbciMapper.toConsentEntity(consentTemplate);
                 consentEntity.setAuthorisationId(consentTemplate.getPsuAccountIban());
                 consentEntity.setId(UUID.randomUUID().toString());
-                consentEntity.setAuthorisationId(UUID.randomUUID().toString());
                 consentEntity.setStatus(ScaStatus.STARTED);
                 hbciConsentRepositoryIf.save(consentEntity);
                 return hbciMapper.toCreateConsentResponse(consentEntity);
@@ -320,15 +320,18 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 entity.setTanMethodList(response.getTanTransportTypes());
                 entity.setStatus(ScaStatus.PSUAUTHENTICATED);
                 hbciConsentRepositoryIf.save(entity);
-                return hbciMapper.toUpdateAuthRepsonse(entity);
+                return hbciMapper.toUpdateAuthResponse(entity);
             }
 
             @Override
             public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
-                // never call this for HBCI
-                // you need to call the distinct function you want to authorize
-                // it will return the challenge
-                throw new IllegalArgumentException();
+                HBCIConsentEntity entity = hbciConsentRepositoryIf
+                    .findById(transactionAuthorisation.getConsentId())
+                    .orElseThrow(IllegalArgumentException::new);
+                entity.setScaAuthenticationData(transactionAuthorisation.getScaAuthenticationData());
+                entity.setStatus(ScaStatus.FINALISED);
+                hbciConsentRepositoryIf.save(entity);
+                return hbciMapper.toUpdateAuthResponse(entity);
             }
 
             @Override
@@ -342,7 +345,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                     .orElseThrow(IllegalArgumentException::new);
                 entity.setSelectedMethod(selectedMethod);
                 entity.setStatus(ScaStatus.SCAMETHODSELECTED);
-                return hbciMapper.toUpdateAuthRepsonse(entity);
+                hbciConsentRepositoryIf.save(entity);
+                return hbciMapper.toUpdateAuthResponse(entity);
             }
 
             @Override
@@ -358,21 +362,35 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 HBCIConsentEntity entity = hbciConsentRepositoryIf
                     .findById(consentId)
                     .orElseThrow(IllegalArgumentException::new);
-                return hbciMapper.toUpdateAuthRepsonse(entity);
+                return hbciMapper.toUpdateAuthResponse(entity);
             }
 
             @Override
-            public void validateConsent(String consentId) throws MultibankingException {
-//                Consent consent = getConsent(consentId);
-//                if (consent == null || consent.getCredentials() == null) {
-//                    throw new MultibankingException(MultibankingError.INVALID_PIN);
-//                }
-//                if (consent.getSelectedScaMethodId() == null) {
-//                    throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
-//                }
-//                if (consent.getTan() == null) {
-//                    throw new MultibankingException(MultibankingError.INVALID_TAN);
-//                }
+            public void validateConsent(String consentId, ScaStatus consentStatus) throws MultibankingException {
+                HBCIConsentEntity entity = hbciConsentRepositoryIf
+                    .findById(consentId)
+                    .orElse(null);
+                if (entity == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_PIN);
+                }
+                if (consentStatus == ScaStatus.STARTED) {
+                    return;
+                }
+                if (entity.getTanMethodList() == null || entity.getTanMethodList().isEmpty()) {
+                    throw new MultibankingException(MultibankingError.INVALID_PIN);
+                }
+                if (consentStatus == ScaStatus.PSUAUTHENTICATED) {
+                    return;
+                }
+                if (entity.getSelectedMethod() == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
+                }
+                if (consentStatus == ScaStatus.SCAMETHODSELECTED) {
+                    return;
+                }
+                if (entity.getScaAuthenticationData() == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_TAN);
+                }
             }
         };
     }

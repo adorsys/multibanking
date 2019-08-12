@@ -280,11 +280,12 @@ public class BookingService {
 
     private LoadBookingsResponse loadBookingsOnline(OnlineBankingService onlineBankingService,
                                                     BankAccessEntity bankAccess,
-                                                    BankAccountEntity bankAccount) {
+                                                    BankAccountEntity bankAccount,
+                                                    ScaStatus consentStatus) {
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, onlineBankingService.bankApi());
 
-        consentService.validate(bankAccess, onlineBankingService);
+        consentService.validate(bankAccess, onlineBankingService, consentStatus);
         //external (figo, finapi) account must exist, otherwise loading bookings will not work
         // FIXME this is a problem! currently we load all accounts for bookings which could cause problems with 2FA
         //  in HBCI
