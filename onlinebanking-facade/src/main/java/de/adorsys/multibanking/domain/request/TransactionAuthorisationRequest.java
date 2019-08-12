@@ -19,10 +19,7 @@ package de.adorsys.multibanking.domain.request;
 import lombok.Data;
 
 @Data
-public class TransactionAuthorisationRequest {
-
-    private String consentId;
-    private String authorisationId;
+public class TransactionAuthorisationRequest extends AbstractStrongCustomerAuthorisationRequest {
 
     private String scaAuthenticationData;
 }

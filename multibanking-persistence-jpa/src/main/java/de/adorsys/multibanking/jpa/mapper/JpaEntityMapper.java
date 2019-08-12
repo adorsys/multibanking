@@ -144,4 +144,5 @@ public interface JpaEntityMapper {
     ConsentEntity toConsentEntity(ConsentJpaEntity consentJpaEntity);
 
     ConsentJpaEntity toConsentJpaEntity(ConsentEntity consentEntity);
+
 }

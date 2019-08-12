@@ -22,14 +22,7 @@ import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.multibanking.web.DirectAccessController;
-import de.adorsys.multibanking.web.model.AccountReferenceTO;
-import de.adorsys.multibanking.web.model.BankAccessTO;
-import de.adorsys.multibanking.web.model.BankAccountTO;
-import de.adorsys.multibanking.web.model.ConsentTO;
-import de.adorsys.multibanking.web.model.ScaStatusTO;
-import de.adorsys.multibanking.web.model.SelectPsuAuthenticationMethodRequestTO;
-import de.adorsys.multibanking.web.model.TransactionAuthorisationRequestTO;
-import de.adorsys.multibanking.web.model.UpdatePsuAuthenticationRequestTO;
+import de.adorsys.multibanking.web.model.*;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
@@ -60,18 +53,12 @@ import java.util.Collections;
 import java.util.UUID;
 
 import static de.adorsys.multibanking.service.TestUtil.createBooking;
-import static de.adorsys.multibanking.web.model.ScaStatusTO.FINALISED;
-import static de.adorsys.multibanking.web.model.ScaStatusTO.PSUAUTHENTICATED;
-import static de.adorsys.multibanking.web.model.ScaStatusTO.SCAMETHODSELECTED;
+import static de.adorsys.multibanking.web.model.ScaStatusTO.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.internal.util.MockUtil.isMock;
 
 @RunWith(SpringRunner.class)
@@ -137,9 +124,6 @@ public class DirectAccessControllerTest {
             .then().assertThat().statusCode(HttpStatus.CREATED.value())
             .and().extract().jsonPath();
 
-        String consentId = jsonPath.getString("consentId");
-        String authorisationId = jsonPath.getString("authorisationId");
-
         assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
 
         //2. get consent authorisation status
@@ -161,24 +145,27 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("scaStatus")).isEqualTo(PSUAUTHENTICATED.toString());
 
         //4. select authentication method
-        SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO = new SelectPsuAuthenticationMethodRequestTO();
+        SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
+            new SelectPsuAuthenticationMethodRequestTO();
         authenticationMethodRequestTO.setAuthenticationMethodId(jsonPath.getString("scaMethods[0].id"));
 
-        jsonPath = request.body(authenticationMethodRequestTO).put(jsonPath.getString("_links.selectAuthenticationMethod.href"))
+        jsonPath = request.body(authenticationMethodRequestTO).put(jsonPath.getString("_links" +
+            ".selectAuthenticationMethod.href"))
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
-        assertThat(jsonPath .getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
+        assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
 
         //5. send tan
         TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
         transactionAuthorisationRequestTO.setScaAuthenticationData("alex1");
 
-        jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links.transactionAuthorisation.href"))
+        jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
+            ".transactionAuthorisation.href"))
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
-        assertThat(jsonPath .getString("scaStatus")).isEqualTo(FINALISED.toString());
+        assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
     }
 
     private RequestSpecification createRestRequest(Object body) {
@@ -188,8 +175,6 @@ public class DirectAccessControllerTest {
         return request;
     }
 
-
-
     @Test
     public void consent_authorisation_hbci() {
         BankAccessTO access = createBankAccess();
@@ -197,11 +182,13 @@ public class DirectAccessControllerTest {
         ScaMethodsResponse hbciResponse = ScaMethodsResponse.builder()
             .tanTransportTypes(Arrays.asList(TestUtil.createTanMethod("Method1"), TestUtil.createTanMethod("Method2")))
             .build();
+
         doReturn(hbciResponse).when(mockBanking).authenticatePsu(Mockito.<String>any(), any());
         UpdateAuthResponse challengeResponse = new UpdateAuthResponse();
         challengeResponse.setChallenge(new ChallengeData());
         LoadAccountInformationResponse loadAccountInformationResponse = LoadAccountInformationResponse.builder()
             .build();
+
         prepareBank(mockBanking, access.getIban());
 
         RequestSpecification request = RestAssured.given();
@@ -250,17 +237,19 @@ public class DirectAccessControllerTest {
         authenticationMethodRequestTO.setScaMethodId(jsonPath.getString("scaMethods[0].id"));
 
         String accountChallengeUrl = "http://localhost:" + port + "/api/v1/direct/accounts";
+
         jsonPath = request.body(authenticationMethodRequestTO).post(accountChallengeUrl)
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
-        assertThat(jsonPath .getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
+        assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
 
         //5. send tan
         TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
         transactionAuthorisationRequestTO.setScaAuthenticationData("alex1");
 
-        jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links.transactionAuthorisation.href"))
+        jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
+            ".transactionAuthorisation.href"))
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
@@ -273,6 +262,8 @@ public class DirectAccessControllerTest {
         jsonPath = request.body(bankAccountListRequest).put(accountUrl)
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
     }
 
     @Test
@@ -312,10 +303,12 @@ public class DirectAccessControllerTest {
     public void verifyApiNoConsent() throws Exception {
         verifyApiNoConsent(MultibankingError.INVALID_PIN, "NO_AUTHORISATION");
     }
+
     @Test
     public void verifyApiConsentWithoutSelectedSCA() throws Exception {
         verifyApiNoConsent(MultibankingError.INVALID_SCA_METHOD, "SELECT_CONSENT_AUTHORISATION");
     }
+
     @Test
     public void verifyApiConsentWithoutAuthorisedSCA() throws Exception {
         verifyApiNoConsent(MultibankingError.INVALID_TAN, "AUTHORISE_CONSENT");
@@ -431,9 +424,9 @@ public class DirectAccessControllerTest {
 
     private ConsentTO createConsentTO(String iban) {
         ConsentTO consentTO = new ConsentTO();
-        consentTO.setAccounts(Collections.singletonList(new AccountReferenceTO(iban)));
-        consentTO.setBalances(Collections.singletonList(new AccountReferenceTO(iban)));
-        consentTO.setTransactions(Collections.singletonList(new AccountReferenceTO(iban)));
+        consentTO.setAccounts(Collections.singletonList(new AccountReferenceTO(iban, null)));
+        consentTO.setBalances(Collections.singletonList(new AccountReferenceTO(iban, null)));
+        consentTO.setTransactions(Collections.singletonList(new AccountReferenceTO(iban, null)));
         consentTO.setPsuAccountIban(iban);
         consentTO.setValidUntil(LocalDate.now().plusDays(1));
         consentTO.setRecurringIndicator(false);

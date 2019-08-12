@@ -28,6 +28,7 @@ public class Consent implements StrongCustomerAuthorisation {
     private String consentId;
 
     private String psuAccountIban;
+
     // Requested access services for a consent.
     /**
      * Is asking for detailed account information.

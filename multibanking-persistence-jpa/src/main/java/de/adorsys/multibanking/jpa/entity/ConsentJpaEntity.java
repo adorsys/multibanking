@@ -21,6 +21,7 @@ import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Data
 @Entity(name = "consent")
@@ -30,5 +31,8 @@ public class ConsentJpaEntity {
     private String id;
     private String authorisationId;
     private BankApi bankApi;
+    private String psuAccountIban;
+    @Lob
+    private Object bankApiConsentData;
 
 }

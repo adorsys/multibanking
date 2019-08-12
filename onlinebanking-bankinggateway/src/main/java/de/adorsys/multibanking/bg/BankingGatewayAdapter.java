@@ -5,7 +5,6 @@ import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiException;
 import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2CAisApi;
-import de.adorsys.multibanking.banking_gateway_b2c.model.ConsentTO;
 import de.adorsys.multibanking.banking_gateway_b2c.model.CreateConsentResponseTO;
 import de.adorsys.multibanking.banking_gateway_b2c.model.ResourceUpdateAuthResponseTO;
 import de.adorsys.multibanking.domain.*;
@@ -21,6 +20,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static de.adorsys.multibanking.domain.BankApi.BANKING_GATEWAY;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
 
@@ -33,7 +33,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     @Override
     public BankApi bankApi() {
-        return BankApi.BANKING_GATEWAY;
+        return BANKING_GATEWAY;
     }
 
     @Override
@@ -160,20 +160,20 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             public Consent getConsent(String consentId) {
                 try {
                     BankingGatewayB2CAisApi bankingGatewayB2CAisApi = new BankingGatewayB2CAisApi(apiClient());
-                    ConsentTO consentTO = bankingGatewayB2CAisApi.getConsentUsingGET(consentId);
 
-                    return bankingGatewayMapper.toConsent(consentTO);
+                    return bankingGatewayMapper.toConsent(bankingGatewayB2CAisApi.getConsentUsingGET(consentId));
                 } catch (ApiException e) {
                     throw handeAisApiException(e);
                 }
             }
 
             @Override
-            public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication, String bankingUrl) {
+            public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication,
+                                                              String bankingUrl) {
                 try {
                     BankingGatewayB2CAisApi bankingGatewayB2CAisApi = new BankingGatewayB2CAisApi(apiClient());
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
-                        bankingGatewayB2CAisApi.updatePsuAuthenticationUsingPUT(bankingGatewayMapper.toUpdatePsuAuthenticationRequestTO(updatePsuAuthentication),  updatePsuAuthentication.getAuthorisationId(), updatePsuAuthentication.getConsentId());
+                        bankingGatewayB2CAisApi.updatePsuAuthenticationUsingPUT(bankingGatewayMapper.toUpdatePsuAuthenticationRequestTO(updatePsuAuthentication), updatePsuAuthentication.getAuthorisationId(), updatePsuAuthentication.getConsentId());
 
                     return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO);
                 } catch (ApiException e) {

@@ -14,13 +14,22 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.hbci.model;
 
+import de.adorsys.multibanking.domain.ScaStatus;
+import de.adorsys.multibanking.domain.TanTransportType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.util.List;
+
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class SelectPsuAuthenticationMethodRequest extends AbstractStrongCustomerAuthorisationRequest {
+public class HBCIConsent {
 
-    private String authenticationMethodId;
-
+    private ScaStatus status;
+    private List<TanTransportType> tanMethodList;
+    private TanTransportType selectedMethod;
 }

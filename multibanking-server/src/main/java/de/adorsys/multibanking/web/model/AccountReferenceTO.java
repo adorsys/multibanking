@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class AccountReferenceTO {
 
     private String iban;
+    private String currency;
 }

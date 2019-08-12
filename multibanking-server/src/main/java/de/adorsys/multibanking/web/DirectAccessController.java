@@ -1,11 +1,6 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.BookingEntity;
-import de.adorsys.multibanking.domain.ScaStatus;
-import de.adorsys.multibanking.domain.UserEntity;
-import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
@@ -15,19 +10,8 @@ import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.service.ConsentService;
-import de.adorsys.multibanking.web.mapper.BalancesMapper;
-import de.adorsys.multibanking.web.mapper.BankAccessMapper;
-import de.adorsys.multibanking.web.mapper.BankAccountMapper;
-import de.adorsys.multibanking.web.mapper.BankApiMapper;
-import de.adorsys.multibanking.web.mapper.BookingMapper;
-import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
-import de.adorsys.multibanking.web.model.BalancesReportTO;
-import de.adorsys.multibanking.web.model.BankAccessTO;
-import de.adorsys.multibanking.web.model.BankAccountTO;
-import de.adorsys.multibanking.web.model.BankApiTO;
-import de.adorsys.multibanking.web.model.BookingTO;
-import de.adorsys.multibanking.web.model.ConsentTO;
-import de.adorsys.multibanking.web.model.UpdateAuthResponseTO;
+import de.adorsys.multibanking.web.mapper.*;
+import de.adorsys.multibanking.web.model.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -40,12 +24,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -85,16 +64,15 @@ public class DirectAccessController {
         @ApiResponse(code = 201, message = "Response", response = LoadBankAccountsResponse.class)})
     @PostMapping("/accounts")
     public ResponseEntity<Resource<UpdateAuthResponseTO>> requestBankAccounts(@Valid @RequestBody BankAccessTO bankAccess,
-                                                                           @RequestParam(required = false) BankApiTO bankApi) {
+                                                                              @RequestParam(required = false) BankApiTO bankApi) {
         log.debug("process start > load bank account list");
         BankAccessEntity bankAccessEntity = prepareBankAccess(bankAccess);
 
         log.debug("set selected 2FA method to consent");
-        SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethodRequest = new SelectPsuAuthenticationMethodRequest();
-        selectPsuAuthenticationMethodRequest.setConsentId(bankAccess.getConsentId());
-        selectPsuAuthenticationMethodRequest.setAuthorisationId(bankAccess.getAuthorisationId());
+        SelectPsuAuthenticationMethodRequestTO selectPsuAuthenticationMethodRequest =
+            new SelectPsuAuthenticationMethodRequestTO();
         selectPsuAuthenticationMethodRequest.setAuthenticationMethodId(bankAccess.getScaMethodId());
-        consentService.selectPsuAuthenticationMethod(selectPsuAuthenticationMethodRequest);
+        consentService.selectPsuAuthenticationMethod(selectPsuAuthenticationMethodRequest, bankAccess.getConsentId());
 
         log.debug("load bank account list from bank");
         try {
@@ -113,7 +91,8 @@ public class DirectAccessController {
             });
 
             log.debug("process finished < return empty challenge");
-            return createChallengeResponse(new UpdateAuthResponse(), bankAccess.getConsentId(), bankAccess.getAuthorisationId());
+            return createChallengeResponse(new UpdateAuthResponse(), bankAccess.getConsentId(),
+                bankAccess.getAuthorisationId());
         } catch (MissingConsentAuthorisationException e) {
             log.debug("process finished < return challenge");
             UpdateAuthResponse response = e.getResponse();
@@ -123,7 +102,9 @@ public class DirectAccessController {
         }
     }
 
-    private ResponseEntity<Resource<UpdateAuthResponseTO>> createChallengeResponse(UpdateAuthResponse response, String consentId, String authorisationId) {
+    private ResponseEntity<Resource<UpdateAuthResponseTO>> createChallengeResponse(UpdateAuthResponse response,
+                                                                                   String consentId,
+                                                                                   String authorisationId) {
         List<Link> links = new ArrayList<>();
         links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId,
             authorisationId)).withSelfRel());
@@ -181,7 +162,8 @@ public class DirectAccessController {
         LoadBookingsResponse loadBookingsResponse = new LoadBookingsResponse();
 
         log.debug("load booking list from bank");
-        List<BookingEntity> bookings = bookingService.syncBookings(bankAccessEntity, bankAccountEntity, bankApiMapper.toBankApi(bankApi));
+        List<BookingEntity> bookings = bookingService.syncBookings(bankAccessEntity, bankAccountEntity,
+            bankApiMapper.toBankApi(bankApi));
         loadBookingsResponse.setBookings(bookingMapper.toBookingTOs(bookings));
         loadBookingsResponse.setBalances(balancesMapper.toBalancesReportTO(bankAccountEntity.getBalances()));
 

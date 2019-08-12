@@ -21,7 +21,8 @@ import lombok.Data;
 @Data
 public class CreateConsentResponse {
 
-    private String authorisationId;
     private String consentId;
+    private String authorisationId;
     private String redirectUrl;
+    private Object bankApiConsentData;
 }

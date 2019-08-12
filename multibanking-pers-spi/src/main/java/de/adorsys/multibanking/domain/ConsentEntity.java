@@ -12,5 +12,6 @@ public class ConsentEntity {
     private String id;
     private String authorisationId;
     private BankApi bankApi;
-
+    private String psuAccountIban;
+    private Object bankApiConsentData;
 }

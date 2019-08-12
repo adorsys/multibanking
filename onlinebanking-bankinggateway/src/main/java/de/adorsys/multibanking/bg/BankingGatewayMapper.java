@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.bg;
 
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
+import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.domain.TanTransportType;
 import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
@@ -8,6 +9,7 @@ import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
+import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -21,14 +23,15 @@ interface BankingGatewayMapper {
     @Mapping(target = "consentStatus", ignore = true)
     ConsentTO toConsentTO(Consent consentTemplate);
 
-    CreateConsentResponse toCreateConsentResponse(CreateConsentResponseTO consentResponse);
-
+    @InheritInverseConfiguration
     Consent toConsent(ConsentTO consentTO);
+
+    @Mapping(target = "bankApiConsentData", ignore = true)
+    CreateConsentResponse toCreateConsentResponse(CreateConsentResponseTO consentResponse);
 
     UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(UpdatePsuAuthenticationRequest updatePsuAuthentication);
 
     UpdateAuthResponse toUpdateAuthResponseTO(ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO);
-
 
     SelectPsuAuthenticationMethodRequestTO toSelectPsuAuthenticationMethodRequestTO(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod);
 

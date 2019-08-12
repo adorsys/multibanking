@@ -19,12 +19,10 @@ package de.adorsys.multibanking.domain.request;
 import lombok.Data;
 
 @Data
-public class UpdatePsuAuthenticationRequest {
-
-    private String consentId;
-    private String authorisationId;
+public class UpdatePsuAuthenticationRequest extends AbstractStrongCustomerAuthorisationRequest {
 
     private String psuId;
     private String psuCustomerId;
     private String password;
+
 }
