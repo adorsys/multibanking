@@ -193,6 +193,8 @@ public class DirectAccessControllerTest {
         challengeResponse.setChallenge(new ChallengeData());
         LoadAccountInformationResponse loadAccountInformationResponse = LoadAccountInformationResponse.builder()
             .build();
+        LoadBookingsResponse loadBookingsResponse = LoadBookingsResponse.builder()
+            .build();
 
         prepareBank(mockBanking, access.getIban());
 
@@ -210,6 +212,9 @@ public class DirectAccessControllerTest {
         doThrow(new MissingConsentAuthorisationException(challengeResponse, consentId, authorisationId))
             .doReturn(loadAccountInformationResponse)
             .when(mockBanking).loadBankAccounts(any());
+        doThrow(new MissingConsentAuthorisationException(challengeResponse, consentId, authorisationId))
+            .doReturn(loadBookingsResponse)
+            .when(mockBanking).loadBookings(any());
 
         assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
 
