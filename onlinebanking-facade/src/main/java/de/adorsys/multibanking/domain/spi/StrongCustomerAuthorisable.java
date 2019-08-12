@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.domain.spi;
 
 import de.adorsys.multibanking.domain.Consent;
+import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
@@ -30,5 +31,5 @@ public interface StrongCustomerAuthorisable {
      *                               INVALID_SCA_METHOD for Consent without selected sca method
      *                               INVALID_TAN for Consent without authorized sca method
      */
-    void validateConsent(String consentId) throws MultibankingException;
+    void validateConsent(String consentId, ScaStatus consentStatus) throws MultibankingException;
 }

@@ -3,8 +3,10 @@ package de.adorsys.multibanking.service;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankEntity;
+import de.adorsys.multibanking.domain.ChallengeData;
 import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.domain.ConsentEntity;
+import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
@@ -109,13 +111,13 @@ public class ConsentService {
             bankingServiceProducer.getBankingService(Iban.valueOf(iban).getBankCode());
     }
 
-    public void validate(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService) {
+    public void validate(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService, ScaStatus consentStatus) {
         if (onlineBankingService.getStrongCustomerAuthorisation() == null) {
             // Bank API doesn't support SCA so nothing to validate
             return;
         }
         try {
-            onlineBankingService.getStrongCustomerAuthorisation().validateConsent(bankAccess.getConsentId());
+            onlineBankingService.getStrongCustomerAuthorisation().validateConsent(bankAccess.getConsentId(), consentStatus);
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
                 case INVALID_PIN:

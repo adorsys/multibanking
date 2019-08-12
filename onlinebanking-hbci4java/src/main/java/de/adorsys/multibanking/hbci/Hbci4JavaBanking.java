@@ -366,17 +366,31 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
 
             @Override
-            public void validateConsent(String consentId) throws MultibankingException {
-//                Consent consent = getConsent(consentId);
-//                if (consent == null || consent.getCredentials() == null) {
-//                    throw new MultibankingException(MultibankingError.INVALID_PIN);
-//                }
-//                if (consent.getSelectedScaMethodId() == null) {
-//                    throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
-//                }
-//                if (consent.getTan() == null) {
-//                    throw new MultibankingException(MultibankingError.INVALID_TAN);
-//                }
+            public void validateConsent(String consentId, ScaStatus consentStatus) throws MultibankingException {
+                HBCIConsentEntity entity = hbciConsentRepositoryIf
+                    .findById(consentId)
+                    .orElse(null);
+                if (entity == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_PIN);
+                }
+                if (consentStatus == ScaStatus.STARTED) {
+                    return;
+                }
+                if (entity.getTanMethodList() == null || entity.getTanMethodList().isEmpty()) {
+                    throw new MultibankingException(MultibankingError.INVALID_PIN);
+                }
+                if (consentStatus == ScaStatus.PSUAUTHENTICATED) {
+                    return;
+                }
+                if (entity.getSelectedMethod() == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
+                }
+                if (consentStatus == ScaStatus.SCAMETHODSELECTED) {
+                    return;
+                }
+                if (entity.getScaAuthenticationData() == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_TAN);
+                }
             }
         };
     }

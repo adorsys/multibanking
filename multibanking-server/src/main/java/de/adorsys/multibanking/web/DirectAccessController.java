@@ -99,7 +99,7 @@ public class DirectAccessController {
         log.debug("load bank account list from bank");
         try {
             List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-                bankApiMapper.toBankApi(bankApi));
+                bankApiMapper.toBankApi(bankApi), ScaStatus.PSUAUTHENTICATED);
             log.debug("request for bank account list was without 2FA");
             log.debug("Process as usual but return empty challenge");
 
@@ -144,7 +144,7 @@ public class DirectAccessController {
 
         log.debug("load bank account list from bank");
         List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            bankApiMapper.toBankApi(bankApi));
+            bankApiMapper.toBankApi(bankApi), ScaStatus.FINALISED);
 
         saveBankAccess(bankAccessEntity);
 
