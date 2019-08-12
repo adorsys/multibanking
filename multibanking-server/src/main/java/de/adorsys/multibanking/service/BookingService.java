@@ -11,6 +11,7 @@ import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
 import de.adorsys.multibanking.exception.InvalidConsentException;
 import de.adorsys.multibanking.exception.InvalidPinException;
+import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsIf;
@@ -137,6 +138,8 @@ public class BookingService {
             bankAccountRepository.save(bankAccount);
 
             return result;
+        } catch (MissingConsentAuthorisationException e) {
+            throw e;
         } catch (Exception e) {
             LoggerFactory.getLogger(getClass()).error("sync bookings failed", e);
             throw e;

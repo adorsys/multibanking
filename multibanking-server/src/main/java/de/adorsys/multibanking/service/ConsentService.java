@@ -57,7 +57,10 @@ public class ConsentService {
             consentAuthorisationMapper.toUpdatePsuAuthenticationRequest(updatePsuAuthenticationRequestTO,
                 internalConsent);
 
-        return onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequest, bank.getBankingUrl());
+        UpdateAuthResponse response = onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequest, bank.getBankingUrl());
+        internalConsent.setBankApiConsentData(updatePsuAuthenticationRequest.getBankApiConsentData());
+        consentRepository.save(internalConsent);
+        return response;
     }
 
     public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequestTO selectPsuAuthenticationMethodRequestTO, String consentId) {
@@ -71,7 +74,10 @@ public class ConsentService {
             consentAuthorisationMapper.toSelectPsuAuthenticationMethodRequest(selectPsuAuthenticationMethodRequestTO,
                 internalConsent);
 
-        return onlineBankingService.getStrongCustomerAuthorisation().selectPsuAuthenticationMethod(selectPsuAuthenticationMethodRequest);
+        UpdateAuthResponse response = onlineBankingService.getStrongCustomerAuthorisation().selectPsuAuthenticationMethod(selectPsuAuthenticationMethodRequest);
+        internalConsent.setBankApiConsentData(selectPsuAuthenticationMethodRequest.getBankApiConsentData());
+        consentRepository.save(internalConsent);
+        return response;
     }
 
     public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequestTO transactionAuthorisationRequestTO,
@@ -86,7 +92,10 @@ public class ConsentService {
             consentAuthorisationMapper.toTransactionAuthorisationRequest(transactionAuthorisationRequestTO,
                 internalConsent);
 
-        return onlineBankingService.getStrongCustomerAuthorisation().authorizeConsent(transactionAuthorisationRequest);
+        UpdateAuthResponse response = onlineBankingService.getStrongCustomerAuthorisation().authorizeConsent(transactionAuthorisationRequest);
+        internalConsent.setBankApiConsentData(transactionAuthorisationRequest.getBankApiConsentData());
+        consentRepository.save(internalConsent);
+        return response;
     }
 
     public void revokeConsent(String consentId) {
@@ -136,7 +145,7 @@ public class ConsentService {
 
         try {
             onlineBankingService.getStrongCustomerAuthorisation().validateConsent(bankAccess.getConsentId(),
-                consentStatus, internalConsent);
+                consentStatus, internalConsent.getBankApiConsentData());
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
                 case INVALID_PIN:

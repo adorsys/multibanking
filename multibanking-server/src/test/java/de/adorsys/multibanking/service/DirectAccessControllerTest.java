@@ -51,6 +51,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -181,8 +182,7 @@ public class DirectAccessControllerTest {
         return request;
     }
 
-    @Test
-    public void consent_authorisation_hbci() {
+    private BankAccessTO consent_authorisation_hbci(String challengeUrl) {
         BankAccessTO access = createBankAccess();
         Hbci4JavaBanking mockBanking = spy(hbci4JavaBanking);
         ScaMethodsResponse hbciResponse = ScaMethodsResponse.builder()
@@ -193,6 +193,9 @@ public class DirectAccessControllerTest {
         UpdateAuthResponse challengeResponse = new UpdateAuthResponse();
         challengeResponse.setChallenge(new ChallengeData());
         LoadAccountInformationResponse loadAccountInformationResponse = LoadAccountInformationResponse.builder()
+            .build();
+        LoadBookingsResponse loadBookingsResponse = LoadBookingsResponse.builder()
+            .bookings(new ArrayList<>())
             .build();
 
         prepareBank(mockBanking, access.getIban());
@@ -211,6 +214,9 @@ public class DirectAccessControllerTest {
         doThrow(new MissingConsentAuthorisationException(challengeResponse, consentId, authorisationId))
             .doReturn(loadAccountInformationResponse)
             .when(mockBanking).loadBankAccounts(any());
+        doThrow(new MissingConsentAuthorisationException(challengeResponse, consentId, authorisationId))
+            .doReturn(loadBookingsResponse)
+            .when(mockBanking).loadBookings(any());
 
         assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
 
@@ -242,9 +248,7 @@ public class DirectAccessControllerTest {
         authenticationMethodRequestTO.setPin(updatePsuAuthentication.getPassword());
         authenticationMethodRequestTO.setScaMethodId(jsonPath.getString("scaMethods[0].id"));
 
-        String accountChallengeUrl = "http://localhost:" + port + "/api/v1/direct/accounts";
-
-        jsonPath = request.body(authenticationMethodRequestTO).post(accountChallengeUrl)
+        jsonPath = request.body(authenticationMethodRequestTO).post(challengeUrl)
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
@@ -260,16 +264,39 @@ public class DirectAccessControllerTest {
             .and().extract().jsonPath();
 
         assertThat(jsonPath .getString("scaStatus")).isEqualTo(FINALISED.toString());
+        return access;
+    }
+
+    @Test
+    public void bankAccountList_with_consent_hbci() {
+        String accountChallengeUrl = "http://localhost:" + port + "/api/v1/direct/accounts";
+        BankAccessTO access = consent_authorisation_hbci(accountChallengeUrl);
+        RequestSpecification request = RestAssured.given();
+        request.contentType(ContentType.JSON);
 
         //6. call method
         BankAccessTO bankAccountListRequest = access;
 
         String accountUrl = accountChallengeUrl;
-        jsonPath = request.body(bankAccountListRequest).put(accountUrl)
+        JsonPath jsonPath = request.body(bankAccountListRequest).put(accountUrl)
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
+    }
 
-        assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
+    @Test
+    public void bookingList_with_consent_hbci() {
+        String bookingChallengeUrl = "http://localhost:" + port + "/api/v1/direct/bookings";
+        BankAccessTO access = consent_authorisation_hbci(bookingChallengeUrl);
+        RequestSpecification request = RestAssured.given();
+        request.contentType(ContentType.JSON);
+
+        //6. call method
+        BankAccessTO bankAccountListRequest = access;
+
+        String bookingUrl = bookingChallengeUrl;
+        JsonPath jsonPath = request.body(bankAccountListRequest).put(bookingUrl)
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
     }
 
     @Test
