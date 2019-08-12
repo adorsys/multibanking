@@ -280,7 +280,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 hbciConsent.setTanMethodList(response.getTanTransportTypes());
                 hbciConsent.setStatus(ScaStatus.PSUAUTHENTICATED);
 
-                return hbciMapper.toUpdateAuthResponse(hbciConsent);
+                return hbciMapper.toUpdateAuthResponse(hbciConsent, bankApi());
             }
 
             @Override
@@ -288,7 +288,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 HBCIConsent hbciConsent = (HBCIConsent) transactionAuthorisation.getBankApiConsentData();
                 hbciConsent.setStatus(ScaStatus.FINALISED);
 
-                return hbciMapper.toUpdateAuthResponse(hbciConsent);
+                return hbciMapper.toUpdateAuthResponse(hbciConsent, bankApi());
             }
 
             @Override
@@ -302,7 +302,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 hbciConsent.setSelectedMethod(selectedMethod);
                 hbciConsent.setStatus(ScaStatus.SCAMETHODSELECTED);
 
-                return hbciMapper.toUpdateAuthResponse(hbciConsent);
+                return hbciMapper.toUpdateAuthResponse(hbciConsent, bankApi());
             }
 
             @Override
@@ -313,34 +313,16 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId,
                                                              Object bankApiConsentData) {
                 HBCIConsent hbciConsent = (HBCIConsent) bankApiConsentData;
-                return hbciMapper.toUpdateAuthResponse(hbciConsent);
+                return hbciMapper.toUpdateAuthResponse(hbciConsent, bankApi());
             }
 
             @Override
-            public void validateConsent(String consentId, ScaStatus consentStatus, Object bankApiConsentData) throws MultibankingException {
-                HBCIConsent hbciConsent = (HBCIConsent) bankApiConsentData;
+            public void validateConsent(String consentId, ScaStatus expectedConsentStatus, Object bankApiConsentData) throws MultibankingException {
+                HBCIConsent hbciConsent = Optional.ofNullable(bankApiConsentData)
+                    .map(o -> (HBCIConsent) o)
+                    .orElseThrow(() -> new MultibankingException(MultibankingError.NO_CONSENT));
 
-                if (hbciConsent == null) {
-                    throw new MultibankingException(MultibankingError.INVALID_PIN);
-                }
-                if (consentStatus == ScaStatus.STARTED) {
-                    return;
-                }
-                if (hbciConsent.getTanMethodList() == null || hbciConsent.getTanMethodList().isEmpty()) {
-                    throw new MultibankingException(MultibankingError.INVALID_PIN);
-                }
-                if (consentStatus == ScaStatus.PSUAUTHENTICATED) {
-                    return;
-                }
-                if (hbciConsent.getSelectedMethod() == null) {
-                    throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
-                }
-                if (consentStatus == ScaStatus.SCAMETHODSELECTED) {
-                    return;
-                }
-//                if (hbciConsent.getScaAuthenticationData() == null) {
-//                    throw new MultibankingException(MultibankingError.INVALID_TAN);
-//                } //TODO tan persistence really needed
+                //FIXME
             }
         };
     }

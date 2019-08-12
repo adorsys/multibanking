@@ -133,8 +133,7 @@ public class ConsentService {
             bankingServiceProducer.getBankingService(Iban.valueOf(iban).getBankCode());
     }
 
-    void validate(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService,
-                  ScaStatus consentStatus) {
+    void validate(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService, ScaStatus expectedConsentStatus) {
         if (onlineBankingService.getStrongCustomerAuthorisation() == null) {
             // Bank API doesn't support SCA so nothing to validate
             return;
@@ -145,7 +144,8 @@ public class ConsentService {
 
         try {
             onlineBankingService.getStrongCustomerAuthorisation().validateConsent(bankAccess.getConsentId(),
-                consentStatus, internalConsent.getBankApiConsentData());
+                expectedConsentStatus, internalConsent.getBankApiConsentData());
+
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
                 case INVALID_PIN:

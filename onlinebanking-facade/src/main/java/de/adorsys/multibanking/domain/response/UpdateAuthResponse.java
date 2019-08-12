@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.domain.response;
 
+import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.ChallengeData;
 import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.TanTransportType;
@@ -26,6 +27,7 @@ import java.util.List;
 @Data
 public class UpdateAuthResponse {
 
+    private BankApi bankApi;
     private List<TanTransportType> scaMethods;
     private ScaStatus scaStatus;
     private ChallengeData challenge;

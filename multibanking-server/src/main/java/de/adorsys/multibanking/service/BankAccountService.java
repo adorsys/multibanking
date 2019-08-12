@@ -63,13 +63,13 @@ public class BankAccountService {
         return loadBankAccountsOnline(bankAccess, bankApi, ScaStatus.FINALISED);
     }
 
-    public List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi, ScaStatus consentStatus) {
+    public List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi, ScaStatus expectedConsentStatus) {
         OnlineBankingService onlineBankingService = bankApi != null ?
             bankingServiceProducer.getBankingService(bankApi) :
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         checkBankSupported(bankAccess, onlineBankingService);
-        consentService.validate(bankAccess, onlineBankingService, consentStatus);
+        consentService.validate(bankAccess, onlineBankingService, expectedConsentStatus);
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankApi);
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());

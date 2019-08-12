@@ -5,9 +5,11 @@ import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiException;
 import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2CAisApi;
+import de.adorsys.multibanking.banking_gateway_b2c.model.ConsentTO;
 import de.adorsys.multibanking.banking_gateway_b2c.model.CreateConsentResponseTO;
 import de.adorsys.multibanking.banking_gateway_b2c.model.ResourceUpdateAuthResponseTO;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
@@ -175,7 +177,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
                         bankingGatewayB2CAisApi.updatePsuAuthenticationUsingPUT(bankingGatewayMapper.toUpdatePsuAuthenticationRequestTO(updatePsuAuthentication), updatePsuAuthentication.getAuthorisationId(), updatePsuAuthentication.getConsentId());
 
-                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO);
+                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO, bankApi());
                 } catch (ApiException e) {
                     throw handeAisApiException(e);
                 }
@@ -188,7 +190,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
                         bankingGatewayB2CAisApi.selectPsuAuthenticationMethodUsingPUT(bankingGatewayMapper.toSelectPsuAuthenticationMethodRequestTO(selectPsuAuthenticationMethod), selectPsuAuthenticationMethod.getAuthorisationId(), selectPsuAuthenticationMethod.getConsentId());
 
-                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO);
+                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO, bankApi());
                 } catch (ApiException e) {
                     throw handeAisApiException(e);
                 }
@@ -201,7 +203,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
                         bankingGatewayB2CAisApi.transactionAuthorisationUsingPUT(bankingGatewayMapper.toTransactionAuthorisationRequestTO(transactionAuthorisation), transactionAuthorisation.getAuthorisationId(), transactionAuthorisation.getConsentId());
 
-                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO);
+                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO, bankApi());
                 } catch (ApiException e) {
                     throw handeAisApiException(e);
                 }
@@ -215,7 +217,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
                         bankingGatewayB2CAisApi.getConsentAuthorisationStatusUsingGET(authorisationId, consentId);
 
-                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO);
+                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO, bankApi());
                 } catch (ApiException e) {
                     throw handeAisApiException(e);
                 }
@@ -227,17 +229,16 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             }
 
             @Override
-            public void validateConsent(String consentId, ScaStatus consentStatus, Object bankApiConsentData) throws MultibankingException {
-//                Consent consent = getConsent(consentId);
-//                switch (consent.getScaStatus()) {
-//                    case PARTIALLY_AUTHORISED:
-//                        throw new MultibankingException(MultibankingError.INVALID_PIN);
-//                    case PSU_AUTHORISED:
-//                        throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
-//                    case SCA_METHOD_SELECTED:
-//                        throw new MultibankingException(MultibankingError.INVALID_TAN);
-//                    default:
-//                        return;
+            public void validateConsent(String consentId, ScaStatus expectedConsentStatus, Object bankApiConsentData) throws MultibankingException {
+                try {
+                    BankingGatewayB2CAisApi bankingGatewayB2CAisApi = new BankingGatewayB2CAisApi(apiClient());
+                    ConsentTO consentTO = bankingGatewayB2CAisApi.getConsentUsingGET(consentId);
+
+                    //FIXME
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
+                }
+
             }
         };
     }

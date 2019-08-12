@@ -31,7 +31,7 @@ interface BankingGatewayMapper {
 
     UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(UpdatePsuAuthenticationRequest updatePsuAuthentication);
 
-    UpdateAuthResponse toUpdateAuthResponseTO(ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO);
+    UpdateAuthResponse toUpdateAuthResponseTO(ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO, BankApi bankApi);
 
     SelectPsuAuthenticationMethodRequestTO toSelectPsuAuthenticationMethodRequestTO(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod);
 

@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.web;
 
+import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
@@ -90,8 +91,11 @@ public class ConsentAuthorisationController {
                     authorisationId, null)).withRel("updateAuthentication"));
                 break;
             case PSUAUTHENTICATED:
-                links.add(linkTo(methodOn(ConsentAuthorisationController.class).selectAuthenticationMethod(consentId,
-                    authorisationId, null)).withRel("selectAuthenticationMethod"));
+                //sca methods will be returned within hbci challenge
+                if (response.getBankApi() != BankApi.HBCI) {
+                    links.add(linkTo(methodOn(ConsentAuthorisationController.class).selectAuthenticationMethod(consentId,
+                        authorisationId, null)).withRel("selectAuthenticationMethod"));
+                }
                 break;
             case SCAMETHODSELECTED:
                 links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
