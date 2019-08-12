@@ -8,6 +8,7 @@ import de.adorsys.multibanking.conf.MapperConfig;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.ChallengeData;
+import de.adorsys.multibanking.domain.ConsentEntity;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
@@ -21,6 +22,7 @@ import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
 import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
+import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.DirectAccessController;
 import de.adorsys.multibanking.web.model.*;
 import io.restassured.RestAssured;
@@ -42,6 +44,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -50,6 +53,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 import static de.adorsys.multibanking.service.TestUtil.createBooking;
@@ -76,6 +80,8 @@ public class DirectAccessControllerTest {
     private OnlineBankingServiceProducer bankingServiceProducer;
     @MockBean
     private BankingGatewayAdapter bankingGatewayAdapterMock;
+    @SpyBean
+    private ConsentRepositoryIf consentRepository;
 
     @LocalServerPort
     private int port;
@@ -319,6 +325,7 @@ public class DirectAccessControllerTest {
         prepareBank(bankingGatewayAdapterMock, bankAccess.getIban());
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
+        doReturn(Optional.of(new ConsentEntity())).when(consentRepository).findById(bankAccess.getConsentId());
 
         doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any(), any(), any());
 
