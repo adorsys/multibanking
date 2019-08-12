@@ -1,6 +1,8 @@
 package de.adorsys.multibanking.web;
 
+import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
+import de.adorsys.multibanking.service.BankService;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
 import de.adorsys.multibanking.web.model.SelectPsuAuthenticationMethodRequestTO;
@@ -11,10 +13,16 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.iban4j.Iban;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -33,6 +41,7 @@ public class ConsentAuthorisationController {
 
     private final ConsentService consentService;
     private final ConsentAuthorisationMapper consentAuthorisationMapper;
+    private final BankService bankService;
 
     @ApiOperation(value = "Update authorisation (authenticate user)")
     @PutMapping("/updatePsuAuthentication")
@@ -90,8 +99,12 @@ public class ConsentAuthorisationController {
                     authorisationId, null)).withRel("updateAuthentication"));
                 break;
             case PSUAUTHENTICATED:
-                links.add(linkTo(methodOn(ConsentAuthorisationController.class).selectAuthenticationMethod(consentId,
-                    authorisationId, null)).withRel("selectAuthenticationMethod"));
+                String bankCode = Iban.valueOf(consentService.getConsent(consentId).getPsuAccountIban()).getBankCode();
+                BankApi bankApi = bankService.findBank(bankCode).getBankApi();
+                if (bankApi != BankApi.HBCI) {
+                    links.add(linkTo(methodOn(ConsentAuthorisationController.class).selectAuthenticationMethod(consentId,
+                        authorisationId, null)).withRel("selectAuthenticationMethod"));
+                }
                 break;
             case SCAMETHODSELECTED:
                 links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,

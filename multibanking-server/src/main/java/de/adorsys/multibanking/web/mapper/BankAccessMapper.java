@@ -12,6 +12,8 @@ public interface BankAccessMapper {
     @Mapping(target = "bankLogin2", ignore = true)
     @Mapping(target = "pin", ignore = true)
     @Mapping(target = "pin2", ignore = true)
+    @Mapping(target = "tan", ignore = true)
+    @Mapping(target = "scaMethodId", ignore = true)
     BankAccessTO toBankAccessTO(BankAccessEntity bankAccessEntity);
 
     @Mapping(target = "tanTransportTypes", ignore = true)

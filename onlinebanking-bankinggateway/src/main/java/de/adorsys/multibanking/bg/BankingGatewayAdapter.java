@@ -169,7 +169,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             }
 
             @Override
-            public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication) {
+            public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication, String bankingUrl) {
                 try {
                     BankingGatewayB2CAisApi bankingGatewayB2CAisApi = new BankingGatewayB2CAisApi(apiClient());
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =

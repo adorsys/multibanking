@@ -13,6 +13,7 @@ public interface ConsentMapper {
     @Mapping(target = "psuAccountIban", ignore = true)
     ConsentTO toConsentTO(Consent consent);
 
+    @Mapping(target = "consentId", ignore = true)
     Consent toConsent(ConsentTO consent);
 
     CreateConsentResponseTO toCreateConsentResponseTO(CreateConsentResponse createConsentResponseconsent);

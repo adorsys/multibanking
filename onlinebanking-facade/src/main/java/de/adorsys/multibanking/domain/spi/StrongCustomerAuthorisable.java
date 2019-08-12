@@ -14,7 +14,7 @@ public interface StrongCustomerAuthorisable {
 
     Consent getConsent(String consentId);
 
-    UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication);
+    UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication, String bankUrl);
 
     UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation);
 

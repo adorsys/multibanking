@@ -43,7 +43,7 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     }
 
     @Override
-    public List<BankAccessEntity> findByUserIdAndConsentId(String userId) {
+    public List<BankAccessEntity> findByUserIdAndConsentId(String userId, String consentId) {
         return entityMapper.mapToBankAccessEntities(bankAccessRepository.findByUserIdAndConsentId(userId));
     }
 

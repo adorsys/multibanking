@@ -2,6 +2,7 @@ package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.domain.ConsentEntity;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
@@ -11,7 +12,9 @@ import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.exception.InvalidPinException;
+import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
+import de.adorsys.multibanking.exception.MissingConsentAuthorisationSelectionException;
+import de.adorsys.multibanking.exception.MissingConsentException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.model.ConsentTO;
@@ -27,6 +30,7 @@ public class ConsentService {
 
     private final ConsentRepositoryIf consentRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
+    private final BankService bankService;
 
     public CreateConsentResponse createConsent(Consent consent, BankApi bankApi) {
         OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getPsuAccountIban());
@@ -45,7 +49,9 @@ public class ConsentService {
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, updatePsuAuthenticationRequestconsent.getConsentId()));
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
-        return onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequestconsent);
+        Consent consent = onlineBankingService.getStrongCustomerAuthorisation().getConsent(updatePsuAuthenticationRequestconsent.getConsentId());
+        BankEntity bank = bankService.findBank(Iban.valueOf(consent.getPsuAccountIban()).getBankCode());
+        return onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequestconsent, bank.getBankingUrl());
     }
 
     public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethodRequest) {
@@ -100,18 +106,20 @@ public class ConsentService {
     }
 
     public void validate(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService) {
+        if (onlineBankingService.getStrongCustomerAuthorisation() == null) {
+            // Bank API doesn't support SCA so nothing to validate
+            return;
+        }
         try {
             onlineBankingService.getStrongCustomerAuthorisation().validateConsent(bankAccess.getConsentId());
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
                 case INVALID_PIN:
-                    throw new InvalidPinException(bankAccess.getId());
+                    throw new MissingConsentException();
                 case INVALID_SCA_METHOD:
-                    // FIXME distinct exceptions
-//                    throw new MissingAuthorisationException();
+                    throw new MissingConsentAuthorisationSelectionException();
                 case INVALID_TAN:
-                    // FIXME distinct exceptions
-//                    throw new MissingAuthorisationException();
+                    throw new MissingConsentAuthorisationException();
                 default:
                     throw e;
             }

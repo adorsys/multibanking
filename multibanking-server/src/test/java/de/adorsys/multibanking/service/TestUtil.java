@@ -51,4 +51,10 @@ public class TestUtil {
         return booking;
     }
 
+    static TanTransportType createTanMethod(String name) {
+        return TanTransportType.builder()
+            .id(UUID.randomUUID().toString())
+            .name(name)
+            .build();
+    }
 }
