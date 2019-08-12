@@ -200,6 +200,8 @@ public class DirectAccessControllerTest {
         doReturn(hbciResponse).when(mockBanking).authenticatePsu(Mockito.<String>any(), any());
         UpdateAuthResponse challengeResponse = new UpdateAuthResponse();
         challengeResponse.setChallenge(new ChallengeData());
+        LoadAccountInformationResponse loadAccountInformationResponse = LoadAccountInformationResponse.builder()
+            .build();
         prepareBank(mockBanking, access.getIban());
 
         RequestSpecification request = RestAssured.given();
@@ -214,6 +216,7 @@ public class DirectAccessControllerTest {
         String consentId = jsonPath.getString("consentId");
         String authorisationId = jsonPath.getString("authorisationId");
         doThrow(new MissingConsentAuthorisationException(challengeResponse, consentId, authorisationId))
+            .doReturn(loadAccountInformationResponse)
             .when(mockBanking).loadBankAccounts(any());
 
         assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
@@ -262,6 +265,14 @@ public class DirectAccessControllerTest {
             .and().extract().jsonPath();
 
         assertThat(jsonPath .getString("scaStatus")).isEqualTo(FINALISED.toString());
+
+        //6. call method
+        BankAccessTO bankAccountListRequest = access;
+
+        String accountUrl = accountChallengeUrl;
+        jsonPath = request.body(bankAccountListRequest).put(accountUrl)
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
     }
 
     @Test
