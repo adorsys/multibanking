@@ -50,8 +50,12 @@ public class ConsentService {
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
         Consent consent = onlineBankingService.getStrongCustomerAuthorisation().getConsent(updatePsuAuthenticationRequestconsent.getConsentId());
-        BankEntity bank = bankService.findBank(Iban.valueOf(consent.getPsuAccountIban()).getBankCode());
-        return onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequestconsent, bank.getBankingUrl());
+        String bankingUrl = null;
+        if (consent.getPsuAccountIban() != null) {
+            BankEntity bank = bankService.findBank(Iban.valueOf(consent.getPsuAccountIban()).getBankCode());
+            bankingUrl = bank.getBankingUrl();
+        }
+        return onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequestconsent, bankingUrl);
     }
 
     public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethodRequest) {
