@@ -2,6 +2,7 @@ package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.domain.ConsentEntity;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
