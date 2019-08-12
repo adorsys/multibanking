@@ -298,7 +298,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 HBCIConsentEntity consentEntity = hbciMapper.toConsentEntity(consentTemplate);
                 consentEntity.setAuthorisationId(consentTemplate.getPsuAccountIban());
                 consentEntity.setId(UUID.randomUUID().toString());
-                consentEntity.setAuthorisationId(UUID.randomUUID().toString());
                 consentEntity.setStatus(ScaStatus.STARTED);
                 hbciConsentRepositoryIf.save(consentEntity);
                 return hbciMapper.toCreateConsentResponse(consentEntity);
