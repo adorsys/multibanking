@@ -398,7 +398,7 @@ public class DirectAccessControllerTest {
                 .build()
             );
 
-        request.body(loadBookingsRequest(loadBankAccountsResponse.getBankAccounts().get(0)));
+        request.body(bankAccess);
 
         response = request.put("http://localhost:" + port + "/api/v1/direct/bookings");
         assertEquals(HttpStatus.OK.value(), response.getStatusCode());
