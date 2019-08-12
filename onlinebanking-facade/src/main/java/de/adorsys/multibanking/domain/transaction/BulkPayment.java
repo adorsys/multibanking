@@ -26,6 +26,7 @@ import java.util.List;
 public class BulkPayment extends AbstractScaTransaction {
 
     private List<SinglePayment> payments;
+    private Boolean batchbooking; // turn off single entry in transaction list
 
     @Override
     public TransactionType getTransactionType() {
