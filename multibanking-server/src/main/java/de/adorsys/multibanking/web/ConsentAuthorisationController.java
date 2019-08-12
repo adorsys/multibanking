@@ -99,8 +99,12 @@ public class ConsentAuthorisationController {
                     authorisationId, null)).withRel("updateAuthentication"));
                 break;
             case PSUAUTHENTICATED:
-                String bankCode = Iban.valueOf(consentService.getConsent(consentId).getPsuAccountIban()).getBankCode();
-                BankApi bankApi = bankService.findBank(bankCode).getBankApi();
+                String iban = consentService.getConsent(consentId).getPsuAccountIban();
+                BankApi bankApi = null;
+                if (consentService.getConsent(consentId).getPsuAccountIban() != null) {
+                    String bankCode = Iban.valueOf(iban).getBankCode();
+                    bankApi = bankService.findBank(bankCode).getBankApi();
+                }
                 if (bankApi != BankApi.HBCI) {
                     links.add(linkTo(methodOn(ConsentAuthorisationController.class).selectAuthenticationMethod(consentId,
                         authorisationId, null)).withRel("selectAuthenticationMethod"));
