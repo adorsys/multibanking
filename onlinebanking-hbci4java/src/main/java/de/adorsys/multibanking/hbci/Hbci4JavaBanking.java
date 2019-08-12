@@ -342,6 +342,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                     .orElseThrow(IllegalArgumentException::new);
                 entity.setSelectedMethod(selectedMethod);
                 entity.setStatus(ScaStatus.SCAMETHODSELECTED);
+                hbciConsentRepositoryIf.save(entity);
                 return hbciMapper.toUpdateAuthRepsonse(entity);
             }
 
