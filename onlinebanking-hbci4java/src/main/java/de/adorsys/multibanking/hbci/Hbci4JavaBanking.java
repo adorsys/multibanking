@@ -27,7 +27,6 @@ import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.hbci.domain.HBCIConsentEntity;
 import de.adorsys.multibanking.hbci.job.*;
 import de.adorsys.multibanking.hbci.model.HBCIConsent;
 import de.adorsys.multibanking.hbci.model.HbciCallback;
@@ -49,7 +48,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static de.adorsys.multibanking.domain.ScaStatus.STARTED;
 import static de.adorsys.multibanking.hbci.job.AccountInformationJob.extractTanTransportTypes;
@@ -311,8 +309,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
 
             @Override
-            public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId) {
-                return null; //FIXME
+            public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId,
+                                                             Object bankApiConsentData) {
+                HBCIConsent hbciConsent = (HBCIConsent) bankApiConsentData;
+                return hbciMapper.toUpdateAuthResponse(hbciConsent);
             }
 
             @Override

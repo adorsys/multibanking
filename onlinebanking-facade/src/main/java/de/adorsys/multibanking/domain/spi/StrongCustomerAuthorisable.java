@@ -23,7 +23,7 @@ public interface StrongCustomerAuthorisable {
 
     void revokeConsent(String consentId);
 
-    UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId);
+    UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId, Object bankApiConsentData);
 
     /**
      * @param consentId

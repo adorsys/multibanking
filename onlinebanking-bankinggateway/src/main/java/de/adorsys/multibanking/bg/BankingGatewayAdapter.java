@@ -208,7 +208,8 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             }
 
             @Override
-            public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId) {
+            public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId,
+                                                             Object bankApiConsentData) {
                 try {
                     BankingGatewayB2CAisApi bankingGatewayB2CAisApi = new BankingGatewayB2CAisApi(apiClient());
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =

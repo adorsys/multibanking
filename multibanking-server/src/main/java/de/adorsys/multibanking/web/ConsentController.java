@@ -70,9 +70,7 @@ public class ConsentController {
     @ApiOperation(value = "Read consent")
     @GetMapping("/{consentId}")
     public Resource<ConsentTO> getConsent(@PathVariable("consentId") String consentId) {
-        Consent consent = consentService.getConsent(consentId);
-
-        return mapToResource(consent);
+        return mapToResource(consentService.getConsent(consentId));
     }
 
     @ApiOperation(value = "Delete consent")

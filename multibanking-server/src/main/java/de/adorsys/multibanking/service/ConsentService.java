@@ -114,7 +114,7 @@ public class ConsentService {
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        return onlineBankingService.getStrongCustomerAuthorisation().getAuthorisationStatus(consentId, authorisationId);
+        return onlineBankingService.getStrongCustomerAuthorisation().getAuthorisationStatus(consentId, authorisationId, );
     }
 
     private OnlineBankingService getOnlineBankingService(BankApi bankApi, String iban) {
