@@ -320,7 +320,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 entity.setTanMethodList(response.getTanTransportTypes());
                 entity.setStatus(ScaStatus.PSUAUTHENTICATED);
                 hbciConsentRepositoryIf.save(entity);
-                return hbciMapper.toUpdateAuthRepsonse(entity);
+                return hbciMapper.toUpdateAuthResponse(entity);
             }
 
             @Override
@@ -343,7 +343,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 entity.setSelectedMethod(selectedMethod);
                 entity.setStatus(ScaStatus.SCAMETHODSELECTED);
                 hbciConsentRepositoryIf.save(entity);
-                return hbciMapper.toUpdateAuthRepsonse(entity);
+                return hbciMapper.toUpdateAuthResponse(entity);
             }
 
             @Override
@@ -359,7 +359,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 HBCIConsentEntity entity = hbciConsentRepositoryIf
                     .findById(consentId)
                     .orElseThrow(IllegalArgumentException::new);
-                return hbciMapper.toUpdateAuthRepsonse(entity);
+                return hbciMapper.toUpdateAuthResponse(entity);
             }
 
             @Override
