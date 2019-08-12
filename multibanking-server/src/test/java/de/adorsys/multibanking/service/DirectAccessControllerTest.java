@@ -320,7 +320,7 @@ public class DirectAccessControllerTest {
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
 
-        doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any(), any());
+        doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any(), any(), any());
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);

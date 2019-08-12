@@ -227,7 +227,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             }
 
             @Override
-            public void validateConsent(String consentId, ScaStatus consentStatus) throws MultibankingException {
+            public void validateConsent(String consentId, ScaStatus consentStatus, Object bankApiConsentData) throws MultibankingException {
 //                Consent consent = getConsent(consentId);
 //                switch (consent.getScaStatus()) {
 //                    case PARTIALLY_AUTHORISED:

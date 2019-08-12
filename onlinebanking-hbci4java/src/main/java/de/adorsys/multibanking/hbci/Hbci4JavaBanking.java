@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
@@ -316,31 +317,30 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
 
             @Override
-            public void validateConsent(String consentId, ScaStatus consentStatus) throws MultibankingException {
-//                HBCIConsentEntity entity = hbciConsentRepositoryIf
-//                    .findById(consentId)
-//                    .orElse(null);
-//                if (entity == null) {
-//                    throw new MultibankingException(MultibankingError.INVALID_PIN);
-//                }
-//                if (consentStatus == ScaStatus.STARTED) {
-//                    return;
-//                }
-//                if (entity.getTanMethodList() == null || entity.getTanMethodList().isEmpty()) {
-//                    throw new MultibankingException(MultibankingError.INVALID_PIN);
-//                }
-//                if (consentStatus == ScaStatus.PSUAUTHENTICATED) {
-//                    return;
-//                }
-//                if (entity.getSelectedMethod() == null) {
-//                    throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
-//                }
-//                if (consentStatus == ScaStatus.SCAMETHODSELECTED) {
-//                    return;
-//                }
-//                if (entity.getScaAuthenticationData() == null) {
+            public void validateConsent(String consentId, ScaStatus consentStatus, Object bankApiConsentData) throws MultibankingException {
+                HBCIConsent hbciConsent = (HBCIConsent) bankApiConsentData;
+
+                if (hbciConsent == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_PIN);
+                }
+                if (consentStatus == ScaStatus.STARTED) {
+                    return;
+                }
+                if (hbciConsent.getTanMethodList() == null || hbciConsent.getTanMethodList().isEmpty()) {
+                    throw new MultibankingException(MultibankingError.INVALID_PIN);
+                }
+                if (consentStatus == ScaStatus.PSUAUTHENTICATED) {
+                    return;
+                }
+                if (hbciConsent.getSelectedMethod() == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_SCA_METHOD);
+                }
+                if (consentStatus == ScaStatus.SCAMETHODSELECTED) {
+                    return;
+                }
+//                if (hbciConsent.getScaAuthenticationData() == null) {
 //                    throw new MultibankingException(MultibankingError.INVALID_TAN);
-//                }
+//                } //TODO tan persistence really needed
             }
         };
     }

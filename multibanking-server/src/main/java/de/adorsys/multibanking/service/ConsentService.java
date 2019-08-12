@@ -114,7 +114,8 @@ public class ConsentService {
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        return onlineBankingService.getStrongCustomerAuthorisation().getAuthorisationStatus(consentId, authorisationId, );
+        return onlineBankingService.getStrongCustomerAuthorisation().getAuthorisationStatus(consentId,
+            authorisationId, internalConsent.getBankApiConsentData());
     }
 
     private OnlineBankingService getOnlineBankingService(BankApi bankApi, String iban) {
@@ -129,9 +130,13 @@ public class ConsentService {
             // Bank API doesn't support SCA so nothing to validate
             return;
         }
+
+        ConsentEntity internalConsent = consentRepository.findById(bankAccess.getConsentId())
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, bankAccess.getConsentId()));
+
         try {
             onlineBankingService.getStrongCustomerAuthorisation().validateConsent(bankAccess.getConsentId(),
-                consentStatus);
+                consentStatus, internalConsent);
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
                 case INVALID_PIN:
@@ -145,7 +150,7 @@ public class ConsentService {
                     response.setChallenge(challengeData);
                     response.setPsuMessage(e.getMessage());
                     throw new MissingConsentAuthorisationException(response, bankAccess.getConsentId(),
-                        bankAccess.getAuthorisationId());
+                        internalConsent.getAuthorisationId());
                 default:
                     throw e;
             }

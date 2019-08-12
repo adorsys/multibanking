@@ -111,14 +111,14 @@ public class BankAccountService {
             return onlineBankingService.loadBankAccounts(request)
                 .getBankAccounts();
         } catch (MultibankingException e) {
-            if (e.getMultibankingError() == INVALID_TAN) {
-                // FIXME get the challenge data
-                ChallengeData challengeData = null;
-                UpdateAuthResponse response = new UpdateAuthResponse();
-                response.setChallenge(challengeData);
-                response.setPsuMessage(e.getMessage());
-                throw new MissingConsentAuthorisationException(response, bankAccess.getConsentId(), bankAccess.getAuthorisationId());
-            }
+//            if (e.getMultibankingError() == INVALID_TAN) {
+//                // FIXME get the challenge data
+//                ChallengeData challengeData = null;
+//                UpdateAuthResponse response = new UpdateAuthResponse();
+//                response.setChallenge(challengeData);
+//                response.setPsuMessage(e.getMessage());
+//                throw new MissingConsentAuthorisationException(response, bankAccess.getConsentId(), bankAccess.getAuthorisationId());
+//            } //FIXME
             return handleMultibankingException(bankAccess, e);
         }
     }
