@@ -190,6 +190,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
         BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
 
+        // FIXME this should throw MultibankingException with INVALID_TAN when 2FA is needed
         try {
             AccountInformationJob accountInformationJob = new AccountInformationJob(request);
             LoadAccountInformationResponse response = accountInformationJob.execute(hbciCallback);

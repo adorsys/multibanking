@@ -123,7 +123,12 @@ public class ConsentService {
                 case INVALID_SCA_METHOD:
                     throw new MissingConsentAuthorisationSelectionException();
                 case INVALID_TAN:
-                    throw new MissingConsentAuthorisationException();
+                    // FIXME get the challenge data
+                    ChallengeData challengeData = null;
+                    UpdateAuthResponse response = new UpdateAuthResponse();
+                    response.setChallenge(challengeData);
+                    response.setPsuMessage(e.getMessage());
+                    throw new MissingConsentAuthorisationException(response, bankAccess.getConsentId(), bankAccess.getAuthorisationId());
                 default:
                     throw e;
             }

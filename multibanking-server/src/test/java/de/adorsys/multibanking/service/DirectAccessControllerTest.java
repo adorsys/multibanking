@@ -7,14 +7,17 @@ import de.adorsys.multibanking.conf.FongoConfig;
 import de.adorsys.multibanking.conf.MapperConfig;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankEntity;
+import de.adorsys.multibanking.domain.ChallengeData;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.response.ScaMethodsResponse;
+import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
 import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
@@ -195,6 +198,8 @@ public class DirectAccessControllerTest {
             .tanTransportTypes(Arrays.asList(TestUtil.createTanMethod("Method1"), TestUtil.createTanMethod("Method2")))
             .build();
         doReturn(hbciResponse).when(mockBanking).authenticatePsu(Mockito.<String>any(), any());
+        UpdateAuthResponse challengeResponse = new UpdateAuthResponse();
+        challengeResponse.setChallenge(new ChallengeData());
         prepareBank(mockBanking, access.getIban());
 
         RequestSpecification request = RestAssured.given();
@@ -208,6 +213,8 @@ public class DirectAccessControllerTest {
 
         String consentId = jsonPath.getString("consentId");
         String authorisationId = jsonPath.getString("authorisationId");
+        doThrow(new MissingConsentAuthorisationException(challengeResponse, consentId, authorisationId))
+            .when(mockBanking).loadBankAccounts(any());
 
         assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
 
@@ -228,14 +235,18 @@ public class DirectAccessControllerTest {
             .and().extract().jsonPath();
 
         assertThat(jsonPath.getString("scaStatus")).isEqualTo(PSUAUTHENTICATED.toString());
+        assertThat(jsonPath.getString("_links.selectAuthenticationMethod.href")).isNullOrEmpty();
 
         //4. select authentication method - by calling the desired method
-        SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO = new SelectPsuAuthenticationMethodRequestTO();
-        authenticationMethodRequestTO.setAuthenticationMethodId(jsonPath.getString("scaMethods[0].id"));
+        BankAccessTO authenticationMethodRequestTO = access;
+        authenticationMethodRequestTO.setConsentId(consentId);
+        authenticationMethodRequestTO.setAuthorisationId(authorisationId);
+        authenticationMethodRequestTO.setBankLogin(updatePsuAuthentication.getPsuId());
+        authenticationMethodRequestTO.setBankLogin2(updatePsuAuthentication.getPsuCustomerId());
+        authenticationMethodRequestTO.setPin(updatePsuAuthentication.getPassword());
+        authenticationMethodRequestTO.setScaMethodId(jsonPath.getString("scaMethods[0].id"));
 
-        assertThat(jsonPath.getString("_links.selectAuthenticationMethod.href")).isNullOrEmpty();
-        // FIXME create POST Method for challenge
-        String accountChallengeUrl = null;
+        String accountChallengeUrl = "http://localhost:" + port + "/api/v1/direct/accounts";
         jsonPath = request.body(authenticationMethodRequestTO).post(accountChallengeUrl)
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
@@ -305,7 +316,7 @@ public class DirectAccessControllerTest {
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
 
-        doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any());
+        doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any(), any());
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);

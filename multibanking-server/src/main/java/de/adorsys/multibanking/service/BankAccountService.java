@@ -4,6 +4,7 @@ import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
+import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.AccountInformationTransaction;
 import de.adorsys.multibanking.exception.*;
@@ -23,6 +24,7 @@ import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_TAN;
 import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_BANKACCOUNTS;
 
 @Slf4j
@@ -105,6 +107,14 @@ public class BankAccountService {
             return onlineBankingService.loadBankAccounts(request)
                 .getBankAccounts();
         } catch (MultibankingException e) {
+            if (e.getMultibankingError() == INVALID_TAN) {
+                // FIXME get the challenge data
+                ChallengeData challengeData = null;
+                UpdateAuthResponse response = new UpdateAuthResponse();
+                response.setChallenge(challengeData);
+                response.setPsuMessage(e.getMessage());
+                throw new MissingConsentAuthorisationException(response, bankAccess.getConsentId(), bankAccess.getAuthorisationId());
+            }
             return handleMultibankingException(bankAccess, e);
         }
     }
