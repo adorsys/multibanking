@@ -54,7 +54,9 @@
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.language>java</sonar.language>
         <sonar.exclusions>file:**/generated-sources/**</sonar.exclusions>
-        <sonar.coverage.exclusions>**/*Entity.java,**/*TO.java,**/*BO.java,**/*Application.java,**/*Exception.java,**/*Config.java</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>
+            **/*Entity.java,**/*TO.java,**/*BO.java,**/*Application.java,**/*Exception.java,**/*Config.java
+        </sonar.coverage.exclusions>
     </properties>
 
     <modules>
@@ -347,5 +349,15 @@
             </build>
         </profile>
     </profiles>
+    <distributionManagement>
+        <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>
