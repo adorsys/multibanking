@@ -12,7 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Ignore
 public class MockBankingTest {
-    MockBanking mockBanking;
+    private MockBanking mockBanking;
     private String pin = "password";
     private BankAccess bankAccess;
 
@@ -37,31 +37,35 @@ public class MockBankingTest {
 
     @Test
     public void testLoadBankAccounts() {
-        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(
-            LoadAccountInformationRequest.builder()
-                .bankAccess(bankAccess)
-                .pin(pin)
-                .build());
+        LoadAccountInformationRequest loadAccountInformationRequest = new LoadAccountInformationRequest();
+        loadAccountInformationRequest.setBankAccess(bankAccess);
+        loadAccountInformationRequest.setPin(pin);
+
+        LoadAccountInformationResponse loadAccountInformationResponse =
+            mockBanking.loadBankAccounts(loadAccountInformationRequest);
         Assert.assertNotNull(loadAccountInformationResponse.getBankAccounts());
         Assert.assertFalse(loadAccountInformationResponse.getBankAccounts().isEmpty());
     }
 
     @Test
     public void testLoadBookings() {
-        LoadAccountInformationResponse loadAccountInformationResponse = mockBanking.loadBankAccounts(
-            LoadAccountInformationRequest.builder()
-                .bankAccess(bankAccess)
-                .pin(pin)
-                .build());
+        LoadAccountInformationRequest loadAccountInformationRequest = new LoadAccountInformationRequest();
+        loadAccountInformationRequest.setBankAccess(bankAccess);
+        loadAccountInformationRequest.setPin(pin);
+
+        LoadAccountInformationResponse loadAccountInformationResponse =
+            mockBanking.loadBankAccounts(loadAccountInformationRequest);
+
         Assume.assumeNotNull(loadAccountInformationResponse.getBankAccounts());
         Assume.assumeFalse(loadAccountInformationResponse.getBankAccounts().isEmpty());
         BankAccount bankAccount = loadAccountInformationResponse.getBankAccounts().iterator().next();
-        LoadBookingsResponse response = mockBanking.loadBookings(
-            LoadBookingsRequest.builder()
-                .bankAccess(bankAccess)
-                .bankAccount(bankAccount)
-                .pin(pin)
-                .build());
+
+        LoadBookingsRequest loadBookingsRequest = new LoadBookingsRequest();
+        loadBookingsRequest.setBankAccess(bankAccess);
+        loadBookingsRequest.setBankAccount(bankAccount);
+        loadBookingsRequest.setPin(pin);
+
+        LoadBookingsResponse response = mockBanking.loadBookings(loadBookingsRequest);
         Assert.assertNotNull(response);
         Assert.assertNotNull(response.getBookings());
         Assert.assertFalse(response.getBookings().isEmpty());

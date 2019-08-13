@@ -43,14 +43,13 @@ public class StandingOrderService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = TransactionRequest.builder()
-                .bankUrl(bankEntity.getBankingUrl())
-                .bankApiUser(bankApiUser)
-                .transaction(standingOrder)
-                .bankAccess(bankAccess)
-                .pin(pin)
-                .bankCode(bankEntity.getBlzHbci())
-                .build();
+            TransactionRequest request = new TransactionRequest();
+            request.setBankApiUser(bankApiUser);
+            request.setTransaction(standingOrder);
+            request.setBankAccess(bankAccess);
+            request.setPin(pin);
+            request.setBankCode(bankEntity.getBlzHbci());
+            request.setBankUrl(bankEntity.getBankingUrl());
             request.setHbciProduct(finTSProductConfig.getProduct());
             Object tanSubmit = bankingService.requestAuthorizationCode(request);
 

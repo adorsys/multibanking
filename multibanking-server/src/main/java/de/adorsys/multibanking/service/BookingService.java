@@ -287,7 +287,6 @@ public class BookingService {
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, onlineBankingService.bankApi());
 
-
         consentService.validate(bankAccess, onlineBankingService, null);
         //external (figo, finapi) account must exist, otherwise loading bookings will not work
         // FIXME this is a problem! currently we load all accounts for bookings which could cause problems with 2FA
@@ -300,19 +299,19 @@ public class BookingService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            LoadBookingsRequest loadBookingsRequest = LoadBookingsRequest.builder()
-                .bankUrl(bankEntity.getBankingUrl())
-                .consentId(bankAccess.getConsentId())
-                .bankApiUser(bankApiUser)
-                .bankAccess(bankAccess)
-                .bankCode(bankEntity.getBlzHbci())
-                .bankAccount(bankAccount)
-                .pin(bankAccess.getPin())
-                .dateFrom(bankAccount.getLastSync() != null ? bankAccount.getLastSync().toLocalDate() : null)
-                .withTanTransportTypes(true)
-                .withBalance(true)
-                .withStandingOrders(true)
-                .build();
+            LoadBookingsRequest loadBookingsRequest = new LoadBookingsRequest();
+            loadBookingsRequest.setConsentId(bankAccess.getConsentId());
+            loadBookingsRequest.setBankApiUser(bankApiUser);
+            loadBookingsRequest.setBankAccess(bankAccess);
+            loadBookingsRequest.setBankCode(bankEntity.getBlzHbci());
+            loadBookingsRequest.setBankAccount(bankAccount);
+            loadBookingsRequest.setPin(bankAccess.getPin());
+            loadBookingsRequest.setDateFrom(bankAccount.getLastSync() != null ?
+                bankAccount.getLastSync().toLocalDate() : null);
+            loadBookingsRequest.setWithTanTransportTypes(true);
+            loadBookingsRequest.setWithBalance(true);
+            loadBookingsRequest.setWithStandingOrders(true);
+            loadBookingsRequest.setBankUrl(bankEntity.getBankingUrl());
             loadBookingsRequest.setHbciProduct(finTSProductConfig.getProduct());
             return onlineBankingService.loadBookings(loadBookingsRequest);
         } catch (MultibankingException e) {
@@ -361,15 +360,14 @@ public class BookingService {
         if (externalAccountId == null) {
             BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
-            LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
-                .bankUrl(bankEntity.getBankingUrl())
-                .bankApiUser(bankApiUser)
-                .bankAccess(bankAccess)
-                .bankCode(bankEntity.getBlzHbci())
-                .updateTanTransportTypes(true)
-                .pin(bankAccess.getPin())
-                .storePin(bankAccess.isStorePin())
-                .build();
+            LoadAccountInformationRequest request = new LoadAccountInformationRequest();
+            request.setBankUrl(bankEntity.getBankingUrl());
+            request.setBankApiUser(bankApiUser);
+            request.setBankAccess(bankAccess);
+            request.setBankCode(bankEntity.getBlzHbci());
+            request.setUpdateTanTransportTypes(true);
+            request.setPin(bankAccess.getPin());
+            request.setStorePin(bankAccess.isStorePin());
             request.setHbciProduct(finTSProductConfig.getProduct());
             List<BankAccount> apiBankAccounts = onlineBankingService.loadBankAccounts(request).getBankAccounts();
 

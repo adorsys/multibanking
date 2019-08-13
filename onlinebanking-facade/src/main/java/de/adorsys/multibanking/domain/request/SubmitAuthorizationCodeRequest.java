@@ -17,12 +17,13 @@
 package de.adorsys.multibanking.domain.request;
 
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
+import lombok.NoArgsConstructor;
 
 @Data
-@SuperBuilder
+@Builder
 @EqualsAndHashCode(callSuper = false)
 public class SubmitAuthorizationCodeRequest extends TransactionRequest {
 

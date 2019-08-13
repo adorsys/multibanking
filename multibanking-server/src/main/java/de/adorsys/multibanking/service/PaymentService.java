@@ -46,15 +46,14 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = TransactionRequest.builder()
-                .bankUrl(bankEntity.getBankingUrl())
-                .bankApiUser(bankApiUser)
-                .tanTransportType(tanTransportType)
-                .transaction(payment)
-                .bankAccess(bankAccess)
-                .pin(pin)
-                .bankCode(bankEntity.getBlzHbci())
-                .build();
+            TransactionRequest request = new TransactionRequest();
+            request.setBankUrl(bankEntity.getBankingUrl());
+            request.setBankApiUser(bankApiUser);
+            request.setTanTransportType(tanTransportType);
+            request.setTransaction(payment);
+            request.setBankAccess(bankAccess);
+            request.setPin(pin);
+            request.setBankCode(bankEntity.getBlzHbci());
             request.setHbciProduct(finTSProductConfig.getProduct());
             Object tanSubmit = bankingService.requestAuthorizationCode(request);
 
@@ -85,15 +84,14 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = TransactionRequest.builder()
-                .bankUrl(bankEntity.getBankingUrl())
-                .bankApiUser(bankApiUser)
-                .tanTransportType(tanTransportType)
-                .transaction(payment)
-                .bankAccess(bankAccess)
-                .pin(pin)
-                .bankCode(bankEntity.getBlzHbci())
-                .build();
+            TransactionRequest request = new TransactionRequest();
+            request.setBankUrl(bankEntity.getBankingUrl());
+            request.setBankApiUser(bankApiUser);
+            request.setTanTransportType(tanTransportType);
+            request.setTransaction(payment);
+            request.setBankAccess(bankAccess);
+            request.setPin(pin);
+            request.setBankCode(bankEntity.getBlzHbci());
             request.setHbciProduct(finTSProductConfig.getProduct());
 
             Object tanSubmit = bankingService.requestAuthorizationCode(request);
@@ -125,15 +123,14 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = TransactionRequest.builder()
-                .bankUrl(bankEntity.getBankingUrl())
-                .bankApiUser(bankApiUser)
-                .transaction(payment)
-                .tanTransportType(tanTransportType)
-                .bankAccess(bankAccess)
-                .pin(pin)
-                .bankCode(bankEntity.getBlzHbci())
-                .build();
+            TransactionRequest request = new TransactionRequest();
+            request.setBankUrl(bankEntity.getBankingUrl());
+            request.setBankApiUser(bankApiUser);
+            request.setTransaction(payment);
+            request.setTanTransportType(tanTransportType);
+            request.setBankAccess(bankAccess);
+            request.setPin(pin);
+            request.setBankCode(bankEntity.getBlzHbci());
             request.setHbciProduct(finTSProductConfig.getProduct());
 
             Object tanSubmit = bankingService.requestAuthorizationCode(request);

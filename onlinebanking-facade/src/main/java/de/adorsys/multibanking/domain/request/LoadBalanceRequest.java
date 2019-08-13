@@ -21,12 +21,10 @@ import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApiUser;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
 
 import java.util.List;
 
 @Data
-@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 public class LoadBalanceRequest extends TransactionRequest {
 

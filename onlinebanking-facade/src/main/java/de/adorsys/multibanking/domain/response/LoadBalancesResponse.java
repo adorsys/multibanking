@@ -19,14 +19,14 @@ package de.adorsys.multibanking.domain.response;
 import de.adorsys.multibanking.domain.BankAccount;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @Data
-@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 public class LoadBalancesResponse extends AbstractResponse {
 
-    private List<BankAccount> bankAccounts;
+    private final List<BankAccount> bankAccounts;
 }

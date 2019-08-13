@@ -1,10 +1,6 @@
 package de.adorsys.multibanking.web;
 
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.BookingEntity;
-import de.adorsys.multibanking.domain.ScaStatus;
-import de.adorsys.multibanking.domain.UserEntity;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
@@ -13,20 +9,8 @@ import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.service.ConsentService;
-import de.adorsys.multibanking.web.mapper.BalancesMapper;
-import de.adorsys.multibanking.web.mapper.BankAccessMapper;
-import de.adorsys.multibanking.web.mapper.BankAccountMapper;
-import de.adorsys.multibanking.web.mapper.BankApiMapper;
-import de.adorsys.multibanking.web.mapper.BookingMapper;
-import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
-import de.adorsys.multibanking.web.model.BalancesReportTO;
-import de.adorsys.multibanking.web.model.BankAccessTO;
-import de.adorsys.multibanking.web.model.BankAccountTO;
-import de.adorsys.multibanking.web.model.BankApiTO;
-import de.adorsys.multibanking.web.model.BookingTO;
-import de.adorsys.multibanking.web.model.ConsentTO;
-import de.adorsys.multibanking.web.model.SelectPsuAuthenticationMethodRequestTO;
-import de.adorsys.multibanking.web.model.UpdateAuthResponseTO;
+import de.adorsys.multibanking.web.mapper.*;
+import de.adorsys.multibanking.web.model.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -39,12 +23,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -83,25 +62,28 @@ public class DirectAccessController {
     @ApiResponses({
         @ApiResponse(code = 201, message = "Response", response = LoadBankAccountsResponse.class)})
     @PostMapping("/accounts")
-    public ResponseEntity<Resource<UpdateAuthResponseTO>> requestBankAccounts(@Valid @RequestBody BankAccessTO bankAccess,
-                                                                              @RequestParam(required = false) BankApiTO bankApi) {
+    public ResponseEntity<Resource<UpdateAuthResponseTO>> requestHbciBankAccounts(@Valid @RequestBody BankAccessTO bankAccess,
+                                                                                  @RequestParam(required = false) BankApiTO bankApi) {
         try {
-            return doLoadBankAccountList(bankAccess, bankApi,
-                (bankAccessEntity) -> {
-                    selectScaMethodForConsent(bankAccess);
-                    return null;
-                },
-                (bankAccounts) -> {
-                    log.debug("request for bank account list was without 2FA");
-                    log.debug("Process as usual but return empty challenge");
-                    return null;
-                },
-                (bankAccounts) -> {
-                    log.debug("process finished < return empty challenge");
-                    return createChallengeResponse(new UpdateAuthResponse(), bankAccess.getConsentId(),
-                        bankAccess.getAuthorisationId());
-                }
-            );
+            BankAccessEntity bankAccessEntity = prepareBankAccess(bankAccess);
+            selectScaMethodForConsent(bankAccess);
+
+            log.debug("load bank account list from bank");
+            List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
+                bankApiMapper.toBankApi(bankApi), ScaStatus.FINALISED);
+
+            saveBankAccess(bankAccessEntity);
+
+            log.debug("save bank account list to db");
+            bankAccounts.forEach(account -> {
+                account.setBankAccessId(bankAccessEntity.getId());
+                account.setUserId(bankAccessEntity.getUserId());
+                bankAccountRepository.save(account);
+            });
+
+            return createChallengeResponse(new UpdateAuthResponse(), bankAccess.getConsentId(),
+                bankAccess.getAuthorisationId());
+
         } catch (MissingConsentAuthorisationException e) {
             log.debug("process finished < return challenge");
             return createChallengeResponse(e.getResponse(), e.getConsentId(), e.getAuthorisationId());
@@ -114,26 +96,31 @@ public class DirectAccessController {
     @PutMapping("/accounts")
     public ResponseEntity<LoadBankAccountsResponse> loadBankAccounts(@Valid @RequestBody BankAccessTO bankAccess,
                                                                      @RequestParam(required = false) BankApiTO bankApi) {
-        return doLoadBankAccountList(bankAccess, bankApi,
-            (bankAccessEntity) -> null,
-            (bankAccounts) -> null,
-            (bankAccounts) -> {
-                LoadBankAccountsResponse response = new LoadBankAccountsResponse();
-                response.setBankAccounts(bankAccountMapper.toBankAccountTOs(bankAccounts));
-                log.debug("process finished < return bank account list");
-                return new ResponseEntity<LoadBankAccountsResponse>(response, HttpStatus.OK);
-            }
-        );
+        BankAccessEntity bankAccessEntity = prepareBankAccess(bankAccess);
+
+        log.debug("load bank account list from bank");
+        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
+            bankApiMapper.toBankApi(bankApi), ScaStatus.FINALISED);
+
+        saveBankAccess(bankAccessEntity);
+
+        log.debug("save bank account list to db");
+        bankAccounts.forEach(account -> {
+            account.setBankAccessId(bankAccessEntity.getId());
+            account.setUserId(bankAccessEntity.getUserId());
+            bankAccountRepository.save(account);
+        });
+
+        LoadBankAccountsResponse response = new LoadBankAccountsResponse();
+        response.setBankAccounts(bankAccountMapper.toBankAccountTOs(bankAccounts));
+        log.debug("process finished < return bank account list");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    private <T> T doLoadBankAccountList(BankAccessTO bankAccess, BankApiTO bankApi,
-                                        Interceptor<BankAccessEntity, Void> preLoad,
+    private <T> T doLoadBankAccountList(BankAccessEntity bankAccessEntity, BankApiTO bankApi,
                                         Interceptor<List<BankAccountEntity>, Void> postLoad,
                                         Interceptor<List<BankAccountEntity>, T> returnInterceptor) {
         log.debug("process start > load bank account list");
-        BankAccessEntity bankAccessEntity = prepareBankAccess(bankAccess);
-
-        preLoad.intercept(bankAccessEntity);
 
         log.debug("load bank account list from bank");
         List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
@@ -178,7 +165,7 @@ public class DirectAccessController {
         @ApiResponse(code = 201, message = "Response", response = LoadBookingsResponse.class)})
     @PostMapping("/bookings")
     public ResponseEntity<Resource<UpdateAuthResponseTO>> requestBookings(@Valid @RequestBody BankAccessTO bankAccess,
-                                                             @RequestParam(required = false) BankApiTO bankApi) {
+                                                                          @RequestParam(required = false) BankApiTO bankApi) {
         try {
             return doLoadBookingList(bankAccess, bankApi,
                 (bankAccessEntity) -> {
@@ -223,11 +210,10 @@ public class DirectAccessController {
     }
 
     private <T> T doLoadBookingList(BankAccessTO bankAccess, BankApiTO bankApi,
-            Interceptor<BankAccessEntity, Void> postAccessLoad,
-            Interceptor<List<BookingEntity>, Void> postLoad,
-            Interceptor<List<BookingEntity>, T> returnInterceptor) {
+                                    Interceptor<BankAccessEntity, Void> postAccessLoad,
+                                    Interceptor<List<BookingEntity>, Void> postLoad,
+                                    Interceptor<List<BookingEntity>, T> returnInterceptor) {
         log.debug("process start > load booking list");
-
 
         log.debug("load bank access");
         BankAccessEntity bankAccessEntity = prepareBankAccess(bankAccess);
@@ -274,6 +260,10 @@ public class DirectAccessController {
         bankAccessRepository.save(bankAccessEntity);
     }
 
+    public interface Interceptor<InputType, OutputType> {
+        OutputType intercept(InputType param);
+    }
+
     @Data
     public static class LoadBookingsRequest {
         @NotBlank
@@ -295,9 +285,5 @@ public class DirectAccessController {
     public static class LoadBankAccountsResponse {
         ConsentTO consent;
         List<BankAccountTO> bankAccounts;
-    }
-
-    public interface Interceptor<InputType, OutputType> {
-        OutputType intercept(InputType param);
     }
 }

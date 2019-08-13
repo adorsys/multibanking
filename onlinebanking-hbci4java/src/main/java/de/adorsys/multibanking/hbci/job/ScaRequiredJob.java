@@ -162,7 +162,7 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         GVTAN2Step hktan = new GVTAN2Step(dialog.getPassport());
         hktan.setSegVersion(hbciTwoStepMechanism.getSegversion());
 
-        if (hbciTwoStepMechanism != null && dialog.getPassport().tanMediaNeeded()) {
+        if (dialog.getPassport().tanMediaNeeded()) {
             hktan.setParam("tanmedia", getTransactionRequest().getTanTransportType().getMedium());
         }
 
@@ -233,7 +233,7 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
     private HbciDialogRequest createDialogRequest(HbciCallback hbciCallback) {
         TransactionRequest transactionRequest = getTransactionRequest();
 
-        return HbciDialogRequest.builder()
+        HbciDialogRequest hbciDialogRequest = HbciDialogRequest.builder()
             .bankCode(transactionRequest.getBankCode() != null ? transactionRequest.getBankCode() :
                 transactionRequest.getBankAccess().getBankCode())
             .customerId(transactionRequest.getBankAccess().getBankLogin())
@@ -241,13 +241,16 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
             .hbciPassportState(transactionRequest.getBankAccess().getHbciPassportState())
             .pin(transactionRequest.getPin())
             .callback(hbciCallback)
-            .hbciProduct(Optional.ofNullable(transactionRequest.getHbciProduct())
-                .map(product -> new Product(product.getName(), product.getVersion()))
-                .orElse(null))
-            .hbciBPD(transactionRequest.getHbciBPD())
-            .hbciUPD(transactionRequest.getHbciUPD())
-            .hbciSysId(transactionRequest.getHbciSysId())
             .build();
+
+        hbciDialogRequest.setHbciProduct(Optional.ofNullable(transactionRequest.getHbciProduct())
+            .map(product -> new Product(product.getName(), product.getVersion()))
+            .orElse(null));
+        hbciDialogRequest.setHbciBPD(transactionRequest.getHbciBPD());
+        hbciDialogRequest.setHbciUPD(transactionRequest.getHbciUPD());
+        hbciDialogRequest.setHbciSysId(transactionRequest.getHbciSysId());
+
+        return hbciDialogRequest;
     }
 
     abstract TransactionRequest getTransactionRequest();

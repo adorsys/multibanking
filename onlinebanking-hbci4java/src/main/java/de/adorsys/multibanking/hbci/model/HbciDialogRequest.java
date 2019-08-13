@@ -17,12 +17,13 @@
 package de.adorsys.multibanking.hbci.model;
 
 import de.adorsys.multibanking.domain.request.AbstractRequest;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
 @Data
-@SuperBuilder
+@Builder
 @EqualsAndHashCode(callSuper = false)
 public class HbciDialogRequest extends AbstractRequest {
 

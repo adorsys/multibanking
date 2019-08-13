@@ -21,7 +21,6 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.SuperBuilder;
 
 @Data
-@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 public class AuthenticatePsuRequest extends AbstractRequest {
 

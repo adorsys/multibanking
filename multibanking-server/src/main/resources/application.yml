@@ -88,12 +88,9 @@ spring:
     - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 db_secret: 1234567890123456
-mongo.properties.url: classpath:/mongo.properties
-bankinggateway:
-  base.url: http://localhost:8084
-  consentAuthorisationUrl: ${bankinggateway.baseUrl}/v1/consents/{consentId}/authorisations/{authorisationId}
-  consentIrl: ${bankinggateway.baseUrl}/v1/consents
 
+mongo.properties.url: classpath:/mongo.properties
+bankinggateway.base.url: http://localhost:8084
 swagger.login.url: http://localhost:8080/auth/realms/multibanking/protocol/openid-connect/auth
 
 idp:

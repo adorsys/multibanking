@@ -44,7 +44,7 @@ import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 @RequiredArgsConstructor
 public class SubmitAuthorisationCodeJob {
 
-    private final ScaRequiredJob scaJob;
+    private final ScaRequiredJob<SubmitAuthorizationCodeResponse> scaJob;
 
     public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
         HbciTanSubmit hbciTanSubmit = evaluateTanSubmit(submitAuthorizationCodeRequest);

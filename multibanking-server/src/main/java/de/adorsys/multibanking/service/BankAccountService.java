@@ -4,7 +4,6 @@ import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
-import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.AccountInformationTransaction;
 import de.adorsys.multibanking.exception.*;
@@ -24,7 +23,6 @@ import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_TAN;
 import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_BANKACCOUNTS;
 
 @Slf4j
@@ -59,11 +57,12 @@ public class BankAccountService {
         return bankAccounts;
     }
 
-    public List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi) {
+    List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi) {
         return loadBankAccountsOnline(bankAccess, bankApi, ScaStatus.FINALISED);
     }
 
-    public List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi, ScaStatus expectedConsentStatus) {
+    public List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi,
+                                                          ScaStatus expectedConsentStatus) {
         OnlineBankingService onlineBankingService = bankApi != null ?
             bankingServiceProducer.getBankingService(bankApi) :
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
@@ -96,17 +95,16 @@ public class BankAccountService {
                                                      OnlineBankingService onlineBankingService,
                                                      BankApiUser bankApiUser, BankEntity bankEntity) {
         try {
-            LoadAccountInformationRequest request = LoadAccountInformationRequest.builder()
-                .bankUrl(bankEntity.getBankingUrl())
-                .consentId(bankAccess.getConsentId())
-                .transaction(new AccountInformationTransaction(LOAD_BANKACCOUNTS))
-                .bankApiUser(bankApiUser)
-                .bankAccess(bankAccess)
-                .bankCode(bankEntity.getBlzHbci())
-                .pin(bankAccess.getPin())
-                .storePin(bankAccess.isStorePin())
-                .updateTanTransportTypes(true)
-                .build();
+            LoadAccountInformationRequest request = new LoadAccountInformationRequest();
+            request.setBankUrl(bankEntity.getBankingUrl());
+            request.setConsentId(bankAccess.getConsentId());
+            request.setTransaction(new AccountInformationTransaction(LOAD_BANKACCOUNTS));
+            request.setBankApiUser(bankApiUser);
+            request.setBankAccess(bankAccess);
+            request.setBankCode(bankEntity.getBlzHbci());
+            request.setPin(bankAccess.getPin());
+            request.setStorePin(bankAccess.isStorePin());
+            request.setUpdateTanTransportTypes(true);
             request.setHbciProduct(finTSProductConfig.getProduct());
             return onlineBankingService.loadBankAccounts(request)
                 .getBankAccounts();
@@ -117,7 +115,8 @@ public class BankAccountService {
 //                UpdateAuthResponse response = new UpdateAuthResponse();
 //                response.setChallenge(challengeData);
 //                response.setPsuMessage(e.getMessage());
-//                throw new MissingConsentAuthorisationException(response, bankAccess.getConsentId(), bankAccess.getAuthorisationId());
+//                throw new MissingConsentAuthorisationException(response, bankAccess.getConsentId(), bankAccess
+//                .getAuthorisationId());
 //            } //FIXME
             return handleMultibankingException(bankAccess, e);
         }

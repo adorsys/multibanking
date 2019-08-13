@@ -131,8 +131,6 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalancesResponse> {
             })
             .collect(Collectors.toList());
 
-        return LoadBalancesResponse.builder()
-            .bankAccounts(bankAccounts)
-            .build();
+        return new LoadBalancesResponse(bankAccounts);
     }
 }

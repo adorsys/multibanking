@@ -16,12 +16,11 @@
 
 package de.adorsys.multibanking.domain.request;
 
+import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 
-@SuperBuilder
-@Getter
+@Data
 @EqualsAndHashCode(callSuper = false)
 public class LoadAccountInformationRequest extends TransactionRequest {
 

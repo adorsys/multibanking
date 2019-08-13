@@ -19,14 +19,13 @@ package de.adorsys.multibanking.domain.request;
 import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApiUser;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 
 @Data
-@SuperBuilder
 @EqualsAndHashCode(callSuper = false)
 public class LoadBookingsRequest extends TransactionRequest {
 

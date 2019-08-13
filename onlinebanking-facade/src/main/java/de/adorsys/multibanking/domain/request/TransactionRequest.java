@@ -20,12 +20,10 @@ import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.TanTransportType;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 
-@SuperBuilder
-@Getter
+@Data
 @EqualsAndHashCode(callSuper = false)
 public class TransactionRequest extends AbstractRequest {
 
