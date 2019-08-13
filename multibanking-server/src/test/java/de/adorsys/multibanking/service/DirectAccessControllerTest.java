@@ -118,6 +118,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
+    @Ignore
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO access = createBankAccess();
