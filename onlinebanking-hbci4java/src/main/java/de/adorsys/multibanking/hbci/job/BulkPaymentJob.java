@@ -23,6 +23,7 @@ import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVMultiUebSEPA;
@@ -56,6 +57,7 @@ public class BulkPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
         }
 
         sepagv.setParam("src", src);
+        sepagv.setParam("batchbook", BooleanUtils.isTrue(bulkPayment.getBatchbooking()) ? "1" : "0");
 
         for (int i = 0; i < bulkPayment.getPayments().size(); i++) {
             SinglePayment payment = bulkPayment.getPayments().get(i);
@@ -69,6 +71,9 @@ public class BulkPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
             sepagv.setParam("btg", i, new Value(payment.getAmount(), payment.getCurrency()));
             if (payment.getPurpose() != null) {
                 sepagv.setParam("usage", i, payment.getPurpose());
+            }
+            if (payment.getPurposecode() != null) {
+                sepagv.setParam("purposecode", i, payment.getPurposecode());
             }
         }
 
