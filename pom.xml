@@ -347,15 +347,5 @@
             </build>
         </profile>
     </profiles>
-    <distributionManagement>
-        <repository>
-            <id>bg-releases</id>
-            <url>https://bg-nexus.cloud.adorsys.de/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>bg-snapshots</id>
-            <url>https://bg-nexus.cloud.adorsys.de/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 
 </project>
