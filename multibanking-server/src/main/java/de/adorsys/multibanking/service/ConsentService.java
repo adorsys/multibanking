@@ -23,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import org.iban4j.Iban;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @RequiredArgsConstructor
 @Service
 public class ConsentService {
@@ -57,7 +59,8 @@ public class ConsentService {
             consentAuthorisationMapper.toUpdatePsuAuthenticationRequest(updatePsuAuthenticationRequestTO,
                 internalConsent);
 
-        UpdateAuthResponse response = onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequest, bank.getBankingUrl());
+        UpdateAuthResponse response =
+            onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequest, bank.getBankingUrl());
         internalConsent.setBankApiConsentData(updatePsuAuthenticationRequest.getBankApiConsentData());
         consentRepository.save(internalConsent);
         return response;
@@ -74,7 +77,8 @@ public class ConsentService {
             consentAuthorisationMapper.toSelectPsuAuthenticationMethodRequest(selectPsuAuthenticationMethodRequestTO,
                 internalConsent);
 
-        UpdateAuthResponse response = onlineBankingService.getStrongCustomerAuthorisation().selectPsuAuthenticationMethod(selectPsuAuthenticationMethodRequest);
+        UpdateAuthResponse response =
+            onlineBankingService.getStrongCustomerAuthorisation().selectPsuAuthenticationMethod(selectPsuAuthenticationMethodRequest);
         internalConsent.setBankApiConsentData(selectPsuAuthenticationMethodRequest.getBankApiConsentData());
         consentRepository.save(internalConsent);
         return response;
@@ -92,7 +96,8 @@ public class ConsentService {
             consentAuthorisationMapper.toTransactionAuthorisationRequest(transactionAuthorisationRequestTO,
                 internalConsent);
 
-        UpdateAuthResponse response = onlineBankingService.getStrongCustomerAuthorisation().authorizeConsent(transactionAuthorisationRequest);
+        UpdateAuthResponse response =
+            onlineBankingService.getStrongCustomerAuthorisation().authorizeConsent(transactionAuthorisationRequest);
         internalConsent.setBankApiConsentData(transactionAuthorisationRequest.getBankApiConsentData());
         consentRepository.save(internalConsent);
         return response;
@@ -133,10 +138,11 @@ public class ConsentService {
             bankingServiceProducer.getBankingService(Iban.valueOf(iban).getBankCode());
     }
 
-    void validate(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService, ScaStatus expectedConsentStatus) {
+    Optional<ConsentEntity> validateAndGetConsent(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService,
+                                                  ScaStatus expectedConsentStatus) {
         if (onlineBankingService.getStrongCustomerAuthorisation() == null) {
             // Bank API doesn't support SCA so nothing to validate
-            return;
+            return Optional.empty();
         }
 
         ConsentEntity internalConsent = consentRepository.findById(bankAccess.getConsentId())
@@ -152,7 +158,7 @@ public class ConsentService {
                     throw new MissingConsentException();
                 case INVALID_SCA_METHOD:
                     throw new MissingConsentAuthorisationSelectionException();
-                case INVALID_TAN:
+                case HBCI_2FA_REQUIRED:
                     // FIXME get the challenge data
                     ChallengeData challengeData = null;
                     UpdateAuthResponse response = new UpdateAuthResponse();
@@ -164,6 +170,8 @@ public class ConsentService {
                     throw e;
             }
         }
+
+        return Optional.of(internalConsent);
     }
 
 }

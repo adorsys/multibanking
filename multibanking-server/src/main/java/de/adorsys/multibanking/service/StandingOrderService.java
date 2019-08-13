@@ -51,7 +51,7 @@ public class StandingOrderService {
             request.setBankCode(bankEntity.getBlzHbci());
             request.setBankUrl(bankEntity.getBankingUrl());
             request.setHbciProduct(finTSProductConfig.getProduct());
-            Object tanSubmit = bankingService.requestAuthorizationCode(request);
+            Object tanSubmit = bankingService.requestPaymentAuthorizationCode(request);
 
             StandingOrderEntity target = new StandingOrderEntity();
             BeanUtils.copyProperties(standingOrder, target);
@@ -83,7 +83,7 @@ public class StandingOrderService {
                 .tan(tan)
                 .build();
             request.setHbciProduct(finTSProductConfig.getProduct());
-            bankingService.submitAuthorizationCode(request);
+            bankingService.submitPaymentAuthorizationCode(request);
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }

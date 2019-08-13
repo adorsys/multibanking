@@ -118,6 +118,7 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalancesResponse> {
 
     @Override
     public LoadBalancesResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        //TODO check for needed 2FA
         List<BankAccount> bankAccounts = jobs.keySet().stream()
             .map(job -> {
                 if (job.getJobResult().getJobStatus().hasErrors()) {

@@ -5,7 +5,6 @@ import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiException;
 import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2CAisApi;
-import de.adorsys.multibanking.banking_gateway_b2c.model.ConsentTO;
 import de.adorsys.multibanking.banking_gateway_b2c.model.CreateConsentResponseTO;
 import de.adorsys.multibanking.banking_gateway_b2c.model.ResourceUpdateAuthResponseTO;
 import de.adorsys.multibanking.domain.*;
@@ -133,12 +132,12 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest request) {
+    public AuthorisationCodeResponse requestPaymentAuthorizationCode(TransactionRequest request) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+    public SubmitAuthorizationCodeResponse submitPaymentAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
         throw new UnsupportedOperationException();
     }
 
@@ -232,13 +231,18 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             public void validateConsent(String consentId, ScaStatus expectedConsentStatus, Object bankApiConsentData) throws MultibankingException {
                 try {
                     BankingGatewayB2CAisApi bankingGatewayB2CAisApi = new BankingGatewayB2CAisApi(apiClient());
-                    ConsentTO consentTO = bankingGatewayB2CAisApi.getConsentUsingGET(consentId);
-
-                    //FIXME
+                    Optional.of(bankingGatewayB2CAisApi.getConsentUsingGET(consentId))
+                        .map(consent -> ScaStatus.valueOf(consent.getConsentStatus().toString()))
+                        .filter(consentStatus -> consentStatus == expectedConsentStatus)
+                        .orElseThrow(() -> new MultibankingException(MultibankingError.INVALID_CONSENT_STATUS));
                 } catch (ApiException e) {
                     throw handeAisApiException(e);
                 }
+            }
 
+            @Override
+            public void preExecute(TransactionRequest request, Object bankApiConsentData) {
+                //noop
             }
         };
     }

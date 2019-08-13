@@ -35,10 +35,9 @@ public interface OnlineBankingService {
 
     boolean bookingsCategorized();
 
-    AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest paymentRequest);
+    AuthorisationCodeResponse requestPaymentAuthorizationCode(TransactionRequest paymentRequest);
 
-    SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
+    SubmitAuthorizationCodeResponse submitPaymentAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
 
     StrongCustomerAuthorisable getStrongCustomerAuthorisation();
-
 }

@@ -16,7 +16,6 @@
 
 package de.adorsys.multibanking.domain.request;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

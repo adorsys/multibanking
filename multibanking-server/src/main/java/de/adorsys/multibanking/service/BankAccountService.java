@@ -6,7 +6,9 @@ import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.AccountInformationTransaction;
-import de.adorsys.multibanking.exception.*;
+import de.adorsys.multibanking.exception.BankAccessAlreadyExistException;
+import de.adorsys.multibanking.exception.InvalidBankAccessException;
+import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import lombok.RequiredArgsConstructor;
@@ -21,14 +23,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
+import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_BANKACCOUNTS;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BankAccountService {
+public class BankAccountService extends AccountInformationService {
 
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BankAccountRepositoryIf bankAccountRepository;
@@ -58,23 +59,22 @@ public class BankAccountService {
     }
 
     List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi) {
-        return loadBankAccountsOnline(bankAccess, bankApi, ScaStatus.FINALISED);
+        return loadBankAccountsOnline(FINALISED, bankAccess, bankApi);
     }
 
-    public List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi,
-                                                          ScaStatus expectedConsentStatus) {
+    public List<BankAccountEntity> loadBankAccountsOnline(ScaStatus expectedConsentStatus,
+                                                          BankAccessEntity bankAccess, BankApi bankApi) {
         OnlineBankingService onlineBankingService = bankApi != null ?
             bankingServiceProducer.getBankingService(bankApi) :
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         checkBankSupported(bankAccess, onlineBankingService);
-        consentService.validate(bankAccess, onlineBankingService, expectedConsentStatus);
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankApi);
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
-        List<BankAccount> bankAccounts = loadBankAccountsOnline(bankAccess, onlineBankingService, bankApiUser,
-            bankEntity);
+        List<BankAccount> bankAccounts = loadBankAccountsOnline(expectedConsentStatus, bankAccess,
+            onlineBankingService, bankApiUser, bankEntity);
 
         if (onlineBankingService.bankApi() == BankApi.FIGO) {
             filterAccounts(bankAccess, onlineBankingService, bankAccounts);
@@ -91,48 +91,33 @@ public class BankAccountService {
             .collect(Collectors.toList());
     }
 
-    private List<BankAccount> loadBankAccountsOnline(BankAccessEntity bankAccess,
+    private List<BankAccount> loadBankAccountsOnline(ScaStatus expectedConsentStatus, BankAccessEntity bankAccess,
                                                      OnlineBankingService onlineBankingService,
                                                      BankApiUser bankApiUser, BankEntity bankEntity) {
-        try {
-            LoadAccountInformationRequest request = new LoadAccountInformationRequest();
-            request.setBankUrl(bankEntity.getBankingUrl());
-            request.setConsentId(bankAccess.getConsentId());
-            request.setTransaction(new AccountInformationTransaction(LOAD_BANKACCOUNTS));
-            request.setBankApiUser(bankApiUser);
-            request.setBankAccess(bankAccess);
-            request.setBankCode(bankEntity.getBlzHbci());
-            request.setPin(bankAccess.getPin());
-            request.setStorePin(bankAccess.isStorePin());
-            request.setUpdateTanTransportTypes(true);
-            request.setHbciProduct(finTSProductConfig.getProduct());
-            return onlineBankingService.loadBankAccounts(request)
-                .getBankAccounts();
-        } catch (MultibankingException e) {
-//            if (e.getMultibankingError() == INVALID_TAN) {
-//                // FIXME get the challenge data
-//                ChallengeData challengeData = null;
-//                UpdateAuthResponse response = new UpdateAuthResponse();
-//                response.setChallenge(challengeData);
-//                response.setPsuMessage(e.getMessage());
-//                throw new MissingConsentAuthorisationException(response, bankAccess.getConsentId(), bankAccess
-//                .getAuthorisationId());
-//            } //FIXME
-            return handleMultibankingException(bankAccess, e);
-        }
-    }
+        Optional<ConsentEntity> consentEntity = consentService.validateAndGetConsent(bankAccess, onlineBankingService,
+            expectedConsentStatus);
 
-    private List<BankAccount> handleMultibankingException(BankAccessEntity bankAccess, MultibankingException e) {
-        if (e.getMultibankingError() == INVALID_PIN) {
-            bankAccess.setPin(null);
-            bankAccessRepository.save(bankAccess);
-            throw new InvalidPinException(bankAccess.getId());
-        } else if (e.getMultibankingError() == INVALID_CONSENT) {
-            bankAccess.setConsentId(null);
-            bankAccessRepository.save(bankAccess);
-            throw new InvalidConsentException();
+        LoadAccountInformationRequest request = new LoadAccountInformationRequest();
+        request.setBankUrl(bankEntity.getBankingUrl());
+        request.setTransaction(new AccountInformationTransaction(LOAD_BANKACCOUNTS));
+        request.setBankApiUser(bankApiUser);
+        request.setBankAccess(bankAccess);
+        request.setBankCode(bankEntity.getBlzHbci());
+        request.setPin(bankAccess.getPin());
+        request.setStorePin(bankAccess.isStorePin());
+        request.setUpdateTanTransportTypes(true);
+        request.setHbciProduct(finTSProductConfig.getProduct());
+        consentEntity.ifPresent(consent -> request.setConsentId(consent.getId()));
+
+        try {
+            consentEntity.ifPresent(consent -> onlineBankingService.getStrongCustomerAuthorisation().preExecute(request,
+                consent.getBankApiConsentData())
+            );
+
+            return onlineBankingService.loadBankAccounts(request).getBankAccounts();
+        } catch (MultibankingException e) {
+            throw handleMultibankingException(bankAccess, consentEntity.orElse(null), e);
         }
-        throw e;
     }
 
     private void checkBankSupported(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService) {

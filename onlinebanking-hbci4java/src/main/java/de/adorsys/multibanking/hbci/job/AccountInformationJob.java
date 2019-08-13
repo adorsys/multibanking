@@ -99,6 +99,7 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccountInformation
     @Override
     public LoadAccountInformationResponse createJobResponse(PinTanPassport passport,
                                                             AuthorisationCodeResponse response) {
+        //TODO check for needed 2FA
         loadAccountInformationRequest.getBankAccess().setBankName(passport.getInstName());
 
         hbciAccounts = new ArrayList<>();

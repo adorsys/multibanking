@@ -5,6 +5,7 @@ import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
@@ -31,7 +32,9 @@ public interface StrongCustomerAuthorisable {
      * @param bankApiConsentData
      * @throws MultibankingException INVALID_PIN for Consent without login
      *                               INVALID_SCA_METHOD for Consent without selected sca method
-     *                               INVALID_TAN for Consent without authorized sca method
+     *                               HBCI_2FA_REQUIRED for Consent without authorized sca method
      */
     void validateConsent(String consentId, ScaStatus expectedConsentStatus, Object bankApiConsentData);
+
+    void preExecute(TransactionRequest request, Object bankApiConsentData);
 }

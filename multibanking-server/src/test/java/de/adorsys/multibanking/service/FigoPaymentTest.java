@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -73,7 +74,7 @@ public class FigoPaymentTest {
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("12324463"))
             .findFirst().get();
 
-        bookingService.syncBookings(bankAccessEntity, bankAccountEntitity, BankApi.FIGO);
+        bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntitity, BankApi.FIGO);
 
         SinglePaymentEntity paymentEntity = new SinglePaymentEntity();
         paymentEntity.setReceiverIban("receiver_iban_needed_here");

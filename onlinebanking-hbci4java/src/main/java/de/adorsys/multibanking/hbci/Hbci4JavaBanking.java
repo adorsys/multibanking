@@ -151,7 +151,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
         BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
 
-        // FIXME this should throw MultibankingException with INVALID_TAN when 2FA is needed
         try {
             AccountInformationJob accountInformationJob = new AccountInformationJob(request);
             LoadAccountInformationResponse response = accountInformationJob.execute(hbciCallback);
@@ -212,7 +211,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest transactionRequest) {
+    public AuthorisationCodeResponse requestPaymentAuthorizationCode(TransactionRequest transactionRequest) {
         checkBankExists(transactionRequest.getBankCode(), transactionRequest.getBankUrl());
         BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(transactionRequest.getBankCode(),
             transactionRequest);
@@ -232,7 +231,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
+    public SubmitAuthorizationCodeResponse submitPaymentAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
         try {
             Map<String, String> bpd = Optional.ofNullable(bpdCache)
                 .map(cache -> cache.get(submitAuthorizationCodeRequest.getBankCode()))
@@ -287,6 +286,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
                 HBCIConsent hbciConsent = (HBCIConsent) transactionAuthorisation.getBankApiConsentData();
                 hbciConsent.setStatus(ScaStatus.FINALISED);
+                hbciConsent.setScaAuthenticationData(transactionAuthorisation.getScaAuthenticationData());
 
                 return hbciMapper.toUpdateAuthResponse(hbciConsent, bankApi());
             }
@@ -322,7 +322,15 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                     .map(o -> (HBCIConsent) o)
                     .orElseThrow(() -> new MultibankingException(MultibankingError.NO_CONSENT));
 
-                //FIXME
+                if (hbciConsent.getStatus() != expectedConsentStatus) {
+                    throw new MultibankingException(MultibankingError.INVALID_CONSENT_STATUS);
+                }
+            }
+
+            @Override
+            public void preExecute(TransactionRequest request, Object bankApiConsentData) {
+                HBCIConsent hbciConsent = (HBCIConsent) bankApiConsentData;
+                request.setTanTransportType(hbciConsent.getSelectedMethod());
             }
         };
     }
@@ -399,6 +407,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     private RuntimeException handleHbciException(HBCI_Exception e) {
+        // FIXME this should throw MultibankingException with HBCI_2FA_REQUIRED when 2FA is needed
+
         Throwable processException = e;
         while (processException.getCause() != null && !(processException.getCause() instanceof MultibankingException)) {
             processException = processException.getCause();

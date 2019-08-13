@@ -9,8 +9,6 @@ import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
-import de.adorsys.multibanking.exception.InvalidConsentException;
-import de.adorsys.multibanking.exception.InvalidPinException;
 import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
@@ -33,13 +31,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
-
 @Slf4j
 @AllArgsConstructor
 @Service
-public class BookingService {
+public class BookingService extends AccountInformationService {
 
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BankAccountRepositoryIf bankAccountRepository;
@@ -111,8 +106,9 @@ public class BookingService {
     }
 
     @Transactional
-    public List<BookingEntity> syncBookings(BankAccessEntity bankAccess,
-                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi) {
+    public List<BookingEntity> syncBookings(ScaStatus expectedConsentStatus, BankAccessEntity bankAccess,
+                                            BankAccountEntity bankAccount,
+                                            @Nullable BankApi bankApi) {
         bankAccountRepository.updateSyncStatus(bankAccount.getId(), BankAccount.SyncStatus.SYNC);
 
         OnlineBankingService onlineBankingService = bankApi != null ?
@@ -120,8 +116,8 @@ public class BookingService {
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         try {
-            LoadBookingsResponse response = loadBookingsOnline(onlineBankingService, bankAccess,
-                bankAccount);
+            LoadBookingsResponse response = loadBookingsOnline(expectedConsentStatus, onlineBankingService,
+                bankAccess, bankAccount);
 
             if (!bankAccess.isTemporary()) {
                 //update bankaccess, passportstate changed
@@ -281,13 +277,13 @@ public class BookingService {
         bookingsIndexRepository.save(bookingsIndexEntity);
     }
 
-    private LoadBookingsResponse loadBookingsOnline(OnlineBankingService onlineBankingService,
-                                                    BankAccessEntity bankAccess,
-                                                    BankAccountEntity bankAccount) {
-
+    private LoadBookingsResponse loadBookingsOnline(ScaStatus expectedConsentStatus,
+                                                    OnlineBankingService onlineBankingService,
+                                                    BankAccessEntity bankAccess, BankAccountEntity bankAccount) {
         BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, onlineBankingService.bankApi());
 
-        consentService.validate(bankAccess, onlineBankingService, null);
+        Optional<ConsentEntity> consentEntity = consentService.validateAndGetConsent(bankAccess, onlineBankingService,
+            expectedConsentStatus);
         //external (figo, finapi) account must exist, otherwise loading bookings will not work
         // FIXME this is a problem! currently we load all accounts for bookings which could cause problems with 2FA
         //  in HBCI
@@ -298,38 +294,30 @@ public class BookingService {
 
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
+        LoadBookingsRequest loadBookingsRequest = new LoadBookingsRequest();
+        loadBookingsRequest.setConsentId(bankAccess.getConsentId());
+        loadBookingsRequest.setBankApiUser(bankApiUser);
+        loadBookingsRequest.setBankAccess(bankAccess);
+        loadBookingsRequest.setBankCode(bankEntity.getBlzHbci());
+        loadBookingsRequest.setBankAccount(bankAccount);
+        loadBookingsRequest.setPin(bankAccess.getPin());
+        loadBookingsRequest.setDateFrom(bankAccount.getLastSync() != null ?
+            bankAccount.getLastSync().toLocalDate() : null);
+        loadBookingsRequest.setWithTanTransportTypes(true);
+        loadBookingsRequest.setWithBalance(true);
+        loadBookingsRequest.setWithStandingOrders(true);
+        loadBookingsRequest.setBankUrl(bankEntity.getBankingUrl());
+        consentEntity.ifPresent(consent -> loadBookingsRequest.setConsentId(consent.getId()));
+
         try {
-            LoadBookingsRequest loadBookingsRequest = new LoadBookingsRequest();
-            loadBookingsRequest.setConsentId(bankAccess.getConsentId());
-            loadBookingsRequest.setBankApiUser(bankApiUser);
-            loadBookingsRequest.setBankAccess(bankAccess);
-            loadBookingsRequest.setBankCode(bankEntity.getBlzHbci());
-            loadBookingsRequest.setBankAccount(bankAccount);
-            loadBookingsRequest.setPin(bankAccess.getPin());
-            loadBookingsRequest.setDateFrom(bankAccount.getLastSync() != null ?
-                bankAccount.getLastSync().toLocalDate() : null);
-            loadBookingsRequest.setWithTanTransportTypes(true);
-            loadBookingsRequest.setWithBalance(true);
-            loadBookingsRequest.setWithStandingOrders(true);
-            loadBookingsRequest.setBankUrl(bankEntity.getBankingUrl());
-            loadBookingsRequest.setHbciProduct(finTSProductConfig.getProduct());
+            consentEntity.ifPresent(consent -> onlineBankingService.getStrongCustomerAuthorisation().preExecute(loadBookingsRequest,
+                consent.getBankApiConsentData())
+            );
+
             return onlineBankingService.loadBookings(loadBookingsRequest);
         } catch (MultibankingException e) {
-            return handleMultibankingException(bankAccess, e);
+            throw handleMultibankingException(bankAccess, consentEntity.orElse(null), e);
         }
-    }
-
-    private LoadBookingsResponse handleMultibankingException(BankAccessEntity bankAccess, MultibankingException e) {
-        if (e.getMultibankingError() == INVALID_PIN) {
-            bankAccess.setPin(null);
-            bankAccessRepository.save(bankAccess);
-            throw new InvalidPinException(bankAccess.getId());
-        } else if (e.getMultibankingError() == INVALID_CONSENT) {
-            bankAccess.setConsentId(null);
-            bankAccessRepository.save(bankAccess);
-            throw new InvalidConsentException();
-        }
-        throw e;
     }
 
     private List<BookingEntity> mapBookings(BankAccountEntity bankAccount, List<Booking> bookings) {
@@ -344,7 +332,8 @@ public class BookingService {
             .collect(Collectors.toList());
     }
 
-    private List<BookingEntity> mergeBookings(List<BookingEntity> dbBookings, List<BookingEntity> newBookings) {
+    private List<BookingEntity> mergeBookings(List<BookingEntity> dbBookings,
+                                              List<BookingEntity> newBookings) {
         return Stream.of(dbBookings, newBookings)
             .flatMap(Collection::stream)
             .collect(Collectors.collectingAndThen(Collectors.toCollection(() ->

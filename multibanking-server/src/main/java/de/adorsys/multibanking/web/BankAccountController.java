@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
+import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -84,7 +85,6 @@ public class BankAccountController {
                 @AuthorizationScope(scope = "openid", description = "")
             })})
     @ApiResponses({
-        @ApiResponse(code = 202, message = "Consent authorisation required", response = Consent.class),
         @ApiResponse(code = 204, message = "Sync started", response = void.class)})
     @PutMapping("/{accountId}/sync")
     public ResponseEntity syncBookings(
@@ -101,7 +101,7 @@ public class BankAccountController {
         if (bankAccount.getSyncStatus() == BankAccount.SyncStatus.SYNC) {
             throw new SyncInProgressException(bankAccount.getId());
         }
-        bookingService.syncBookings(bankAccess, bankAccount, null);
+        bookingService.syncBookings(FINALISED, bankAccess, bankAccount, null);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

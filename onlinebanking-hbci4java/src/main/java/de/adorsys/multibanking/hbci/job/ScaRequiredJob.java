@@ -69,7 +69,7 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         boolean tan2StepRequired = hbciJobs == null || dialog.getPassport().tan2StepRequired(hbciJobs);
 
         if (tan2StepRequired) {
-            handleSCA(hbciTanSubmit, dialog, hbciJobs);
+            requestAuthorisationCode(hbciTanSubmit, dialog, hbciJobs);
         } else {
             //No SCA needed
             dialog.addTasks(hbciJobs);
@@ -85,7 +85,7 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         return createJobResponse(dialog.getPassport(), authorisationCodeResponse);
     }
 
-    private void handleSCA(HbciTanSubmit hbciTanSubmit, HBCIDialog dialog, List<AbstractHBCIJob> hbciJobs) {
+    private void requestAuthorisationCode(HbciTanSubmit hbciTanSubmit, HBCIDialog dialog, List<AbstractHBCIJob> hbciJobs) {
         HBCITwoStepMechanism hbciTwoStepMechanism = getUserTanTransportType(dialog);
         dialog.getPassport().setCurrentSecMechInfo(hbciTwoStepMechanism);
 

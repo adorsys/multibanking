@@ -88,6 +88,8 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
 
     @Override
     public LoadBookingsResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        //TODO check for needed 2FA
+
         if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
             throw new MultibankingException(HBCI_ERROR, bookingsJob.getJobResult().getJobStatus().getErrorList());

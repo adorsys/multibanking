@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.security.Security;
 import java.util.Optional;
 
+import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static junit.framework.TestCase.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -93,7 +94,7 @@ public class MockBankingTest {
         bankAccountEntity.setAccountNumber("765551851");
 
         try {
-            bookingService.syncBookings(bankAccessEntity, bankAccountEntity, BankApi.MOCK);
+            bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntity, BankApi.MOCK);
         } catch (MissingConsentException e) {
             fail();
         }

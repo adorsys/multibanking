@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -98,7 +99,7 @@ public class SyncTest {
 
         bankAccountEntity.setId("test-account-id");
 
-        bookingService.syncBookings(bankAccessEntity, bankAccountEntity, BankApi.HBCI);
+        bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntity, BankApi.HBCI);
 
         Optional<AccountAnalyticsEntity> analyticsEntity = analyticsRepository.findLastByUserIdAndAccountId("test" +
             "-user-id", "test-account-id");
