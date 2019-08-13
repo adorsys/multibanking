@@ -28,13 +28,14 @@ public interface StrongCustomerAuthorisable {
 
     /**
      * @param consentId
+     * @param authorisationId
      * @param expectedConsentStatus
      * @param bankApiConsentData
      * @throws MultibankingException INVALID_PIN for Consent without login
      *                               INVALID_SCA_METHOD for Consent without selected sca method
      *                               HBCI_2FA_REQUIRED for Consent without authorized sca method
      */
-    void validateConsent(String consentId, ScaStatus expectedConsentStatus, Object bankApiConsentData);
+    void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus, Object bankApiConsentData);
 
     void preExecute(TransactionRequest request, Object bankApiConsentData);
 }

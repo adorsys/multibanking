@@ -317,7 +317,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
 
             @Override
-            public void validateConsent(String consentId, ScaStatus expectedConsentStatus, Object bankApiConsentData) throws MultibankingException {
+            public void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus, Object bankApiConsentData) throws MultibankingException {
                 HBCIConsent hbciConsent = Optional.ofNullable(bankApiConsentData)
                     .map(o -> (HBCIConsent) o)
                     .orElseThrow(() -> new MultibankingException(MultibankingError.NO_CONSENT));

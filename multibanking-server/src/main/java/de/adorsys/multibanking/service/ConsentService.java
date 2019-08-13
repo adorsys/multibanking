@@ -138,7 +138,8 @@ public class ConsentService {
             bankingServiceProducer.getBankingService(Iban.valueOf(iban).getBankCode());
     }
 
-    Optional<ConsentEntity> validateAndGetConsent(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService,
+    Optional<ConsentEntity> validateAndGetConsent(BankAccessEntity bankAccess,
+                                                  OnlineBankingService onlineBankingService,
                                                   ScaStatus expectedConsentStatus) {
         if (onlineBankingService.getStrongCustomerAuthorisation() == null) {
             // Bank API doesn't support SCA so nothing to validate
@@ -149,7 +150,8 @@ public class ConsentService {
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, bankAccess.getConsentId()));
 
         try {
-            onlineBankingService.getStrongCustomerAuthorisation().validateConsent(bankAccess.getConsentId(),
+            onlineBankingService.getStrongCustomerAuthorisation().validateConsent(internalConsent.getId(),
+                internalConsent.getAuthorisationId(),
                 expectedConsentStatus, internalConsent.getBankApiConsentData());
 
         } catch (MultibankingException e) {

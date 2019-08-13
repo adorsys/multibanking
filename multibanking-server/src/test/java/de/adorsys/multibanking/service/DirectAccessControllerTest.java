@@ -80,8 +80,10 @@ public class DirectAccessControllerTest {
     @LocalServerPort
     private int port;
 
-    @Value("${bankinggateway.base.url:http://localhost:8084}")
+    @Value("${bankinggateway.b2c.url}")
     private String bankingGatewayBaseUrl;
+    @Value("${bankinggateway.adapter.url}")
+    private String bankingGatewayAdapterUrl;
 
     private Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
 
@@ -116,7 +118,7 @@ public class DirectAccessControllerTest {
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO access = createBankAccess();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl), access.getIban());
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), access.getIban());
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
@@ -343,7 +345,7 @@ public class DirectAccessControllerTest {
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
         doReturn(Optional.of(new ConsentEntity())).when(consentRepository).findById(bankAccess.getConsentId());
 
-        doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any(), any(), any());
+        doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any(), any(), any(), any());
 
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);

@@ -31,7 +31,8 @@ interface BankingGatewayMapper {
 
     UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(UpdatePsuAuthenticationRequest updatePsuAuthentication);
 
-    UpdateAuthResponse toUpdateAuthResponseTO(ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO, BankApi bankApi);
+    UpdateAuthResponse toUpdateAuthResponseTO(ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO,
+                                              BankApi bankApi);
 
     SelectPsuAuthenticationMethodRequestTO toSelectPsuAuthenticationMethodRequestTO(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod);
 
@@ -41,4 +42,5 @@ interface BankingGatewayMapper {
     @Mapping(target = "inputInfo", source = "explanation")
     @Mapping(target = "medium", source = "name")
     TanTransportType toTanTransportType(ScaMethodTO scaMethodTO);
+
 }
