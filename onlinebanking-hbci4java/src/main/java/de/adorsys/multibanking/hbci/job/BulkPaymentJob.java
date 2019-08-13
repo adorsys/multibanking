@@ -72,6 +72,9 @@ public class BulkPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
             if (payment.getPurpose() != null) {
                 sepagv.setParam("usage", i, payment.getPurpose());
             }
+            if (payment.getPurposecode() != null) {
+                sepagv.setParam("purposecode", i, payment.getPurposecode());
+            }
         }
 
         sepagv.verifyConstraints();
