@@ -33,6 +33,7 @@ import io.restassured.specification.RequestSpecification;
 import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kapott.hbci.manager.BankInfo;
@@ -299,6 +300,7 @@ public class DirectAccessControllerTest {
             .and().extract().jsonPath();
     }
 
+    @Ignore
     @Test
     public void verifyCreateBankAccessHbci() throws Exception {
         BankAccessTO bankAccess = createBankAccess();
