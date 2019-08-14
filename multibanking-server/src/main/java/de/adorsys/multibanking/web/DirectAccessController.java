@@ -94,12 +94,6 @@ public class DirectAccessController {
         List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(FINALISED, bankAccessEntity,
             bankApiMapper.toBankApi(bankApi));
 
-        log.debug("save bank account list to db");
-        bankAccounts.forEach(account -> {
-            account.setBankAccessId(bankAccessEntity.getId());
-            account.setUserId(bankAccessEntity.getUserId());
-        });
-
         return createLoadBankAccountsResponse(bankAccounts);
     }
 
@@ -129,7 +123,6 @@ public class DirectAccessController {
             log.debug("process finished < return challenge");
             return createChallengeResponse(e.getResponse(), e.getConsentId(), e.getAuthorisationId());
         }
-
     }
 
     @ApiResponses({
