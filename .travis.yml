@@ -46,21 +46,17 @@ deploy:
     script: /bin/bash .travis/deploy.sh
     on:
       branch: develop
-  -
+  # Deploy to opehsift banking-gateway-dev
+  - provider: script
     skip_cleanup: true
-    provider: script
-    script: env TAG=latest OPENSHIFT_NAMESPACE=$OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV  OPENSHIFT_USER=$OPENSHIFT_BANKING_GATEWAY_DEV_USER OPENSHIFT_TOKEN=$OPENSHIFT_BANKING_GATEWAY_TOKEN .travis/deploy_openshift.sh
-    on:
-      branch: develop
-  -
-    skip_cleanup: true
-    provider: script
     script: env TAG=latest OPENSHIFT_NAMESPACE=$OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV  OPENSHIFT_USER=$OPENSHIFT_BANKING_GATEWAY_DEV_USER OPENSHIFT_TOKEN=$OPENSHIFT_BANKING_GATEWAY_TOKEN .travis/deploy_openshift.sh
     on:
       branch: KOA_add_deployment_to_openshift
-  -
+  # Deploy to harbor banking-gateway
+  - provider: script
     skip_cleanup: true
-    provider: script
     script:  env HARBOR_NAMESPACE=$HARBOR_NAMESPACE_BANKING_GATEWAY_DEV HARBOR_USER=$HARBOR_BANKING_GATEWAY_USER HARBOR_TOKEN=$HARBOR_BANKING_GATEWAY_TOKEN .travis/deploy_harbor.sh
     on:
-      branch: develop
+      branch: KOA_add_deployment_to_openshift
+
+
