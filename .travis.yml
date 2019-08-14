@@ -6,6 +6,13 @@ jdk:
 services:
   - docker
 
+env:
+  global:
+    - OPENSHIFT_REGISTRY="openshift-registry.adorsys.de"
+    - OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV="banking-gateway-dev"
+    - HARBOR_REGISTRY="harbor.adorsys.de"
+    - HARBOR_NAMESPACE_BANKING_GATEWAY_DEV="teambank-banking-gateway"
+
 git:
   submodules: false
 
@@ -39,3 +46,17 @@ deploy:
     script: /bin/bash .travis/deploy.sh
     on:
       branch: develop
+  -
+    name: "Deploy to openshift banking-gateway-dev"
+    skip_cleanup: true
+    provider: script
+    script: env TAG=latest OPENSHIFT_NAMESPACE=$OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV  OPENSHIFT_USER=$OPENSHIFT_BANKING_GATEWAY_DEV_USER OPENSHIFT_TOKEN=$OPENSHIFT_BANKING_GATEWAY_TOKEN .travis/deploy_openshift.sh
+    on:
+      branch: KOA_add_deployment_to_openshift
+  -
+    name: "Deploy to harbor teambank-banking-gateway"
+    skip_cleanup: true
+    provider: script
+    script:  env HARBOR_NAMESPACE=$HARBOR_NAMESPACE_BANKING_GATEWAY_DEV HARBOR_USER=$HARBOR_BANKING_GATEWAY_USER HARBOR_TOKEN=$HARBOR_BANKING_GATEWAY_TOKEN .travis/deploy_harbor.sh
+    on:
+      branch: KOA_add_deployment_to_openshift
