@@ -114,6 +114,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
+    @Ignore
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO access = createBankAccess();
@@ -180,11 +181,7 @@ public class DirectAccessControllerTest {
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
-        DirectAccessController.LoadBookingsRequest loadBookingsRequest = new DirectAccessController.LoadBookingsRequest();
-        loadBookingsRequest.setAccessId(jsonPath.getString("bankAccounts[0].bankAccessId"));
-        loadBookingsRequest.setAccountId(jsonPath.getString("bankAccounts[0].id"));
-
-        request.body(loadBookingsRequest).put("http://localhost:" + port + "/api/v1/direct/bookings")
+        request.body(access).put("http://localhost:" + port + "/api/v1/direct/bookings")
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
     }
@@ -202,7 +199,6 @@ public class DirectAccessControllerTest {
             .and().extract().jsonPath();
 
         String consentId = jsonPath.getString("consentId");
-        String authorisationId = jsonPath.getString("authorisationId");
 
         assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
 
@@ -280,6 +276,7 @@ public class DirectAccessControllerTest {
     public void bookingList_with_consent_hbci() {
         Hbci4JavaBanking hbci4JavaBankingMock = spy(hbci4JavaBanking);
 
+        //1. authorise consent
         doThrow(new MultibankingException(HBCI_2FA_REQUIRED))
             .doReturn(LoadBookingsResponse.builder()
                 .bookings(new ArrayList<>())
@@ -289,10 +286,11 @@ public class DirectAccessControllerTest {
         String bookingChallengeUrl = "http://localhost:" + port + "/api/v1/direct/bookings";
         BankAccessTO access = consent_authorisation_hbci(hbci4JavaBankingMock, bookingChallengeUrl);
 
+        //2. get bookings for account
         RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(access).put(bookingChallengeUrl)
-            .then().assertThat().statusCode(HttpStatus.OK.value());
+            .contentType(ContentType.JSON).body(access).put("http://localhost:" + port + "/api/v1/direct/bookings")
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
     }
 
     @Ignore
@@ -316,7 +314,7 @@ public class DirectAccessControllerTest {
 
         assertThat(loadBankAccountsResponse.getBankAccounts()).isNotEmpty();
 
-        request.body(loadBookingsRequest(loadBankAccountsResponse.getBankAccounts().get(0)));
+        request.body(bankAccess);
 
         response = request.put("http://localhost:" + port + "/api/v1/direct/bookings");
         assertEquals(HttpStatus.OK.value(), response.getStatusCode());
@@ -435,14 +433,6 @@ public class DirectAccessControllerTest {
             bankInfo.setPinTanVersion(HBCI_300);
             HBCIUtils.addBankInfo(bankInfo);
         }
-    }
-
-    private DirectAccessController.LoadBookingsRequest loadBookingsRequest(BankAccountTO bankAccount) {
-        DirectAccessController.LoadBookingsRequest request = new DirectAccessController.LoadBookingsRequest();
-        request.setAccountId(bankAccount.getId());
-        request.setAccessId(bankAccount.getBankAccessId());
-        request.setPin(System.getProperty("pin", "12456"));
-        return request;
     }
 
     private ConsentTO createConsentTO(String iban) {

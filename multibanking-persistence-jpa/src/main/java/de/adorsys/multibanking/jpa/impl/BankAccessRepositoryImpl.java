@@ -23,13 +23,13 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     @Override
     public Optional<BankAccessEntity> findByUserIdAndId(String userId, String id) {
         return bankAccessRepository.findByUserIdAndId(userId, new Long(id))
-                .map(entityMapper::mapToBankAccessEntity);
+            .map(entityMapper::mapToBankAccessEntity);
     }
 
     @Override
     public Optional<BankAccessEntity> findOne(String id) {
         return bankAccessRepository.findById(new Long(id))
-                .map(entityMapper::mapToBankAccessEntity);
+            .map(entityMapper::mapToBankAccessEntity);
     }
 
     @Override
@@ -38,14 +38,15 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     }
 
     @Override
-    public List<BankAccessEntity> findByUserIdAndConsentId(String userId, String consentId) {
-        return entityMapper.mapToBankAccessEntities(bankAccessRepository.findByUserIdAndConsentId(userId, consentId));
+    public Optional<BankAccessEntity> findByConsentId(String consentId) {
+        return bankAccessRepository.findByConsentId(consentId)
+            .map(entityMapper::mapToBankAccessEntity);
     }
 
     @Override
     public void save(BankAccessEntity bankAccess) {
         BankAccessJpaEntity bankAccessMongoEntity =
-                bankAccessRepository.save(entityMapper.mapToBankAccessJpaEntity(bankAccess));
+            bankAccessRepository.save(entityMapper.mapToBankAccessJpaEntity(bankAccess));
         bankAccess.setId(bankAccessMongoEntity.getId().toString());
     }
 

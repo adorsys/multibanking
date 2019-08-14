@@ -107,8 +107,7 @@ public class BookingService extends AccountInformationService {
 
     @Transactional
     public List<BookingEntity> syncBookings(ScaStatus expectedConsentStatus, BankAccessEntity bankAccess,
-                                            BankAccountEntity bankAccount,
-                                            @Nullable BankApi bankApi) {
+                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi) {
         bankAccountRepository.updateSyncStatus(bankAccount.getId(), BankAccount.SyncStatus.SYNC);
 
         OnlineBankingService onlineBankingService = bankApi != null ?

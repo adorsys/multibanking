@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class UpdateAuthResponseTO {
+
     @ApiModelProperty(value = "This data element might be contained, if SCA is required and if the PSU has a choice " +
         "between different authentication methods. These methods shall be presented towards the PSU for selection by " +
         "the TPP.")

@@ -15,7 +15,15 @@ import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.xs2a.adapter.api.AccountApi;
-import de.adorsys.xs2a.adapter.model.AccountListTO;
+import de.adorsys.xs2a.adapter.api.remote.AccountInformationClient;
+import de.adorsys.xs2a.adapter.model.BookingStatusTO;
+import de.adorsys.xs2a.adapter.service.GeneralResponse;
+import de.adorsys.xs2a.adapter.service.RequestHeaders;
+import de.adorsys.xs2a.adapter.service.RequestParams;
+import de.adorsys.xs2a.adapter.service.account.AccountListHolder;
+import de.adorsys.xs2a.adapter.service.account.TransactionsReport;
+import de.adorsys.xs2a.adapter.service.ais.AccountInformationService;
+import de.adorsys.xs2a.adapter.service.impl.AccountInformationServiceImpl;
 import feign.Feign;
 import feign.Logger;
 import feign.jackson.JacksonDecoder;
@@ -27,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.util.*;
@@ -37,7 +45,6 @@ import java.util.stream.Collectors;
 import static de.adorsys.multibanking.domain.BankApi.BANKING_GATEWAY;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
-import static de.adorsys.xs2a.adapter.model.BookingStatusTO.BOOKED;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -47,17 +54,21 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private final String bankingGatewayBaseUrl;
     @NonNull
     private final String xs2aAdapterBaseUrl;
+    @Getter(lazy = true)
+    private final BankingGatewayB2CAisApi bankingGatewayB2CAisApi = new BankingGatewayB2CAisApi(apiClient());
 
     @Getter(lazy = true)
-    private final AccountApi accountApi = Feign.builder()
+    private final AccountInformationClient accountApi = Feign.builder()
         .contract(new SpringMvcContract())
         .logLevel(Logger.Level.FULL)
         .logger(new Slf4jLogger(AccountApi.class))
         .encoder(new JacksonEncoder())
         .decoder(new ResponseEntityDecoder(new JacksonDecoder()))
-        .target(AccountApi.class, xs2aAdapterBaseUrl);
+        .target(AccountInformationClient.class, xs2aAdapterBaseUrl);
+
     @Getter(lazy = true)
-    private final BankingGatewayB2CAisApi bankingGatewayB2CAisApi = new BankingGatewayB2CAisApi(apiClient());
+    private final AccountInformationService accountInformationService =
+        new AccountInformationServiceImpl(getAccountApi());
 
     private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
 
@@ -90,12 +101,13 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     @Override
     public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
-        Map<String, String> aisHeaders = createAisHeaders(loadAccountInformationRequest,
+        RequestHeaders aisHeaders = createAisHeaders(loadAccountInformationRequest,
             loadAccountInformationRequest.getConsentId());
 
-        ResponseEntity<AccountListTO> accountList = getAccountApi().getAccountList(false, aisHeaders);
+        GeneralResponse<AccountListHolder> accountList = getAccountInformationService().getAccountList(aisHeaders,
+            RequestParams.builder().build());
 
-        List<BankAccount> bankAccounts = accountList.getBody().getAccounts().stream()
+        List<BankAccount> bankAccounts = accountList.getResponseBody().getAccounts().stream()
             .map(accountDetailsTO -> bankingGatewayMapper.toBankAccount(accountDetailsTO))
             .collect(Collectors.toList());
 
@@ -112,12 +124,26 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     @Override
     public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
-        Map<String, String> aisHeaders = createAisHeaders(loadBookingsRequest, loadBookingsRequest.getConsentId());
+        String resourceId = loadBookingsRequest.getBankAccount().getExternalIdMap().get(bankApi());
+        RequestHeaders requestHeaders = createAisHeaders(loadBookingsRequest, loadBookingsRequest.getConsentId());
+        RequestParams requestParams = RequestParams.builder()
+            .dateFrom(loadBookingsRequest.getDateFrom())
+            .dateTo(loadBookingsRequest.getDateTo())
+            .withBalance(loadBookingsRequest.isWithBalance())
+            .bookingStatus(BookingStatusTO.BOOKED.toString()).build();
 
-        ResponseEntity<Object> transactionList =
-            getAccountApi().getTransactionList(loadBookingsRequest.getBankAccount().getExternalIdMap().get(bankApi()),
-                loadBookingsRequest.getDateFrom(), loadBookingsRequest.getDateTo(), null, BOOKED, null,
-                loadBookingsRequest.isWithBalance(), aisHeaders);
+        GeneralResponse<TransactionsReport> bookingsResponse =
+            getAccountInformationService().getTransactionList(resourceId, requestHeaders, requestParams);
+
+        bookingsResponse.getResponseBody().getTransactions().getBooked().stream()
+            .map(transactions -> bankingGatewayMapper.toBooking(transactions))
+            .collect(Collectors.toList());
+
+//        ResponseEntity<Object> transactionList =
+//            accountInformationService.getTransactionList(loadBookingsRequest.getBankAccount().getExternalIdMap()
+//            .get(bankApi()),
+//                loadBookingsRequest.getDateFrom(), loadBookingsRequest.getDateTo(), null, BOOKED, null,
+//                loadBookingsRequest.isWithBalance(), requestHeaders);
 
 //        return LoadBookingsResponse.builder()
 //            .bookings(BankingGatewayMapping.toBookings(transactionList))
@@ -126,14 +152,15 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         return null;
     }
 
-    private Map<String, String> createAisHeaders(TransactionRequest loadBookingsRequest, String consentId) {
+    private RequestHeaders createAisHeaders(TransactionRequest loadBookingsRequest, String consentId) {
         Map<String, String> headers = new HashMap<>();
-        headers.put("x-request-id", UUID.randomUUID().toString());
-        headers.put("Consent-ID", consentId);
-        headers.put("X-GTW-Bank-Code",
+        headers.put(RequestHeaders.X_REQUEST_ID, UUID.randomUUID().toString());
+        headers.put(RequestHeaders.CONSENT_ID, consentId);
+        headers.put(RequestHeaders.X_GTW_BANK_CODE,
             loadBookingsRequest.getBankCode() != null ? loadBookingsRequest.getBankCode() :
                 loadBookingsRequest.getBankAccess().getBankCode());
-        return headers;
+        headers.put(RequestHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        return RequestHeaders.fromMap(headers);
     }
 
     @Override

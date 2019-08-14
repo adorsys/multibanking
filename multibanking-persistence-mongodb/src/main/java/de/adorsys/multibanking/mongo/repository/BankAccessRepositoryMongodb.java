@@ -20,4 +20,5 @@ public interface BankAccessRepositoryMongodb extends MongoRepository<BankAccessM
 
     List<BankAccessMongoEntity> findByUserIdAndConsentId(String userId);
 
+    Optional<BankAccessMongoEntity> findByConsentId(String consentId);
 }
