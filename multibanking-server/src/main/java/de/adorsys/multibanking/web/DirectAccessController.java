@@ -6,6 +6,7 @@ import de.adorsys.multibanking.domain.BookingEntity;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
+import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
@@ -87,9 +88,7 @@ public class DirectAccessController {
                 bankAccountRepository.save(account);
             });
 
-            return createChallengeResponse(new UpdateAuthResponse(), bankAccess.getConsentId(),
-                bankAccess.getAuthorisationId());
-
+            return createChallengeResponse(new UpdateAuthResponse(), null, null);
         } catch (MissingConsentAuthorisationException e) {
             log.debug("process finished < return challenge");
             return createChallengeResponse(e.getResponse(), e.getConsentId(), e.getAuthorisationId());
@@ -148,8 +147,7 @@ public class DirectAccessController {
             removeBankAccessPinFromDatabase(bankAccessEntity);
 
             log.debug("process finished < return empty challenge");
-            return createChallengeResponse(new UpdateAuthResponse(), bankAccess.getConsentId(),
-                bankAccess.getAuthorisationId());
+            return createChallengeResponse(new UpdateAuthResponse(), null, null);
         } catch (MissingConsentAuthorisationException e) {
             log.debug("process finished < return challenge");
             return createChallengeResponse(e.getResponse(), e.getConsentId(), e.getAuthorisationId());
@@ -161,19 +159,16 @@ public class DirectAccessController {
         @ApiResponse(code = 200, message = "Response", response = LoadBookingsResponse.class)})
     @ApiOperation(value = "Read account bookings")
     @PutMapping("/bookings")
-    public ResponseEntity<LoadBookingsResponse> loadBookings(@Valid @RequestBody BankAccessTO bankAccess,
+    public ResponseEntity<LoadBookingsResponse> loadBookings(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
                                                              @RequestParam(required = false) BankApiTO bankApi) {
         log.debug("process start > load booking list");
+        BankAccessEntity bankAccessEntity = bankAccessRepository.findOne(loadBookingsRequest.getAccessId())
+            .orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class,
+                loadBookingsRequest.getAccessId()));
 
-        log.debug("load bank access");
-        BankAccessEntity bankAccessEntity = prepareBankAccess(bankAccess);
-
-        log.debug("create bank account");
-        BankAccountEntity bankAccountEntity = new BankAccountEntity();
-        bankAccountEntity.setBankAccessId(bankAccess.getId());
-        bankAccountEntity.setUserId(bankAccessEntity.getUserId());
-        bankAccountEntity.setIban(bankAccess.getIban());
-        bankAccountRepository.save(bankAccountEntity);
+        BankAccountEntity bankAccountEntity = bankAccountRepository.findOne(loadBookingsRequest.getAccountId())
+            .orElseThrow(() -> new ResourceNotFoundException(BankAccountEntity.class,
+                loadBookingsRequest.getAccountId()));
 
         log.debug("load booking list from bank");
         List<BookingEntity> bookings = bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntity,
@@ -236,20 +231,17 @@ public class DirectAccessController {
         String accessId;
         @NotBlank
         String accountId;
-        @NotBlank
         String pin;
     }
 
     @Data
     public static class LoadBookingsResponse {
-        ConsentTO consent;
         List<BookingTO> bookings;
         BalancesReportTO balances;
     }
 
     @Data
     public static class LoadBankAccountsResponse {
-        ConsentTO consent;
         List<BankAccountTO> bankAccounts;
     }
 }

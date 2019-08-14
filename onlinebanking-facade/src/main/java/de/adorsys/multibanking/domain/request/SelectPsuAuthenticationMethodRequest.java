@@ -17,8 +17,10 @@
 package de.adorsys.multibanking.domain.request;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class SelectPsuAuthenticationMethodRequest extends AbstractStrongCustomerAuthorisationRequest {
 
     private String authenticationMethodId;

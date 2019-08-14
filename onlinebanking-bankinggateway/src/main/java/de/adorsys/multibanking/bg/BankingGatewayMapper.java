@@ -1,17 +1,22 @@
 package de.adorsys.multibanking.bg;
 
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
-import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.domain.Consent;
-import de.adorsys.multibanking.domain.TanTransportType;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
+import de.adorsys.xs2a.adapter.model.AccountDetailsTO;
+import org.iban4j.Iban;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.EnumMap;
+import java.util.Map;
+
+import static de.adorsys.multibanking.domain.BankAccountType.fromXS2AType;
 
 @Mapper
 interface BankingGatewayMapper {
@@ -43,4 +48,33 @@ interface BankingGatewayMapper {
     @Mapping(target = "medium", source = "name")
     TanTransportType toTanTransportType(ScaMethodTO scaMethodTO);
 
+    @Mapping(target = "country", ignore = true)
+    @Mapping(target = "bankName", ignore = true)
+    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "syncStatus", ignore = true)
+    @Mapping(target = "lastSync", ignore = true)
+    @Mapping(target = "balances", ignore = true)
+    @Mapping(target = "externalIdMap", expression = "java(getExternalIdMap(accountDetailsTO.getResourceId()))")
+    @Mapping(target = "blz", expression = "java(getBlz(accountDetailsTO))")
+    @Mapping(target = "accountNumber", expression = "java(getAccountNumber(accountDetailsTO))")
+    @Mapping(target = "type", expression = "java(getAccounType(accountDetailsTO.getCashAccountType()))")
+    BankAccount toBankAccount(AccountDetailsTO accountDetailsTO);
+
+    default Map<BankApi, String> getExternalIdMap(String accountResourceId) {
+        Map<BankApi, String> externalIdMap = new EnumMap<>(BankApi.class);
+        externalIdMap.put(BankApi.BANKING_GATEWAY, accountResourceId);
+        return externalIdMap;
+    }
+
+    default String getBlz(AccountDetailsTO accountDetailsTO) {
+        return Iban.valueOf(accountDetailsTO.getIban()).getBankCode();
+    }
+
+    default String getAccountNumber(AccountDetailsTO accountDetailsTO) {
+        return Iban.valueOf(accountDetailsTO.getIban()).getAccountNumber();
+    }
+
+    default BankAccountType getAccounType(String cashAccountType) {
+        return fromXS2AType(cashAccountType);
+    }
 }

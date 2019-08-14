@@ -114,7 +114,6 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
-    @Ignore
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO access = createBankAccess();
@@ -177,7 +176,15 @@ public class DirectAccessControllerTest {
         //6. load transactions
         access.setConsentId(consentId);
 
-        request.body(access).put("http://localhost:" + port + "/api/v1/direct/bookings")
+        jsonPath = request.body(access).put("http://localhost:" + port + "/api/v1/direct/accounts")
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
+
+        DirectAccessController.LoadBookingsRequest loadBookingsRequest = new DirectAccessController.LoadBookingsRequest();
+        loadBookingsRequest.setAccessId(jsonPath.getString("bankAccounts[0].bankAccessId"));
+        loadBookingsRequest.setAccountId(jsonPath.getString("bankAccounts[0].id"));
+
+        request.body(loadBookingsRequest).put("http://localhost:" + port + "/api/v1/direct/bookings")
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
     }
@@ -227,7 +234,6 @@ public class DirectAccessControllerTest {
 
         //4. select authentication method - by calling the desired method
         access.setConsentId(consentId);
-        access.setAuthorisationId(authorisationId);
         access.setBankLogin(updatePsuAuthentication.getPsuId());
         access.setBankLogin2(updatePsuAuthentication.getPsuCustomerId());
         access.setPin(updatePsuAuthentication.getPassword());

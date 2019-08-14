@@ -25,6 +25,7 @@ public class SinglePaymentJpaEntity extends PaymentCommonJpaEntity {
     private String receiverAccountNumber;
     private String receiverAccountCurrency;
     private String purpose;
+    private String purposecode;
     private BigDecimal amount;
     private String currency;
 
