@@ -9,6 +9,7 @@ import de.adorsys.multibanking.finapi.FinapiBanking;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.mock.MockBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,13 @@ public class OnlineBankingServiceProducer {
     @Value("${bankinggateway.adapter.url}")
     private String bankingAdapterBaseUrl;
 
+    @Getter(lazy = true)
+    private final BankingGatewayAdapter xs2ABanking = new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingAdapterBaseUrl);
     private Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
     private FigoBanking figoBanking = new FigoBanking(BankApi.FIGO);
     private FigoBanking figoBankingAlternative = new FigoBanking(BankApi.FIGO_ALTERNATIVE);
     private FinapiBanking finapiBanking = new FinapiBanking();
     private MockBanking mockBanking = new MockBanking();
-    private BankingGatewayAdapter xs2ABanking = new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingAdapterBaseUrl);
 
     private BankApi getBankApiForBlz(String blz) {
         BankEntity bankInfoEntity = bankRepository.findByBankCode(blz).orElse(null);
@@ -60,7 +62,7 @@ public class OnlineBankingServiceProducer {
                 return finapiBanking;
             case XS2A:
             case BANKING_GATEWAY:
-                return xs2ABanking;
+                return getXs2ABanking();
             case MOCK:
                 return mockBanking;
             case SCREEN_SCRAPPING:
