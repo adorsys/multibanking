@@ -70,7 +70,7 @@ public class DirectAccessController {
     public ResponseEntity createHbciAccountsChallenge(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
                                                       @RequestParam(required = false) BankApiTO bankApi) {
         try {
-            selectScaMethodForConsent(loadAccountsRequest.getBankAccessTO().getConsentId(),
+            selectScaMethodForConsent(loadAccountsRequest.getBankAccess().getConsentId(),
                 loadAccountsRequest.getScaMethodId());
             return doLoadBankAccounts(loadAccountsRequest, bankApi, SCAMETHODSELECTED);
         } catch (MissingConsentAuthorisationException e) {
@@ -118,7 +118,7 @@ public class DirectAccessController {
         UserEntity userEntity = createUser();
 
         BankAccessEntity bankAccessEntity =
-            bankAccessMapper.toBankAccessEntity(loadAccountsRequest.getBankAccessTO(), userEntity.getId(), true);
+            bankAccessMapper.toBankAccessEntity(loadAccountsRequest.getBankAccess(), userEntity.getId(), true);
 
         log.debug("load bank account list from bank");
         Credentials credentials = credentialsMapper.toCredentials(loadAccountsRequest.getCredentials());
@@ -235,7 +235,7 @@ public class DirectAccessController {
 
     @Data
     public static class LoadAccountsRequest {
-        @NotNull BankAccessTO bankAccessTO;
+        @NotNull BankAccessTO bankAccess;
         CredentialsTO credentials;
         String scaMethodId;
     }
