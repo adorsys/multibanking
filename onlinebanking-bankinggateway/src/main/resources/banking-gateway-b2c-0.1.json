@@ -32,6 +32,13 @@
         ],
         "parameters": [
           {
+            "name": "X-GTW-Bank-Code",
+            "in": "header",
+            "description": "X-GTW-Bank-Code",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "PSU-ID",
             "in": "header",
             "description": "PSU-ID",
