@@ -237,8 +237,8 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         HbciDialogRequest hbciDialogRequest = HbciDialogRequest.builder()
             .bankCode(transactionRequest.getBankCode() != null ? transactionRequest.getBankCode() :
                 transactionRequest.getBankAccess().getBankCode())
-            .customerId(transactionRequest.getCredentials().getBankLogin())
-            .login(transactionRequest.getCredentials().getBankLogin2())
+            .login(transactionRequest.getCredentials().getBankLogin())
+            .customerId(transactionRequest.getCredentials().getBankLogin2())
             .hbciPassportState(transactionRequest.getBankAccess().getHbciPassportState())
             .pin(transactionRequest.getCredentials().getPin())
             .callback(hbciCallback)

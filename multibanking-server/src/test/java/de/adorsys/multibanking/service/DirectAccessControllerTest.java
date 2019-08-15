@@ -82,8 +82,6 @@ public class DirectAccessControllerTest {
     @Value("${bankinggateway.adapter.url}")
     private String bankingGatewayAdapterUrl;
 
-    private Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
-
     @BeforeClass
     public static void beforeClass() {
         TestConstants.setup();
@@ -97,7 +95,7 @@ public class DirectAccessControllerTest {
     @Test
     public void createConsent_should_return_a_authorisationStatus_link_hbci() {
         BankAccessTO access = createBankAccess();
-        prepareBank(hbci4JavaBanking, access.getIban());
+        prepareBank(new Hbci4JavaBanking(true), access.getIban());
 
         JsonPath jsonPath = RestAssured.given()
             .contentType(ContentType.JSON)
@@ -148,8 +146,9 @@ public class DirectAccessControllerTest {
             .when(hbci4JavaBankingMock).loadBookings(any());
 
         CredentialsTO credentials = CredentialsTO.builder()
-            .bankLogin("Alex.Geist")
-            .pin("sandbox")
+            .bankLogin(System.getProperty("login2", "login"))
+            .bankLogin2(System.getProperty("login", "login2"))
+            .pin(System.getProperty("pin", "pin"))
             .build();
 
         consent_authorisation(access, credentials);
@@ -179,6 +178,7 @@ public class DirectAccessControllerTest {
         //3. update psu authentication
         UpdatePsuAuthenticationRequestTO updatePsuAuthentication = new UpdatePsuAuthenticationRequestTO();
         updatePsuAuthentication.setPsuId(credentialsTO.getBankLogin());
+        updatePsuAuthentication.setPsuCustomerId(credentialsTO.getBankLogin2());
         updatePsuAuthentication.setPassword(credentialsTO.getPin());
 
         jsonPath = request.body(updatePsuAuthentication).put(jsonPath.getString("_links.updateAuthentication.href"))
@@ -206,6 +206,7 @@ public class DirectAccessControllerTest {
                 .then().assertThat().statusCode(HttpStatus.OK.value())
                 .and().extract().jsonPath();
         } else {
+            //xs2a case
             SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
                 new SelectPsuAuthenticationMethodRequestTO();
             authenticationMethodRequestTO.setAuthenticationMethodId(sceMethodId);

@@ -105,7 +105,8 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     @Override
     public void removeUser(BankApiUser bankApiUser) {
-        throw new UnsupportedOperationException();
+        //FIXME
+        //throw new UnsupportedOperationException();
     }
 
     @Override
