@@ -138,16 +138,15 @@ public class ConsentService {
             bankingServiceProducer.getBankingService(Iban.valueOf(iban).getBankCode());
     }
 
-    Optional<ConsentEntity> validateAndGetConsent(BankAccessEntity bankAccess,
-                                                  OnlineBankingService onlineBankingService,
+    Optional<ConsentEntity> validateAndGetConsent(OnlineBankingService onlineBankingService, String consentId,
                                                   ScaStatus expectedConsentStatus) {
         if (onlineBankingService.getStrongCustomerAuthorisation() == null) {
             // Bank API doesn't support SCA so nothing to validate
             return Optional.empty();
         }
 
-        ConsentEntity internalConsent = consentRepository.findById(bankAccess.getConsentId())
-            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, bankAccess.getConsentId()));
+        ConsentEntity internalConsent = consentRepository.findById(consentId)
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
 
         try {
             onlineBankingService.getStrongCustomerAuthorisation().validateConsent(internalConsent.getId(),
@@ -166,7 +165,7 @@ public class ConsentService {
                     UpdateAuthResponse response = new UpdateAuthResponse();
                     response.setChallenge(challengeData);
                     response.setPsuMessage(e.getMessage());
-                    throw new MissingConsentAuthorisationException(response, bankAccess.getConsentId(),
+                    throw new MissingConsentAuthorisationException(response, consentId,
                         internalConsent.getAuthorisationId());
                 default:
                     throw e;

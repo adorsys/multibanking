@@ -24,7 +24,6 @@ import lombok.EqualsAndHashCode;
 public class LoadAccountInformationRequest extends TransactionRequest {
 
     private String consentId;
-    private boolean storePin;
     private boolean updateTanTransportTypes;
 
 }

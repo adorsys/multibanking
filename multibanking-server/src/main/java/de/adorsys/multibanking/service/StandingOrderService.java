@@ -1,15 +1,13 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.config.FinTSProductConfig;
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankApiUser;
-import de.adorsys.multibanking.domain.BankEntity;
-import de.adorsys.multibanking.domain.StandingOrderEntity;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
+import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.domain.MissingPinException;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +28,12 @@ public class StandingOrderService {
     private final OnlineBankingServiceProducer bankingServiceProducer;
     private final FinTSProductConfig finTSProductConfig;
 
-    Object createStandingOrder(BankAccessEntity bankAccess, String pin, StandingOrder standingOrder) {
+    Object createStandingOrder(BankAccessEntity bankAccess, Credentials credentials, StandingOrder standingOrder) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankingService.bankApi());
+        BankApiUser bankApiUser = userService.checkApiRegistration(bankingService, userService.findUser(bankAccess.getUserId()));
 
-        pin = pin == null ? bankAccess.getPin() : pin;
-        if (pin == null) {
+        if (credentials.getPin() == null) {
             throw new MissingPinException();
         }
 
@@ -47,7 +44,7 @@ public class StandingOrderService {
             request.setBankApiUser(bankApiUser);
             request.setTransaction(standingOrder);
             request.setBankAccess(bankAccess);
-            request.setPin(pin);
+            request.setCredentials(credentials);
             request.setBankCode(bankEntity.getBlzHbci());
             request.setBankUrl(bankEntity.getBankingUrl());
             request.setHbciProduct(finTSProductConfig.getProduct());
@@ -70,7 +67,6 @@ public class StandingOrderService {
                              String pin, String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        pin = pin == null ? bankAccess.getPin() : pin;
         if (pin == null) {
             throw new MissingPinException();
         }

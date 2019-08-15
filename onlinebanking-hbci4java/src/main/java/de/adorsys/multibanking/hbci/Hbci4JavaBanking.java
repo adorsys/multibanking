@@ -115,7 +115,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(String userId) {
         //no registration needed
         return null;
     }

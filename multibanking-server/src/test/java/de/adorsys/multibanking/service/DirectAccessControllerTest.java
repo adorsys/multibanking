@@ -24,7 +24,6 @@ import de.adorsys.multibanking.web.model.*;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
-import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.iban4j.Iban;
 import org.junit.Before;
@@ -45,15 +44,16 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_2FA_REQUIRED;
 import static de.adorsys.multibanking.service.TestUtil.createBooking;
 import static de.adorsys.multibanking.web.model.ScaStatusTO.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -67,8 +67,6 @@ public class DirectAccessControllerTest {
 
     @Autowired
     private BankRepositoryIf bankRepository;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @MockBean
     private OnlineBankingServiceProducer bankingServiceProducer;
@@ -120,6 +118,45 @@ public class DirectAccessControllerTest {
         BankAccessTO access = createBankAccess();
         prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), access.getIban());
 
+        CredentialsTO credentials = CredentialsTO.builder()
+            .bankLogin("Alex.Geist")
+            .pin("sandbox")
+            .build();
+
+        consent_authorisation(access, credentials);
+    }
+
+    @Test
+    public void consent_authorisation_hbci() {
+        BankAccessTO access = createBankAccess();
+        Hbci4JavaBanking hbci4JavaBankingMock = spy(hbci4JavaBanking);
+        prepareBank(hbci4JavaBankingMock, access.getIban());
+
+        //mock hbci authenticate psu
+        doReturn(ScaMethodsResponse.builder()
+            .tanTransportTypes(Arrays.asList(TestUtil.createTanMethod("Method1"), TestUtil.createTanMethod("Method2")))
+            .build()).when(hbci4JavaBankingMock).authenticatePsu(any(), any());
+
+        //mock hbci accounts response
+        doThrow(new MultibankingException(HBCI_2FA_REQUIRED))
+            .doReturn(LoadAccountInformationResponse.builder().bankAccounts(Collections.singletonList(new BankAccount())).build())
+            .when(hbci4JavaBankingMock).loadBankAccounts(any());
+
+        //mock bookings response
+        doReturn(LoadBookingsResponse.builder()
+                .bookings(new ArrayList<>())
+                .build())
+            .when(hbci4JavaBankingMock).loadBookings(any());
+
+        CredentialsTO credentials = CredentialsTO.builder()
+            .bankLogin("Alex.Geist")
+            .pin("sandbox")
+            .build();
+
+        consent_authorisation(access, credentials);
+    }
+
+    public void consent_authorisation(BankAccessTO access, CredentialsTO credentialsTO) {
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
 
@@ -129,7 +166,7 @@ public class DirectAccessControllerTest {
             .then().assertThat().statusCode(HttpStatus.CREATED.value())
             .and().extract().jsonPath();
 
-        String consentId = jsonPath.getString("consentId");
+        access.setConsentId(jsonPath.getString("consentId"));
 
         assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
 
@@ -142,8 +179,8 @@ public class DirectAccessControllerTest {
 
         //3. update psu authentication
         UpdatePsuAuthenticationRequestTO updatePsuAuthentication = new UpdatePsuAuthenticationRequestTO();
-        updatePsuAuthentication.setPsuId("Alex.Geist");
-        updatePsuAuthentication.setPassword("sandbox");
+        updatePsuAuthentication.setPsuId(credentialsTO.getBankLogin());
+        updatePsuAuthentication.setPassword(credentialsTO.getPin());
 
         jsonPath = request.body(updatePsuAuthentication).put(jsonPath.getString("_links.updateAuthentication.href"))
             .then().assertThat().statusCode(HttpStatus.OK.value())
@@ -152,16 +189,31 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("scaStatus")).isEqualTo(PSUAUTHENTICATED.toString());
 
         //4. select authentication method
-        SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
-            new SelectPsuAuthenticationMethodRequestTO();
-        authenticationMethodRequestTO.setAuthenticationMethodId(jsonPath.getString("scaMethods[0].id"));
+        String selectAuthenticationMethodLink = jsonPath.getString("_links" + ".selectAuthenticationMethod.href");
+        String sceMethodId = jsonPath.getString("scaMethods[0].id");
 
-        jsonPath = request.body(authenticationMethodRequestTO).put(jsonPath.getString("_links" +
-            ".selectAuthenticationMethod.href"))
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
+        //hbci case
+        if (selectAuthenticationMethodLink == null) {
+            DirectAccessController.LoadAccountsRequest loadAccountsRequest =
+                new DirectAccessController.LoadAccountsRequest();
+            loadAccountsRequest.setBankAccessTO(access);
+            loadAccountsRequest.setCredentials(credentialsTO);
+            loadAccountsRequest.setScaMethodId(sceMethodId);
 
-        assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
+            jsonPath = RestAssured.given()
+                .contentType(ContentType.JSON).body(loadAccountsRequest).post("http://localhost:" + port + "/api/v1/direct/accounts")
+                .then().assertThat().statusCode(HttpStatus.OK.value())
+                .and().extract().jsonPath();
+        } else {
+            SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
+                new SelectPsuAuthenticationMethodRequestTO();
+            authenticationMethodRequestTO.setAuthenticationMethodId(sceMethodId);
+
+            jsonPath = request.body(authenticationMethodRequestTO).put(selectAuthenticationMethodLink)
+                .then().assertThat().statusCode(HttpStatus.OK.value())
+                .and().extract().jsonPath();
+            assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
+        }
 
         //5. send tan
         TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
@@ -174,202 +226,73 @@ public class DirectAccessControllerTest {
 
         assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
 
+        //6. load accounts
+        DirectAccessController.LoadAccountsRequest loadAccountsRequest =
+            new DirectAccessController.LoadAccountsRequest();
+        loadAccountsRequest.setBankAccessTO(access);
+        loadAccountsRequest.setCredentials(credentialsTO);
+        loadAccountsRequest.setScaMethodId(sceMethodId);
+
+        jsonPath = request.body(loadAccountsRequest).put("http://localhost:" + port + "/api/v1/direct/accounts")
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
+
         //6. load transactions
-        access.setConsentId(consentId);
+        DirectAccessController.LoadBookingsRequest loadBookingsRequest =
+            new DirectAccessController.LoadBookingsRequest();
+        loadBookingsRequest.setUserId(jsonPath.getString("bankAccounts[0].userId"));
+        loadBookingsRequest.setAccessId(jsonPath.getString("bankAccounts[0].bankAccessId"));
+        loadBookingsRequest.setAccountId(jsonPath.getString("bankAccounts[0].id"));
+        loadBookingsRequest.setCredentials(credentialsTO);
+        loadBookingsRequest.setScaMethodId(sceMethodId);
 
-        jsonPath = request.body(access).put("http://localhost:" + port + "/api/v1/direct/accounts")
+        request.body(loadBookingsRequest).put("http://localhost:" + port + "/api/v1/direct/bookings")
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
-
-        request.body(access).put("http://localhost:" + port + "/api/v1/direct/bookings")
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
-    }
-
-    private BankAccessTO consent_authorisation_hbci(Hbci4JavaBanking hbci4JavaBanking, String challengeUrl) {
-        BankAccessTO access = createBankAccess();
-        prepareBank(hbci4JavaBanking, access.getIban());
-
-        //1. create consent
-        JsonPath jsonPath = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(createConsentTO(access.getIban()))
-            .post("http://localhost:" + port + "/api/v1/consents")
-            .then().assertThat().statusCode(HttpStatus.CREATED.value())
-            .and().extract().jsonPath();
-
-        String consentId = jsonPath.getString("consentId");
-
-        assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
-
-        //2. get consent authorisation status
-        jsonPath = RestAssured.given()
-            .contentType(ContentType.JSON).get(jsonPath.getString("_links.authorisationStatus.href"))
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
-
-        assertThat(jsonPath.getString("scaStatus")).isEqualTo(ScaStatusTO.STARTED.toString());
-
-        //3. update psu authentication
-        doReturn(ScaMethodsResponse.builder()
-            .tanTransportTypes(Arrays.asList(TestUtil.createTanMethod("Method1"), TestUtil.createTanMethod("Method2")))
-            .build()).when(hbci4JavaBanking).authenticatePsu(any(), any());
-
-        UpdatePsuAuthenticationRequestTO updatePsuAuthentication = new UpdatePsuAuthenticationRequestTO();
-        updatePsuAuthentication.setPsuId("Alex.Geist");
-        updatePsuAuthentication.setPassword("sandbox");
-
-        jsonPath = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(updatePsuAuthentication).put(jsonPath.getString("_links.updateAuthentication.href"))
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
-
-        assertThat(jsonPath.getString("scaStatus")).isEqualTo(PSUAUTHENTICATED.toString());
-        assertThat(jsonPath.getString("_links.selectAuthenticationMethod.href")).isNullOrEmpty();
-
-        //4. select authentication method - by calling the desired method
-        access.setConsentId(consentId);
-        access.setBankLogin(updatePsuAuthentication.getPsuId());
-        access.setBankLogin2(updatePsuAuthentication.getPsuCustomerId());
-        access.setPin(updatePsuAuthentication.getPassword());
-        access.setScaMethodId(jsonPath.getString("scaMethods[0].id"));
-
-        jsonPath = RestAssured.given()
-            .contentType(ContentType.JSON).body(access).post(challengeUrl)
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
-
-        assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
-
-        //5. send tan
-        TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
-        transactionAuthorisationRequestTO.setScaAuthenticationData("alex1");
-
-        jsonPath = RestAssured.given()
-            .contentType(ContentType.JSON).body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
-                ".transactionAuthorisation.href"))
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
-
-        assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
-        return access;
     }
 
     @Test
-    public void bankAccountList_with_consent_hbci() {
-        Hbci4JavaBanking hbci4JavaBankingMock = spy(hbci4JavaBanking);
-
-        doThrow(new MultibankingException(HBCI_2FA_REQUIRED))
-            .doReturn(LoadAccountInformationResponse.builder().build())
-            .when(hbci4JavaBankingMock).loadBankAccounts(any());
-
-        String accountChallengeUrl = "http://localhost:" + port + "/api/v1/direct/accounts";
-        BankAccessTO access = consent_authorisation_hbci(hbci4JavaBankingMock, accountChallengeUrl);
-
-        RestAssured.given().contentType(ContentType.JSON)
-            .body(access).put(accountChallengeUrl)
-            .then().assertThat().statusCode(HttpStatus.OK.value());
+    public void verifyApi() {
+        verifyApi(MultibankingError.INVALID_PIN, "NO_AUTHORISATION");
     }
 
     @Test
-    public void bookingList_with_consent_hbci() {
-        Hbci4JavaBanking hbci4JavaBankingMock = spy(hbci4JavaBanking);
-
-        //1. authorise consent
-        doThrow(new MultibankingException(HBCI_2FA_REQUIRED))
-            .doReturn(LoadBookingsResponse.builder()
-                .bookings(new ArrayList<>())
-                .build())
-            .when(hbci4JavaBankingMock).loadBookings(any());
-
-        String bookingChallengeUrl = "http://localhost:" + port + "/api/v1/direct/bookings";
-        BankAccessTO access = consent_authorisation_hbci(hbci4JavaBankingMock, bookingChallengeUrl);
-
-        //2. get bookings for account
-        RestAssured.given()
-            .contentType(ContentType.JSON).body(access).put("http://localhost:" + port + "/api/v1/direct/bookings")
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
-    }
-
-    @Ignore
-    @Test
-    public void verifyCreateBankAccessHbci() throws Exception {
-        BankAccessTO bankAccess = createBankAccess();
-        prepareBank(hbci4JavaBanking, bankAccess.getIban());
-
-        //create bank access
-        RequestSpecification request = RestAssured.given();
-        request.contentType(ContentType.JSON);
-        request.body(bankAccess);
-
-        Response response = request.put("http://localhost:" + port + "/api/v1/direct/accounts");
-        assertEquals(HttpStatus.OK.value(), response.getStatusCode());
-
-        //load bookings
-        DirectAccessController.LoadBankAccountsResponse loadBankAccountsResponse =
-            objectMapper.readValue(response.getBody().print()
-                , DirectAccessController.LoadBankAccountsResponse.class);
-
-        assertThat(loadBankAccountsResponse.getBankAccounts()).isNotEmpty();
-
-        request.body(bankAccess);
-
-        response = request.put("http://localhost:" + port + "/api/v1/direct/bookings");
-        assertEquals(HttpStatus.OK.value(), response.getStatusCode());
-
-        DirectAccessController.LoadBookingsResponse loadBookingsResponse =
-            objectMapper.readValue(response.getBody().print()
-                , DirectAccessController.LoadBookingsResponse.class);
-
-        assertThat(loadBookingsResponse.getBookings()).isNotEmpty();
-        assertThat(loadBookingsResponse.getBalances().getReadyBalance()).isNotNull();
+    public void verifyApiConsentWithoutSelectedSCA() {
+        verifyApi(MultibankingError.INVALID_SCA_METHOD, "SELECT_CONSENT_AUTHORISATION");
     }
 
     @Test
-    public void verifyApiNoConsent() throws Exception {
-        verifyApiNoConsent(MultibankingError.INVALID_PIN, "NO_AUTHORISATION");
+    public void verifyApiConsentWithoutAuthorisedSCA() {
+        verifyApi(MultibankingError.HBCI_2FA_REQUIRED, "AUTHORISE_CONSENT");
     }
 
-    @Test
-    public void verifyApiConsentWithoutSelectedSCA() throws Exception {
-        verifyApiNoConsent(MultibankingError.INVALID_SCA_METHOD, "SELECT_CONSENT_AUTHORISATION");
-    }
-
-    @Test
-    public void verifyApiConsentWithoutAuthorisedSCA() throws Exception {
-        verifyApiNoConsent(MultibankingError.HBCI_2FA_REQUIRED, "AUTHORISE_CONSENT");
-    }
-
-    private void verifyApiNoConsent(MultibankingError error, String messageKey) throws Exception {
+    private void verifyApi(MultibankingError error, String messageKey) {
         BankAccessTO bankAccess = createBankAccess();
         prepareBank(bankingGatewayAdapterMock, bankAccess.getIban());
+
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
         doReturn(Optional.of(new ConsentEntity())).when(consentRepository).findById(bankAccess.getConsentId());
-
         doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any(), any(), any(), any());
 
-        RequestSpecification request = RestAssured.given();
-        request.contentType(ContentType.JSON);
-        request.body(bankAccess);
+        DirectAccessController.LoadAccountsRequest loadAccountsRequest =
+            new DirectAccessController.LoadAccountsRequest();
+        loadAccountsRequest.setBankAccessTO(bankAccess);
 
-        Response response = request.put("http://localhost:" + port + "/api/v1/direct/accounts");
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
+        Messages messages = RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(loadAccountsRequest)
+            .put("http://localhost:" + port + "/api/v1/direct/accounts")
+            .then().assertThat().statusCode(HttpStatus.BAD_REQUEST.value())
+            .extract().body().as(Messages.class);
 
-        Messages messages = objectMapper.readValue(response.getBody().print(), Messages.class);
         assertThat(messages.getMessages().iterator().next().getKey()).isEqualTo(messageKey);
     }
 
     @Test
-    public void verifyApiConsentStatusValid() throws IOException {
+    public void verifyApiConsentStatusValid() {
         BankAccessTO bankAccess = createBankAccess();
         prepareBank(bankingGatewayAdapterMock, bankAccess.getIban());
-
-        RequestSpecification request = RestAssured.given();
-        request.contentType(ContentType.JSON);
-        request.body(bankAccess);
 
         when(bankingGatewayAdapterMock.loadBankAccounts(any()))
             .thenReturn(LoadAccountInformationResponse.builder()
@@ -377,12 +300,16 @@ public class DirectAccessControllerTest {
                 .build()
             );
 
-        Response response = request.put("http://localhost:" + port + "/api/v1/direct/accounts");
-        assertEquals(HttpStatus.OK.value(), response.getStatusCode());
+        DirectAccessController.LoadAccountsRequest loadAccountsRequest =
+            new DirectAccessController.LoadAccountsRequest();
+        loadAccountsRequest.setBankAccessTO(bankAccess);
 
-        DirectAccessController.LoadBankAccountsResponse loadBankAccountsResponse =
-            objectMapper.readValue(response.getBody().print()
-                , DirectAccessController.LoadBankAccountsResponse.class);
+        DirectAccessController.LoadBankAccountsResponse loadBankAccountsResponse = RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(loadAccountsRequest)
+            .put("http://localhost:" + port + "/api/v1/direct/accounts")
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .extract().body().as(DirectAccessController.LoadBankAccountsResponse.class);
 
         assertThat(loadBankAccountsResponse.getBankAccounts()).isNotEmpty();
 
@@ -393,14 +320,18 @@ public class DirectAccessControllerTest {
                 .build()
             );
 
-        request.body(bankAccess);
+        DirectAccessController.LoadBookingsRequest loadBookingsRequest =
+            new DirectAccessController.LoadBookingsRequest();
+        loadBookingsRequest.setUserId(loadBankAccountsResponse.getBankAccounts().get(0).getUserId());
+        loadBookingsRequest.setAccessId(loadBankAccountsResponse.getBankAccounts().get(0).getBankAccessId());
+        loadBookingsRequest.setAccountId(loadBankAccountsResponse.getBankAccounts().get(0).getId());
 
-        response = request.put("http://localhost:" + port + "/api/v1/direct/bookings");
-        assertEquals(HttpStatus.OK.value(), response.getStatusCode());
-
-        DirectAccessController.LoadBookingsResponse loadBookingsResponse =
-            objectMapper.readValue(response.getBody().print()
-                , DirectAccessController.LoadBookingsResponse.class);
+        DirectAccessController.LoadBookingsResponse loadBookingsResponse = RestAssured.given()
+            .contentType(ContentType.JSON)
+            .body(loadBookingsRequest)
+            .put("http://localhost:" + port + "/api/v1/direct/bookings")
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .extract().body().as(DirectAccessController.LoadBookingsResponse.class);
 
         assertThat(loadBookingsResponse.getBookings()).isNotEmpty();
     }
@@ -451,11 +382,6 @@ public class DirectAccessControllerTest {
     private BankAccessTO createBankAccess() {
         BankAccessTO bankAccessTO = new BankAccessTO();
         bankAccessTO.setIban(System.getProperty("iban", "DE34900000019090909000"));
-        bankAccessTO.setBankLogin(System.getProperty("login", "test-login"));
-        bankAccessTO.setBankLogin2(System.getProperty("login2"));
-        bankAccessTO.setPin(System.getProperty("pin", "12456"));
-        bankAccessTO.setConsentId(UUID.randomUUID().toString());
-
         return bankAccessTO;
     }
 }

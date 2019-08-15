@@ -124,18 +124,18 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(String userId) {
         if (figoConnection == null) {
             throw new IllegalArgumentException("figo connection not available, check env properties FIGO_CLIENT_ID " +
                 "and/or FIGO_SECRET");
         }
 
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
-        String apiUserId = bankAccess.getBankLogin() + RandomStringUtils.randomAlphanumeric(10);
+        String apiUserId = userId + RandomStringUtils.randomAlphanumeric(10);
         String email = apiUserId + MAIL_SUFFIX;
 
         try {
-            figoConnection.addUser(bankAccess.getBankLogin(), email, password, "de");
+            figoConnection.addUser(userId, email, password, "de");
         } catch (IOException | FigoException e) {
             throw new IllegalStateException(e);
         }
@@ -175,12 +175,12 @@ public class FigoBanking implements OnlineBankingService {
                 bankAccess.getBankCode(),
                 "de",
                 createCredentials(
-                    bankAccess.getBankLogin(),
-                    bankAccess.getBankLogin2(),
-                    loadAccountInformationRequest.getPin()
+                    loadAccountInformationRequest.getCredentials().getBankLogin(),
+                    loadAccountInformationRequest.getCredentials().getBankLogin2(),
+                    loadAccountInformationRequest.getCredentials().getPin()
                 ),
                 Collections.singletonList("standingOrders"),
-                loadAccountInformationRequest.isStorePin(),
+                false,
                 true
             );
 

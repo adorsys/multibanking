@@ -1,9 +1,9 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.exception.MissingConsentException;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import de.adorsys.multibanking.exception.MissingConsentException;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.extern.slf4j.Slf4j;
@@ -69,14 +69,12 @@ public class HbciSinglePaymentTest {
 
     public void testSinglePayment() throws Exception {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
-            System.getProperty("blz"), System.getProperty("pin"));
-        bankAccessEntity.setBankLogin(System.getProperty("login"));
-        bankAccessEntity.setBankLogin2(System.getProperty("login2"));
+            System.getProperty("blz"));
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI);
+            BankApi.HBCI, null);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
             .findFirst().get();
@@ -95,7 +93,7 @@ public class HbciSinglePaymentTest {
         payment.setPsuAccount(bankAccountEntitity);
 
         SinglePaymentEntity paymentEntity = paymentService.createSinglePayment(bankAccessEntity, tanTransportType,
-            System.getProperty("pin"), payment);
+            null, payment);
 
         String tan = "";
         paymentService.submitSinglePayment(paymentEntity, bankAccessEntity, System.getProperty("pin"), tan);
@@ -104,14 +102,12 @@ public class HbciSinglePaymentTest {
     @Test
     public void testRawPayment() throws MissingConsentException {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
-            System.getProperty("blz"), System.getProperty("pin"));
-        bankAccessEntity.setBankLogin(System.getProperty("login"));
-        bankAccessEntity.setBankLogin2(System.getProperty("login2"));
+            System.getProperty("blz"));
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI);
+            BankApi.HBCI, null);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
             .findFirst().get();
@@ -141,7 +137,7 @@ public class HbciSinglePaymentTest {
         payment.setPsuAccount(bankAccountEntitity);
 
         RawSepaTransactionEntity paymentEntity = paymentService.createSepaRawPayment(bankAccessEntity,
-            tanTransportType, System.getProperty("pin"), payment);
+            tanTransportType, null, payment);
 
         String tan = "";
         paymentService.submitRawSepaTransaction(paymentEntity, bankAccessEntity, System.getProperty("pin"), tan);

@@ -35,9 +35,7 @@ public class FigoBankingTest {
     @Ignore("Use System Variables e.g. from de.adorsys.multibanking.service.FigoPaymentTest")
     @Test
     public void registerUser_should_successfully_run() {
-        val bankaccess = getFigoTestUser();
-
-        val result = service.registerUser(bankaccess, "1234");
+        val result = service.registerUser(FIGO_TEST_USER);
 
         assertThat(result, allOf(
             hasProperty("apiUserId", notNullValue()),
@@ -49,10 +47,8 @@ public class FigoBankingTest {
     @Ignore("Use System Variables e.g. from de.adorsys.multibanking.service.FigoPaymentTest")
     @Test
     public void registerUser_should_successfully_run_twice() {
-        val bankaccess = getFigoTestUser();
-
-        service.registerUser(bankaccess, "1234");
-        val result2 = service.registerUser(bankaccess, "1234");
+        service.registerUser(FIGO_TEST_USER);
+        val result2 = service.registerUser(FIGO_TEST_USER);
 
         assertThat(result2, allOf(
             hasProperty("apiUserId", notNullValue()),
@@ -65,8 +61,7 @@ public class FigoBankingTest {
     @Ignore("Use System Variables e.g. from de.adorsys.multibanking.service.FigoPaymentTest")
     @Test
     public void removeUser_should_successfully_run_after_registerUser() {
-        val bankaccess = getFigoTestUser();
-        val result = service.registerUser(bankaccess, "1234");
+        val result = service.registerUser(FIGO_TEST_USER);
 
         service.removeUser(result);
 
@@ -77,14 +72,12 @@ public class FigoBankingTest {
     @Test
     public void loadBankAccounts_should_successfully_run_after_registerUser() {
         val bankaccess = getFigoTestUser();
-        val result = service.registerUser(bankaccess, "1234");
+        val result = service.registerUser(FIGO_TEST_USER);
 
         val request = new LoadAccountInformationRequest();
         request.setBankAccess(bankaccess);
         request.setBankApiUser(result);
         request.setBankCode(FIGO_TEST_BANKCODE);
-        request.setStorePin(false);
-        request.setPin(FIGO_TEST_PIN);
 
         val response = service.loadBankAccounts(request);
 
@@ -97,13 +90,11 @@ public class FigoBankingTest {
     @Test
     public void loadBookings_should_successfully_run_after_registerUser() {
         val bankaccess = getFigoTestUser();
-        val result = service.registerUser(bankaccess, "1234");
+        val result = service.registerUser(FIGO_TEST_USER);
         val request = new LoadAccountInformationRequest();
         request.setBankAccess(bankaccess);
         request.setBankApiUser(result);
         request.setBankCode(FIGO_TEST_BANKCODE);
-        request.setStorePin(false);
-        request.setPin(FIGO_TEST_PIN);
 
         val result2 = service.loadBankAccounts(request);
         val request2 = new LoadBookingsRequest();
@@ -128,7 +119,6 @@ public class FigoBankingTest {
 
     private BankAccess getFigoTestUser() {
         val bankAccess = new BankAccess();
-        bankAccess.setBankLogin(FIGO_TEST_USER);
         bankAccess.setBankCode(FIGO_TEST_BANKCODE);
         return bankAccess;
     }

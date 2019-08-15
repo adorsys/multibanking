@@ -32,21 +32,20 @@ public class BankAccessService {
     private final ConsentRepositoryIf consentRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
-    public BankAccessEntity createBankAccess(String userId, BankAccessEntity bankAccess) {
-        userService.checkUserExists(userId);
+    public BankAccessEntity createBankAccess(BankAccessEntity bankAccess, Credentials credentials) {
+        userService.checkUserExists(bankAccess.getUserId());
 
-        bankAccess.setUserId(userId);
         if (StringUtils.isNoneBlank(bankAccess.getIban())) {
             bankAccess.setBankCode(Iban.valueOf(bankAccess.getIban()).getBankCode());
         }
 
-        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null);
+        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null, credentials);
 
         if (bankAccounts.isEmpty()) {
             throw new InvalidBankAccessException(bankAccess.getBankCode());
         }
 
-        saveBankAccess(bankAccess);
+        bankAccessRepository.save(bankAccess);
 
         bankAccounts.forEach(account -> account.setBankAccessId(bankAccess.getId()));
         bankAccountRepository.save(bankAccounts);
@@ -55,33 +54,15 @@ public class BankAccessService {
         return bankAccess;
     }
 
-    private void saveBankAccess(BankAccessEntity bankAccess) {
-        if (!bankAccess.isStorePin()) {
-            bankAccess.setPin(null);
-        }
-        bankAccessRepository.save(bankAccess);
-
-        log.info("Bank connection [{}] created.", bankAccess.getId());
-    }
-
     public void updateBankAccess(String accessId, BankAccessEntity bankAccessEntity) {
         BankAccessEntity bankAccessEntityDb = bankAccessRepository.findByUserIdAndId(bankAccessEntity.getUserId(),
             accessId).orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accessId));
 
-        bankAccessEntityDb.setStorePin(bankAccessEntity.isStorePin());
         bankAccessEntityDb.setStoreBookings(bankAccessEntity.isStoreBookings());
         bankAccessEntityDb.setCategorizeBookings(bankAccessEntity.isCategorizeBookings());
         bankAccessEntityDb.setStoreAnalytics(bankAccessEntity.isStoreAnalytics());
         bankAccessEntityDb.setStoreAnonymizedBookings(bankAccessEntity.isStoreAnonymizedBookings());
-        if (!bankAccessEntityDb.isStorePin()) {
-            bankAccessEntityDb.setPin(null);
-        } else {
-            if (bankAccessEntity.getPin() == null) {
-                bankAccessEntityDb.setStorePin(false);
-            } else {
-                bankAccessEntityDb.setPin(bankAccessEntity.getPin());
-            }
-        }
+
         if (!bankAccessEntityDb.isStoreBookings() || !bankAccessEntityDb.isStoreAnalytics()) {
             bankAccountRepository.findByUserIdAndBankAccessId(bankAccessEntityDb.getUserId(),
                 bankAccessEntityDb.getId()).forEach(bankAccountEntity -> {
@@ -109,7 +90,8 @@ public class BankAccessService {
                     ConsentEntity internalConsent = consentRepository.findById(consentId)
                         .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
 
-                    OnlineBankingService bankingService = bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+                    OnlineBankingService bankingService =
+                        bankingServiceProducer.getBankingService(internalConsent.getBankApi());
                     bankingService.getStrongCustomerAuthorisation().revokeConsent(internalConsent.getId());
                     consentRepository.delete(internalConsent);
                 });

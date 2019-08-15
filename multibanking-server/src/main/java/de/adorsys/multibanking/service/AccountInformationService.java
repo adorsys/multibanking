@@ -29,8 +29,6 @@ abstract class AccountInformationService {
             return new MissingConsentAuthorisationException(response, consentEntity.getId(),
                 consentEntity.getAuthorisationId());
         } else if (e.getMultibankingError() == INVALID_PIN) {
-            bankAccess.setPin(null);
-            bankAccessRepository.save(bankAccess);
             return new InvalidPinException(bankAccess.getId());
         } else if (e.getMultibankingError() == INVALID_CONSENT) {
             bankAccess.setConsentId(null);

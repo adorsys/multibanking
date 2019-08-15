@@ -27,12 +27,11 @@ public class TestUtil {
         return userEntity;
     }
 
-    static BankAccessEntity getBankAccessEntity(String userId, String id, String bankCode, String pin) {
+    static BankAccessEntity getBankAccessEntity(String userId, String id, String bankCode) {
         BankAccessEntity bankAccessEntity = new BankAccessEntity();
         bankAccessEntity.setUserId(userId);
         bankAccessEntity.setId(id);
         bankAccessEntity.setBankCode(bankCode);
-        bankAccessEntity.setPin(pin);
         return bankAccessEntity;
     }
 

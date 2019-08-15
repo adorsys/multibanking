@@ -43,10 +43,10 @@ public class TransferJob {
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
             .bankCode(sepaTransactionRequest.getBankCode() != null ? sepaTransactionRequest.getBankCode() :
                 sepaTransactionRequest.getBankAccess().getBankCode())
-            .customerId(sepaTransactionRequest.getBankAccess().getBankLogin())
-            .login(sepaTransactionRequest.getBankAccess().getBankLogin2())
+            .customerId(sepaTransactionRequest.getCredentials().getBankLogin())
+            .login(sepaTransactionRequest.getCredentials().getBankLogin2())
             .hbciPassportState(sepaTransactionRequest.getBankAccess().getHbciPassportState())
-            .pin(sepaTransactionRequest.getPin())
+            .pin(sepaTransactionRequest.getCredentials().getPin())
             .build();
 
         dialogRequest.setHbciProduct(Optional.ofNullable(sepaTransactionRequest.getHbciProduct())

@@ -85,7 +85,8 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         return createJobResponse(dialog.getPassport(), authorisationCodeResponse);
     }
 
-    private void requestAuthorisationCode(HbciTanSubmit hbciTanSubmit, HBCIDialog dialog, List<AbstractHBCIJob> hbciJobs) {
+    private void requestAuthorisationCode(HbciTanSubmit hbciTanSubmit, HBCIDialog dialog,
+                                          List<AbstractHBCIJob> hbciJobs) {
         HBCITwoStepMechanism hbciTwoStepMechanism = getUserTanTransportType(dialog);
         dialog.getPassport().setCurrentSecMechInfo(hbciTwoStepMechanism);
 
@@ -236,10 +237,10 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         HbciDialogRequest hbciDialogRequest = HbciDialogRequest.builder()
             .bankCode(transactionRequest.getBankCode() != null ? transactionRequest.getBankCode() :
                 transactionRequest.getBankAccess().getBankCode())
-            .customerId(transactionRequest.getBankAccess().getBankLogin())
-            .login(transactionRequest.getBankAccess().getBankLogin2())
+            .customerId(transactionRequest.getCredentials().getBankLogin())
+            .login(transactionRequest.getCredentials().getBankLogin2())
             .hbciPassportState(transactionRequest.getBankAccess().getHbciPassportState())
-            .pin(transactionRequest.getPin())
+            .pin(transactionRequest.getCredentials().getPin())
             .callback(hbciCallback)
             .build();
 

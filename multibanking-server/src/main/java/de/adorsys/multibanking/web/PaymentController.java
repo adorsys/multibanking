@@ -5,12 +5,13 @@ import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.SinglePaymentEntity;
 import de.adorsys.multibanking.domain.TanTransportType;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
-import de.adorsys.multibanking.exception.PaymentException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.SinglePaymentRepositoryIf;
 import de.adorsys.multibanking.service.PaymentService;
+import de.adorsys.multibanking.web.mapper.CredentialsMapper;
+import de.adorsys.multibanking.web.model.CredentialsTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -41,6 +42,7 @@ public class PaymentController {
     private final SinglePaymentRepositoryIf paymentRepository;
     private final PaymentService paymentService;
     private final Principal principal;
+    private final CredentialsMapper credentialsMapper;
 
     @ApiOperation(
         value = "Read payment",
@@ -72,12 +74,9 @@ public class PaymentController {
         bankAccountRepository.findByUserIdAndId(principal.getName(), accountId)
             .orElseThrow(() -> new ResourceNotFoundException(BankAccountEntity.class, accountId));
 
-        String pin = paymentRequest.getPin() != null ? paymentRequest.getPin() : bankAccessEntity.getPin();
-        if (pin == null) {
-            throw new PaymentException("required pin not specified");
-        }
         SinglePaymentEntity payment = paymentService.createSinglePayment(bankAccessEntity,
-            paymentRequest.getTanTransportType(), paymentRequest.getPin(), paymentRequest.getPayment());
+            paymentRequest.getTanTransportType(), credentialsMapper.toCredentials(paymentRequest.getCredentials()),
+            paymentRequest.getPayment());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(linkTo(methodOn(PaymentController.class).getPayment(accessId, accountId, payment.getId())).toUri());
@@ -117,6 +116,7 @@ public class PaymentController {
 
     @Data
     private static class CreatePaymentRequest {
+        CredentialsTO credentials;
         TanTransportType tanTransportType;
         SinglePayment payment;
         String pin;

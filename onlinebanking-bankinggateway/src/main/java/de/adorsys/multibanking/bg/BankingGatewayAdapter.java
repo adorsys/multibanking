@@ -17,6 +17,8 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.xs2a.adapter.api.AccountApi;
 import de.adorsys.xs2a.adapter.api.remote.AccountInformationClient;
 import de.adorsys.xs2a.adapter.model.BookingStatusTO;
+import de.adorsys.xs2a.adapter.model.PaymentProductTO;
+import de.adorsys.xs2a.adapter.model.PaymentServiceTO;
 import de.adorsys.xs2a.adapter.service.GeneralResponse;
 import de.adorsys.xs2a.adapter.service.RequestHeaders;
 import de.adorsys.xs2a.adapter.service.RequestParams;
@@ -35,6 +37,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
@@ -59,7 +63,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     @Getter(lazy = true)
     private final AccountInformationClient accountApi = Feign.builder()
-        .contract(new SpringMvcContract())
+        .contract(createSpringMvcContract())
         .logLevel(Logger.Level.FULL)
         .logger(new Slf4jLogger(AccountApi.class))
         .encoder(new JacksonEncoder())
@@ -71,6 +75,10 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         new AccountInformationServiceImpl(getAccountApi());
 
     private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
+
+    private SpringMvcContract createSpringMvcContract() {
+        return new SpringMvcContract(Collections.emptyList(), new CustomConversionService());
+    }
 
     @Override
     public BankApi bankApi() {
@@ -88,7 +96,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(String userId) {
         BankApiUser bankApiUser = new BankApiUser();
         bankApiUser.setBankApi(bankApi());
         return bankApiUser;
@@ -135,21 +143,13 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         GeneralResponse<TransactionsReport> bookingsResponse =
             getAccountInformationService().getTransactionList(resourceId, requestHeaders, requestParams);
 
-        bookingsResponse.getResponseBody().getTransactions().getBooked().stream()
+        List<Booking> bookings = bookingsResponse.getResponseBody().getTransactions().getBooked().stream()
             .map(transactions -> bankingGatewayMapper.toBooking(transactions))
             .collect(Collectors.toList());
 
-//        ResponseEntity<Object> transactionList =
-//            accountInformationService.getTransactionList(loadBookingsRequest.getBankAccount().getExternalIdMap()
-//            .get(bankApi()),
-//                loadBookingsRequest.getDateFrom(), loadBookingsRequest.getDateTo(), null, BOOKED, null,
-//                loadBookingsRequest.isWithBalance(), requestHeaders);
-
-//        return LoadBookingsResponse.builder()
-//            .bookings(BankingGatewayMapping.toBookings(transactionList))
-//            .build();
-
-        return null;
+        return LoadBookingsResponse.builder()
+            .bookings(bookings)
+            .build();
     }
 
     private RequestHeaders createAisHeaders(TransactionRequest loadBookingsRequest, String consentId) {
@@ -355,6 +355,33 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 //            }
 //        }
         return new MultibankingException(INTERNAL_ERROR, e.getMessage());
+    }
+
+    public static class CustomConversionService extends DefaultConversionService {
+
+        public CustomConversionService() {
+
+            addConverter(new Converter<BookingStatusTO, String>() {
+                @Override
+                public String convert(BookingStatusTO source) {
+                    return source.toString();
+                }
+            });
+
+            addConverter(new Converter<PaymentProductTO, String>() {
+                @Override
+                public String convert(PaymentProductTO source) {
+                    return source.toString();
+                }
+            });
+
+            addConverter(new Converter<PaymentServiceTO, String>() {
+                @Override
+                public String convert(PaymentServiceTO source) {
+                    return source.toString();
+                }
+            });
+        }
     }
 }
 

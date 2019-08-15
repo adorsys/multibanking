@@ -14,6 +14,7 @@ import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -39,14 +40,14 @@ public class BankAccountService extends AccountInformationService {
     private final BankService bankService;
     private final FinTSProductConfig finTSProductConfig;
 
-    public List<BankAccountEntity> getBankAccounts(String userId, String accessId) {
+    public List<BankAccountEntity> getBankAccounts(String userId, String accessId, Credentials credentials) {
         BankAccessEntity bankAccessEntity = bankAccessRepository.findByUserIdAndId(userId, accessId)
             .orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accessId));
 
         List<BankAccountEntity> bankAccounts = bankAccountRepository.findByUserIdAndBankAccessId(userId, accessId);
 
         if (bankAccounts.isEmpty()) {
-            bankAccounts = loadBankAccountsOnline(bankAccessEntity, null);
+            bankAccounts = loadBankAccountsOnline(bankAccessEntity, null, credentials);
             bankAccounts.forEach(account -> account.setBankAccessId(bankAccessEntity.getId()));
 
             bankAccountRepository.save(bankAccounts);
@@ -58,23 +59,23 @@ public class BankAccountService extends AccountInformationService {
         return bankAccounts;
     }
 
-    List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi) {
-        return loadBankAccountsOnline(FINALISED, bankAccess, bankApi);
+    List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi,
+                                                   Credentials credentials) {
+        return loadBankAccountsOnline(bankAccess, userService.findUser(bankAccess.getUserId()), bankApi, FINALISED, credentials);
     }
 
-    public List<BankAccountEntity> loadBankAccountsOnline(ScaStatus expectedConsentStatus,
-                                                          BankAccessEntity bankAccess, BankApi bankApi) {
+    public List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, UserEntity userEntity,
+                                                          BankApi bankApi, ScaStatus expectedConsentStatus,
+                                                          @Nullable Credentials credentials) {
         OnlineBankingService onlineBankingService = bankApi != null ?
             bankingServiceProducer.getBankingService(bankApi) :
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        checkBankSupported(bankAccess, onlineBankingService);
-
-        BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankApi);
-        BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
+        BankEntity bankEntity = checkBankSupported(onlineBankingService, bankAccess.getBankCode());
+        BankApiUser bankApiUser = userService.checkApiRegistration(onlineBankingService, userEntity);
 
         List<BankAccount> bankAccounts = loadBankAccountsOnline(expectedConsentStatus, bankAccess,
-            onlineBankingService, bankApiUser, bankEntity);
+            onlineBankingService, bankApiUser, bankEntity, credentials);
 
         if (onlineBankingService.bankApi() == BankApi.FIGO) {
             filterAccounts(bankAccess, onlineBankingService, bankAccounts);
@@ -93,8 +94,10 @@ public class BankAccountService extends AccountInformationService {
 
     private List<BankAccount> loadBankAccountsOnline(ScaStatus expectedConsentStatus, BankAccessEntity bankAccess,
                                                      OnlineBankingService onlineBankingService,
-                                                     BankApiUser bankApiUser, BankEntity bankEntity) {
-        Optional<ConsentEntity> consentEntity = consentService.validateAndGetConsent(bankAccess, onlineBankingService,
+                                                     BankApiUser bankApiUser, BankEntity bankEntity,
+                                                     Credentials credentials) {
+        Optional<ConsentEntity> consentEntity = consentService.validateAndGetConsent(onlineBankingService,
+            bankAccess.getConsentId(),
             expectedConsentStatus);
 
         LoadAccountInformationRequest request = new LoadAccountInformationRequest();
@@ -103,8 +106,7 @@ public class BankAccountService extends AccountInformationService {
         request.setBankApiUser(bankApiUser);
         request.setBankAccess(bankAccess);
         request.setBankCode(bankEntity.getBlzHbci());
-        request.setPin(bankAccess.getPin());
-        request.setStorePin(bankAccess.isStorePin());
+        request.setCredentials(credentials);
         request.setUpdateTanTransportTypes(true);
         request.setHbciProduct(finTSProductConfig.getProduct());
         consentEntity.ifPresent(consent -> request.setConsentId(consent.getId()));
@@ -120,12 +122,11 @@ public class BankAccountService extends AccountInformationService {
         }
     }
 
-    private void checkBankSupported(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService) {
-        if (!onlineBankingService.bankSupported(bankAccess.getBankCode())) {
-            bankAccess.setStorePin(false);
-            bankAccess.setPin(null);
-            throw new InvalidBankAccessException(bankAccess.getBankCode());
+    private BankEntity checkBankSupported(OnlineBankingService onlineBankingService, String bankCode) {
+        if (!onlineBankingService.bankSupported(bankCode)) {
+            throw new InvalidBankAccessException(bankCode);
         }
+        return bankService.findBank(bankCode);
     }
 
     private void filterAccounts(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService,

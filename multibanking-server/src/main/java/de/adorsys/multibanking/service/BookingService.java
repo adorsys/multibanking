@@ -26,6 +26,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -107,7 +108,8 @@ public class BookingService extends AccountInformationService {
 
     @Transactional
     public List<BookingEntity> syncBookings(ScaStatus expectedConsentStatus, BankAccessEntity bankAccess,
-                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi) {
+                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi,
+                                            Credentials credentials) {
         bankAccountRepository.updateSyncStatus(bankAccount.getId(), BankAccount.SyncStatus.SYNC);
 
         OnlineBankingService onlineBankingService = bankApi != null ?
@@ -116,7 +118,7 @@ public class BookingService extends AccountInformationService {
 
         try {
             LoadBookingsResponse response = loadBookingsOnline(expectedConsentStatus, onlineBankingService,
-                bankAccess, bankAccount);
+                bankAccess, bankAccount, credentials);
 
             if (!bankAccess.isTemporary()) {
                 //update bankaccess, passportstate changed
@@ -278,17 +280,19 @@ public class BookingService extends AccountInformationService {
 
     private LoadBookingsResponse loadBookingsOnline(ScaStatus expectedConsentStatus,
                                                     OnlineBankingService onlineBankingService,
-                                                    BankAccessEntity bankAccess, BankAccountEntity bankAccount) {
-        BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, onlineBankingService.bankApi());
+                                                    BankAccessEntity bankAccess, BankAccountEntity bankAccount,
+                                                    Credentials credentials) {
+        BankApiUser bankApiUser = userService.checkApiRegistration(onlineBankingService,
+            userService.findUser(bankAccess.getUserId()));
 
-        Optional<ConsentEntity> consentEntity = consentService.validateAndGetConsent(bankAccess, onlineBankingService,
-            expectedConsentStatus);
+        Optional<ConsentEntity> consentEntity = consentService.validateAndGetConsent(onlineBankingService,
+            bankAccess.getConsentId(), expectedConsentStatus);
         //external (figo, finapi) account must exist, otherwise loading bookings will not work
         // FIXME this is a problem! currently we load all accounts for bookings which could cause problems with 2FA
         //  in HBCI
         if (onlineBankingService.externalBankAccountRequired()) {
             checkExternalBankAccountExists(bankAccess, bankAccount, bankApiUser,
-                onlineBankingService);
+                onlineBankingService, credentials);
         }
 
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
@@ -299,9 +303,10 @@ public class BookingService extends AccountInformationService {
         loadBookingsRequest.setBankAccess(bankAccess);
         loadBookingsRequest.setBankCode(bankEntity.getBlzHbci());
         loadBookingsRequest.setBankAccount(bankAccount);
-        loadBookingsRequest.setPin(bankAccess.getPin());
+        loadBookingsRequest.setCredentials(credentials);
         loadBookingsRequest.setDateFrom(bankAccount.getLastSync() != null ?
-            bankAccount.getLastSync().toLocalDate() : null);
+            bankAccount.getLastSync().toLocalDate() : LocalDate.now().minusYears(1));
+        loadBookingsRequest.setDateTo(LocalDate.now());
         loadBookingsRequest.setWithTanTransportTypes(true);
         loadBookingsRequest.setWithBalance(true);
         loadBookingsRequest.setWithStandingOrders(true);
@@ -342,7 +347,7 @@ public class BookingService extends AccountInformationService {
     //only for figo
     private void checkExternalBankAccountExists(BankAccessEntity bankAccess,
                                                 BankAccountEntity bankAccount, BankApiUser bankApiUser,
-                                                OnlineBankingService onlineBankingService) {
+                                                OnlineBankingService onlineBankingService, Credentials credentials) {
         String externalAccountId = bankAccount.getExternalIdMap().get(onlineBankingService.bankApi());
         //account not created by given bank-api, account must be created, otherwise loading bookings will not work
         if (externalAccountId == null) {
@@ -354,8 +359,7 @@ public class BookingService extends AccountInformationService {
             request.setBankAccess(bankAccess);
             request.setBankCode(bankEntity.getBlzHbci());
             request.setUpdateTanTransportTypes(true);
-            request.setPin(bankAccess.getPin());
-            request.setStorePin(bankAccess.isStorePin());
+            request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());
             List<BankAccount> apiBankAccounts = onlineBankingService.loadBankAccounts(request).getBankAccounts();
 

@@ -20,7 +20,7 @@ public interface BankAccountRepositoryIf {
 
     boolean exists(String accountId);
 
-    void save(List<BankAccountEntity> bankAccounts);
+    List<BankAccountEntity> save(List<BankAccountEntity> bankAccounts);
 
     void save(BankAccountEntity bankAccount);
 

@@ -67,8 +67,9 @@ public class BankAccessController {
             })})
     @PostMapping
     public ResponseEntity<Resource<BankAccessTO>> createBankAccess(@RequestBody BankAccessTO bankAccess) {
-        BankAccessEntity persistedBankAccess = bankAccessService.createBankAccess(principal.getName(),
-            bankAccessMapper.toBankAccessEntity(bankAccess));
+        BankAccessEntity persistedBankAccess =
+            bankAccessService.createBankAccess(bankAccessMapper.toBankAccessEntity(bankAccess, principal.getName(),
+                false), null);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(linkTo(methodOn(BankAccessController.class).getBankAccess(persistedBankAccess.getId())).toUri());
@@ -99,7 +100,8 @@ public class BankAccessController {
     @PutMapping("/{accessId}")
     public HttpEntity<Void> updateBankAccess(@PathVariable String accessId,
                                              @RequestBody BankAccessTO bankAccess) {
-        bankAccessService.updateBankAccess(accessId, bankAccessMapper.toBankAccessEntity(bankAccess));
+        bankAccessService.updateBankAccess(accessId, bankAccessMapper.toBankAccessEntity(bankAccess,
+            principal.getName(), false));
         log.info("Bank access [{}] updated.", accessId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

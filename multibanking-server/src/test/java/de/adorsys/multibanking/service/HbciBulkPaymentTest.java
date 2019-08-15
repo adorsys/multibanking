@@ -63,14 +63,12 @@ public class HbciBulkPaymentTest {
     public void testPayment() throws Exception {
 
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
-            System.getProperty("blz"), System.getProperty("pin"));
-        bankAccessEntity.setBankLogin(System.getProperty("login"));
-        bankAccessEntity.setBankLogin2(System.getProperty("login2"));
+            System.getProperty("blz"));
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI);
+            BankApi.HBCI, null);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
             .findFirst().get();
@@ -93,7 +91,7 @@ public class HbciBulkPaymentTest {
         bulkPayment.setPsuAccount(bankAccountEntitity);
 
         BulkPaymentEntity paymentEntity = paymentService.createBulkPayment(bankAccessEntity,
-            tanTransportType, System.getProperty("pin"), bulkPayment);
+            tanTransportType, null, bulkPayment);
 
         String tan = "";
         paymentService.submitBulkPayment(paymentEntity, bankAccessEntity, System.getProperty("pin"), tan);

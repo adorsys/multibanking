@@ -69,7 +69,6 @@
         <module>onlinebanking-finapi</module>
         <module>onlinebanking-hbci4java</module>
         <module>onlinebanking-bankinggateway</module>
-        <module>onlinebanking-mock</module>
         <module>multibanking-pers-spi</module>
     </modules>
 

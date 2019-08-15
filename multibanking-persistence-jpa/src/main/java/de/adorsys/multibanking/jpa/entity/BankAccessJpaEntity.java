@@ -19,10 +19,7 @@ public class BankAccessJpaEntity {
     private Long id;
     private String userId;
     private String consentId;
-    private String pin;
-    private String pin2;
     private boolean temporary;
-    private boolean storePin;
     private boolean storeBookings;
     private boolean categorizeBookings;
     private boolean storeAnalytics;
