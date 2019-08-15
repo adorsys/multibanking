@@ -272,7 +272,7 @@ public class DirectAccessControllerTest {
 
         DirectAccessController.LoadAccountsRequest loadAccountsRequest =
             new DirectAccessController.LoadAccountsRequest();
-        loadAccountsRequest.setBankAccessTO(bankAccess);
+        loadAccountsRequest.setBankAccess(bankAccess);
 
         Messages messages = RestAssured.given()
             .contentType(ContentType.JSON)
@@ -297,7 +297,7 @@ public class DirectAccessControllerTest {
 
         DirectAccessController.LoadAccountsRequest loadAccountsRequest =
             new DirectAccessController.LoadAccountsRequest();
-        loadAccountsRequest.setBankAccessTO(bankAccess);
+        loadAccountsRequest.setBankAccess(bankAccess);
 
         DirectAccessController.LoadBankAccountsResponse loadBankAccountsResponse = RestAssured.given()
             .contentType(ContentType.JSON)
