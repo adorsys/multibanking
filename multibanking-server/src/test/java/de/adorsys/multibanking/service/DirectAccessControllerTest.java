@@ -111,7 +111,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO access = createBankAccess();
@@ -122,7 +122,7 @@ public class DirectAccessControllerTest {
             .pin("sandbox")
             .build();
 
-        consent_authorisation(access, credentials, true);
+        consent_authorisation(access, credentials);
     }
 
     @Test
@@ -136,6 +136,10 @@ public class DirectAccessControllerTest {
             .tanTransportTypes(Arrays.asList(TestUtil.createTanMethod("Method1"), TestUtil.createTanMethod("Method2")))
             .build()).when(hbci4JavaBankingMock).authenticatePsu(any(), any());
 
+        //mock accounts response
+        doThrow(new MultibankingException(HBCI_2FA_REQUIRED))
+            .when(hbci4JavaBankingMock).loadBankAccounts(any());
+
         //mock bookings response
         doThrow(new MultibankingException(HBCI_2FA_REQUIRED))
             .doReturn(LoadBookingsResponse.builder()
@@ -148,10 +152,10 @@ public class DirectAccessControllerTest {
             .pin("sandbox")
             .build();
 
-        consent_authorisation(access, credentials, false);
+        consent_authorisation(access, credentials);
     }
 
-    public void consent_authorisation(BankAccessTO bankAccess, CredentialsTO credentialsTO, boolean loadAccounts) {
+    public void consent_authorisation(BankAccessTO bankAccess, CredentialsTO credentialsTO) {
         RequestSpecification request = RestAssured.given();
         request.contentType(ContentType.JSON);
 
@@ -224,17 +228,14 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
 
         //6. load accounts
-        if (loadAccounts) {
-            DirectAccessController.LoadAccountsRequest loadAccountsRequest =
-                new DirectAccessController.LoadAccountsRequest();
-            loadAccountsRequest.setBankAccessTO(bankAccess);
-            loadAccountsRequest.setCredentials(credentialsTO);
-            loadAccountsRequest.setScaMethodId(sceMethodId);
+        DirectAccessController.LoadAccountsRequest loadAccountsRequest =
+            new DirectAccessController.LoadAccountsRequest();
+        loadAccountsRequest.setBankAccessTO(bankAccess);
+        loadAccountsRequest.setCredentials(credentialsTO);
+        loadAccountsRequest.setScaMethodId(sceMethodId);
 
-            jsonPath = request.body(loadAccountsRequest).put("http://localhost:" + port + "/api/v1/direct/accounts")
-                .then().assertThat().statusCode(HttpStatus.OK.value())
-                .and().extract().jsonPath();
-        }
+        jsonPath = request.body(loadAccountsRequest).put("http://localhost:" + port + "/api/v1/direct/accounts")
+            .then().and().extract().jsonPath();
 
         //7. load transactions
         DirectAccessController.LoadBookingsRequest loadBookingsRequest =
