@@ -287,9 +287,8 @@ public class BookingService extends AccountInformationService {
 
         Optional<ConsentEntity> consentEntity = consentService.validateAndGetConsent(onlineBankingService,
             bankAccess.getConsentId(), expectedConsentStatus);
+
         //external (figo, finapi) account must exist, otherwise loading bookings will not work
-        // FIXME this is a problem! currently we load all accounts for bookings which could cause problems with 2FA
-        //  in HBCI
         if (onlineBankingService.externalBankAccountRequired()) {
             checkExternalBankAccountExists(bankAccess, bankAccount, bankApiUser,
                 onlineBankingService, credentials);

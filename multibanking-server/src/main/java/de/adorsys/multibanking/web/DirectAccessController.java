@@ -31,6 +31,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
@@ -94,6 +95,8 @@ public class DirectAccessController {
     public ResponseEntity createHbciBookingsChallenge(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
                                                       @RequestParam(required = false) BankApiTO bankApi) {
         try {
+            selectScaMethodForConsent(loadBookingsRequest.getBankAccess().getConsentId(),
+                loadBookingsRequest.getScaMethodId());
             return doLoadBookings(loadBookingsRequest, bankApi, SCAMETHODSELECTED);
         } catch (MissingConsentAuthorisationException e) {
             log.debug("process finished < return challenge");
@@ -135,20 +138,13 @@ public class DirectAccessController {
         });
 
         return createLoadBankAccountsResponse(bankAccounts);
-
     }
 
     private ResponseEntity doLoadBookings(LoadBookingsRequest loadBookingsRequest,
                                           BankApiTO bankApi, ScaStatus scaStatus) {
         log.debug("process start > load booking list");
-        BankAccessEntity bankAccessEntity = bankAccessRepository.findByUserIdAndId(loadBookingsRequest.getUserId(),
-            loadBookingsRequest.getAccessId())
-            .orElseThrow(() -> new ResourceNotFoundException(BankAccessTO.class, loadBookingsRequest.getAccessId()));
-
-        BankAccountEntity bankAccountEntity = bankAccountRepository.findByUserIdAndId(loadBookingsRequest.getUserId()
-            , loadBookingsRequest.getAccountId())
-            .orElseThrow(() -> new ResourceNotFoundException(BankAccountTO.class,
-                loadBookingsRequest.getAccountId()));
+        BankAccessEntity bankAccessEntity = getBankAccessEntity(loadBookingsRequest);
+        BankAccountEntity bankAccountEntity = getBankAccountEntity(loadBookingsRequest, bankAccessEntity);
 
         log.debug("load booking list from bank");
         List<BookingEntity> bookingEntities = bookingService.syncBookings(scaStatus, bankAccessEntity,
@@ -156,7 +152,41 @@ public class DirectAccessController {
             credentialsMapper.toCredentials(loadBookingsRequest.getCredentials()));
 
         return createLoadBookingsResponse(bankAccountEntity, bookingEntities);
+    }
 
+    private BankAccessEntity getBankAccessEntity(LoadBookingsRequest loadBookingsRequest) {
+        return Optional.ofNullable(loadBookingsRequest.getUserId())
+            .map(userId -> bankAccessRepository.findByUserIdAndId(loadBookingsRequest.getUserId(),
+                loadBookingsRequest.getAccessId())
+                .orElseThrow(() -> new ResourceNotFoundException(BankAccessTO.class,
+                    loadBookingsRequest.getAccessId())))
+            .orElseGet(() -> prepareBankAccess(loadBookingsRequest.getBankAccess()));
+    }
+
+    private BankAccountEntity getBankAccountEntity(LoadBookingsRequest loadBookingsRequest,
+                                                   BankAccessEntity bankAccessEntity) {
+        return Optional.ofNullable(loadBookingsRequest.getAccountId())
+            .map(accountId -> bankAccountRepository.findByUserIdAndId(loadBookingsRequest.getUserId()
+                , loadBookingsRequest.getAccountId())
+                .orElseThrow(() -> new ResourceNotFoundException(BankAccountTO.class,
+                    loadBookingsRequest.getAccountId()))).orElseGet(() -> {
+                BankAccountEntity bankAccountEntity = new BankAccountEntity();
+                bankAccountEntity.setBankAccessId(bankAccessEntity.getId());
+                bankAccountEntity.setUserId(bankAccessEntity.getUserId());
+                bankAccountEntity.setIban(bankAccessEntity.getIban());
+                return bankAccountEntity;
+            });
+    }
+
+    private BankAccessEntity prepareBankAccess(BankAccessTO bankAccess) {
+        log.debug("save temporary user to db");
+        //temporary user, will be deleted after x minutes
+        UserEntity userEntity = createUser();
+        userRepository.save(userEntity);
+
+        BankAccessEntity bankAccessEntity = bankAccessMapper.toBankAccessEntity(bankAccess, userEntity.getId(), true);
+        bankAccessEntity.setUserId(userEntity.getId());
+        return bankAccessEntity;
     }
 
     private UserEntity createUser() {
@@ -217,9 +247,10 @@ public class DirectAccessController {
 
     @Data
     public static class LoadBookingsRequest {
-        @NotNull String userId;
-        @NotNull String accessId;
-        @NotNull String accountId;
+        String userId;
+        String accessId;
+        String accountId;
+        BankAccessTO bankAccess;
         CredentialsTO credentials;
         String scaMethodId;
     }
