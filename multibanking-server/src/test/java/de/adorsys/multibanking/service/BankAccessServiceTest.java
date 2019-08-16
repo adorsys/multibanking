@@ -135,14 +135,6 @@ public class BankAccessServiceTest {
     }
 
     @Test
-    public void when_delete_bankAccesd_user_notExist_should_throw_exception() {
-        thrown.expect(ResourceNotFoundException.class);
-
-        boolean deleteBankAccess = bankAccessService.deleteBankAccess("badLogin", "badAccess");
-        assertThat(deleteBankAccess).isEqualTo(false);
-    }
-
-    @Test
     public void when_delete_bankAcces_user_exist_should_return_false() {
         String userId = UUID.randomUUID().toString();
         userRepository.save(TestUtil.getUserEntity(userId));

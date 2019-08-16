@@ -30,6 +30,7 @@ import io.restassured.specification.RequestSpecification;
 import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kapott.hbci.manager.BankInfo;
@@ -112,7 +113,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
-    //    @Ignore
+    @Ignore
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO access = createBankAccess();
@@ -129,10 +130,12 @@ public class DirectAccessControllerTest {
     @Test
     public void consent_authorisation_hbci() {
         BankAccessTO access = createBankAccess();
-//        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
-        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
-        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme.de/hbciTunnel/hbciTransfer" +
-            ".jsp");
+        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
+        prepareBank(hbci4JavaBanking, access.getIban());
+//        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
+//        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme
+//        .de/hbciTunnel/hbciTransfer" +
+//            ".jsp");
 
         if (isMock(hbci4JavaBanking)) {
             //mock hbci authenticate psu
@@ -378,8 +381,8 @@ public class DirectAccessControllerTest {
     }
 
     private String getRemoteMultibankingUrl() {
-        return "http://localhost:8081";
-//        return "http://localhost:" + port;
+        return "http://localhost:" + port;
+//        return "http://localhost:8081";
 //        return "https://dev-bankinggateway-multibanking-multibankingservice.cloud.adorsys.de";
     }
 }
