@@ -102,8 +102,8 @@ public class PaymentController {
         SinglePaymentEntity paymentEntity = paymentRepository.findByUserIdAndId(principal.getName(), paymentId)
             .orElseThrow(() -> new ResourceNotFoundException(SinglePaymentEntity.class, paymentId));
 
-        paymentService.submitSinglePayment(paymentEntity, bankAccessEntity, paymentRequest.getPin(),
-            paymentRequest.getTan());
+        paymentService.submitSinglePayment(paymentEntity, bankAccessEntity,
+            credentialsMapper.toCredentials(paymentRequest.getCredentials()), paymentRequest.getTan());
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -119,12 +119,11 @@ public class PaymentController {
         CredentialsTO credentials;
         TanTransportType tanTransportType;
         SinglePayment payment;
-        String pin;
     }
 
     @Data
     private static class SubmitPaymentRequest {
-        String pin;
+        CredentialsTO credentials;
         String tan;
     }
 }

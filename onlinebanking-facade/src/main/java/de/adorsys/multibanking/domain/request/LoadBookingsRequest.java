@@ -16,10 +16,7 @@
 
 package de.adorsys.multibanking.domain.request;
 
-import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankApiUser;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,11 +27,7 @@ import java.time.LocalDate;
 public class LoadBookingsRequest extends TransactionRequest {
 
     private String consentId;
-    private BankApiUser bankApiUser;
     private BankAccount bankAccount;
-    private BankAccess bankAccess;
-    private String bankCode;
-    private String pin;
     private RawResponseType rawResponseType;
     private LocalDate dateFrom;
     private LocalDate dateTo;

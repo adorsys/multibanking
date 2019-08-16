@@ -115,6 +115,40 @@
           }
         },
         "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Revoke consent by consent id",
+        "operationId": "revokeConsentUsingDELETE",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "description": "consentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false
       }
     },
     "/v1/ais/consents/{consentId}/status": {

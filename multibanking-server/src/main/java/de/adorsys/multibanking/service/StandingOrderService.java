@@ -7,7 +7,6 @@ import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
-import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.domain.MissingPinException;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,8 @@ public class StandingOrderService {
     Object createStandingOrder(BankAccessEntity bankAccess, Credentials credentials, StandingOrder standingOrder) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        BankApiUser bankApiUser = userService.checkApiRegistration(bankingService, userService.findUser(bankAccess.getUserId()));
+        BankApiUser bankApiUser = userService.checkApiRegistration(bankingService,
+            userService.findUser(bankAccess.getUserId()));
 
         if (credentials.getPin() == null) {
             throw new MissingPinException();
@@ -45,7 +45,7 @@ public class StandingOrderService {
             request.setTransaction(standingOrder);
             request.setBankAccess(bankAccess);
             request.setCredentials(credentials);
-            request.setBankCode(bankEntity.getBlzHbci());
+            request.setBankCode(bankEntity.getBankApiBankCode());
             request.setBankUrl(bankEntity.getBankingUrl());
             request.setHbciProduct(finTSProductConfig.getProduct());
             Object tanSubmit = bankingService.requestPaymentAuthorizationCode(request);
@@ -64,10 +64,10 @@ public class StandingOrderService {
     }
 
     void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, BankAccessEntity bankAccess,
-                             String pin, String tan) {
+                             Credentials credentials, String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        if (pin == null) {
+        if (credentials == null) {
             throw new MissingPinException();
         }
 
@@ -75,9 +75,10 @@ public class StandingOrderService {
             SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
                 .sepaTransaction(standingOrder)
                 .tanSubmit(tanSubmit)
-                .pin(pin)
                 .tan(tan)
                 .build();
+
+            request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());
             bankingService.submitPaymentAuthorizationCode(request);
         } catch (MultibankingException e) {

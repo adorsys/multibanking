@@ -30,7 +30,8 @@ public class DeleteExpiredUsersScheduled {
         AtomicInteger count = new AtomicInteger(0);
 
         userRepository.findExpiredUser().forEach(userId -> {
-            bankAccessRepository.findByUserId(userId).forEach(bankAccessEntity -> bankAccessService.deleteBankAccess(userId, bankAccessEntity.getId()));
+            bankAccessRepository.findByUserId(userId)
+                .forEach(bankAccessEntity -> bankAccessService.deleteBankAccess(userId, bankAccessEntity.getId()));
 
             userRepository.findById(userId)
                 .ifPresent(userEntity -> {

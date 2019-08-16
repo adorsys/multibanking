@@ -27,8 +27,6 @@ public class BankAccessJpaEntity {
     private boolean provideDataForMachineLearning;
 
     private String bankName;
-    private String bankLogin;
-    private String bankLogin2;
     private String bankCode;
     private String iban;
     @Column(length = 10000)

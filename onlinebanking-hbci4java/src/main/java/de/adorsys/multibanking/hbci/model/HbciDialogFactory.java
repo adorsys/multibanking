@@ -43,7 +43,7 @@ public class HbciDialogFactory {
 
         HbciPassport newPassport = Optional.ofNullable(passport)
             .orElseGet(() -> createPassport(bankInfo.getPinTanVersion().getId(), dialogRequest.getBankCode(),
-                dialogRequest.getCustomerId(), dialogRequest.getLogin(), hbciProduct,
+                dialogRequest.getCredentials().getBankLogin(), dialogRequest.getCredentials().getBankLogin2(), hbciProduct,
                 dialogRequest.getCallback()
             ));
 
@@ -59,7 +59,7 @@ public class HbciDialogFactory {
         Optional.ofNullable(dialogRequest.getHbciSysId())
             .ifPresent(newPassport::setSysId);
 
-        newPassport.setPIN(dialogRequest.getPin());
+        newPassport.setPIN(dialogRequest.getCredentials().getPin());
 
         String url = bankInfo.getPinTanAddress();
         String proxyPrefix = System.getProperty("proxyPrefix", null);

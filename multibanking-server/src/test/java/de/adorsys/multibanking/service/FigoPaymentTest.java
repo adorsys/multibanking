@@ -83,7 +83,6 @@ public class FigoPaymentTest {
         paymentEntity.setPurpose("test");
 
         paymentService.createSinglePayment(bankAccessEntity, null, null, paymentEntity);
-        paymentService.submitSinglePayment(paymentEntity, bankAccessEntity, System.getProperty("pin"),
-            "tan_needed_here");
+        paymentService.submitSinglePayment(paymentEntity, bankAccessEntity, null, "tan_needed_here");
     }
 }

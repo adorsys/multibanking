@@ -300,7 +300,7 @@ public class BookingService extends AccountInformationService {
         loadBookingsRequest.setConsentId(bankAccess.getConsentId());
         loadBookingsRequest.setBankApiUser(bankApiUser);
         loadBookingsRequest.setBankAccess(bankAccess);
-        loadBookingsRequest.setBankCode(bankEntity.getBlzHbci());
+        loadBookingsRequest.setBankCode(bankEntity.getBankApiBankCode());
         loadBookingsRequest.setBankAccount(bankAccount);
         loadBookingsRequest.setCredentials(credentials);
         loadBookingsRequest.setDateFrom(bankAccount.getLastSync() != null ?
@@ -356,7 +356,7 @@ public class BookingService extends AccountInformationService {
             request.setBankUrl(bankEntity.getBankingUrl());
             request.setBankApiUser(bankApiUser);
             request.setBankAccess(bankAccess);
-            request.setBankCode(bankEntity.getBlzHbci());
+            request.setBankCode(bankEntity.getBankApiBankCode());
             request.setUpdateTanTransportTypes(true);
             request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());

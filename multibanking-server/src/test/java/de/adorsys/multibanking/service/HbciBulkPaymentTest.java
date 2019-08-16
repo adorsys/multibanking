@@ -94,7 +94,7 @@ public class HbciBulkPaymentTest {
             tanTransportType, null, bulkPayment);
 
         String tan = "";
-        paymentService.submitBulkPayment(paymentEntity, bankAccessEntity, System.getProperty("pin"), tan);
+        paymentService.submitBulkPayment(paymentEntity, bankAccessEntity, null, tan);
 
     }
 

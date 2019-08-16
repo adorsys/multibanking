@@ -13,5 +13,5 @@ public class BankTO {
     private String name;
     private BankLoginSettingsTO loginSettings;
     private BankApiTO bankApi;
-    private boolean ibanRequired;
+
 }

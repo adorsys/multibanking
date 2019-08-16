@@ -11,6 +11,7 @@ import java.util.List;
 public interface BookingMapper {
 
     @Mapping(target = "otherAccount.id", ignore = true)
+    @Mapping(target = "otherAccount.userId", ignore = true)
     @Mapping(target = "otherAccount.bankAccessId", ignore = true)
     @Mapping(target = "bookingCategory.id", ignore = true)
     BookingTO toBookingTO(BookingEntity bookingEntity);

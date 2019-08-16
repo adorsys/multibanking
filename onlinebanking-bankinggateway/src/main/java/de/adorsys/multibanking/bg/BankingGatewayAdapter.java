@@ -7,6 +7,7 @@ import de.adorsys.multibanking.banking_gateway_b2c.ApiException;
 import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2CAisApi;
 import de.adorsys.multibanking.banking_gateway_b2c.model.CreateConsentResponseTO;
 import de.adorsys.multibanking.banking_gateway_b2c.model.ResourceUpdateAuthResponseTO;
+import de.adorsys.multibanking.banking_gateway_b2c.model.UpdatePsuAuthenticationRequestTO;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
@@ -39,7 +40,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.iban4j.Iban;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.MediaType;
 
@@ -48,7 +48,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static de.adorsys.multibanking.domain.BankApi.BANKING_GATEWAY;
+import static de.adorsys.multibanking.domain.BankApi.XS2A;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
 
 @RequiredArgsConstructor
@@ -83,7 +83,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     @Override
     public BankApi bankApi() {
-        return BANKING_GATEWAY;
+        return XS2A;
     }
 
     @Override
@@ -227,9 +227,11 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication,
                                                               String bankingUrl) {
                 try {
-
+                    UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequestTO =
+                        bankingGatewayMapper.toUpdatePsuAuthenticationRequestTO(updatePsuAuthentication.getCredentials());
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
-                        getBankingGatewayB2CAisApi().updatePsuAuthenticationUsingPUT(bankingGatewayMapper.toUpdatePsuAuthenticationRequestTO(updatePsuAuthentication), updatePsuAuthentication.getAuthorisationId(), updatePsuAuthentication.getConsentId());
+                        getBankingGatewayB2CAisApi().updatePsuAuthenticationUsingPUT(updatePsuAuthenticationRequestTO
+                            , updatePsuAuthentication.getAuthorisationId(), updatePsuAuthentication.getConsentId());
 
                     return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO, bankApi());
                 } catch (ApiException e) {
@@ -267,7 +269,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId,
                                                              Object bankApiConsentData) {
                 try {
-
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
                         getBankingGatewayB2CAisApi().getConsentAuthorisationStatusUsingGET(authorisationId, consentId);
 
@@ -279,7 +280,11 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
             @Override
             public void revokeConsent(String consentId) {
-                throw new UnsupportedOperationException();
+                try {
+                    getBankingGatewayB2CAisApi().revokeConsentUsingDELETE(consentId);
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
+                }
             }
 
             @Override
@@ -375,28 +380,10 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     public static class CustomConversionService extends DefaultConversionService {
 
-        public CustomConversionService() {
-
-            addConverter(new Converter<BookingStatusTO, String>() {
-                @Override
-                public String convert(BookingStatusTO source) {
-                    return source.toString();
-                }
-            });
-
-            addConverter(new Converter<PaymentProductTO, String>() {
-                @Override
-                public String convert(PaymentProductTO source) {
-                    return source.toString();
-                }
-            });
-
-            addConverter(new Converter<PaymentServiceTO, String>() {
-                @Override
-                public String convert(PaymentServiceTO source) {
-                    return source.toString();
-                }
-            });
+        CustomConversionService() {
+            addConverter(BookingStatusTO.class, String.class, BookingStatusTO::toString);
+            addConverter(PaymentProductTO.class, String.class, PaymentProductTO::toString);
+            addConverter(PaymentServiceTO.class, String.class, PaymentServiceTO::toString);
         }
     }
 }

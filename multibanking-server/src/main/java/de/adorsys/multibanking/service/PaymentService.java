@@ -36,7 +36,8 @@ public class PaymentService {
                                                   Credentials credentials, RawSepaPayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        BankApiUser bankApiUser = userService.checkApiRegistration(bankingService, userService.findUser(bankAccess.getUserId()));
+        BankApiUser bankApiUser = userService.checkApiRegistration(bankingService,
+            userService.findUser(bankAccess.getUserId()));
 
         if (credentials.getPin() == null) {
             throw new MissingPinException();
@@ -52,7 +53,7 @@ public class PaymentService {
             request.setTransaction(payment);
             request.setBankAccess(bankAccess);
             request.setCredentials(credentials);
-            request.setBankCode(bankEntity.getBlzHbci());
+            request.setBankCode(bankEntity.getBankApiBankCode());
             request.setHbciProduct(finTSProductConfig.getProduct());
             Object tanSubmit = bankingService.requestPaymentAuthorizationCode(request);
 
@@ -73,7 +74,8 @@ public class PaymentService {
                                                    Credentials credentials, SinglePayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        BankApiUser bankApiUser = userService.checkApiRegistration(bankingService, userService.findUser(bankAccess.getUserId()));
+        BankApiUser bankApiUser = userService.checkApiRegistration(bankingService,
+            userService.findUser(bankAccess.getUserId()));
 
         if (credentials.getPin() == null) {
             throw new MissingPinException();
@@ -89,7 +91,7 @@ public class PaymentService {
             request.setTransaction(payment);
             request.setBankAccess(bankAccess);
             request.setCredentials(credentials);
-            request.setBankCode(bankEntity.getBlzHbci());
+            request.setBankCode(bankEntity.getBankApiBankCode());
             request.setHbciProduct(finTSProductConfig.getProduct());
 
             Object tanSubmit = bankingService.requestPaymentAuthorizationCode(request);
@@ -111,7 +113,8 @@ public class PaymentService {
                                         Credentials credentials, BulkPayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        BankApiUser bankApiUser = userService.checkApiRegistration(bankingService, userService.findUser(bankAccess.getUserId()));
+        BankApiUser bankApiUser = userService.checkApiRegistration(bankingService,
+            userService.findUser(bankAccess.getUserId()));
 
         if (credentials.getPin() == null) {
             throw new MissingPinException();
@@ -127,7 +130,7 @@ public class PaymentService {
             request.setTanTransportType(tanTransportType);
             request.setBankAccess(bankAccess);
             request.setCredentials(credentials);
-            request.setBankCode(bankEntity.getBlzHbci());
+            request.setBankCode(bankEntity.getBankApiBankCode());
             request.setHbciProduct(finTSProductConfig.getProduct());
 
             Object tanSubmit = bankingService.requestPaymentAuthorizationCode(request);
@@ -146,10 +149,10 @@ public class PaymentService {
     }
 
     void submitRawSepaTransaction(RawSepaTransactionEntity transactionEntity, BankAccessEntity bankAccess,
-                                  String pin, String tan) {
+                                  Credentials credentials, String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        if (pin == null) {
+        if (credentials == null) {
             throw new MissingPinException();
         }
 
@@ -157,9 +160,10 @@ public class PaymentService {
             SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
                 .sepaTransaction(transactionEntity)
                 .tanSubmit(transactionEntity.getTanSubmitExternal())
-                .pin(pin)
                 .tan(tan)
                 .build();
+
+            request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());
             bankingService.submitPaymentAuthorizationCode(request);
         } catch (MultibankingException e) {
@@ -169,11 +173,12 @@ public class PaymentService {
         rawSepaTransactionRepository.delete(transactionEntity.getId());
     }
 
-    public void submitSinglePayment(SinglePaymentEntity paymentEntity, BankAccessEntity bankAccess, String pin,
+    public void submitSinglePayment(SinglePaymentEntity paymentEntity, BankAccessEntity bankAccess,
+                                    Credentials credentials,
                                     String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        if (pin == null) {
+        if (credentials == null) {
             throw new MissingPinException();
         }
 
@@ -181,9 +186,10 @@ public class PaymentService {
             SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
                 .sepaTransaction(paymentEntity)
                 .tanSubmit(paymentEntity.getTanSubmitExternal())
-                .pin(pin)
                 .tan(tan)
                 .build();
+
+            request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());
             bankingService.submitPaymentAuthorizationCode(request);
         } catch (MultibankingException e) {
@@ -193,11 +199,11 @@ public class PaymentService {
         singlePaymentRepository.delete(paymentEntity.getId());
     }
 
-    void submitBulkPayment(BulkPaymentEntity paymentEntity, BankAccessEntity bankAccess, String pin,
+    void submitBulkPayment(BulkPaymentEntity paymentEntity, BankAccessEntity bankAccess, Credentials credentials,
                            String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        if (pin == null) {
+        if (credentials == null) {
             throw new MissingPinException();
         }
 
@@ -205,9 +211,10 @@ public class PaymentService {
             SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
                 .sepaTransaction(paymentEntity)
                 .tanSubmit(paymentEntity.getTanSubmitExternal())
-                .pin(pin)
                 .tan(tan)
                 .build();
+
+            request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());
             bankingService.submitPaymentAuthorizationCode(request);
         } catch (MultibankingException e) {

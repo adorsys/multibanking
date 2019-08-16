@@ -283,7 +283,7 @@ public class FigoBanking implements OnlineBankingService {
 
             Status status = waitForFinish(session, response.getTaskToken());
             if (status == Status.PIN) {
-                submitPin(response.getTaskToken(), loadBookingsRequest.getPin(), session);
+                submitPin(response.getTaskToken(), loadBookingsRequest.getCredentials().getPin(), session);
             }
 
             List<Booking> bookings = session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))

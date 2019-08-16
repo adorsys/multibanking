@@ -144,7 +144,7 @@ public class SubmitAuthorisationCodeJob {
             });
         state.apply(hbciPassport);
 
-        hbciPassport.setPIN(submitAuthorizationCodeRequest.getPin());
+        hbciPassport.setPIN(submitAuthorizationCodeRequest.getCredentials().getPin());
         hbciPassport.setCurrentSecMechInfo(hbciTanSubmit.getTwoStepMechanism());
         hbciPassport.setBPD(bpd);
 

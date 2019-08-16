@@ -16,21 +16,19 @@
 
 package de.adorsys.multibanking.domain.request;
 
+import de.adorsys.multibanking.domain.Credentials;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class AuthenticatePsuRequest extends AbstractRequest {
 
+    private String psuAccountIban;
     private String paymentId;
     private String paymentProduct;
     private String paymentService;
     private String consentId;
-    private String bankCode;
-    private String customerId;
-    private String login;
-    private String pin;
+    private Credentials credentials;
 
 }

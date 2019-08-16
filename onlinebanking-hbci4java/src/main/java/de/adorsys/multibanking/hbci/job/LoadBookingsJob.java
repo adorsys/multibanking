@@ -88,6 +88,11 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
     }
 
     @Override
+    public Konto getDebtorAccount(PinTanPassport passport) {
+        return createAccount();
+    }
+
+    @Override
     public LoadBookingsResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
         //TODO check for needed 2FA
 

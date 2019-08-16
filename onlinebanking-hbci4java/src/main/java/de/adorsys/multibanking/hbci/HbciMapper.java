@@ -24,17 +24,8 @@ interface HbciMapper {
     @Mapping(target = "scaStatus", source = "hbciConsent.status")
     UpdateAuthResponse toUpdateAuthResponse(HBCIConsent hbciConsent, BankApi bankApi);
 
-    @Mapping(target = "login", source = "psuId")
-    @Mapping(target = "customerId", source = "psuCustomerId")
-    @Mapping(target = "pin", source = "password")
-    @Mapping(target = "bankUrl", ignore = true)
-    @Mapping(target = "hbciProduct", ignore = true)
-    @Mapping(target = "hbciBPD", ignore = true)
-    @Mapping(target = "hbciUPD", ignore = true)
-    @Mapping(target = "hbciSysId", ignore = true)
     @Mapping(target = "paymentId", ignore = true)
     @Mapping(target = "paymentProduct", ignore = true)
     @Mapping(target = "paymentService", ignore = true)
-    @Mapping(target = "bankCode", ignore = true)
     AuthenticatePsuRequest toAuthenticatePsuRequest(UpdatePsuAuthenticationRequest updatePsuAuthentication);
 }

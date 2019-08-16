@@ -125,18 +125,26 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         //not needed
     }
 
-    public ScaMethodsResponse authenticatePsu(String bankingUrl, AuthenticatePsuRequest authenticatePsuRequest) {
+    public ScaMethodsResponse authenticatePsu(AuthenticatePsuRequest authenticatePsuRequest) {
+        String bankCode = authenticatePsuRequest.getBankCode() != null ? authenticatePsuRequest.getBankCode() :
+            Iban.valueOf(authenticatePsuRequest.getPsuAccountIban()).getBankCode();
+
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
-            .bankCode(authenticatePsuRequest.getBankCode())
-            .login(authenticatePsuRequest.getLogin())
-            .customerId(authenticatePsuRequest.getCustomerId())
-            .pin(authenticatePsuRequest.getPin())
+            .credentials(authenticatePsuRequest.getCredentials())
             .build();
+
+        dialogRequest.setBankCode(bankCode);
+        dialogRequest.setHbciProduct(Optional.ofNullable(authenticatePsuRequest.getHbciProduct())
+            .map(product -> new Product(product.getName(), product.getVersion()))
+            .orElse(null));
+        dialogRequest.setHbciBPD(authenticatePsuRequest.getHbciBPD());
+        dialogRequest.setHbciUPD(authenticatePsuRequest.getHbciUPD());
+        dialogRequest.setHbciSysId(authenticatePsuRequest.getHbciSysId());
 
         BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(dialogRequest.getBankCode(), dialogRequest);
         dialogRequest.setCallback(hbciCallback);
 
-        HBCIDialog dialog = createDialog(bankingUrl, dialogRequest);
+        HBCIDialog dialog = createDialog(authenticatePsuRequest.getBankUrl(), dialogRequest);
 
         ScaMethodsResponse response = ScaMethodsResponse.builder()
             .tanTransportTypes(extractTanTransportTypes(dialog.getPassport()))
@@ -147,9 +155,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest request) {
-        checkBankExists(request.getBankCode(), request.getBankUrl());
-
-        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
+        String bankCode = request.getBankCode() != null ? request.getBankCode() : request.getBankAccess().getBankCode();
+        checkBankExists(bankCode, request.getBankUrl());
+        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(bankCode, request);
 
         try {
             AccountInformationJob accountInformationJob = new AccountInformationJob(request);
@@ -163,9 +171,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public LoadBookingsResponse loadBookings(LoadBookingsRequest request) {
-        checkBankExists(request.getBankCode(), request.getBankUrl());
-
-        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
+        String bankCode = request.getBankCode() != null ? request.getBankCode() : request.getBankAccess().getBankCode();
+        checkBankExists(bankCode, request.getBankUrl());
+        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(bankCode, request);
 
         try {
             LoadBookingsJob loadBookingsJob = new LoadBookingsJob(request);
@@ -178,9 +186,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     public LoadBalancesResponse loadBalances(String bankingUrl, LoadBalanceRequest request) {
-        checkBankExists(request.getBankCode(), bankingUrl);
-
-        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBankCode(), request);
+        String bankCode = request.getBankCode() != null ? request.getBankCode() : request.getBankAccess().getBankCode();
+        checkBankExists(bankCode, request.getBankUrl());
+        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(bankCode, request);
 
         try {
             LoadBalancesJob loadBalanceJob = new LoadBalancesJob(request);
@@ -197,14 +205,16 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return false;
     }
 
-    public void executeTransactionWithoutSca(String bankingUrl, TransactionRequest paymentRequest) {
-        checkBankExists(paymentRequest.getBankCode(), bankingUrl);
+    public void executeTransactionWithoutSca(TransactionRequest request) {
+        String bankCode = request.getBankCode() != null ? request.getBankCode() : request.getBankAccess().getBankCode();
+        checkBankExists(bankCode, request.getBankUrl());
+
         Optional.ofNullable(bpdCache)
-            .ifPresent(cache -> paymentRequest.setHbciBPD(cache.get(paymentRequest.getBankCode())));
+            .ifPresent(cache -> request.setHbciBPD(cache.get(request.getBankCode())));
 
         try {
             TransferJob transferJob = new TransferJob();
-            transferJob.requestTransfer(paymentRequest);
+            transferJob.requestTransfer(request);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -212,9 +222,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public AuthorisationCodeResponse requestPaymentAuthorizationCode(TransactionRequest transactionRequest) {
-        checkBankExists(transactionRequest.getBankCode(), transactionRequest.getBankUrl());
-        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(transactionRequest.getBankCode(),
-            transactionRequest);
+        String bankCode = transactionRequest.getBankCode() != null ? transactionRequest.getBankCode() :
+            transactionRequest.getBankAccess().getBankCode();
+        checkBankExists(bankCode, transactionRequest.getBankUrl());
+        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(bankCode, transactionRequest);
 
         try {
             ScaRequiredJob scaJob = Optional.ofNullable(transactionRequest.getTransaction())
@@ -232,9 +243,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public SubmitAuthorizationCodeResponse submitPaymentAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
+        String bankCode = submitAuthorizationCodeRequest.getBankCode() != null ?
+            submitAuthorizationCodeRequest.getBankCode() :
+            submitAuthorizationCodeRequest.getBankAccess().getBankCode();
         try {
             Map<String, String> bpd = Optional.ofNullable(bpdCache)
-                .map(cache -> cache.get(submitAuthorizationCodeRequest.getBankCode()))
+                .map(cache -> cache.get(bankCode))
                 .orElse(null);
 
             submitAuthorizationCodeRequest.setHbciBPD(bpd);
@@ -273,9 +287,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 HBCIConsent hbciConsent = (HBCIConsent) updatePsuAuthentication.getBankApiConsentData();
 
                 AuthenticatePsuRequest request = hbciMapper.toAuthenticatePsuRequest(updatePsuAuthentication);
-                request.setBankCode(Iban.valueOf(updatePsuAuthentication.getPsuAccountIban()).getBankCode());
 
-                ScaMethodsResponse response = authenticatePsu(bankingUrl, request);
+                ScaMethodsResponse response = authenticatePsu(request);
                 hbciConsent.setTanMethodList(response.getTanTransportTypes());
                 hbciConsent.setStatus(ScaStatus.PSUAUTHENTICATED);
 
@@ -317,7 +330,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
 
             @Override
-            public void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus, Object bankApiConsentData) throws MultibankingException {
+            public void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus,
+                                        Object bankApiConsentData) throws MultibankingException {
                 HBCIConsent hbciConsent = Optional.ofNullable(bankApiConsentData)
                     .map(o -> (HBCIConsent) o)
                     .orElseThrow(() -> new MultibankingException(MultibankingError.NO_CONSENT));

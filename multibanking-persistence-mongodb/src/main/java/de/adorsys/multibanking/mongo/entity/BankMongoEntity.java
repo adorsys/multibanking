@@ -21,7 +21,7 @@ public class BankMongoEntity extends Bank {
 
     @Id
     private String id;
-    private String blzHbci;
+    private String bankApiBankCode;
 
     @Indexed
     private List<String> searchIndex;

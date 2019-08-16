@@ -235,15 +235,13 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         TransactionRequest transactionRequest = getTransactionRequest();
 
         HbciDialogRequest hbciDialogRequest = HbciDialogRequest.builder()
-            .bankCode(transactionRequest.getBankCode() != null ? transactionRequest.getBankCode() :
-                transactionRequest.getBankAccess().getBankCode())
-            .login(transactionRequest.getCredentials().getBankLogin())
-            .customerId(transactionRequest.getCredentials().getBankLogin2())
+            .credentials(transactionRequest.getCredentials())
             .hbciPassportState(transactionRequest.getBankAccess().getHbciPassportState())
-            .pin(transactionRequest.getCredentials().getPin())
             .callback(hbciCallback)
             .build();
 
+        hbciDialogRequest.setBankCode(transactionRequest.getBankCode() != null ? transactionRequest.getBankCode() :
+            transactionRequest.getBankAccess().getBankCode());
         hbciDialogRequest.setHbciProduct(Optional.ofNullable(transactionRequest.getHbciProduct())
             .map(product -> new Product(product.getName(), product.getVersion()))
             .orElse(null));

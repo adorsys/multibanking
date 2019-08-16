@@ -2,6 +2,7 @@ package de.adorsys.multibanking.figo;
 
 import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.Credentials;
 import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
 import lombok.val;
@@ -101,7 +102,7 @@ public class FigoBankingTest {
         request2.setBankAccess(bankaccess);
         request2.setBankApiUser(result);
         request2.setBankCode(FIGO_TEST_BANKCODE);
-        request2.setPin(FIGO_TEST_PIN);
+        request2.setCredentials(Credentials.builder().pin(FIGO_TEST_PIN).build());
         request2.setBankAccount(result2.getBankAccounts().get(0));
 
         val response = service.loadBookings(request2);

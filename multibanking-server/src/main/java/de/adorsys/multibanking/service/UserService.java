@@ -12,9 +12,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
 
-/**
- * Created by alexg on 05.09.17.
- */
 @Service
 @AllArgsConstructor
 public class UserService {
@@ -53,7 +50,7 @@ public class UserService {
         }
     }
 
-    public UserEntity findUser(String userId) {
+    UserEntity findUser(String userId) {
         return userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException(UserEntity.class, userId));
     }

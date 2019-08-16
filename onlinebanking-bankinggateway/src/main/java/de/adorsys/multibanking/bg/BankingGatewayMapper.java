@@ -7,7 +7,6 @@ import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
-import de.adorsys.xs2a.adapter.model.AccountDetailsTO;
 import de.adorsys.xs2a.adapter.service.account.AccountDetails;
 import de.adorsys.xs2a.adapter.service.account.CashAccountType;
 import de.adorsys.xs2a.adapter.service.account.Transactions;
@@ -21,6 +20,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 import static de.adorsys.multibanking.domain.BankAccountType.fromXS2AType;
+import static de.adorsys.multibanking.domain.BankApi.XS2A;
 
 @Mapper
 interface BankingGatewayMapper {
@@ -38,7 +38,10 @@ interface BankingGatewayMapper {
     @Mapping(target = "bankApiConsentData", ignore = true)
     CreateConsentResponse toCreateConsentResponse(CreateConsentResponseTO consentResponse);
 
-    UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(UpdatePsuAuthenticationRequest updatePsuAuthentication);
+    @Mapping(source = "bankLogin", target = "psuId")
+    @Mapping(source = "bankLogin2", target = "psuCustomerId")
+    @Mapping(source = "pin", target = "password")
+    UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(Credentials credentials);
 
     UpdateAuthResponse toUpdateAuthResponseTO(ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO,
                                               BankApi bankApi);
@@ -66,7 +69,7 @@ interface BankingGatewayMapper {
 
     default Map<BankApi, String> getExternalIdMap(String accountResourceId) {
         Map<BankApi, String> externalIdMap = new EnumMap<>(BankApi.class);
-        externalIdMap.put(BankApi.BANKING_GATEWAY, accountResourceId);
+        externalIdMap.put(XS2A, accountResourceId);
         return externalIdMap;
     }
 
@@ -89,7 +92,7 @@ interface BankingGatewayMapper {
     @Mapping(source = "remittanceInformationUnstructured", target = "usage")
     default Booking toBooking(Transactions transactionDetails) {
         Booking booking = new Booking();
-        booking.setBankApi(BankApi.BANKING_GATEWAY);
+        booking.setBankApi(XS2A);
         booking.setBookingDate(transactionDetails.getBookingDate());
         booking.setValutaDate(transactionDetails.getValueDate());
         booking.setAmount(new BigDecimal(transactionDetails.getTransactionAmount().getAmount()));

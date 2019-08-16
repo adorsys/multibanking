@@ -107,7 +107,6 @@ public class HbciStandingOrderTest {
             standingOrder);
 
         String tan = "";
-        standingOrderService.submitStandingOrder(standingOrder, tanSubmit, bankAccessEntity, System.getProperty(
-            "pin"), tan);
+        standingOrderService.submitStandingOrder(standingOrder, tanSubmit, bankAccessEntity, null, tan);
     }
 }

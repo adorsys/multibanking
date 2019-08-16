@@ -155,7 +155,7 @@ public class ImportBanks {
             bankEntity.getSearchIndex().add(strings.get(3).toLowerCase());
             bankEntity.getSearchIndex().add(strings.get(4).toLowerCase());
 
-            bankEntity.setBlzHbci(strings.get(0));
+            bankEntity.setBankApiBankCode(strings.get(0));
         });
 
         try (InputStream inputStream = HBCIUtils.class.getClassLoader().getResource("blz.properties").openStream()) {

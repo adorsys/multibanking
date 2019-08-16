@@ -105,7 +105,7 @@ public class BankAccountService extends AccountInformationService {
         request.setTransaction(new AccountInformationTransaction(LOAD_BANKACCOUNTS));
         request.setBankApiUser(bankApiUser);
         request.setBankAccess(bankAccess);
-        request.setBankCode(bankEntity.getBlzHbci());
+        request.setBankCode(bankEntity.getBankApiBankCode());
         request.setCredentials(credentials);
         request.setUpdateTanTransportTypes(true);
         request.setHbciProduct(finTSProductConfig.getProduct());

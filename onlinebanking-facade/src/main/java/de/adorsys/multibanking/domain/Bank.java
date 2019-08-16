@@ -27,6 +27,5 @@ public class Bank {
     private String name;
     private BankLoginSettings loginSettings;
     private BankApi bankApi;
-    private boolean ibanRequired;
 
 }

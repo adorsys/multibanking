@@ -12,11 +12,9 @@ import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.*;
 import de.adorsys.multibanking.web.model.*;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -65,9 +64,10 @@ public class DirectAccessController {
 
     @ApiOperation(value = "create challenge for accounts")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Response", response = LoadBankAccountsResponse.class)})
+        @ApiResponse(code = 200, message = "Response", response = UpdateAuthResponseTO.class)
+    })
     @PostMapping("/accounts")
-    public ResponseEntity createHbciAccountsChallenge(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
+    public ResponseEntity createHbciAccountsChallenge(@Valid @RequestBody LoadAccountsChallengeRequest loadAccountsRequest,
                                                       @RequestParam(required = false) BankApiTO bankApi) {
         try {
             selectScaMethodForConsent(loadAccountsRequest.getBankAccess().getConsentId(),
@@ -81,7 +81,7 @@ public class DirectAccessController {
 
     @ApiOperation(value = "Read bank accounts")
     @ApiResponses({
-        @ApiResponse(code = 200, message = "Response", response = LoadBankAccountsResponse.class)})
+        @ApiResponse(code = 200, message = "Response", response = UpdateAuthResponseTO.class)})
     @PutMapping("/accounts")
     public ResponseEntity loadBankAccounts(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
                                            @RequestParam(required = false) BankApiTO bankApi) {
@@ -92,7 +92,7 @@ public class DirectAccessController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "Response", response = LoadBookingsResponse.class)})
     @PostMapping("/bookings")
-    public ResponseEntity createHbciBookingsChallenge(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
+    public ResponseEntity createHbciBookingsChallenge(@Valid @RequestBody LoadBookingsChallengeRequest loadBookingsRequest,
                                                       @RequestParam(required = false) BankApiTO bankApi) {
         try {
             selectScaMethodForConsent(loadBookingsRequest.getBankAccess().getConsentId(),
@@ -115,19 +115,14 @@ public class DirectAccessController {
 
     private ResponseEntity doLoadBankAccounts(LoadAccountsRequest loadAccountsRequest,
                                               BankApiTO bankApi, ScaStatus scaStatus) {
-        UserEntity userEntity = createUser();
-
-        BankAccessEntity bankAccessEntity =
-            bankAccessMapper.toBankAccessEntity(loadAccountsRequest.getBankAccess(), userEntity.getId(), true);
+        UserEntity userEntity = createTemporaryUser();
+        BankAccessEntity bankAccessEntity = prepareBankAccess(loadAccountsRequest.getBankAccess(), userEntity);
 
         log.debug("load bank account list from bank");
         Credentials credentials = credentialsMapper.toCredentials(loadAccountsRequest.getCredentials());
 
         List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
             userEntity, bankApiMapper.toBankApi(bankApi), scaStatus, credentials);
-
-        userRepository.save(userEntity);
-        bankAccessRepository.save(bankAccessEntity);
 
         //persisting externalId for further request
         log.debug("save bank account list to db");
@@ -179,18 +174,23 @@ public class DirectAccessController {
     }
 
     private BankAccessEntity prepareBankAccess(BankAccessTO bankAccess) {
+        return prepareBankAccess(bankAccess, null);
+    }
+
+    private BankAccessEntity prepareBankAccess(BankAccessTO bankAccess, UserEntity userEntity) {
         log.debug("save temporary user to db");
         //temporary user, will be deleted after x minutes
-        UserEntity userEntity = createUser();
+        userEntity = Optional.ofNullable(userEntity).orElseGet(this::createTemporaryUser);
         userRepository.save(userEntity);
 
+        //temporary bank access, will be deleted with user
         BankAccessEntity bankAccessEntity = bankAccessMapper.toBankAccessEntity(bankAccess, userEntity.getId(), true);
         bankAccessEntity.setUserId(userEntity.getId());
+        bankAccessRepository.save(bankAccessEntity);
         return bankAccessEntity;
     }
 
-    private UserEntity createUser() {
-        //temporary user, will be deleted after x minutes
+    private UserEntity createTemporaryUser() {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(UUID.randomUUID().toString());
         userEntity.setExpireUser(LocalDateTime.now().plusMinutes(thresholdTemporaryData));
@@ -234,10 +234,18 @@ public class DirectAccessController {
     }
 
     @Data
-    public static class LoadAccountsRequest {
-        @NotNull BankAccessTO bankAccess;
-        CredentialsTO credentials;
+    @EqualsAndHashCode(callSuper = true)
+    public static class LoadAccountsChallengeRequest extends LoadAccountsRequest {
         String scaMethodId;
+    }
+
+    @Data
+    public static class LoadAccountsRequest {
+        @NotNull
+        @ApiModelProperty("Bankaccess properties")
+        BankAccessTO bankAccess;
+        @ApiModelProperty("Conditional: bank credentials, mandated if HBCI bankapi is used")
+        CredentialsTO credentials;
     }
 
     @Data
@@ -246,13 +254,25 @@ public class DirectAccessController {
     }
 
     @Data
-    public static class LoadBookingsRequest {
-        String userId;
-        String accessId;
-        String accountId;
-        BankAccessTO bankAccess;
-        CredentialsTO credentials;
+    @EqualsAndHashCode(callSuper = true)
+    public static class LoadBookingsChallengeRequest extends LoadBookingsRequest {
+        @NotBlank
+        @ApiModelProperty("Authentication method id")
         String scaMethodId;
+    }
+
+    @Data
+    public static class LoadBookingsRequest {
+        @ApiModelProperty("Conditional: multibanking user id, mandated if bankaccess was created")
+        String userId;
+        @ApiModelProperty("Conditional: multibanking bank access id, mandated if bankaccess was created")
+        String accessId;
+        @ApiModelProperty("Conditional: multibanking bank account id, mandated if bankaccess was created")
+        String accountId;
+        @ApiModelProperty("Conditional: bankaccess properties, mandated if bankaccess was not created")
+        BankAccessTO bankAccess;
+        @ApiModelProperty("Conditional: bank credentials, mandated if HBCI bankapi is used")
+        CredentialsTO credentials;
     }
 
     @Data

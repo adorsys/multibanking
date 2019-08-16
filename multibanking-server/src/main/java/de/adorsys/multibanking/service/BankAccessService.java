@@ -79,22 +79,10 @@ public class BankAccessService {
 
     @Transactional
     public boolean deleteBankAccess(String userId, String accessId) {
-        UserEntity userEntity =
-            userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(UserEntity.class, userId));
-
         return bankAccessRepository.findByUserIdAndId(userId, accessId).map(bankAccessEntity -> {
             bankAccessRepository.deleteByUserIdAndBankAccessId(userId, accessId);
 
-            Optional.ofNullable(bankAccessEntity.getConsentId())
-                .ifPresent(consentId -> {
-                    ConsentEntity internalConsent = consentRepository.findById(consentId)
-                        .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
-
-                    OnlineBankingService bankingService =
-                        bankingServiceProducer.getBankingService(internalConsent.getBankApi());
-                    bankingService.getStrongCustomerAuthorisation().revokeConsent(internalConsent.getId());
-                    consentRepository.delete(internalConsent);
-                });
+            deleteConsent(bankAccessEntity);
 
             List<BankAccountEntity> bankAccounts = bankAccountRepository.deleteByBankAccess(accessId);
             bankAccounts.forEach(bankAccountEntity -> {
@@ -102,18 +90,36 @@ public class BankAccessService {
                 analyticsRepository.deleteByAccountId(bankAccountEntity.getId());
                 contractRepository.deleteByAccountId(bankAccountEntity.getId());
                 standingOrderRepository.deleteByAccountId(bankAccountEntity.getId());
-                bankAccountEntity.getExternalIdMap().keySet().forEach(bankApi -> {
-                    OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankApi);
-                    //remove remote bank api user
-                    if (bankingService.userRegistrationRequired()) {
-                        BankApiUser bankApiUser =
-                            userEntity.getApiUser().stream().filter(apiUser -> apiUser.getBankApi() == bankApi).findFirst().orElseThrow(() -> new ResourceNotFoundException(BankApiUser.class, bankApi.toString()));
-                        bankingService.removeBankAccount(bankAccountEntity, bankApiUser);
-                    }
-                });
+                deleteExternalBankAccount(userId, bankAccountEntity);
             });
             return true;
         }).orElse(false);
+    }
+
+    private void deleteExternalBankAccount(String userId, BankAccountEntity bankAccountEntity) {
+        bankAccountEntity.getExternalIdMap().keySet().forEach(bankApi -> {
+            OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankApi);
+            //remove remote bank api user
+            if (bankingService.userRegistrationRequired()) {
+                UserEntity userEntity =
+                    userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(UserEntity.class, userId));
+                BankApiUser bankApiUser =
+                    userEntity.getApiUser().stream().filter(apiUser -> apiUser.getBankApi() == bankApi).findFirst().orElseThrow(() -> new ResourceNotFoundException(BankApiUser.class, bankApi.toString()));
+                bankingService.removeBankAccount(bankAccountEntity, bankApiUser);
+            }
+        });
+    }
+
+    private void deleteConsent(BankAccessEntity bankAccessEntity) {
+        Optional.ofNullable(bankAccessEntity.getConsentId())
+            .map(consentRepository::findById)
+            .map(Optional::get)
+            .ifPresent(internalConsent -> {
+                OnlineBankingService bankingService =
+                    bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+                bankingService.getStrongCustomerAuthorisation().revokeConsent(internalConsent.getId());
+                consentRepository.delete(internalConsent);
+            });
     }
 
 }

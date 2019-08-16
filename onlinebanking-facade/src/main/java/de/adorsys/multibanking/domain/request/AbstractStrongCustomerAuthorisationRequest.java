@@ -17,9 +17,11 @@
 package de.adorsys.multibanking.domain.request;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class AbstractStrongCustomerAuthorisationRequest {
+@EqualsAndHashCode(callSuper = false)
+class AbstractStrongCustomerAuthorisationRequest extends AbstractRequest {
 
     private String consentId;
     private String authorisationId;

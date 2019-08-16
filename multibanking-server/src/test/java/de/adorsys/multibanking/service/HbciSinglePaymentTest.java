@@ -96,7 +96,7 @@ public class HbciSinglePaymentTest {
             null, payment);
 
         String tan = "";
-        paymentService.submitSinglePayment(paymentEntity, bankAccessEntity, System.getProperty("pin"), tan);
+        paymentService.submitSinglePayment(paymentEntity, bankAccessEntity, null, tan);
     }
 
     @Test
@@ -140,7 +140,7 @@ public class HbciSinglePaymentTest {
             tanTransportType, null, payment);
 
         String tan = "";
-        paymentService.submitRawSepaTransaction(paymentEntity, bankAccessEntity, System.getProperty("pin"), tan);
+        paymentService.submitRawSepaTransaction(paymentEntity, bankAccessEntity, null, tan);
     }
 
 }

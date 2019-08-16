@@ -70,7 +70,7 @@ public class BankJpaEntity {
     @Id
     @GeneratedValue
     private Long id;
-    private String blzHbci;
+    private String bankApiBankCode;
 
     private String bankingUrl;
     @Field(name = "bankCode", index = Index.YES, store = Store.YES,
