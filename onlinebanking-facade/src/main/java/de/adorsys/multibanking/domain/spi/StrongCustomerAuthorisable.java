@@ -12,7 +12,7 @@ import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 
 public interface StrongCustomerAuthorisable {
 
-    CreateConsentResponse createConsent(Consent consentTemplate);
+    CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred, String tppRedirectUri);
 
     Consent getConsent(String consentId);
 
@@ -35,7 +35,8 @@ public interface StrongCustomerAuthorisable {
      *                               INVALID_SCA_METHOD for Consent without selected sca method
      *                               HBCI_2FA_REQUIRED for Consent without authorized sca method
      */
-    void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus, Object bankApiConsentData);
+    void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus,
+                         Object bankApiConsentData);
 
     void preExecute(TransactionRequest request, Object bankApiConsentData);
 }

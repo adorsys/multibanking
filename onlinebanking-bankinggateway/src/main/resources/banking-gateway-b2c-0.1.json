@@ -32,17 +32,31 @@
         ],
         "parameters": [
           {
-            "name": "X-GTW-Bank-Code",
-            "in": "header",
-            "description": "X-GTW-Bank-Code",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "PSU-ID",
             "in": "header",
             "description": "PSU-ID",
             "required": false,
+            "type": "string"
+          },
+          {
+            "name": "TPP-Redirect-Preferred",
+            "in": "header",
+            "description": "TPP-Redirect-Preferred",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "TPP-Redirect-URI",
+            "in": "header",
+            "description": "TPP-Redirect-URI",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "X-GTW-Bank-Code",
+            "in": "header",
+            "description": "X-GTW-Bank-Code",
+            "required": true,
             "type": "string"
           },
           {
@@ -1126,6 +1140,14 @@
           "type": "string",
           "description": "Text to be displayed to the PSU"
         },
+        "scaApproach": {
+          "type": "string",
+          "enum": [
+            "EMBEDDED",
+            "REDIRECT",
+            "DECOUPLED"
+          ]
+        },
         "scaMethods": {
           "type": "array",
           "description": "This data element might be contained, if SCA is required and if the PSU has a choice between different authentication methods. These methods shall be presented towards the PSU for selection by the TPP.",
@@ -1136,7 +1158,9 @@
         "scaStatus": {
           "type": "string",
           "enum": [
+            "RECEIVED",
             "STARTED",
+            "PSUIDENTIFIED",
             "PSUAUTHENTICATED",
             "SCAMETHODSELECTED",
             "FINALISED",
@@ -1222,6 +1246,14 @@
           "type": "string",
           "description": "Text to be displayed to the PSU"
         },
+        "scaApproach": {
+          "type": "string",
+          "enum": [
+            "EMBEDDED",
+            "REDIRECT",
+            "DECOUPLED"
+          ]
+        },
         "scaMethods": {
           "type": "array",
           "description": "This data element might be contained, if SCA is required and if the PSU has a choice between different authentication methods. These methods shall be presented towards the PSU for selection by the TPP.",
@@ -1232,7 +1264,9 @@
         "scaStatus": {
           "type": "string",
           "enum": [
+            "RECEIVED",
             "STARTED",
+            "PSUIDENTIFIED",
             "PSUAUTHENTICATED",
             "SCAMETHODSELECTED",
             "FINALISED",

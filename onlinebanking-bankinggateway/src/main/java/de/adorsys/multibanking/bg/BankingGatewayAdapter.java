@@ -202,11 +202,12 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
         return new StrongCustomerAuthorisable() {
             @Override
-            public CreateConsentResponse createConsent(Consent consentTemplate) {
+            public CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred,
+                                                       String tppRedirectUri) {
                 try {
                     String bankCode = Iban.valueOf(consentTemplate.getPsuAccountIban()).getBankCode();
                     CreateConsentResponseTO consentResponse =
-                        getBankingGatewayB2CAisApi().createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null);
+                        getBankingGatewayB2CAisApi().createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, redirectPreferred, tppRedirectUri);
 
                     return bankingGatewayMapper.toCreateConsentResponse(consentResponse);
                 } catch (ApiException e) {
@@ -269,10 +270,10 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId,
                                                              Object bankApiConsentData) {
                 try {
-                    ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
+                    ResourceUpdateAuthResponseTO updateAuthResponseTO =
                         getBankingGatewayB2CAisApi().getConsentAuthorisationStatusUsingGET(authorisationId, consentId);
 
-                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO, bankApi());
+                    return bankingGatewayMapper.toUpdateAuthResponseTO(updateAuthResponseTO, bankApi());
                 } catch (ApiException e) {
                     throw handeAisApiException(e);
                 }

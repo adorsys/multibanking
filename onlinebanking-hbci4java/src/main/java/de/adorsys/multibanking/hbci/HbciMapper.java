@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.hbci;
 
 import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.ScaApproach;
 import de.adorsys.multibanking.domain.request.AuthenticatePsuRequest;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
@@ -22,6 +23,7 @@ interface HbciMapper {
     @Mapping(target = "psuMessage", ignore = true)
     @Mapping(target = "scaMethods", source = "hbciConsent.tanMethodList")
     @Mapping(target = "scaStatus", source = "hbciConsent.status")
+    @Mapping(target = "scaApproach", constant = "EMBEDDED")
     UpdateAuthResponse toUpdateAuthResponse(HBCIConsent hbciConsent, BankApi bankApi);
 
     @Mapping(target = "paymentId", ignore = true)

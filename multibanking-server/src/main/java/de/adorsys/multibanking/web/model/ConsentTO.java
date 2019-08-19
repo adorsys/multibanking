@@ -13,23 +13,29 @@ public class ConsentTO {
 
     @NotNull
     private String psuAccountIban;
+    @ApiModelProperty("URI of the TPP, where the transaction flow shall be redirected to after a Redirect.\n" +
+        "        \n" +
+        "        Mandated for the Redirect SCA Approach, specifically \n" +
+        "        when TPP-Redirect-Preferred equals \"true\".\n" +
+        "        It is recommended to always use this header field.")
+    private String tppRedirectUri;
 
-    @ApiModelProperty(value = "consent accounts for details")
+    @ApiModelProperty("consent accounts for details")
     private List<AccountReferenceTO> accounts;
-    @ApiModelProperty(value = "consent accounts for balances")
+    @ApiModelProperty("consent accounts for balances")
     private List<AccountReferenceTO> balances;
-    @ApiModelProperty(value = "consent accounts for transactions")
+    @ApiModelProperty("consent accounts for transactions")
     private List<AccountReferenceTO> transactions;
 
     @NotNull
-    @ApiModelProperty(value = "recurring indicator")
+    @ApiModelProperty("recurring indicator")
     private boolean recurringIndicator;
     @Future
     @NotNull
-    @ApiModelProperty(value = "consent valid date")
+    @ApiModelProperty("consent valid date")
     private LocalDate validUntil;
     @NotNull
-    @ApiModelProperty(value = "allowed access frequency per day")
+    @ApiModelProperty("allowed access frequency per day")
     private int frequencyPerDay;
 
 }

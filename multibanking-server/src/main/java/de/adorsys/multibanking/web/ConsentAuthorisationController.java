@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.ScaApproach;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
@@ -21,6 +22,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.adorsys.multibanking.domain.ScaApproach.REDIRECT;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -85,27 +87,32 @@ public class ConsentAuthorisationController {
         links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId,
             authorisationId)).withSelfRel());
 
-        switch (response.getScaStatus()) {
-            case STARTED:
-                links.add(linkTo(methodOn(ConsentAuthorisationController.class).updateAuthentication(consentId,
-                    authorisationId, null)).withRel("updateAuthentication"));
-                break;
-            case PSUAUTHENTICATED:
-                //sca methods will be returned within hbci challenge
-                if (response.getBankApi() != BankApi.HBCI) {
-                    links.add(linkTo(methodOn(ConsentAuthorisationController.class).selectAuthenticationMethod(consentId,
-                        authorisationId, null)).withRel("selectAuthenticationMethod"));
-                }
-                break;
-            case SCAMETHODSELECTED:
-                links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
-                    authorisationId, null)).withRel("transactionAuthorisation"));
-                break;
-            case FINALISED:
-            case FAILED:
-            case EXEMPTED:
-                break;
+        if (response.getScaApproach() != REDIRECT) {
+            switch (response.getScaStatus()) {
+                case RECEIVED:
+                case STARTED:
+                case PSUIDENTIFIED:
+                    links.add(linkTo(methodOn(ConsentAuthorisationController.class).updateAuthentication(consentId,
+                        authorisationId, null)).withRel("updateAuthentication"));
+                    break;
+                case PSUAUTHENTICATED:
+                    //sca methods will be returned within hbci challenge
+                    if (response.getBankApi() != BankApi.HBCI) {
+                        links.add(linkTo(methodOn(ConsentAuthorisationController.class).selectAuthenticationMethod(consentId,
+                            authorisationId, null)).withRel("selectAuthenticationMethod"));
+                    }
+                    break;
+                case SCAMETHODSELECTED:
+                    links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
+                        authorisationId, null)).withRel("transactionAuthorisation"));
+                    break;
+                case FINALISED:
+                case FAILED:
+                case EXEMPTED:
+                    break;
+            }
         }
+
 
         return new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links);
     }

@@ -91,6 +91,6 @@ public class BankJpaEntity {
     @Embedded
     private BankLoginSettingsJpaEntity loginSettings;
     private BankApi bankApi;
-    private boolean ibanRequired;
+    private boolean redirectPreferred;
 
 }

@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpEntity;
@@ -22,7 +23,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -48,6 +51,7 @@ public class ConsentController {
                                                                            @RequestParam(required = false) BankApiTO bankApi) {
         Consent consentInput = consentMapper.toConsent(consent);
         CreateConsentResponse createConsentResponse = consentService.createConsent(consentInput,
+            consent.getTppRedirectUri(),
             bankApiMapper.toBankApi(bankApi));
 
         HttpHeaders headers = new HttpHeaders();
@@ -92,13 +96,18 @@ public class ConsentController {
             linkTo(methodOn(ConsentController.class).getConsent(consent.getConsentId())).withSelfRel());
     }
 
-    private Resource<CreateConsentResponseTO> mapToResource(CreateConsentResponse createConsentResponseconsent) {
-        String consentId = createConsentResponseconsent.getConsentId();
-        String authorisationId = createConsentResponseconsent.getAuthorisationId();
+    private Resource<CreateConsentResponseTO> mapToResource(CreateConsentResponse createConsentResponse) {
+        String consentId = createConsentResponse.getConsentId();
+        String authorisationId = createConsentResponse.getAuthorisationId();
 
-        return new Resource<>(consentMapper.toCreateConsentResponseTO(createConsentResponseconsent),
-            linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId,
-                authorisationId)).withRel("authorisationStatus"));
+        List<Link> links = new ArrayList<>();
+        links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId,
+            authorisationId)).withRel("authorisationStatus"));
+
+        Optional.ofNullable(createConsentResponse.getRedirectUrl())
+            .ifPresent(redirectUrl -> links.add(new Link(redirectUrl, "redirectUrl")));
+
+        return new Resource<>(consentMapper.toCreateConsentResponseTO(createConsentResponse), links);
     }
 
 }

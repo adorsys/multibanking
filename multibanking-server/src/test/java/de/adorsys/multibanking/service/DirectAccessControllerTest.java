@@ -30,7 +30,6 @@ import io.restassured.specification.RequestSpecification;
 import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kapott.hbci.manager.BankInfo;
@@ -101,7 +100,7 @@ public class DirectAccessControllerTest {
     @Test
     public void createConsent_should_return_a_authorisationStatus_link_hbci() {
         BankAccessTO access = createBankAccess();
-        prepareBank(new Hbci4JavaBanking(true), access.getIban());
+        prepareBank(new Hbci4JavaBanking(true), access.getIban(), false);
 
         JsonPath jsonPath = request.body(createConsentTO(access.getIban()))
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
@@ -113,29 +112,46 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
-    @Ignore
     @Test
-    public void consent_authorisation_bankinggateway() {
-        BankAccessTO access = createBankAccess();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), access.getIban());
+    public void consent_authorisation_bankinggateway_redirect() {
+        BankAccessTO bankAccess = createBankAccess();
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(), true);
 
         CredentialsTO credentials = CredentialsTO.builder()
             .bankLogin("Alex.Geist")
             .pin("sandbox")
             .build();
 
-        consent_authorisation(access, credentials);
+        JsonPath jsonPath = request.body(createConsentTO(bankAccess.getIban()))
+            .post(getRemoteMultibankingUrl() + "/api/v1/consents")
+            .then().assertThat().statusCode(HttpStatus.CREATED.value())
+            .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("_links.redirectUrl.href")).isNotBlank();
+    }
+
+    //    @Ignore
+    @Test
+    public void consent_authorisation_bankinggateway() {
+        BankAccessTO bankAccess = createBankAccess();
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(), false);
+
+        CredentialsTO credentials = CredentialsTO.builder()
+            .bankLogin("Alex.Geist")
+            .pin("sandbox")
+            .build();
+
+        consent_authorisation(bankAccess, credentials);
     }
 
     @Test
     public void consent_authorisation_hbci() {
         BankAccessTO access = createBankAccess();
-        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
-        prepareBank(hbci4JavaBanking, access.getIban());
-//        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
-//        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme
-//        .de/hbciTunnel/hbciTransfer" +
-//            ".jsp");
+//        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
+//        prepareBank(hbci4JavaBanking, access.getIban());
+        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
+        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme.de/hbciTunnel/hbciTransfer" +
+            ".jsp", false);
 
         if (isMock(hbci4JavaBanking)) {
             //mock hbci authenticate psu
@@ -267,7 +283,7 @@ public class DirectAccessControllerTest {
 
     private void verifyApi(MultibankingError error, String messageKey) {
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(bankingGatewayAdapterMock, bankAccess.getIban());
+        prepareBank(bankingGatewayAdapterMock, bankAccess.getIban(), false);
 
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
@@ -289,7 +305,7 @@ public class DirectAccessControllerTest {
     @Test
     public void verifyApiConsentStatusValid() {
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(bankingGatewayAdapterMock, bankAccess.getIban());
+        prepareBank(bankingGatewayAdapterMock, bankAccess.getIban(), false);
 
         when(bankingGatewayAdapterMock.loadBankAccounts(any()))
             .thenReturn(LoadAccountInformationResponse.builder()
@@ -331,11 +347,11 @@ public class DirectAccessControllerTest {
         assertThat(loadBookingsResponse.getBookings()).isNotEmpty();
     }
 
-    private void prepareBank(OnlineBankingService onlineBankingService, String iban) {
-        prepareBank(onlineBankingService, iban, System.getProperty("bankUrl"));
+    private void prepareBank(OnlineBankingService onlineBankingService, String iban, boolean redirectPreferred) {
+        prepareBank(onlineBankingService, iban, System.getProperty("bankUrl"), redirectPreferred);
     }
 
-    private void prepareBank(OnlineBankingService onlineBankingService, String iban, String bankUrl) {
+    private void prepareBank(OnlineBankingService onlineBankingService, String iban, String bankUrl, boolean redirectPreferred) {
         if (isMock(onlineBankingService)) {
             when(onlineBankingService.bankSupported(any())).thenReturn(true);
         }
@@ -347,7 +363,9 @@ public class DirectAccessControllerTest {
 
         BankEntity test_bank = bankRepository.findByBankCode(bankCode).orElseGet(() -> {
             BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", bankCode, onlineBankingService.bankApi());
+            bankEntity.setName("UNITTEST BANK");
             bankEntity.setBankingUrl(bankUrl);
+            bankEntity.setRedirectPreferred(redirectPreferred);
             bankRepository.save(bankEntity);
             return bankEntity;
         });
@@ -370,6 +388,7 @@ public class DirectAccessControllerTest {
         consentTO.setValidUntil(LocalDate.now().plusDays(1));
         consentTO.setRecurringIndicator(false);
         consentTO.setFrequencyPerDay(1);
+        consentTO.setTppRedirectUri("https://www.google.com");
 
         return consentTO;
     }

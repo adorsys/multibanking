@@ -16,17 +16,7 @@
 
 package de.adorsys.multibanking.domain;
 
-import lombok.Data;
+public enum  ScaApproach {
 
-@Data
-public class Bank {
-
-    private String bankingUrl;
-    private String bankCode;
-    private String bic;
-    private String name;
-    private BankLoginSettings loginSettings;
-    private BankApi bankApi;
-    private boolean redirectPreferred;
-
+    EMBEDDED, REDIRECT, DECOUPLED
 }

@@ -268,7 +268,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return new StrongCustomerAuthorisable() {
 
             @Override
-            public CreateConsentResponse createConsent(Consent consent) {
+            public CreateConsentResponse createConsent(Consent consent, boolean redirectPreferred, String tppRedirectUri) {
                 HBCIConsent hbciConsent = new HBCIConsent();
                 hbciConsent.setStatus(STARTED);
 
