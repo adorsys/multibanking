@@ -65,6 +65,7 @@ interface BankingGatewayMapper {
     @Mapping(target = "id", source = "authenticationMethodId")
     @Mapping(target = "inputInfo", source = "explanation")
     @Mapping(target = "medium", source = "name")
+    @Mapping(target = "type", source = "authenticationType")
     TanTransportType toTanTransportType(ScaMethodTO scaMethodTO);
 
     @Mapping(target = "country", ignore = true)
