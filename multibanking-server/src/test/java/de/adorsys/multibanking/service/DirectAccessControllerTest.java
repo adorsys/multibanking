@@ -30,6 +30,7 @@ import io.restassured.specification.RequestSpecification;
 import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kapott.hbci.manager.BankInfo;
@@ -112,10 +113,12 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
+    @Ignore
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(), true);
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(),
+            true);
 
         CredentialsTO credentials = CredentialsTO.builder()
             .bankLogin("Alex.Geist")
@@ -130,11 +133,12 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.redirectUrl.href")).isNotBlank();
     }
 
-    //    @Ignore
+    @Ignore
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(), false);
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(),
+            false);
 
         CredentialsTO credentials = CredentialsTO.builder()
             .bankLogin("Alex.Geist")
@@ -147,11 +151,12 @@ public class DirectAccessControllerTest {
     @Test
     public void consent_authorisation_hbci() {
         BankAccessTO access = createBankAccess();
-//        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
-//        prepareBank(hbci4JavaBanking, access.getIban());
-        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
-        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme.de/hbciTunnel/hbciTransfer" +
-            ".jsp", false);
+        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
+        prepareBank(hbci4JavaBanking, access.getIban(), false);
+//        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
+//        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme
+//        .de/hbciTunnel/hbciTransfer" +
+//            ".jsp", false);
 
         if (isMock(hbci4JavaBanking)) {
             //mock hbci authenticate psu
@@ -351,7 +356,8 @@ public class DirectAccessControllerTest {
         prepareBank(onlineBankingService, iban, System.getProperty("bankUrl"), redirectPreferred);
     }
 
-    private void prepareBank(OnlineBankingService onlineBankingService, String iban, String bankUrl, boolean redirectPreferred) {
+    private void prepareBank(OnlineBankingService onlineBankingService, String iban, String bankUrl,
+                             boolean redirectPreferred) {
         if (isMock(onlineBankingService)) {
             when(onlineBankingService.bankSupported(any())).thenReturn(true);
         }
