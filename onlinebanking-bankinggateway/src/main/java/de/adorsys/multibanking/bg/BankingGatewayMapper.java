@@ -1,10 +1,22 @@
 package de.adorsys.multibanking.bg;
 
-import de.adorsys.multibanking.banking_gateway_b2c.model.*;
-import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.banking_gateway_b2c.model.ConsentTO;
+import de.adorsys.multibanking.banking_gateway_b2c.model.CreateConsentResponseTO;
+import de.adorsys.multibanking.banking_gateway_b2c.model.ResourceUpdateAuthResponseTO;
+import de.adorsys.multibanking.banking_gateway_b2c.model.ScaMethodTO;
+import de.adorsys.multibanking.banking_gateway_b2c.model.SelectPsuAuthenticationMethodRequestTO;
+import de.adorsys.multibanking.banking_gateway_b2c.model.TransactionAuthorisationRequestTO;
+import de.adorsys.multibanking.banking_gateway_b2c.model.UpdatePsuAuthenticationRequestTO;
+import de.adorsys.multibanking.domain.Balance;
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.BankAccountType;
+import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.Booking;
+import de.adorsys.multibanking.domain.Consent;
+import de.adorsys.multibanking.domain.Credentials;
+import de.adorsys.multibanking.domain.TanTransportType;
 import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
-import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.xs2a.adapter.service.account.AccountDetails;
@@ -109,4 +121,9 @@ interface BankingGatewayMapper {
 
         return booking;
     }
+
+    @Mapping(target = "amount", source = "balanceAmount.amount")
+    @Mapping(target = "date", source = "referenceDate")
+    @Mapping(target = "currency", source = "balanceAmount.currency")
+    Balance toBalance(de.adorsys.xs2a.adapter.service.account.Balance balance);
 }

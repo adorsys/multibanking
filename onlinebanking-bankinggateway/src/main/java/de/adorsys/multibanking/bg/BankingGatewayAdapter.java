@@ -152,8 +152,24 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .map(transactions -> bankingGatewayMapper.toBooking(transactions))
             .collect(Collectors.toList());
 
+        BalancesReport balancesReport = new BalancesReport();
+        bookingsResponse.getResponseBody().getBalances().forEach(balance -> {
+            switch (balance.getBalanceType()) {
+                case EXPECTED:
+                    balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
+                    break;
+                case CLOSINGBOOKED:
+                    balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
+                    break;
+                default:
+                    // ignore
+                    break;
+            }
+        });
+
         return LoadBookingsResponse.builder()
             .bookings(bookings)
+            .bankAccountBalance(balancesReport)
             .build();
     }
 
