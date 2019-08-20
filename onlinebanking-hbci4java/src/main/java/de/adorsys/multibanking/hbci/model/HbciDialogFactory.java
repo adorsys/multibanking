@@ -43,7 +43,7 @@ public class HbciDialogFactory {
 
         HbciPassport newPassport = Optional.ofNullable(passport)
             .orElseGet(() -> createPassport(bankInfo.getPinTanVersion().getId(), dialogRequest.getBankCode(),
-                dialogRequest.getCredentials().getBankLogin(), dialogRequest.getCredentials().getBankLogin2(), hbciProduct,
+                dialogRequest.getCredentials().getUserId(), dialogRequest.getCredentials().getCustomerId(), hbciProduct,
                 dialogRequest.getCallback()
             ));
 
@@ -76,7 +76,7 @@ public class HbciDialogFactory {
             state.getHbciProduct(), callback);
     }
 
-    private static HbciPassport createPassport(String hbciVersion, String bankCode, String customerId, String login,
+    private static HbciPassport createPassport(String hbciVersion, String bankCode, String customerId, String userId,
                                                HBCIProduct hbciProduct, HbciCallback callback) {
         HashMap<String, String> properties = new HashMap<>();
         properties.put("kernel.rewriter", "InvalidSegment,WrongStatusSegOrder,WrongSequenceNumbers,MissingMsgRef," +
@@ -92,8 +92,8 @@ public class HbciDialogFactory {
         properties.put("client.passport.customerId", customerId);
         properties.put("client.errors.ignoreCryptErrors", "yes");
 
-        if (StringUtils.isNotBlank(login)) {
-            properties.put("client.passport.userId", login);
+        if (StringUtils.isNotBlank(userId)) {
+            properties.put("client.passport.userId", userId);
         }
 
         return new HbciPassport(hbciVersion, properties, callback, hbciProduct);

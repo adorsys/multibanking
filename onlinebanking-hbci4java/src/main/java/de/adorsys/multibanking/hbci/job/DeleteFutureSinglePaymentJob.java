@@ -44,7 +44,7 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<AuthorisationCo
     public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         FutureSinglePayment singlePayment = (FutureSinglePayment) transactionRequest.getTransaction();
 
-        Konto src = getDebtorAccount(passport);
+        Konto src = getPsuKonto(passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();

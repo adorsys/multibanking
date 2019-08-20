@@ -72,11 +72,10 @@ public class StandingOrderService {
         }
 
         try {
-            SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
-                .sepaTransaction(standingOrder)
-                .tanSubmit(tanSubmit)
-                .tan(tan)
-                .build();
+            SubmitAuthorizationCodeRequest request = new SubmitAuthorizationCodeRequest();
+            request.setTransaction(standingOrder);
+            request.setTanSubmit(tanSubmit);
+            request.setTan(tan);
 
             request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());

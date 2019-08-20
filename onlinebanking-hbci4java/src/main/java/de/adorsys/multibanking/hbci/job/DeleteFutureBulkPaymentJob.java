@@ -43,7 +43,7 @@ public class DeleteFutureBulkPaymentJob extends ScaRequiredJob<AuthorisationCode
     public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         FutureBulkPayment futureBulkPayment = (FutureBulkPayment) transactionRequest.getTransaction();
 
-        Konto src = getDebtorAccount(passport);
+        Konto src = getPsuKonto(passport);
 
         jobName = GVTermMultiUebSEPADel.getLowlevelName();
 

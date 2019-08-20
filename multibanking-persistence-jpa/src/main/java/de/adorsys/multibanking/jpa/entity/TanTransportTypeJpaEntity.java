@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.jpa.entity;
 
+import de.adorsys.multibanking.domain.AuthenticationType;
 import lombok.Data;
 
 import javax.persistence.Embeddable;
@@ -29,4 +30,5 @@ public class TanTransportTypeJpaEntity implements Serializable {
     private String name;
     private String medium;
     private String inputInfo;
+    private AuthenticationType type;
 }

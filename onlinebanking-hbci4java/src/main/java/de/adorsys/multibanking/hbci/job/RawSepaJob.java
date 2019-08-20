@@ -81,7 +81,7 @@ public class RawSepaJob extends ScaRequiredJob<AuthorisationCodeResponse> {
         }
 
         GVRawSEPA sepagv = new GVRawSEPA(passport, jobName, sepaPayment.getRawData());
-        sepagv.setParam("src", getDebtorAccount(passport));
+        sepagv.setParam("src", getPsuKonto(passport));
 
         appendPainValues(sepaPayment, sepagv);
 

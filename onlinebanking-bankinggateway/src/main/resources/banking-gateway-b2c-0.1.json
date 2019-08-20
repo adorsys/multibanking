@@ -32,6 +32,13 @@
         ],
         "parameters": [
           {
+            "name": "PSU-Corporate-ID",
+            "in": "header",
+            "description": "PSU-Corporate-ID",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "PSU-ID",
             "in": "header",
             "description": "PSU-ID",
@@ -1287,7 +1294,7 @@
           "type": "string",
           "description": "Password"
         },
-        "psuCustomerId": {
+        "psuCorporateId": {
           "type": "string"
         },
         "psuId": {

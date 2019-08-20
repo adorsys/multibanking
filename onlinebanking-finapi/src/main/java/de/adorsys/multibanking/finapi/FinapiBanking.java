@@ -132,7 +132,7 @@ public class FinapiBanking implements OnlineBankingService {
             BankConnection connections =
                 new BankConnectionsApi(apiClient).importBankConnection(new ImportBankConnectionParams()
                     .bankId(searchAllBanks.getBanks().get(0).getId())
-                    .bankingUserId(loadAccountInformationRequest.getCredentials().getBankLogin())
+                    .bankingUserId(loadAccountInformationRequest.getCredentials().getCustomerId())
                     .bankingPin(loadAccountInformationRequest.getCredentials().getPin())
                     .storePin(false));
 

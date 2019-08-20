@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.domain.request;
 
+import de.adorsys.multibanking.domain.Credentials;
 import de.adorsys.multibanking.domain.Product;
 import lombok.Data;
 
@@ -24,6 +25,7 @@ import java.util.Map;
 @Data
 public abstract class AbstractRequest {
 
+    private Credentials credentials;
     private String bankCode;
     private String bankUrl;
     private Product hbciProduct;

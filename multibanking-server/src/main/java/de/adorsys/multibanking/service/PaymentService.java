@@ -157,11 +157,10 @@ public class PaymentService {
         }
 
         try {
-            SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
-                .sepaTransaction(transactionEntity)
-                .tanSubmit(transactionEntity.getTanSubmitExternal())
-                .tan(tan)
-                .build();
+            SubmitAuthorizationCodeRequest request = new SubmitAuthorizationCodeRequest();
+            request.setTransaction(transactionEntity);
+            request.setTanSubmit(transactionEntity.getTanSubmitExternal());
+            request.setTan(tan);
 
             request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());
@@ -183,11 +182,10 @@ public class PaymentService {
         }
 
         try {
-            SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
-                .sepaTransaction(paymentEntity)
-                .tanSubmit(paymentEntity.getTanSubmitExternal())
-                .tan(tan)
-                .build();
+            SubmitAuthorizationCodeRequest request = new SubmitAuthorizationCodeRequest();
+            request.setTransaction(paymentEntity);
+            request.setTanSubmit(paymentEntity.getTanSubmitExternal());
+            request.setTan(tan);
 
             request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());
@@ -208,11 +206,10 @@ public class PaymentService {
         }
 
         try {
-            SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
-                .sepaTransaction(paymentEntity)
-                .tanSubmit(paymentEntity.getTanSubmitExternal())
-                .tan(tan)
-                .build();
+            SubmitAuthorizationCodeRequest request = new SubmitAuthorizationCodeRequest();
+            request.setTransaction(paymentEntity);
+            request.setTanSubmit(paymentEntity.getTanSubmitExternal());
+            request.setTan(tan);
 
             request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());

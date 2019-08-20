@@ -223,7 +223,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 try {
                     String bankCode = Iban.valueOf(consentTemplate.getPsuAccountIban()).getBankCode();
                     CreateConsentResponseTO consentResponse =
-                        getBankingGatewayB2CAisApi().createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, redirectPreferred, tppRedirectUri);
+                        getBankingGatewayB2CAisApi().createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, null, redirectPreferred, tppRedirectUri);
 
                     return bankingGatewayMapper.toCreateConsentResponse(consentResponse);
                 } catch (ApiException e) {
@@ -259,7 +259,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             @Override
             public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod) {
                 try {
-
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
                         getBankingGatewayB2CAisApi().selectPsuAuthenticationMethodUsingPUT(bankingGatewayMapper.toSelectPsuAuthenticationMethodRequestTO(selectPsuAuthenticationMethod), selectPsuAuthenticationMethod.getAuthorisationId(), selectPsuAuthenticationMethod.getConsentId());
 
@@ -272,7 +271,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             @Override
             public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
                 try {
-
                     ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
                         getBankingGatewayB2CAisApi().transactionAuthorisationUsingPUT(bankingGatewayMapper.toTransactionAuthorisationRequestTO(transactionAuthorisation), transactionAuthorisation.getAuthorisationId(), transactionAuthorisation.getConsentId());
 

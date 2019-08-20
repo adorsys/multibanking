@@ -7,8 +7,7 @@ import lombok.Data;
 public class UpdatePsuAuthenticationRequestTO {
 
     private String psuId;
-
-    private String psuCustomerId;
+    private String psuCorporateId;
 
     @ApiModelProperty(value = "Password", required = true)
     private String password;
