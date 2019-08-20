@@ -40,6 +40,7 @@ public class StandingOrder extends AbstractScaTransaction {
     private BankAccount otherAccount;
     private String usage;
     private boolean delete;
+    private String purposecode;
 
     @Override
     public void delete(boolean delete) {

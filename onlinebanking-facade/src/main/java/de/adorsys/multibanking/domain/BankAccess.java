@@ -26,8 +26,6 @@ import java.util.Map;
 public class BankAccess {
 
     private String bankName;
-    private String bankLogin;
-    private String bankLogin2;
     private String bankCode;
     private String iban;
     private Map<BankApi, List<TanTransportType>> tanTransportTypes = new EnumMap<>(BankApi.class);

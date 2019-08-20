@@ -34,13 +34,13 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
     @Override
     public List<BankAccountEntity> findByUserIdAndBankAccessId(String userId, String bankAccessId) {
         return entityMapper.mapToBankAccountEntities(bankAccountRepository.findByUserIdAndBankAccessId(userId,
-                bankAccessId));
+            bankAccessId));
     }
 
     @Override
     public Optional<BankAccountEntity> findByUserIdAndId(String userId, String id) {
         return bankAccountRepository.findByUserIdAndId(userId, id)
-                .map(entityMapper::mapToBankAccountEntity);
+            .map(entityMapper::mapToBankAccountEntity);
     }
 
     @Override
@@ -49,8 +49,8 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
     }
 
     @Override
-    public void save(List<BankAccountEntity> bankAccounts) {
-        bankAccountRepository.saveAll(entityMapper.mapToBankAccountMongoEntities(bankAccounts));
+    public List<BankAccountEntity> save(List<BankAccountEntity> bankAccounts) {
+        return entityMapper.mapToBankAccountEntities(bankAccountRepository.saveAll(entityMapper.mapToBankAccountMongoEntities(bankAccounts)));
     }
 
     @Override
@@ -86,7 +86,7 @@ public class BankAccountRepositoryImpl implements BankAccountRepositoryIf {
     @Override
     public Optional<BankAccountEntity> findOne(String accountId) {
         return bankAccountRepository.findById(accountId)
-                .map(entityMapper::mapToBankAccountEntity);
+            .map(entityMapper::mapToBankAccountEntity);
     }
 
 }

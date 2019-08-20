@@ -16,6 +16,8 @@ public class BankAccountTO {
     @NotNull
     @ApiModelProperty(value = "Account ID")
     private String id;
+    @ApiModelProperty(value = "User ID")
+    private String userId;
     @NotNull
     @ApiModelProperty(value = "Bank Access Id")
     private String bankAccessId;

@@ -25,4 +25,5 @@ public class TanTransportTypeTO {
     private String name;
     private String medium;
     private String inputInfo;
+    private AuthenticationTypeTO type;
 }

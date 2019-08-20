@@ -18,11 +18,8 @@ public class BankAccessJpaEntity {
     @GeneratedValue
     private Long id;
     private String userId;
-    private String psd2ConsentId;
-    private String pin;
-    private String pin2;
+    private String consentId;
     private boolean temporary;
-    private boolean storePin;
     private boolean storeBookings;
     private boolean categorizeBookings;
     private boolean storeAnalytics;
@@ -30,8 +27,6 @@ public class BankAccessJpaEntity {
     private boolean provideDataForMachineLearning;
 
     private String bankName;
-    private String bankLogin;
-    private String bankLogin2;
     private String bankCode;
     private String iban;
     @Column(length = 10000)

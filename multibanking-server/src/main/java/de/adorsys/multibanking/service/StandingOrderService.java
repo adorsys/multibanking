@@ -1,10 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.config.FinTSProductConfig;
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankApiUser;
-import de.adorsys.multibanking.domain.BankEntity;
-import de.adorsys.multibanking.domain.StandingOrderEntity;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
@@ -30,29 +27,28 @@ public class StandingOrderService {
     private final OnlineBankingServiceProducer bankingServiceProducer;
     private final FinTSProductConfig finTSProductConfig;
 
-    Object createStandingOrder(BankAccessEntity bankAccess, String pin, StandingOrder standingOrder) {
+    Object createStandingOrder(BankAccessEntity bankAccess, Credentials credentials, StandingOrder standingOrder) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        BankApiUser bankApiUser = userService.checkApiRegistration(bankAccess, bankingService.bankApi());
+        BankApiUser bankApiUser = userService.checkApiRegistration(bankingService,
+            userService.findUser(bankAccess.getUserId()));
 
-        pin = pin == null ? bankAccess.getPin() : pin;
-        if (pin == null) {
+        if (credentials.getPin() == null) {
             throw new MissingPinException();
         }
 
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = TransactionRequest.builder()
-                .bankUrl(bankEntity.getBankingUrl())
-                .bankApiUser(bankApiUser)
-                .transaction(standingOrder)
-                .bankAccess(bankAccess)
-                .pin(pin)
-                .bankCode(bankEntity.getBlzHbci())
-                .build();
+            TransactionRequest request = new TransactionRequest();
+            request.setBankApiUser(bankApiUser);
+            request.setTransaction(standingOrder);
+            request.setBankAccess(bankAccess);
+            request.setCredentials(credentials);
+            request.setBankCode(bankEntity.getBankApiBankCode());
+            request.setBankUrl(bankEntity.getBankingUrl());
             request.setHbciProduct(finTSProductConfig.getProduct());
-            Object tanSubmit = bankingService.requestAuthorizationCode(request);
+            Object tanSubmit = bankingService.requestPaymentAuthorizationCode(request);
 
             StandingOrderEntity target = new StandingOrderEntity();
             BeanUtils.copyProperties(standingOrder, target);
@@ -68,11 +64,10 @@ public class StandingOrderService {
     }
 
     void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, BankAccessEntity bankAccess,
-                             String pin, String tan) {
+                             Credentials credentials, String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        pin = pin == null ? bankAccess.getPin() : pin;
-        if (pin == null) {
+        if (credentials == null) {
             throw new MissingPinException();
         }
 
@@ -80,11 +75,12 @@ public class StandingOrderService {
             SubmitAuthorizationCodeRequest request = SubmitAuthorizationCodeRequest.builder()
                 .sepaTransaction(standingOrder)
                 .tanSubmit(tanSubmit)
-                .pin(pin)
                 .tan(tan)
                 .build();
+
+            request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());
-            bankingService.submitAuthorizationCode(request);
+            bankingService.submitPaymentAuthorizationCode(request);
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }

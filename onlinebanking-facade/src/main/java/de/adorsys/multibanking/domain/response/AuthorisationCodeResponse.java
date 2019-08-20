@@ -17,12 +17,12 @@
 package de.adorsys.multibanking.domain.response;
 
 import de.adorsys.multibanking.domain.TanChallenge;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.experimental.SuperBuilder;
 
 @Data
-@SuperBuilder
+@Builder
 @EqualsAndHashCode(callSuper = false)
 public class AuthorisationCodeResponse extends AbstractResponse {
 

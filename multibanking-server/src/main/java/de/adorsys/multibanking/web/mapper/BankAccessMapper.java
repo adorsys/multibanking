@@ -8,19 +8,13 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface BankAccessMapper {
 
-    @Mapping(target = "bankLogin", ignore = true)
-    @Mapping(target = "bankLogin2", ignore = true)
-    @Mapping(target = "pin", ignore = true)
-    @Mapping(target = "pin2", ignore = true)
     BankAccessTO toBankAccessTO(BankAccessEntity bankAccessEntity);
 
     @Mapping(target = "tanTransportTypes", ignore = true)
     @Mapping(target = "hbciPassportState", ignore = true)
     @Mapping(target = "externalIdMap", ignore = true)
-    @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "temporary", ignore = true)
     @Mapping(target = "bankCode", expression = "java(org.iban4j.Iban.valueOf(bankAccessTO.getIban()).getBankCode())")
-    BankAccessEntity toBankAccessEntity(BankAccessTO bankAccessTO);
+    BankAccessEntity toBankAccessEntity(BankAccessTO bankAccessTO, String userId, boolean temporary);
 
 }
 

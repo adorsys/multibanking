@@ -1,8 +1,14 @@
 package de.adorsys.multibanking.finapi;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.request.*;
-import de.adorsys.multibanking.domain.response.*;
+import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
+import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
+import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
+import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.utils.Utils;
@@ -33,7 +39,7 @@ public class FinapiBanking implements OnlineBankingService {
 
     //https://finapi.zendesk.com/hc/en-us/articles/222013148
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789&(){}[]" +
-            ".:,?!+-_$@#";
+        ".:,?!+-_$@#";
     private static final Logger LOG = LoggerFactory.getLogger(FinapiBanking.class);
     private static SecureRandom random = getSecureRandom();
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -73,24 +79,24 @@ public class FinapiBanking implements OnlineBankingService {
     public boolean bankSupported(String bankCode) {
         if (clientToken == null) {
             LOG.warn("skip finapi bank api, client token not available, check env properties FINAPI_CLIENT_ID and/or " +
-                    "FINAPI_SECRET");
+                "FINAPI_SECRET");
         }
         return true;
     }
 
     @Override
-    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(String userId) {
         String password = RandomStringUtils.random(20, 0, 0, false, false, CHARACTERS.toCharArray(), random);
 
         try {
-            new UsersApi(createApiClient()).createUser(new UserCreateParams().email(bankAccess.getBankLogin() +
-                    "@admb.de").password(password).id(bankAccess.getBankLogin()));
+            new UsersApi(createApiClient()).createUser(new UserCreateParams().email(userId +
+                "@admb.de").password(password).id(userId));
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
 
         BankApiUser bankApiUser = new BankApiUser();
-        bankApiUser.setApiUserId(bankAccess.getBankLogin());
+        bankApiUser.setApiUserId(userId);
         bankApiUser.setApiPassword(password);
         bankApiUser.setBankApi(BankApi.FINAPI);
 
@@ -113,7 +119,7 @@ public class FinapiBanking implements OnlineBankingService {
 
         try {
             PageableBankList searchAllBanks = new BanksApi(createApiClient()).getAndSearchAllBanks(null,
-                    bankAccess.getBankCode(), null, null, null, null, null, null, null, null);
+                bankAccess.getBankCode(), null, null, null, null, null, null, null, null);
             if (searchAllBanks.getBanks().size() != 1) {
                 throw new RuntimeException("Bank not supported");
             }
@@ -124,31 +130,31 @@ public class FinapiBanking implements OnlineBankingService {
             apiClient.setAccessToken(authorizeUser(loadAccountInformationRequest.getBankApiUser()));
 
             BankConnection connections =
-                    new BankConnectionsApi(apiClient).importBankConnection(new ImportBankConnectionParams()
-                            .bankId(searchAllBanks.getBanks().get(0).getId())
-                            .bankingUserId(bankAccess.getBankLogin())
-                            .bankingPin(loadAccountInformationRequest.getPin())
-                            .storePin(loadAccountInformationRequest.isStorePin()));
+                new BankConnectionsApi(apiClient).importBankConnection(new ImportBankConnectionParams()
+                    .bankId(searchAllBanks.getBanks().get(0).getId())
+                    .bankingUserId(loadAccountInformationRequest.getCredentials().getBankLogin())
+                    .bankingPin(loadAccountInformationRequest.getCredentials().getPin())
+                    .storePin(false));
 
             bankAccess.externalId(bankApi(), connections.getId().toString());
 
             AccountList accounts = new AccountsApi(apiClient).getAndSearchAllAccounts(null, null, null,
-                    Arrays.asList(connections.getId()), null, null, null, null);
+                Arrays.asList(connections.getId()), null, null, null, null);
 
             return LoadAccountInformationResponse.builder().bankAccounts(accounts.getAccounts().stream().map(account ->
-                    new BankAccount()
-                            .externalId(bankApi(), account.getId().toString())
-                            .owner(account.getAccountHolderName())
-                            .bankName(bankAccess.getBankName())
-                            .accountNumber(account.getAccountNumber())
-                            .name(account.getAccountTypeName())
-                            .iban(account.getIban())
-                            .blz(bankAccess.getBankCode())
-                            .type(BankAccountType.fromFinapiType(account.getAccountTypeId().intValue()))
-                            .balances(new BalancesReport()
-                                    .readyBalance(Balance.builder().amount(account.getBalance()).build())))
-                    .collect(Collectors.toList()))
-                    .build();
+                new BankAccount()
+                    .externalId(bankApi(), account.getId().toString())
+                    .owner(account.getAccountHolderName())
+                    .bankName(bankAccess.getBankName())
+                    .accountNumber(account.getAccountNumber())
+                    .name(account.getAccountTypeName())
+                    .iban(account.getIban())
+                    .blz(bankAccess.getBankCode())
+                    .type(BankAccountType.fromFinapiType(account.getAccountTypeId().intValue()))
+                    .balances(new BalancesReport()
+                        .readyBalance(Balance.builder().amount(account.getBalance()).build())))
+                .collect(Collectors.toList()))
+                .build();
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
@@ -189,47 +195,47 @@ public class FinapiBanking implements OnlineBankingService {
 
             while (nextPage == null || transactionsResponse.getPaging().getPage() < transactionsResponse.getPaging().getPageCount()) {
                 transactionsResponse = new TransactionsApi(apiClient).getAndSearchAllTransactions("bankView", null,
-                        null, null, null, accountIds, null, null, null, null, null, null, null, null, null, null, null,
-                        null, null, null, null, nextPage, null, order);
+                    null, null, null, accountIds, null, null, null, null, null, null, null, null, null, null, null,
+                    null, null, null, null, nextPage, null, order);
                 nextPage = transactionsResponse.getPaging().getPage() + 1;
                 bookingList.addAll(transactionsResponse.getTransactions().stream().map(transaction -> {
-                            Booking booking = new Booking();
-                            booking.setExternalId(transaction.getId().toString());
-                            booking.setBankApi(bankApi());
-                            booking.setBookingDate(LocalDate.from(formatter.parse(transaction.getBankBookingDate(),
-                                    new ParsePosition(0))));
-                            booking.setValutaDate(LocalDate.from(formatter.parse(transaction.getValueDate(),
-                                    new ParsePosition(0))));
+                        Booking booking = new Booking();
+                        booking.setExternalId(transaction.getId().toString());
+                        booking.setBankApi(bankApi());
+                        booking.setBookingDate(LocalDate.from(formatter.parse(transaction.getBankBookingDate(),
+                            new ParsePosition(0))));
+                        booking.setValutaDate(LocalDate.from(formatter.parse(transaction.getValueDate(),
+                            new ParsePosition(0))));
 
-                            booking.setAmount(transaction.getAmount());
-                            booking.setUsage(transaction.getPurpose());
-                            booking.setCreditorId(Utils.extractCreditorId(transaction.getPurpose()));
-                            booking.setMandateReference(Utils.extractMandateReference(transaction.getPurpose()));
+                        booking.setAmount(transaction.getAmount());
+                        booking.setUsage(transaction.getPurpose());
+                        booking.setCreditorId(Utils.extractCreditorId(transaction.getPurpose()));
+                        booking.setMandateReference(Utils.extractMandateReference(transaction.getPurpose()));
 
-                            if (transaction.getCounterpartName() != null) {
-                                booking.setOtherAccount(new BankAccount());
-                                booking.getOtherAccount().setName(transaction.getCounterpartName());
-                                booking.getOtherAccount().setAccountNumber(transaction.getCounterpartAccountNumber());
-                                booking.getOtherAccount().setIban(Utils.extractIban(transaction.getPurpose()));
-                            }
-
-                            if (transaction.getCategory() != null) {
-                                BookingCategory bookingCategory = new BookingCategory();
-                                bookingCategory.setMainCategory(transaction.getCategory().getParentName());
-                                bookingCategory.setSubCategory(transaction.getCategory().getName());
-                                booking.setBookingCategory(bookingCategory);
-                            }
-
-                            return booking;
+                        if (transaction.getCounterpartName() != null) {
+                            booking.setOtherAccount(new BankAccount());
+                            booking.getOtherAccount().setName(transaction.getCounterpartName());
+                            booking.getOtherAccount().setAccountNumber(transaction.getCounterpartAccountNumber());
+                            booking.getOtherAccount().setIban(Utils.extractIban(transaction.getPurpose()));
                         }
+
+                        if (transaction.getCategory() != null) {
+                            BookingCategory bookingCategory = new BookingCategory();
+                            bookingCategory.setMainCategory(transaction.getCategory().getParentName());
+                            bookingCategory.setSubCategory(transaction.getCategory().getName());
+                            booking.setBookingCategory(bookingCategory);
+                        }
+
+                        return booking;
+                    }
                 ).collect(Collectors.toList()));
             }
             LOG.info("loaded [{}] bookings for account [{}]", bookingList.size(), bankAccount.getAccountNumber());
 
             return LoadBookingsResponse.builder()
-                    .bankAccountBalance(new BalancesReport().readyBalance(Balance.builder().amount(account.getBalance()).build()))
-                    .bookings(bookingList)
-                    .build();
+                .bankAccountBalance(new BalancesReport().readyBalance(Balance.builder().amount(account.getBalance()).build()))
+                .bookings(bookingList)
+                .build();
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
@@ -237,7 +243,7 @@ public class FinapiBanking implements OnlineBankingService {
 
     private Account waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {
         Account account =
-                new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
+            new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
         while (account.getStatus() == Account.StatusEnum.DOWNLOAD_IN_PROGRESS) {
             try {
                 Thread.sleep(1000);
@@ -245,14 +251,14 @@ public class FinapiBanking implements OnlineBankingService {
                 e.printStackTrace();
             }
             account =
-                    new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
+                new AccountsApi(apiClient).getAccount(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
         }
         return account;
     }
 
     private void waitBookingsCategorized(BankAccess bankAccess, ApiClient apiClient) throws ApiException {
         BankConnection connection =
-                new BankConnectionsApi(apiClient).getBankConnection(Long.parseLong(bankAccess.getExternalIdMap().get(bankApi())));
+            new BankConnectionsApi(apiClient).getBankConnection(Long.parseLong(bankAccess.getExternalIdMap().get(bankApi())));
         while (connection.getCategorizationStatus() != BankConnection.CategorizationStatusEnum.READY) {
             try {
                 Thread.sleep(1000);
@@ -260,7 +266,7 @@ public class FinapiBanking implements OnlineBankingService {
                 e.printStackTrace();
             }
             connection =
-                    new BankConnectionsApi(apiClient).getBankConnection(Long.parseLong(bankAccess.getExternalIdMap().get(bankApi())));
+                new BankConnectionsApi(apiClient).getBankConnection(Long.parseLong(bankAccess.getExternalIdMap().get(bankApi())));
         }
     }
 
@@ -270,12 +276,12 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest paymentRequest) {
+    public AuthorisationCodeResponse requestPaymentAuthorizationCode(TransactionRequest paymentRequest) {
         return null;
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+    public SubmitAuthorizationCodeResponse submitPaymentAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
         return null;
     }
 
@@ -300,7 +306,7 @@ public class FinapiBanking implements OnlineBankingService {
     private String authorizeUser(BankApiUser bankApiUser) {
         try {
             return new AuthorizationApi(createApiClient()).getToken("password", finapiClientId, finapiSecret, null,
-                    bankApiUser.getApiUserId(), bankApiUser.getApiPassword()).getAccessToken();
+                bankApiUser.getApiUserId(), bankApiUser.getApiPassword()).getAccessToken();
         } catch (ApiException e) {
             throw new RuntimeException(e);
         }
@@ -309,7 +315,7 @@ public class FinapiBanking implements OnlineBankingService {
     private void authorizeClient() {
         try {
             clientToken = new AuthorizationApi(createApiClient()).getToken("client_credentials", finapiClientId,
-                    finapiSecret, null, null, null);
+                finapiSecret, null, null, null);
         } catch (ApiException e) {
             LOG.error(e.getMessage(), e);
         }

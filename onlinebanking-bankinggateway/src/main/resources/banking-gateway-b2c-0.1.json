@@ -1,0 +1,1300 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.1-SNAPSHOT",
+    "title": "Banking Gateway API"
+  },
+  "host": "localhost:8084",
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Banking-Gateway B2C AIS",
+      "description": "Consent Authorisation Resource"
+    },
+    {
+      "name": "Banking-Gateway B2C PIS",
+      "description": "Payment Authorisation Resource"
+    }
+  ],
+  "paths": {
+    "/v1/ais/consents": {
+      "post": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Create AIS consent",
+        "operationId": "createConsentUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "PSU-ID",
+            "in": "header",
+            "description": "PSU-ID",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "TPP-Redirect-Preferred",
+            "in": "header",
+            "description": "TPP-Redirect-Preferred",
+            "required": false,
+            "type": "boolean"
+          },
+          {
+            "name": "TPP-Redirect-URI",
+            "in": "header",
+            "description": "TPP-Redirect-URI",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "X-GTW-Bank-Code",
+            "in": "header",
+            "description": "X-GTW-Bank-Code",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "consentTO",
+            "description": "consentTO",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ConsentTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/CreateConsentResponseTO"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/ais/consents/{consentId}": {
+      "get": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Get AIS consent by consent id",
+        "operationId": "getConsentUsingGET",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "description": "consentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ConsentTO"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      },
+      "delete": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Revoke consent by consent id",
+        "operationId": "revokeConsentUsingDELETE",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "description": "consentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/ais/consents/{consentId}/status": {
+      "get": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Get AIS consent status by consent id",
+        "operationId": "getConsentStatusUsingGET",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "description": "consentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "RECEIVED",
+                "REJECTED",
+                "VALID",
+                "REVOKEDBYPSU",
+                "EXPIRED",
+                "TERMINATEDBYTPP",
+                "TERMINATED_BY_ASPSP",
+                "PARTIALLY_AUTHORISED"
+              ]
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "deprecated": false
+      }
+    },
+    "/v1/consents/{consentId}/authorisations/{authorisationId}": {
+      "get": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Get consent authorisation status",
+        "operationId": "getConsentAuthorisationStatusUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "description": "authorisationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "description": "consentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ],
+        "deprecated": false
+      }
+    },
+    "/v1/consents/{consentId}/authorisations/{authorisationId}/selectPsuAuthenticationMethod": {
+      "put": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Update authorisation (select SCA method)",
+        "operationId": "selectPsuAuthenticationMethodUsingPUT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorisation",
+            "description": "authorisation",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SelectPsuAuthenticationMethodRequestTO"
+            }
+          },
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "description": "authorisationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "description": "consentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ],
+        "deprecated": false
+      }
+    },
+    "/v1/consents/{consentId}/authorisations/{authorisationId}/transactionAuthorisation": {
+      "put": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Update authorisation (authorize transaction)",
+        "operationId": "transactionAuthorisationUsingPUT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorisation",
+            "description": "authorisation",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TransactionAuthorisationRequestTO"
+            }
+          },
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "description": "authorisationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "description": "consentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ],
+        "deprecated": false
+      }
+    },
+    "/v1/consents/{consentId}/authorisations/{authorisationId}/updatePsuAuthentication": {
+      "put": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Update authorisation (authenticate user)",
+        "operationId": "updatePsuAuthenticationUsingPUT",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorisation",
+            "description": "authorisation",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdatePsuAuthenticationRequestTO"
+            }
+          },
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "description": "authorisationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "description": "consentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ],
+        "deprecated": false
+      }
+    },
+    "/v1/payments/{paymentId}": {
+      "get": {
+        "tags": [
+          "Banking-Gateway B2C PIS"
+        ],
+        "summary": "Get payment information",
+        "operationId": "getPaymentUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "description": "paymentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ResourcePaymentDataTO"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ],
+        "deprecated": false
+      }
+    },
+    "/v1/payments/{paymentId}/authorisations/{authorisationId}": {
+      "get": {
+        "tags": [
+          "Banking-Gateway B2C PIS"
+        ],
+        "summary": "Get payment authorisation status",
+        "operationId": "getPaymentAuthorisationStatusUsingGET",
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "description": "authorisationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "paymentId",
+            "in": "path",
+            "description": "paymentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ],
+        "deprecated": false
+      }
+    },
+    "/v1/payments/{paymentId}/authorisations/{authorisationId}/selectPsuAuthenticationMethod": {
+      "put": {
+        "tags": [
+          "Banking-Gateway B2C PIS"
+        ],
+        "summary": "Update authorisation (select SCA method)",
+        "operationId": "selectPsuAuthenticationMethodUsingPUT_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorisation",
+            "description": "authorisation",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/SelectPsuAuthenticationMethodRequestTO"
+            }
+          },
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "description": "authorisationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "paymentId",
+            "in": "path",
+            "description": "paymentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ],
+        "deprecated": false
+      }
+    },
+    "/v1/payments/{paymentId}/authorisations/{authorisationId}/transactionAuthorisation": {
+      "put": {
+        "tags": [
+          "Banking-Gateway B2C PIS"
+        ],
+        "summary": "Update authorisation (authorize transaction)",
+        "operationId": "transactionAuthorisationUsingPUT_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorisation",
+            "description": "authorisation",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TransactionAuthorisationRequestTO"
+            }
+          },
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "description": "authorisationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "paymentId",
+            "in": "path",
+            "description": "paymentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ],
+        "deprecated": false
+      }
+    },
+    "/v1/payments/{paymentId}/authorisations/{authorisationId}/updatePsuAuthentication": {
+      "put": {
+        "tags": [
+          "Banking-Gateway B2C PIS"
+        ],
+        "summary": "Update authorisation (authenticate user)",
+        "operationId": "updatePsuAuthenticationUsingPUT_1",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorisation",
+            "description": "authorisation",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/UpdatePsuAuthenticationRequestTO"
+            }
+          },
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "description": "authorisationId",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "paymentId",
+            "in": "path",
+            "description": "paymentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ],
+        "deprecated": false
+      }
+    }
+  },
+  "definitions": {
+    "AccountAccessTO": {
+      "type": "object",
+      "properties": {
+        "accounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AccountReferenceTO"
+          }
+        },
+        "balances": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AccountReferenceTO"
+          }
+        },
+        "transactions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AccountReferenceTO"
+          }
+        }
+      },
+      "title": "AccountAccessTO"
+    },
+    "AccountReferenceTO": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "iban": {
+          "type": "string"
+        }
+      },
+      "title": "AccountReferenceTO"
+    },
+    "ChallengeDataTO": {
+      "type": "object",
+      "properties": {
+        "additionalInformation": {
+          "type": "string",
+          "description": "Additional explanation for the PSU to explain e.g. fallback mechanism for the chosen SCA method"
+        },
+        "data": {
+          "type": "string",
+          "description": "String challenge data"
+        },
+        "image": {
+          "type": "string",
+          "format": "byte",
+          "description": "PNG data (max. 512 kilobyte) to be displayed to the PSU, Base64 encoding, cp. [RFC4648].\nThis attribute is used only, when PHOTO_OTP or CHIP_OTP is the selected SCA method."
+        },
+        "imageLink": {
+          "type": "string",
+          "description": "A link where the ASPSP will provides the challenge image"
+        },
+        "otpFormat": {
+          "type": "string",
+          "description": "The format type of the OTP to be typed in. The admitted values are \"characters\" or \"integer\""
+        },
+        "otpMaxLength": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The maximal length for the OTP to be typed in by the PSU"
+        }
+      },
+      "title": "ChallengeDataTO",
+      "description": "It is contained in addition to the data element 'chosenScaMethod' if challenge data is needed for SCA"
+    },
+    "ConsentTO": {
+      "type": "object",
+      "properties": {
+        "access": {
+          "$ref": "#/definitions/AccountAccessTO"
+        },
+        "consentId": {
+          "type": "string"
+        },
+        "consentStatus": {
+          "type": "string",
+          "enum": [
+            "RECEIVED",
+            "REJECTED",
+            "VALID",
+            "REVOKEDBYPSU",
+            "EXPIRED",
+            "TERMINATEDBYTPP",
+            "TERMINATED_BY_ASPSP",
+            "PARTIALLY_AUTHORISED"
+          ]
+        },
+        "frequencyPerDay": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "psuAccount": {
+          "type": "string"
+        },
+        "recurringIndicator": {
+          "type": "boolean"
+        },
+        "validUntil": {
+          "type": "string",
+          "format": "date"
+        }
+      },
+      "title": "ConsentTO"
+    },
+    "CreateConsentResponseTO": {
+      "type": "object",
+      "properties": {
+        "authorisationId": {
+          "type": "string"
+        },
+        "consentId": {
+          "type": "string"
+        },
+        "redirectUrl": {
+          "type": "string"
+        }
+      },
+      "title": "CreateConsentResponseTO"
+    },
+    "Link": {
+      "type": "object",
+      "properties": {
+        "deprecation": {
+          "type": "string",
+          "xml": {
+            "name": "deprecation",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "href": {
+          "type": "string",
+          "xml": {
+            "name": "href",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "hreflang": {
+          "type": "string",
+          "xml": {
+            "name": "hreflang",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "media": {
+          "type": "string",
+          "xml": {
+            "name": "media",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "rel": {
+          "type": "string",
+          "xml": {
+            "name": "rel",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "templated": {
+          "type": "boolean"
+        },
+        "title": {
+          "type": "string",
+          "xml": {
+            "name": "title",
+            "attribute": true,
+            "wrapped": false
+          }
+        },
+        "type": {
+          "type": "string",
+          "xml": {
+            "name": "type",
+            "attribute": true,
+            "wrapped": false
+          }
+        }
+      },
+      "title": "Link",
+      "xml": {
+        "name": "link",
+        "namespace": "http://www.w3.org/2005/Atom",
+        "attribute": false,
+        "wrapped": false
+      }
+    },
+    "PaymentDataTO": {
+      "type": "object",
+      "properties": {
+        "paymentProduct": {
+          "type": "string"
+        },
+        "paymentType": {
+          "type": "string",
+          "enum": [
+            "SINGLE",
+            "BULK",
+            "PERIODIC"
+          ]
+        },
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PaymentTO"
+          }
+        },
+        "psuAccount": {
+          "type": "string"
+        },
+        "rawPayment": {
+          "type": "string"
+        }
+      },
+      "title": "PaymentDataTO"
+    },
+    "PaymentTO": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number"
+        },
+        "creditorAccount": {
+          "$ref": "#/definitions/AccountReferenceTO"
+        },
+        "creditorAgent": {
+          "type": "string"
+        },
+        "creditorName": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "dayOfExecution": {
+          "type": "string"
+        },
+        "debtorAccount": {
+          "$ref": "#/definitions/AccountReferenceTO"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "endToEndIdentification": {
+          "type": "string"
+        },
+        "executionId": {
+          "type": "string"
+        },
+        "executionRule": {
+          "type": "string",
+          "enum": [
+            "FOLLOWING",
+            "PRECEDING"
+          ]
+        },
+        "frequency": {
+          "type": "string"
+        },
+        "paymentId": {
+          "type": "string"
+        },
+        "purposeCode": {
+          "type": "string"
+        },
+        "remittanceInformationUnstructured": {
+          "type": "string"
+        },
+        "requestedExecutionDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "requestedExecutionTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "ultimateCreditor": {
+          "type": "string"
+        },
+        "ultimateDebtor": {
+          "type": "string"
+        }
+      },
+      "title": "PaymentTO"
+    },
+    "ResourcePaymentDataTO": {
+      "type": "object",
+      "properties": {
+        "_links": {
+          "type": "object",
+          "xml": {
+            "name": "link",
+            "attribute": false,
+            "wrapped": false
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/Link"
+          }
+        },
+        "paymentProduct": {
+          "type": "string"
+        },
+        "paymentType": {
+          "type": "string",
+          "enum": [
+            "SINGLE",
+            "BULK",
+            "PERIODIC"
+          ]
+        },
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PaymentTO"
+          }
+        },
+        "psuAccount": {
+          "type": "string"
+        },
+        "rawPayment": {
+          "type": "string"
+        }
+      },
+      "title": "ResourcePaymentDataTO",
+      "xml": {
+        "name": "ResourcePaymentDataTO",
+        "attribute": false,
+        "wrapped": false
+      }
+    },
+    "ResourceUpdateAuthResponseTO": {
+      "type": "object",
+      "properties": {
+        "_links": {
+          "type": "object",
+          "xml": {
+            "name": "link",
+            "attribute": false,
+            "wrapped": false
+          },
+          "additionalProperties": {
+            "$ref": "#/definitions/Link"
+          }
+        },
+        "challenge": {
+          "description": "It is contained in addition to the data element 'chosenScaMethod' if challenge data is needed for SCA.",
+          "$ref": "#/definitions/ChallengeDataTO"
+        },
+        "psuMessage": {
+          "type": "string",
+          "description": "Text to be displayed to the PSU"
+        },
+        "scaApproach": {
+          "type": "string",
+          "enum": [
+            "EMBEDDED",
+            "REDIRECT",
+            "DECOUPLED"
+          ]
+        },
+        "scaMethods": {
+          "type": "array",
+          "description": "This data element might be contained, if SCA is required and if the PSU has a choice between different authentication methods. These methods shall be presented towards the PSU for selection by the TPP.",
+          "items": {
+            "$ref": "#/definitions/ScaMethodTO"
+          }
+        },
+        "scaStatus": {
+          "type": "string",
+          "enum": [
+            "RECEIVED",
+            "STARTED",
+            "PSUIDENTIFIED",
+            "PSUAUTHENTICATED",
+            "SCAMETHODSELECTED",
+            "FINALISED",
+            "FAILED",
+            "EXEMPTED"
+          ]
+        }
+      },
+      "title": "ResourceUpdateAuthResponseTO"
+    },
+    "ScaMethodTO": {
+      "type": "object",
+      "required": [
+        "authenticationMethodId",
+        "authenticationType"
+      ],
+      "properties": {
+        "authenticationMethodId": {
+          "type": "string",
+          "description": "An identification provided by the ASPSP for the later identification of the authentication method selection"
+        },
+        "authenticationType": {
+          "type": "string",
+          "description": "Type of the authentication method.  More authentication types might be added during implementation projects and documented in the ASPSP documentation.    - 'SMS_OTP': An SCA method, where an OTP linked to the transaction to be authorised is sent to the PSU through a SMS channel.   - 'CHIP_OTP': An SCA method, where an OTP is generated by a chip card, e.g. an TOP derived from an EMV cryptogram.      To contact the card, the PSU normally needs a (handheld) device.      With this device, the PSU either reads the challenging data through a visual interface like flickering or      the PSU types in the challenge through the device key pad.      The device then derives an OTP from the challenge data and displays the OTP to the PSU.   - 'PHOTO_OTP': An SCA method, where the challenge is a QR code or similar encoded visual data      which can be read in by a consumer device or specific mobile app.      The device resp. the specific app than derives an OTP from the visual challenge data and displays      the OTP to the PSU.   - 'PUSH_OTP': An OTP is pushed to a dedicated authentication APP and displayed to the PSU.",
+          "enum": [
+            "SMS_OTP",
+            "CHIP_OTP",
+            "PHOTO_OTP",
+            "PUSH_OTP",
+            "EMAIL"
+          ]
+        },
+        "authenticationVersion": {
+          "type": "string",
+          "description": "This version can be used by differentiating authentication tools used within performing OTP generation in the same authentication type"
+        },
+        "explanation": {
+          "type": "string",
+          "description": "Detailed information about the SCA method for the PSU"
+        },
+        "name": {
+          "type": "string",
+          "description": "This is the name of the authentication method defined by the PSU in the Online Banking frontend of the ASPSP.\nAlternatively this could be a description provided by the ASPSP like \"SMS OTP on phone +49160 xxxxx 28\"."
+        }
+      },
+      "title": "ScaMethodTO"
+    },
+    "SelectPsuAuthenticationMethodRequestTO": {
+      "type": "object",
+      "required": [
+        "authenticationMethodId"
+      ],
+      "properties": {
+        "authenticationMethodId": {
+          "type": "string",
+          "example": "myAuthenticationID",
+          "description": "An identification provided by the ASPSP for the later identification of the authentication method selection."
+        }
+      },
+      "title": "SelectPsuAuthenticationMethodRequestTO"
+    },
+    "TransactionAuthorisationRequestTO": {
+      "type": "object",
+      "required": [
+        "scaAuthenticationData"
+      ],
+      "properties": {
+        "scaAuthenticationData": {
+          "type": "string",
+          "description": "SCA authentication data, depending on the chosen authentication method. If the data is binary, then it is base64 encoded."
+        }
+      },
+      "title": "TransactionAuthorisationRequestTO"
+    },
+    "UpdateAuthResponseTO": {
+      "type": "object",
+      "properties": {
+        "challenge": {
+          "description": "It is contained in addition to the data element 'chosenScaMethod' if challenge data is needed for SCA.",
+          "$ref": "#/definitions/ChallengeDataTO"
+        },
+        "psuMessage": {
+          "type": "string",
+          "description": "Text to be displayed to the PSU"
+        },
+        "scaApproach": {
+          "type": "string",
+          "enum": [
+            "EMBEDDED",
+            "REDIRECT",
+            "DECOUPLED"
+          ]
+        },
+        "scaMethods": {
+          "type": "array",
+          "description": "This data element might be contained, if SCA is required and if the PSU has a choice between different authentication methods. These methods shall be presented towards the PSU for selection by the TPP.",
+          "items": {
+            "$ref": "#/definitions/ScaMethodTO"
+          }
+        },
+        "scaStatus": {
+          "type": "string",
+          "enum": [
+            "RECEIVED",
+            "STARTED",
+            "PSUIDENTIFIED",
+            "PSUAUTHENTICATED",
+            "SCAMETHODSELECTED",
+            "FINALISED",
+            "FAILED",
+            "EXEMPTED"
+          ]
+        }
+      },
+      "title": "UpdateAuthResponseTO"
+    },
+    "UpdatePsuAuthenticationRequestTO": {
+      "type": "object",
+      "required": [
+        "password"
+      ],
+      "properties": {
+        "password": {
+          "type": "string",
+          "description": "Password"
+        },
+        "psuCustomerId": {
+          "type": "string"
+        },
+        "psuId": {
+          "type": "string"
+        }
+      },
+      "title": "UpdatePsuAuthenticationRequestTO"
+    }
+  }
+}

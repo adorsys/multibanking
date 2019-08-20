@@ -6,6 +6,13 @@ jdk:
 services:
   - docker
 
+env:
+  global:
+    - OPENSHIFT_REGISTRY="openshift-registry.adorsys.de"
+    - OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV="banking-gateway-dev"
+    - HARBOR_REGISTRY="harbor.adorsys.de"
+    - HARBOR_NAMESPACE_BANKING_GATEWAY_DEV="teambank-banking-gateway"
+
 git:
   submodules: false
 
@@ -21,8 +28,8 @@ script:
   - /bin/bash .travis/build.sh
 
 before_deploy:
-  - echo $GPG_SECRET_KEY | base64 --decode | $GPG_EXECUTABLE --import
-  - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust
+  - echo $GPG_SECRET_KEY | base64 --decode | $GPG_EXECUTABLE --import || true
+  - echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust || true
 
 deploy:
   -
@@ -39,3 +46,17 @@ deploy:
     script: /bin/bash .travis/deploy.sh
     on:
       branch: develop
+  # Deploy to opehsift banking-gateway-dev
+  - provider: script
+    skip_cleanup: true
+    script: env TAG=latest OPENSHIFT_NAMESPACE=$OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV  OPENSHIFT_USER=$OPENSHIFT_BANKING_GATEWAY_DEV_USER OPENSHIFT_TOKEN=$OPENSHIFT_BANKING_GATEWAY_TOKEN /bin/bash .travis/deploy_openshift.sh
+    on:
+      branch: develop
+  # Deploy to harbor banking-gateway
+  - provider: script
+    skip_cleanup: true
+    script:  env HARBOR_NAMESPACE=$HARBOR_NAMESPACE_BANKING_GATEWAY_DEV HARBOR_USER=$HARBOR_BANKING_GATEWAY_USER HARBOR_TOKEN=$HARBOR_BANKING_GATEWAY_TOKEN /bin/bash .travis/deploy_harbor.sh
+    on:
+      branch: master
+
+

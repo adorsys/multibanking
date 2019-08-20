@@ -27,6 +27,7 @@ public class StandingOrderJpaEntity extends PaymentCommonJpaEntity {
     @AttributeOverride(name = "currency", column = @Column(name = "otherAccountCurrency"))
     private BankAccountCommonJpaEntity otherAccount;
     private String usage;
+    private String purposecode;
     private boolean delete;
 
 }

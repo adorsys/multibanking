@@ -26,4 +26,5 @@ import lombok.NoArgsConstructor;
 public class AccountReference {
 
     private String iban;
+    private String currency;
 }

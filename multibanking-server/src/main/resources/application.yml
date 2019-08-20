@@ -71,6 +71,9 @@ sts:
   keymanagement.rotation.signKeyPairs.enabled: false
   keymanagement.rotation.encKeyPairs.enabled: false
 
+bankinggateway.b2c.url: https://dev-bankinggateway-b2c-b2cserver.cloud.adorsys.de
+bankinggateway.adapter.url: https://dev-bankinggateway-adapter.cloud.adorsys.de
+
 ---
 
 spring:
@@ -88,11 +91,8 @@ spring:
     - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
 db_secret: 1234567890123456
-mongo.properties.url: classpath:/mongo.properties
-bankinggateway:
-  auth.url: http://localhost:8086/v1/consents/{consentId}/authorisations/{authorisationId}
-  consent.url: http://localhost:8086/v1/consents
 
+mongo.properties.url: classpath:/mongo.properties
 swagger.login.url: http://localhost:8080/auth/realms/multibanking/protocol/openid-connect/auth
 
 idp:

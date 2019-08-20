@@ -3,8 +3,7 @@ package de.adorsys.multibanking.web;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.bg.domain.Consent;
-import de.adorsys.multibanking.bg.exception.ConsentAuthorisationRequiredException;
+import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.SyncInProgressException;
 import de.adorsys.multibanking.exception.domain.Messages;
@@ -26,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.List;
 
+import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -55,7 +55,7 @@ public class BankAccountController {
         @ApiResponse(code = 400, message = "Consent authorisation required", response = Messages.class)})
     @GetMapping
     public Resources<Resource<BankAccountTO>> getBankAccounts(@PathVariable String accessId) {
-        List<BankAccountEntity> bankAccounts = bankAccountService.getBankAccounts(principal.getName(), accessId);
+        List<BankAccountEntity> bankAccounts = bankAccountService.getBankAccounts(principal.getName(), accessId, null);
         return new Resources<>(mapToResources(bankAccounts, accessId));
     }
 
@@ -85,7 +85,6 @@ public class BankAccountController {
                 @AuthorizationScope(scope = "openid", description = "")
             })})
     @ApiResponses({
-        @ApiResponse(code = 202, message = "Consent authorisation required", response = Consent.class),
         @ApiResponse(code = 204, message = "Sync started", response = void.class)})
     @PutMapping("/{accountId}/sync")
     public ResponseEntity syncBookings(
@@ -102,12 +101,8 @@ public class BankAccountController {
         if (bankAccount.getSyncStatus() == BankAccount.SyncStatus.SYNC) {
             throw new SyncInProgressException(bankAccount.getId());
         }
-        try {
-            bookingService.syncBookings(bankAccess, bankAccount, null, pin != null ? pin : bankAccess.getPin());
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (ConsentAuthorisationRequiredException e) {
-            return new ResponseEntity<>(e.getAuthorisation(), HttpStatus.ACCEPTED);
-        }
+        bookingService.syncBookings(FINALISED, bankAccess, bankAccount, null, null);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private List<Resource<BankAccountTO>> mapToResources(List<BankAccountEntity> accountEntities, String accessId) {

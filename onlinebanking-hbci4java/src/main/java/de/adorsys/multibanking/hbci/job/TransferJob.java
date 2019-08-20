@@ -39,16 +39,15 @@ import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDial
 
 @Slf4j
 public class TransferJob {
+
     public void requestTransfer(TransactionRequest sepaTransactionRequest) {
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
-            .bankCode(sepaTransactionRequest.getBankCode() != null ? sepaTransactionRequest.getBankCode() :
-                sepaTransactionRequest.getBankAccess().getBankCode())
-            .customerId(sepaTransactionRequest.getBankAccess().getBankLogin())
-            .login(sepaTransactionRequest.getBankAccess().getBankLogin2())
+            .credentials(sepaTransactionRequest.getCredentials())
             .hbciPassportState(sepaTransactionRequest.getBankAccess().getHbciPassportState())
-            .pin(sepaTransactionRequest.getPin())
             .build();
 
+        dialogRequest.setBankCode(sepaTransactionRequest.getBankCode() != null ? sepaTransactionRequest.getBankCode() :
+            sepaTransactionRequest.getBankAccess().getBankCode());
         dialogRequest.setHbciProduct(Optional.ofNullable(sepaTransactionRequest.getHbciProduct())
             .map(product -> new Product(product.getName(), product.getVersion()))
             .orElse(null));

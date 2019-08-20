@@ -72,6 +72,9 @@ public class NewStandingOrderJob extends ScaRequiredJob<AuthorisationCodeRespons
         if (standingOrder.getLastExecutionDate() != null) {
             gvDauerSEPANew.setParam("lastdate", standingOrder.getLastExecutionDate().toString());
         }
+        if (standingOrder.getPurposecode() != null) {
+            gvDauerSEPANew.setParam("purposecode", standingOrder.getPurposecode());
+        }
 
         gvDauerSEPANew.verifyConstraints();
 

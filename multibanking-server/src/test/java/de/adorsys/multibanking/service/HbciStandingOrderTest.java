@@ -60,16 +60,14 @@ public class HbciStandingOrderTest {
     }
 
     @Test
-    public void testListStandingOrders() throws Exception {
+    public void testListStandingOrders() {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
-            System.getProperty("blz"), System.getProperty("pin"));
-        bankAccessEntity.setBankLogin(System.getProperty("login"));
-        bankAccessEntity.setBankLogin2(System.getProperty("login2"));
+            System.getProperty("blz"));
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI);
+            BankApi.HBCI, null);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
             .findFirst().get();
@@ -79,16 +77,14 @@ public class HbciStandingOrderTest {
     }
 
     @Test
-    public void testNewStandingOrder() throws Exception {
+    public void testNewStandingOrder() {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
-            System.getProperty("blz"), System.getProperty("pin"));
-        bankAccessEntity.setBankLogin(System.getProperty("login"));
-        bankAccessEntity.setBankLogin2(System.getProperty("login2"));
+            System.getProperty("blz"));
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(false);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI);
+            BankApi.HBCI, null);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("3312345678"))
             .findFirst().get();
@@ -107,11 +103,10 @@ public class HbciStandingOrderTest {
         standingOrder.setLastExecutionDate(LocalDate.now().plusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).plusYears(2));
         standingOrder.setPsuAccount(bankAccountEntitity);
 
-        Object tanSubmit = standingOrderService.createStandingOrder(bankAccessEntity, System.getProperty("pin"),
+        Object tanSubmit = standingOrderService.createStandingOrder(bankAccessEntity, null,
             standingOrder);
 
         String tan = "";
-        standingOrderService.submitStandingOrder(standingOrder, tanSubmit, bankAccessEntity, System.getProperty(
-            "pin"), tan);
+        standingOrderService.submitStandingOrder(standingOrder, tanSubmit, bankAccessEntity, null, tan);
     }
 }

@@ -90,9 +90,9 @@ public class BankAccessServiceTest {
         when(mockBanking.bankSupported(anyString())).thenReturn(false);
         thrown.expect(InvalidBankAccessException.class);
 
-        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", null, null);
+        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", null);
         bankAccessEntity.setBankCode("unsupported");
-        bankAccessService.createBankAccess("testUserId", bankAccessEntity);
+        bankAccessService.createBankAccess(bankAccessEntity, null);
     }
 
     @Test
@@ -101,25 +101,25 @@ public class BankAccessServiceTest {
         when(mockBanking.loadBankAccounts(any())).thenReturn(LoadAccountInformationResponse.builder().build());
         thrown.expect(InvalidBankAccessException.class);
 
-        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500", null);
-        bankAccessService.createBankAccess("testUserId", bankAccessEntity);
+        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500");
+        bankAccessService.createBankAccess(bankAccessEntity, null);
     }
 
     @Test
     public void create_bank_access_invalid_pin() {
-        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500", null);
+        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500");
 
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
         when(mockBanking.loadBankAccounts(any()))
             .thenThrow(new InvalidPinException("access"));
         thrown.expect(InvalidPinException.class);
 
-        bankAccessService.createBankAccess("testUserId", bankAccessEntity);
+        bankAccessService.createBankAccess(bankAccessEntity, null);
     }
 
     @Test
     public void create_bank_access_ok() {
-        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500", null);
+        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500");
 
         when(mockBanking.bankSupported(anyString())).thenReturn(true);
         when(mockBanking.loadBankAccounts(any()))
@@ -127,19 +127,11 @@ public class BankAccessServiceTest {
                 .bankAccounts(Collections.singletonList(TestUtil.getBankAccountEntity("account")))
                 .build());
 
-        bankAccessService.createBankAccess("testUserId", bankAccessEntity);
+        bankAccessService.createBankAccess(bankAccessEntity, null);
 
         notNull(userRepository.findById("login"), "user not exists");
         notNull(bankAccessRepository.findByUserIdAndId("login", "access"), "bankaccess not exists");
         notNull(bankAccountRepository.findByUserIdAndId("login", "account"), "bankaccount not exists");
-    }
-
-    @Test
-    public void when_delete_bankAccesd_user_notExist_should_throw_exception() {
-        thrown.expect(ResourceNotFoundException.class);
-
-        boolean deleteBankAccess = bankAccessService.deleteBankAccess("badLogin", "badAccess");
-        assertThat(deleteBankAccess).isEqualTo(false);
     }
 
     @Test
@@ -154,7 +146,7 @@ public class BankAccessServiceTest {
     @Test
     public void when_delete_bankAcces_user_exist_should_return_true() {
         userRepository.save(TestUtil.getUserEntity("login"));
-        bankAccessRepository.save(TestUtil.getBankAccessEntity("login", "access", null, null));
+        bankAccessRepository.save(TestUtil.getBankAccessEntity("login", "access", null));
 
         boolean deleteBankAccess = bankAccessService.deleteBankAccess("login", "access");
         assertThat(deleteBankAccess).isEqualTo(true);
@@ -163,7 +155,7 @@ public class BankAccessServiceTest {
     @Test
     public void get_bank_code() {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access",
-            "code", null);
+            "code");
 
         bankAccessRepository.save(bankAccessEntity);
 

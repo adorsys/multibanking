@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.domain.spi;
 
-import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankApiUser;
@@ -21,7 +20,7 @@ public interface OnlineBankingService {
 
     boolean userRegistrationRequired();
 
-    BankApiUser registerUser(BankAccess bankAccess, String pin);
+    BankApiUser registerUser(String userId);
 
     void removeUser(BankApiUser bankApiUser);
 
@@ -35,10 +34,9 @@ public interface OnlineBankingService {
 
     boolean bookingsCategorized();
 
-    AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest paymentRequest);
+    AuthorisationCodeResponse requestPaymentAuthorizationCode(TransactionRequest paymentRequest);
 
-    SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
+    SubmitAuthorizationCodeResponse submitPaymentAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
 
     StrongCustomerAuthorisable getStrongCustomerAuthorisation();
-
 }

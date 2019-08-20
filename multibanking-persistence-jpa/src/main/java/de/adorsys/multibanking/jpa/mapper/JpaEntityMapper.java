@@ -140,4 +140,9 @@ public interface JpaEntityMapper {
     List<BankEntity> mapToBankEntities(List<BankJpaEntity> bankJpaEntities);
 
     List<BookingsIndexEntity> mapToBookingsIndexEntities(List<BookingsIndexJpaEntity> bookingsIndexJpaEntities);
+
+    ConsentEntity toConsentEntity(ConsentJpaEntity consentJpaEntity);
+
+    ConsentJpaEntity toConsentJpaEntity(ConsentEntity consentEntity);
+
 }

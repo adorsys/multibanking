@@ -83,4 +83,8 @@ public interface MongoEntityMapper {
     List<BankEntity> mapToBankEntities(List<BankMongoEntity> bankMongoEntities);
 
     List<BookingsIndexEntity> mapToBookingsIndexEntities(List<BookingsIndexMongoEntity> bookingsIndexMongoEntities);
+
+    ConsentEntity toConsentEntity(ConsentMongoEntity consentMongoEntity);
+
+    ConsentMongoEntity toConsentMongoEntity(ConsentEntity consentEntity);
 }

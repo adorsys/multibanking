@@ -1,7 +1,5 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
@@ -13,33 +11,21 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-/**
- * Created by alexg on 05.09.17.
- */
 @Service
 @AllArgsConstructor
 public class UserService {
 
     private final UserRepositoryIf userRepository;
-    private final BankService bankService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
-    BankApiUser checkApiRegistration(BankAccessEntity bankAccess, BankApi bankApi) {
-        OnlineBankingService onlineBankingService = bankApi != null
-            ? bankingServiceProducer.getBankingService(bankApi)
-            : bankingServiceProducer.getBankingService(bankAccess.getBankCode());
-
+    BankApiUser checkApiRegistration(OnlineBankingService onlineBankingService, UserEntity userEntity) {
         if (onlineBankingService.userRegistrationRequired()) {
-            UserEntity userEntity = userRepository.findById(bankAccess.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException(UserEntity.class, bankAccess.getUserId()));
-
             return userEntity.getApiUser()
                 .stream()
                 .filter(bankApiUser -> bankApiUser.getBankApi() == onlineBankingService.bankApi())
                 .findFirst()
-                .orElseGet(() -> registerUser(bankAccess, onlineBankingService, userEntity));
+                .orElseGet(() -> registerUser(userEntity.getId(), onlineBankingService, userEntity));
         } else {
             BankApiUser bankApiUser = new BankApiUser();
             bankApiUser.setBankApi(onlineBankingService.bankApi());
@@ -47,9 +33,9 @@ public class UserService {
         }
     }
 
-    private BankApiUser registerUser(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService,
+    private BankApiUser registerUser(String userId, OnlineBankingService onlineBankingService,
                                      UserEntity userEntity) {
-        BankApiUser bankApiUser = onlineBankingService.registerUser(bankAccess, bankAccess.getPin());
+        BankApiUser bankApiUser = onlineBankingService.registerUser(userId);
         userEntity.getApiUser().add(bankApiUser);
         userRepository.save(userEntity);
         return bankApiUser;
@@ -64,18 +50,9 @@ public class UserService {
         }
     }
 
-    void updataeBankApiUser(String userId, BankApiUser bankApiUser) {
-        UserEntity userEntity = userRepository.findById(userId)
+    UserEntity findUser(String userId) {
+        return userRepository.findById(userId)
             .orElseThrow(() -> new ResourceNotFoundException(UserEntity.class, userId));
-
-        userEntity.setApiUser(
-            userEntity.getApiUser().stream()
-                .filter(bau -> bau.getBankApi() != bankApiUser.getBankApi())
-                .collect(Collectors.toList())
-        );
-
-        userEntity.getApiUser().add(bankApiUser);
-        userRepository.save(userEntity);
     }
 
     Optional<LocalDateTime> getRulesLastChangeDate(String userId) {

@@ -31,4 +31,5 @@ public class TanTransportType {
     private String name;
     private String medium;
     private String inputInfo;
+    private AuthenticationType type;
 }

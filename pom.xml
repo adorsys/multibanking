@@ -5,7 +5,7 @@
 
     <groupId>de.adorsys.multibanking</groupId>
     <artifactId>multibanking</artifactId>
-    <version>5.0.8</version>
+    <version>5.1.0</version>
     <packaging>pom</packaging>
     <name>Multibanking</name>
     <url>https://github.com/adorsys/multibanking</url>
@@ -54,7 +54,9 @@
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.language>java</sonar.language>
         <sonar.exclusions>file:**/generated-sources/**</sonar.exclusions>
-        <sonar.coverage.exclusions>**/*Entity.java,**/*TO.java,**/*BO.java,**/*Application.java,**/*Exception.java,**/*Config.java</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>
+            **/*Entity.java,**/*TO.java,**/*BO.java,**/*Application.java,**/*Exception.java,**/*Config.java
+        </sonar.coverage.exclusions>
     </properties>
 
     <modules>
@@ -67,7 +69,6 @@
         <module>onlinebanking-finapi</module>
         <module>onlinebanking-hbci4java</module>
         <module>onlinebanking-bankinggateway</module>
-        <module>onlinebanking-mock</module>
         <module>multibanking-pers-spi</module>
     </modules>
 
@@ -349,12 +350,12 @@
     </profiles>
     <distributionManagement>
         <repository>
-            <id>bg-releases</id>
-            <url>https://bg-nexus.cloud.adorsys.de/repository/maven-releases/</url>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
-            <id>bg-snapshots</id>
-            <url>https://bg-nexus.cloud.adorsys.de/repository/maven-snapshots/</url>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 

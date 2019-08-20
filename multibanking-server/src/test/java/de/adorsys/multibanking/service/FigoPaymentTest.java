@@ -18,6 +18,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -63,17 +64,17 @@ public class FigoPaymentTest {
         userRepository.save(userEntity);
 
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
-            System.getProperty("blz"), System.getProperty("pin"));
-        bankAccessEntity.setBankLogin(System.getProperty("login"));
+            System.getProperty("blz"));
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(false);
 
-        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity, null);
+        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
+            null, null);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("12324463"))
             .findFirst().get();
 
-        bookingService.syncBookings(bankAccessEntity, bankAccountEntitity, BankApi.FIGO, System.getProperty("pin"));
+        bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntitity, BankApi.FIGO, null);
 
         SinglePaymentEntity paymentEntity = new SinglePaymentEntity();
         paymentEntity.setReceiverIban("receiver_iban_needed_here");
@@ -81,8 +82,7 @@ public class FigoPaymentTest {
         paymentEntity.setAmount(new BigDecimal(1));
         paymentEntity.setPurpose("test");
 
-        paymentService.createSinglePayment(bankAccessEntity, null, System.getProperty("pin"), paymentEntity);
-        paymentService.submitSinglePayment(paymentEntity, bankAccessEntity, System.getProperty("pin"),
-            "tan_needed_here");
+        paymentService.createSinglePayment(bankAccessEntity, null, null, paymentEntity);
+        paymentService.submitSinglePayment(paymentEntity, bankAccessEntity, null, "tan_needed_here");
     }
 }

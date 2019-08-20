@@ -69,7 +69,7 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         boolean tan2StepRequired = hbciJobs == null || dialog.getPassport().tan2StepRequired(hbciJobs);
 
         if (tan2StepRequired) {
-            handleSCA(hbciTanSubmit, dialog, hbciJobs);
+            requestAuthorisationCode(hbciTanSubmit, dialog, hbciJobs);
         } else {
             //No SCA needed
             dialog.addTasks(hbciJobs);
@@ -85,7 +85,8 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         return createJobResponse(dialog.getPassport(), authorisationCodeResponse);
     }
 
-    private void handleSCA(HbciTanSubmit hbciTanSubmit, HBCIDialog dialog, List<AbstractHBCIJob> hbciJobs) {
+    private void requestAuthorisationCode(HbciTanSubmit hbciTanSubmit, HBCIDialog dialog,
+                                          List<AbstractHBCIJob> hbciJobs) {
         HBCITwoStepMechanism hbciTwoStepMechanism = getUserTanTransportType(dialog);
         dialog.getPassport().setCurrentSecMechInfo(hbciTwoStepMechanism);
 
@@ -162,7 +163,7 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         GVTAN2Step hktan = new GVTAN2Step(dialog.getPassport());
         hktan.setSegVersion(hbciTwoStepMechanism.getSegversion());
 
-        if (hbciTwoStepMechanism != null && dialog.getPassport().tanMediaNeeded()) {
+        if (dialog.getPassport().tanMediaNeeded()) {
             hktan.setParam("tanmedia", getTransactionRequest().getTanTransportType().getMedium());
         }
 
@@ -233,21 +234,22 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
     private HbciDialogRequest createDialogRequest(HbciCallback hbciCallback) {
         TransactionRequest transactionRequest = getTransactionRequest();
 
-        return HbciDialogRequest.builder()
-            .bankCode(transactionRequest.getBankCode() != null ? transactionRequest.getBankCode() :
-                transactionRequest.getBankAccess().getBankCode())
-            .customerId(transactionRequest.getBankAccess().getBankLogin())
-            .login(transactionRequest.getBankAccess().getBankLogin2())
+        HbciDialogRequest hbciDialogRequest = HbciDialogRequest.builder()
+            .credentials(transactionRequest.getCredentials())
             .hbciPassportState(transactionRequest.getBankAccess().getHbciPassportState())
-            .pin(transactionRequest.getPin())
             .callback(hbciCallback)
-            .hbciProduct(Optional.ofNullable(transactionRequest.getHbciProduct())
-                .map(product -> new Product(product.getName(), product.getVersion()))
-                .orElse(null))
-            .hbciBPD(transactionRequest.getHbciBPD())
-            .hbciUPD(transactionRequest.getHbciUPD())
-            .hbciSysId(transactionRequest.getHbciSysId())
             .build();
+
+        hbciDialogRequest.setBankCode(transactionRequest.getBankCode() != null ? transactionRequest.getBankCode() :
+            transactionRequest.getBankAccess().getBankCode());
+        hbciDialogRequest.setHbciProduct(Optional.ofNullable(transactionRequest.getHbciProduct())
+            .map(product -> new Product(product.getName(), product.getVersion()))
+            .orElse(null));
+        hbciDialogRequest.setHbciBPD(transactionRequest.getHbciBPD());
+        hbciDialogRequest.setHbciUPD(transactionRequest.getHbciUPD());
+        hbciDialogRequest.setHbciSysId(transactionRequest.getHbciSysId());
+
+        return hbciDialogRequest;
     }
 
     abstract TransactionRequest getTransactionRequest();

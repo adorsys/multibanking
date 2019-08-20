@@ -7,17 +7,13 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@JsonIgnoreProperties(value = {"pin", "pin2", "hbciPassportState"}, allowSetters = true)
+@JsonIgnoreProperties(value = {"hbciPassportState"}, allowSetters = true)
 public class BankAccessEntity extends BankAccess implements StrongCustomerAuthorisationContainer {
 
     private String id;
     private String userId;
-    private String psd2ConsentId;
-    private String authorisation;
-    private String pin;
-    private String pin2;
+    private String consentId;
     private boolean temporary;
-    private boolean storePin;
     private boolean storeBookings;
     private boolean categorizeBookings;
     private boolean storeAnalytics;

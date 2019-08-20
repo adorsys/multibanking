@@ -16,16 +16,23 @@
 
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.ScaStatus;
+import de.adorsys.multibanking.domain.BankApi;
 import lombok.Data;
 
-import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
 
-@Embeddable
 @Data
+@Entity(name = "consent")
 public class ConsentJpaEntity {
 
-    private String consentId;
-    private String authUrl;
-    private ScaStatus scaStatus;
+    @Id
+    private String id;
+    private String authorisationId;
+    private BankApi bankApi;
+    private String psuAccountIban;
+    @Lob
+    private Object bankApiConsentData;
+
 }

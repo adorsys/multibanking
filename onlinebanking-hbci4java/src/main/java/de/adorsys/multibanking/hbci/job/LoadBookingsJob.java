@@ -29,6 +29,7 @@ import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.iban4j.Iban;
 import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
@@ -87,7 +88,14 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
     }
 
     @Override
+    public Konto getDebtorAccount(PinTanPassport passport) {
+        return createAccount();
+    }
+
+    @Override
     public LoadBookingsResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
+        //TODO check for needed 2FA
+
         if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
             throw new MultibankingException(HBCI_ERROR, bookingsJob.getJobResult().getJobStatus().getErrorList());
@@ -166,11 +174,13 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
     }
 
     private Konto createAccount() {
+        Iban iban = Iban.valueOf(loadBookingsRequest.getBankAccount().getIban());
+
         Konto account = new Konto();
+        account.iban = iban.toString();
+        account.blz = iban.getBankCode();
+        account.number = iban.getAccountNumber();
         account.bic = loadBookingsRequest.getBankAccount().getBic();
-        account.iban = loadBookingsRequest.getBankAccount().getIban();
-        account.blz = loadBookingsRequest.getBankAccount().getBlz();
-        account.number = loadBookingsRequest.getBankAccount().getAccountNumber();
         return account;
     }
 }

@@ -7,7 +7,6 @@ import de.adorsys.multibanking.mongo.mapper.MongoEntityMapper;
 import de.adorsys.multibanking.mongo.repository.BankAccessRepositoryMongodb;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import lombok.AllArgsConstructor;
-import lombok.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -44,8 +43,9 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     }
 
     @Override
-    public List<BankAccessEntity> findByUserIdAndPsd2ConsentIdNotNull(String userId) {
-        return entityMapper.mapToBankAccessEntities(bankAccessRepository.findByUserIdAndPsd2ConsentIdNotNull(userId));
+    public Optional<BankAccessEntity> findByConsentId(String consentId) {
+        return bankAccessRepository.findByConsentId(consentId)
+            .map(entityMapper::mapToBankAccessEntity);
     }
 
     @Override

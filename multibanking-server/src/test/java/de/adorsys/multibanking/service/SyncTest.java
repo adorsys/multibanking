@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -82,15 +83,12 @@ public class SyncTest {
 
     @Test
     public void testSyncBookings() {
-        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
-            System.getProperty("blz"), System.getProperty("pin"));
-        bankAccessEntity.setBankLogin(System.getProperty("login"));
-        bankAccessEntity.setBankLogin2(System.getProperty("login2"));
+        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id", System.getProperty("blz"));
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI);
+            BankApi.HBCI, null);
         BankAccountEntity bankAccountEntity = bankAccountEntities.stream()
             .filter(account -> account.getAccountNumber().equals(System.getProperty("account")))
             .findFirst()
@@ -98,7 +96,7 @@ public class SyncTest {
 
         bankAccountEntity.setId("test-account-id");
 
-        bookingService.syncBookings(bankAccessEntity, bankAccountEntity, BankApi.HBCI, System.getProperty("pin"));
+        bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntity, BankApi.HBCI, null);
 
         Optional<AccountAnalyticsEntity> analyticsEntity = analyticsRepository.findLastByUserIdAndAccountId("test" +
             "-user-id", "test-account-id");

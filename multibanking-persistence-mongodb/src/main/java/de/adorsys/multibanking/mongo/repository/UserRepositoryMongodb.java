@@ -8,13 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 @Profile({"mongo", "fongo"})
 public interface UserRepositoryMongodb extends MongoRepository<UserMongoEntity, String> {
-
-    Optional<UserMongoEntity> findById(String id);
 
     @Query(fields = "{id : 1}")
     List<UserMongoEntity> findByExpireUserLessThan(LocalDateTime date);

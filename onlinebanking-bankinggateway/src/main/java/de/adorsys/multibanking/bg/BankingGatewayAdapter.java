@@ -1,54 +1,89 @@
 package de.adorsys.multibanking.bg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
-import de.adorsys.multibanking.bg.api.AccountInformationServiceAisApi;
-import de.adorsys.multibanking.bg.domain.Consent;
-import static de.adorsys.multibanking.bg.domain.ConsentStatus.*;
-
-import de.adorsys.multibanking.bg.exception.ConsentAuthorisationRequiredException;
-import de.adorsys.multibanking.bg.exception.ConsentRequiredException;
-import de.adorsys.multibanking.bg.model.*;
+import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
+import de.adorsys.multibanking.banking_gateway_b2c.ApiException;
+import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2CAisApi;
+import de.adorsys.multibanking.banking_gateway_b2c.model.CreateConsentResponseTO;
+import de.adorsys.multibanking.banking_gateway_b2c.model.ResourceUpdateAuthResponseTO;
+import de.adorsys.multibanking.banking_gateway_b2c.model.UpdatePsuAuthenticationRequestTO;
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.exception.MissingAuthorisationException;
+import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
-import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
-import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
-import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
-import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
-import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
-import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
+import de.adorsys.multibanking.domain.request.*;
+import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisationContainer;
+import de.adorsys.xs2a.adapter.api.AccountApi;
+import de.adorsys.xs2a.adapter.api.remote.AccountInformationClient;
+import de.adorsys.xs2a.adapter.model.BookingStatusTO;
+import de.adorsys.xs2a.adapter.model.PaymentProductTO;
+import de.adorsys.xs2a.adapter.model.PaymentServiceTO;
+import de.adorsys.xs2a.adapter.service.GeneralResponse;
+import de.adorsys.xs2a.adapter.service.RequestHeaders;
+import de.adorsys.xs2a.adapter.service.RequestParams;
+import de.adorsys.xs2a.adapter.service.account.AccountDetails;
+import de.adorsys.xs2a.adapter.service.account.AccountListHolder;
+import de.adorsys.xs2a.adapter.service.account.TransactionsReport;
+import de.adorsys.xs2a.adapter.service.ais.AccountInformationService;
+import de.adorsys.xs2a.adapter.service.impl.AccountInformationServiceImpl;
+import feign.Feign;
+import feign.Logger;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
+import feign.slf4j.Slf4jLogger;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.iban4j.Iban;
+import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
+import org.springframework.cloud.openfeign.support.SpringMvcContract;
+import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.http.MediaType;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static de.adorsys.multibanking.bg.model.MessageCode400AIS.CONSENT_UNKNOWN;
-import static de.adorsys.multibanking.bg.model.MessageCode401AIS.CONSENT_INVALID;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_AUTHORISATION;
+import static de.adorsys.multibanking.domain.BankApi.XS2A;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
 
+@RequiredArgsConstructor
 @Slf4j
 public class BankingGatewayAdapter implements OnlineBankingService {
 
-    private static final String PSU_IP_ADDRESS = "127.0.0.1";
+    @NonNull
+    private final String bankingGatewayBaseUrl;
+    @NonNull
+    private final String xs2aAdapterBaseUrl;
+    @Getter(lazy = true)
+    private final BankingGatewayB2CAisApi bankingGatewayB2CAisApi = new BankingGatewayB2CAisApi(apiClient());
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    @Getter(lazy = true)
+    private final AccountInformationClient accountApi = Feign.builder()
+        .contract(createSpringMvcContract())
+        .logLevel(Logger.Level.FULL)
+        .logger(new Slf4jLogger(AccountApi.class))
+        .encoder(new JacksonEncoder())
+        .decoder(new ResponseEntityDecoder(new JacksonDecoder()))
+        .target(AccountInformationClient.class, xs2aAdapterBaseUrl);
+
+    @Getter(lazy = true)
+    private final AccountInformationService accountInformationService =
+        new AccountInformationServiceImpl(getAccountApi());
+
+    private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
+
+    private SpringMvcContract createSpringMvcContract() {
+        return new SpringMvcContract(Collections.emptyList(), new CustomConversionService());
+    }
 
     @Override
     public BankApi bankApi() {
-        return BankApi.BANKING_GATEWAY;
+        return XS2A;
     }
 
     @Override
@@ -62,7 +97,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public BankApiUser registerUser(BankAccess bankAccess, String pin) {
+    public BankApiUser registerUser(String userId) {
         BankApiUser bankApiUser = new BankApiUser();
         bankApiUser.setBankApi(bankApi());
         return bankApiUser;
@@ -70,32 +105,26 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     @Override
     public void removeUser(BankApiUser bankApiUser) {
-        throw new UnsupportedOperationException();
+        //FIXME
+        //throw new UnsupportedOperationException();
     }
 
     @Override
     public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
-        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(apiClient(loadAccountInformationRequest.getBankUrl()));
+        RequestHeaders aisHeaders = createAisHeaders(loadAccountInformationRequest,
+            loadAccountInformationRequest.getConsentId());
 
-        try {
-            AccountList accountList = ais.getAccountList(
-                loadAccountInformationRequest.getBankAccess().getBankCode(),
-                UUID.randomUUID(),
-                loadAccountInformationRequest.getConsentId(), false,
-                null, null, null,
-                null, PSU_IP_ADDRESS, null, null,
-                null, null,
-                null, null, null, null);
+        GeneralResponse<AccountListHolder> accountList = getAccountInformationService().getAccountList(aisHeaders,
+            RequestParams.builder().build());
 
-            return LoadAccountInformationResponse.builder()
-                .bankAccounts(accountList.getAccounts()
-                    .stream()
-                    .map(BankingGatewayMapping::toBankAccount)
-                    .collect(Collectors.toList()))
-                .build();
-        } catch (ApiException e) {
-            throw handeAisApiException(e);
-        }
+        List<BankAccount> bankAccounts = accountList.getResponseBody().getAccounts().stream()
+            .map(accountDetailsTO -> bankingGatewayMapper.toBankAccount(accountDetailsTO))
+            .collect(Collectors.toList());
+
+        return LoadAccountInformationResponse.builder()
+            .bankAccess(loadAccountInformationRequest.getBankAccess())
+            .bankAccounts(bankAccounts)
+            .build();
     }
 
     @Override
@@ -105,28 +134,64 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     @Override
     public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
-        AccountInformationServiceAisApi ais = new AccountInformationServiceAisApi(apiClient(loadBookingsRequest.getBankUrl()));
-        String resourceId = loadBookingsRequest.getBankAccount().getExternalIdMap().get(BankApi.XS2A);
-        LocalDate dateFrom = loadBookingsRequest.getDateFrom() != null ? loadBookingsRequest.getDateFrom() :
-            LocalDate.now().minusYears(1);
-        LocalDate dateTo = loadBookingsRequest.getDateTo();
-        try {
-            TransactionsResponse200Json transactionList = ais.getTransactionList(
-                loadBookingsRequest.getBankAccess().getBankCode(),
-                resourceId, "booked", UUID.randomUUID(),
-                loadBookingsRequest.getAuthorisation(), dateFrom, dateTo, null, null,
-                null, null, null, null, null,
-                PSU_IP_ADDRESS, null, null, null,
-                null, null, null, null,
-                null);
+        RequestHeaders requestHeaders = createAisHeaders(loadBookingsRequest, loadBookingsRequest.getConsentId());
 
-            return LoadBookingsResponse.builder()
-                .bookings(BankingGatewayMapping.toBookings(transactionList))
-                .build();
+        String resourceId = Optional.ofNullable(loadBookingsRequest.getBankAccount().getExternalIdMap().get(bankApi()))
+            .orElseGet(() -> getAccountResourceId(loadBookingsRequest.getBankAccess().getIban(), requestHeaders));
 
-        } catch (ApiException e) {
-            throw handeAisApiException(e);
-        }
+        RequestParams requestParams = RequestParams.builder()
+            .dateFrom(loadBookingsRequest.getDateFrom())
+            .dateTo(loadBookingsRequest.getDateTo())
+            .withBalance(loadBookingsRequest.isWithBalance())
+            .bookingStatus(BookingStatusTO.BOOKED.toString()).build();
+
+        GeneralResponse<TransactionsReport> bookingsResponse =
+            getAccountInformationService().getTransactionList(resourceId, requestHeaders, requestParams);
+
+        List<Booking> bookings = bookingsResponse.getResponseBody().getTransactions().getBooked().stream()
+            .map(transactions -> bankingGatewayMapper.toBooking(transactions))
+            .collect(Collectors.toList());
+
+        BalancesReport balancesReport = new BalancesReport();
+        bookingsResponse.getResponseBody().getBalances().forEach(balance -> {
+            switch (balance.getBalanceType()) {
+                case EXPECTED:
+                    balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
+                    break;
+                case CLOSINGBOOKED:
+                    balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
+                    break;
+                default:
+                    // ignore
+                    break;
+            }
+        });
+
+        return LoadBookingsResponse.builder()
+            .bookings(bookings)
+            .bankAccountBalance(balancesReport)
+            .build();
+    }
+
+    private String getAccountResourceId(String iban, RequestHeaders requestHeaders) {
+        return getAccountInformationService().getAccountList(requestHeaders, RequestParams.builder().build())
+            .getResponseBody().getAccounts()
+            .stream()
+            .filter(accountDetails -> accountDetails.getIban().equals(iban))
+            .findAny()
+            .map(AccountDetails::getResourceId)
+            .orElseThrow(() -> new MultibankingException(INVALID_ACCOUNT_REFERENCE));
+    }
+
+    private RequestHeaders createAisHeaders(TransactionRequest transactionRequest, String consentId) {
+        Map<String, String> headers = new HashMap<>();
+        headers.put(RequestHeaders.X_REQUEST_ID, UUID.randomUUID().toString());
+        headers.put(RequestHeaders.CONSENT_ID, consentId);
+        headers.put(RequestHeaders.X_GTW_BANK_CODE,
+            transactionRequest.getBankCode() != null ? transactionRequest.getBankCode() :
+                transactionRequest.getBankAccess().getBankCode());
+        headers.put(RequestHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        return RequestHeaders.fromMap(headers);
     }
 
     @Override
@@ -140,68 +205,131 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse requestAuthorizationCode(TransactionRequest request) {
+    public AuthorisationCodeResponse requestPaymentAuthorizationCode(TransactionRequest request) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+    public SubmitAuthorizationCodeResponse submitPaymentAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public StrongCustomerAuthorisable<Consent> getStrongCustomerAuthorisation() {
-        return new StrongCustomerAuthorisable<Consent>() {
+    public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
+        return new StrongCustomerAuthorisable() {
             @Override
-            public void containsValidAuthorisation(StrongCustomerAuthorisationContainer container) {
-                // FIXME get consent id from access
-                Object authorisation = container.getAuthorisation();
-                if (authorisation == null || !(authorisation instanceof Consent)) {
-                    throw new MissingAuthorisationException();
-                }
-                String consentId = ((Consent)authorisation).getConsentId();
-                // FIXME get consent by banking gateway - maybe with a function here
-                Consent consent = null;
+            public CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred,
+                                                       String tppRedirectUri) {
+                try {
+                    String bankCode = Iban.valueOf(consentTemplate.getPsuAccountIban()).getBankCode();
+                    CreateConsentResponseTO consentResponse =
+                        getBankingGatewayB2CAisApi().createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, redirectPreferred, tppRedirectUri);
 
-                if (consent.getScaStatus() != VALID) {
-                    if (consent.getScaStatus() == RECEIVED || consent.getScaStatus() == PARTIALLY_AUTHORISED) {
-                        throw new ConsentAuthorisationRequiredException(consent);
-                    } else {
-                        throw new ConsentRequiredException();
-                    }
+                    return bankingGatewayMapper.toCreateConsentResponse(consentResponse);
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
                 }
             }
 
             @Override
-            public Consent createAuthorisation(Consent authorisation) {
-                // FIXME create a authorisation by calling the banking gateway
-                return null;
+            public Consent getConsent(String consentId) {
+                try {
+                    return bankingGatewayMapper.toConsent(getBankingGatewayB2CAisApi().getConsentUsingGET(consentId));
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
+                }
             }
 
             @Override
-            public List<Consent> getAuthorisationList() {
-                // for banking gateway there is only the creation of a consent available
-                return null;
+            public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication,
+                                                              String bankingUrl) {
+                try {
+                    UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequestTO =
+                        bankingGatewayMapper.toUpdatePsuAuthenticationRequestTO(updatePsuAuthentication.getCredentials());
+                    ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
+                        getBankingGatewayB2CAisApi().updatePsuAuthenticationUsingPUT(updatePsuAuthenticationRequestTO
+                            , updatePsuAuthentication.getAuthorisationId(), updatePsuAuthentication.getConsentId());
+
+                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO, bankApi());
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
+                }
             }
 
             @Override
-            public Consent getAuthorisation(String authorisationId) {
-                // FIXME get consent from banking gateway?
-                return null;
+            public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod) {
+                try {
+
+                    ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
+                        getBankingGatewayB2CAisApi().selectPsuAuthenticationMethodUsingPUT(bankingGatewayMapper.toSelectPsuAuthenticationMethodRequestTO(selectPsuAuthenticationMethod), selectPsuAuthenticationMethod.getAuthorisationId(), selectPsuAuthenticationMethod.getConsentId());
+
+                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO, bankApi());
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
+                }
             }
 
             @Override
-            public void revokeAuthorisation(String authorisationId) {
-                // FIXME revoke consent at banking gateway?
+            public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
+                try {
+
+                    ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO =
+                        getBankingGatewayB2CAisApi().transactionAuthorisationUsingPUT(bankingGatewayMapper.toTransactionAuthorisationRequestTO(transactionAuthorisation), transactionAuthorisation.getAuthorisationId(), transactionAuthorisation.getConsentId());
+
+                    return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponseTO, bankApi());
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
+                }
+            }
+
+            @Override
+            public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId,
+                                                             Object bankApiConsentData) {
+                try {
+                    ResourceUpdateAuthResponseTO updateAuthResponseTO =
+                        getBankingGatewayB2CAisApi().getConsentAuthorisationStatusUsingGET(authorisationId, consentId);
+
+                    return bankingGatewayMapper.toUpdateAuthResponseTO(updateAuthResponseTO, bankApi());
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
+                }
+            }
+
+            @Override
+            public void revokeConsent(String consentId) {
+                try {
+                    getBankingGatewayB2CAisApi().revokeConsentUsingDELETE(consentId);
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
+                }
+            }
+
+            @Override
+            public void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus,
+                                        Object bankApiConsentData) {
+                try {
+                    Optional.of(getBankingGatewayB2CAisApi().getConsentAuthorisationStatusUsingGET(authorisationId,
+                        consentId))
+                        .map(consentStatus -> ScaStatus.valueOf(consentStatus.getScaStatus().getValue()))
+                        .filter(consentStatus -> consentStatus == expectedConsentStatus)
+                        .orElseThrow(() -> new MultibankingException(MultibankingError.INVALID_CONSENT_STATUS));
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
+                }
+            }
+
+            @Override
+            public void preExecute(TransactionRequest request, Object bankApiConsentData) {
+                //noop
             }
         };
     }
 
-    private ApiClient apiClient(String url) {
-        return apiClient(url, null, null);
+    private ApiClient apiClient() {
+        return apiClient(null, null);
     }
 
-    private ApiClient apiClient(String url, String acceptHeader, String contentTypeHeader) {
+    private ApiClient apiClient(String acceptHeader, String contentTypeHeader) {
         OkHttpClient client = new OkHttpClient();
         client.setReadTimeout(600, TimeUnit.SECONDS);
         client.interceptors().add(
@@ -224,7 +352,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         };
 
         apiClient.setHttpClient(client);
-        apiClient.setBasePath(url);
+        apiClient.setBasePath(bankingGatewayBaseUrl);
         return apiClient;
     }
 
@@ -236,7 +364,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 case 401:
                     return handleAis401Error(e);
                 case 429:
-                    return new MultibankingException(INVALID_AUTHORISATION, "consent access exceeded");
+                    return new MultibankingException(INVALID_CONSENT, "consent access exceeded");
                 default:
                     throw new MultibankingException(INTERNAL_ERROR, e.getMessage());
             }
@@ -248,23 +376,32 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     private MultibankingException handleAis401Error(ApiException e) throws IOException {
-        for (TppMessage401AIS tppMessage :
-            (objectMapper.readValue(e.getResponseBody(), Error401NGAIS.class)).getTppMessages()) {
-            if (tppMessage.getCode() == CONSENT_INVALID) {
-                return new MultibankingException(INVALID_AUTHORISATION, tppMessage.getText());
-            }
-        }
+//        for (TppMessage401AIS tppMessage :
+//            (objectMapper.readValue(e.getResponseBody(), Error401NGAIS.class)).getTppMessages()) {
+//            if (tppMessage.getCode() == CONSENT_INVALID) {
+//                return new MultibankingException(INVALID_AUTHORISATION, tppMessage.getText());
+//            }
+//        }
         return new MultibankingException(INTERNAL_ERROR, e.getMessage());
     }
 
     private MultibankingException handleAis400Error(ApiException e) throws IOException {
-        for (TppMessage400AIS tppMessage :
-            (objectMapper.readValue(e.getResponseBody(), Error400NGAIS.class)).getTppMessages()) {
-            if (tppMessage.getCode() == CONSENT_UNKNOWN) {
-                return new MultibankingException(INVALID_AUTHORISATION, tppMessage.getText());
-            }
-        }
+//        for (TppMessage400AIS tppMessage :
+//            (objectMapper.readValue(e.getResponseBody(), Error400NGAIS.class)).getTppMessages()) {
+//            if (tppMessage.getCode() == CONSENT_UNKNOWN) {
+//                return new MultibankingException(INVALID_AUTHORISATION, tppMessage.getText());
+//            }
+//        }
         return new MultibankingException(INTERNAL_ERROR, e.getMessage());
+    }
+
+    public static class CustomConversionService extends DefaultConversionService {
+
+        CustomConversionService() {
+            addConverter(BookingStatusTO.class, String.class, BookingStatusTO::toString);
+            addConverter(PaymentProductTO.class, String.class, PaymentProductTO::toString);
+            addConverter(PaymentServiceTO.class, String.class, PaymentServiceTO::toString);
+        }
     }
 }
 

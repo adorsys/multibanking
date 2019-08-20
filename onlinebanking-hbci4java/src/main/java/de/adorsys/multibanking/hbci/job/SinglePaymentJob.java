@@ -65,6 +65,9 @@ public class SinglePaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> 
         if (singlePayment.getPurpose() != null) {
             sepagv.setParam("usage", singlePayment.getPurpose());
         }
+        if (singlePayment.getPurposecode() != null) {
+            sepagv.setParam("purposecode", singlePayment.getPurposecode());
+        }
         sepagv.verifyConstraints();
 
         return Collections.singletonList(sepagv);

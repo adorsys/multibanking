@@ -44,7 +44,7 @@ import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 @RequiredArgsConstructor
 public class SubmitAuthorisationCodeJob {
 
-    private final ScaRequiredJob scaJob;
+    private final ScaRequiredJob<SubmitAuthorizationCodeResponse> scaJob;
 
     public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
         HbciTanSubmit hbciTanSubmit = evaluateTanSubmit(submitAuthorizationCodeRequest);
@@ -144,7 +144,7 @@ public class SubmitAuthorisationCodeJob {
             });
         state.apply(hbciPassport);
 
-        hbciPassport.setPIN(submitAuthorizationCodeRequest.getPin());
+        hbciPassport.setPIN(submitAuthorizationCodeRequest.getCredentials().getPin());
         hbciPassport.setCurrentSecMechInfo(hbciTanSubmit.getTwoStepMechanism());
         hbciPassport.setBPD(bpd);
 

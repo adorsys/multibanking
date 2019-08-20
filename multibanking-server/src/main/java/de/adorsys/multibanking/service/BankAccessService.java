@@ -1,9 +1,6 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.BankApiUser;
-import de.adorsys.multibanking.domain.UserEntity;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
@@ -32,23 +29,23 @@ public class BankAccessService {
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BookingRepositoryIf bookingRepository;
     private final BankAccountService bankAccountService;
+    private final ConsentRepositoryIf consentRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
-    public BankAccessEntity createBankAccess(String userId, BankAccessEntity bankAccess) {
-        userService.checkUserExists(userId);
+    public BankAccessEntity createBankAccess(BankAccessEntity bankAccess, Credentials credentials) {
+        userService.checkUserExists(bankAccess.getUserId());
 
-        bankAccess.setUserId(userId);
         if (StringUtils.isNoneBlank(bankAccess.getIban())) {
             bankAccess.setBankCode(Iban.valueOf(bankAccess.getIban()).getBankCode());
         }
 
-        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null);
+        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null, credentials);
 
         if (bankAccounts.isEmpty()) {
             throw new InvalidBankAccessException(bankAccess.getBankCode());
         }
 
-        saveBankAccess(bankAccess);
+        bankAccessRepository.save(bankAccess);
 
         bankAccounts.forEach(account -> account.setBankAccessId(bankAccess.getId()));
         bankAccountRepository.save(bankAccounts);
@@ -57,33 +54,15 @@ public class BankAccessService {
         return bankAccess;
     }
 
-    private void saveBankAccess(BankAccessEntity bankAccess) {
-        if (!bankAccess.isStorePin()) {
-            bankAccess.setPin(null);
-        }
-        bankAccessRepository.save(bankAccess);
-
-        log.info("Bank connection [{}] created.", bankAccess.getId());
-    }
-
     public void updateBankAccess(String accessId, BankAccessEntity bankAccessEntity) {
         BankAccessEntity bankAccessEntityDb = bankAccessRepository.findByUserIdAndId(bankAccessEntity.getUserId(),
             accessId).orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accessId));
 
-        bankAccessEntityDb.setStorePin(bankAccessEntity.isStorePin());
         bankAccessEntityDb.setStoreBookings(bankAccessEntity.isStoreBookings());
         bankAccessEntityDb.setCategorizeBookings(bankAccessEntity.isCategorizeBookings());
         bankAccessEntityDb.setStoreAnalytics(bankAccessEntity.isStoreAnalytics());
         bankAccessEntityDb.setStoreAnonymizedBookings(bankAccessEntity.isStoreAnonymizedBookings());
-        if (!bankAccessEntityDb.isStorePin()) {
-            bankAccessEntityDb.setPin(null);
-        } else {
-            if (bankAccessEntity.getPin() == null) {
-                bankAccessEntityDb.setStorePin(false);
-            } else {
-                bankAccessEntityDb.setPin(bankAccessEntity.getPin());
-            }
-        }
+
         if (!bankAccessEntityDb.isStoreBookings() || !bankAccessEntityDb.isStoreAnalytics()) {
             bankAccountRepository.findByUserIdAndBankAccessId(bankAccessEntityDb.getUserId(),
                 bankAccessEntityDb.getId()).forEach(bankAccountEntity -> {
@@ -100,11 +79,10 @@ public class BankAccessService {
 
     @Transactional
     public boolean deleteBankAccess(String userId, String accessId) {
-        UserEntity userEntity =
-            userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(UserEntity.class, userId));
-
         return bankAccessRepository.findByUserIdAndId(userId, accessId).map(bankAccessEntity -> {
             bankAccessRepository.deleteByUserIdAndBankAccessId(userId, accessId);
+
+            deleteConsent(bankAccessEntity);
 
             List<BankAccountEntity> bankAccounts = bankAccountRepository.deleteByBankAccess(accessId);
             bankAccounts.forEach(bankAccountEntity -> {
@@ -112,22 +90,36 @@ public class BankAccessService {
                 analyticsRepository.deleteByAccountId(bankAccountEntity.getId());
                 contractRepository.deleteByAccountId(bankAccountEntity.getId());
                 standingOrderRepository.deleteByAccountId(bankAccountEntity.getId());
-                bankAccountEntity.getExternalIdMap().keySet().forEach(bankApi -> {
-                    OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankApi);
-                    // FIXME this would mean that there is the same authorisation id for different bank apis? which feels wrong
-                    // remove authorisation if needed by the bank api
-                    Optional.ofNullable(bankingService.getStrongCustomerAuthorisation())
-                        .ifPresent(strongCustomerAuthorisable -> strongCustomerAuthorisable.revokeAuthorisation(bankAccessEntity.getAuthorisation()));
-                    //remove remote bank api user
-                    if (bankingService.userRegistrationRequired()) {
-                        BankApiUser bankApiUser =
-                            userEntity.getApiUser().stream().filter(apiUser -> apiUser.getBankApi() == bankApi).findFirst().orElseThrow(() -> new ResourceNotFoundException(BankApiUser.class, bankApi.toString()));
-                        bankingService.removeBankAccount(bankAccountEntity, bankApiUser);
-                    }
-                });
+                deleteExternalBankAccount(userId, bankAccountEntity);
             });
             return true;
         }).orElse(false);
+    }
+
+    private void deleteExternalBankAccount(String userId, BankAccountEntity bankAccountEntity) {
+        bankAccountEntity.getExternalIdMap().keySet().forEach(bankApi -> {
+            OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankApi);
+            //remove remote bank api user
+            if (bankingService.userRegistrationRequired()) {
+                UserEntity userEntity =
+                    userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(UserEntity.class, userId));
+                BankApiUser bankApiUser =
+                    userEntity.getApiUser().stream().filter(apiUser -> apiUser.getBankApi() == bankApi).findFirst().orElseThrow(() -> new ResourceNotFoundException(BankApiUser.class, bankApi.toString()));
+                bankingService.removeBankAccount(bankAccountEntity, bankApiUser);
+            }
+        });
+    }
+
+    private void deleteConsent(BankAccessEntity bankAccessEntity) {
+        Optional.ofNullable(bankAccessEntity.getConsentId())
+            .map(consentRepository::findById)
+            .map(Optional::get)
+            .ifPresent(internalConsent -> {
+                OnlineBankingService bankingService =
+                    bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+                bankingService.getStrongCustomerAuthorisation().revokeConsent(internalConsent.getId());
+                consentRepository.delete(internalConsent);
+            });
     }
 
 }
