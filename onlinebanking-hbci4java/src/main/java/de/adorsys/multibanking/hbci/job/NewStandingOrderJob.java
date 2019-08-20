@@ -44,7 +44,7 @@ public class NewStandingOrderJob extends ScaRequiredJob<AuthorisationCodeRespons
     public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         StandingOrder standingOrder = (StandingOrder) transactionRequest.getTransaction();
 
-        Konto src = getDebtorAccount(passport);
+        Konto src = getPsuKonto(passport);
 
         Konto dst = new Konto();
         dst.name = standingOrder.getOtherAccount().getOwner();

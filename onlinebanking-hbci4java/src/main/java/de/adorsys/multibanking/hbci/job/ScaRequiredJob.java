@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.hbci.job;
 
+import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.Product;
 import de.adorsys.multibanking.domain.TanChallenge;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
@@ -28,6 +29,7 @@ import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
 import de.adorsys.multibanking.hbci.model.HbciPassport;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import org.apache.commons.lang3.StringUtils;
+import org.iban4j.Iban;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -167,12 +169,13 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
             hktan.setParam("tanmedia", getTransactionRequest().getTanTransportType().getMedium());
         }
 
-        Konto debtorAccount = getDebtorAccount(dialog.getPassport());
+        Konto psuKonto = getPsuKonto(dialog.getPassport());
 
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         hktan.setParam("process", "4");
-        hktan.setParam("orderaccount", debtorAccount);
+        hktan.setParam("ordersegcode", "HKIDN");
+        hktan.setParam("orderaccount", psuKonto);
 
         Optional<List<AbstractHBCIJob>> messages = Optional.ofNullable(hbciJob)
             .map(dialog::addTask);
@@ -184,15 +187,17 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         }
     }
 
-    Konto getDebtorAccount(PinTanPassport passport) {
+    Konto getPsuKonto(PinTanPassport passport) {
+        BankAccount account = getPsuBankAccount();
+        Konto konto = passport.findAccountByAccountNumber(Iban.valueOf(account.getIban()).getAccountNumber());
+        konto.iban = account.getIban();
+        konto.bic = account.getBic();
+        return konto;
+    }
+
+    BankAccount getPsuBankAccount() {
         return Optional.ofNullable(getTransactionRequest().getTransaction().getPsuAccount())
-            .map(bankAccount -> {
-                Konto konto = passport.findAccountByAccountNumber(bankAccount.getAccountNumber());
-                konto.iban = bankAccount.getIban();
-                konto.bic = bankAccount.getBic();
-                return konto;
-            })
-            .orElse(null);
+            .orElseThrow(() -> new MultibankingException(INVALID_ACCOUNT_REFERENCE, "Missing transaction psu account"));
     }
 
     HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog) {

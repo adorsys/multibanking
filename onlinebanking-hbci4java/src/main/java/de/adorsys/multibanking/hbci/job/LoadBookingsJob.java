@@ -17,6 +17,7 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BalancesReport;
+import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
@@ -83,13 +84,13 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
     }
 
     @Override
-    public String orderIdFromJobResult(HBCIJobResult jobResult) {
-        return null;
+    BankAccount getPsuBankAccount() {
+        return loadBookingsRequest.getBankAccount();
     }
 
     @Override
-    public Konto getDebtorAccount(PinTanPassport passport) {
-        return createAccount();
+    public String orderIdFromJobResult(HBCIJobResult jobResult) {
+        return null;
     }
 
     @Override
@@ -138,7 +139,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
     private AbstractHBCIJob createStandingOrdersJob(PinTanPassport passport) {
         if (passport.jobSupported("DauerSEPAList")) {
             AbstractHBCIJob hbciJob = new GVDauerSEPAList(passport);
-            hbciJob.setParam("src", createAccount());
+            hbciJob.setParam("src", getPsuKonto(passport));
         }
         return null;
     }
@@ -154,7 +155,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
             })
             .orElseGet(() -> new GVKUmsAll(passport));
 
-        hbciJob.setParam("my", createAccount());
+        hbciJob.setParam("my", getPsuKonto(passport));
 
         Optional.ofNullable(loadBookingsRequest.getDateFrom())
             .ifPresent(localDate -> hbciJob.setParam("startdate",
@@ -169,18 +170,9 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
 
     private AbstractHBCIJob createBalanceJob(PinTanPassport passport) {
         AbstractHBCIJob hbciJob = new GVSaldoReq(passport);
-        hbciJob.setParam("my", createAccount());
+        hbciJob.setParam("my", getPsuKonto(passport));
         return hbciJob;
     }
 
-    private Konto createAccount() {
-        Iban iban = Iban.valueOf(loadBookingsRequest.getBankAccount().getIban());
 
-        Konto account = new Konto();
-        account.iban = iban.toString();
-        account.blz = iban.getBankCode();
-        account.number = iban.getAccountNumber();
-        account.bic = loadBookingsRequest.getBankAccount().getBic();
-        return account;
-    }
 }

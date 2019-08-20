@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CredentialsTO {
-    private String bankLogin;
-    private String bankLogin2;
+    private String customerId;
+    private String userId;
     private String pin;
     private String pin2;
 }

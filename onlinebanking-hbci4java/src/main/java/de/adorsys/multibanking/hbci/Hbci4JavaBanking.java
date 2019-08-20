@@ -320,6 +320,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             @Override
             public void revokeConsent(String consentId) {
+                //noop
             }
 
             @Override

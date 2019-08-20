@@ -46,7 +46,7 @@ public class BulkPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
     public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         BulkPayment bulkPayment = (BulkPayment) transactionRequest.getTransaction();
 
-        Konto src = getDebtorAccount(passport);
+        Konto src = getPsuKonto(passport);
 
         AbstractSEPAGV sepagv;
         if (bulkPayment instanceof FutureBulkPayment) {

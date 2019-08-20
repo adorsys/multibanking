@@ -38,7 +38,7 @@ public class ForeignPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse>
 
     @Override
     public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
-        Konto src = getDebtorAccount(passport);
+        Konto src = getPsuKonto(passport);
 
         GVDTAZV gv = new GVDTAZV(passport, GVDTAZV.getLowlevelName());
 

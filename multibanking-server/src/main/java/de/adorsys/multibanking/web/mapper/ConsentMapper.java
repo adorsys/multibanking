@@ -13,6 +13,7 @@ import org.mapstruct.Mapping;
 public interface ConsentMapper {
 
     @Mapping(target = "psuAccountIban", ignore = true)
+    @Mapping(target = "tppRedirectUri", ignore = true)
     ConsentTO toConsentTO(Consent consent);
 
     @Mapping(target = "consentId", ignore = true)

@@ -28,7 +28,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class TransactionRequest extends AbstractRequest {
 
-    private Credentials credentials;
     private BankApiUser bankApiUser;
     private TanTransportType tanTransportType;
     private AbstractScaTransaction transaction;

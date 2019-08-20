@@ -16,14 +16,12 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ConsentAuthorisationMapper {
 
-    UpdateAuthResponseTO toUpdateAuthResponseTO(UpdateAuthResponse updateAuthResponse);
-
     @Mapping(target = "consentId", source = "consentEntity.id")
     @Mapping(target = "authorisationId", source = "consentEntity.authorisationId")
     @Mapping(target = "psuAccountIban", source = "consentEntity.psuAccountIban")
     @Mapping(target = "bankApiConsentData", source = "consentEntity.bankApiConsentData")
-    @Mapping(target = "credentials.bankLogin", source = "updatePsuAuthenticationRequest.psuId")
-    @Mapping(target = "credentials.bankLogin2", source = "updatePsuAuthenticationRequest.psuCustomerId")
+    @Mapping(target = "credentials.customerId", source = "updatePsuAuthenticationRequest.psuId")
+    @Mapping(target = "credentials.userId", source = "updatePsuAuthenticationRequest.psuCorporateId")
     @Mapping(target = "credentials.pin", source = "updatePsuAuthenticationRequest.password")
     @Mapping(target = "bankCode", source = "bankEntity.bankApiBankCode")
     @Mapping(target = "bankUrl", source = "bankEntity.bankingUrl")
@@ -33,7 +31,10 @@ public interface ConsentAuthorisationMapper {
     @Mapping(target = "hbciSysId", ignore = true)
     UpdatePsuAuthenticationRequest toUpdatePsuAuthenticationRequest(UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequest, ConsentEntity consentEntity, BankEntity bankEntity);
 
+    UpdateAuthResponseTO toUpdateAuthResponseTO(UpdateAuthResponse updateAuthResponse);
+
     @Mapping(target = "consentId", source = "consentEntity.id")
+    @Mapping(target = "credentials", ignore = true)
     @Mapping(target = "hbciProduct", ignore = true)
     @Mapping(target = "hbciBPD", ignore = true)
     @Mapping(target = "hbciUPD", ignore = true)
@@ -43,6 +44,7 @@ public interface ConsentAuthorisationMapper {
     SelectPsuAuthenticationMethodRequest toSelectPsuAuthenticationMethodRequest(SelectPsuAuthenticationMethodRequestTO selectPsuAuthenticationMethodRequest, ConsentEntity consentEntity);
 
     @Mapping(target = "consentId", source = "consentEntity.id")
+    @Mapping(target = "credentials", ignore = true)
     @Mapping(target = "hbciProduct", ignore = true)
     @Mapping(target = "hbciBPD", ignore = true)
     @Mapping(target = "hbciUPD", ignore = true)

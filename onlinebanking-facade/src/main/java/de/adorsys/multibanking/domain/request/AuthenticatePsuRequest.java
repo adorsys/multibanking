@@ -29,6 +29,5 @@ public class AuthenticatePsuRequest extends AbstractRequest {
     private String paymentProduct;
     private String paymentService;
     private String consentId;
-    private Credentials credentials;
 
 }

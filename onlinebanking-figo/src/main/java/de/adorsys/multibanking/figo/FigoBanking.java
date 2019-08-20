@@ -175,8 +175,8 @@ public class FigoBanking implements OnlineBankingService {
                 bankAccess.getBankCode(),
                 "de",
                 createCredentials(
-                    loadAccountInformationRequest.getCredentials().getBankLogin(),
-                    loadAccountInformationRequest.getCredentials().getBankLogin2(),
+                    loadAccountInformationRequest.getCredentials().getCustomerId(),
+                    loadAccountInformationRequest.getCredentials().getUserId(),
                     loadAccountInformationRequest.getCredentials().getPin()
                 ),
                 Collections.singletonList("standingOrders"),

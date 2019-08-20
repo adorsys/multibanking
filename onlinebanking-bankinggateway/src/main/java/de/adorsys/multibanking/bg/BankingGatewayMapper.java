@@ -50,9 +50,9 @@ interface BankingGatewayMapper {
     @Mapping(target = "bankApiConsentData", ignore = true)
     CreateConsentResponse toCreateConsentResponse(CreateConsentResponseTO consentResponse);
 
-    @Mapping(source = "bankLogin", target = "psuId")
-    @Mapping(source = "bankLogin2", target = "psuCustomerId")
-    @Mapping(source = "pin", target = "password")
+    @Mapping(target = "psuId", source = "customerId")
+    @Mapping(target = "psuCorporateId", source = "userId")
+    @Mapping(target = "password", source = "pin")
     UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(Credentials credentials);
 
     UpdateAuthResponse toUpdateAuthResponseTO(ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO,

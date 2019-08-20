@@ -44,7 +44,7 @@ public class SinglePaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> 
     public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
         SinglePayment singlePayment = (SinglePayment) transactionRequest.getTransaction();
 
-        Konto src = getDebtorAccount(passport);
+        Konto src = getPsuKonto(passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();
