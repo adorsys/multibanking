@@ -21,6 +21,7 @@ import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import de.adorsys.multibanking.hbci.model.HBCIConsent;
 import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -41,8 +42,10 @@ import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDial
 public class TransferJob {
 
     public void requestTransfer(TransactionRequest sepaTransactionRequest) {
+        HBCIConsent hbciConsent = (HBCIConsent) sepaTransactionRequest.getBankApiConsentData();
+
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
-            .credentials(sepaTransactionRequest.getCredentials())
+            .credentials(hbciConsent.getCredentials())
             .hbciPassportState(sepaTransactionRequest.getBankAccess().getHbciPassportState())
             .build();
 
@@ -68,6 +71,8 @@ public class TransferJob {
         if (hbciJob.getJobResult().getJobStatus().hasErrors()) {
             throw new MultibankingException(HBCI_ERROR, hbciJob.getJobResult().getJobStatus().getErrorList());
         }
+
+        dialog.execute(true);
     }
 
     private AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,

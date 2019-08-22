@@ -11,8 +11,8 @@ import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -175,9 +175,9 @@ public class FigoBanking implements OnlineBankingService {
                 bankAccess.getBankCode(),
                 "de",
                 createCredentials(
-                    loadAccountInformationRequest.getCredentials().getCustomerId(),
-                    loadAccountInformationRequest.getCredentials().getUserId(),
-                    loadAccountInformationRequest.getCredentials().getPin()
+//                    loadAccountInformationRequest.getCredentials().getCustomerId(),
+//                    loadAccountInformationRequest.getCredentials().getUserId(),
+//                    loadAccountInformationRequest.getCredentials().getPin()
                 ),
                 Collections.singletonList("standingOrders"),
                 false,
@@ -283,7 +283,7 @@ public class FigoBanking implements OnlineBankingService {
 
             Status status = waitForFinish(session, response.getTaskToken());
             if (status == Status.PIN) {
-                submitPin(response.getTaskToken(), loadBookingsRequest.getCredentials().getPin(), session);
+//                submitPin(response.getTaskToken(), loadBookingsRequest.getCredentials().getPin(), session);
             }
 
             List<Booking> bookings = session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))

@@ -25,6 +25,7 @@ import java.util.Map;
 @Data
 public abstract class AbstractRequest {
 
+    private Object bankApiConsentData;
     private Credentials credentials;
     private String bankCode;
     private String bankUrl;

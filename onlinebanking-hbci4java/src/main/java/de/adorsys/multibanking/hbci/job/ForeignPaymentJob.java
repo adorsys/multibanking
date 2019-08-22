@@ -55,11 +55,6 @@ public class ForeignPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse>
     }
 
     @Override
-    HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog) {
-        return dialog.getPassport().getBankTwostepMechanisms().get(transactionRequest.getTanTransportType().getId());
-    }
-
-    @Override
     TransactionRequest getTransactionRequest() {
         return transactionRequest;
     }

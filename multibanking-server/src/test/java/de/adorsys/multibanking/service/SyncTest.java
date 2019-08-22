@@ -88,7 +88,7 @@ public class SyncTest {
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI, null);
+            BankApi.HBCI);
         BankAccountEntity bankAccountEntity = bankAccountEntities.stream()
             .filter(account -> account.getAccountNumber().equals(System.getProperty("account")))
             .findFirst()

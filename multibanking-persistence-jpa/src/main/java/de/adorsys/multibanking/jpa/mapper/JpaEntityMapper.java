@@ -42,6 +42,9 @@ public interface JpaEntityMapper {
 
     List<TanTransportType> mapToTanTransportTypeList(List<TanTransportTypeJpaEntity> value);
 
+    @Mapping(target = "needTanMedia", ignore = true)
+    TanTransportType mapToTanTransportType(TanTransportTypeJpaEntity value);
+
     List<BankAccessEntity> mapToBankAccessEntities(List<BankAccessJpaEntity> byUserId);
 
     BankAccessJpaEntity mapToBankAccessJpaEntity(BankAccessEntity bankAccess);

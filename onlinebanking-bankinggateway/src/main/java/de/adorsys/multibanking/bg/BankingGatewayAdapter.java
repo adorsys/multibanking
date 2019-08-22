@@ -105,8 +105,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     @Override
     public void removeUser(BankApiUser bankApiUser) {
-        //FIXME
-        //throw new UnsupportedOperationException();
+        //noop
     }
 
     @Override
@@ -317,7 +316,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             }
 
             @Override
-            public void preExecute(TransactionRequest request, Object bankApiConsentData) {
+            public void afterExecute(Object bankApiConsentData, AuthorisationCodeResponse authorisationCodeResponse) {
                 //noop
             }
         };

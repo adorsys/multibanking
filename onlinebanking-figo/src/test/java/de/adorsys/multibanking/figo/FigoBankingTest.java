@@ -102,7 +102,7 @@ public class FigoBankingTest {
         request2.setBankAccess(bankaccess);
         request2.setBankApiUser(result);
         request2.setBankCode(FIGO_TEST_BANKCODE);
-        request2.setCredentials(Credentials.builder().pin(FIGO_TEST_PIN).build());
+//        request2.setCredentials(Credentials.builder().pin(FIGO_TEST_PIN).build());
         request2.setBankAccount(result2.getBankAccounts().get(0));
 
         val response = service.loadBookings(request2);

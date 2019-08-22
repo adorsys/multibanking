@@ -2,7 +2,7 @@ package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
-import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
+import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
@@ -73,7 +73,7 @@ public class DirectAccessController {
             selectScaMethodForConsent(loadAccountsRequest.getBankAccess().getConsentId(),
                 loadAccountsRequest.getScaMethodId());
             return doLoadBankAccounts(loadAccountsRequest, bankApi, SCAMETHODSELECTED);
-        } catch (MissingConsentAuthorisationException e) {
+        } catch (TransactionAuthorisationRequiredException e) {
             log.debug("process finished < return challenge");
             return createChallengeResponse(e.getResponse(), e.getConsentId(), e.getAuthorisationId());
         }
@@ -98,7 +98,7 @@ public class DirectAccessController {
             selectScaMethodForConsent(loadBookingsRequest.getBankAccess().getConsentId(),
                 loadBookingsRequest.getScaMethodId());
             return doLoadBookings(loadBookingsRequest, bankApi, SCAMETHODSELECTED);
-        } catch (MissingConsentAuthorisationException e) {
+        } catch (TransactionAuthorisationRequiredException e) {
             log.debug("process finished < return challenge");
             return createChallengeResponse(e.getResponse(), e.getConsentId(), e.getAuthorisationId());
         }

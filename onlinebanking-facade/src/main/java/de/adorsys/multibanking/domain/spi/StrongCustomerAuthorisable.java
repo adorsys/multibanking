@@ -7,6 +7,7 @@ import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodReque
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 
@@ -38,5 +39,5 @@ public interface StrongCustomerAuthorisable {
     void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus,
                          Object bankApiConsentData);
 
-    void preExecute(TransactionRequest request, Object bankApiConsentData);
+    void afterExecute(Object bankApiConsentData, AuthorisationCodeResponse authorisationCodeResponse);
 }

@@ -44,7 +44,6 @@ public class StandingOrderService {
             request.setBankApiUser(bankApiUser);
             request.setTransaction(standingOrder);
             request.setBankAccess(bankAccess);
-            request.setCredentials(credentials);
             request.setBankCode(bankEntity.getBankApiBankCode());
             request.setBankUrl(bankEntity.getBankingUrl());
             request.setHbciProduct(finTSProductConfig.getProduct());
@@ -76,8 +75,6 @@ public class StandingOrderService {
             request.setTransaction(standingOrder);
             request.setTanSubmit(tanSubmit);
             request.setTan(tan);
-
-            request.setCredentials(credentials);
             request.setHbciProduct(finTSProductConfig.getProduct());
             bankingService.submitPaymentAuthorizationCode(request);
         } catch (MultibankingException e) {

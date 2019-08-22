@@ -18,7 +18,6 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BalancesReport;
 import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
@@ -30,14 +29,12 @@ import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.iban4j.Iban;
 import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.structures.Konto;
 
 import java.time.ZoneId;
 import java.util.*;
@@ -45,7 +42,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
-import static de.adorsys.multibanking.hbci.job.AccountInformationJob.extractTanTransportTypes;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -80,7 +76,15 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
 
     @Override
     String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
-        return GVSEPAInfo.getLowlevelName();
+        return Optional.ofNullable(loadBookingsRequest.getRawResponseType())
+            .map(rawResponseType -> {
+                if (rawResponseType == LoadBookingsRequest.RawResponseType.CAMT) {
+                    return GVKUmsAllCamt.getLowlevelName();
+                } else {
+                    return GVKUmsAll.getLowlevelName();
+                }
+            })
+            .orElse(GVKUmsAll.getLowlevelName());
     }
 
     @Override
@@ -95,17 +99,9 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
 
     @Override
     public LoadBookingsResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        //TODO check for needed 2FA
-
         if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
             throw new MultibankingException(HBCI_ERROR, bookingsJob.getJobResult().getJobStatus().getErrorList());
-        }
-
-        if (loadBookingsRequest.isWithTanTransportTypes()) {
-            loadBookingsRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
-            loadBookingsRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI,
-                extractTanTransportTypes(passport));
         }
 
         List<StandingOrder> standingOrders = Optional.ofNullable(standingOrdersJob)
@@ -173,6 +169,5 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
         hbciJob.setParam("my", getPsuKonto(passport));
         return hbciJob;
     }
-
 
 }

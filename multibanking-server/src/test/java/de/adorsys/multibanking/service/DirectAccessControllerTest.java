@@ -9,6 +9,8 @@ import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.ConsentEntity;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
+import de.adorsys.multibanking.domain.exception.ScaRequiredException;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.response.ScaMethodsResponse;
@@ -52,7 +54,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_2FA_REQUIRED;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
 import static de.adorsys.multibanking.service.TestUtil.createBooking;
 import static de.adorsys.multibanking.web.model.ScaStatusTO.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -113,7 +115,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
         BankAccessTO bankAccess = createBankAccess();
@@ -133,7 +135,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.redirectUrl.href")).isNotBlank();
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO bankAccess = createBankAccess();
@@ -151,11 +153,12 @@ public class DirectAccessControllerTest {
     @Test
     public void consent_authorisation_hbci() {
         BankAccessTO access = createBankAccess();
-        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
-        prepareBank(hbci4JavaBanking, access.getIban(), false);
-//        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
-//        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme.de/hbciTunnel/hbciTransfer" +
-//            ".jsp", false);
+//        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
+//        prepareBank(hbci4JavaBanking, access.getIban(), false);
+        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
+        prepareBank(hbci4JavaBanking, access.getIban(), null, false);
+//        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme
+//        .de/hbciTunnel/hbciTransfer.jsp", false);
 
         if (isMock(hbci4JavaBanking)) {
             //mock hbci authenticate psu
@@ -165,7 +168,7 @@ public class DirectAccessControllerTest {
                 .build()).when(hbci4JavaBanking).authenticatePsu(any());
 
             //mock bookings response
-            doThrow(new MultibankingException(HBCI_2FA_REQUIRED))
+            doThrow(new ScaRequiredException(AuthorisationCodeResponse.builder().build()))
                 .doReturn(LoadBookingsResponse.builder()
                     .bookings(new ArrayList<>())
                     .build())
@@ -173,8 +176,8 @@ public class DirectAccessControllerTest {
         }
 
         CredentialsTO credentials = CredentialsTO.builder()
-            .customerId(System.getProperty("login2", "login"))
-            .userId(System.getProperty("login", "login2"))
+            .customerId(System.getProperty("login", "login"))
+            .userId(System.getProperty("login2", null))
             .pin(System.getProperty("pin", "pin"))
             .build();
 
@@ -242,6 +245,11 @@ public class DirectAccessControllerTest {
             assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
         }
 
+        if (jsonPath.get("bookings") != null) {
+            //response contains bookings -> sca not needed
+            return;
+        }
+
         //5. send tan
         TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
         transactionAuthorisationRequestTO.setScaAuthenticationData("alex1");
@@ -272,17 +280,17 @@ public class DirectAccessControllerTest {
 
     @Test
     public void verifyApi() {
-        verifyApi(MultibankingError.INVALID_PIN, "NO_AUTHORISATION");
+        verifyApi(INVALID_PIN, "NO_AUTHORISATION");
     }
 
     @Test
     public void verifyApiConsentWithoutSelectedSCA() {
-        verifyApi(MultibankingError.INVALID_SCA_METHOD, "SELECT_CONSENT_AUTHORISATION");
+        verifyApi(INVALID_SCA_METHOD, "SELECT_CONSENT_AUTHORISATION");
     }
 
     @Test
     public void verifyApiConsentWithoutAuthorisedSCA() {
-        verifyApi(MultibankingError.HBCI_2FA_REQUIRED, "AUTHORISE_CONSENT");
+        verifyApi(INVALID_CONSENT_STATUS, "AUTHORISE_CONSENT");
     }
 
     private void verifyApi(MultibankingError error, String messageKey) {

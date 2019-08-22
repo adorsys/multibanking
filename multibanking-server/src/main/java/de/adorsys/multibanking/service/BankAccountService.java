@@ -40,7 +40,7 @@ public class BankAccountService extends AccountInformationService {
     private final BankService bankService;
     private final FinTSProductConfig finTSProductConfig;
 
-    public List<BankAccountEntity> getBankAccounts(String userId, String accessId, Credentials credentials) {
+    public List<BankAccountEntity> getBankAccounts(String userId, String accessId, @Nullable Credentials credentials) {
         BankAccessEntity bankAccessEntity = bankAccessRepository.findByUserIdAndId(userId, accessId)
             .orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accessId));
 
@@ -59,9 +59,14 @@ public class BankAccountService extends AccountInformationService {
         return bankAccounts;
     }
 
+    List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi) {
+        return loadBankAccountsOnline(bankAccess, bankApi, null);
+    }
+
     List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi,
-                                                   Credentials credentials) {
-        return loadBankAccountsOnline(bankAccess, userService.findUser(bankAccess.getUserId()), bankApi, FINALISED, credentials);
+                                                   @Nullable Credentials credentials) {
+        return loadBankAccountsOnline(bankAccess, userService.findUser(bankAccess.getUserId()), bankApi, FINALISED,
+            credentials);
     }
 
     public List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, UserEntity userEntity,
@@ -112,13 +117,9 @@ public class BankAccountService extends AccountInformationService {
         consentEntity.ifPresent(consent -> request.setConsentId(consent.getId()));
 
         try {
-            consentEntity.ifPresent(consent -> onlineBankingService.getStrongCustomerAuthorisation().preExecute(request,
-                consent.getBankApiConsentData())
-            );
-
             return onlineBankingService.loadBankAccounts(request).getBankAccounts();
         } catch (MultibankingException e) {
-            throw handleMultibankingException(bankAccess, consentEntity.orElse(null), e);
+            throw handleMultibankingException(bankAccess, e);
         }
     }
 

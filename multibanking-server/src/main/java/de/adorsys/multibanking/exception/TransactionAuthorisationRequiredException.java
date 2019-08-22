@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.exception;
 
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -11,13 +12,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
     reason = "AUTHORISE_CONSENT"
 )
 @Getter
-public class MissingConsentAuthorisationException extends ParametrizedMessageException {
+@EqualsAndHashCode(callSuper = false)
+public class TransactionAuthorisationRequiredException extends ParametrizedMessageException {
 
-    private String consentId;
-    private String authorisationId;
-    private UpdateAuthResponse response;
+    private final String consentId;
+    private final String authorisationId;
+    private final UpdateAuthResponse response;
 
-    public MissingConsentAuthorisationException(UpdateAuthResponse response, String consentId, String authorisationId) {
+    public TransactionAuthorisationRequiredException(UpdateAuthResponse response, String consentId, String authorisationId) {
         super("Solve Selected SCA Method");
         this.consentId = consentId;
         this.authorisationId = authorisationId;

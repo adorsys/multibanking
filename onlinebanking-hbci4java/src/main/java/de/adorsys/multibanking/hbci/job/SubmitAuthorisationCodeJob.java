@@ -21,10 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
-import de.adorsys.multibanking.hbci.model.HbciCallback;
-import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
-import de.adorsys.multibanking.hbci.model.HbciPassport;
-import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
+import de.adorsys.multibanking.hbci.model.*;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
@@ -97,8 +94,7 @@ public class SubmitAuthorisationCodeJob {
                 return result;
             }).orElse(null);
 
-        GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport());
-        hktan.setOriginJob(originJob);
+        GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport(), originJob);
         hktan.setParam("orderref", hbciTanSubmit.getOrderRef());
         hktan.setParam("process", hbciTanSubmit.getHktanProcess() != null ? hbciTanSubmit.getHktanProcess() : "2");
         hktan.setParam("notlasttan", "N");
@@ -144,7 +140,9 @@ public class SubmitAuthorisationCodeJob {
             });
         state.apply(hbciPassport);
 
-        hbciPassport.setPIN(submitAuthorizationCodeRequest.getCredentials().getPin());
+        HBCIConsent hbciConsent = (HBCIConsent) submitAuthorizationCodeRequest.getBankApiConsentData();
+
+        hbciPassport.setPIN(hbciConsent.getCredentials().getPin());
         hbciPassport.setCurrentSecMechInfo(hbciTanSubmit.getTwoStepMechanism());
         hbciPassport.setBPD(bpd);
 

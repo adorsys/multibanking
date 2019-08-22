@@ -3,7 +3,6 @@ package de.adorsys.multibanking.web;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.SyncInProgressException;
 import de.adorsys.multibanking.exception.domain.Messages;

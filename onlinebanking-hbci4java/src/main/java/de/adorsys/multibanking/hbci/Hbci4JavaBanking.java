@@ -29,15 +29,13 @@ import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.hbci.job.*;
-import de.adorsys.multibanking.hbci.model.HBCIConsent;
-import de.adorsys.multibanking.hbci.model.HbciCallback;
-import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
-import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
+import de.adorsys.multibanking.hbci.model.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.iban4j.Iban;
+import org.kapott.hbci.GV.GVTANMediaList;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIDialog;
@@ -146,6 +144,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
         HBCIDialog dialog = createDialog(authenticatePsuRequest.getBankUrl(), dialogRequest);
 
+        if (dialog.getPassport().jobSupported(GVTANMediaList.getLowlevelName())) {
+            dialog.addTask(new GVTANMediaList(dialog.getPassport()));
+            dialog.execute("HKTAB", true);
+        }
+
         ScaMethodsResponse response = ScaMethodsResponse.builder()
             .tanTransportTypes(extractTanTransportTypes(dialog.getPassport()))
             .build();
@@ -185,7 +188,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
-    public LoadBalancesResponse loadBalances(String bankingUrl, LoadBalanceRequest request) {
+    public LoadBalancesResponse loadBalances(LoadBalanceRequest request) {
         String bankCode = request.getBankCode() != null ? request.getBankCode() : request.getBankAccess().getBankCode();
         checkBankExists(bankCode, request.getBankUrl());
         BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(bankCode, request);
@@ -268,7 +271,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return new StrongCustomerAuthorisable() {
 
             @Override
-            public CreateConsentResponse createConsent(Consent consent, boolean redirectPreferred, String tppRedirectUri) {
+            public CreateConsentResponse createConsent(Consent consent, boolean redirectPreferred,
+                                                       String tppRedirectUri) {
                 HBCIConsent hbciConsent = new HBCIConsent();
                 hbciConsent.setStatus(STARTED);
 
@@ -291,6 +295,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 ScaMethodsResponse response = authenticatePsu(request);
                 hbciConsent.setTanMethodList(response.getTanTransportTypes());
                 hbciConsent.setStatus(ScaStatus.PSUAUTHENTICATED);
+                if (updatePsuAuthentication.isSaveCredentials()) {
+                    hbciConsent.setCredentials(request.getCredentials());
+                }
 
                 return hbciMapper.toUpdateAuthResponse(hbciConsent, bankApi());
             }
@@ -332,7 +339,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             @Override
             public void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus,
-                                        Object bankApiConsentData) throws MultibankingException {
+                                        Object bankApiConsentData) {
                 HBCIConsent hbciConsent = Optional.ofNullable(bankApiConsentData)
                     .map(o -> (HBCIConsent) o)
                     .orElseThrow(() -> new MultibankingException(MultibankingError.NO_CONSENT));
@@ -343,9 +350,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
 
             @Override
-            public void preExecute(TransactionRequest request, Object bankApiConsentData) {
+            public void afterExecute(Object bankApiConsentData, AuthorisationCodeResponse authorisationCodeResponse) {
+                //tansubmit persistence fur further call
                 HBCIConsent hbciConsent = (HBCIConsent) bankApiConsentData;
-                request.setTanTransportType(hbciConsent.getSelectedMethod());
+                hbciConsent.setHbciTanSubmit((HbciTanSubmit) authorisationCodeResponse.getTanSubmit());
             }
         };
     }
@@ -422,8 +430,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     private RuntimeException handleHbciException(HBCI_Exception e) {
-        // FIXME this should throw MultibankingException with HBCI_2FA_REQUIRED when 2FA is needed
-
         Throwable processException = e;
         while (processException.getCause() != null && !(processException.getCause() instanceof MultibankingException)) {
             processException = processException.getCause();

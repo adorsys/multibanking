@@ -82,7 +82,7 @@ public class FigoPaymentTest {
         paymentEntity.setAmount(new BigDecimal(1));
         paymentEntity.setPurpose("test");
 
-        paymentService.createSinglePayment(bankAccessEntity, null, null, paymentEntity);
+        paymentService.createSinglePayment(bankAccessEntity, null, paymentEntity);
         paymentService.submitSinglePayment(paymentEntity, bankAccessEntity, null, "tan_needed_here");
     }
 }

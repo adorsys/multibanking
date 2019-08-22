@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
-/**
- * Created by alexg on 10.11.17.
- */
+@RequiredArgsConstructor
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class TanChallenge {
+@EqualsAndHashCode(callSuper = false)
+public class ScaRequiredException extends RuntimeException {
 
-    private String title;
-    private String label;
-    private String format;
-    private String data;
-
+    private final AuthorisationCodeResponse authorisationCodeResponse;
 }

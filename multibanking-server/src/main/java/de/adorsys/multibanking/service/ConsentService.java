@@ -8,7 +8,6 @@ import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
 import de.adorsys.multibanking.exception.MissingConsentAuthorisationSelectionException;
 import de.adorsys.multibanking.exception.MissingConsentException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
@@ -163,14 +162,6 @@ public class ConsentService {
                     throw new MissingConsentException();
                 case INVALID_SCA_METHOD:
                     throw new MissingConsentAuthorisationSelectionException();
-                case HBCI_2FA_REQUIRED:
-                    // FIXME get the challenge data
-                    ChallengeData challengeData = null;
-                    UpdateAuthResponse response = new UpdateAuthResponse();
-                    response.setChallenge(challengeData);
-                    response.setPsuMessage(e.getMessage());
-                    throw new MissingConsentAuthorisationException(response, consentId,
-                        internalConsent.getAuthorisationId());
                 default:
                     throw e;
             }

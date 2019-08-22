@@ -92,7 +92,7 @@ public class BankAccessServiceTest {
 
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", null);
         bankAccessEntity.setBankCode("unsupported");
-        bankAccessService.createBankAccess(bankAccessEntity, null);
+        bankAccessService.createBankAccess(bankAccessEntity);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class BankAccessServiceTest {
         thrown.expect(InvalidBankAccessException.class);
 
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500");
-        bankAccessService.createBankAccess(bankAccessEntity, null);
+        bankAccessService.createBankAccess(bankAccessEntity);
     }
 
     @Test
@@ -114,7 +114,7 @@ public class BankAccessServiceTest {
             .thenThrow(new InvalidPinException("access"));
         thrown.expect(InvalidPinException.class);
 
-        bankAccessService.createBankAccess(bankAccessEntity, null);
+        bankAccessService.createBankAccess(bankAccessEntity);
     }
 
     @Test
@@ -127,7 +127,7 @@ public class BankAccessServiceTest {
                 .bankAccounts(Collections.singletonList(TestUtil.getBankAccountEntity("account")))
                 .build());
 
-        bankAccessService.createBankAccess(bankAccessEntity, null);
+        bankAccessService.createBankAccess(bankAccessEntity);
 
         notNull(userRepository.findById("login"), "user not exists");
         notNull(bankAccessRepository.findByUserIdAndId("login", "access"), "bankaccess not exists");

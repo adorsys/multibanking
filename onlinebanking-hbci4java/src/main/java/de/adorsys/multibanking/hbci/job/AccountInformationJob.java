@@ -30,6 +30,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.SerializationUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSEPAInfo;
 import org.kapott.hbci.GV.GVTANMediaList;
@@ -61,10 +63,24 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccountInformation
                 .id(hbciTwoStepMechanism.getSecfunc())
                 .name(hbciTwoStepMechanism.getName())
                 .inputInfo(hbciTwoStepMechanism.getInputinfo())
-                .medium(hbciPassport.getTanMedia(hbciTwoStepMechanism.getId()) != null ?
-                    hbciPassport.getTanMedia(hbciTwoStepMechanism.getId()).mediaName : null)
+                .needTanMedia(hbciTwoStepMechanism.getNeedtanmedia().equals("2"))
                 .build())
+            .map(tanTransportType -> {
+                if (!tanTransportType.isNeedTanMedia()) {
+                    return Collections.singletonList(tanTransportType);
+                } else {
+                    return hbciPassport.getTanMedias().stream()
+                        .map(tanMediaInfo -> {
+                            TanTransportType clone = SerializationUtils.clone(tanTransportType);
+                            clone.setMedium(tanMediaInfo.mediaName);
+                            return clone;
+                        })
+                        .collect(Collectors.toList());
+                }
+            })
+            .flatMap(Collection::stream)
             .collect(Collectors.toList());
+
     }
 
     @Override
@@ -73,7 +89,7 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccountInformation
             throw new MultibankingException(HBCI_ERROR, "SEPAInfo job not supported");
 
         // TAN-Medien abrufen
-        if (loadAccountInformationRequest.isUpdateTanTransportTypes() && passport.jobSupported("TANMediaList")) {
+        if (loadAccountInformationRequest.isUpdateTanTransportTypes() && passport.jobSupported(GVTANMediaList.getLowlevelName())) {
             log.info("fetching TAN media list");
             return Arrays.asList(new GVSEPAInfo(passport), new GVTANMediaList(passport));
         }

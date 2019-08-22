@@ -31,9 +31,8 @@ public class PaymentService {
     private final BulkPaymentRepositoryIf bulkPaymentRepository;
     private final FinTSProductConfig finTSProductConfig;
 
-    RawSepaTransactionEntity createSepaRawPayment(BankAccessEntity bankAccess,
-                                                  TanTransportType tanTransportType,
-                                                  Credentials credentials, RawSepaPayment payment) {
+    RawSepaTransactionEntity createSepaRawPayment(BankAccessEntity bankAccess, Credentials credentials,
+                                                  RawSepaPayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankingService,
@@ -49,7 +48,6 @@ public class PaymentService {
             TransactionRequest request = new TransactionRequest();
             request.setBankUrl(bankEntity.getBankingUrl());
             request.setBankApiUser(bankApiUser);
-            request.setTanTransportType(tanTransportType);
             request.setTransaction(payment);
             request.setBankAccess(bankAccess);
             request.setCredentials(credentials);
@@ -70,8 +68,8 @@ public class PaymentService {
         }
     }
 
-    public SinglePaymentEntity createSinglePayment(BankAccessEntity bankAccess, TanTransportType tanTransportType,
-                                                   Credentials credentials, SinglePayment payment) {
+    public SinglePaymentEntity createSinglePayment(BankAccessEntity bankAccess, Credentials credentials,
+                                                   SinglePayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankingService,
@@ -87,7 +85,6 @@ public class PaymentService {
             TransactionRequest request = new TransactionRequest();
             request.setBankUrl(bankEntity.getBankingUrl());
             request.setBankApiUser(bankApiUser);
-            request.setTanTransportType(tanTransportType);
             request.setTransaction(payment);
             request.setBankAccess(bankAccess);
             request.setCredentials(credentials);
@@ -109,8 +106,7 @@ public class PaymentService {
         }
     }
 
-    BulkPaymentEntity createBulkPayment(BankAccessEntity bankAccess, TanTransportType tanTransportType,
-                                        Credentials credentials, BulkPayment payment) {
+    BulkPaymentEntity createBulkPayment(BankAccessEntity bankAccess, Credentials credentials, BulkPayment payment) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankingService,
@@ -127,7 +123,6 @@ public class PaymentService {
             request.setBankUrl(bankEntity.getBankingUrl());
             request.setBankApiUser(bankApiUser);
             request.setTransaction(payment);
-            request.setTanTransportType(tanTransportType);
             request.setBankAccess(bankAccess);
             request.setCredentials(credentials);
             request.setBankCode(bankEntity.getBankApiBankCode());

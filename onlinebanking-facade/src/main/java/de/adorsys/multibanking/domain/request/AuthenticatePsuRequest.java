@@ -24,6 +24,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class AuthenticatePsuRequest extends AbstractRequest {
 
+    private Credentials credentials;
     private String psuAccountIban;
     private String paymentId;
     private String paymentProduct;

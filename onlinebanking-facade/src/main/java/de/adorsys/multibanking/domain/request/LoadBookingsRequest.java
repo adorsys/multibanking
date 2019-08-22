@@ -33,7 +33,6 @@ public class LoadBookingsRequest extends TransactionRequest {
     private LocalDate dateTo;
     private boolean withBalance;
     private boolean withStandingOrders;
-    private boolean withTanTransportTypes;
 
     public enum RawResponseType {
         CAMT, MT940

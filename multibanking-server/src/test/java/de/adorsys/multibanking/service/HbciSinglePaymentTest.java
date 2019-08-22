@@ -7,7 +7,6 @@ import de.adorsys.multibanking.exception.MissingConsentException;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -67,23 +66,18 @@ public class HbciSinglePaymentTest {
         });
     }
 
-    public void testSinglePayment() throws Exception {
+    public void testSinglePayment() {
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
             System.getProperty("blz"));
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI, null);
+            BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
             .findFirst().get();
         bankAccountEntitity.setId("test-account-id");
-
-        TanTransportType tanTransportType = bankAccessEntity.getTanTransportTypes().get(BankApi.HBCI).stream()
-            .filter(ttt -> StringUtils.containsIgnoreCase(ttt.getName(), "sms"))
-            .findAny()
-            .orElseThrow(() -> new IllegalArgumentException("invalid tan transport type"));
 
         SinglePayment payment = new SinglePayment();
         payment.setReceiverIban("DE56760905000002257793");
@@ -92,8 +86,7 @@ public class HbciSinglePaymentTest {
         payment.setPurpose("test130");
         payment.setPsuAccount(bankAccountEntitity);
 
-        SinglePaymentEntity paymentEntity = paymentService.createSinglePayment(bankAccessEntity, tanTransportType,
-            null, payment);
+        SinglePaymentEntity paymentEntity = paymentService.createSinglePayment(bankAccessEntity, null, payment);
 
         String tan = "";
         paymentService.submitSinglePayment(paymentEntity, bankAccessEntity, null, tan);
@@ -107,16 +100,11 @@ public class HbciSinglePaymentTest {
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI, null);
+            BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
             .findFirst().get();
         bankAccountEntitity.setId("test-account-id");
-
-        TanTransportType tanTransportType = bankAccessEntity.getTanTransportTypes().get(BankApi.HBCI).stream()
-            .filter(ttt -> StringUtils.containsIgnoreCase(ttt.getName(), "sms"))
-            .findAny()
-            .orElseThrow(() -> new IllegalArgumentException("invalid tan transport type"));
 
         String painXml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Document " +
             "xmlns=\"urn:iso:std:iso:20022:tech:xsd:pain.001.001.03\" xmlns:xsi=\"http://www.w3" +
@@ -136,8 +124,7 @@ public class HbciSinglePaymentTest {
         payment.setPainXml(painXml);
         payment.setPsuAccount(bankAccountEntitity);
 
-        RawSepaTransactionEntity paymentEntity = paymentService.createSepaRawPayment(bankAccessEntity,
-            tanTransportType, null, payment);
+        RawSepaTransactionEntity paymentEntity = paymentService.createSepaRawPayment(bankAccessEntity, null, payment);
 
         String tan = "";
         paymentService.submitRawSepaTransaction(paymentEntity, bankAccessEntity, null, tan);

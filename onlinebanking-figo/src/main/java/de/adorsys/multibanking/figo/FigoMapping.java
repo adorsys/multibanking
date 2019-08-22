@@ -3,7 +3,6 @@ package de.adorsys.multibanking.figo;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.domain.utils.Utils;
-import me.figo.models.StandingOrder;
 import me.figo.models.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,34 +31,35 @@ public class FigoMapping {
     }
 
     public static de.adorsys.multibanking.domain.transaction.StandingOrder mapStandingOrder(StandingOrder figoStandingOrder) {
-        de.adorsys.multibanking.domain.transaction.StandingOrder standingOrder = new de.adorsys.multibanking.domain.transaction.StandingOrder();
+        de.adorsys.multibanking.domain.transaction.StandingOrder standingOrder =
+            new de.adorsys.multibanking.domain.transaction.StandingOrder();
         standingOrder.setOrderId(figoStandingOrder.getStandingOrderId());
         standingOrder.setExecutionDay(figoStandingOrder.getExecutionDay());
         standingOrder.setAmount(figoStandingOrder.getAmount());
         standingOrder.setUsage(figoStandingOrder.getPurposeText());
         standingOrder.setCycle(Cycle.valueOf(figoStandingOrder.getInterval().toString()));
         standingOrder.setOtherAccount(new BankAccount()
-                .owner(figoStandingOrder.getName())
-                .accountNumber(figoStandingOrder.getAccountNumber())
-                .blz(figoStandingOrder.getBankCode())
-                .currency(figoStandingOrder.getCurrency())
+            .owner(figoStandingOrder.getName())
+            .accountNumber(figoStandingOrder.getAccountNumber())
+            .blz(figoStandingOrder.getBankCode())
+            .currency(figoStandingOrder.getCurrency())
         );
         return standingOrder;
     }
 
     public static BankAccount mapBankAccount(Account account, BankApi bankApi) {
         return new BankAccount()
-                .externalId(bankApi, account.getAccountId())
-                .owner(account.getOwner())
-                .accountNumber(account.getAccountNumber())
-                .name(account.getName())
-                .bankName(account.getBankName())
-                .bic(account.getBIC())
-                .blz(account.getBankCode())
-                .iban(account.getIBAN())
-                .type(BankAccountType.fromFigoType(account.getType()))
-                .balances(new BalancesReport()
-                        .readyBalance(Balance.builder().amount(account.getBalance().getBalance()).build()));
+            .externalId(bankApi, account.getAccountId())
+            .owner(account.getOwner())
+            .accountNumber(account.getAccountNumber())
+            .name(account.getName())
+            .bankName(account.getBankName())
+            .bic(account.getBIC())
+            .blz(account.getBankCode())
+            .iban(account.getIBAN())
+            .type(BankAccountType.fromFigoType(account.getType()))
+            .balances(new BalancesReport()
+                .readyBalance(Balance.builder().amount(account.getBalance().getBalance()).build()));
     }
 
     public static Booking mapBooking(Transaction transaction, BankApi bankApi) {
@@ -91,10 +91,10 @@ public class FigoMapping {
 
     public static TanTransportType mapTanTransportTypes(TanScheme tanScheme) {
         return TanTransportType.builder()
-                .id(tanScheme.getTan_scheme_id())
-                .name(tanScheme.getName())
+            .id(tanScheme.getTan_scheme_id())
+            .name(tanScheme.getName())
 //                .medium(tanScheme.getMedium_name())
-                .build();
+            .build();
     }
 
     public static me.figo.models.Payment mapToFigoPayment(String accountId, SinglePayment payment) {
@@ -136,12 +136,11 @@ public class FigoMapping {
         return figoPayment;
     }
 
-    public static TanChallenge mapToChallenge(Challenge challenge) {
-        return TanChallenge.builder()
-                .data(challenge.getData())
-                .format(challenge.getFormat())
-                .label(challenge.getLabel())
-                .title(challenge.getTitle())
-                .build();
+    public static ChallengeData mapToChallenge(Challenge challenge) {
+        ChallengeData challengeData = new ChallengeData();
+        challengeData.setData(challenge.getData());
+        challengeData.setOtpFormat(challenge.getFormat());
+        challengeData.setAdditionalInformation(challenge.getTitle());
+        return challengeData;
     }
 }
