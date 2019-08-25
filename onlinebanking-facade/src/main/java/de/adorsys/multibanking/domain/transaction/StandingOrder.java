@@ -29,7 +29,7 @@ import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class StandingOrder extends AbstractScaTransaction {
+public class StandingOrder extends AbstractScaPaymentTransaction {
 
     private Cycle cycle;
     private int executionDay;

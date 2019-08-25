@@ -14,28 +14,13 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.transaction;
+package de.adorsys.multibanking.domain.response;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Created by alexg on 19.10.17.
- */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ForeignPayment extends AbstractScaPaymentTransaction {
-
-    private String dtazv;
-
-    @Override
-    public TransactionType getTransactionType() {
-        return TransactionType.FOREIGN_PAYMENT;
-    }
-
-    @Override
-    public String getRawData() {
-        return dtazv;
-    }
+public class EmptyResponse extends AbstractResponse {
 
 }

@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain.transaction;
 
-import de.adorsys.multibanking.domain.BankAccount;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.List;
-
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LoadBalanceRequest extends TransactionRequest {
+public abstract class AbstractScaPaymentTransaction extends AbstractScaTransaction {
 
-    private String consentId;
-    private List<BankAccount> bankAccounts;
+    private String orderId;
+    private String paymentId;
+    private String product;
 }

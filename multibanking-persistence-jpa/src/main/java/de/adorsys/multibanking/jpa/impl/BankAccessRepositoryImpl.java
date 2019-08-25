@@ -38,12 +38,6 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     }
 
     @Override
-    public Optional<BankAccessEntity> findByConsentId(String consentId) {
-        return bankAccessRepository.findByConsentId(consentId)
-            .map(entityMapper::mapToBankAccessEntity);
-    }
-
-    @Override
     public void save(BankAccessEntity bankAccess) {
         BankAccessJpaEntity bankAccessMongoEntity =
             bankAccessRepository.save(entityMapper.mapToBankAccessJpaEntity(bankAccess));

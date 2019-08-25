@@ -62,7 +62,7 @@ public class ConsentService {
                 internalConsent, bank);
 
         UpdateAuthResponse response =
-            onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequest, bank.getBankingUrl());
+            onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequest);
 
         internalConsent.setBankApiConsentData(updatePsuAuthenticationRequest.getBankApiConsentData());
         consentRepository.save(internalConsent);

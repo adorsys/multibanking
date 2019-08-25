@@ -24,6 +24,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class UpdatePsuAuthenticationRequest extends AbstractStrongCustomerAuthorisationRequest {
 
-    private boolean saveCredentials;
     private Credentials credentials;
 }

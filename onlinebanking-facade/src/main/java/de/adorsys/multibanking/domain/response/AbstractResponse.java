@@ -8,6 +8,7 @@ import java.util.Map;
 @Data
 public abstract class AbstractResponse {
 
+    private AuthorisationCodeResponse authorisationCodeResponse;
     private String hbciSysId;
     private Map<String, String> hbciUpd;
     private List<String> messages;

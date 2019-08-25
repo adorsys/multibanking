@@ -4,13 +4,12 @@ import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.exception.ScaRequiredException;
-import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
-import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.LoadAccounts;
+import de.adorsys.multibanking.domain.transaction.LoadBookings;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
-import de.adorsys.multibanking.domain.utils.Utils;
 import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
@@ -110,8 +109,7 @@ public class BookingService extends AccountInformationService {
 
     @Transactional
     public List<BookingEntity> syncBookings(ScaStatus expectedConsentStatus, BankAccessEntity bankAccess,
-                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi,
-                                            @Nullable Credentials credentials) {
+                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi) {
         bankAccountRepository.updateSyncStatus(bankAccount.getId(), BankAccount.SyncStatus.SYNC);
 
         OnlineBankingService onlineBankingService = bankApi != null ?
@@ -120,7 +118,7 @@ public class BookingService extends AccountInformationService {
 
         try {
             LoadBookingsResponse response = loadBookingsOnline(expectedConsentStatus, onlineBankingService,
-                bankAccess, bankAccount, credentials);
+                bankAccess, bankAccount);
 
             if (!bankAccess.isTemporary()) {
                 //update bankaccess, passportstate changed
@@ -129,7 +127,7 @@ public class BookingService extends AccountInformationService {
 
             List<BookingEntity> result = processBookings(onlineBankingService, bankAccess, bankAccount, response);
 
-            Optional.ofNullable(response.getBankAccountBalance())
+            Optional.ofNullable(response.getBalancesReport())
                 .ifPresent(bankAccount::setBalances);
 
             bankAccount.setSyncStatus(BankAccount.SyncStatus.READY);
@@ -150,7 +148,7 @@ public class BookingService extends AccountInformationService {
     private List<BookingEntity> processBookings(OnlineBankingService onlineBankingService, BankAccessEntity bankAccess,
                                                 BankAccountEntity bankAccount, LoadBookingsResponse response) {
         List<BookingEntity> newBookings = mapBookings(bankAccount, response.getBookings());
-        mapStandingOrders(response, newBookings);
+//        mapStandingOrders(response, newBookings);
 
         List<BookingEntity> existingBookings = bookingRepository.findByUserIdAndAccountIdAndBankApi(
             bankAccess.getUserId(), bankAccount.getId(), onlineBankingService.bankApi());
@@ -171,11 +169,12 @@ public class BookingService extends AccountInformationService {
             }
         }
 
-        if (bankAccess.isStoreBookings()) {
-            bookingRepository.save(mergedBookings);
-            saveStandingOrders(bankAccount, response.getStandingOrders());
-            updateBookingsIndex(bankAccount, mergedBookings);
-        }
+        //not working with PSD2
+//        if (bankAccess.isStoreBookings()) {
+//            bookingRepository.save(mergedBookings);
+//            saveStandingOrders(bankAccount, response.getStandingOrders());
+//            updateBookingsIndex(bankAccount, mergedBookings);
+//        }
 
         if (bankAccess.isStoreAnonymizedBookings()) {
             anonymizationService.anonymizeAndStoreBookingsAsync(mergedBookings);
@@ -228,24 +227,24 @@ public class BookingService extends AccountInformationService {
         }
     }
 
-    private void mapStandingOrders(LoadBookingsResponse response, List<BookingEntity> bookingEntities) {
-        if (response.getStandingOrders() == null) {
-            return;
-        }
-
-        bookingEntities.forEach(booking ->
-            response.getStandingOrders()
-                .stream()
-                .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
-                    Utils.inCycle(booking.getValutaDate(), so.getExecutionDay()) &&
-                    Utils.usageContains(booking.getUsage(), so.getUsage())
-                )
-                .findFirst()
-                .ifPresent(standingOrder -> {
-                    booking.setOtherAccount(standingOrder.getOtherAccount());
-                    booking.setStandingOrder(true);
-                }));
-    }
+//    private void mapStandingOrders(LoadBookingsResponse response, List<BookingEntity> bookingEntities) {
+//        if (response.getStandingOrders() == null) {
+//            return;
+//        }
+//
+//        bookingEntities.forEach(booking ->
+//            response.getStandingOrders()
+//                .stream()
+//                .filter(so -> so.getAmount().negate().compareTo(booking.getAmount()) == 0 &&
+//                    Utils.inCycle(booking.getValutaDate(), so.getExecutionDay()) &&
+//                    Utils.usageContains(booking.getUsage(), so.getUsage())
+//                )
+//                .findFirst()
+//                .ifPresent(standingOrder -> {
+//                    booking.setOtherAccount(standingOrder.getOtherAccount());
+//                    booking.setStandingOrder(true);
+//                }));
+//    }
 
     private void saveStandingOrders(BankAccountEntity bankAccount, List<StandingOrder> standingOrders) {
         Optional.ofNullable(standingOrders)
@@ -282,8 +281,7 @@ public class BookingService extends AccountInformationService {
 
     private LoadBookingsResponse loadBookingsOnline(ScaStatus expectedConsentStatus,
                                                     OnlineBankingService onlineBankingService,
-                                                    BankAccessEntity bankAccess, BankAccountEntity bankAccount,
-                                                    @Nullable Credentials credentials) {
+                                                    BankAccessEntity bankAccess, BankAccountEntity bankAccount) {
         BankApiUser bankApiUser = userService.checkApiRegistration(onlineBankingService,
             userService.findUser(bankAccess.getUserId()));
 
@@ -298,28 +296,35 @@ public class BookingService extends AccountInformationService {
 
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
-        LoadBookingsRequest loadBookingsRequest = new LoadBookingsRequest();
-        loadBookingsRequest.setConsentId(bankAccess.getConsentId());
-        loadBookingsRequest.setCredentials(credentials);
-        loadBookingsRequest.setBankApiUser(bankApiUser);
-        loadBookingsRequest.setBankAccess(bankAccess);
-        loadBookingsRequest.setBankCode(bankEntity.getBankApiBankCode());
-        loadBookingsRequest.setBankAccount(bankAccount);
-        loadBookingsRequest.setDateFrom(bankAccount.getLastSync() != null ?
-            bankAccount.getLastSync().toLocalDate() : LocalDate.now().minusYears(1));
-        loadBookingsRequest.setDateTo(LocalDate.now());
-        loadBookingsRequest.setWithBalance(true);
-        loadBookingsRequest.setWithStandingOrders(true);
-        loadBookingsRequest.setBankUrl(bankEntity.getBankingUrl());
-        loadBookingsRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
+        TransactionRequest<LoadBookings> loadBookingsRequest = createLoadBookingsRequest(bankAccess, bankAccount, bankApiUser, consentEntity, bankEntity);
 
         try {
-            return onlineBankingService.loadBookings(loadBookingsRequest);
+            LoadBookingsResponse response = onlineBankingService.loadBookings(loadBookingsRequest);
+            checkScaRequired(response, consentEntity, onlineBankingService);
+            return response;
         } catch (MultibankingException e) {
             throw handleMultibankingException(bankAccess, e);
-        } catch (ScaRequiredException e) {
-            throw handleScaRequiredException(consentEntity, onlineBankingService, e);
         }
+    }
+
+    private TransactionRequest<LoadBookings> createLoadBookingsRequest(BankAccessEntity bankAccess,
+                                                                       BankAccountEntity bankAccount,
+                                                                       BankApiUser bankApiUser,
+                                                                       ConsentEntity consentEntity,
+                                                                       BankEntity bankEntity) {
+        LoadBookings loadBookings = new LoadBookings();
+        loadBookings.setPsuAccount(bankAccount);
+        loadBookings.setDateFrom(bankAccount.getLastSync() != null ?
+            bankAccount.getLastSync().toLocalDate() : LocalDate.now().minusYears(1));
+        loadBookings.setDateTo(LocalDate.now());
+        loadBookings.setWithBalance(true);
+
+        TransactionRequest<LoadBookings> transactionRequest = new TransactionRequest<>(loadBookings);
+        transactionRequest.setBankApiUser(bankApiUser);
+        transactionRequest.setBankAccess(bankAccess);
+        transactionRequest.setBank(bankEntity);
+        transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
+        return transactionRequest;
     }
 
     private List<BookingEntity> mapBookings(BankAccountEntity bankAccount, List<Booking> bookings) {
@@ -351,14 +356,16 @@ public class BookingService extends AccountInformationService {
         if (externalAccountId == null) {
             BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
-            LoadAccountInformationRequest request = new LoadAccountInformationRequest();
-            request.setBankUrl(bankEntity.getBankingUrl());
-            request.setBankApiUser(bankApiUser);
-            request.setBankAccess(bankAccess);
-            request.setBankCode(bankEntity.getBankApiBankCode());
-            request.setUpdateTanTransportTypes(true);
-            request.setHbciProduct(finTSProductConfig.getProduct());
-            List<BankAccount> apiBankAccounts = onlineBankingService.loadBankAccounts(request).getBankAccounts();
+            LoadAccounts loadAccounts = new LoadAccounts();
+            loadAccounts.setUpdateTanTransportTypes(true);
+
+            TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(loadAccounts);
+            transactionRequest.setBankApiUser(bankApiUser);
+            transactionRequest.setBankAccess(bankAccess);
+            transactionRequest.setBank(bankEntity);
+
+            List<BankAccount> apiBankAccounts =
+                onlineBankingService.loadBankAccounts(transactionRequest).getBankAccounts();
 
             List<BankAccountEntity> dbBankAccounts = bankAccountRepository
                 .findByUserIdAndBankAccessId(bankAccess.getUserId(), bankAccess.getId());

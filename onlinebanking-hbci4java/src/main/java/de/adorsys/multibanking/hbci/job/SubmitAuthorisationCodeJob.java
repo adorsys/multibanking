@@ -18,50 +18,55 @@ package de.adorsys.multibanking.hbci.job;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
+import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
 import de.adorsys.multibanking.hbci.model.*;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.manager.HBCIDialog;
+import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @RequiredArgsConstructor
 public class SubmitAuthorisationCodeJob {
 
-    private final ScaRequiredJob<SubmitAuthorizationCodeResponse> scaJob;
+    private final ScaRequiredJob scaJob;
 
-    public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
-        HbciTanSubmit hbciTanSubmit = evaluateTanSubmit(submitAuthorizationCodeRequest);
+    public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitAuthorizationCodeRequest) {
+        HbciTanSubmit hbciTanSubmit =
+            evaluateTanSubmit((HBCIConsent) submitAuthorizationCodeRequest.getBankApiConsentData());
 
         HbciPassport hbciPassport = createPassport(submitAuthorizationCodeRequest, hbciTanSubmit);
 
         HBCIDialog hbciDialog = new HBCIDialog(hbciPassport, hbciTanSubmit.getDialogId(), hbciTanSubmit.getMsgNum());
-        AbstractHBCIJob paymentGV;
+        AbstractHBCIJob hbciJob;
 
         if (hbciTanSubmit.getTwoStepMechanism().getProcess() == 1) {
-            paymentGV = submitProcess1(hbciTanSubmit, hbciPassport, hbciDialog);
+            hbciJob = submitProcess1(hbciTanSubmit, hbciPassport, hbciDialog);
         } else {
-            paymentGV = submitProcess2(hbciTanSubmit, hbciDialog);
+            hbciJob = submitProcess2(hbciTanSubmit, hbciDialog);
         }
 
         HBCIExecStatus status = hbciDialog.execute(true);
         if (!status.isOK()) {
-            throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorMessages());
+            throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorMessages().stream()
+                .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                .collect(Collectors.toList()));
         } else {
-            return createResponse(hbciTanSubmit, paymentGV, status);
+            return createResponse(hbciPassport, hbciTanSubmit, hbciJob, status);
         }
     }
 
@@ -69,13 +74,8 @@ public class SubmitAuthorisationCodeJob {
                                            HBCIDialog hbciDialog) {
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
-        List<AbstractHBCIJob> hbciJobs = scaJob.createHbciJobs(hbciPassport);
-        if (hbciJobs.size() > 1) {
-            throw new MultibankingException(INTERNAL_ERROR, "multiple transacations not supported with HKTAN process " +
-                "variant 1");
-        }
+        AbstractHBCIJob hbciJob = scaJob.createScaMessage(hbciPassport);
 
-        AbstractHBCIJob hbciJob = hbciJobs.get(0);
         if (hbciTanSubmit.getSepaPain() != null) {
             hbciJob.getConstraints().remove("_sepapain"); //prevent pain generation
             hbciJob.setLowlevelParam(hbciJob.getName() + ".sepapain", hbciTanSubmit.getSepaPain());
@@ -94,7 +94,7 @@ public class SubmitAuthorisationCodeJob {
                 return result;
             }).orElse(null);
 
-        GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport(), originJob);
+        GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport(), originJob, true);
         hktan.setParam("orderref", hbciTanSubmit.getOrderRef());
         hktan.setParam("process", hbciTanSubmit.getHktanProcess() != null ? hbciTanSubmit.getHktanProcess() : "2");
         hktan.setParam("notlasttan", "N");
@@ -102,11 +102,11 @@ public class SubmitAuthorisationCodeJob {
         return originJob;
     }
 
-    private HbciTanSubmit evaluateTanSubmit(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest) {
-        if (submitAuthorizationCodeRequest.getTanSubmit() instanceof HbciTanSubmit) {
-            return (HbciTanSubmit) submitAuthorizationCodeRequest.getTanSubmit();
+    private HbciTanSubmit evaluateTanSubmit(HBCIConsent hbciConsent) {
+        if (hbciConsent.getHbciTanSubmit() instanceof HbciTanSubmit) {
+            return (HbciTanSubmit) hbciConsent.getHbciTanSubmit();
         } else {
-            return deserializeTanSubmit((byte[]) submitAuthorizationCodeRequest.getTanSubmit());
+            return deserializeTanSubmit((byte[]) hbciConsent.getHbciTanSubmit());
         }
     }
 
@@ -118,7 +118,7 @@ public class SubmitAuthorisationCodeJob {
         }
     }
 
-    private HbciPassport createPassport(SubmitAuthorizationCodeRequest submitAuthorizationCodeRequest,
+    private HbciPassport createPassport(TransactionRequest<SubmitAuthorisationCode> submitAuthorizationCodeRequest,
                                         HbciTanSubmit hbciTanSubmit) {
         Map<String, String> bpd = new HashMap<>();
         bpd.put("Params." + hbciTanSubmit.getOriginLowLevelName() + "Par" + hbciTanSubmit.getOriginSegVersion() +
@@ -135,7 +135,7 @@ public class SubmitAuthorisationCodeJob {
 
                 @Override
                 public String needTAN() {
-                    return submitAuthorizationCodeRequest.getTan();
+                    return ((HBCIConsent) submitAuthorizationCodeRequest.getBankApiConsentData()).getScaAuthenticationData();
                 }
             });
         state.apply(hbciPassport);
@@ -156,19 +156,21 @@ public class SubmitAuthorisationCodeJob {
         return objectMapper;
     }
 
-    private SubmitAuthorizationCodeResponse createResponse(HbciTanSubmit hbciTanSubmit, AbstractHBCIJob paymentGV,
-                                                           HBCIExecStatus status) {
-        String transactionId = Optional.ofNullable(paymentGV)
+    private SubmitAuthorizationCodeResponse createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
+                                                           AbstractHBCIJob hbciJob, HBCIExecStatus status) {
+        String transactionId = Optional.ofNullable(hbciJob)
             .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
             .orElse(hbciTanSubmit.getOrderRef());
 
-        SubmitAuthorizationCodeResponse response = SubmitAuthorizationCodeResponse.builder()
-            .transactionId(transactionId)
-            .build();
+        SubmitAuthorizationCodeResponse response = new SubmitAuthorizationCodeResponse();
+        response.setTransactionId(transactionId);
 
         if (!status.getDialogStatus().msgStatusList.isEmpty()) {
             response.setStatus(status.getDialogStatus().msgStatusList.get(0).segStatus.toString());
         }
+
+        response.setJobResponse(scaJob.createJobResponse(passport));
+
         return response;
     }
 

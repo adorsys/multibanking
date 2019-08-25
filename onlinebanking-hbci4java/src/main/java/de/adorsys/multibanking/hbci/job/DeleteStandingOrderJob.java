@@ -17,7 +17,7 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
@@ -35,12 +35,12 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
-public class DeleteStandingOrderJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+public class DeleteStandingOrderJob extends ScaRequiredJob<EmptyResponse> {
 
     private final TransactionRequest transactionRequest;
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
         StandingOrder standingOrder = (StandingOrder) transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);
@@ -76,12 +76,17 @@ public class DeleteStandingOrderJob extends ScaRequiredJob<AuthorisationCodeResp
 
         gvDauerSEPADel.verifyConstraints();
 
-        return Collections.singletonList(gvDauerSEPADel);
+        return gvDauerSEPADel;
     }
 
     @Override
-    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        return response;
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    EmptyResponse createJobResponse(PinTanPassport passport) {
+        return new EmptyResponse();
     }
 
     @Override

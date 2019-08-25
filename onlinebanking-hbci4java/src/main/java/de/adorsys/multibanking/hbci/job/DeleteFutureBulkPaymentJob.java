@@ -17,7 +17,7 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
 import lombok.RequiredArgsConstructor;
@@ -34,31 +34,31 @@ import java.util.List;
  * Only for future payment (GVTermUebSEPA)
  */
 @RequiredArgsConstructor
-public class DeleteFutureBulkPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+public class DeleteFutureBulkPaymentJob extends ScaRequiredJob<EmptyResponse> {
 
     private final TransactionRequest transactionRequest;
-    private String jobName;
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
         FutureBulkPayment futureBulkPayment = (FutureBulkPayment) transactionRequest.getTransaction();
 
-        Konto src = getPsuKonto(passport);
-
-        jobName = GVTermMultiUebSEPADel.getLowlevelName();
-
-        GVTermMultiUebSEPADel sepadelgv = new GVTermMultiUebSEPADel(passport, jobName);
+        GVTermMultiUebSEPADel sepadelgv = new GVTermMultiUebSEPADel(passport, GVTermMultiUebSEPADel.getLowlevelName());
 
         sepadelgv.setParam("orderid", futureBulkPayment.getOrderId());
-        sepadelgv.setParam("src", src);
+        sepadelgv.setParam("src", getPsuKonto(passport));
         sepadelgv.verifyConstraints();
 
-        return Collections.singletonList(sepadelgv);
+        return sepadelgv;
     }
 
     @Override
-    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        return response;
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    EmptyResponse createJobResponse(PinTanPassport passport) {
+        return new EmptyResponse();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class DeleteFutureBulkPaymentJob extends ScaRequiredJob<AuthorisationCode
 
     @Override
     protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
-        return jobName;
+        return "TermMultiUebSEPADel";
     }
 
     @Override

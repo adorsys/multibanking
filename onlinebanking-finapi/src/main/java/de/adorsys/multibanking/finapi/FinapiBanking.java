@@ -1,9 +1,6 @@
 package de.adorsys.multibanking.finapi;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
-import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
-import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
@@ -11,6 +8,9 @@ import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.domain.transaction.LoadAccounts;
+import de.adorsys.multibanking.domain.transaction.LoadBookings;
+import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
 import de.adorsys.multibanking.domain.utils.Utils;
 import io.swagger.client.ApiClient;
 import io.swagger.client.ApiException;
@@ -113,7 +113,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
         LOG.info("load bank accounts");
         BankAccess bankAccess = loadAccountInformationRequest.getBankAccess();
 
@@ -173,8 +173,8 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
-        BankAccount bankAccount = loadBookingsRequest.getBankAccount();
+    public LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> loadBookingsRequest) {
+        BankAccount bankAccount = loadBookingsRequest.getTransaction().getPsuAccount();
 
         //TODO standing orders needed
         LOG.debug("load bookings for account [{}]", bankAccount.getAccountNumber());
@@ -233,7 +233,7 @@ public class FinapiBanking implements OnlineBankingService {
             LOG.info("loaded [{}] bookings for account [{}]", bookingList.size(), bankAccount.getAccountNumber());
 
             return LoadBookingsResponse.builder()
-                .bankAccountBalance(new BalancesReport().readyBalance(Balance.builder().amount(account.getBalance()).build()))
+                .balancesReport(new BalancesReport().readyBalance(Balance.builder().amount(account.getBalance()).build()))
                 .bookings(bookingList)
                 .build();
         } catch (ApiException e) {
@@ -276,12 +276,12 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse requestPaymentAuthorizationCode(TransactionRequest paymentRequest) {
+    public AuthorisationCodeResponse initiatePayment(TransactionRequest paymentRequest) {
         return null;
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitPaymentAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+    public SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitPaymentRequest) {
         return null;
     }
 

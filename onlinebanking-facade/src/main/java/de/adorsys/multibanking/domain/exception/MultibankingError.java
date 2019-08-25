@@ -28,6 +28,7 @@ public enum MultibankingError {
     NO_CONSENT,
     INVALID_CONSENT_STATUS,
     BANK_NOT_SUPPORTED,
+    BANKING_GATEWAY_ERROR,
     INTERNAL_ERROR;
 
 }

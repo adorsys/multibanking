@@ -69,12 +69,12 @@ public class FigoPaymentTest {
         bankAccessEntity.setStoreAnalytics(false);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            null, null);
+            null);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("12324463"))
             .findFirst().get();
 
-        bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntitity, BankApi.FIGO, null);
+        bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntitity, BankApi.FIGO);
 
         SinglePaymentEntity paymentEntity = new SinglePaymentEntity();
         paymentEntity.setReceiverIban("receiver_iban_needed_here");

@@ -16,5 +16,4 @@ public class UpdatePsuAuthenticationRequestTO {
     @NotBlank
     @ApiModelProperty(value = "Password", required = true)
     private String password;
-    private boolean saveCredentials;
 }

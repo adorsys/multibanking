@@ -18,11 +18,13 @@ package de.adorsys.multibanking.domain;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ChallengeData {
 
     private String image;
-    private String data;
+    private List<String> data;
     private String imageLink;
     private int otpMaxLength;
     private String otpFormat;

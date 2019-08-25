@@ -86,6 +86,12 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -125,6 +131,12 @@
               "$ref": "#/definitions/ConsentTO"
             }
           },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -161,6 +173,12 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -208,6 +226,12 @@
               ]
             }
           },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -252,6 +276,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+            }
+          },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
             }
           },
           "401": {
@@ -322,6 +352,12 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -389,6 +425,12 @@
           },
           "201": {
             "description": "Created"
+          },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -458,6 +500,12 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -502,6 +550,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/ResourcePaymentDataTO"
+            }
+          },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
             }
           },
           "401": {
@@ -555,6 +609,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+            }
+          },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
             }
           },
           "401": {
@@ -625,6 +685,12 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -692,6 +758,12 @@
           },
           "201": {
             "description": "Created"
+          },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -761,6 +833,12 @@
           "201": {
             "description": "Created"
           },
+          "400": {
+            "description": "Messages",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
           "401": {
             "description": "Unauthorized"
           },
@@ -827,8 +905,11 @@
           "description": "Additional explanation for the PSU to explain e.g. fallback mechanism for the chosen SCA method"
         },
         "data": {
-          "type": "string",
-          "description": "String challenge data"
+          "type": "array",
+          "description": "String challenge data",
+          "items": {
+            "type": "string"
+          }
         },
         "image": {
           "type": "string",
@@ -976,6 +1057,50 @@
         "attribute": false,
         "wrapped": false
       }
+    },
+    "MessageTO": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "key": {
+          "type": "string"
+        },
+        "paramsMap": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "renderedMessage": {
+          "type": "string"
+        },
+        "severity": {
+          "type": "string",
+          "enum": [
+            "ERROR",
+            "WARNING",
+            "INFO"
+          ]
+        }
+      },
+      "title": "MessageTO"
+    },
+    "MessagesTO": {
+      "type": "object",
+      "properties": {
+        "messageList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MessageTO"
+          }
+        },
+        "uuid": {
+          "type": "string"
+        }
+      },
+      "title": "MessagesTO"
     },
     "PaymentDataTO": {
       "type": "object",

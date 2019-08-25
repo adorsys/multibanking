@@ -1,19 +1,19 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.ChallengeData;
 import de.adorsys.multibanking.domain.ConsentEntity;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.exception.ScaRequiredException;
+import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.exception.InvalidConsentException;
 import de.adorsys.multibanking.exception.InvalidPinException;
 import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Optional;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
@@ -36,17 +36,20 @@ abstract class AccountInformationService {
         return e;
     }
 
-    TransactionAuthorisationRequiredException handleScaRequiredException(ConsentEntity consentEntity,
-                                                                         OnlineBankingService onlineBankingService,
-                                                                         ScaRequiredException e) {
-        onlineBankingService.getStrongCustomerAuthorisation().afterExecute(consentEntity.getBankApiConsentData(), e.getAuthorisationCodeResponse());
-        consentRepository.save(consentEntity);
+    void checkScaRequired(AbstractResponse response, ConsentEntity consentEntity,
+                          OnlineBankingService onlineBankingService) {
 
-        ChallengeData challengeData = e.getAuthorisationCodeResponse().getChallenge();
-        UpdateAuthResponse response = new UpdateAuthResponse();
-        response.setChallenge(challengeData);
-        return new TransactionAuthorisationRequiredException(response, consentEntity.getId(),
-            consentEntity.getAuthorisationId());
+        Optional.ofNullable(response.getAuthorisationCodeResponse()).ifPresent(authorisationCodeResponse -> {
+            onlineBankingService.getStrongCustomerAuthorisation().afterExecute(consentEntity.getBankApiConsentData(),
+                authorisationCodeResponse);
+            consentRepository.save(consentEntity);
+
+            UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
+            updateAuthResponse.setChallenge(authorisationCodeResponse.getChallenge());
+            throw new TransactionAuthorisationRequiredException(updateAuthResponse, consentEntity.getId(),
+                consentEntity.getAuthorisationId());
+        });
+
     }
 
 }

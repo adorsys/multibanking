@@ -14,17 +14,32 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.exception;
+package de.adorsys.multibanking.domain.transaction;
 
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
+import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.TAN_REQUEST;
+
 @RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ScaRequiredException extends RuntimeException {
+public class SubmitAuthorisationCode extends AbstractScaTransaction {
 
-    private final AuthorisationCodeResponse authorisationCodeResponse;
+    private final AbstractScaTransaction originTransaction;
+
+    @Override
+    public TransactionType getTransactionType() {
+        return Optional.ofNullable(originTransaction)
+            .map(AbstractScaTransaction::getTransactionType)
+            .orElse(TAN_REQUEST);
+    }
+
+    @Override
+    public String getRawData() {
+        return null;
+    }
 }

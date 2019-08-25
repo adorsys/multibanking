@@ -19,12 +19,10 @@ package de.adorsys.multibanking.domain.response;
 import de.adorsys.multibanking.domain.ChallengeData;
 import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
 @Builder
-@EqualsAndHashCode(callSuper = false)
-public class AuthorisationCodeResponse extends AbstractResponse {
+public class AuthorisationCodeResponse {
 
     private Object tanSubmit;
     private ChallengeData challenge;

@@ -7,6 +7,7 @@ import me.figo.models.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -138,7 +139,7 @@ public class FigoMapping {
 
     public static ChallengeData mapToChallenge(Challenge challenge) {
         ChallengeData challengeData = new ChallengeData();
-        challengeData.setData(challenge.getData());
+        challengeData.setData(Collections.singletonList(challenge.getData()));
         challengeData.setOtpFormat(challenge.getFormat());
         challengeData.setAdditionalInformation(challenge.getTitle());
         return challengeData;

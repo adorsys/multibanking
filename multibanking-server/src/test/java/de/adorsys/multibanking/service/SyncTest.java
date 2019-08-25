@@ -96,7 +96,7 @@ public class SyncTest {
 
         bankAccountEntity.setId("test-account-id");
 
-        bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntity, BankApi.HBCI, null);
+        bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntity, BankApi.HBCI);
 
         Optional<AccountAnalyticsEntity> analyticsEntity = analyticsRepository.findLastByUserIdAndAccountId("test" +
             "-user-id", "test-account-id");

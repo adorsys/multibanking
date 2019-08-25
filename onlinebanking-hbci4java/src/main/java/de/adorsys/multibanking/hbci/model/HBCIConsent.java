@@ -36,5 +36,5 @@ public class HBCIConsent {
     private List<TanTransportType> tanMethodList;
     private TanTransportType selectedMethod;
     private String scaAuthenticationData;
-    private HbciTanSubmit hbciTanSubmit;
+    private Object hbciTanSubmit;
 }

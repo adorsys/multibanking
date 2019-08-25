@@ -18,7 +18,4 @@ public interface BankAccessRepositoryMongodb extends MongoRepository<BankAccessM
 
     long deleteByUserIdAndId(String userId, String id);
 
-    List<BankAccessMongoEntity> findByUserIdAndConsentId(String userId);
-
-    Optional<BankAccessMongoEntity> findByConsentId(String consentId);
 }

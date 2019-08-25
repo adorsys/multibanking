@@ -17,7 +17,7 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
@@ -38,12 +38,12 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class BulkPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+public class BulkPaymentJob extends ScaRequiredJob<EmptyResponse> {
 
     private final TransactionRequest transactionRequest;
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
         BulkPayment bulkPayment = (BulkPayment) transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);
@@ -79,12 +79,17 @@ public class BulkPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
 
         sepagv.verifyConstraints();
 
-        return Collections.singletonList(sepagv);
+        return sepagv;
     }
 
     @Override
-    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        return response;
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    EmptyResponse createJobResponse(PinTanPassport passport) {
+        return new EmptyResponse();
     }
 
     @Override

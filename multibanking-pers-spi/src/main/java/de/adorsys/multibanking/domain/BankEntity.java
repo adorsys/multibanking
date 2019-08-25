@@ -10,7 +10,6 @@ import java.util.List;
 public class BankEntity extends Bank {
 
     private String id;
-    private String bankApiBankCode;
     private List<String> searchIndex;
 
 }

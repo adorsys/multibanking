@@ -9,7 +9,6 @@ import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.ConsentEntity;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.exception.ScaRequiredException;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
@@ -32,7 +31,6 @@ import io.restassured.specification.RequestSpecification;
 import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kapott.hbci.manager.BankInfo;
@@ -115,7 +113,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
-//    @Ignore
+    //    @Ignore
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
         BankAccessTO bankAccess = createBankAccess();
@@ -135,7 +133,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.redirectUrl.href")).isNotBlank();
     }
 
-//    @Ignore
+    //    @Ignore
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO bankAccess = createBankAccess();
@@ -143,8 +141,8 @@ public class DirectAccessControllerTest {
             false);
 
         CredentialsTO credentials = CredentialsTO.builder()
-            .customerId("Alex.Geist")
-            .pin("sandbox")
+            .customerId("aguex13")
+            .pin("aguex13")
             .build();
 
         consent_authorisation(bankAccess, credentials);
@@ -165,10 +163,13 @@ public class DirectAccessControllerTest {
             doReturn(ScaMethodsResponse.builder()
                 .tanTransportTypes(Arrays.asList(TestUtil.createTanMethod("Method1"), TestUtil.createTanMethod(
                     "Method2")))
-                .build()).when(hbci4JavaBanking).authenticatePsu(any());
+                .build()).when(hbci4JavaBanking).getStrongCustomerAuthorisation().updatePsuAuthentication(any());
 
             //mock bookings response
-            doThrow(new ScaRequiredException(AuthorisationCodeResponse.builder().build()))
+            LoadBookingsResponse scaRequiredResponse = LoadBookingsResponse.builder().build();
+            scaRequiredResponse.setAuthorisationCodeResponse(AuthorisationCodeResponse.builder().build());
+
+            doReturn(scaRequiredResponse)
                 .doReturn(LoadBookingsResponse.builder()
                     .bookings(new ArrayList<>())
                     .build())
@@ -201,7 +202,7 @@ public class DirectAccessControllerTest {
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
-        assertThat(jsonPath.getString("scaStatus")).isEqualTo(ScaStatusTO.STARTED.toString());
+        assertThat(jsonPath.getString("scaStatus")).isIn(RECEIVED.toString(), ScaStatusTO.STARTED.toString());
 
         //3. update psu authentication
         UpdatePsuAuthenticationRequestTO updatePsuAuthentication = new UpdatePsuAuthenticationRequestTO();
@@ -213,36 +214,37 @@ public class DirectAccessControllerTest {
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
-        assertThat(jsonPath.getString("scaStatus")).isEqualTo(PSUAUTHENTICATED.toString());
+        String scaStatus = jsonPath.getString("scaStatus");
 
-        //4. select authentication method
-        String selectAuthenticationMethodLink = jsonPath.getString("_links" + ".selectAuthenticationMethod.href");
-        String sceMethodId = jsonPath.getString("scaMethods[0].id");
+        //4. select authentication method (optional), can be skipped by banks in case of selection not needed
+        if (scaStatus.equals(PSUAUTHENTICATED.toString())) {
+            String selectAuthenticationMethodLink = jsonPath.getString("_links" + ".selectAuthenticationMethod.href");
+            String sceMethodId = jsonPath.getString("scaMethods[0].id");
 
-        //hbci case
-        if (selectAuthenticationMethodLink == null) {
-            DirectAccessController.LoadBookingsChallengeRequest loadBookingsChallengeRequest =
-                new DirectAccessController.LoadBookingsChallengeRequest();
+            //hbci case
+            if (selectAuthenticationMethodLink == null) {
+                DirectAccessController.LoadBookingsChallengeRequest loadBookingsChallengeRequest =
+                    new DirectAccessController.LoadBookingsChallengeRequest();
 
-            loadBookingsChallengeRequest.setCredentials(credentialsTO);
-            loadBookingsChallengeRequest.setScaMethodId(sceMethodId);
-            loadBookingsChallengeRequest.setBankAccess(bankAccess);
+                loadBookingsChallengeRequest.setScaMethodId(sceMethodId);
+                loadBookingsChallengeRequest.setBankAccess(bankAccess);
 
-            jsonPath = request
-                .body(loadBookingsChallengeRequest)
-                .post(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
-                .then().assertThat().statusCode(HttpStatus.OK.value())
-                .and().extract().jsonPath();
-        } else {
-            //xs2a case
-            SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
-                new SelectPsuAuthenticationMethodRequestTO();
-            authenticationMethodRequestTO.setAuthenticationMethodId(sceMethodId);
+                jsonPath = request
+                    .body(loadBookingsChallengeRequest)
+                    .post(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
+                    .then().assertThat().statusCode(HttpStatus.OK.value())
+                    .and().extract().jsonPath();
+            } else {
+                //xs2a case
+                SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
+                    new SelectPsuAuthenticationMethodRequestTO();
+                authenticationMethodRequestTO.setAuthenticationMethodId(sceMethodId);
 
-            jsonPath = request.body(authenticationMethodRequestTO).put(selectAuthenticationMethodLink)
-                .then().assertThat().statusCode(HttpStatus.OK.value())
-                .and().extract().jsonPath();
-            assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
+                jsonPath = request.body(authenticationMethodRequestTO).put(selectAuthenticationMethodLink)
+                    .then().assertThat().statusCode(HttpStatus.OK.value())
+                    .and().extract().jsonPath();
+                assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
+            }
         }
 
         if (jsonPath.get("bookings") != null) {
@@ -270,7 +272,6 @@ public class DirectAccessControllerTest {
             loadBookingsRequest.setAccountId(jsonPath.getString("bankAccounts[0].id"));
         }
 
-        loadBookingsRequest.setCredentials(credentialsTO);
         loadBookingsRequest.setBankAccess(bankAccess);
 
         request.body(loadBookingsRequest).put(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")

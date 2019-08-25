@@ -19,8 +19,6 @@ public class BankAccessMongoEntity extends BankAccess {
     @Id
     private String id;
     @Indexed
-    private String consentId;
-    @Indexed
     private String userId;
     private boolean temporary;
     private boolean storeBookings;

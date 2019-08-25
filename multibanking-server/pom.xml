@@ -56,11 +56,6 @@
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
-            <artifactId>onlinebanking-mock</artifactId>
-            <version>5.0.9-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-bankinggateway</artifactId>
             <version>5.1.2-SNAPSHOT</version>
             <exclusions>

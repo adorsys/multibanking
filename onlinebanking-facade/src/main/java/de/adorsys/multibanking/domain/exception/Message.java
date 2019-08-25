@@ -14,26 +14,37 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.transaction;
+package de.adorsys.multibanking.domain.exception;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@RequiredArgsConstructor
+import java.io.Serializable;
+import java.util.Map;
+
+@NoArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class AccountInformationTransaction extends AbstractScaTransaction {
+@AllArgsConstructor
+@Builder
+public class Message implements Serializable {
 
-    private final TransactionType transactionType;
+    private static final long serialVersionUID = -1L;
 
-    @Override
-    public TransactionType getTransactionType() {
-        return transactionType;
-    }
+    private String key;
 
-    @Override
-    public String getRawData() {
-        return null;
+    private Severity severity;
+
+    private String field;
+
+    private String renderedMessage;
+
+    private Map<String, String> paramsMap;
+
+    public enum Severity {
+        ERROR,
+        WARNING,
+        INFO
     }
 }

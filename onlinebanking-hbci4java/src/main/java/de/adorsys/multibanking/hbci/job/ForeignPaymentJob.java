@@ -17,14 +17,12 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDTAZV;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.manager.HBCIDialog;
-import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 
@@ -32,12 +30,12 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class ForeignPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+public class ForeignPaymentJob extends ScaRequiredJob<EmptyResponse> {
 
     private final TransactionRequest transactionRequest;
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
         Konto src = getPsuKonto(passport);
 
         GVDTAZV gv = new GVDTAZV(passport, GVDTAZV.getLowlevelName());
@@ -46,12 +44,17 @@ public class ForeignPaymentJob extends ScaRequiredJob<AuthorisationCodeResponse>
         gv.setParam("dtazv", "B" + transactionRequest.getTransaction().getRawData());
         gv.verifyConstraints();
 
-        return Collections.singletonList(gv);
+        return gv;
     }
 
     @Override
-    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        return response;
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    EmptyResponse createJobResponse(PinTanPassport passport) {
+        return new EmptyResponse();
     }
 
     @Override

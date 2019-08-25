@@ -25,6 +25,7 @@ import java.util.Map;
 @Data
 public class BankAccess {
 
+    private String consentId;
     private String bankName;
     private String bankCode;
     private String iban;

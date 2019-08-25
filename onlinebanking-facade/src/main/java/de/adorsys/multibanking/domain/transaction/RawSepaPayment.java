@@ -21,7 +21,7 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class RawSepaPayment extends AbstractScaTransaction {
+public class RawSepaPayment extends AbstractScaPaymentTransaction {
 
     private String painXml;
     private String service;

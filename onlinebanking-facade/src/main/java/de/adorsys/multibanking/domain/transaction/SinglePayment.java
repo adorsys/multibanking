@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SinglePayment extends AbstractScaTransaction {
+public class SinglePayment extends AbstractScaPaymentTransaction {
 
     private String receiver;
     private String receiverBic;

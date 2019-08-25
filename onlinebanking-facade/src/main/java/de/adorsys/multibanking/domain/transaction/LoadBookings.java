@@ -14,25 +14,33 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain.transaction;
 
-import de.adorsys.multibanking.domain.BankAccount;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 
+import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_TRANSACTIONS;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LoadBookingsRequest extends TransactionRequest {
+public class LoadBookings extends AbstractScaTransaction {
 
-    private String consentId;
-    private BankAccount bankAccount;
-    private RawResponseType rawResponseType;
+    private LoadBookings.RawResponseType rawResponseType;
     private LocalDate dateFrom;
     private LocalDate dateTo;
     private boolean withBalance;
-    private boolean withStandingOrders;
+
+    @Override
+    public TransactionType getTransactionType() {
+        return LOAD_TRANSACTIONS;
+    }
+
+    @Override
+    public String getRawData() {
+        return null;
+    }
 
     public enum RawResponseType {
         CAMT, MT940

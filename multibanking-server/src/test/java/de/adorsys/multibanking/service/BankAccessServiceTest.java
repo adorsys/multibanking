@@ -4,12 +4,7 @@ import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.UserEntity;
-import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
-import de.adorsys.multibanking.exception.InvalidBankAccessException;
-import de.adorsys.multibanking.exception.InvalidPinException;
-import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.figo.FigoBanking;
-import de.adorsys.multibanking.mock.MockBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
@@ -30,15 +25,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.util.Assert.*;
+import static org.springframework.util.Assert.isTrue;
+import static org.springframework.util.Assert.notEmpty;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -63,8 +55,6 @@ public class BankAccessServiceTest {
     @MockBean
     private FigoBanking figoBanking;
     @MockBean
-    private MockBanking mockBanking;
-    @MockBean
     private OnlineBankingServiceProducer bankingServiceProducer;
     @MockBean
     private AnalyticsConfigProvider analyticsConfigProvider;
@@ -77,61 +67,11 @@ public class BankAccessServiceTest {
     @Before
     public void beforeTest() {
         MockitoAnnotations.initMocks(this);
-        when(bankingServiceProducer.getBankingService(anyString())).thenReturn(mockBanking);
         bankRepository.findByBankCode("76090500").orElseGet(() -> {
             BankEntity bankEntity = TestUtil.getBankEntity("Sparda Bank", "76090500", BankApi.HBCI);
             bankRepository.save(bankEntity);
             return bankEntity;
         });
-    }
-
-    @Test
-    public void create_bank_access_not_supported() {
-        when(mockBanking.bankSupported(anyString())).thenReturn(false);
-        thrown.expect(InvalidBankAccessException.class);
-
-        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", null);
-        bankAccessEntity.setBankCode("unsupported");
-        bankAccessService.createBankAccess(bankAccessEntity);
-    }
-
-    @Test
-    public void create_bank_access_no_accounts() {
-        when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any())).thenReturn(LoadAccountInformationResponse.builder().build());
-        thrown.expect(InvalidBankAccessException.class);
-
-        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500");
-        bankAccessService.createBankAccess(bankAccessEntity);
-    }
-
-    @Test
-    public void create_bank_access_invalid_pin() {
-        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500");
-
-        when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any()))
-            .thenThrow(new InvalidPinException("access"));
-        thrown.expect(InvalidPinException.class);
-
-        bankAccessService.createBankAccess(bankAccessEntity);
-    }
-
-    @Test
-    public void create_bank_access_ok() {
-        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("login", "access", "76090500");
-
-        when(mockBanking.bankSupported(anyString())).thenReturn(true);
-        when(mockBanking.loadBankAccounts(any()))
-            .thenReturn(LoadAccountInformationResponse.builder()
-                .bankAccounts(Collections.singletonList(TestUtil.getBankAccountEntity("account")))
-                .build());
-
-        bankAccessService.createBankAccess(bankAccessEntity);
-
-        notNull(userRepository.findById("login"), "user not exists");
-        notNull(bankAccessRepository.findByUserIdAndId("login", "access"), "bankaccess not exists");
-        notNull(bankAccountRepository.findByUserIdAndId("login", "account"), "bankaccount not exists");
     }
 
     @Test

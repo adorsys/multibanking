@@ -10,18 +10,25 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class MultibankingException extends RuntimeException {
 
-    private List<String> messages;
+    private List<Message> messages;
     private MultibankingError multibankingError;
 
     public MultibankingException(MultibankingError multibankingError) {
         this(multibankingError, Collections.emptyList());
     }
 
-    public MultibankingException(MultibankingError multibankingError, String message) {
+    public MultibankingException(MultibankingError multibankingError, String messageString) {
+        this(multibankingError, Collections.singletonList(Message.builder()
+            .renderedMessage(messageString)
+            .build())
+        );
+    }
+
+    public MultibankingException(MultibankingError multibankingError, Message message) {
         this(multibankingError, Collections.singletonList(message));
     }
 
-    public MultibankingException(MultibankingError multibankingError, List<String> messages) {
+    public MultibankingException(MultibankingError multibankingError, List<Message> messages) {
         super(messages.toString());
         this.messages = messages;
         this.multibankingError = multibankingError;

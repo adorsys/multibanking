@@ -17,7 +17,7 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class RawSepaJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+public class RawSepaJob extends ScaRequiredJob<EmptyResponse> {
 
     private final TransactionRequest transactionRequest;
 
@@ -62,7 +62,7 @@ public class RawSepaJob extends ScaRequiredJob<AuthorisationCodeResponse> {
     }
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
         RawSepaPayment sepaPayment = (RawSepaPayment) transactionRequest.getTransaction();
 
         String jobName;
@@ -87,12 +87,17 @@ public class RawSepaJob extends ScaRequiredJob<AuthorisationCodeResponse> {
 
         sepagv.verifyConstraints();
 
-        return Collections.singletonList(sepagv);
+        return sepagv;
     }
 
     @Override
-    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        return response;
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    EmptyResponse createJobResponse(PinTanPassport passport) {
+        return new EmptyResponse();
     }
 
     private void appendPainValues(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {

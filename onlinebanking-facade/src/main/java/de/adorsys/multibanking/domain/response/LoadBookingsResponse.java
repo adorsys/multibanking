@@ -18,7 +18,6 @@ package de.adorsys.multibanking.domain.response;
 
 import de.adorsys.multibanking.domain.BalancesReport;
 import de.adorsys.multibanking.domain.Booking;
-import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -33,7 +32,6 @@ public class LoadBookingsResponse extends AbstractResponse {
     //possible multiple CAMT files
     private List<String> rawData;
     private List<Booking> bookings;
-    private List<StandingOrder> standingOrders;
-    private BalancesReport bankAccountBalance;
+    private BalancesReport balancesReport;
 
 }
