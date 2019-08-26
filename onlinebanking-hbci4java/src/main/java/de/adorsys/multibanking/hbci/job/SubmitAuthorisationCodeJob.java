@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
 import de.adorsys.multibanking.hbci.model.*;
@@ -41,11 +42,11 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @RequiredArgsConstructor
-public class SubmitAuthorisationCodeJob {
+public class SubmitAuthorisationCodeJob<T extends AbstractResponse> {
 
     private final ScaRequiredJob scaJob;
 
-    public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitAuthorizationCodeRequest) {
+    public SubmitAuthorizationCodeResponse<T> sumbitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitAuthorizationCodeRequest) {
         HbciTanSubmit hbciTanSubmit =
             evaluateTanSubmit((HBCIConsent) submitAuthorizationCodeRequest.getBankApiConsentData());
 
@@ -156,20 +157,19 @@ public class SubmitAuthorisationCodeJob {
         return objectMapper;
     }
 
-    private SubmitAuthorizationCodeResponse createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
+    private SubmitAuthorizationCodeResponse<T> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
                                                            AbstractHBCIJob hbciJob, HBCIExecStatus status) {
         String transactionId = Optional.ofNullable(hbciJob)
             .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
             .orElse(hbciTanSubmit.getOrderRef());
 
-        SubmitAuthorizationCodeResponse response = new SubmitAuthorizationCodeResponse();
+        SubmitAuthorizationCodeResponse response =
+            new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport));
         response.setTransactionId(transactionId);
 
         if (!status.getDialogStatus().msgStatusList.isEmpty()) {
             response.setStatus(status.getDialogStatus().msgStatusList.get(0).segStatus.toString());
         }
-
-        response.setJobResponse(scaJob.createJobResponse(passport));
 
         return response;
     }

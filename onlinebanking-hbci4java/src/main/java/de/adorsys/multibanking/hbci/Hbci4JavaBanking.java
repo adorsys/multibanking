@@ -171,9 +171,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 TransactionRequest<SubmitAuthorisationCode> submitAuthorisationCodeRequest =
                     new TransactionRequest<>(submitAuthorisationCode);
 
-                submitAuthorizationCode(submitAuthorisationCodeRequest);
+                SubmitAuthorizationCodeResponse<LoadAccountInformationResponse> submitAuthorizationCodeResponse =
+                    submitAuthorizationCode(submitAuthorisationCodeRequest);
 
-                return null;
+                return submitAuthorizationCodeResponse.getJobResponse();
             } else {
                 AccountInformationJob accountInformationJob = new AccountInformationJob(request);
 
@@ -197,9 +198,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 TransactionRequest<SubmitAuthorisationCode> submitAuthorisationCodeRequest =
                     new TransactionRequest<>(submitAuthorisationCode);
 
-                submitAuthorizationCode(submitAuthorisationCodeRequest);
+                SubmitAuthorizationCodeResponse<LoadBookingsResponse> submitAuthorizationCodeResponse =
+                    submitAuthorizationCode(submitAuthorisationCodeRequest);
 
-                return null;
+                return submitAuthorizationCodeResponse.getJobResponse();
             } else {
                 checkBankExists(request.getBank());
                 BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBank(), request);
@@ -229,9 +231,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 TransactionRequest<SubmitAuthorisationCode> submitAuthorisationCodeRequest =
                     new TransactionRequest<>(submitAuthorisationCode);
 
-                submitAuthorizationCode(submitAuthorisationCodeRequest);
+                SubmitAuthorizationCodeResponse<LoadBalancesResponse> submitAuthorizationCodeResponse =
+                    submitAuthorizationCode(submitAuthorisationCodeRequest);
 
-                return null;
+                return submitAuthorizationCodeResponse.getJobResponse();
             } else {
                 LoadBalancesJob loadBalancesJob = new LoadBalancesJob(request);
                 LoadBalancesResponse response = loadBalancesJob.authorisationAwareExecute(hbciCallback);
@@ -281,7 +284,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> request) {
+    public <T extends AbstractResponse> SubmitAuthorizationCodeResponse<T> submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> request) {
         checkBankExists(request.getBank());
         setRequestBpdAndCreateCallback(request.getBank(), request);
         try {
@@ -289,7 +292,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 .map(transaction -> createScaJob(request))
                 .orElse(new TanRequestJob(request));
 
-            return new SubmitAuthorisationCodeJob(scaJob).sumbitAuthorizationCode(request);
+            return new SubmitAuthorisationCodeJob<T>(scaJob).sumbitAuthorizationCode(request);
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -414,8 +417,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             @Override
             public Consent getConsent(String consentId) {
-                //FIXME
-                return null;
+                Consent consent = new Consent();
+                consent.setConsentId(consentId);
+                return consent;
             }
 
             @Override

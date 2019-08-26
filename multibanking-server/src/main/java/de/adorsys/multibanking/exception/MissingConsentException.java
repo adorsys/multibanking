@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.exception;
 
-import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisation;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

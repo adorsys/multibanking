@@ -210,12 +210,12 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse initiatePayment(TransactionRequest request) {
+    public <T extends AbstractResponse> SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitPaymentRequest) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitPaymentRequest) {
+    public AuthorisationCodeResponse initiatePayment(TransactionRequest request) {
         throw new UnsupportedOperationException();
     }
 

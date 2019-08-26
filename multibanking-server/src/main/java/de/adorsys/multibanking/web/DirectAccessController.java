@@ -51,7 +51,6 @@ public class DirectAccessController {
     private final BalancesMapper balancesMapper;
     private final BankAccessMapper bankAccessMapper;
     private final BankAccountMapper bankAccountMapper;
-    private final CredentialsMapper credentialsMapper;
     private final BankAccountService bankAccountService;
     private final BookingService bookingService;
     private final BankAccessRepositoryIf bankAccessRepository;
