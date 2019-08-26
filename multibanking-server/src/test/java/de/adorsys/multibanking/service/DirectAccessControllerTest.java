@@ -5,22 +5,34 @@ import de.adorsys.multibanking.bg.BankingGatewayAdapter;
 import de.adorsys.multibanking.conf.FongoConfig;
 import de.adorsys.multibanking.conf.MapperConfig;
 import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.ConsentEntity;
+import de.adorsys.multibanking.domain.ScaStatus;
+import de.adorsys.multibanking.domain.TanTransportType;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
+import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
-import de.adorsys.multibanking.domain.response.ScaMethodsResponse;
+import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
+import de.adorsys.multibanking.hbci.model.HBCIConsent;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.DirectAccessController;
-import de.adorsys.multibanking.web.model.*;
+import de.adorsys.multibanking.web.model.AccountReferenceTO;
+import de.adorsys.multibanking.web.model.BankAccessTO;
+import de.adorsys.multibanking.web.model.ConsentTO;
+import de.adorsys.multibanking.web.model.CredentialsTO;
+import de.adorsys.multibanking.web.model.ScaStatusTO;
+import de.adorsys.multibanking.web.model.SelectPsuAuthenticationMethodRequestTO;
+import de.adorsys.multibanking.web.model.TransactionAuthorisationRequestTO;
+import de.adorsys.multibanking.web.model.UpdatePsuAuthenticationRequestTO;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.ErrorLoggingFilter;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -31,6 +43,7 @@ import io.restassured.specification.RequestSpecification;
 import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kapott.hbci.manager.BankInfo;
@@ -50,15 +63,28 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT_STATUS;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_SCA_METHOD;
 import static de.adorsys.multibanking.service.TestUtil.createBooking;
-import static de.adorsys.multibanking.web.model.ScaStatusTO.*;
+import static de.adorsys.multibanking.web.model.ScaStatusTO.FINALISED;
+import static de.adorsys.multibanking.web.model.ScaStatusTO.PSUAUTHENTICATED;
+import static de.adorsys.multibanking.web.model.ScaStatusTO.RECEIVED;
+import static de.adorsys.multibanking.web.model.ScaStatusTO.SCAMETHODSELECTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static org.mockito.internal.util.MockUtil.isMock;
 
 @RunWith(SpringRunner.class)
@@ -148,33 +174,61 @@ public class DirectAccessControllerTest {
         consent_authorisation(bankAccess, credentials);
     }
 
+    @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_hbci() {
         BankAccessTO access = createBankAccess();
-//        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
-//        prepareBank(hbci4JavaBanking, access.getIban(), false);
         Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
         prepareBank(hbci4JavaBanking, access.getIban(), null, false);
 //        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme
 //        .de/hbciTunnel/hbciTransfer.jsp", false);
 
-        if (isMock(hbci4JavaBanking)) {
-            //mock hbci authenticate psu
-            doReturn(ScaMethodsResponse.builder()
-                .tanTransportTypes(Arrays.asList(TestUtil.createTanMethod("Method1"), TestUtil.createTanMethod(
-                    "Method2")))
-                .build()).when(hbci4JavaBanking).getStrongCustomerAuthorisation().updatePsuAuthentication(any());
+        CredentialsTO credentials = CredentialsTO.builder()
+            .customerId(System.getProperty("login", "login"))
+            .userId(System.getProperty("login2", null))
+            .pin(System.getProperty("pin", "pin"))
+            .build();
 
-            //mock bookings response
-            LoadBookingsResponse scaRequiredResponse = LoadBookingsResponse.builder().build();
-            scaRequiredResponse.setAuthorisationCodeResponse(AuthorisationCodeResponse.builder().build());
+        consent_authorisation(access, credentials);
+    }
 
-            doReturn(scaRequiredResponse)
-                .doReturn(LoadBookingsResponse.builder()
-                    .bookings(new ArrayList<>())
-                    .build())
-                .when(hbci4JavaBanking).loadBookings(any());
-        }
+    @Test
+    public void consent_authorisation_hbci_mock() {
+        BankAccessTO access = createBankAccess();
+        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
+        prepareBank(hbci4JavaBanking, access.getIban(), false);
+//        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
+//        prepareBank(hbci4JavaBanking, access.getIban(), null, false);
+//        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme
+//        .de/hbciTunnel/hbciTransfer.jsp", false);
+
+        //mock hbci authenticate "authenticatePsu" that's why we need to use an answer to manipulate the consent
+        StrongCustomerAuthorisable strongCustomerAuthorisable = spy(hbci4JavaBanking.getStrongCustomerAuthorisation());
+        doReturn(strongCustomerAuthorisable).when(hbci4JavaBanking).getStrongCustomerAuthorisation();
+        // unfortunately we can't mock the private method ``
+        doAnswer(invocationOnMock -> {
+            List<TanTransportType> fakeList = Arrays.asList(TestUtil.createTanMethod("Method1"), TestUtil.createTanMethod(
+                "Method2"));
+            UpdatePsuAuthenticationRequest updatePsuAuthentication = invocationOnMock.getArgument(0);
+            HBCIConsent hbciConsent = (HBCIConsent) updatePsuAuthentication.getBankApiConsentData();
+            hbciConsent.setStatus(ScaStatus.PSUAUTHENTICATED);
+            hbciConsent.setTanMethodList(fakeList);
+            UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
+            updateAuthResponse.setScaStatus(ScaStatus.PSUAUTHENTICATED);
+            updateAuthResponse.setBankApi(BankApi.HBCI);
+            updateAuthResponse.setScaMethods(fakeList);
+            return updateAuthResponse;
+        }).when(strongCustomerAuthorisable).updatePsuAuthentication(any());
+
+        //mock bookings response
+        LoadBookingsResponse scaRequiredResponse = LoadBookingsResponse.builder().build();
+        scaRequiredResponse.setAuthorisationCodeResponse(AuthorisationCodeResponse.builder().build());
+
+        doReturn(scaRequiredResponse)
+            .doReturn(LoadBookingsResponse.builder()
+                .bookings(new ArrayList<>())
+                .build())
+            .when(hbci4JavaBanking).loadBookings(any());
 
         CredentialsTO credentials = CredentialsTO.builder()
             .customerId(System.getProperty("login", "login"))
