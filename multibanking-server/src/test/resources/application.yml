@@ -76,5 +76,5 @@ sts:
 db_secret: 1234567890ABCDEF
 
 #bankinggateway.b2c.url: http://localhost:8084
-bankinggateway.b2c.url: https://dev-bankinggateway-b2c-b2cserver.cloud.adorsys.de
+bankinggateway.b2c.url: https://dev-bankinggateway-b2c.cloud.adorsys.de
 bankinggateway.adapter.url: https://dev-bankinggateway-adapter.cloud.adorsys.de
