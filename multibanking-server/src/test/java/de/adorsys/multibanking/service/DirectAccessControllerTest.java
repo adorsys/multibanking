@@ -113,7 +113,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
-    //    @Ignore
+    @Ignore("currently redirect url is not returned from banking gateway after login")
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
         BankAccessTO bankAccess = createBankAccess();
