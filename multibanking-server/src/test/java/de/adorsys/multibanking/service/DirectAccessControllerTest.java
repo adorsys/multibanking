@@ -241,6 +241,7 @@ public class DirectAccessControllerTest {
                 .and().extract().jsonPath();
             assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
         }
+        assertThat(jsonPath.getString("scaApproach")).as("sca approach type should not be null").isNotEmpty();
 
         //5. send tan
         TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
