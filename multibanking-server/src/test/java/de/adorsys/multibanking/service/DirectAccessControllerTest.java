@@ -133,7 +133,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.redirectUrl.href")).isNotBlank();
     }
 
-    //    @Ignore
+    @Ignore("Error from BankingGateway: status 400 reading AccountInformationClient#updateConsentsPsuData(String,String,Map,ObjectNode)")
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO bankAccess = createBankAccess();
