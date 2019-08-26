@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "0.1-SNAPSHOT",
+    "version": "0.2-SNAPSHOT",
     "title": "Banking Gateway API"
   },
   "host": "localhost:8084",
@@ -83,23 +83,17 @@
               "$ref": "#/definitions/CreateConsentResponseTO"
             }
           },
-          "201": {
-            "description": "Created"
-          },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "deprecated": false
@@ -132,19 +126,16 @@
             }
           },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "deprecated": false
@@ -171,20 +162,17 @@
           "200": {
             "description": "OK"
           },
-          "204": {
-            "description": "No Content"
-          },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "deprecated": false
@@ -227,19 +215,16 @@
             }
           },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "deprecated": false
@@ -275,23 +260,20 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+              "$ref": "#/definitions/ResourceOfUpdateAuthResponseTO"
             }
           },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "security": [
@@ -346,26 +328,20 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+              "$ref": "#/definitions/ResourceOfUpdateAuthResponseTO"
             }
           },
-          "201": {
-            "description": "Created"
-          },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "security": [
@@ -420,26 +396,20 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+              "$ref": "#/definitions/ResourceOfUpdateAuthResponseTO"
             }
           },
-          "201": {
-            "description": "Created"
-          },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "security": [
@@ -494,26 +464,20 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+              "$ref": "#/definitions/ResourceOfUpdateAuthResponseTO"
             }
           },
-          "201": {
-            "description": "Created"
-          },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "security": [
@@ -549,23 +513,20 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/ResourcePaymentDataTO"
+              "$ref": "#/definitions/ResourceOfPaymentDataTO"
             }
           },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "security": [
@@ -608,23 +569,20 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+              "$ref": "#/definitions/ResourceOfUpdateAuthResponseTO"
             }
           },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "security": [
@@ -679,26 +637,20 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+              "$ref": "#/definitions/ResourceOfUpdateAuthResponseTO"
             }
           },
-          "201": {
-            "description": "Created"
-          },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "security": [
@@ -753,26 +705,20 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+              "$ref": "#/definitions/ResourceOfUpdateAuthResponseTO"
             }
           },
-          "201": {
-            "description": "Created"
-          },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "security": [
@@ -827,26 +773,20 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/ResourceUpdateAuthResponseTO"
+              "$ref": "#/definitions/ResourceOfUpdateAuthResponseTO"
             }
           },
-          "201": {
-            "description": "Created"
-          },
           "400": {
-            "description": "Messages",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/MessagesTO"
             }
           },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
-            "description": "Not Found"
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
           }
         },
         "security": [
@@ -1205,7 +1145,7 @@
       },
       "title": "PaymentTO"
     },
-    "ResourcePaymentDataTO": {
+    "ResourceOfPaymentDataTO": {
       "type": "object",
       "properties": {
         "_links": {
@@ -1243,14 +1183,14 @@
           "type": "string"
         }
       },
-      "title": "ResourcePaymentDataTO",
+      "title": "ResourceOfPaymentDataTO",
       "xml": {
-        "name": "ResourcePaymentDataTO",
+        "name": "ResourceOfPaymentDataTO",
         "attribute": false,
         "wrapped": false
       }
     },
-    "ResourceUpdateAuthResponseTO": {
+    "ResourceOfUpdateAuthResponseTO": {
       "type": "object",
       "properties": {
         "_links": {
@@ -1301,7 +1241,7 @@
           ]
         }
       },
-      "title": "ResourceUpdateAuthResponseTO"
+      "title": "ResourceOfUpdateAuthResponseTO"
     },
     "ScaMethodTO": {
       "type": "object",

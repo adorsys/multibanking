@@ -44,7 +44,7 @@ interface BankingGatewayMapper {
     @Mapping(target = "password", source = "pin")
     UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(Credentials credentials);
 
-    UpdateAuthResponse toUpdateAuthResponseTO(ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO,
+    UpdateAuthResponse toUpdateAuthResponseTO(ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponseTO,
                                               BankApi bankApi);
 
     SelectPsuAuthenticationMethodRequestTO toSelectPsuAuthenticationMethodRequestTO(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod);
