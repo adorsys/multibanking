@@ -164,8 +164,13 @@ public class ConsentService {
                 case INVALID_SCA_METHOD:
                     throw new MissingConsentAuthorisationSelectionException();
                 case INVALID_CONSENT_STATUS:
-                    // TODO don't know where to get UpdateAuthResponse
-                    throw new TransactionAuthorisationRequiredException(null, internalConsent.getId(), internalConsent.getAuthorisationId());
+                    if (expectedConsentStatus == ScaStatus.FINALISED) {
+                        // TODO don't know where to get UpdateAuthResponse
+                        throw new TransactionAuthorisationRequiredException(null, internalConsent.getId(), internalConsent.getAuthorisationId());
+                    } else if (expectedConsentStatus == ScaStatus.SCAMETHODSELECTED) {
+                        throw new MissingConsentAuthorisationSelectionException();
+                    }
+                    throw e;
                 default:
                     throw e;
             }
