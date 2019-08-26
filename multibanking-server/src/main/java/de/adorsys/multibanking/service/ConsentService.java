@@ -11,6 +11,7 @@ import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.exception.MissingConsentAuthorisationSelectionException;
 import de.adorsys.multibanking.exception.MissingConsentException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
 import de.adorsys.multibanking.web.mapper.ConsentMapper;
@@ -162,6 +163,14 @@ public class ConsentService {
                     throw new MissingConsentException();
                 case INVALID_SCA_METHOD:
                     throw new MissingConsentAuthorisationSelectionException();
+                case INVALID_CONSENT_STATUS:
+                    if (expectedConsentStatus == ScaStatus.FINALISED) {
+                        // TODO don't know where to get UpdateAuthResponse
+                        throw new TransactionAuthorisationRequiredException(null, internalConsent.getId(), internalConsent.getAuthorisationId());
+                    } else if (expectedConsentStatus == ScaStatus.SCAMETHODSELECTED) {
+                        throw new MissingConsentAuthorisationSelectionException();
+                    }
+                    throw e;
                 default:
                     throw e;
             }
