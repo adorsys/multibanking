@@ -319,6 +319,7 @@ public class DirectAccessControllerTest {
     public void verifyApiConsentStatusValid() {
         BankAccessTO bankAccess = createBankAccess();
         prepareBank(bankingGatewayAdapterMock, bankAccess.getIban(), false);
+        fakeConsentValidation(bankingGatewayAdapterMock);
 
         when(bankingGatewayAdapterMock.loadBankAccounts(any()))
             .thenReturn(LoadAccountInformationResponse.builder()
@@ -358,6 +359,14 @@ public class DirectAccessControllerTest {
             .extract().body().as(DirectAccessController.LoadBookingsResponse.class);
 
         assertThat(loadBookingsResponse.getBookings()).isNotEmpty();
+    }
+
+    private void fakeConsentValidation(OnlineBankingService onlineBankingService) {
+        // mock the sca handler
+        when(onlineBankingService.getStrongCustomerAuthorisation()).thenReturn(mock(StrongCustomerAuthorisable.class));
+        // return a fake consent
+        doReturn(Optional.of(new ConsentEntity())).when(consentRepository).findById(nullable(String.class));
+        // sca handler will do nothing with the fake and this result in a positive validation
     }
 
     private void prepareBank(OnlineBankingService onlineBankingService, String iban, boolean redirectPreferred) {
@@ -410,6 +419,7 @@ public class DirectAccessControllerTest {
     private BankAccessTO createBankAccess() {
         BankAccessTO bankAccessTO = new BankAccessTO();
         bankAccessTO.setIban(System.getProperty("iban", "DE34900000019090909000"));
+        bankAccessTO.setConsentId(UUID.randomUUID().toString());
         return bankAccessTO;
     }
 
