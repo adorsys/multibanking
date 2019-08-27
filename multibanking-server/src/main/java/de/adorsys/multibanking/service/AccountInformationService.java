@@ -4,7 +4,6 @@ import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.ConsentEntity;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
-import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.exception.InvalidConsentException;
 import de.adorsys.multibanking.exception.InvalidPinException;
@@ -44,10 +43,8 @@ abstract class AccountInformationService {
                 authorisationCodeResponse);
             consentRepository.save(consentEntity);
 
-            UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
-            updateAuthResponse.setChallenge(authorisationCodeResponse.getChallenge());
-            throw new TransactionAuthorisationRequiredException(updateAuthResponse, consentEntity.getId(),
-                consentEntity.getAuthorisationId());
+            throw new TransactionAuthorisationRequiredException(authorisationCodeResponse.getUpdateAuthResponse(),
+                consentEntity.getId(), consentEntity.getAuthorisationId());
         });
 
     }

@@ -4,12 +4,7 @@ import de.adorsys.multibanking.Application;
 import de.adorsys.multibanking.bg.BankingGatewayAdapter;
 import de.adorsys.multibanking.conf.FongoConfig;
 import de.adorsys.multibanking.conf.MapperConfig;
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.domain.BankEntity;
-import de.adorsys.multibanking.domain.ConsentEntity;
-import de.adorsys.multibanking.domain.ScaStatus;
-import de.adorsys.multibanking.domain.TanTransportType;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
@@ -197,10 +192,6 @@ public class DirectAccessControllerTest {
         BankAccessTO access = createBankAccess();
         Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
         prepareBank(hbci4JavaBanking, access.getIban(), false);
-//        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
-//        prepareBank(hbci4JavaBanking, access.getIban(), null, false);
-//        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme
-//        .de/hbciTunnel/hbciTransfer.jsp", false);
 
         //mock hbci authenticate "authenticatePsu" that's why we need to use an answer to manipulate the consent
         StrongCustomerAuthorisable strongCustomerAuthorisable = spy(hbci4JavaBanking.getStrongCustomerAuthorisation());
@@ -214,6 +205,7 @@ public class DirectAccessControllerTest {
             hbciConsent.setStatus(ScaStatus.PSUAUTHENTICATED);
             hbciConsent.setTanMethodList(fakeList);
             UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
+            updateAuthResponse.setScaApproach(ScaApproach.EMBEDDED);
             updateAuthResponse.setScaStatus(ScaStatus.PSUAUTHENTICATED);
             updateAuthResponse.setBankApi(BankApi.HBCI);
             updateAuthResponse.setScaMethods(fakeList);
@@ -221,8 +213,15 @@ public class DirectAccessControllerTest {
         }).when(strongCustomerAuthorisable).updatePsuAuthentication(any());
 
         //mock bookings response
+        UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
+        updateAuthResponse.setScaApproach(ScaApproach.EMBEDDED);
+        updateAuthResponse.setScaStatus(ScaStatus.SCAMETHODSELECTED);
+        updateAuthResponse.setBankApi(BankApi.HBCI);
+        updateAuthResponse.setChallenge(new ChallengeData());
         LoadBookingsResponse scaRequiredResponse = LoadBookingsResponse.builder().build();
-        scaRequiredResponse.setAuthorisationCodeResponse(AuthorisationCodeResponse.builder().build());
+        scaRequiredResponse.setAuthorisationCodeResponse(AuthorisationCodeResponse.builder()
+            .updateAuthResponse(updateAuthResponse)
+            .build());
 
         doReturn(scaRequiredResponse)
             .doReturn(LoadBookingsResponse.builder()

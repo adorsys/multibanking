@@ -16,7 +16,6 @@
 
 package de.adorsys.multibanking.domain.response;
 
-import de.adorsys.multibanking.domain.ChallengeData;
 import lombok.Builder;
 import lombok.Data;
 
@@ -25,6 +24,6 @@ import lombok.Data;
 public class AuthorisationCodeResponse {
 
     private Object tanSubmit;
-    private ChallengeData challenge;
+    private UpdateAuthResponse updateAuthResponse;
 
 }

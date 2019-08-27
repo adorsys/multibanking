@@ -16,14 +16,13 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.ChallengeData;
-import de.adorsys.multibanking.domain.Product;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.hbci.model.*;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +40,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static de.adorsys.multibanking.domain.BankApi.HBCI;
+import static de.adorsys.multibanking.domain.ScaApproach.EMBEDDED;
+import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
 import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDialog;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -238,7 +240,13 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
                         }
                     }
 
-                    response.setChallenge(challengeData);
+                    UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
+                    updateAuthResponse.setBankApi(HBCI);
+                    updateAuthResponse.setScaStatus(SCAMETHODSELECTED);
+                    updateAuthResponse.setScaApproach(EMBEDDED);
+                    updateAuthResponse.setChallenge(challengeData);
+
+                    response.setUpdateAuthResponse(updateAuthResponse);
                 }
             }
 

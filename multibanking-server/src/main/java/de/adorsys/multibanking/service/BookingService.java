@@ -135,8 +135,6 @@ public class BookingService extends AccountInformationService {
             bankAccountRepository.save(bankAccount);
 
             return result;
-        } catch (TransactionAuthorisationRequiredException e) {
-            throw e;
         } catch (Exception e) {
             LoggerFactory.getLogger(getClass()).error("sync bookings failed", e);
             throw e;

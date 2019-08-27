@@ -225,7 +225,6 @@ public class DirectAccessController {
             authorisationId)).withSelfRel());
         links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
             authorisationId, null)).withRel("transactionAuthorisation"));
-        response.setScaStatus(SCAMETHODSELECTED);
         return ResponseEntity.ok(new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links));
     }
 
