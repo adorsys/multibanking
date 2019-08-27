@@ -16,7 +16,9 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.ChallengeData;
+import de.adorsys.multibanking.domain.Product;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
@@ -47,9 +49,9 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
 import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDialog;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public abstract class ScaRequiredJob<T extends AbstractResponse> {
+public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends AbstractResponse> {
 
-    public T authorisationAwareExecute(HbciCallback hbciCallback) {
+    public R authorisationAwareExecute(HbciCallback hbciCallback) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
         AuthorisationCodeResponse authorisationCodeResponse =
             AuthorisationCodeResponse.builder().tanSubmit(hbciTanSubmit).build();
@@ -77,7 +79,7 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
             .map(gvtan2Step -> KnownReturncode.W3076.searchReturnValue(gvtan2Step.getJobResult().getJobStatus().getRetVals()) == null)
             .orElse(false);
 
-        T jobResponse = createJobResponse(dialog.getPassport());
+        R jobResponse = createJobResponse(dialog.getPassport());
         if (tan2StepRequired) {
             updateTanSubmit(hbciTanSubmit, dialog, hbciJob);
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
@@ -204,7 +206,7 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
         BankAccount account = getPsuBankAccount();
         Konto konto = passport.findAccountByAccountNumber(Iban.valueOf(account.getIban()).getAccountNumber());
         konto.iban = account.getIban();
-        konto.bic = account.getBic();
+        konto.bic = Optional.ofNullable(account.getBic()).orElse(getTransactionRequest().getBank().getBic());
         return konto;
     }
 
@@ -213,7 +215,7 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
             .orElseThrow(() -> new MultibankingException(INVALID_ACCOUNT_REFERENCE, "Missing transaction psu account"));
     }
 
-    HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog) {
+    private HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog) {
         return Optional.of(getConsent().getSelectedMethod())
             .map(tanTransportType -> dialog.getPassport().getBankTwostepMechanisms().get(tanTransportType.getId()))
             .orElseThrow(() -> new MultibankingException(INVALID_SCA_METHOD));
@@ -292,11 +294,11 @@ public abstract class ScaRequiredJob<T extends AbstractResponse> {
 
     public abstract List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport);
 
-    abstract TransactionRequest getTransactionRequest();
+    abstract TransactionRequest<T> getTransactionRequest();
 
     abstract String getHbciJobName(AbstractScaTransaction.TransactionType transactionType);
 
-    abstract T createJobResponse(PinTanPassport passport);
+    abstract R createJobResponse(PinTanPassport passport);
 
     public abstract String orderIdFromJobResult(HBCIJobResult jobResult);
 

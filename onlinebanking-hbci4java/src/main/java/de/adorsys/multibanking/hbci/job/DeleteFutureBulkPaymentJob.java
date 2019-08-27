@@ -25,7 +25,6 @@ import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTermMultiUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.structures.Konto;
 
 import java.util.Collections;
 import java.util.List;
@@ -34,13 +33,13 @@ import java.util.List;
  * Only for future payment (GVTermUebSEPA)
  */
 @RequiredArgsConstructor
-public class DeleteFutureBulkPaymentJob extends ScaRequiredJob<EmptyResponse> {
+public class DeleteFutureBulkPaymentJob extends ScaRequiredJob<FutureBulkPayment, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<FutureBulkPayment> transactionRequest;
 
     @Override
     public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
-        FutureBulkPayment futureBulkPayment = (FutureBulkPayment) transactionRequest.getTransaction();
+        FutureBulkPayment futureBulkPayment = transactionRequest.getTransaction();
 
         GVTermMultiUebSEPADel sepadelgv = new GVTermMultiUebSEPADel(passport, GVTermMultiUebSEPADel.getLowlevelName());
 
@@ -62,7 +61,7 @@ public class DeleteFutureBulkPaymentJob extends ScaRequiredJob<EmptyResponse> {
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<FutureBulkPayment> getTransactionRequest() {
         return transactionRequest;
     }
 

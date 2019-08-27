@@ -35,13 +35,13 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
-public class DeleteStandingOrderJob extends ScaRequiredJob<EmptyResponse> {
+public class DeleteStandingOrderJob extends ScaRequiredJob<StandingOrder, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<StandingOrder> transactionRequest;
 
     @Override
     public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
-        StandingOrder standingOrder = (StandingOrder) transactionRequest.getTransaction();
+        StandingOrder standingOrder = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);
 
@@ -90,7 +90,7 @@ public class DeleteStandingOrderJob extends ScaRequiredJob<EmptyResponse> {
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<StandingOrder> getTransactionRequest() {
         return transactionRequest;
     }
 

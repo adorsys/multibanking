@@ -28,7 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class TanRequestJob extends ScaRequiredJob<EmptyResponse> {
+public class TanRequestJob extends ScaRequiredJob {
 
     private final TransactionRequest transactionRequest;
 

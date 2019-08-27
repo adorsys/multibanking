@@ -19,6 +19,7 @@ package de.adorsys.multibanking.hbci.job;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.ForeignPayment;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDTAZV;
@@ -30,9 +31,9 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class ForeignPaymentJob extends ScaRequiredJob<EmptyResponse> {
+public class ForeignPaymentJob extends ScaRequiredJob<ForeignPayment, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<ForeignPayment> transactionRequest;
 
     @Override
     public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
@@ -58,7 +59,7 @@ public class ForeignPaymentJob extends ScaRequiredJob<EmptyResponse> {
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<ForeignPayment> getTransactionRequest() {
         return transactionRequest;
     }
 

@@ -105,7 +105,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public <T extends AbstractResponse> SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitPaymentRequest) {
+    public SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> request) {
         return null;
     }
 

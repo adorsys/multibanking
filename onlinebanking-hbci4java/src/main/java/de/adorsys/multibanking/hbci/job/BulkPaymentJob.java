@@ -38,13 +38,13 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class BulkPaymentJob extends ScaRequiredJob<EmptyResponse> {
+public class BulkPaymentJob extends ScaRequiredJob<BulkPayment, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<BulkPayment> transactionRequest;
 
     @Override
     public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
-        BulkPayment bulkPayment = (BulkPayment) transactionRequest.getTransaction();
+        BulkPayment bulkPayment = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);
 
@@ -93,7 +93,7 @@ public class BulkPaymentJob extends ScaRequiredJob<EmptyResponse> {
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<BulkPayment> getTransactionRequest() {
         return transactionRequest;
     }
 

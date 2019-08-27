@@ -42,12 +42,12 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class RawSepaJob extends ScaRequiredJob<EmptyResponse> {
+public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<RawSepaPayment> transactionRequest;
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<RawSepaPayment> getTransactionRequest() {
         return transactionRequest;
     }
 
@@ -63,7 +63,7 @@ public class RawSepaJob extends ScaRequiredJob<EmptyResponse> {
 
     @Override
     public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
-        RawSepaPayment sepaPayment = (RawSepaPayment) transactionRequest.getTransaction();
+        RawSepaPayment sepaPayment = transactionRequest.getTransaction();
 
         String jobName;
         switch (sepaPayment.getSepaTransactionType()) {

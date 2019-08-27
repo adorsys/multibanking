@@ -10,7 +10,6 @@ import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadBookings;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
-import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsIf;
@@ -19,7 +18,6 @@ import de.adorsys.smartanalytics.api.AnalyticsResult;
 import de.adorsys.smartanalytics.api.config.ConfigStatus;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -135,9 +133,6 @@ public class BookingService extends AccountInformationService {
             bankAccountRepository.save(bankAccount);
 
             return result;
-        } catch (Exception e) {
-            LoggerFactory.getLogger(getClass()).error("sync bookings failed", e);
-            throw e;
         } finally {
             bankAccountRepository.updateSyncStatus(bankAccount.getId(), BankAccount.SyncStatus.PENDING);
         }

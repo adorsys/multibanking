@@ -16,6 +16,8 @@
 
 package de.adorsys.multibanking.hbci.job;
 
+import de.adorsys.multibanking.domain.Balance;
+import de.adorsys.multibanking.domain.BalancesReport;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.exception.Message;
@@ -27,7 +29,9 @@ import de.adorsys.multibanking.domain.transaction.LoadBookings;
 import de.adorsys.multibanking.hbci.model.HbciMapping;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV.*;
+import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV.GVKUmsAll;
+import org.kapott.hbci.GV.GVKUmsAllCamt;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
@@ -41,7 +45,7 @@ import static de.adorsys.multibanking.domain.transaction.LoadBookings.RawRespons
 
 @RequiredArgsConstructor
 @Slf4j
-public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
+public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsResponse> {
 
     private final TransactionRequest<LoadBookings> loadBookingsRequest;
 
@@ -59,7 +63,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<LoadBookings> getTransactionRequest() {
         return loadBookingsRequest;
     }
 
@@ -90,26 +94,52 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
     public LoadBookingsResponse createJobResponse(PinTanPassport passport) {
         if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
-            throw new MultibankingException(HBCI_ERROR, bookingsJob.getJobResult().getJobStatus().getErrorList().stream()
-                .map(messageString -> Message.builder().renderedMessage(messageString).build())
-                .collect(Collectors.toList()));
+            throw new MultibankingException(HBCI_ERROR,
+                bookingsJob.getJobResult().getJobStatus().getErrorList().stream()
+                    .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                    .collect(Collectors.toList()));
         }
 
-        ArrayList<Booking> bookingList = null;
+        List<Booking> bookingList = null;
+        BalancesReport balancesReport = null;
         List<String> raw = null;
         GVRKUms bookingsResult = (GVRKUms) bookingsJob.getJobResult();
         if (loadBookingsRequest.getTransaction().getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
-            bookingList = HbciMapping.createBookings(bookingsResult).stream()
+            bookingList = HbciMapping.createBookings(bookingsResult);
+
+            if (loadBookingsRequest.getTransaction().isWithBalance()) {
+                balancesReport = createBalancesReport(bookingList);
+            }
+
+            bookingList = bookingList.stream()
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
                     () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
         }
 
         return LoadBookingsResponse.builder()
             .bookings(bookingList)
+            .balancesReport(balancesReport)
             .rawData(raw)
             .build();
+    }
+
+    private BalancesReport createBalancesReport(List<Booking> bookingList) {
+        BalancesReport balancesReport;
+        balancesReport = bookingList.stream().reduce((first, second) -> first)
+            .map(booking -> {
+                Balance balance = new Balance();
+                balance.setAmount(booking.getBalance());
+                balance.setDate(booking.getValutaDate());
+                balance.setCurrency(booking.getCurrency());
+
+                BalancesReport result = new BalancesReport();
+                result.setReadyBalance(balance);
+                return result;
+            })
+            .orElse(null);
+        return balancesReport;
     }
 
     private AbstractHBCIJob createBookingsJob(PinTanPassport passport) {

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
 import de.adorsys.multibanking.hbci.model.*;
@@ -42,11 +41,11 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @RequiredArgsConstructor
-public class SubmitAuthorisationCodeJob<T extends AbstractResponse> {
+public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
-    private final ScaRequiredJob<T> scaJob;
+    private final J scaJob;
 
-    public SubmitAuthorizationCodeResponse<T> sumbitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitAuthorizationCodeRequest) {
+    public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitAuthorizationCodeRequest) {
         HbciTanSubmit hbciTanSubmit =
             evaluateTanSubmit((HBCIConsent) submitAuthorizationCodeRequest.getBankApiConsentData());
 
@@ -103,13 +102,13 @@ public class SubmitAuthorisationCodeJob<T extends AbstractResponse> {
         return originJob;
     }
 
-    private SubmitAuthorizationCodeResponse<T> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
+    private SubmitAuthorizationCodeResponse<?> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
                                                               AbstractHBCIJob hbciJob, HBCIExecStatus status) {
         String transactionId = Optional.ofNullable(hbciJob)
             .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
             .orElse(hbciTanSubmit.getOrderRef());
 
-        SubmitAuthorizationCodeResponse response =
+        SubmitAuthorizationCodeResponse<?> response =
             new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport));
         response.setTransactionId(transactionId);
 
@@ -173,8 +172,6 @@ public class SubmitAuthorisationCodeJob<T extends AbstractResponse> {
         objectMapper.findAndRegisterModules();
         return objectMapper;
     }
-
-
 
     private String orderIdFromJobResult(HBCIJobResult jobResult) {
         return scaJob.orderIdFromJobResult(jobResult);

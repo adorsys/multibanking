@@ -27,9 +27,9 @@ import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.
 @RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SubmitAuthorisationCode extends AbstractScaTransaction {
+public class SubmitAuthorisationCode<T extends AbstractScaTransaction> extends AbstractScaTransaction {
 
-    private final AbstractScaTransaction originTransaction;
+    private final T originTransaction;
 
     @Override
     public TransactionType getTransactionType() {

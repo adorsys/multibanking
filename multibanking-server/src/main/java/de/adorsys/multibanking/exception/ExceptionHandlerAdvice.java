@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.exception;
 
-import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.exception.domain.Message;
 import de.adorsys.multibanking.exception.domain.Messages;
@@ -85,9 +84,7 @@ public class ExceptionHandlerAdvice {
     @ExceptionHandler
     @ResponseBody
     public ResponseEntity<Messages> handleException(MultibankingException e) {
-        HttpStatus httpStatus = Optional.ofNullable(e.getMultibankingError())
-            .map(this::toHttpStatus)
-            .orElse(HttpStatus.BAD_REQUEST);
+        HttpStatus httpStatus = HttpStatus.valueOf(e.getHttpResponseCode());
 
         Messages messages = Messages.builder()
             .message(Message.builder()
@@ -97,19 +94,6 @@ public class ExceptionHandlerAdvice {
             .build();
 
         return handleInternal(e, messages, httpStatus);
-    }
-
-    private HttpStatus toHttpStatus(MultibankingError multibankingError) {
-        switch (multibankingError) {
-            case HBCI_ERROR:
-            case INVALID_PAYMENT:
-            case INVALID_SCA_METHOD:
-            case INVALID_CONSENT:
-            case INVALID_PIN:
-            case INVALID_TAN:
-            default:
-                return HttpStatus.BAD_REQUEST;
-        }
     }
 
     @ExceptionHandler

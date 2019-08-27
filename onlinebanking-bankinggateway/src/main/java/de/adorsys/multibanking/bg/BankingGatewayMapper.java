@@ -88,6 +88,8 @@ interface BankingGatewayMapper {
         return fromXS2AType(cashAccountType.toString());
     }
 
+    List<Booking> toBookings(List<Transactions> transactionDetails);
+
     @Mapping(source = "valueDate", target = "valutaDate")
     @Mapping(source = "transactionAmount.amount", target = "amount")
     @Mapping(source = "transactionAmount.currency", target = "currency")

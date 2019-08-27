@@ -16,20 +16,18 @@
 
 package de.adorsys.multibanking.domain.request;
 
-import de.adorsys.multibanking.domain.BankAccess;
-import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class TransactionRequest<T extends AbstractScaTransaction> extends AbstractRequest {
 
-    private final T transaction;
-    private BankApiUser bankApiUser;
-    private BankAccess bankAccess;
+    private T transaction;
 
 }

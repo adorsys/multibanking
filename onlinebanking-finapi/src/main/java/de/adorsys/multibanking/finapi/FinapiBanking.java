@@ -2,7 +2,10 @@ package de.adorsys.multibanking.finapi;
 
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.*;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
+import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
@@ -273,8 +276,8 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public <T extends AbstractResponse> SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitPaymentRequest) {
-        return null;
+    public SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> request) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

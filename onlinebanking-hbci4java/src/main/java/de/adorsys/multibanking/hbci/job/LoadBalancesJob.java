@@ -47,7 +47,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Slf4j
-public class LoadBalancesJob extends ScaRequiredJob<LoadBalancesResponse> {
+public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesResponse> {
 
     private final TransactionRequest<LoadBalances> loadBalanceRequest;
     private AbstractHBCIJob balanceJob;
@@ -100,7 +100,7 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalancesResponse> {
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<LoadBalances> getTransactionRequest() {
         return loadBalanceRequest;
     }
 

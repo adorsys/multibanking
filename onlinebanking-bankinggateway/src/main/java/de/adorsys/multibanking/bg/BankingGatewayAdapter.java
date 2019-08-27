@@ -33,6 +33,7 @@ import de.adorsys.xs2a.adapter.service.RequestHeaders;
 import de.adorsys.xs2a.adapter.service.RequestParams;
 import de.adorsys.xs2a.adapter.service.account.AccountDetails;
 import de.adorsys.xs2a.adapter.service.account.AccountListHolder;
+import de.adorsys.xs2a.adapter.service.account.AccountReport;
 import de.adorsys.xs2a.adapter.service.account.TransactionsReport;
 import de.adorsys.xs2a.adapter.service.ais.AccountInformationService;
 import de.adorsys.xs2a.adapter.service.impl.AccountInformationServiceImpl;
@@ -152,9 +153,11 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         GeneralResponse<TransactionsReport> bookingsResponse =
             getAccountInformationService().getTransactionList(resourceId, requestHeaders, requestParams);
 
-        List<Booking> bookings = bookingsResponse.getResponseBody().getTransactions().getBooked().stream()
-            .map(transactions -> bankingGatewayMapper.toBooking(transactions))
-            .collect(Collectors.toList());
+        List<Booking> bookings = Optional.ofNullable(bookingsResponse.getResponseBody())
+            .map(TransactionsReport::getTransactions)
+            .map(AccountReport::getBooked)
+            .map(transactions -> bankingGatewayMapper.toBookings(transactions))
+            .orElse(Collections.emptyList());
 
         BalancesReport balancesReport = new BalancesReport();
         bookingsResponse.getResponseBody().getBalances().forEach(balance -> {
@@ -210,7 +213,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public <T extends AbstractResponse> SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitPaymentRequest) {
+    public SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> request) {
         throw new UnsupportedOperationException();
     }
 
@@ -363,21 +366,22 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             case 400:
             case 401:
             case 404:
+            case 500:
                 return handleBankingGatewayError(e);
             case 429:
-                return new MultibankingException(INVALID_CONSENT, "consent access exceeded");
+                return new MultibankingException(INVALID_CONSENT, e.getCode(), "consent access exceeded");
             default:
-                throw new MultibankingException(BANKING_GATEWAY_ERROR, e.getMessage());
+                throw new MultibankingException(BANKING_GATEWAY_ERROR, 500, e.getMessage());
         }
     }
 
     private MultibankingException handleBankingGatewayError(ApiException e) {
         try {
             MessagesTO messagesTO = objectMapper.readValue(e.getResponseBody(), MessagesTO.class);
-            return new MultibankingException(BANKING_GATEWAY_ERROR,
+            return new MultibankingException(BANKING_GATEWAY_ERROR, e.getCode(),
                 bankingGatewayMapper.toMessages(messagesTO.getMessageList()));
         } catch (Exception e2) {
-            return new MultibankingException(BANKING_GATEWAY_ERROR, e.getMessage());
+            return new MultibankingException(BANKING_GATEWAY_ERROR, 500, e.getMessage());
         }
     }
 

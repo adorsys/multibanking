@@ -35,14 +35,14 @@ import java.util.List;
  * Only for future payment (GVTermUebSEPA)
  */
 @RequiredArgsConstructor
-public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<EmptyResponse> {
+public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<FutureSinglePayment, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<FutureSinglePayment> transactionRequest;
     private String jobName;
 
     @Override
     public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
-        FutureSinglePayment singlePayment = (FutureSinglePayment) transactionRequest.getTransaction();
+        FutureSinglePayment singlePayment = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);
 
@@ -81,7 +81,7 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<EmptyResponse> 
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<FutureSinglePayment> getTransactionRequest() {
         return transactionRequest;
     }
 

@@ -162,8 +162,8 @@ public class DirectAccessControllerTest {
             false);
 
         CredentialsTO credentials = CredentialsTO.builder()
-            .customerId("aguex13")
-            .pin("aguex13")
+            .customerId("agead3")
+            .pin("agead3")
             .build();
 
         consent_authorisation(bankAccess, credentials);
@@ -308,7 +308,7 @@ public class DirectAccessControllerTest {
 
         //5. send tan
         TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
-        transactionAuthorisationRequestTO.setScaAuthenticationData("alex1");
+        transactionAuthorisationRequestTO.setScaAuthenticationData("agead3");
 
         jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
             ".transactionAuthorisation.href"))
@@ -472,7 +472,7 @@ public class DirectAccessControllerTest {
 
     private BankAccessTO createBankAccess() {
         BankAccessTO bankAccessTO = new BankAccessTO();
-        bankAccessTO.setIban(System.getProperty("iban", "DE34900000019090909000"));
+        bankAccessTO.setIban(System.getProperty("iban", "DE46900000011234567802"));
         bankAccessTO.setConsentId(UUID.randomUUID().toString());
         return bankAccessTO;
     }

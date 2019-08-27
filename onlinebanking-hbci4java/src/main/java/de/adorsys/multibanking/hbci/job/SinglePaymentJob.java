@@ -36,13 +36,13 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class SinglePaymentJob extends ScaRequiredJob<EmptyResponse> {
+public class SinglePaymentJob extends ScaRequiredJob<SinglePayment, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<SinglePayment> transactionRequest;
 
     @Override
     public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
-        SinglePayment singlePayment = (SinglePayment) transactionRequest.getTransaction();
+        SinglePayment singlePayment = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);
 
@@ -84,7 +84,7 @@ public class SinglePaymentJob extends ScaRequiredJob<EmptyResponse> {
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<SinglePayment> getTransactionRequest() {
         return transactionRequest;
     }
 
