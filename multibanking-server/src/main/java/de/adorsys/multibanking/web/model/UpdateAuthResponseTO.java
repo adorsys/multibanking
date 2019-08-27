@@ -21,4 +21,7 @@ public class UpdateAuthResponseTO {
 
     @ApiModelProperty(value = "Text to be displayed to the PSU")
     private String psuMessage;
+
+    @ApiModelProperty(value = "Type of sca approach to identify challenge handling")
+    private ScaApproachTO scaApproach;
 }

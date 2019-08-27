@@ -44,7 +44,7 @@ import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 @RequiredArgsConstructor
 public class SubmitAuthorisationCodeJob<T extends AbstractResponse> {
 
-    private final ScaRequiredJob scaJob;
+    private final ScaRequiredJob<T> scaJob;
 
     public SubmitAuthorizationCodeResponse<T> sumbitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitAuthorizationCodeRequest) {
         HbciTanSubmit hbciTanSubmit =
@@ -103,6 +103,23 @@ public class SubmitAuthorisationCodeJob<T extends AbstractResponse> {
         return originJob;
     }
 
+    private SubmitAuthorizationCodeResponse<T> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
+                                                              AbstractHBCIJob hbciJob, HBCIExecStatus status) {
+        String transactionId = Optional.ofNullable(hbciJob)
+            .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
+            .orElse(hbciTanSubmit.getOrderRef());
+
+        SubmitAuthorizationCodeResponse response =
+            new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport));
+        response.setTransactionId(transactionId);
+
+        if (!status.getDialogStatus().msgStatusList.isEmpty()) {
+            response.setStatus(status.getDialogStatus().msgStatusList.get(0).segStatus.toString());
+        }
+
+        return response;
+    }
+
     private HbciTanSubmit evaluateTanSubmit(HBCIConsent hbciConsent) {
         if (hbciConsent.getHbciTanSubmit() instanceof HbciTanSubmit) {
             return (HbciTanSubmit) hbciConsent.getHbciTanSubmit();
@@ -157,22 +174,7 @@ public class SubmitAuthorisationCodeJob<T extends AbstractResponse> {
         return objectMapper;
     }
 
-    private SubmitAuthorizationCodeResponse<T> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
-                                                           AbstractHBCIJob hbciJob, HBCIExecStatus status) {
-        String transactionId = Optional.ofNullable(hbciJob)
-            .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
-            .orElse(hbciTanSubmit.getOrderRef());
 
-        SubmitAuthorizationCodeResponse response =
-            new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport));
-        response.setTransactionId(transactionId);
-
-        if (!status.getDialogStatus().msgStatusList.isEmpty()) {
-            response.setStatus(status.getDialogStatus().msgStatusList.get(0).segStatus.toString());
-        }
-
-        return response;
-    }
 
     private String orderIdFromJobResult(HBCIJobResult jobResult) {
         return scaJob.orderIdFromJobResult(jobResult);

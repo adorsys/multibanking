@@ -296,7 +296,8 @@ public class BookingService extends AccountInformationService {
 
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
-        TransactionRequest<LoadBookings> loadBookingsRequest = createLoadBookingsRequest(bankAccess, bankAccount, bankApiUser, consentEntity, bankEntity);
+        TransactionRequest<LoadBookings> loadBookingsRequest = createLoadBookingsRequest(bankAccess, bankAccount,
+            bankApiUser, consentEntity, bankEntity);
 
         try {
             LoadBookingsResponse response = onlineBankingService.loadBookings(loadBookingsRequest);
