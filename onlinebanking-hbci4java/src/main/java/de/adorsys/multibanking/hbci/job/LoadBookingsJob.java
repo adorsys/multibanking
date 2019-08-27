@@ -69,15 +69,11 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
 
     @Override
     String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
-        return Optional.ofNullable(loadBookingsRequest.getTransaction().getRawResponseType())
-            .map(rawResponseType -> {
-                if (rawResponseType == CAMT) {
-                    return GVKUmsAllCamt.getLowlevelName();
-                } else {
-                    return GVKUmsAll.getLowlevelName();
-                }
-            })
-            .orElse(GVKUmsAll.getLowlevelName());
+        boolean camt = Optional.ofNullable(loadBookingsRequest.getTransaction().getRawResponseType())
+            .map(rawResponseType -> rawResponseType == CAMT)
+            .orElse(false);
+
+        return camt ? "KUmsAllCamt" : "KUmsAll";
     }
 
     @Override
