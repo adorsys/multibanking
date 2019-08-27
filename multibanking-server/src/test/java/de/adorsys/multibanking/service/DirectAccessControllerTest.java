@@ -305,6 +305,7 @@ public class DirectAccessControllerTest {
             //response contains bookings -> sca not needed
             return;
         }
+        assertThat(jsonPath.getString("scaApproach")).as("sca approach type should not be null").isNotEmpty();
 
         //5. send tan
         TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
