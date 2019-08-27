@@ -16,7 +16,6 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.Balance;
 import de.adorsys.multibanking.domain.BalancesReport;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.Booking;
@@ -35,6 +34,7 @@ import org.kapott.hbci.GV.GVKUmsAllCamt;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
+import org.kapott.hbci.structures.Saldo;
 
 import java.time.ZoneId;
 import java.util.*;
@@ -103,13 +103,17 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
         if (loadBookingsRequest.getTransaction().getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
-            bookingList = HbciMapping.createBookings(bookingsResult);
-
             if (loadBookingsRequest.getTransaction().isWithBalance()) {
-                balancesReport = createBalancesReport(bookingList);
+                if (bookingsResult.getDataPerDay().isEmpty()) {
+                    //TODO camt
+                } else {
+                    GVRKUms.BTag lastBoookingDay =
+                        bookingsResult.getDataPerDay().get(bookingsResult.getDataPerDay().size() - 1);
+                    balancesReport = createBalancesReport(lastBoookingDay.end);
+                }
             }
 
-            bookingList = bookingList.stream()
+            bookingList = HbciMapping.createBookings(bookingsResult).stream()
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
                     () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
         }
@@ -121,20 +125,9 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
             .build();
     }
 
-    private BalancesReport createBalancesReport(List<Booking> bookingList) {
-        BalancesReport balancesReport;
-        balancesReport = bookingList.stream().reduce((first, second) -> first)
-            .map(booking -> {
-                Balance balance = new Balance();
-                balance.setAmount(booking.getBalance());
-                balance.setDate(booking.getValutaDate());
-                balance.setCurrency(booking.getCurrency());
-
-                BalancesReport result = new BalancesReport();
-                result.setReadyBalance(balance);
-                return result;
-            })
-            .orElse(null);
+    private BalancesReport createBalancesReport(Saldo saldo) {
+        BalancesReport balancesReport = new BalancesReport();
+        balancesReport.setReadyBalance(HbciMapping.createBalance(saldo));
         return balancesReport;
     }
 

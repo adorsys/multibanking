@@ -82,7 +82,7 @@ public final class HbciMapping {
             .build();
     }
 
-    private static Balance createBalance(Saldo saldo) {
+    public static Balance createBalance(Saldo saldo) {
         return Balance.builder()
             .date(saldo.timestamp.toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
             .currency(saldo.value.getCurr())
@@ -173,13 +173,13 @@ public final class HbciMapping {
                 booking.setText(line.text);
                 booking.setValutaDate(line.valuta.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
                 if (line.saldo != null && line.saldo.value != null) {
-                    booking.setBalance(line.saldo.value.getBigDecimalValue().setScale(2));
+                    booking.setBalance(line.saldo.value.getBigDecimalValue());
                 }
                 if (line.charge_value != null) {
-                    booking.setChargeValue(line.charge_value.getBigDecimalValue().setScale(2));
+                    booking.setChargeValue(line.charge_value.getBigDecimalValue());
                 }
                 if (line.orig_value != null) {
-                    booking.setOrigValue(line.orig_value.getBigDecimalValue().setScale(2));
+                    booking.setOrigValue(line.orig_value.getBigDecimalValue());
                 }
                 if (line.other != null) {
                     booking.setOtherAccount(toBankAccount(line.other));
