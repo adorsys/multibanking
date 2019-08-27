@@ -362,6 +362,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         switch (e.getCode()) {
             case 400:
             case 401:
+            case 404:
                 return handleBankingGatewayError(e);
             case 429:
                 return new MultibankingException(INVALID_CONSENT, "consent access exceeded");
