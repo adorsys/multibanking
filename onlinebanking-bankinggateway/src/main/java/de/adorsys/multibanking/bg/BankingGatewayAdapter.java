@@ -152,9 +152,13 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         GeneralResponse<TransactionsReport> bookingsResponse =
             getAccountInformationService().getTransactionList(resourceId, requestHeaders, requestParams);
 
-        List<Booking> bookings = bookingsResponse.getResponseBody().getTransactions().getBooked().stream()
-            .map(transactions -> bankingGatewayMapper.toBooking(transactions))
-            .collect(Collectors.toList());
+        List<Booking> bookings = new ArrayList<>();
+        if (bookingsResponse.getResponseBody().getTransactions() != null
+            && bookingsResponse.getResponseBody().getTransactions().getBooked() != null) {
+            bookings = bookingsResponse.getResponseBody().getTransactions().getBooked().stream()
+                .map(transactions -> bankingGatewayMapper.toBooking(transactions))
+                .collect(Collectors.toList());
+        }
 
         BalancesReport balancesReport = new BalancesReport();
         bookingsResponse.getResponseBody().getBalances().forEach(balance -> {
