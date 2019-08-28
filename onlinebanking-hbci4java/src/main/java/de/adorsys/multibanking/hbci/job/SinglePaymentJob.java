@@ -79,7 +79,7 @@ public class SinglePaymentJob extends ScaRequiredJob<SinglePayment, EmptyRespons
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
+    EmptyResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
         return new EmptyResponse();
     }
 

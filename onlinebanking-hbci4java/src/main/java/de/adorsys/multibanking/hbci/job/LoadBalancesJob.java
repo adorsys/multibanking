@@ -23,7 +23,6 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadBalancesResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadBalances;
-import de.adorsys.multibanking.hbci.model.HbciMapping;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +38,7 @@ import org.kapott.hbci.structures.Konto;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
@@ -115,17 +115,20 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesRe
     }
 
     @Override
-    public LoadBalancesResponse createJobResponse(PinTanPassport passport) {
-        if (balanceJob.getJobResult().getJobStatus().hasErrors()) {
+    public LoadBalancesResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+        AbstractHBCIJob resultJob = Optional.ofNullable(hbciJob)
+            .orElse(this.balanceJob);
+
+        if (resultJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Balance job not OK");
-            throw new MultibankingException(HBCI_ERROR, balanceJob.getJobResult().getJobStatus().getErrorList().stream()
+            throw new MultibankingException(HBCI_ERROR, resultJob.getJobResult().getJobStatus().getErrorList().stream()
                 .map(messageString -> Message.builder().renderedMessage(messageString).build())
                 .collect(Collectors.toList()));
         }
 
         BankAccount bankAccount = loadBalanceRequest.getTransaction().getPsuAccount();
 
-        bankAccount.setBalances(HbciMapping.createBalance((GVRSaldoReq) balanceJob.getJobResult(),
+        bankAccount.setBalances(hbciObjectMapper.createBalance((GVRSaldoReq) resultJob.getJobResult(),
             bankAccount.getAccountNumber()));
 
         return new LoadBalancesResponse(bankAccount);

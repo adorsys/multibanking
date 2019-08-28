@@ -24,7 +24,6 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
-import de.adorsys.multibanking.hbci.model.HbciMapping;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -115,12 +114,12 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAcco
     }
 
     @Override
-    public LoadAccountInformationResponse createJobResponse(PinTanPassport passport) {
+    public LoadAccountInformationResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
         loadAccountInformationRequest.getBankAccess().setBankName(passport.getInstName());
 
         hbciAccounts = new ArrayList<>();
         for (Konto konto : passport.getAccounts()) {
-            BankAccount bankAccount = HbciMapping.toBankAccount(konto);
+            BankAccount bankAccount = hbciObjectMapper.toBankAccount(konto);
             bankAccount.externalId(BankApi.HBCI, UUID.randomUUID().toString());
             bankAccount.bankName(loadAccountInformationRequest.getBankAccess().getBankName());
             hbciAccounts.add(bankAccount);

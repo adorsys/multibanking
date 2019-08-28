@@ -25,7 +25,6 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadBookings;
-import de.adorsys.multibanking.hbci.model.HbciMapping;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -87,11 +86,14 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
     }
 
     @Override
-    public LoadBookingsResponse createJobResponse(PinTanPassport passport) {
-        if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
+    public LoadBookingsResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+        AbstractHBCIJob resultJob = Optional.ofNullable(hbciJob)
+            .orElse(this.bookingsJob);
+
+        if (resultJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
             throw new MultibankingException(HBCI_ERROR,
-                bookingsJob.getJobResult().getJobStatus().getErrorList().stream()
+                resultJob.getJobResult().getJobStatus().getErrorList().stream()
                     .map(messageString -> Message.builder().renderedMessage(messageString).build())
                     .collect(Collectors.toList()));
         }
@@ -99,7 +101,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
         List<Booking> bookingList = null;
         BalancesReport balancesReport = null;
         List<String> raw = null;
-        GVRKUms bookingsResult = (GVRKUms) bookingsJob.getJobResult();
+        GVRKUms bookingsResult = (GVRKUms) resultJob.getJobResult();
         if (loadBookingsRequest.getTransaction().getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
@@ -113,7 +115,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
                 }
             }
 
-            bookingList = HbciMapping.createBookings(bookingsResult).stream()
+            bookingList = hbciObjectMapper.createBookings(bookingsResult).stream()
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
                     () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
         }
@@ -127,7 +129,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
 
     private BalancesReport createBalancesReport(Saldo saldo) {
         BalancesReport balancesReport = new BalancesReport();
-        balancesReport.setReadyBalance(HbciMapping.createBalance(saldo));
+        balancesReport.setReadyBalance(hbciObjectMapper.toBalance(saldo));
         return balancesReport;
     }
 

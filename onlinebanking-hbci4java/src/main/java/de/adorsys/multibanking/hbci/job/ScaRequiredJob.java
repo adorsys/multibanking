@@ -79,7 +79,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
             .map(gvtan2Step -> KnownReturncode.W3076.searchReturnValue(gvtan2Step.getJobResult().getJobStatus().getRetVals()) == null)
             .orElse(false);
 
-        R jobResponse = createJobResponse(dialog.getPassport());
+        R jobResponse = createJobResponse(dialog.getPassport(), null);
         if (tan2StepRequired) {
             updateTanSubmit(hbciTanSubmit, dialog, hbciJob);
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
@@ -124,7 +124,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
                     .ifPresent(painVersion -> hbciTanSubmit.setPainVersion(painVersion.getURN()));
                 hbciTanSubmit.setOriginLowLevelName(hbciJob.getJobName());
                 hbciTanSubmit.setOriginSegVersion(hbciJob.getSegVersion());
-                hbciTanSubmit.setHbciJobName(hbciJob.getHBCICode());
+                hbciTanSubmit.setHbciJobName(hbciJob.getHBCICode(false));
             });
     }
 
@@ -298,7 +298,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
     abstract String getHbciJobName(AbstractScaTransaction.TransactionType transactionType);
 
-    abstract R createJobResponse(PinTanPassport passport);
+    abstract R createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob);
 
     public abstract String orderIdFromJobResult(HBCIJobResult jobResult);
 

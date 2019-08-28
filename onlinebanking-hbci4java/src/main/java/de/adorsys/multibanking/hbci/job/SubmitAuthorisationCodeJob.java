@@ -109,8 +109,9 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
             .orElse(hbciTanSubmit.getOrderRef());
 
         SubmitAuthorizationCodeResponse<?> response =
-            new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport));
+            new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport, hbciJob));
         response.setTransactionId(transactionId);
+
 
         if (!status.getDialogStatus().msgStatusList.isEmpty()) {
             response.setStatus(status.getDialogStatus().msgStatusList.get(0).segStatus.toString());

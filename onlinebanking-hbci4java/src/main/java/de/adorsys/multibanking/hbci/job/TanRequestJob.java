@@ -58,7 +58,7 @@ public class TanRequestJob extends ScaRequiredJob {
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
+    EmptyResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
         return new EmptyResponse();
     }
 }

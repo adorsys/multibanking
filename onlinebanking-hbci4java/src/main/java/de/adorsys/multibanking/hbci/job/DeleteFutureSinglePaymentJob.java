@@ -76,7 +76,7 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<FutureSinglePay
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
+    EmptyResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
         return new EmptyResponse();
     }
 

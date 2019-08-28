@@ -54,7 +54,7 @@ public class ForeignPaymentJob extends ScaRequiredJob<ForeignPayment, EmptyRespo
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
+    EmptyResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
         return new EmptyResponse();
     }
 

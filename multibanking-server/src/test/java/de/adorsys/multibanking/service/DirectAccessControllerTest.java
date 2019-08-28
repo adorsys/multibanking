@@ -443,6 +443,7 @@ public class DirectAccessControllerTest {
             bankEntity.setName("UNITTEST BANK");
             bankEntity.setBankingUrl(bankUrl);
             bankEntity.setRedirectPreferred(redirectPreferred);
+            bankEntity.setBic(System.getProperty("bic"));
             bankRepository.save(bankEntity);
             return bankEntity;
         });
