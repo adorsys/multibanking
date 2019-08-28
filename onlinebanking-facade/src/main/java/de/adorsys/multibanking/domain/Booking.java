@@ -48,5 +48,5 @@ public class Booking {
     private String mandateReference;
     private BankApi bankApi;
     private BookingCategory bookingCategory;
-
+    private String transactionCode;
 }

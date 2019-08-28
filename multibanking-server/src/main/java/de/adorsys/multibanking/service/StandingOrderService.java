@@ -68,16 +68,16 @@ public class StandingOrderService {
             throw new MissingPinException();
         }
 
-        try {
-            SubmitAuthorisationCode submitAuthorisationCode = new SubmitAuthorisationCode(standingOrder);
-
-            TransactionRequest<SubmitAuthorisationCode> submitAuthorisationCodeRequest =
-                new TransactionRequest<>(submitAuthorisationCode);
-
-            submitAuthorisationCodeRequest.setHbciProduct(finTSProductConfig.getProduct());
-            bankingService.submitAuthorizationCode(submitAuthorisationCodeRequest);
-        } catch (MultibankingException e) {
-            throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
-        }
+//        try {
+//            SubmitAuthorisationCode submitAuthorisationCode = new SubmitAuthorisationCode(standingOrder);
+//
+//            TransactionRequest<SubmitAuthorisationCode> submitAuthorisationCodeRequest =
+//                new TransactionRequest<>(submitAuthorisationCode);
+//
+//            submitAuthorisationCodeRequest.setHbciProduct(finTSProductConfig.getProduct());
+//            bankingService.submitAuthorizationCode(submitAuthorisationCodeRequest);
+//        } catch (MultibankingException e) {
+//            throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
+//        }
     }
 }

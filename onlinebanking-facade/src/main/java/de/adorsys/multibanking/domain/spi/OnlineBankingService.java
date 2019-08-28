@@ -34,7 +34,7 @@ public interface OnlineBankingService {
 
     AuthorisationCodeResponse initiatePayment(TransactionRequest<AbstractScaPaymentTransaction> paymentRequest);
 
-    SubmitAuthorizationCodeResponse submitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> request);
+    SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode);
 
     StrongCustomerAuthorisable getStrongCustomerAuthorisation();
 }

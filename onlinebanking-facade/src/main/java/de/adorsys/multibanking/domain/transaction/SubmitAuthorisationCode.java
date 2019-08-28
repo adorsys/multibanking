@@ -21,27 +21,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
-
-import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.TAN_REQUEST;
-
 @RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SubmitAuthorisationCode<T extends AbstractScaTransaction> extends AbstractScaTransaction {
+public class SubmitAuthorisationCode<T extends AbstractScaTransaction> {
 
     private final TransactionRequest<T> originTransactionRequest;
 
-    @Override
-    public TransactionType getTransactionType() {
-        return Optional.ofNullable(originTransactionRequest)
-            .map(TransactionRequest::getTransaction)
-            .map(AbstractScaTransaction::getTransactionType)
-            .orElse(TAN_REQUEST);
-    }
-
-    @Override
-    public String getRawData() {
-        return null;
-    }
 }

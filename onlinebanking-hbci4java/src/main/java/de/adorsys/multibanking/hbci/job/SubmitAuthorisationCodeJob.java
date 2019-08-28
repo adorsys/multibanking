@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
 import de.adorsys.multibanking.hbci.model.*;
@@ -45,11 +44,11 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
     private final J scaJob;
 
-    public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(TransactionRequest<SubmitAuthorisationCode> submitAuthorizationCodeRequest) {
+    public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode) {
         HbciTanSubmit hbciTanSubmit =
-            evaluateTanSubmit((HBCIConsent) submitAuthorizationCodeRequest.getBankApiConsentData());
+            evaluateTanSubmit((HBCIConsent) submitAuthorisationCode.getOriginTransactionRequest().getBankApiConsentData());
 
-        HbciPassport hbciPassport = createPassport(submitAuthorizationCodeRequest, hbciTanSubmit);
+        HbciPassport hbciPassport = createPassport(submitAuthorisationCode, hbciTanSubmit);
 
         HBCIDialog hbciDialog = new HBCIDialog(hbciPassport, hbciTanSubmit.getDialogId(), hbciTanSubmit.getMsgNum());
         AbstractHBCIJob hbciJob;
@@ -135,8 +134,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         }
     }
 
-    private HbciPassport createPassport(TransactionRequest<SubmitAuthorisationCode> submitAuthorizationCodeRequest,
-                                        HbciTanSubmit hbciTanSubmit) {
+    private HbciPassport createPassport(SubmitAuthorisationCode submitAuthorizationCode, HbciTanSubmit hbciTanSubmit) {
         Map<String, String> bpd = new HashMap<>();
         bpd.put("Params." + hbciTanSubmit.getOriginLowLevelName() + "Par" + hbciTanSubmit.getOriginSegVersion() +
             ".Par" + hbciTanSubmit.getOriginLowLevelName() + ".suppformats", hbciTanSubmit.getPainVersion());
@@ -152,12 +150,13 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
                 @Override
                 public String needTAN() {
-                    return ((HBCIConsent) submitAuthorizationCodeRequest.getBankApiConsentData()).getScaAuthenticationData();
+                    return ((HBCIConsent) submitAuthorizationCode.getOriginTransactionRequest().getBankApiConsentData()).getScaAuthenticationData();
                 }
             });
         state.apply(hbciPassport);
 
-        HBCIConsent hbciConsent = (HBCIConsent) submitAuthorizationCodeRequest.getBankApiConsentData();
+        HBCIConsent hbciConsent =
+            (HBCIConsent) submitAuthorizationCode.getOriginTransactionRequest().getBankApiConsentData();
 
         hbciPassport.setPIN(hbciConsent.getCredentials().getPin());
         hbciPassport.setCurrentSecMechInfo(hbciTanSubmit.getTwoStepMechanism());
