@@ -61,7 +61,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private Map<String, Map<String, String>> bpdCache;
 
-    private HbciMapper hbciMapper = new HbciMapperImpl();
+    private HbciScaMapper hbciMapper = new HbciScaMapperImpl();
 
     public Hbci4JavaBanking() {
         this(null, false);
@@ -167,7 +167,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         try {
             if (hbciConsent.getStatus() == FINALISED) {
                 SubmitAuthorisationCode<LoadAccounts> submitAuthorisationCode =
-                    new SubmitAuthorisationCode<>(request.getTransaction());
+                    new SubmitAuthorisationCode<>(request);
 
                 TransactionRequest<SubmitAuthorisationCode> submitAuthorisationCodeRequest =
                     hbciMapper.toSubmitAuthorisationCodeRequest(request, submitAuthorisationCode);
@@ -192,8 +192,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     public LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> request) {
         try {
             if (((HBCIConsent) request.getBankApiConsentData()).getStatus() == FINALISED) {
-                SubmitAuthorisationCode<LoadBookings> submitAuthorisationCode =
-                    new SubmitAuthorisationCode<>(request.getTransaction());
+                SubmitAuthorisationCode<LoadBookings> submitAuthorisationCode = new SubmitAuthorisationCode<>(request);
                 TransactionRequest<SubmitAuthorisationCode> submitAuthorisationCodeRequest =
                     hbciMapper.toSubmitAuthorisationCodeRequest(request, submitAuthorisationCode);
 
@@ -224,8 +223,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
         try {
             if (hbciConsent.getStatus() == FINALISED) {
-                SubmitAuthorisationCode<LoadBalances> submitAuthorisationCode =
-                    new SubmitAuthorisationCode<>(request.getTransaction());
+                SubmitAuthorisationCode<LoadBalances> submitAuthorisationCode = new SubmitAuthorisationCode<>(request);
 
                 TransactionRequest<SubmitAuthorisationCode> submitAuthorisationCodeRequest =
                     hbciMapper.toSubmitAuthorisationCodeRequest(request, submitAuthorisationCode);
@@ -353,34 +351,34 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @SuppressWarnings("unchecked")
-    private ScaRequiredJob createScaJob(TransactionRequest transactionRequest) {
+    private ScaRequiredJob createScaJob(TransactionRequest<SubmitAuthorisationCode> transactionRequest) {
         switch (transactionRequest.getTransaction().getTransactionType()) {
             case SINGLE_PAYMENT:
             case FUTURE_SINGLE_PAYMENT:
-                return new SinglePaymentJob(transactionRequest);
+                return new SinglePaymentJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             case FOREIGN_PAYMENT:
-                return new ForeignPaymentJob(transactionRequest);
+                return new ForeignPaymentJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             case BULK_PAYMENT:
             case FUTURE_BULK_PAYMENT:
-                return new BulkPaymentJob(transactionRequest);
+                return new BulkPaymentJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             case STANDING_ORDER:
-                return new NewStandingOrderJob(transactionRequest);
+                return new NewStandingOrderJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             case RAW_SEPA:
-                return new RawSepaJob(transactionRequest);
+                return new RawSepaJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             case FUTURE_SINGLE_PAYMENT_DELETE:
-                return new DeleteFutureSinglePaymentJob(transactionRequest);
+                return new DeleteFutureSinglePaymentJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             case FUTURE_BULK_PAYMENT_DELETE:
-                return new DeleteFutureBulkPaymentJob(transactionRequest);
+                return new DeleteFutureBulkPaymentJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             case STANDING_ORDER_DELETE:
-                return new DeleteStandingOrderJob(transactionRequest);
+                return new DeleteStandingOrderJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             case TAN_REQUEST:
                 return new TanRequestJob(transactionRequest);
             case LOAD_BANKACCOUNTS:
-                return new AccountInformationJob(transactionRequest);
+                return new AccountInformationJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             case LOAD_BALANCES:
-                return new LoadBalancesJob(transactionRequest);
+                return new LoadBalancesJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             case LOAD_TRANSACTIONS:
-                return new LoadBookingsJob(transactionRequest);
+                return new LoadBookingsJob(transactionRequest.getTransaction().getOriginTransactionRequest());
             default:
                 throw new IllegalArgumentException("invalid transaction type " + transactionRequest.getTransaction().getTransactionType());
         }

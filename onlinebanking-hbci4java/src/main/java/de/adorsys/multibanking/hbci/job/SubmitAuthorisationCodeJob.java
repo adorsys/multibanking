@@ -112,7 +112,6 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
             new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport, hbciJob));
         response.setTransactionId(transactionId);
 
-
         if (!status.getDialogStatus().msgStatusList.isEmpty()) {
             response.setStatus(status.getDialogStatus().msgStatusList.get(0).segStatus.toString());
         }

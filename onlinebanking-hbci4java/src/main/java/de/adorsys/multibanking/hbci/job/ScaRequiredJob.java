@@ -51,6 +51,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends AbstractResponse> {
 
+    static HbciObjectMapper hbciObjectMapper = new HbciObjectMapperImpl();
+
     public R authorisationAwareExecute(HbciCallback hbciCallback) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
         AuthorisationCodeResponse authorisationCodeResponse =

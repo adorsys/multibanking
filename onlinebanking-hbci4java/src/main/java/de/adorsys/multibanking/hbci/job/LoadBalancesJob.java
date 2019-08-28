@@ -128,8 +128,10 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesRe
 
         BankAccount bankAccount = loadBalanceRequest.getTransaction().getPsuAccount();
 
-        bankAccount.setBalances(hbciObjectMapper.createBalance((GVRSaldoReq) resultJob.getJobResult(),
-            bankAccount.getAccountNumber()));
+        if (resultJob.getJobResult().isOK()) {
+            bankAccount.setBalances(hbciObjectMapper.createBalancesReport((GVRSaldoReq) resultJob.getJobResult(),
+                bankAccount.getAccountNumber()));
+        }
 
         return new LoadBalancesResponse(bankAccount);
     }

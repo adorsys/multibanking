@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.domain.transaction;
 
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +30,12 @@ import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.
 @EqualsAndHashCode(callSuper = false)
 public class SubmitAuthorisationCode<T extends AbstractScaTransaction> extends AbstractScaTransaction {
 
-    private final T originTransaction;
+    private final TransactionRequest<T> originTransactionRequest;
 
     @Override
     public TransactionType getTransactionType() {
-        return Optional.ofNullable(originTransaction)
+        return Optional.ofNullable(originTransactionRequest)
+            .map(TransactionRequest::getTransaction)
             .map(AbstractScaTransaction::getTransactionType)
             .orElse(TAN_REQUEST);
     }

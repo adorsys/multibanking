@@ -42,10 +42,11 @@ public class Booking {
     private String usage;
     private String addkey;
     private boolean sepa;
+    private boolean camt;
     private boolean standingOrder;
     private String creditorId;
     private String mandateReference;
     private BankApi bankApi;
     private BookingCategory bookingCategory;
-    private String transactionCode;
+
 }
