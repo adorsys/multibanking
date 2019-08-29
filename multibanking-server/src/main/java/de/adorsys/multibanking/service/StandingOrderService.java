@@ -40,9 +40,7 @@ public class StandingOrderService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = new TransactionRequest(standingOrder);
-            request.setBankApiUser(bankApiUser);
-            request.setBankAccess(bankAccess);
+            TransactionRequest request = new TransactionRequest<>(standingOrder, bankApiUser, bankAccess);
             request.setBank(bankEntity);
             request.setHbciProduct(finTSProductConfig.getProduct());
             Object tanSubmit = bankingService.initiatePayment(request);

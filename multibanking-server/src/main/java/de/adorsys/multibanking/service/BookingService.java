@@ -313,9 +313,8 @@ public class BookingService extends AccountInformationService {
         loadBookings.setDateTo(LocalDate.now());
         loadBookings.setWithBalance(true);
 
-        TransactionRequest<LoadBookings> transactionRequest = new TransactionRequest<>(loadBookings);
-        transactionRequest.setBankApiUser(bankApiUser);
-        transactionRequest.setBankAccess(bankAccess);
+        TransactionRequest<LoadBookings> transactionRequest = new TransactionRequest<>(loadBookings, bankApiUser,
+            bankAccess);
         transactionRequest.setBank(bankEntity);
         transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
         return transactionRequest;
@@ -353,9 +352,8 @@ public class BookingService extends AccountInformationService {
             LoadAccounts loadAccounts = new LoadAccounts();
             loadAccounts.setUpdateTanTransportTypes(true);
 
-            TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(loadAccounts);
-            transactionRequest.setBankApiUser(bankApiUser);
-            transactionRequest.setBankAccess(bankAccess);
+            TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(loadAccounts, bankApiUser,
+                bankAccess);
             transactionRequest.setBank(bankEntity);
 
             List<BankAccount> apiBankAccounts =

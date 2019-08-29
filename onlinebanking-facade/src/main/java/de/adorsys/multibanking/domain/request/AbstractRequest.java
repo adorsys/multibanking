@@ -27,8 +27,6 @@ import java.util.Map;
 @Data
 public abstract class AbstractRequest {
 
-    private BankApiUser bankApiUser;
-    private BankAccess bankAccess;
     private Bank bank;
 
     //hbci stuff

@@ -150,7 +150,8 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
     private GVTAN2Step hktanProcess1(HBCIDialog dialog, HBCITwoStepMechanism hbciTwoStepMechanism,
                                      HbciTanSubmit hbciTanSubmit,
                                      AbstractHBCIJob hbciJob) {
-        GVTAN2Step hktan = new GVTAN2Step(dialog.getPassport(), hbciJob, false);
+        GVTAN2Step hktan = new GVTAN2Step(dialog.getPassport(), hbciJob);
+        hktan.setProcess(KnownTANProcess.PROCESS1);
         hktan.setSegVersion(hbciTwoStepMechanism.getSegversion());
 
         if (dialog.getPassport().tanMediaNeeded()) {
@@ -159,7 +160,6 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
-        hktan.setParam("process", hbciTwoStepMechanism.getProcess());
         hktan.setParam("notlasttan", "N");
         hktan.setParam("orderhash", hbciJob.createOrderHash(hbciTwoStepMechanism.getSegversion()));
 
@@ -177,7 +177,8 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
     private GVTAN2Step hktanProcess2(HBCIDialog dialog, HBCITwoStepMechanism hbciTwoStepMechanism,
                                      AbstractHBCIJob hbciJob) {
-        GVTAN2Step hktan = new GVTAN2Step(dialog.getPassport(), hbciJob, false);
+        GVTAN2Step hktan = new GVTAN2Step(dialog.getPassport(), hbciJob);
+        hktan.setProcess(KnownTANProcess.PROCESS2_STEP1);
         hktan.setSegVersion(hbciTwoStepMechanism.getSegversion());
 
         if (dialog.getPassport().tanMediaNeeded()) {
@@ -186,17 +187,16 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
-        hktan.setParam("process", "4");
         hktan.setParam("orderaccount", getPsuKonto(dialog.getPassport()));
         hktan.setParam("ordersegcode", Optional.ofNullable(hbciJob)
             .map(AbstractHBCIJob::getHBCICode)
             .orElse("HKIDN"));
 
-        Optional<List<AbstractHBCIJob>> messages = Optional.ofNullable(hbciJob)
+        Optional<HBCIMessage> messages = Optional.ofNullable(hbciJob)
             .map(dialog::addTask);
 
         if (messages.isPresent()) {
-            messages.get().add(hktan);
+            messages.get().append(hktan);
         } else {
             dialog.addTask(hktan);
         }
@@ -220,6 +220,10 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
     private HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog) {
         return Optional.of(getConsent().getSelectedMethod())
             .map(tanTransportType -> dialog.getPassport().getBankTwostepMechanisms().get(tanTransportType.getId()))
+            .map(hbciTwoStepMechanism -> {
+                hbciTwoStepMechanism.setMedium(getConsent().getSelectedMethod().getMedium());
+                return hbciTwoStepMechanism;
+            })
             .orElseThrow(() -> new MultibankingException(INVALID_SCA_METHOD));
     }
 

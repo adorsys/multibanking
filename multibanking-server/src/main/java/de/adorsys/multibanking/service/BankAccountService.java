@@ -98,9 +98,8 @@ public class BankAccountService extends AccountInformationService {
         LoadAccounts loadAccounts = new LoadAccounts();
         loadAccounts.setUpdateTanTransportTypes(true);
 
-        TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(loadAccounts);
-        transactionRequest.setBankApiUser(bankApiUser);
-        transactionRequest.setBankAccess(bankAccess);
+        TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(loadAccounts, bankApiUser,
+            bankAccess);
         transactionRequest.setBank(bankEntity);
         transactionRequest.setBankApiConsentData(consentEntity.orElse(null));
 

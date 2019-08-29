@@ -28,6 +28,7 @@ import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.manager.HBCIDialog;
+import org.kapott.hbci.manager.KnownTANProcess;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 
@@ -93,9 +94,9 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
                 return result;
             }).orElse(null);
 
-        GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport(), originJob, true);
+        GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport(), originJob);
+        hktan.setProcess(KnownTANProcess.PROCESS2_STEP2);
         hktan.setParam("orderref", hbciTanSubmit.getOrderRef());
-        hktan.setParam("process", hbciTanSubmit.getHktanProcess() != null ? hbciTanSubmit.getHktanProcess() : "2");
         hktan.setParam("notlasttan", "N");
         hbciDialog.addTask(hktan, false);
         return originJob;
