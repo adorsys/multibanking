@@ -17,7 +17,6 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BalancesReport;
-import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
@@ -39,6 +38,7 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static de.adorsys.multibanking.domain.exception.MultibankingError.BOOKINGS_FORMAT_NOT_SUPPORTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.domain.transaction.LoadBookings.RawResponseType.CAMT;
 
@@ -76,11 +76,6 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
     }
 
     @Override
-    BankAccount getPsuBankAccount() {
-        return loadBookingsRequest.getTransaction().getPsuAccount();
-    }
-
-    @Override
     public String orderIdFromJobResult(HBCIJobResult jobResult) {
         return null;
     }
@@ -105,14 +100,10 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
         if (loadBookingsRequest.getTransaction().getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
-            if (loadBookingsRequest.getTransaction().isWithBalance()) {
-                if (bookingsResult.getDataPerDay().isEmpty()) {
-                    //TODO camt
-                } else {
-                    GVRKUms.BTag lastBoookingDay =
-                        bookingsResult.getDataPerDay().get(bookingsResult.getDataPerDay().size() - 1);
-                    balancesReport = createBalancesReport(lastBoookingDay.end);
-                }
+            if (loadBookingsRequest.getTransaction().isWithBalance() && !bookingsResult.getDataPerDay().isEmpty()) {
+                GVRKUms.BTag lastBoookingDay =
+                    bookingsResult.getDataPerDay().get(bookingsResult.getDataPerDay().size() - 1);
+                balancesReport = createBalancesReport(lastBoookingDay.end);
             }
 
             bookingList = hbciObjectMapper.createBookings(bookingsResult).stream()
@@ -134,15 +125,21 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
     }
 
     private AbstractHBCIJob createBookingsJob(PinTanPassport passport) {
-        AbstractHBCIJob hbciJob = Optional.ofNullable(loadBookingsRequest.getTransaction().getRawResponseType())
-            .map(rawResponseType -> {
-                if (rawResponseType == CAMT) {
+        LoadBookings.RawResponseType rawResponseType = loadBookingsRequest.getTransaction().getRawResponseType();
+        if (rawResponseType != null && passport.jobSupported(rawResponseType == CAMT ?
+            GVKUmsAllCamt.getLowlevelName() : GVKUmsAll.getLowlevelName())) {
+            throw new MultibankingException(BOOKINGS_FORMAT_NOT_SUPPORTED, rawResponseType + " not supported");
+        }
+
+        AbstractHBCIJob hbciJob = Optional.ofNullable(rawResponseType)
+            .map(format -> {
+                if (format == CAMT) {
                     return new GVKUmsAllCamt(passport, true);
                 } else {
                     return new GVKUmsAll(passport);
                 }
             })
-            .orElseGet(() -> new GVKUmsAll(passport));
+            .orElseGet(() -> new GVKUmsAllCamt(passport, false));
 
         hbciJob.setParam("my", getPsuKonto(passport));
 

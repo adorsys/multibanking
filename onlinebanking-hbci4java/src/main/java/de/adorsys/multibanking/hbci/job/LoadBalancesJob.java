@@ -95,11 +95,6 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesRe
     }
 
     @Override
-    BankAccount getPsuBankAccount() {
-        return loadBalanceRequest.getTransaction().getPsuAccount();
-    }
-
-    @Override
     TransactionRequest<LoadBalances> getTransactionRequest() {
         return loadBalanceRequest;
     }

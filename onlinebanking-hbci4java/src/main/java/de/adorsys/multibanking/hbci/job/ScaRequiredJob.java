@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.hbci.job;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.ChallengeData;
 import de.adorsys.multibanking.domain.Product;
@@ -27,6 +28,7 @@ import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.hbci.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -45,10 +47,12 @@ import java.util.stream.Collectors;
 import static de.adorsys.multibanking.domain.BankApi.HBCI;
 import static de.adorsys.multibanking.domain.ScaApproach.EMBEDDED;
 import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
 import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDialog;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+@Slf4j
 public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends AbstractResponse> {
 
     static HbciObjectMapper hbciObjectMapper = new HbciObjectMapperImpl();
@@ -120,6 +124,12 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         hbciTanSubmit.setDialogId(dialog.getDialogID());
         hbciTanSubmit.setMsgNum(dialog.getMsgnum());
         hbciTanSubmit.setTwoStepMechanism(getUserTanTransportType(dialog));
+        try {
+            hbciTanSubmit.setLowLevelParams(new ObjectMapper().writeValueAsString(scaJob.getLowlevelParams()));
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new MultibankingException(INTERNAL_ERROR, 500, e.getMessage());
+        }
         Optional.ofNullable(scaJob)
             .ifPresent(hbciJob -> {
                 Optional.ofNullable(hbciJob.getPainVersion())
@@ -205,26 +215,29 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
     }
 
     Konto getPsuKonto(PinTanPassport passport) {
-        BankAccount account = getPsuBankAccount();
-        Konto konto = passport.findAccountByAccountNumber(Iban.valueOf(account.getIban()).getAccountNumber());
-        konto.iban = account.getIban();
-        konto.bic = Optional.ofNullable(account.getBic()).orElse(getTransactionRequest().getBank().getBic());
-        return konto;
+        return getPsuAccount()
+            .map(account -> {
+                Konto konto = passport.findAccountByAccountNumber(Iban.valueOf(account.getIban()).getAccountNumber());
+                konto.iban = account.getIban();
+                konto.bic = Optional.ofNullable(account.getBic())
+                    .orElse(HBCIUtils.getBankInfo(konto.blz).getBic());
+                return konto;
+            })
+            .orElseGet(() -> passport.getAccounts().get(0));
     }
 
-    BankAccount getPsuBankAccount() {
-        return Optional.ofNullable(getTransactionRequest().getTransaction().getPsuAccount())
-            .orElseThrow(() -> new MultibankingException(INVALID_ACCOUNT_REFERENCE, "Missing transaction psu account"));
+    private Optional<BankAccount> getPsuAccount() {
+        return Optional.ofNullable(getTransactionRequest().getTransaction().getPsuAccount());
     }
 
     private HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog) {
-        return Optional.of(getConsent().getSelectedMethod())
+        return Optional.ofNullable(getConsent().getSelectedMethod())
             .map(tanTransportType -> dialog.getPassport().getBankTwostepMechanisms().get(tanTransportType.getId()))
             .map(hbciTwoStepMechanism -> {
                 hbciTwoStepMechanism.setMedium(getConsent().getSelectedMethod().getMedium());
                 return hbciTwoStepMechanism;
             })
-            .orElseThrow(() -> new MultibankingException(INVALID_SCA_METHOD));
+            .orElseGet(() -> dialog.getPassport().getBankTwostepMechanisms().get(dialog.getPassport().getUserTwostepMechanisms().get(0)));
     }
 
     private HbciCallback createCallback(HbciCallback hbciCallback, AuthorisationCodeResponse response) {

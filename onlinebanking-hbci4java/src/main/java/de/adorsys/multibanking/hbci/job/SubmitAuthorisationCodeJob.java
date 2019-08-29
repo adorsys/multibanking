@@ -24,6 +24,7 @@ import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
 import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
 import de.adorsys.multibanking.hbci.model.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -38,9 +39,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
 import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @RequiredArgsConstructor
+@Slf4j
 public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
     private final J scaJob;
@@ -84,12 +87,19 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         return hbciJob;
     }
 
+    @SuppressWarnings("unchecked")
     private AbstractHBCIJob submitProcess2(HbciTanSubmit hbciTanSubmit, HBCIDialog hbciDialog) {
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         AbstractHBCIJob originJob = Optional.ofNullable(hbciTanSubmit.getOriginJobName())
             .map(s -> {
                 AbstractHBCIJob result = newJob(hbciTanSubmit.getOriginJobName(), hbciDialog.getPassport());
+                try {
+                    result.setLlParams(objectMapper().readValue(hbciTanSubmit.getLowLevelParams(), HashMap.class));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new MultibankingException(INTERNAL_ERROR, 500, e.getMessage());
+                }
                 result.setSegVersion(hbciTanSubmit.getOriginSegVersion());
                 return result;
             }).orElse(null);
