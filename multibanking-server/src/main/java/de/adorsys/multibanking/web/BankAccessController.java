@@ -69,7 +69,7 @@ public class BankAccessController {
     public ResponseEntity<Resource<BankAccessTO>> createBankAccess(@RequestBody BankAccessTO bankAccess) {
         BankAccessEntity persistedBankAccess =
             bankAccessService.createBankAccess(bankAccessMapper.toBankAccessEntity(bankAccess, principal.getName(),
-                false), null);
+                false));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(linkTo(methodOn(BankAccessController.class).getBankAccess(persistedBankAccess.getId())).toUri());

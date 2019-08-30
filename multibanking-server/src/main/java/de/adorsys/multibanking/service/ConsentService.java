@@ -8,10 +8,10 @@ import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
 import de.adorsys.multibanking.exception.MissingConsentAuthorisationSelectionException;
 import de.adorsys.multibanking.exception.MissingConsentException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
 import de.adorsys.multibanking.web.mapper.ConsentMapper;
@@ -63,7 +63,7 @@ public class ConsentService {
                 internalConsent, bank);
 
         UpdateAuthResponse response =
-            onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequest, bank.getBankingUrl());
+            onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequest);
 
         internalConsent.setBankApiConsentData(updatePsuAuthenticationRequest.getBankApiConsentData());
         consentRepository.save(internalConsent);
@@ -163,14 +163,14 @@ public class ConsentService {
                     throw new MissingConsentException();
                 case INVALID_SCA_METHOD:
                     throw new MissingConsentAuthorisationSelectionException();
-                case HBCI_2FA_REQUIRED:
-                    // FIXME get the challenge data
-                    ChallengeData challengeData = null;
-                    UpdateAuthResponse response = new UpdateAuthResponse();
-                    response.setChallenge(challengeData);
-                    response.setPsuMessage(e.getMessage());
-                    throw new MissingConsentAuthorisationException(response, consentId,
-                        internalConsent.getAuthorisationId());
+                case INVALID_CONSENT_STATUS:
+                    if (expectedConsentStatus == ScaStatus.FINALISED) {
+                        // TODO don't know where to get UpdateAuthResponse
+                        throw new TransactionAuthorisationRequiredException(null, internalConsent.getId(), internalConsent.getAuthorisationId());
+                    } else if (expectedConsentStatus == ScaStatus.SCAMETHODSELECTED) {
+                        throw new MissingConsentAuthorisationSelectionException();
+                    }
+                    throw e;
                 default:
                     throw e;
             }

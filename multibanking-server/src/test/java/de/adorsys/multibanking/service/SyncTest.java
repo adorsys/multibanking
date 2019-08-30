@@ -88,7 +88,7 @@ public class SyncTest {
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI, null);
+            BankApi.HBCI);
         BankAccountEntity bankAccountEntity = bankAccountEntities.stream()
             .filter(account -> account.getAccountNumber().equals(System.getProperty("account")))
             .findFirst()
@@ -96,7 +96,7 @@ public class SyncTest {
 
         bankAccountEntity.setId("test-account-id");
 
-        bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntity, BankApi.HBCI, null);
+        bookingService.syncBookings(FINALISED, bankAccessEntity, bankAccountEntity, BankApi.HBCI);
 
         Optional<AccountAnalyticsEntity> analyticsEntity = analyticsRepository.findLastByUserIdAndAccountId("test" +
             "-user-id", "test-account-id");

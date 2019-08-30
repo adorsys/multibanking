@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @ApiModel(description = "It is contained in addition to the data element 'chosenScaMethod' if challenge data is " +
     "needed for SCA")
@@ -15,7 +17,7 @@ public class ChallengeDataTO {
     private String image;
 
     @ApiModelProperty(value = "String challenge data")
-    private String data;
+    private List<String> data;
 
     @ApiModelProperty(value = "A link where the ASPSP will provides the challenge image")
     private String imageLink;

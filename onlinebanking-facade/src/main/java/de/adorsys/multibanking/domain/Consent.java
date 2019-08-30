@@ -16,14 +16,13 @@
 
 package de.adorsys.multibanking.domain;
 
-import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisation;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class Consent implements StrongCustomerAuthorisation {
+public class Consent {
 
     private String consentId;
 

@@ -7,7 +7,7 @@ import java.util.Date;
 
 @MappedSuperclass
 @Data
-public class PaymentCommonJpaEntity {
+class PaymentCommonJpaEntity {
 
     private String userId;
     private Date createdDateTime;

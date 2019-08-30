@@ -17,13 +17,12 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.LoadBalanceRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.LoadBalancesResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
-import de.adorsys.multibanking.hbci.model.HbciMapping;
+import de.adorsys.multibanking.domain.transaction.LoadBalances;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +36,9 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
@@ -49,19 +47,17 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Slf4j
-public class LoadBalancesJob extends ScaRequiredJob<LoadBalancesResponse> {
+public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesResponse> {
 
-    private final LoadBalanceRequest loadBalanceRequest;
+    private final TransactionRequest<LoadBalances> loadBalanceRequest;
+    private AbstractHBCIJob balanceJob;
 
-    private Map<AbstractHBCIJob, BankAccount> jobs;
-
-    private static AbstractHBCIJob createBalanceJob(PinTanPassport passport, Konto konto) {
-        AbstractHBCIJob balanceJob = new GVSaldoReq(passport);
-        balanceJob.setParam("my", konto);
-        return balanceJob;
+    private static boolean initFailed(HBCIExecStatus status) {
+        return status.getErrorMessages().stream()
+            .anyMatch(line -> line.charAt(0) == '9');
     }
 
-    private static Konto createAccount(BankAccount bankAccount) {
+    private Konto createAccount(BankAccount bankAccount) {
         Konto account = new Konto();
         account.bic = bankAccount.getBic();
         account.number = bankAccount.getAccountNumber();
@@ -72,21 +68,16 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalancesResponse> {
         return account;
     }
 
-    private static boolean initFailed(HBCIExecStatus status) {
-        return status.getErrorMessages().stream()
-            .anyMatch(line -> line.charAt(0) == '9');
+    @Override
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+        balanceJob = new GVSaldoReq(passport);
+        balanceJob.setParam("my", createAccount(loadBalanceRequest.getTransaction().getPsuAccount()));
+        return balanceJob;
     }
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
-        jobs = new HashMap<>();
-
-        loadBalanceRequest.getBankAccounts().forEach(bankAccount -> {
-            Konto account = createAccount(bankAccount);
-            jobs.put(createBalanceJob(passport, account), bankAccount);
-        });
-
-        return new ArrayList<>(jobs.keySet());
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
     }
 
     @Override
@@ -96,18 +87,15 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalancesResponse> {
             log.error("Status of balance job not OK " + status);
 
             if (initFailed(status)) {
-                throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorMessages());
+                throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorMessages().stream()
+                    .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                    .collect(Collectors.toList()));
             }
         }
     }
 
     @Override
-    BankAccount getPsuBankAccount() {
-        return loadBalanceRequest.getBankAccounts().get(0);
-    }
-
-    @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<LoadBalances> getTransactionRequest() {
         return loadBalanceRequest;
     }
 
@@ -122,21 +110,24 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalancesResponse> {
     }
 
     @Override
-    public LoadBalancesResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        //TODO check for needed 2FA
-        List<BankAccount> bankAccounts = jobs.keySet().stream()
-            .map(job -> {
-                if (job.getJobResult().getJobStatus().hasErrors()) {
-                    log.error("Balance job not OK");
-                    throw new MultibankingException(HBCI_ERROR, job.getJobResult().getJobStatus().getErrorList());
-                }
-                BankAccount bankAccount = jobs.get(job);
-                bankAccount.setBalances(HbciMapping.createBalance((GVRSaldoReq) job.getJobResult(),
-                    bankAccount.getAccountNumber()));
-                return bankAccount;
-            })
-            .collect(Collectors.toList());
+    public LoadBalancesResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+        AbstractHBCIJob resultJob = Optional.ofNullable(hbciJob)
+            .orElse(this.balanceJob);
 
-        return new LoadBalancesResponse(bankAccounts);
+        if (resultJob.getJobResult().getJobStatus().hasErrors()) {
+            log.error("Balance job not OK");
+            throw new MultibankingException(HBCI_ERROR, resultJob.getJobResult().getJobStatus().getErrorList().stream()
+                .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                .collect(Collectors.toList()));
+        }
+
+        BankAccount bankAccount = loadBalanceRequest.getTransaction().getPsuAccount();
+
+        if (resultJob.getJobResult().isOK()) {
+            bankAccount.setBalances(hbciObjectMapper.createBalancesReport((GVRSaldoReq) resultJob.getJobResult(),
+                bankAccount.getAccountNumber()));
+        }
+
+        return new LoadBalancesResponse(bankAccount);
     }
 }

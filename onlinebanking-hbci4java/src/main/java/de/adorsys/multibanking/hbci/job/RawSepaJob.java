@@ -17,7 +17,7 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +42,12 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class RawSepaJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<RawSepaPayment> transactionRequest;
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    TransactionRequest<RawSepaPayment> getTransactionRequest() {
         return transactionRequest;
     }
 
@@ -62,8 +62,8 @@ public class RawSepaJob extends ScaRequiredJob<AuthorisationCodeResponse> {
     }
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
-        RawSepaPayment sepaPayment = (RawSepaPayment) transactionRequest.getTransaction();
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+        RawSepaPayment sepaPayment = transactionRequest.getTransaction();
 
         String jobName;
         switch (sepaPayment.getSepaTransactionType()) {
@@ -87,12 +87,17 @@ public class RawSepaJob extends ScaRequiredJob<AuthorisationCodeResponse> {
 
         sepagv.verifyConstraints();
 
-        return Collections.singletonList(sepagv);
+        return sepagv;
     }
 
     @Override
-    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        return response;
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    EmptyResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+        return new EmptyResponse();
     }
 
     private void appendPainValues(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {

@@ -18,6 +18,7 @@ package de.adorsys.multibanking.domain.exception;
 
 public enum MultibankingError {
 
+    RESOURCE_NOT_FOUND,
     HBCI_ERROR,
     INVALID_PAYMENT,
     INVALID_SCA_METHOD,
@@ -25,10 +26,10 @@ public enum MultibankingError {
     INVALID_PIN,
     INVALID_TAN,
     INVALID_ACCOUNT_REFERENCE,
-    NO_CONSENT,
     INVALID_CONSENT_STATUS,
-    HBCI_2FA_REQUIRED,
     BANK_NOT_SUPPORTED,
+    BANKING_GATEWAY_ERROR,
+    BOOKINGS_FORMAT_NOT_SUPPORTED,
     INTERNAL_ERROR;
 
 }

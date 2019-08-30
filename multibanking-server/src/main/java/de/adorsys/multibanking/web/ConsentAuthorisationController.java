@@ -1,7 +1,6 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.domain.ScaApproach;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
@@ -112,7 +111,6 @@ public class ConsentAuthorisationController {
                     break;
             }
         }
-
 
         return new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links);
     }

@@ -17,10 +17,12 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.Product;
+import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import de.adorsys.multibanking.hbci.model.HBCIConsent;
 import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -33,6 +35,7 @@ import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDialog;
@@ -41,13 +44,14 @@ import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDial
 public class TransferJob {
 
     public void requestTransfer(TransactionRequest sepaTransactionRequest) {
+        HBCIConsent hbciConsent = (HBCIConsent) sepaTransactionRequest.getBankApiConsentData();
+
         HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
-            .credentials(sepaTransactionRequest.getCredentials())
+            .credentials(hbciConsent.getCredentials())
             .hbciPassportState(sepaTransactionRequest.getBankAccess().getHbciPassportState())
             .build();
 
-        dialogRequest.setBankCode(sepaTransactionRequest.getBankCode() != null ? sepaTransactionRequest.getBankCode() :
-            sepaTransactionRequest.getBankAccess().getBankCode());
+        dialogRequest.setBank(sepaTransactionRequest.getBank());
         dialogRequest.setHbciProduct(Optional.ofNullable(sepaTransactionRequest.getHbciProduct())
             .map(product -> new Product(product.getName(), product.getVersion()))
             .orElse(null));
@@ -66,8 +70,12 @@ public class TransferJob {
         }
 
         if (hbciJob.getJobResult().getJobStatus().hasErrors()) {
-            throw new MultibankingException(HBCI_ERROR, hbciJob.getJobResult().getJobStatus().getErrorList());
+            throw new MultibankingException(HBCI_ERROR, hbciJob.getJobResult().getJobStatus().getErrorList().stream()
+                .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                .collect(Collectors.toList()));
         }
+
+        dialog.execute(true);
     }
 
     private AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,

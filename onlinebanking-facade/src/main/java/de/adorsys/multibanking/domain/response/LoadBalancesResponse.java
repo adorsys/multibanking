@@ -21,12 +21,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class LoadBalancesResponse extends AbstractResponse {
 
-    private final List<BankAccount> bankAccounts;
+    private final BankAccount bankAccount;
 }

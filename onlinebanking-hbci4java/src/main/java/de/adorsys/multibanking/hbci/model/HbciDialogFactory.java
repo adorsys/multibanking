@@ -33,16 +33,20 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NO
 public class HbciDialogFactory {
 
     public static HBCIDialog startHbciDialog(HbciPassport passport, HbciDialogRequest dialogRequest) {
-        BankInfo bankInfo = Optional.ofNullable(HBCIUtils.getBankInfo(dialogRequest.getBankCode()))
+        String bankCode = dialogRequest.getBank().getBankApiBankCode() != null
+            ? dialogRequest.getBank().getBankApiBankCode()
+            : dialogRequest.getBank().getBankCode();
+
+        BankInfo bankInfo = Optional.ofNullable(HBCIUtils.getBankInfo(dialogRequest.getBank().getBankCode()))
             .orElseThrow(() -> new MultibankingException(BANK_NOT_SUPPORTED,
-                "Bank [" + dialogRequest.getBankCode() + "] not supported"));
+                "Bank [" + bankCode + "] not supported"));
 
         HBCIProduct hbciProduct = Optional.ofNullable(dialogRequest.getHbciProduct())
             .map(product -> new HBCIProduct(product.getName(), product.getVersion()))
             .orElse(null);
 
         HbciPassport newPassport = Optional.ofNullable(passport)
-            .orElseGet(() -> createPassport(bankInfo.getPinTanVersion().getId(), dialogRequest.getBankCode(),
+            .orElseGet(() -> createPassport(bankInfo.getPinTanVersion().getId(), bankCode,
                 dialogRequest.getCredentials().getUserId(), dialogRequest.getCredentials().getCustomerId(), hbciProduct,
                 dialogRequest.getCallback()
             ));

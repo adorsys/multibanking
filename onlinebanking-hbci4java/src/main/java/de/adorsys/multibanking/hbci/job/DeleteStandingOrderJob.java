@@ -17,10 +17,9 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
-import de.adorsys.multibanking.hbci.model.HbciMapping;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -35,13 +34,13 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
-public class DeleteStandingOrderJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+public class DeleteStandingOrderJob extends ScaRequiredJob<StandingOrder, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<StandingOrder> transactionRequest;
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
-        StandingOrder standingOrder = (StandingOrder) transactionRequest.getTransaction();
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+        StandingOrder standingOrder = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);
 
@@ -64,9 +63,10 @@ public class DeleteStandingOrderJob extends ScaRequiredJob<AuthorisationCodeResp
             gvDauerSEPADel.setParam("firstdate", standingOrder.getFirstExecutionDate().toString());
         }
         if (standingOrder.getCycle() != null) {
-            gvDauerSEPADel.setParam("timeunit", HbciMapping.cycleToTimeunit(standingOrder.getCycle())); // M month, W
+            gvDauerSEPADel.setParam("timeunit", hbciObjectMapper.cycleToTimeunit(standingOrder.getCycle())); // M
+            // month, W
             // week
-            gvDauerSEPADel.setParam("turnus", HbciMapping.cycleToTurnus(standingOrder.getCycle())); // 1W = every
+            gvDauerSEPADel.setParam("turnus", hbciObjectMapper.cycleToTurnus(standingOrder.getCycle())); // 1W = every
             // week, 2M = every two months
         }
         gvDauerSEPADel.setParam("execday", standingOrder.getExecutionDay()); // W: 1-7, M: 1-31
@@ -76,16 +76,21 @@ public class DeleteStandingOrderJob extends ScaRequiredJob<AuthorisationCodeResp
 
         gvDauerSEPADel.verifyConstraints();
 
-        return Collections.singletonList(gvDauerSEPADel);
+        return gvDauerSEPADel;
     }
 
     @Override
-    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        return response;
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    EmptyResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+        return new EmptyResponse();
+    }
+
+    @Override
+    TransactionRequest<StandingOrder> getTransactionRequest() {
         return transactionRequest;
     }
 

@@ -1,18 +1,16 @@
 package de.adorsys.multibanking.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisationContainer;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(value = {"hbciPassportState"}, allowSetters = true)
-public class BankAccessEntity extends BankAccess implements StrongCustomerAuthorisationContainer {
+public class BankAccessEntity extends BankAccess {
 
     private String id;
     private String userId;
-    private String consentId;
     private boolean temporary;
     private boolean storeBookings;
     private boolean categorizeBookings;

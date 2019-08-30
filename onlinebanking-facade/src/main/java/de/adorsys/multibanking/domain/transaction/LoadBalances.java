@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain.transaction;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_BALANCES;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LoadAccountInformationRequest extends TransactionRequest {
+public class LoadBalances extends AbstractScaTransaction {
 
-    private String consentId;
-    private boolean updateTanTransportTypes;
+    @Override
+    public TransactionType getTransactionType() {
+        return LOAD_BALANCES;
+    }
 
+    @Override
+    public String getRawData() {
+        return null;
+    }
 }

@@ -23,34 +23,28 @@ public interface ConsentAuthorisationMapper {
     @Mapping(target = "credentials.customerId", source = "updatePsuAuthenticationRequest.psuId")
     @Mapping(target = "credentials.userId", source = "updatePsuAuthenticationRequest.psuCorporateId")
     @Mapping(target = "credentials.pin", source = "updatePsuAuthenticationRequest.password")
-    @Mapping(target = "bankCode", source = "bankEntity.bankApiBankCode")
-    @Mapping(target = "bankUrl", source = "bankEntity.bankingUrl")
     @Mapping(target = "hbciProduct", ignore = true)
     @Mapping(target = "hbciBPD", ignore = true)
     @Mapping(target = "hbciUPD", ignore = true)
     @Mapping(target = "hbciSysId", ignore = true)
-    UpdatePsuAuthenticationRequest toUpdatePsuAuthenticationRequest(UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequest, ConsentEntity consentEntity, BankEntity bankEntity);
+    UpdatePsuAuthenticationRequest toUpdatePsuAuthenticationRequest(UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequest, ConsentEntity consentEntity, BankEntity bank);
 
     UpdateAuthResponseTO toUpdateAuthResponseTO(UpdateAuthResponse updateAuthResponse);
 
     @Mapping(target = "consentId", source = "consentEntity.id")
-    @Mapping(target = "credentials", ignore = true)
     @Mapping(target = "hbciProduct", ignore = true)
     @Mapping(target = "hbciBPD", ignore = true)
     @Mapping(target = "hbciUPD", ignore = true)
     @Mapping(target = "hbciSysId", ignore = true)
-    @Mapping(target = "bankCode", ignore = true)
-    @Mapping(target = "bankUrl", ignore = true)
+    @Mapping(target = "bank", ignore = true)
     SelectPsuAuthenticationMethodRequest toSelectPsuAuthenticationMethodRequest(SelectPsuAuthenticationMethodRequestTO selectPsuAuthenticationMethodRequest, ConsentEntity consentEntity);
 
     @Mapping(target = "consentId", source = "consentEntity.id")
-    @Mapping(target = "credentials", ignore = true)
     @Mapping(target = "hbciProduct", ignore = true)
     @Mapping(target = "hbciBPD", ignore = true)
     @Mapping(target = "hbciUPD", ignore = true)
     @Mapping(target = "hbciSysId", ignore = true)
-    @Mapping(target = "bankCode", ignore = true)
-    @Mapping(target = "bankUrl", ignore = true)
+    @Mapping(target = "bank", ignore = true)
     TransactionAuthorisationRequest toTransactionAuthorisationRequest(TransactionAuthorisationRequestTO transactionAuthorisationRequest, ConsentEntity consentEntity);
 
 }

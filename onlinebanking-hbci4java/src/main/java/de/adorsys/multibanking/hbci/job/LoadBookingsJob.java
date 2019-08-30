@@ -17,75 +17,62 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BalancesReport;
-import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.Booking;
+import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.transaction.StandingOrder;
-import de.adorsys.multibanking.hbci.model.HbciMapping;
+import de.adorsys.multibanking.domain.transaction.LoadBookings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.iban4j.Iban;
-import org.kapott.hbci.GV.*;
-import org.kapott.hbci.GV_Result.GVRDauerList;
+import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV.GVKUmsAll;
+import org.kapott.hbci.GV.GVKUmsAllCamt;
 import org.kapott.hbci.GV_Result.GVRKUms;
-import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.structures.Konto;
+import org.kapott.hbci.structures.Saldo;
 
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import static de.adorsys.multibanking.domain.exception.MultibankingError.BOOKINGS_FORMAT_NOT_SUPPORTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
-import static de.adorsys.multibanking.hbci.job.AccountInformationJob.extractTanTransportTypes;
+import static de.adorsys.multibanking.domain.transaction.LoadBookings.RawResponseType.CAMT;
 
 @RequiredArgsConstructor
 @Slf4j
-public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
+public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsResponse> {
 
-    private final LoadBookingsRequest loadBookingsRequest;
+    private final TransactionRequest<LoadBookings> loadBookingsRequest;
 
     private AbstractHBCIJob bookingsJob;
-    private AbstractHBCIJob balanceJob;
-    private AbstractHBCIJob standingOrdersJob;
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
         bookingsJob = createBookingsJob(passport);
-        balanceJob = loadBookingsRequest.isWithBalance()
-            ? createBalanceJob(passport)
-            : null;
-
-        standingOrdersJob = loadBookingsRequest.isWithStandingOrders()
-            ? createStandingOrdersJob(passport)
-            : null;
-
-        return Stream.of(bookingsJob, balanceJob, standingOrdersJob)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+        return bookingsJob;
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    TransactionRequest<LoadBookings> getTransactionRequest() {
         return loadBookingsRequest;
     }
 
     @Override
     String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
-        return GVSEPAInfo.getLowlevelName();
-    }
+        boolean camt = Optional.ofNullable(loadBookingsRequest.getTransaction().getRawResponseType())
+            .map(rawResponseType -> rawResponseType == CAMT)
+            .orElse(false);
 
-    @Override
-    BankAccount getPsuBankAccount() {
-        return loadBookingsRequest.getBankAccount();
+        return camt ? "KUmsAllCamt" : "KUmsAll";
     }
 
     @Override
@@ -94,85 +81,77 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookingsResponse> {
     }
 
     @Override
-    public LoadBookingsResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        //TODO check for needed 2FA
+    public LoadBookingsResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+        AbstractHBCIJob resultJob = Optional.ofNullable(hbciJob)
+            .orElse(this.bookingsJob);
 
-        if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
+        if (resultJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
-            throw new MultibankingException(HBCI_ERROR, bookingsJob.getJobResult().getJobStatus().getErrorList());
+            throw new MultibankingException(HBCI_ERROR,
+                resultJob.getJobResult().getJobStatus().getErrorList().stream()
+                    .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                    .collect(Collectors.toList()));
         }
 
-        if (loadBookingsRequest.isWithTanTransportTypes()) {
-            loadBookingsRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
-            loadBookingsRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI,
-                extractTanTransportTypes(passport));
-        }
-
-        List<StandingOrder> standingOrders = Optional.ofNullable(standingOrdersJob)
-            .map(abstractHBCIJob -> HbciMapping.createStandingOrders((GVRDauerList) abstractHBCIJob.getJobResult()))
-            .orElse(null);
-
-        BalancesReport bankAccountBalance = Optional.ofNullable(balanceJob)
-            .map(abstractHBCIJob -> HbciMapping.createBalance((GVRSaldoReq) abstractHBCIJob.getJobResult(),
-                loadBookingsRequest.getBankAccount().getAccountNumber()))
-            .orElse(null);
-
-        ArrayList<Booking> bookingList = null;
+        List<Booking> bookingList = null;
+        BalancesReport balancesReport = null;
         List<String> raw = null;
-        GVRKUms bookingsResult = (GVRKUms) bookingsJob.getJobResult();
-        if (loadBookingsRequest.getRawResponseType() != null) {
+        GVRKUms bookingsResult = (GVRKUms) resultJob.getJobResult();
+        if (loadBookingsRequest.getTransaction().getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
-            bookingList = HbciMapping.createBookings(bookingsResult).stream()
+            if (loadBookingsRequest.getTransaction().isWithBalance() && !bookingsResult.getDataPerDay().isEmpty()) {
+                GVRKUms.BTag lastBoookingDay =
+                    bookingsResult.getDataPerDay().get(bookingsResult.getDataPerDay().size() - 1);
+                balancesReport = createBalancesReport(lastBoookingDay.end);
+            }
+
+            bookingList = hbciObjectMapper.createBookings(bookingsResult).stream()
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
                     () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
         }
 
         return LoadBookingsResponse.builder()
             .bookings(bookingList)
+            .balancesReport(balancesReport)
             .rawData(raw)
-            .bankAccountBalance(bankAccountBalance)
-            .standingOrders(standingOrders)
             .build();
     }
 
-    private AbstractHBCIJob createStandingOrdersJob(PinTanPassport passport) {
-        if (passport.jobSupported("DauerSEPAList")) {
-            AbstractHBCIJob hbciJob = new GVDauerSEPAList(passport);
-            hbciJob.setParam("src", getPsuKonto(passport));
-        }
-        return null;
+    private BalancesReport createBalancesReport(Saldo saldo) {
+        BalancesReport balancesReport = new BalancesReport();
+        balancesReport.setReadyBalance(hbciObjectMapper.toBalance(saldo));
+        return balancesReport;
     }
 
     private AbstractHBCIJob createBookingsJob(PinTanPassport passport) {
-        AbstractHBCIJob hbciJob = Optional.ofNullable(loadBookingsRequest.getRawResponseType())
-            .map(rawResponseType -> {
-                if (rawResponseType == LoadBookingsRequest.RawResponseType.CAMT) {
+        LoadBookings.RawResponseType rawResponseType = loadBookingsRequest.getTransaction().getRawResponseType();
+        if (rawResponseType != null && passport.jobSupported(rawResponseType == CAMT ?
+            GVKUmsAllCamt.getLowlevelName() : GVKUmsAll.getLowlevelName())) {
+            throw new MultibankingException(BOOKINGS_FORMAT_NOT_SUPPORTED, rawResponseType + " not supported");
+        }
+
+        AbstractHBCIJob hbciJob = Optional.ofNullable(rawResponseType)
+            .map(format -> {
+                if (format == CAMT) {
                     return new GVKUmsAllCamt(passport, true);
                 } else {
                     return new GVKUmsAll(passport);
                 }
             })
-            .orElseGet(() -> new GVKUmsAll(passport));
+            .orElseGet(() -> new GVKUmsAllCamt(passport, false));
 
         hbciJob.setParam("my", getPsuKonto(passport));
 
-        Optional.ofNullable(loadBookingsRequest.getDateFrom())
+        Optional.ofNullable(loadBookingsRequest.getTransaction().getDateFrom())
             .ifPresent(localDate -> hbciJob.setParam("startdate",
                 Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
-        Optional.ofNullable(loadBookingsRequest.getDateTo())
+        Optional.ofNullable(loadBookingsRequest.getTransaction().getDateTo())
             .ifPresent(localDate -> hbciJob.setParam("enddate",
                 Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
         return hbciJob;
     }
-
-    private AbstractHBCIJob createBalanceJob(PinTanPassport passport) {
-        AbstractHBCIJob hbciJob = new GVSaldoReq(passport);
-        hbciJob.setParam("my", getPsuKonto(passport));
-        return hbciJob;
-    }
-
 
 }

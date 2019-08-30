@@ -1,21 +1,16 @@
 package de.adorsys.multibanking.domain.response;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-import java.util.Map;
-
+@RequiredArgsConstructor
 @Data
-@Builder
 @EqualsAndHashCode(callSuper = false)
-public class SubmitAuthorizationCodeResponse extends AbstractResponse {
+public class SubmitAuthorizationCodeResponse<T extends AbstractResponse> {
 
+    private final T jobResponse;
     private String status;
     private String transactionId;
-    private String hbciSysId;
-    private Map<String, String> hbciUpd;
-    private List<String> messages;
 
 }

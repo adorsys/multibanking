@@ -3,7 +3,6 @@ package de.adorsys.multibanking.web;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.SinglePaymentEntity;
-import de.adorsys.multibanking.domain.TanTransportType;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
@@ -75,7 +74,7 @@ public class PaymentController {
             .orElseThrow(() -> new ResourceNotFoundException(BankAccountEntity.class, accountId));
 
         SinglePaymentEntity payment = paymentService.createSinglePayment(bankAccessEntity,
-            paymentRequest.getTanTransportType(), credentialsMapper.toCredentials(paymentRequest.getCredentials()),
+            credentialsMapper.toCredentials(paymentRequest.getCredentials()),
             paymentRequest.getPayment());
 
         HttpHeaders headers = new HttpHeaders();
@@ -117,7 +116,6 @@ public class PaymentController {
     @Data
     private static class CreatePaymentRequest {
         CredentialsTO credentials;
-        TanTransportType tanTransportType;
         SinglePayment payment;
     }
 

@@ -18,17 +18,20 @@ package de.adorsys.multibanking.domain;
 
 import lombok.*;
 
+import java.io.Serializable;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class TanTransportType {
+public class TanTransportType implements Serializable {
 
     @EqualsAndHashCode.Include
     private String id;
     private String name;
     private String medium;
     private String inputInfo;
+    private boolean needTanMedia;
     private AuthenticationType type;
 }

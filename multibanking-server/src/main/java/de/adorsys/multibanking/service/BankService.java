@@ -66,8 +66,4 @@ public class BankService {
         return bankRepository.search(terms);
     }
 
-    String findBankingUrl(String bankCode) {
-        return bankRepository.findBankingUrl(bankCode)
-            .orElse(null);
-    }
 }

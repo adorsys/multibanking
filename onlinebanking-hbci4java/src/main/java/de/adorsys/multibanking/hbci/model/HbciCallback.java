@@ -16,12 +16,14 @@
 
 package de.adorsys.multibanking.hbci.model;
 
+import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.manager.HHDVersion;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 
@@ -39,7 +41,9 @@ public class HbciCallback implements HBCICallback {
                 break;
             }
             case HBCICallback.WRONG_PIN: {
-                throw new MultibankingException(INVALID_PIN, msg);
+                throw new MultibankingException(INVALID_PIN, msg.stream()
+                    .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                    .collect(Collectors.toList()));
             }
             // No need to tell when we may open or close our internet connection
             case HBCICallback.NEED_CONNECTION:

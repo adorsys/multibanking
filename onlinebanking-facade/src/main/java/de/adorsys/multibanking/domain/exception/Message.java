@@ -14,28 +14,37 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain.exception;
 
-import de.adorsys.multibanking.domain.BankAccount;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.io.Serializable;
+import java.util.Map;
 
+@NoArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class LoadBookingsRequest extends TransactionRequest {
+@AllArgsConstructor
+@Builder
+public class Message implements Serializable {
 
-    private String consentId;
-    private BankAccount bankAccount;
-    private RawResponseType rawResponseType;
-    private LocalDate dateFrom;
-    private LocalDate dateTo;
-    private boolean withBalance;
-    private boolean withStandingOrders;
-    private boolean withTanTransportTypes;
+    private static final long serialVersionUID = -1L;
 
-    public enum RawResponseType {
-        CAMT, MT940
+    private String key;
+
+    private Severity severity;
+
+    private String field;
+
+    private String renderedMessage;
+
+    private Map<String, String> paramsMap;
+
+    public enum Severity {
+        ERROR,
+        WARNING,
+        INFO
     }
 }

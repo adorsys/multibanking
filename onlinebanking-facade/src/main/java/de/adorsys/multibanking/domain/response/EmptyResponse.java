@@ -14,26 +14,13 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.transaction;
+package de.adorsys.multibanking.domain.response;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class AccountInformationTransaction extends AbstractScaTransaction {
+public class EmptyResponse extends AbstractResponse {
 
-    private final TransactionType transactionType;
-
-    @Override
-    public TransactionType getTransactionType() {
-        return transactionType;
-    }
-
-    @Override
-    public String getRawData() {
-        return null;
-    }
 }

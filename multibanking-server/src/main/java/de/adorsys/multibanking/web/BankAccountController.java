@@ -3,7 +3,6 @@ package de.adorsys.multibanking.web;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.SyncInProgressException;
 import de.adorsys.multibanking.exception.domain.Messages;
@@ -55,7 +54,7 @@ public class BankAccountController {
         @ApiResponse(code = 400, message = "Consent authorisation required", response = Messages.class)})
     @GetMapping
     public Resources<Resource<BankAccountTO>> getBankAccounts(@PathVariable String accessId) {
-        List<BankAccountEntity> bankAccounts = bankAccountService.getBankAccounts(principal.getName(), accessId, null);
+        List<BankAccountEntity> bankAccounts = bankAccountService.getBankAccounts(principal.getName(), accessId);
         return new Resources<>(mapToResources(bankAccounts, accessId));
     }
 
@@ -101,7 +100,7 @@ public class BankAccountController {
         if (bankAccount.getSyncStatus() == BankAccount.SyncStatus.SYNC) {
             throw new SyncInProgressException(bankAccount.getId());
         }
-        bookingService.syncBookings(FINALISED, bankAccess, bankAccount, null, null);
+        bookingService.syncBookings(FINALISED, bankAccess, bankAccount, null);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

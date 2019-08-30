@@ -34,4 +34,5 @@ public class HbciTanSubmit {
     private String sepaPain;
     private String painVersion;
     private HBCITwoStepMechanism twoStepMechanism;
+    private String lowLevelParams;
 }

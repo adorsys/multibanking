@@ -14,25 +14,16 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.transaction;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
-/**
- * Created by alexg on 10.11.17.
- */
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class TanChallenge {
+@EqualsAndHashCode(callSuper = false)
+public abstract class AbstractScaPaymentTransaction extends AbstractScaTransaction {
 
-    private String title;
-    private String label;
-    private String format;
-    private String data;
-
+    private String orderId;
+    private String paymentId;
+    private String product;
 }

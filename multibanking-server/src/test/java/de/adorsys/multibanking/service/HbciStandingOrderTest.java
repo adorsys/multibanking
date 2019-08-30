@@ -67,7 +67,7 @@ public class HbciStandingOrderTest {
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI, null);
+            BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
             .findFirst().get();
@@ -84,7 +84,7 @@ public class HbciStandingOrderTest {
         bankAccessEntity.setStoreAnalytics(false);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI, null);
+            BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("3312345678"))
             .findFirst().get();

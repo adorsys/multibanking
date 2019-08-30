@@ -24,7 +24,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ForeignPayment extends AbstractScaTransaction {
+public class ForeignPayment extends AbstractScaPaymentTransaction {
 
     private String dtazv;
 

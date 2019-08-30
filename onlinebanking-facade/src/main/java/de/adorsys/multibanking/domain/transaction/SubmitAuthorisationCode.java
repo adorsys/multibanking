@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain.transaction;
 
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SubmitAuthorizationCodeRequest extends TransactionRequest {
+public class SubmitAuthorisationCode<T extends AbstractScaTransaction> {
 
-    private Object tanSubmit;
-    private String tan;
+    private final TransactionRequest<T> originTransactionRequest;
+
 }

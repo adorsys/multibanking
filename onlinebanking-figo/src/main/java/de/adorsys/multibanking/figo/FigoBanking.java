@@ -2,17 +2,13 @@ package de.adorsys.multibanking.figo;
 
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
-import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
-import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
-import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
-import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
-import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
+import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.domain.transaction.LoadAccounts;
+import de.adorsys.multibanking.domain.transaction.LoadBookings;
+import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -109,12 +105,12 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse requestPaymentAuthorizationCode(TransactionRequest paymentRequest) {
+    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode) {
         return null;
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitPaymentAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest) {
+    public AuthorisationCodeResponse initiatePayment(TransactionRequest paymentRequest) {
         return null;
     }
 
@@ -161,7 +157,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest) {
+    public LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
 
         BankApiUser bankApiUser = loadAccountInformationRequest.getBankApiUser();
         BankAccess bankAccess = loadAccountInformationRequest.getBankAccess();
@@ -175,9 +171,9 @@ public class FigoBanking implements OnlineBankingService {
                 bankAccess.getBankCode(),
                 "de",
                 createCredentials(
-                    loadAccountInformationRequest.getCredentials().getCustomerId(),
-                    loadAccountInformationRequest.getCredentials().getUserId(),
-                    loadAccountInformationRequest.getCredentials().getPin()
+//                    loadAccountInformationRequest.getCredentials().getCustomerId(),
+//                    loadAccountInformationRequest.getCredentials().getUserId(),
+//                    loadAccountInformationRequest.getCredentials().getPin()
                 ),
                 Collections.singletonList("standingOrders"),
                 false,
@@ -260,9 +256,9 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest) {
+    public LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> loadBookingsRequest) {
         BankApiUser bankApiUser = loadBookingsRequest.getBankApiUser();
-        BankAccount bankAccount = loadBookingsRequest.getBankAccount();
+        BankAccount bankAccount = loadBookingsRequest.getTransaction().getPsuAccount();
 
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de",
@@ -283,7 +279,7 @@ public class FigoBanking implements OnlineBankingService {
 
             Status status = waitForFinish(session, response.getTaskToken());
             if (status == Status.PIN) {
-                submitPin(response.getTaskToken(), loadBookingsRequest.getCredentials().getPin(), session);
+//                submitPin(response.getTaskToken(), loadBookingsRequest.getCredentials().getPin(), session);
             }
 
             List<Booking> bookings = session.getTransactions(bankAccount.getExternalIdMap().get(bankApi()))
@@ -291,18 +287,10 @@ public class FigoBanking implements OnlineBankingService {
                 .map(transaction -> FigoMapping.mapBooking(transaction, bankApi))
                 .collect(Collectors.toList());
 
-            List<StandingOrder> standingOrders =
-                session.getStandingOrders(bankAccount.getExternalIdMap().get(bankApi()))
-                    .stream()
-                    .map(FigoMapping::mapStandingOrder)
-                    .collect(Collectors.toList());
-
             updateTanTransportTypes(loadBookingsRequest.getBankAccess(), session.getAccounts());
 
             return LoadBookingsResponse.builder()
                 .bookings(bookings)
-                .standingOrders(standingOrders)
-                .bankAccountBalance(getBalance(session, bankAccount.getExternalIdMap().get(bankApi())))
                 .build();
 
         } catch (IOException | FigoException | InterruptedException e) {

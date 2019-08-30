@@ -42,6 +42,7 @@ public class Booking {
     private String usage;
     private String addkey;
     private boolean sepa;
+    private boolean camt;
     private boolean standingOrder;
     private String creditorId;
     private String mandateReference;

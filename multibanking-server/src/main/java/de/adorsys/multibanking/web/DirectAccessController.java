@@ -2,8 +2,8 @@ package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
-import de.adorsys.multibanking.exception.MissingConsentAuthorisationException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
@@ -51,7 +51,6 @@ public class DirectAccessController {
     private final BalancesMapper balancesMapper;
     private final BankAccessMapper bankAccessMapper;
     private final BankAccountMapper bankAccountMapper;
-    private final CredentialsMapper credentialsMapper;
     private final BankAccountService bankAccountService;
     private final BookingService bookingService;
     private final BankAccessRepositoryIf bankAccessRepository;
@@ -73,7 +72,7 @@ public class DirectAccessController {
             selectScaMethodForConsent(loadAccountsRequest.getBankAccess().getConsentId(),
                 loadAccountsRequest.getScaMethodId());
             return doLoadBankAccounts(loadAccountsRequest, bankApi, SCAMETHODSELECTED);
-        } catch (MissingConsentAuthorisationException e) {
+        } catch (TransactionAuthorisationRequiredException e) {
             log.debug("process finished < return challenge");
             return createChallengeResponse(e.getResponse(), e.getConsentId(), e.getAuthorisationId());
         }
@@ -98,7 +97,7 @@ public class DirectAccessController {
             selectScaMethodForConsent(loadBookingsRequest.getBankAccess().getConsentId(),
                 loadBookingsRequest.getScaMethodId());
             return doLoadBookings(loadBookingsRequest, bankApi, SCAMETHODSELECTED);
-        } catch (MissingConsentAuthorisationException e) {
+        } catch (TransactionAuthorisationRequiredException e) {
             log.debug("process finished < return challenge");
             return createChallengeResponse(e.getResponse(), e.getConsentId(), e.getAuthorisationId());
         }
@@ -119,10 +118,8 @@ public class DirectAccessController {
         BankAccessEntity bankAccessEntity = prepareBankAccess(loadAccountsRequest.getBankAccess(), userEntity);
 
         log.debug("load bank account list from bank");
-        Credentials credentials = credentialsMapper.toCredentials(loadAccountsRequest.getCredentials());
-
         List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            userEntity, bankApiMapper.toBankApi(bankApi), scaStatus, credentials);
+            userEntity, bankApiMapper.toBankApi(bankApi), scaStatus);
 
         //persisting externalId for further request
         log.debug("save bank account list to db");
@@ -143,8 +140,7 @@ public class DirectAccessController {
 
         log.debug("load booking list from bank");
         List<BookingEntity> bookingEntities = bookingService.syncBookings(scaStatus, bankAccessEntity,
-            bankAccountEntity, bankApiMapper.toBankApi(bankApi),
-            credentialsMapper.toCredentials(loadBookingsRequest.getCredentials()));
+            bankAccountEntity, bankApiMapper.toBankApi(bankApi));
 
         return createLoadBookingsResponse(bankAccountEntity, bookingEntities);
     }
@@ -229,7 +225,6 @@ public class DirectAccessController {
             authorisationId)).withSelfRel());
         links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
             authorisationId, null)).withRel("transactionAuthorisation"));
-        response.setScaStatus(SCAMETHODSELECTED);
         return ResponseEntity.ok(new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links));
     }
 
@@ -244,8 +239,6 @@ public class DirectAccessController {
         @NotNull
         @ApiModelProperty("Bankaccess properties")
         BankAccessTO bankAccess;
-        @ApiModelProperty("Conditional: bank credentials, mandated if HBCI bankapi is used")
-        CredentialsTO credentials;
     }
 
     @Data
@@ -271,8 +264,6 @@ public class DirectAccessController {
         String accountId;
         @ApiModelProperty("Conditional: bankaccess properties, mandated if bankaccess was not created")
         BankAccessTO bankAccess;
-        @ApiModelProperty("Conditional: bank credentials, mandated if HBCI bankapi is used")
-        CredentialsTO credentials;
     }
 
     @Data

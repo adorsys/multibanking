@@ -1,6 +1,9 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.BankAccountEntity;
+import de.adorsys.multibanking.domain.BankApiUser;
+import de.adorsys.multibanking.domain.UserEntity;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
@@ -32,14 +35,14 @@ public class BankAccessService {
     private final ConsentRepositoryIf consentRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
-    public BankAccessEntity createBankAccess(BankAccessEntity bankAccess, Credentials credentials) {
+    public BankAccessEntity createBankAccess(BankAccessEntity bankAccess) {
         userService.checkUserExists(bankAccess.getUserId());
 
         if (StringUtils.isNoneBlank(bankAccess.getIban())) {
             bankAccess.setBankCode(Iban.valueOf(bankAccess.getIban()).getBankCode());
         }
 
-        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null, credentials);
+        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null);
 
         if (bankAccounts.isEmpty()) {
             throw new InvalidBankAccessException(bankAccess.getBankCode());
@@ -102,7 +105,8 @@ public class BankAccessService {
             //remove remote bank api user
             if (bankingService.userRegistrationRequired()) {
                 UserEntity userEntity =
-                    userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(UserEntity.class, userId));
+                    userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(UserEntity.class,
+                        userId));
                 BankApiUser bankApiUser =
                     userEntity.getApiUser().stream().filter(apiUser -> apiUser.getBankApi() == bankApi).findFirst().orElseThrow(() -> new ResourceNotFoundException(BankApiUser.class, bankApi.toString()));
                 bankingService.removeBankAccount(bankAccountEntity, bankApiUser);

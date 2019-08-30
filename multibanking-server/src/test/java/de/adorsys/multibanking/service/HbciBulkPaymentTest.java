@@ -60,7 +60,7 @@ public class HbciBulkPaymentTest {
     }
 
     @Test
-    public void testPayment() throws Exception {
+    public void testPayment() {
 
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
             System.getProperty("blz"));
@@ -68,7 +68,7 @@ public class HbciBulkPaymentTest {
         bankAccessEntity.setStoreAnalytics(true);
 
         List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
-            BankApi.HBCI, null);
+            BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
             .findFirst().get();
@@ -84,14 +84,11 @@ public class HbciBulkPaymentTest {
 
         bankAccessEntity.getTanTransportTypes().get(BankApi.HBCI).forEach(tanTransportType -> log.info(tanTransportType.toString()));
 
-        TanTransportType tanTransportType = bankAccessEntity.getTanTransportTypes().get(BankApi.HBCI).get(5);
-
         BulkPayment bulkPayment = new BulkPayment();
         bulkPayment.setPayments(Collections.singletonList(payment));
         bulkPayment.setPsuAccount(bankAccountEntitity);
 
-        BulkPaymentEntity paymentEntity = paymentService.createBulkPayment(bankAccessEntity,
-            tanTransportType, null, bulkPayment);
+        BulkPaymentEntity paymentEntity = paymentService.createBulkPayment(bankAccessEntity, null, bulkPayment);
 
         String tan = "";
         paymentService.submitBulkPayment(paymentEntity, bankAccessEntity, null, tan);

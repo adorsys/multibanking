@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.domain.request;
 
+import de.adorsys.multibanking.domain.Credentials;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,4 +24,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 public class UpdatePsuAuthenticationRequest extends AbstractStrongCustomerAuthorisationRequest {
 
+    private Credentials credentials;
 }

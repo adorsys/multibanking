@@ -3,14 +3,12 @@ package de.adorsys.multibanking.domain.spi;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankApiUser;
-import de.adorsys.multibanking.domain.request.LoadAccountInformationRequest;
-import de.adorsys.multibanking.domain.request.LoadBookingsRequest;
-import de.adorsys.multibanking.domain.request.SubmitAuthorizationCodeRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
+import de.adorsys.multibanking.domain.transaction.*;
 
 public interface OnlineBankingService {
 
@@ -24,19 +22,19 @@ public interface OnlineBankingService {
 
     void removeUser(BankApiUser bankApiUser);
 
-    LoadAccountInformationResponse loadBankAccounts(LoadAccountInformationRequest loadAccountInformationRequest);
+    LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest);
 
     void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
 
-    LoadBookingsResponse loadBookings(LoadBookingsRequest loadBookingsRequest);
+    LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> loadBookingsRequest);
 
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
 
-    AuthorisationCodeResponse requestPaymentAuthorizationCode(TransactionRequest paymentRequest);
+    AuthorisationCodeResponse initiatePayment(TransactionRequest<AbstractScaPaymentTransaction> paymentRequest);
 
-    SubmitAuthorizationCodeResponse submitPaymentAuthorizationCode(SubmitAuthorizationCodeRequest submitPaymentRequest);
+    SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode);
 
     StrongCustomerAuthorisable getStrongCustomerAuthorisation();
 }

@@ -17,7 +17,7 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import lombok.RequiredArgsConstructor;
@@ -35,14 +35,14 @@ import java.util.List;
  * Only for future payment (GVTermUebSEPA)
  */
 @RequiredArgsConstructor
-public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<FutureSinglePayment, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<FutureSinglePayment> transactionRequest;
     private String jobName;
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
-        FutureSinglePayment singlePayment = (FutureSinglePayment) transactionRequest.getTransaction();
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+        FutureSinglePayment singlePayment = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);
 
@@ -67,16 +67,21 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<AuthorisationCo
 
         sepadelgv.verifyConstraints();
 
-        return Collections.singletonList(sepadelgv);
+        return sepadelgv;
     }
 
     @Override
-    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        return response;
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    EmptyResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+        return new EmptyResponse();
+    }
+
+    @Override
+    TransactionRequest<FutureSinglePayment> getTransactionRequest() {
         return transactionRequest;
     }
 

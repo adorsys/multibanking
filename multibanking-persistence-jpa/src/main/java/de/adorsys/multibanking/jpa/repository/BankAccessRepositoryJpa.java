@@ -23,5 +23,4 @@ public interface BankAccessRepositoryJpa extends JpaRepository<BankAccessJpaEnti
     @Query(value = "SELECT bankCode FROM #{#entityName} a WHERE a.id=:id")
     String getBankCode(@Param("id") Long id);
 
-    Optional<BankAccessJpaEntity> findByConsentId(String consentId);
 }

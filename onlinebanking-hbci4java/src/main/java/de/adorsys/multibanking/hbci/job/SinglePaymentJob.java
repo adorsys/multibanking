@@ -17,7 +17,7 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
+import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
@@ -36,13 +36,13 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class SinglePaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> {
+public class SinglePaymentJob extends ScaRequiredJob<SinglePayment, EmptyResponse> {
 
-    private final TransactionRequest transactionRequest;
+    private final TransactionRequest<SinglePayment> transactionRequest;
 
     @Override
-    public List<AbstractHBCIJob> createHbciJobs(PinTanPassport passport) {
-        SinglePayment singlePayment = (SinglePayment) transactionRequest.getTransaction();
+    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+        SinglePayment singlePayment = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);
 
@@ -70,16 +70,21 @@ public class SinglePaymentJob extends ScaRequiredJob<AuthorisationCodeResponse> 
         }
         sepagv.verifyConstraints();
 
-        return Collections.singletonList(sepagv);
+        return sepagv;
     }
 
     @Override
-    AuthorisationCodeResponse createJobResponse(PinTanPassport passport, AuthorisationCodeResponse response) {
-        return response;
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
     }
 
     @Override
-    TransactionRequest getTransactionRequest() {
+    EmptyResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+        return new EmptyResponse();
+    }
+
+    @Override
+    TransactionRequest<SinglePayment> getTransactionRequest() {
         return transactionRequest;
     }
 

@@ -1,7 +1,6 @@
 package de.adorsys.multibanking.hbci;
 
 import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.domain.ScaApproach;
 import de.adorsys.multibanking.domain.request.AuthenticatePsuRequest;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
@@ -11,7 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
-interface HbciMapper {
+interface HbciScaMapper {
 
     @Mapping(target = "consentId", expression = "java( java.util.UUID.randomUUID().toString() )")
     @Mapping(target = "authorisationId", expression = "java( java.util.UUID.randomUUID().toString() )")
@@ -30,4 +29,5 @@ interface HbciMapper {
     @Mapping(target = "paymentProduct", ignore = true)
     @Mapping(target = "paymentService", ignore = true)
     AuthenticatePsuRequest toAuthenticatePsuRequest(UpdatePsuAuthenticationRequest updatePsuAuthentication);
+
 }

@@ -15,13 +15,12 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Document
 @CompoundIndexes({
-        @CompoundIndex(name = "bank_index", def = "{'bankCode': 1}")
+    @CompoundIndex(name = "bank_index", def = "{'bankCode': 1}")
 })
 public class BankMongoEntity extends Bank {
 
     @Id
     private String id;
-    private String bankApiBankCode;
 
     @Indexed
     private List<String> searchIndex;

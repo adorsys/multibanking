@@ -23,9 +23,6 @@ import lombok.Data;
 public abstract class AbstractScaTransaction {
 
     private BankAccount psuAccount;
-    private String orderId;
-    private String paymentId;
-    private String product;
 
     public abstract TransactionType getTransactionType();
 

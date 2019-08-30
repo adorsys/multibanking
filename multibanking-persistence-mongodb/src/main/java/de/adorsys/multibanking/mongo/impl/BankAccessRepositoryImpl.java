@@ -28,13 +28,13 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     @Override
     public Optional<BankAccessEntity> findByUserIdAndId(String userId, String id) {
         return bankAccessRepository.findByUserIdAndId(userId, id)
-                .map(entityMapper::mapToBankAccessEntity);
+            .map(entityMapper::mapToBankAccessEntity);
     }
 
     @Override
     public Optional<BankAccessEntity> findOne(String id) {
         return bankAccessRepository.findById(id)
-                .map(entityMapper::mapToBankAccessEntity);
+            .map(entityMapper::mapToBankAccessEntity);
     }
 
     @Override
@@ -43,14 +43,9 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     }
 
     @Override
-    public Optional<BankAccessEntity> findByConsentId(String consentId) {
-        return bankAccessRepository.findByConsentId(consentId)
-            .map(entityMapper::mapToBankAccessEntity);
-    }
-
-    @Override
     public void save(BankAccessEntity bankAccess) {
-        BankAccessMongoEntity bankAccessMongoEntity = bankAccessRepository.save(entityMapper.mapToBankAccessMongoEntity(bankAccess));
+        BankAccessMongoEntity bankAccessMongoEntity =
+            bankAccessRepository.save(entityMapper.mapToBankAccessMongoEntity(bankAccess));
         bankAccess.setId(bankAccessMongoEntity.getId());
     }
 
@@ -60,8 +55,8 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
         query.fields().include("bankCode");
 
         return Optional.ofNullable(mongoTemplate.findOne(query, BankAccessMongoEntity.class))
-                .map(BankAccess::getBankCode)
-                .orElse(null);
+            .map(BankAccess::getBankCode)
+            .orElse(null);
     }
 
     @Override

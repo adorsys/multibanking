@@ -14,19 +14,35 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.hbci.exception;
+package de.adorsys.multibanking.domain.transaction;
 
-import de.adorsys.multibanking.domain.TanTransportType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
 
-import java.util.List;
+import java.time.LocalDate;
 
-@RequiredArgsConstructor
+import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_TRANSACTIONS;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class HbciAuthorisationRequiredException extends RuntimeException {
+public class LoadBookings extends AbstractScaTransaction {
 
-    private final List<TanTransportType> tanTransportTypes;
+    private LoadBookings.RawResponseType rawResponseType;
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
+    private boolean withBalance;
+
+    @Override
+    public TransactionType getTransactionType() {
+        return LOAD_TRANSACTIONS;
+    }
+
+    @Override
+    public String getRawData() {
+        return null;
+    }
+
+    public enum RawResponseType {
+        CAMT, MT940
+    }
 }
