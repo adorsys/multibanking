@@ -463,9 +463,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             @Override
             public void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus,
                                         Object bankApiConsentData) {
-                HBCIConsent hbciConsent = Optional.ofNullable(bankApiConsentData)
-                    .map(o -> (HBCIConsent) o)
-                    .orElseThrow(() -> new MultibankingException(MultibankingError.NO_CONSENT));
+                HBCIConsent hbciConsent = (HBCIConsent) bankApiConsentData;
 
                 if (hbciConsent.getStatus() != expectedConsentStatus) {
                     throw new MultibankingException(MultibankingError.INVALID_CONSENT_STATUS);

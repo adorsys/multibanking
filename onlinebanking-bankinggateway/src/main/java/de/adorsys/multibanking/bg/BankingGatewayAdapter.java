@@ -363,22 +363,24 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private MultibankingException handeAisApiException(ApiException e) {
         switch (e.getCode()) {
-            case 400:
             case 401:
+                return handleBankingGatewayError(e, INVALID_PIN);
             case 404:
+                return handleBankingGatewayError(e, RESOURCE_NOT_FOUND);
+            case 400:
             case 500:
-                return handleBankingGatewayError(e);
+                return handleBankingGatewayError(e, BANKING_GATEWAY_ERROR);
             case 429:
-                return new MultibankingException(INVALID_CONSENT, e.getCode(), "consent access exceeded");
+                return new MultibankingException(INVALID_CONSENT, 429, "consent access exceeded");
             default:
                 throw new MultibankingException(BANKING_GATEWAY_ERROR, 500, e.getMessage());
         }
     }
 
-    private MultibankingException handleBankingGatewayError(ApiException e) {
+    private MultibankingException handleBankingGatewayError(ApiException e, MultibankingError multibankingError) {
         try {
             MessagesTO messagesTO = objectMapper.readValue(e.getResponseBody(), MessagesTO.class);
-            return new MultibankingException(BANKING_GATEWAY_ERROR, e.getCode(),
+            return new MultibankingException(multibankingError, e.getCode(),
                 bankingGatewayMapper.toMessages(messagesTO.getMessageList()));
         } catch (Exception e2) {
             return new MultibankingException(BANKING_GATEWAY_ERROR, 500, e.getMessage());
@@ -386,7 +388,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     public static class CustomConversionService extends DefaultConversionService {
-
         CustomConversionService() {
             addConverter(BookingStatusTO.class, String.class, BookingStatusTO::toString);
             addConverter(PaymentProductTO.class, String.class, PaymentProductTO::toString);

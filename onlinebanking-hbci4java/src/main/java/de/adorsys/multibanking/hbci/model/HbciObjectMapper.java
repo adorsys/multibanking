@@ -162,6 +162,7 @@ public interface HbciObjectMapper {
     @Mapping(target = "amount", source = "value.bigDecimalValue")
     @Mapping(target = "currency", source = "value.curr")
     @Mapping(target = "reversal", source = "storno")
+    @Mapping(target = "transactionCode", source = "purposecode")
     @Mapping(target = "balance", source = "saldo.value.bigDecimalValue")
     @Mapping(target = "externalId", expression = "java(\"B-\" + line.valuta.getTime() + \"_\" + line.value" +
         ".getLongValue() + \"_\" + line.saldo.value.getLongValue())")
