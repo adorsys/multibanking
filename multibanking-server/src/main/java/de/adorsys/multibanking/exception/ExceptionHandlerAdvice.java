@@ -260,7 +260,7 @@ public class ExceptionHandlerAdvice {
             log.warn("Exception {} from Controller: {}", throwable.getClass(),
                 NestedExceptionUtils.buildMessage(throwable.getMessage(), throwable.getCause()));
         } else {
-            log.error("Exception {} from Controller: {}", throwable);
+            log.error("Exception {} from Controller: {}", throwable.getClass(), throwable);
         }
 
         if (messages == null) {

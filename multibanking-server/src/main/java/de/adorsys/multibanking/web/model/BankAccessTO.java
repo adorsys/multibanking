@@ -15,7 +15,7 @@ public class BankAccessTO {
     @ApiModelProperty(value = "Internal bank access id", readOnly = true, accessMode =
         ApiModelProperty.AccessMode.READ_ONLY)
     private String id;
-    @ApiModelProperty(value = "PSD2 consent id", readOnly = true, accessMode = ApiModelProperty.AccessMode.READ_ONLY)
+    @ApiModelProperty(value = "PSD2 consent id", required = true)
     private String consentId;
 
     @NotBlank

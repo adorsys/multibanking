@@ -12,6 +12,7 @@ import java.util.List;
 public class ConsentTO {
 
     @NotNull
+    @ApiModelProperty(value = "account iban", required = true)
     private String psuAccountIban;
     @ApiModelProperty("URI of the TPP, where the transaction flow shall be redirected to after a Redirect.\n" +
         "        \n" +

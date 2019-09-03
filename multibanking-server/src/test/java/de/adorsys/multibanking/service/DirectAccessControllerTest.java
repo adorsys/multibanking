@@ -20,14 +20,7 @@ import de.adorsys.multibanking.hbci.model.HBCIConsent;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.DirectAccessController;
-import de.adorsys.multibanking.web.model.AccountReferenceTO;
-import de.adorsys.multibanking.web.model.BankAccessTO;
-import de.adorsys.multibanking.web.model.ConsentTO;
-import de.adorsys.multibanking.web.model.CredentialsTO;
-import de.adorsys.multibanking.web.model.ScaStatusTO;
-import de.adorsys.multibanking.web.model.SelectPsuAuthenticationMethodRequestTO;
-import de.adorsys.multibanking.web.model.TransactionAuthorisationRequestTO;
-import de.adorsys.multibanking.web.model.UpdatePsuAuthenticationRequestTO;
+import de.adorsys.multibanking.web.model.*;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.ErrorLoggingFilter;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -55,31 +48,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT_STATUS;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_SCA_METHOD;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
 import static de.adorsys.multibanking.service.TestUtil.createBooking;
-import static de.adorsys.multibanking.web.model.ScaStatusTO.FINALISED;
-import static de.adorsys.multibanking.web.model.ScaStatusTO.PSUAUTHENTICATED;
-import static de.adorsys.multibanking.web.model.ScaStatusTO.RECEIVED;
-import static de.adorsys.multibanking.web.model.ScaStatusTO.SCAMETHODSELECTED;
+import static de.adorsys.multibanking.web.model.ScaStatusTO.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.mockito.internal.util.MockUtil.isMock;
 
 @RunWith(SpringRunner.class)
@@ -134,17 +112,12 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.authorisationStatus")).isNotBlank();
     }
 
-    @Ignore("currently redirect url is not returned from banking gateway after login")
+    @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
         BankAccessTO bankAccess = createBankAccess();
         prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(),
             true);
-
-        CredentialsTO credentials = CredentialsTO.builder()
-            .customerId("Alex.Geist")
-            .pin("sandbox")
-            .build();
 
         JsonPath jsonPath = request.body(createConsentTO(bankAccess.getIban()))
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
@@ -154,7 +127,22 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.redirectUrl.href")).isNotBlank();
     }
 
-    @Ignore("Error from BankingGateway: status 400 reading AccountInformationClient#updateConsentsPsuData(String,String,Map,ObjectNode)")
+    @Ignore("uses real data - please setup ENV")
+    @Test
+    public void consent_authorisation_bankinggateway_decoupled() {
+        BankAccessTO bankAccess = createBankAccess();
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(),
+            false);
+
+        CredentialsTO credentials = CredentialsTO.builder()
+            .customerId("aguex12")
+            .pin("aguex12")
+            .build();
+
+        consent_authorisation(bankAccess, credentials);
+    }
+
+    @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway() {
         BankAccessTO bankAccess = createBankAccess();
@@ -162,8 +150,8 @@ public class DirectAccessControllerTest {
             false);
 
         CredentialsTO credentials = CredentialsTO.builder()
-            .customerId("agead3")
-            .pin("agead3")
+            .customerId("aguex10")
+            .pin("aguex10")
             .build();
 
         consent_authorisation(bankAccess, credentials);
@@ -198,7 +186,8 @@ public class DirectAccessControllerTest {
         doReturn(strongCustomerAuthorisable).when(hbci4JavaBanking).getStrongCustomerAuthorisation();
         // unfortunately we can't mock the private method ``
         doAnswer(invocationOnMock -> {
-            List<TanTransportType> fakeList = Arrays.asList(TestUtil.createTanMethod("Method1"), TestUtil.createTanMethod(
+            List<TanTransportType> fakeList = Arrays.asList(TestUtil.createTanMethod("Method1"),
+                TestUtil.createTanMethod(
                 "Method2"));
             UpdatePsuAuthenticationRequest updatePsuAuthentication = invocationOnMock.getArgument(0);
             HBCIConsent hbciConsent = (HBCIConsent) updatePsuAuthentication.getBankApiConsentData();
@@ -304,33 +293,38 @@ public class DirectAccessControllerTest {
             //response contains bookings -> sca not needed
             return;
         }
-        assertThat(jsonPath.getString("scaApproach")).as("sca approach type should not be null").isNotEmpty();
 
-        //5. send tan
-        TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
-        transactionAuthorisationRequestTO.setScaAuthenticationData("agead3");
+        String scaApproach = jsonPath.getString("scaApproach");
+        assertThat(scaApproach).as("sca approach type should not be null").isNotEmpty();
 
-        jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
-            ".transactionAuthorisation.href"))
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
+        if (ScaApproachTO.valueOf(scaApproach) == ScaApproachTO.EMBEDDED) {
+            //5. send tan
+            TransactionAuthorisationRequestTO transactionAuthorisationRequestTO =
+                new TransactionAuthorisationRequestTO();
+            transactionAuthorisationRequestTO.setScaAuthenticationData("agead3");
 
-        assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
+            jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
+                ".transactionAuthorisation.href"))
+                .then().assertThat().statusCode(HttpStatus.OK.value())
+                .and().extract().jsonPath();
 
-        //6. load transactions
-        DirectAccessController.LoadBookingsRequest loadBookingsRequest =
-            new DirectAccessController.LoadBookingsRequest();
-        if (jsonPath.getString("bankAccounts") != null) {
-            loadBookingsRequest.setUserId(jsonPath.getString("bankAccounts[0].userId"));
-            loadBookingsRequest.setAccessId(jsonPath.getString("bankAccounts[0].bankAccessId"));
-            loadBookingsRequest.setAccountId(jsonPath.getString("bankAccounts[0].id"));
+            assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
+
+            //6. load transactions
+            DirectAccessController.LoadBookingsRequest loadBookingsRequest =
+                new DirectAccessController.LoadBookingsRequest();
+            if (jsonPath.getString("bankAccounts") != null) {
+                loadBookingsRequest.setUserId(jsonPath.getString("bankAccounts[0].userId"));
+                loadBookingsRequest.setAccessId(jsonPath.getString("bankAccounts[0].bankAccessId"));
+                loadBookingsRequest.setAccountId(jsonPath.getString("bankAccounts[0].id"));
+            }
+
+            loadBookingsRequest.setBankAccess(bankAccess);
+
+            request.body(loadBookingsRequest).put(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
+                .then().assertThat().statusCode(HttpStatus.OK.value())
+                .and().extract().jsonPath();
         }
-
-        loadBookingsRequest.setBankAccess(bankAccess);
-
-        request.body(loadBookingsRequest).put(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
     }
 
     @Test

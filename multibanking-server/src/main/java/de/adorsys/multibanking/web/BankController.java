@@ -5,6 +5,7 @@ import de.adorsys.multibanking.service.BankService;
 import de.adorsys.multibanking.web.mapper.BankMapper;
 import de.adorsys.multibanking.web.model.BankTO;
 import de.adorsys.smartanalytics.exception.FileUploadException;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import io.swagger.annotations.AuthorizationScope;
@@ -23,6 +24,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Api(tags = "Multibanking banks")
 @RequiredArgsConstructor
 @UserResource
 @RestController

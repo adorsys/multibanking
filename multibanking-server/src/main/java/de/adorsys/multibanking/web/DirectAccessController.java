@@ -231,6 +231,8 @@ public class DirectAccessController {
     @Data
     @EqualsAndHashCode(callSuper = true)
     public static class LoadAccountsChallengeRequest extends LoadAccountsRequest {
+        @NotBlank
+        @ApiModelProperty("Authentication method id")
         String scaMethodId;
     }
 

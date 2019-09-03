@@ -21,6 +21,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.adorsys.multibanking.domain.ScaApproach.EMBEDDED;
 import static de.adorsys.multibanking.domain.ScaApproach.REDIRECT;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
@@ -102,8 +103,10 @@ public class ConsentAuthorisationController {
                     }
                     break;
                 case SCAMETHODSELECTED:
-                    links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
-                        authorisationId, null)).withRel("transactionAuthorisation"));
+                    if (response.getScaApproach() == EMBEDDED) {
+                        links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
+                            authorisationId, null)).withRel("transactionAuthorisation"));
+                    }
                     break;
                 case FINALISED:
                 case FAILED:
