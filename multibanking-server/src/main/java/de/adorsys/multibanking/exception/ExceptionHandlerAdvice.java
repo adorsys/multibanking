@@ -4,6 +4,7 @@ import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.exception.domain.Message;
 import de.adorsys.multibanking.exception.domain.Messages;
 import lombok.extern.slf4j.Slf4j;
+import org.iban4j.InvalidCheckDigitException;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -234,6 +235,18 @@ public class ExceptionHandlerAdvice {
     @ResponseBody
     public ResponseEntity<Messages> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         return handleInternal(ex, null, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler
+    @ResponseBody
+    public ResponseEntity<Messages> handleInvalidCheckDigitException(InvalidCheckDigitException ex) {
+        return handleInternal(ex, Messages.builder()
+            .message(Message.builder()
+                .key("INVALID_IBAN")
+                .field("iban")
+                .severity(ERROR)
+                .build())
+            .build(), HttpStatus.BAD_REQUEST);
     }
 
     private ResponseEntity<Messages> handleInternal(Throwable throwable) {
