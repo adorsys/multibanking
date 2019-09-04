@@ -85,7 +85,7 @@ public class BankAccessService {
         return bankAccessRepository.findByUserIdAndId(userId, accessId).map(bankAccessEntity -> {
             bankAccessRepository.deleteByUserIdAndBankAccessId(userId, accessId);
 
-            deleteConsent(bankAccessEntity);
+            deleteConsent(bankAccessEntity.getConsentId());
 
             List<BankAccountEntity> bankAccounts = bankAccountRepository.deleteByBankAccess(accessId);
             bankAccounts.forEach(bankAccountEntity -> {
@@ -114,9 +114,10 @@ public class BankAccessService {
         });
     }
 
-    private void deleteConsent(BankAccessEntity bankAccessEntity) {
-        Optional.ofNullable(bankAccessEntity.getConsentId())
+    private void deleteConsent(String consentId) {
+        Optional.ofNullable(consentId)
             .map(consentRepository::findById)
+            .filter(Optional::isPresent)
             .map(Optional::get)
             .ifPresent(internalConsent -> {
                 OnlineBankingService bankingService =
@@ -124,6 +125,7 @@ public class BankAccessService {
                 bankingService.getStrongCustomerAuthorisation().revokeConsent(internalConsent.getId());
                 consentRepository.delete(internalConsent);
             });
+
     }
 
 }
