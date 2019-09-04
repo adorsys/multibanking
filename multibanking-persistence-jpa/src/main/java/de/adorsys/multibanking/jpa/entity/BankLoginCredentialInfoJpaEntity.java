@@ -25,6 +25,7 @@ import javax.persistence.Embeddable;
 public class BankLoginCredentialInfoJpaEntity {
 
     private String label;
+    private String fieldName;
     private boolean masked;
     private boolean optional;
 

@@ -6,6 +6,7 @@ import lombok.Data;
 public class BankLoginCredentialInfoTO {
 
     private String label;
+    private String fieldName;
     private boolean masked;
     private boolean optional;
 

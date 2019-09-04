@@ -364,12 +364,12 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private MultibankingException handeAisApiException(ApiException e) {
         switch (e.getCode()) {
             case 401:
-                return handleBankingGatewayError(e, INVALID_PIN);
+                return toMultibankingException(e, INVALID_PIN);
             case 404:
-                return handleBankingGatewayError(e, RESOURCE_NOT_FOUND);
+                return toMultibankingException(e, RESOURCE_NOT_FOUND);
             case 400:
             case 500:
-                return handleBankingGatewayError(e, BANKING_GATEWAY_ERROR);
+                return toMultibankingException(e, BANKING_GATEWAY_ERROR);
             case 429:
                 return new MultibankingException(INVALID_CONSENT, 429, "consent access exceeded");
             default:
@@ -377,7 +377,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         }
     }
 
-    private MultibankingException handleBankingGatewayError(ApiException e, MultibankingError multibankingError) {
+    private MultibankingException toMultibankingException(ApiException e, MultibankingError multibankingError) {
         try {
             MessagesTO messagesTO = objectMapper.readValue(e.getResponseBody(), MessagesTO.class);
             return new MultibankingException(multibankingError, e.getCode(),

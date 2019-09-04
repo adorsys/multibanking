@@ -117,6 +117,11 @@ public class ConsentService {
         throw new ResourceNotFoundException(ConsentTO.class, consentId);
     }
 
+    public ConsentEntity getInternalConsent(String consentId) {
+        return consentRepository.findById(consentId)
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
+    }
+
     public Consent getConsent(String consentId) {
         ConsentEntity internalConsent = consentRepository.findById(consentId)
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
@@ -166,7 +171,8 @@ public class ConsentService {
                 case INVALID_CONSENT_STATUS:
                     if (expectedConsentStatus == ScaStatus.FINALISED) {
                         // TODO don't know where to get UpdateAuthResponse
-                        throw new TransactionAuthorisationRequiredException(null, internalConsent.getId(), internalConsent.getAuthorisationId());
+                        throw new TransactionAuthorisationRequiredException(null, internalConsent.getId(),
+                            internalConsent.getAuthorisationId());
                     } else if (expectedConsentStatus == ScaStatus.SCAMETHODSELECTED) {
                         throw new MissingConsentAuthorisationSelectionException();
                     }

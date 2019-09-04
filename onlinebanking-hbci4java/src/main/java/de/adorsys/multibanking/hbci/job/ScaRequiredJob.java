@@ -111,7 +111,6 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         } else {
             return hktanProcess1(dialog, hbciTwoStepMechanism, hbciTanSubmit, hbciJob);
         }
-
     }
 
     private void updateTanSubmit(HbciTanSubmit hbciTanSubmit, HBCIDialog dialog, AbstractHBCIJob scaJob) {
@@ -124,14 +123,16 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         hbciTanSubmit.setDialogId(dialog.getDialogID());
         hbciTanSubmit.setMsgNum(dialog.getMsgnum());
         hbciTanSubmit.setTwoStepMechanism(getUserTanTransportType(dialog));
-        try {
-            hbciTanSubmit.setLowLevelParams(new ObjectMapper().writeValueAsString(scaJob.getLowlevelParams()));
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            throw new MultibankingException(INTERNAL_ERROR, 500, e.getMessage());
-        }
+
         Optional.ofNullable(scaJob)
             .ifPresent(hbciJob -> {
+                try {
+                    hbciTanSubmit.setLowLevelParams(new ObjectMapper().writeValueAsString(scaJob.getLowlevelParams()));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new MultibankingException(INTERNAL_ERROR, 500, e.getMessage());
+                }
+
                 Optional.ofNullable(hbciJob.getPainVersion())
                     .ifPresent(painVersion -> hbciTanSubmit.setPainVersion(painVersion.getURN()));
                 hbciTanSubmit.setOriginLowLevelName(hbciJob.getJobName());
@@ -198,9 +199,9 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         hktan.setParam("orderaccount", getPsuKonto(dialog.getPassport()));
-        hktan.setParam("ordersegcode", Optional.ofNullable(hbciJob)
+        Optional.ofNullable(hbciJob)
             .map(AbstractHBCIJob::getHBCICode)
-            .orElse("HKIDN"));
+            .ifPresent(hbciCode -> hktan.setParam("ordersegcode", hbciCode));
 
         Optional<HBCIMessage> messages = Optional.ofNullable(hbciJob)
             .map(dialog::addTask);

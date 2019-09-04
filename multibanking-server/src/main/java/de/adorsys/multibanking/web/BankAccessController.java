@@ -44,22 +44,6 @@ public class BankAccessController {
     private final Principal principal;
 
     @ApiOperation(
-        value = "Read bank accesses",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
-    @GetMapping
-    public Resources<Resource<BankAccessTO>> getBankAccesses() {
-        if (!userRepository.exists(principal.getName())) {
-            return new Resources<>(Collections.emptyList());
-        }
-
-        List<BankAccessEntity> accessEntities = bankAccessRepository.findByUserId(principal.getName());
-        return new Resources<>(mapToResources(accessEntities));
-    }
-
-    @ApiOperation(
         value = "Create new bank accesses",
         authorizations = {
             @Authorization(value = "multibanking_auth", scopes = {
@@ -75,6 +59,22 @@ public class BankAccessController {
         headers.setLocation(linkTo(methodOn(BankAccessController.class).getBankAccess(persistedBankAccess.getId())).toUri());
 
         return new ResponseEntity<>(mapToResource(persistedBankAccess), headers, HttpStatus.CREATED);
+    }
+
+    @ApiOperation(
+        value = "Read bank accesses",
+        authorizations = {
+            @Authorization(value = "multibanking_auth", scopes = {
+                @AuthorizationScope(scope = "openid", description = "")
+            })})
+    @GetMapping
+    public Resources<Resource<BankAccessTO>> getBankAccesses() {
+        if (!userRepository.exists(principal.getName())) {
+            return new Resources<>(Collections.emptyList());
+        }
+
+        List<BankAccessEntity> accessEntities = bankAccessRepository.findByUserId(principal.getName());
+        return new Resources<>(mapToResources(accessEntities));
     }
 
     @ApiOperation(

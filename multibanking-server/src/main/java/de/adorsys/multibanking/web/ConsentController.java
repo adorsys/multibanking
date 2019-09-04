@@ -13,6 +13,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.iban4j.Iban;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -57,7 +58,8 @@ public class ConsentController {
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(linkTo(methodOn(ConsentController.class).getConsent(createConsentResponse.getConsentId())).toUri());
 
-        return new ResponseEntity<>(mapToResource(createConsentResponse), headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(mapToResource(createConsentResponse,
+            Iban.valueOf(consentInput.getPsuAccountIban()).getBankCode()), headers, HttpStatus.CREATED);
     }
 
     @ApiOperation(value = "Read user consents")
@@ -96,11 +98,13 @@ public class ConsentController {
             linkTo(methodOn(ConsentController.class).getConsent(consent.getConsentId())).withSelfRel());
     }
 
-    private Resource<CreateConsentResponseTO> mapToResource(CreateConsentResponse createConsentResponse) {
+    private Resource<CreateConsentResponseTO> mapToResource(CreateConsentResponse createConsentResponse,
+                                                            String bankCode) {
         String consentId = createConsentResponse.getConsentId();
         String authorisationId = createConsentResponse.getAuthorisationId();
 
         List<Link> links = new ArrayList<>();
+        links.add(linkTo(methodOn(BankController.class).getBank(bankCode)).withRel("bank"));
         links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId,
             authorisationId)).withRel("authorisationStatus"));
 
