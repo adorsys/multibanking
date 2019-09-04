@@ -124,7 +124,16 @@ public class DirectAccessControllerTest {
             .then().assertThat().statusCode(HttpStatus.CREATED.value())
             .and().extract().jsonPath();
 
-        assertThat(jsonPath.getString("_links.redirectUrl.href")).isNotBlank();
+        String statusLink = jsonPath.getString("_links.authorisationStatus.href");
+
+        System.out.println(jsonPath.getString("_links.redirectUrl.href"));
+
+        //enter breakpoint and use link for authorisation
+        jsonPath = request.get(statusLink)
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("scaStatus")).isIn(FINALISED.toString());
     }
 
     @Ignore("uses real data - please setup ENV")
@@ -139,7 +148,15 @@ public class DirectAccessControllerTest {
             .pin("aguex12")
             .build();
 
-        consent_authorisation(bankAccess, credentials);
+        JsonPath jsonPath = consent_authorisation(bankAccess, credentials);
+        System.out.println(jsonPath.getString("psuMessage"));
+
+        //enter breakpoint and use link for authorisation
+        jsonPath = request.get(jsonPath.getString("_links.self.href"))
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("scaStatus")).isIn(FINALISED.toString());
     }
 
     @Ignore("uses real data - please setup ENV")
@@ -188,7 +205,7 @@ public class DirectAccessControllerTest {
         doAnswer(invocationOnMock -> {
             List<TanTransportType> fakeList = Arrays.asList(TestUtil.createTanMethod("Method1"),
                 TestUtil.createTanMethod(
-                "Method2"));
+                    "Method2"));
             UpdatePsuAuthenticationRequest updatePsuAuthentication = invocationOnMock.getArgument(0);
             HBCIConsent hbciConsent = (HBCIConsent) updatePsuAuthentication.getBankApiConsentData();
             hbciConsent.setStatus(ScaStatus.PSUAUTHENTICATED);
@@ -227,7 +244,7 @@ public class DirectAccessControllerTest {
         consent_authorisation(access, credentials);
     }
 
-    public void consent_authorisation(BankAccessTO bankAccess, CredentialsTO credentialsTO) {
+    public JsonPath consent_authorisation(BankAccessTO bankAccess, CredentialsTO credentialsTO) {
 
         //1. create consent
         JsonPath jsonPath = request.body(createConsentTO(bankAccess.getIban()))
@@ -291,11 +308,15 @@ public class DirectAccessControllerTest {
 
         if (jsonPath.get("bookings") != null) {
             //response contains bookings -> sca not needed
-            return;
+            return null;
         }
 
         String scaApproach = jsonPath.getString("scaApproach");
         assertThat(scaApproach).as("sca approach type should not be null").isNotEmpty();
+
+        if (ScaApproachTO.valueOf(scaApproach) == ScaApproachTO.DECOUPLED) {
+            return jsonPath;
+        }
 
         if (ScaApproachTO.valueOf(scaApproach) == ScaApproachTO.EMBEDDED) {
             //5. send tan
@@ -325,6 +346,7 @@ public class DirectAccessControllerTest {
                 .then().assertThat().statusCode(HttpStatus.OK.value())
                 .and().extract().jsonPath();
         }
+        return null;
     }
 
     @Test
@@ -467,7 +489,7 @@ public class DirectAccessControllerTest {
 
     private BankAccessTO createBankAccess() {
         BankAccessTO bankAccessTO = new BankAccessTO();
-        bankAccessTO.setIban(System.getProperty("iban", "DE46900000011234567802"));
+        bankAccessTO.setIban(System.getProperty("iban", "DE60900000020000000001"));
         bankAccessTO.setConsentId(UUID.randomUUID().toString());
         return bankAccessTO;
     }
