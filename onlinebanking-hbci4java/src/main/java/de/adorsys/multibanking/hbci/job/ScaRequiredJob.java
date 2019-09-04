@@ -238,7 +238,14 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
                 hbciTwoStepMechanism.setMedium(getConsent().getSelectedMethod().getMedium());
                 return hbciTwoStepMechanism;
             })
-            .orElseGet(() -> dialog.getPassport().getBankTwostepMechanisms().get(dialog.getPassport().getUserTwostepMechanisms().get(0)));
+            .orElseGet(() -> {
+                HBCITwoStepMechanism hbciTwoStepMechanism = new HBCITwoStepMechanism();
+                hbciTwoStepMechanism.setSecfunc("999");
+                hbciTwoStepMechanism.setSegversion(6);
+                hbciTwoStepMechanism.setProcess(2);
+                hbciTwoStepMechanism.setId("999");
+                return hbciTwoStepMechanism;
+            });
     }
 
     private HbciCallback createCallback(HbciCallback hbciCallback, AuthorisationCodeResponse response) {

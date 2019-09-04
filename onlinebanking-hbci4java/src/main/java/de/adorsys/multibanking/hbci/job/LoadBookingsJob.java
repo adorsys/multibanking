@@ -68,11 +68,10 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
 
     @Override
     String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
-        boolean camt = Optional.ofNullable(loadBookingsRequest.getTransaction().getRawResponseType())
-            .map(rawResponseType -> rawResponseType == CAMT)
-            .orElse(false);
-
-        return camt ? "KUmsAllCamt" : "KUmsAll";
+        if (bookingsJob instanceof GVKUmsAllCamt) {
+            return "KUmsAllCamt";
+        }
+        return "KUmsAll";
     }
 
     @Override
@@ -142,7 +141,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
 
     private AbstractHBCIJob createBookingsJobInternal(PinTanPassport passport) {
         LoadBookings.RawResponseType rawResponseType = loadBookingsRequest.getTransaction().getRawResponseType();
-        if (rawResponseType != null && passport.jobSupported(rawResponseType == CAMT ?
+        if (rawResponseType != null && !passport.jobSupported(rawResponseType == CAMT ?
             GVKUmsAllCamt.getLowlevelName() : GVKUmsAll.getLowlevelName())) {
             throw new MultibankingException(BOOKINGS_FORMAT_NOT_SUPPORTED, rawResponseType + " not supported");
         }
