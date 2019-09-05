@@ -86,10 +86,7 @@ public class BankAccountController {
     @ApiResponses({
         @ApiResponse(code = 204, message = "Sync started", response = void.class)})
     @PutMapping("/{accountId}/sync")
-    public ResponseEntity syncBookings(
-        @PathVariable String accessId,
-        @PathVariable String accountId,
-        @RequestBody(required = false) String pin) {
+    public ResponseEntity syncBookings(@PathVariable String accessId, @PathVariable String accountId) {
 
         BankAccessEntity bankAccess = bankAccessRepository.findByUserIdAndId(principal.getName(), accessId)
             .orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accessId));
@@ -116,7 +113,7 @@ public class BankAccountController {
             linkTo(methodOn(BankAccessController.class).getBankAccess(accessId)).withRel("bankAccess"),
             linkTo(methodOn(BankAccountAnalyticsController.class).getAccountAnalytics(accessId,
                 accountEntity.getId())).withRel("analytics"),
-            linkTo(methodOn(BankAccountController.class).syncBookings(accessId, accountEntity.getId(), null)).withRel("sync"),
+            linkTo(methodOn(BankAccountController.class).syncBookings(accessId, accountEntity.getId())).withRel("sync"),
             linkTo(methodOn(BookingController.class).getBookings(accessId, accountEntity.getId(), null, null, null,
                 null)).withRel("bookings"));
     }

@@ -99,10 +99,10 @@ public class DirectAccessControllerTest {
 
     @Test
     public void createConsent_should_return_a_authorisationStatus_link_hbci() {
-        BankAccessTO access = createBankAccess();
-        prepareBank(new Hbci4JavaBanking(true), access.getIban(), false);
+        ConsentTO consentTO = createConsentTO();
+        prepareBank(new Hbci4JavaBanking(true), consentTO.getPsuAccountIban(), false);
 
-        JsonPath jsonPath = request.body(createConsentTO(access.getIban()))
+        JsonPath jsonPath = request.body(consentTO)
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
             .then().assertThat().statusCode(HttpStatus.CREATED.value())
             .and().extract().jsonPath();
@@ -115,11 +115,12 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
-        BankAccessTO bankAccess = createBankAccess();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(),
+        ConsentTO consentTO = createConsentTO();
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+            consentTO.getPsuAccountIban(),
             true);
 
-        JsonPath jsonPath = request.body(createConsentTO(bankAccess.getIban()))
+        JsonPath jsonPath = request.body(createConsentTO())
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
             .then().assertThat().statusCode(HttpStatus.CREATED.value())
             .and().extract().jsonPath();
@@ -139,8 +140,9 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway_decoupled() {
-        BankAccessTO bankAccess = createBankAccess();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(),
+        ConsentTO consentTO = createConsentTO();
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+            consentTO.getPsuAccountIban(),
             false);
 
         CredentialsTO credentials = CredentialsTO.builder()
@@ -148,7 +150,8 @@ public class DirectAccessControllerTest {
             .pin("aguex12")
             .build();
 
-        JsonPath jsonPath = consent_authorisation(bankAccess, credentials);
+        BankAccessTO bankAccess = createBankAccess();
+        JsonPath jsonPath = consent_authorisation(consentTO, bankAccess, credentials);
         System.out.println(jsonPath.getString("psuMessage"));
 
         //enter breakpoint and use link for authorisation
@@ -162,24 +165,26 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway() {
-        BankAccessTO bankAccess = createBankAccess();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl), bankAccess.getIban(),
+        ConsentTO consentTO = createConsentTO();
+
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+            consentTO.getPsuAccountIban(),
             false);
 
         CredentialsTO credentials = CredentialsTO.builder()
-            .customerId("aguex10")
-            .pin("aguex10")
+            .customerId("aguex8")
+            .pin("aguex8")
             .build();
 
-        consent_authorisation(bankAccess, credentials);
+        consent_authorisation(consentTO, createBankAccess(), credentials);
     }
 
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_hbci() {
-        BankAccessTO access = createBankAccess();
+        ConsentTO consentTO = createConsentTO();
         Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
-        prepareBank(hbci4JavaBanking, access.getIban(), null, false);
+        prepareBank(hbci4JavaBanking, consentTO.getPsuAccountIban(), null, false);
 //        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme
 //        .de/hbciTunnel/hbciTransfer.jsp", false);
 
@@ -189,14 +194,15 @@ public class DirectAccessControllerTest {
             .pin(System.getProperty("pin", "pin"))
             .build();
 
-        consent_authorisation(access, credentials);
+        consent_authorisation(consentTO, createBankAccess(), credentials);
     }
 
     @Test
     public void consent_authorisation_hbci_mock() {
-        BankAccessTO access = createBankAccess();
+        ConsentTO consentTO = createConsentTO();
+
         Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(true));
-        prepareBank(hbci4JavaBanking, access.getIban(), false);
+        prepareBank(hbci4JavaBanking, consentTO.getPsuAccountIban(), false);
 
         //mock hbci authenticate "authenticatePsu" that's why we need to use an answer to manipulate the consent
         StrongCustomerAuthorisable strongCustomerAuthorisable = spy(hbci4JavaBanking.getStrongCustomerAuthorisation());
@@ -241,13 +247,12 @@ public class DirectAccessControllerTest {
             .pin(System.getProperty("pin", "pin"))
             .build();
 
-        consent_authorisation(access, credentials);
+        consent_authorisation(consentTO, createBankAccess(), credentials);
     }
 
-    public JsonPath consent_authorisation(BankAccessTO bankAccess, CredentialsTO credentialsTO) {
-
+    public JsonPath consent_authorisation(ConsentTO consent, BankAccessTO bankAccess, CredentialsTO credentialsTO) {
         //1. create consent
-        JsonPath jsonPath = request.body(createConsentTO(bankAccess.getIban()))
+        JsonPath jsonPath = request.body(consent)
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
             .then().assertThat().statusCode(HttpStatus.CREATED.value())
             .and().extract().jsonPath();
@@ -322,7 +327,7 @@ public class DirectAccessControllerTest {
             //5. send tan
             TransactionAuthorisationRequestTO transactionAuthorisationRequestTO =
                 new TransactionAuthorisationRequestTO();
-            transactionAuthorisationRequestTO.setScaAuthenticationData("agead3");
+            transactionAuthorisationRequestTO.setScaAuthenticationData("0000");
 
             jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
                 ".transactionAuthorisation.href"))
@@ -365,12 +370,13 @@ public class DirectAccessControllerTest {
     }
 
     private void verifyApi(MultibankingError error, String messageKey) {
+        ConsentTO consentTO = createConsentTO();
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(bankingGatewayAdapterMock, bankAccess.getIban(), false);
+        prepareBank(bankingGatewayAdapterMock, consentTO.getPsuAccountIban(), false);
 
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
-        doReturn(Optional.of(new ConsentEntity())).when(consentRepository).findById(bankAccess.getConsentId());
+        doReturn(Optional.of(new ConsentEntity(null, null, null, consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
         doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any(), any(), any(), any());
 
         DirectAccessController.LoadAccountsRequest loadAccountsRequest =
@@ -387,10 +393,12 @@ public class DirectAccessControllerTest {
 
     @Test
     public void verifyApiConsentStatusValid() {
+        ConsentTO consentTO = createConsentTO();
         BankAccessTO bankAccess = createBankAccess();
-        prepareBank(bankingGatewayAdapterMock, bankAccess.getIban(), false);
+        prepareBank(bankingGatewayAdapterMock, consentTO.getPsuAccountIban(), false);
         fakeConsentValidation(bankingGatewayAdapterMock);
 
+        doReturn(Optional.of(new ConsentEntity(null, null, null, consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
         when(bankingGatewayAdapterMock.loadBankAccounts(any()))
             .thenReturn(LoadAccountInformationResponse.builder()
                 .bankAccounts(Collections.singletonList(new BankAccount()))
@@ -473,7 +481,9 @@ public class DirectAccessControllerTest {
         }
     }
 
-    private ConsentTO createConsentTO(String iban) {
+    private ConsentTO createConsentTO() {
+        String iban = System.getProperty("iban", "DE60900000020000000001");
+
         ConsentTO consentTO = new ConsentTO();
         consentTO.setAccounts(Collections.singletonList(new AccountReferenceTO(iban, null)));
         consentTO.setBalances(Collections.singletonList(new AccountReferenceTO(iban, null)));
@@ -489,7 +499,6 @@ public class DirectAccessControllerTest {
 
     private BankAccessTO createBankAccess() {
         BankAccessTO bankAccessTO = new BankAccessTO();
-        bankAccessTO.setIban(System.getProperty("iban", "DE60900000020000000001"));
         bankAccessTO.setConsentId(UUID.randomUUID().toString());
         return bankAccessTO;
     }

@@ -11,6 +11,10 @@ import java.util.List;
 @Data
 public class ConsentTO {
 
+    @ApiModelProperty(value = "Internal consent id", readOnly = true, accessMode =
+        ApiModelProperty.AccessMode.READ_ONLY)
+    private String id;
+
     @NotNull
     @ApiModelProperty(value = "account iban", required = true)
     private String psuAccountIban;

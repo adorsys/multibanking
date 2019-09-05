@@ -61,13 +61,12 @@ public class HbciBulkPaymentTest {
 
     @Test
     public void testPayment() {
-
         BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
             System.getProperty("blz"));
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
-        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
+        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(null, bankAccessEntity,
             BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))

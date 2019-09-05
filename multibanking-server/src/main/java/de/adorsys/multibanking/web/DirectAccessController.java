@@ -8,6 +8,7 @@ import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.service.BankAccountService;
+import de.adorsys.multibanking.service.BankService;
 import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.*;
@@ -52,6 +53,7 @@ public class DirectAccessController {
     private final BankAccessMapper bankAccessMapper;
     private final BankAccountMapper bankAccountMapper;
     private final BankAccountService bankAccountService;
+    private final BankService bankService;
     private final BookingService bookingService;
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BankAccountRepositoryIf bankAccountRepository;
@@ -116,9 +118,10 @@ public class DirectAccessController {
                                               BankApiTO bankApi, ScaStatus scaStatus) {
         UserEntity userEntity = createTemporaryUser();
         BankAccessEntity bankAccessEntity = prepareBankAccess(loadAccountsRequest.getBankAccess(), userEntity);
+        BankEntity bankEntity = bankService.findBank(bankAccessEntity.getBankCode());
 
         log.debug("load bank account list from bank");
-        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
+        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankEntity, bankAccessEntity,
             userEntity, bankApiMapper.toBankApi(bankApi), scaStatus);
 
         //persisting externalId for further request
@@ -179,8 +182,10 @@ public class DirectAccessController {
         userEntity = Optional.ofNullable(userEntity).orElseGet(this::createTemporaryUser);
         userRepository.save(userEntity);
 
+        ConsentEntity internalConsent = consentService.getInternalConsent(bankAccess.getConsentId());
+
         //temporary bank access, will be deleted with user
-        BankAccessEntity bankAccessEntity = bankAccessMapper.toBankAccessEntity(bankAccess, userEntity.getId(), true);
+        BankAccessEntity bankAccessEntity = bankAccessMapper.toBankAccessEntity(bankAccess, userEntity.getId(), true, internalConsent.getPsuAccountIban());
         bankAccessEntity.setUserId(userEntity.getId());
         bankAccessRepository.save(bankAccessEntity);
         return bankAccessEntity;

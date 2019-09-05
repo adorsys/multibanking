@@ -162,12 +162,12 @@ public class BookingService extends AccountInformationService {
             }
         }
 
-        //not working with PSD2
-//        if (bankAccess.isStoreBookings()) {
-//            bookingRepository.save(mergedBookings);
+        if (bankAccess.isStoreBookings()) {
+            bookingRepository.save(mergedBookings);
+            //not working with PSD2
 //            saveStandingOrders(bankAccount, response.getStandingOrders());
-//            updateBookingsIndex(bankAccount, mergedBookings);
-//        }
+            updateBookingsIndex(bankAccount, mergedBookings);
+        }
 
         if (bankAccess.isStoreAnonymizedBookings()) {
             anonymizationService.anonymizeAndStoreBookingsAsync(mergedBookings);

@@ -38,6 +38,7 @@ import de.adorsys.xs2a.adapter.service.account.TransactionsReport;
 import de.adorsys.xs2a.adapter.service.ais.AccountInformationService;
 import de.adorsys.xs2a.adapter.service.impl.AccountInformationServiceImpl;
 import feign.Feign;
+import feign.FeignException;
 import feign.Logger;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
@@ -150,34 +151,39 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .withBalance(loadBookings.isWithBalance())
             .bookingStatus(BookingStatusTO.BOOKED.toString()).build();
 
-        GeneralResponse<TransactionsReport> bookingsResponse =
-            getAccountInformationService().getTransactionList(resourceId, requestHeaders, requestParams);
+        try {
 
-        List<Booking> bookings = Optional.ofNullable(bookingsResponse.getResponseBody())
-            .map(TransactionsReport::getTransactions)
-            .map(AccountReport::getBooked)
-            .map(transactions -> bankingGatewayMapper.toBookings(transactions))
-            .orElse(Collections.emptyList());
+            GeneralResponse<TransactionsReport> bookingsResponse =
+                getAccountInformationService().getTransactionList(resourceId, requestHeaders, requestParams);
 
-        BalancesReport balancesReport = new BalancesReport();
-        bookingsResponse.getResponseBody().getBalances().forEach(balance -> {
-            switch (balance.getBalanceType()) {
-                case EXPECTED:
-                    balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
-                    break;
-                case CLOSINGBOOKED:
-                    balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
-                    break;
-                default:
-                    // ignore
-                    break;
-            }
-        });
+            List<Booking> bookings = Optional.ofNullable(bookingsResponse.getResponseBody())
+                .map(TransactionsReport::getTransactions)
+                .map(AccountReport::getBooked)
+                .map(transactions -> bankingGatewayMapper.toBookings(transactions))
+                .orElse(Collections.emptyList());
 
-        return LoadBookingsResponse.builder()
-            .bookings(bookings)
-            .balancesReport(balancesReport)
-            .build();
+            BalancesReport balancesReport = new BalancesReport();
+            bookingsResponse.getResponseBody().getBalances().forEach(balance -> {
+                switch (balance.getBalanceType()) {
+                    case EXPECTED:
+                        balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
+                        break;
+                    case CLOSINGBOOKED:
+                        balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
+                        break;
+                    default:
+                        // ignore
+                        break;
+                }
+            });
+
+            return LoadBookingsResponse.builder()
+                .bookings(bookings)
+                .balancesReport(balancesReport)
+                .build();
+        } catch (FeignException e) {
+            throw handeAisApiException(e);
+        }
     }
 
     private String getAccountResourceId(String iban, RequestHeaders requestHeaders) {
@@ -359,6 +365,13 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         apiClient.setHttpClient(client);
         apiClient.setBasePath(bankingGatewayBaseUrl);
         return apiClient;
+    }
+
+    private MultibankingException handeAisApiException(FeignException e) {
+        if (e.status() == 429) {
+            return new MultibankingException(INVALID_CONSENT, 429, "consent access exceeded");
+        }
+        return new MultibankingException(BANKING_GATEWAY_ERROR, e.status(), e.getMessage());
     }
 
     private MultibankingException handeAisApiException(ApiException e) {

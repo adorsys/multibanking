@@ -68,7 +68,7 @@ public class FigoPaymentTest {
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(false);
 
-        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
+        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(null, bankAccessEntity,
             null);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("12324463"))
