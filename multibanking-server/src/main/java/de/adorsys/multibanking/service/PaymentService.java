@@ -44,7 +44,9 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = new TransactionRequest<>(payment, bankApiUser, bankAccess);
+            TransactionRequest request = new TransactionRequest<>(payment);
+            request.setBankApiUser(bankApiUser);
+            request.setBankAccess(bankAccess);
             request.setBank(bankEntity);
             request.setHbciProduct(finTSProductConfig.getProduct());
             Object tanSubmit = bankingService.initiatePayment(request);
@@ -76,7 +78,9 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = new TransactionRequest<>(payment, bankApiUser, bankAccess);
+            TransactionRequest request = new TransactionRequest<>(payment);
+            request.setBankApiUser(bankApiUser);
+            request.setBankAccess(bankAccess);
             request.setBank(bankEntity);
             request.setHbciProduct(finTSProductConfig.getProduct());
 
@@ -108,7 +112,9 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = new TransactionRequest<>(payment, bankApiUser, bankAccess);
+            TransactionRequest request = new TransactionRequest<>(payment);
+            request.setBankApiUser(bankApiUser);
+            request.setBankAccess(bankAccess);
             request.setBank(bankEntity);
             request.setHbciProduct(finTSProductConfig.getProduct());
 

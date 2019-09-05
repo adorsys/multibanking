@@ -6,6 +6,8 @@ import java.util.Optional;
 
 public interface ConsentRepositoryIf {
 
+    Optional<ConsentEntity> findByRedirectId(String id);
+
     Optional<ConsentEntity> findById(String id);
 
     void save(ConsentEntity consentEntity);

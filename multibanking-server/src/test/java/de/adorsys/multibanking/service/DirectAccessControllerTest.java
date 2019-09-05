@@ -278,52 +278,48 @@ public class DirectAccessControllerTest {
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
-        String scaStatus = jsonPath.getString("scaStatus");
-
-        //4. select authentication method (optional), can be skipped by banks in case of selection not needed
-        if (scaStatus.equals(PSUAUTHENTICATED.toString())) {
-            String selectAuthenticationMethodLink = jsonPath.getString("_links" + ".selectAuthenticationMethod.href");
-            String sceMethodId = jsonPath.getString("scaMethods[0].id");
-
-            //hbci case
-            if (selectAuthenticationMethodLink == null) {
-                DirectAccessController.LoadBookingsChallengeRequest loadBookingsChallengeRequest =
-                    new DirectAccessController.LoadBookingsChallengeRequest();
-
-                loadBookingsChallengeRequest.setScaMethodId(sceMethodId);
-                loadBookingsChallengeRequest.setBankAccess(bankAccess);
-
-                jsonPath = request
-                    .body(loadBookingsChallengeRequest)
-                    .post(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
-                    .then().assertThat().statusCode(HttpStatus.OK.value())
-                    .and().extract().jsonPath();
-            } else {
-                //xs2a case
-                SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
-                    new SelectPsuAuthenticationMethodRequestTO();
-                authenticationMethodRequestTO.setAuthenticationMethodId(sceMethodId);
-
-                jsonPath = request.body(authenticationMethodRequestTO).put(selectAuthenticationMethodLink)
-                    .then().assertThat().statusCode(HttpStatus.OK.value())
-                    .and().extract().jsonPath();
-                assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
-            }
-        }
-
-        if (jsonPath.get("bookings") != null) {
-            //response contains bookings -> sca not needed
-            return null;
-        }
-
-        String scaApproach = jsonPath.getString("scaApproach");
-        assertThat(scaApproach).as("sca approach type should not be null").isNotEmpty();
-
-        if (ScaApproachTO.valueOf(scaApproach) == ScaApproachTO.DECOUPLED) {
+        if (ScaApproachTO.valueOf(jsonPath.getString("scaApproach")) == ScaApproachTO.DECOUPLED) {
             return jsonPath;
         }
 
-        if (ScaApproachTO.valueOf(scaApproach) == ScaApproachTO.EMBEDDED) {
+        //4. select authentication method (optional), can be skipped by banks in case of selection not needed
+        if (jsonPath.getString("scaStatus").equals(PSUAUTHENTICATED.toString())) {
+            String selectAuthenticationMethodLink = jsonPath.getString("_links" + ".selectAuthenticationMethod.href");
+            String sceMethodId = jsonPath.getString("scaMethods[0].id");
+
+            SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
+                new SelectPsuAuthenticationMethodRequestTO();
+            authenticationMethodRequestTO.setAuthenticationMethodId(sceMethodId);
+
+            jsonPath = request.body(authenticationMethodRequestTO).put(selectAuthenticationMethodLink)
+                .then().assertThat().statusCode(HttpStatus.OK.value())
+                .and().extract().jsonPath();
+            assertThat(jsonPath.getString("scaStatus")).isEqualTo(SCAMETHODSELECTED.toString());
+        }
+
+        if (ScaApproachTO.valueOf(jsonPath.getString("scaApproach")) == ScaApproachTO.DECOUPLED) {
+            return jsonPath;
+        }
+
+        String transactionAuthorisationLink = jsonPath.getString("_links" + ".transactionAuthorisation.href");
+        //5. bookings challenge for hbci (Optional)
+        //hbci case
+        if (transactionAuthorisationLink == null) {
+            DirectAccessController.LoadBookingsRequest LoadBookingsRequest =
+                new DirectAccessController.LoadBookingsRequest();
+            LoadBookingsRequest.setBankAccess(bankAccess);
+
+            jsonPath = request
+                .body(LoadBookingsRequest)
+                .post(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
+                .then().assertThat().statusCode(HttpStatus.OK.value())
+                .and().extract().jsonPath();
+
+            if (jsonPath.get("bookings") != null) {
+                //response contains bookings -> sca not needed
+                return null;
+            }
+        } else {
             //5. send tan
             TransactionAuthorisationRequestTO transactionAuthorisationRequestTO =
                 new TransactionAuthorisationRequestTO();
@@ -376,7 +372,7 @@ public class DirectAccessControllerTest {
 
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
-        doReturn(Optional.of(new ConsentEntity(null, null, null, consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
+        doReturn(Optional.of(new ConsentEntity(null, null, null, null, consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
         doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any(), any(), any(), any());
 
         DirectAccessController.LoadAccountsRequest loadAccountsRequest =
@@ -398,7 +394,7 @@ public class DirectAccessControllerTest {
         prepareBank(bankingGatewayAdapterMock, consentTO.getPsuAccountIban(), false);
         fakeConsentValidation(bankingGatewayAdapterMock);
 
-        doReturn(Optional.of(new ConsentEntity(null, null, null, consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
+        doReturn(Optional.of(new ConsentEntity(null, null, null, null, consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
         when(bankingGatewayAdapterMock.loadBankAccounts(any()))
             .thenReturn(LoadAccountInformationResponse.builder()
                 .bankAccounts(Collections.singletonList(new BankAccount()))

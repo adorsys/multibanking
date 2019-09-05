@@ -26,6 +26,8 @@ public class Consent {
 
     private String consentId;
 
+    private String redirectId;
+
     private String psuAccountIban;
 
     // Requested access services for a consent.

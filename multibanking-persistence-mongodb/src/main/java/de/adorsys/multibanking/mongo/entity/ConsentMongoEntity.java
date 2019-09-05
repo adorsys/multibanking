@@ -10,12 +10,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Document
-@Encrypted(exclude = {"_id"})
+@Encrypted(exclude = {"_id", "redirectId"})
 public class ConsentMongoEntity {
 
     @Id
     private String id;
     private String authorisationId;
+    private String redirectId;
     private BankApi bankApi;
     private String psuAccountIban;
     private Object bankApiConsentData;

@@ -369,7 +369,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private MultibankingException handeAisApiException(FeignException e) {
         if (e.status() == 429) {
-            return new MultibankingException(INVALID_CONSENT, 429, "consent access exceeded");
+            return new MultibankingException(CONSENT_ACCESS_EXCEEDED, 429, "consent access exceeded");
         }
         return new MultibankingException(BANKING_GATEWAY_ERROR, e.status(), e.getMessage());
     }

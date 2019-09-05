@@ -25,8 +25,6 @@ import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.
 @EqualsAndHashCode(callSuper = false)
 public class LoadAccounts extends AbstractScaTransaction {
 
-    private boolean updateTanTransportTypes;
-
     @Override
     public TransactionType getTransactionType() {
         return LOAD_BANKACCOUNTS;

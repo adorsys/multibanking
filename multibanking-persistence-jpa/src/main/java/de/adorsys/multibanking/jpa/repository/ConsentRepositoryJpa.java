@@ -11,10 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Repository
 @Profile({"jpa"})
 public interface ConsentRepositoryJpa extends JpaRepository<ConsentJpaEntity, String> {
 
-
+    Optional<ConsentJpaEntity> findByRedirectId(String id);
 }

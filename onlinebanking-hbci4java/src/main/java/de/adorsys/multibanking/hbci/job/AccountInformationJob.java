@@ -18,7 +18,6 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.domain.TanTransportType;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
@@ -28,16 +27,16 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.SerializationUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSEPAInfo;
-import org.kapott.hbci.GV.GVTANMediaList;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
@@ -51,35 +50,6 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAcco
 
     private List<BankAccount> hbciAccounts;
 
-    public static List<TanTransportType> extractTanTransportTypes(PinTanPassport hbciPassport) {
-        return hbciPassport.getUserTwostepMechanisms()
-            .stream()
-            .map(id -> hbciPassport.getBankTwostepMechanisms().get(id))
-            .filter(Objects::nonNull)
-            .map(hbciTwoStepMechanism -> TanTransportType.builder()
-                .id(hbciTwoStepMechanism.getSecfunc())
-                .name(hbciTwoStepMechanism.getName())
-                .inputInfo(hbciTwoStepMechanism.getInputinfo())
-                .needTanMedia(hbciTwoStepMechanism.getNeedtanmedia().equals("2"))
-                .build())
-            .map(tanTransportType -> {
-                if (!tanTransportType.isNeedTanMedia()) {
-                    return Collections.singletonList(tanTransportType);
-                } else {
-                    return hbciPassport.getTanMedias().stream()
-                        .map(tanMediaInfo -> {
-                            TanTransportType clone = SerializationUtils.clone(tanTransportType);
-                            clone.setMedium(tanMediaInfo.mediaName);
-                            return clone;
-                        })
-                        .collect(Collectors.toList());
-                }
-            })
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-
-    }
-
     @Override
     public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
         if (!passport.jobSupported("SEPAInfo"))
@@ -90,11 +60,6 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAcco
 
     @Override
     public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        // TAN-Medien abrufen
-        if (loadAccountInformationRequest.getTransaction().isUpdateTanTransportTypes() && passport.jobSupported(GVTANMediaList.getLowlevelName())) {
-            log.info("fetching TAN media list");
-            return Collections.singletonList(new GVTANMediaList(passport));
-        }
         return Collections.emptyList();
     }
 
@@ -123,12 +88,6 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAcco
             bankAccount.externalId(BankApi.HBCI, UUID.randomUUID().toString());
             bankAccount.bankName(loadAccountInformationRequest.getBankAccess().getBankName());
             hbciAccounts.add(bankAccount);
-        }
-
-        if (loadAccountInformationRequest.getTransaction().isUpdateTanTransportTypes()) {
-            loadAccountInformationRequest.getBankAccess().setTanTransportTypes(new HashMap<>());
-            loadAccountInformationRequest.getBankAccess().getTanTransportTypes().put(BankApi.HBCI,
-                extractTanTransportTypes(passport));
         }
 
         return LoadAccountInformationResponse.builder()

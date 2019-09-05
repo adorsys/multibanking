@@ -15,7 +15,6 @@ import de.adorsys.multibanking.web.mapper.*;
 import de.adorsys.multibanking.web.model.*;
 import io.swagger.annotations.*;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -68,11 +66,9 @@ public class DirectAccessController {
         @ApiResponse(code = 200, message = "Response", response = UpdateAuthResponseTO.class)
     })
     @PostMapping("/accounts")
-    public ResponseEntity createHbciAccountsChallenge(@Valid @RequestBody LoadAccountsChallengeRequest loadAccountsRequest,
+    public ResponseEntity createHbciAccountsChallenge(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
                                                       @RequestParam(required = false) BankApiTO bankApi) {
         try {
-            selectScaMethodForConsent(loadAccountsRequest.getBankAccess().getConsentId(),
-                loadAccountsRequest.getScaMethodId());
             return doLoadBankAccounts(loadAccountsRequest, bankApi, SCAMETHODSELECTED);
         } catch (TransactionAuthorisationRequiredException e) {
             log.debug("process finished < return challenge");
@@ -93,11 +89,9 @@ public class DirectAccessController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "Response", response = LoadBookingsResponse.class)})
     @PostMapping("/bookings")
-    public ResponseEntity createHbciBookingsChallenge(@Valid @RequestBody LoadBookingsChallengeRequest loadBookingsRequest,
+    public ResponseEntity createHbciBookingsChallenge(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
                                                       @RequestParam(required = false) BankApiTO bankApi) {
         try {
-            selectScaMethodForConsent(loadBookingsRequest.getBankAccess().getConsentId(),
-                loadBookingsRequest.getScaMethodId());
             return doLoadBookings(loadBookingsRequest, bankApi, SCAMETHODSELECTED);
         } catch (TransactionAuthorisationRequiredException e) {
             log.debug("process finished < return challenge");
@@ -185,7 +179,8 @@ public class DirectAccessController {
         ConsentEntity internalConsent = consentService.getInternalConsent(bankAccess.getConsentId());
 
         //temporary bank access, will be deleted with user
-        BankAccessEntity bankAccessEntity = bankAccessMapper.toBankAccessEntity(bankAccess, userEntity.getId(), true, internalConsent.getPsuAccountIban());
+        BankAccessEntity bankAccessEntity = bankAccessMapper.toBankAccessEntity(bankAccess, userEntity.getId(), true,
+            internalConsent.getPsuAccountIban());
         bankAccessEntity.setUserId(userEntity.getId());
         bankAccessRepository.save(bankAccessEntity);
         return bankAccessEntity;
@@ -196,14 +191,6 @@ public class DirectAccessController {
         userEntity.setId(UUID.randomUUID().toString());
         userEntity.setExpireUser(LocalDateTime.now().plusMinutes(thresholdTemporaryData));
         return userEntity;
-    }
-
-    private void selectScaMethodForConsent(String consentId, String scaMethodId) {
-        log.debug("set selected 2FA method to consent");
-        SelectPsuAuthenticationMethodRequestTO selectPsuAuthenticationMethodRequest =
-            new SelectPsuAuthenticationMethodRequestTO();
-        selectPsuAuthenticationMethodRequest.setAuthenticationMethodId(scaMethodId);
-        consentService.selectPsuAuthenticationMethod(selectPsuAuthenticationMethodRequest, consentId);
     }
 
     private ResponseEntity<LoadBankAccountsResponse> createLoadBankAccountsResponse(List<BankAccountEntity> bankAccounts) {
@@ -234,14 +221,6 @@ public class DirectAccessController {
     }
 
     @Data
-    @EqualsAndHashCode(callSuper = true)
-    public static class LoadAccountsChallengeRequest extends LoadAccountsRequest {
-        @NotBlank
-        @ApiModelProperty("Authentication method id")
-        String scaMethodId;
-    }
-
-    @Data
     public static class LoadAccountsRequest {
         @NotNull
         @ApiModelProperty("Bankaccess properties")
@@ -251,14 +230,6 @@ public class DirectAccessController {
     @Data
     public static class LoadBankAccountsResponse {
         List<BankAccountTO> bankAccounts;
-    }
-
-    @Data
-    @EqualsAndHashCode(callSuper = true)
-    public static class LoadBookingsChallengeRequest extends LoadBookingsRequest {
-        @NotBlank
-        @ApiModelProperty("Authentication method id")
-        String scaMethodId;
     }
 
     @Data

@@ -59,11 +59,14 @@ public class BankAccountService extends AccountInformationService {
         return bankAccounts;
     }
 
-    List<BankAccountEntity> loadBankAccountsOnline(BankEntity bankEntity, BankAccessEntity bankAccess, BankApi bankApi) {
-        return loadBankAccountsOnline(bankEntity, bankAccess, userService.findUser(bankAccess.getUserId()), bankApi, FINALISED);
+    List<BankAccountEntity> loadBankAccountsOnline(BankEntity bankEntity, BankAccessEntity bankAccess,
+                                                   BankApi bankApi) {
+        return loadBankAccountsOnline(bankEntity, bankAccess, userService.findUser(bankAccess.getUserId()), bankApi,
+            FINALISED);
     }
 
-    public List<BankAccountEntity> loadBankAccountsOnline(BankEntity bankEntity, BankAccessEntity bankAccess, UserEntity userEntity,
+    public List<BankAccountEntity> loadBankAccountsOnline(BankEntity bankEntity, BankAccessEntity bankAccess,
+                                                          UserEntity userEntity,
                                                           BankApi bankApi, ScaStatus expectedConsentStatus) {
         OnlineBankingService onlineBankingService = bankApi != null ?
             bankingServiceProducer.getBankingService(bankApi) :
@@ -95,17 +98,15 @@ public class BankAccountService extends AccountInformationService {
     private List<BankAccount> loadBankAccountsOnline(ScaStatus expectedConsentStatus, BankAccessEntity bankAccess,
                                                      OnlineBankingService onlineBankingService,
                                                      BankApiUser bankApiUser, BankEntity bankEntity) {
-        Optional<ConsentEntity> consentEntity = consentService.validateAndGetConsent(onlineBankingService,
-            bankAccess.getConsentId(),
-            expectedConsentStatus);
+        ConsentEntity consentEntity = consentService.validateAndGetConsent(onlineBankingService,
+            bankAccess.getConsentId(), expectedConsentStatus);
 
-        LoadAccounts loadAccounts = new LoadAccounts();
-        loadAccounts.setUpdateTanTransportTypes(true);
-
-        TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(loadAccounts, bankApiUser,
-            bankAccess);
+        TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(new LoadAccounts());
+        transactionRequest.setBankApiUser(bankApiUser);
+        transactionRequest.setBankAccess(bankAccess);
         transactionRequest.setBank(bankEntity);
-        transactionRequest.setBankApiConsentData(consentEntity.orElse(null));
+        transactionRequest.setHbciProduct(finTSProductConfig.getProduct());
+        transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
 
         try {
             return onlineBankingService.loadBankAccounts(transactionRequest).getBankAccounts();

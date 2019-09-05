@@ -2,7 +2,6 @@ package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
@@ -49,8 +48,8 @@ public class BookingService extends AccountInformationService {
     private final BankService bankService;
     private final UserService userService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
-    private final FinTSProductConfig finTSProductConfig;
     private final SmartAnalyticsMapper smartAnalyticsMapper;
+    private final FinTSProductConfig finTSProductConfig;
 
     public String getBookingsCsv(String userId, String accessId, String accountId) {
         List<BookingEntity> bookings = getBookings(userId, accessId, accountId);
@@ -279,8 +278,7 @@ public class BookingService extends AccountInformationService {
             userService.findUser(bankAccess.getUserId()));
 
         ConsentEntity consentEntity = consentService.validateAndGetConsent(onlineBankingService,
-            bankAccess.getConsentId(), expectedConsentStatus)
-            .orElseThrow(() -> new MultibankingException(MultibankingError.INVALID_CONSENT));
+            bankAccess.getConsentId(), expectedConsentStatus);
 
         //external (figo, finapi) account must exist, otherwise loading bookings will not work
         if (onlineBankingService.externalBankAccountRequired()) {
@@ -313,8 +311,10 @@ public class BookingService extends AccountInformationService {
         loadBookings.setDateTo(LocalDate.now());
         loadBookings.setWithBalance(true);
 
-        TransactionRequest<LoadBookings> transactionRequest = new TransactionRequest<>(loadBookings, bankApiUser,
-            bankAccess);
+        TransactionRequest<LoadBookings> transactionRequest = new TransactionRequest<>(loadBookings);
+        transactionRequest.setBankApiUser(bankApiUser);
+        transactionRequest.setBankAccess(bankAccess);
+        transactionRequest.setHbciProduct(finTSProductConfig.getProduct());
         transactionRequest.setBank(bankEntity);
         transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
         return transactionRequest;
@@ -349,12 +349,11 @@ public class BookingService extends AccountInformationService {
         if (externalAccountId == null) {
             BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
-            LoadAccounts loadAccounts = new LoadAccounts();
-            loadAccounts.setUpdateTanTransportTypes(true);
-
-            TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(loadAccounts, bankApiUser,
-                bankAccess);
+            TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(new LoadAccounts());
+            transactionRequest.setBankApiUser(bankApiUser);
+            transactionRequest.setBankAccess(bankAccess);
             transactionRequest.setBank(bankEntity);
+            transactionRequest.setHbciProduct(finTSProductConfig.getProduct());
 
             List<BankAccount> apiBankAccounts =
                 onlineBankingService.loadBankAccounts(transactionRequest).getBankAccounts();
