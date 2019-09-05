@@ -85,7 +85,7 @@ public class DeleteStandingOrderJob extends ScaRequiredJob<StandingOrder, EmptyR
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+    EmptyResponse createJobResponse(PinTanPassport passport) {
         return new EmptyResponse();
     }
 

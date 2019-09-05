@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
-import static org.kapott.hbci.manager.HBCIJobFactory.newJob;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -93,7 +92,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         AbstractHBCIJob originJob = Optional.ofNullable(hbciTanSubmit.getOriginJobName())
             .map(s -> {
-                AbstractHBCIJob result = newJob(hbciTanSubmit.getOriginJobName(), hbciDialog.getPassport());
+                AbstractHBCIJob result = scaJob.createScaMessage(hbciDialog.getPassport());
                 try {
                     result.setLlParams(objectMapper().readValue(hbciTanSubmit.getLowLevelParams(), HashMap.class));
                 } catch (Exception e) {
@@ -119,7 +118,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
             .orElse(hbciTanSubmit.getOrderRef());
 
         SubmitAuthorizationCodeResponse<?> response =
-            new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport, hbciJob));
+            new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport));
         response.setTransactionId(transactionId);
 
         if (!status.getDialogStatus().msgStatusList.isEmpty()) {

@@ -114,7 +114,7 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAcco
     }
 
     @Override
-    public LoadAccountInformationResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+    public LoadAccountInformationResponse createJobResponse(PinTanPassport passport) {
         loadAccountInformationRequest.getBankAccess().setBankName(passport.getInstName());
 
         hbciAccounts = new ArrayList<>();

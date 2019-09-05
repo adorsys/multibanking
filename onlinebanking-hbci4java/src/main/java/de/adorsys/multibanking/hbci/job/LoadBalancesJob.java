@@ -110,21 +110,18 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesRe
     }
 
     @Override
-    public LoadBalancesResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
-        AbstractHBCIJob resultJob = Optional.ofNullable(hbciJob)
-            .orElse(this.balanceJob);
-
-        if (resultJob.getJobResult().getJobStatus().hasErrors()) {
+    public LoadBalancesResponse createJobResponse(PinTanPassport passport) {
+        if (balanceJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Balance job not OK");
-            throw new MultibankingException(HBCI_ERROR, resultJob.getJobResult().getJobStatus().getErrorList().stream()
+            throw new MultibankingException(HBCI_ERROR, balanceJob.getJobResult().getJobStatus().getErrorList().stream()
                 .map(messageString -> Message.builder().renderedMessage(messageString).build())
                 .collect(Collectors.toList()));
         }
 
         BankAccount bankAccount = loadBalanceRequest.getTransaction().getPsuAccount();
 
-        if (resultJob.getJobResult().isOK()) {
-            bankAccount.setBalances(hbciObjectMapper.createBalancesReport((GVRSaldoReq) resultJob.getJobResult(),
+        if (balanceJob.getJobResult().isOK()) {
+            bankAccount.setBalances(hbciObjectMapper.createBalancesReport((GVRSaldoReq) balanceJob.getJobResult(),
                 bankAccount.getAccountNumber()));
         }
 

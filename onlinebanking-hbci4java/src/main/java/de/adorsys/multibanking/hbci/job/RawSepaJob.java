@@ -96,7 +96,7 @@ public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, EmptyResponse> {
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
+    EmptyResponse createJobResponse(PinTanPassport passport) {
         return new EmptyResponse();
     }
 

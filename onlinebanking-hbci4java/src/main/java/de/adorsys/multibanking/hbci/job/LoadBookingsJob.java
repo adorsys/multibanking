@@ -80,14 +80,11 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
     }
 
     @Override
-    public LoadBookingsResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
-        AbstractHBCIJob resultJob = Optional.ofNullable(hbciJob)
-            .orElse(this.bookingsJob);
-
-        if (resultJob.getJobResult().getJobStatus().hasErrors()) {
+    public LoadBookingsResponse createJobResponse(PinTanPassport passport) {
+        if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
             throw new MultibankingException(HBCI_ERROR,
-                resultJob.getJobResult().getJobStatus().getErrorList().stream()
+                bookingsJob.getJobResult().getJobStatus().getErrorList().stream()
                     .map(messageString -> Message.builder().renderedMessage(messageString).build())
                     .collect(Collectors.toList()));
         }
@@ -95,7 +92,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
         List<Booking> bookingList = null;
         BalancesReport balancesReport = null;
         List<String> raw = null;
-        GVRKUms bookingsResult = (GVRKUms) resultJob.getJobResult();
+        GVRKUms bookingsResult = (GVRKUms) bookingsJob.getJobResult();
         if (loadBookingsRequest.getTransaction().getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
