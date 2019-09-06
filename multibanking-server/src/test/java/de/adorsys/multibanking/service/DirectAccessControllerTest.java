@@ -318,40 +318,38 @@ public class DirectAccessControllerTest {
                 //response contains bookings -> sca not needed
                 return null;
             }
-        } else {
-            //5. send tan
-            TransactionAuthorisationRequestTO transactionAuthorisationRequestTO =
-                new TransactionAuthorisationRequestTO();
-            transactionAuthorisationRequestTO.setScaAuthenticationData("0000");
-
-            jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
-                ".transactionAuthorisation.href"))
-                .then().assertThat().statusCode(HttpStatus.OK.value())
-                .and().extract().jsonPath();
-
-            assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
-
-            //6. load transactions
-            DirectAccessController.LoadBookingsRequest loadBookingsRequest =
-                new DirectAccessController.LoadBookingsRequest();
-            if (jsonPath.getString("bankAccounts") != null) {
-                loadBookingsRequest.setUserId(jsonPath.getString("bankAccounts[0].userId"));
-                loadBookingsRequest.setAccessId(jsonPath.getString("bankAccounts[0].bankAccessId"));
-                loadBookingsRequest.setAccountId(jsonPath.getString("bankAccounts[0].id"));
-            }
-
-            loadBookingsRequest.setBankAccess(bankAccess);
-
-            request.body(loadBookingsRequest).put(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
-                .then().assertThat().statusCode(HttpStatus.OK.value())
-                .and().extract().jsonPath();
         }
-        return null;
+        //6. send tan
+        TransactionAuthorisationRequestTO transactionAuthorisationRequestTO =
+            new TransactionAuthorisationRequestTO();
+        transactionAuthorisationRequestTO.setScaAuthenticationData("0000");
+
+        jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
+            ".transactionAuthorisation.href"))
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
+
+        //7. load transactions
+        DirectAccessController.LoadBookingsRequest loadBookingsRequest =
+            new DirectAccessController.LoadBookingsRequest();
+        if (jsonPath.getString("bankAccounts") != null) {
+            loadBookingsRequest.setUserId(jsonPath.getString("bankAccounts[0].userId"));
+            loadBookingsRequest.setAccessId(jsonPath.getString("bankAccounts[0].bankAccessId"));
+            loadBookingsRequest.setAccountId(jsonPath.getString("bankAccounts[0].id"));
+        }
+
+        loadBookingsRequest.setBankAccess(bankAccess);
+
+        return request.body(loadBookingsRequest).put(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
     }
 
     @Test
     public void verifyApi() {
-        verifyApi(INVALID_PIN, "NO_AUTHORISATION");
+        verifyApi(INVALID_PIN, "INVALID_PIN");
     }
 
     @Test
@@ -364,15 +362,16 @@ public class DirectAccessControllerTest {
         verifyApi(INVALID_CONSENT_STATUS, "AUTHORISE_CONSENT");
     }
 
-    private void verifyApi(MultibankingError error, String messageKey) {
+    private void verifyApi(MultibankingError throwError, String expectedMessage) {
         ConsentTO consentTO = createConsentTO();
         BankAccessTO bankAccess = createBankAccess();
         prepareBank(bankingGatewayAdapterMock, consentTO.getPsuAccountIban(), false);
 
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
-        when(bankingGatewayAdapterMock.getStrongCustomerAuthorisation()).thenReturn(authorisationMock);
-        doReturn(Optional.of(new ConsentEntity(null, null, null, null, consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
-        doThrow(new MultibankingException(error)).when(authorisationMock).validateConsent(any(), any(), any(), any());
+        doReturn(authorisationMock).when(bankingGatewayAdapterMock).getStrongCustomerAuthorisation();
+        doReturn(createAuthResponse()).when(authorisationMock).getAuthorisationStatus(bankAccess.getConsentId(), null, null);
+        doReturn(Optional.of(new ConsentEntity(bankAccess.getConsentId(), null, null, null, consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
+        doThrow(new MultibankingException(throwError)).when(authorisationMock).validateConsent(any(), any(), any(), any());
 
         DirectAccessController.LoadAccountsRequest loadAccountsRequest =
             new DirectAccessController.LoadAccountsRequest();
@@ -383,7 +382,7 @@ public class DirectAccessControllerTest {
             .then().assertThat().statusCode(HttpStatus.BAD_REQUEST.value())
             .extract().body().as(Messages.class);
 
-        assertThat(messages.getMessages().iterator().next().getKey()).isEqualTo(messageKey);
+        assertThat(messages.getMessages().iterator().next().getKey()).isEqualTo(expectedMessage);
     }
 
     @Test
@@ -471,6 +470,14 @@ public class DirectAccessControllerTest {
             bankInfo.setBic(System.getProperty("bic"));
             HBCIUtils.addBankInfo(bankInfo);
         }
+    }
+
+    private UpdateAuthResponse createAuthResponse() {
+        UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
+        updateAuthResponse.setScaApproach(ScaApproach.EMBEDDED);
+        updateAuthResponse.setScaStatus(ScaStatus.SCAMETHODSELECTED);
+
+        return updateAuthResponse;
     }
 
     private ConsentTO createConsentTO() {

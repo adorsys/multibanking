@@ -490,8 +490,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                                         Object bankApiConsentData) {
                 HBCIConsent hbciConsent = (HBCIConsent) bankApiConsentData;
 
-                //hbci consent is never FINALISED
-                if (hbciConsent.getStatus() == SCAMETHODSELECTED) {
+                if (hbciConsent.getStatus() == SCAMETHODSELECTED || hbciConsent.getStatus() == FINALISED) {
                     return;
                 }
                 throw new MultibankingException(MultibankingError.INVALID_CONSENT_STATUS);
