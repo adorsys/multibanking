@@ -78,7 +78,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
             dialog.addTask(hbciJob);
         }
 
-        execute(dialog, !tan2StepRequired);
+        HBCIExecStatus hbciExecStatus = execute(dialog, !tan2StepRequired);
 
         //check for SCA is really needed after execution
         tan2StepRequired = Optional.ofNullable(hktan)
@@ -89,11 +89,13 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         if (tan2StepRequired) {
             updateTanSubmit(hbciTanSubmit, dialog, hbciJob);
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
-            return jobResponse;
-        } else {
-            dialog.close();
-            return jobResponse;
         }
+
+        if (hbciExecStatus.getDialogStatus().endStatus == null) {
+            dialog.close();
+        }
+
+        return jobResponse;
     }
 
     private GVTAN2Step requestAuthorisationCode(HbciTanSubmit hbciTanSubmit, HBCIDialog dialog,
@@ -148,7 +150,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         return startHbciDialog(null, dialogRequest);
     }
 
-    void execute(HBCIDialog dialog, boolean closeDialog) {
+    HBCIExecStatus execute(HBCIDialog dialog, boolean closeDialog) {
         HBCIExecStatus status = dialog.execute(closeDialog);
         if (!status.isOK()) {
             throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorMessages()
@@ -156,6 +158,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
                 .map(messageString -> Message.builder().renderedMessage(messageString).build())
                 .collect(Collectors.toList()));
         }
+        return status;
     }
 
     private GVTAN2Step hktanProcess1(HBCIDialog dialog, HBCITwoStepMechanism hbciTwoStepMechanism,

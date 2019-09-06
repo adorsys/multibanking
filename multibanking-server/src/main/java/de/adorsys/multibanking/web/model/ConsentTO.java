@@ -15,7 +15,7 @@ public class ConsentTO {
         ApiModelProperty.AccessMode.READ_ONLY)
     private String id;
 
-    @ApiModelProperty(value = "Conesent redirect id")
+    @ApiModelProperty(value = "Consent redirect id")
     private String redirectId;
 
     @NotNull

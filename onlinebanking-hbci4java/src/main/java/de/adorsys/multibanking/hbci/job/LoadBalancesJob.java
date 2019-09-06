@@ -31,14 +31,11 @@ import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
@@ -51,11 +48,6 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesRe
 
     private final TransactionRequest<LoadBalances> loadBalanceRequest;
     private AbstractHBCIJob balanceJob;
-
-    private static boolean initFailed(HBCIExecStatus status) {
-        return status.getErrorMessages().stream()
-            .anyMatch(line -> line.charAt(0) == '9');
-    }
 
     private Konto createAccount(BankAccount bankAccount) {
         Konto account = new Konto();
@@ -78,20 +70,6 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesRe
     @Override
     public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
         return Collections.emptyList();
-    }
-
-    @Override
-    protected void execute(HBCIDialog dialog, boolean closeDialog) {
-        HBCIExecStatus status = dialog.execute(closeDialog);
-        if (!status.isOK()) {
-            log.error("Status of balance job not OK " + status);
-
-            if (initFailed(status)) {
-                throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorMessages().stream()
-                    .map(messageString -> Message.builder().renderedMessage(messageString).build())
-                    .collect(Collectors.toList()));
-            }
-        }
     }
 
     @Override

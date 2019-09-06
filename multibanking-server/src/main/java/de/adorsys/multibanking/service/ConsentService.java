@@ -172,14 +172,13 @@ public class ConsentService {
 
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
-                case INVALID_PIN:
-                    throw new MissingConsentException();
                 case INVALID_SCA_METHOD:
                     throw new MissingConsentAuthorisationSelectionException();
                 case INVALID_CONSENT_STATUS:
                     if (expectedConsentStatus == ScaStatus.FINALISED) {
-                        // TODO don't know where to get UpdateAuthResponse
-                        throw new TransactionAuthorisationRequiredException(null, internalConsent.getId(),
+                        UpdateAuthResponse authorisationStatus = getAuthorisationStatus(internalConsent.getId(),
+                            internalConsent.getAuthorisationId());
+                        throw new TransactionAuthorisationRequiredException(authorisationStatus, internalConsent.getId(),
                             internalConsent.getAuthorisationId());
                     } else if (expectedConsentStatus == ScaStatus.SCAMETHODSELECTED) {
                         throw new MissingConsentAuthorisationSelectionException();

@@ -182,11 +182,10 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_hbci() {
-        ConsentTO consentTO = createConsentTO();
         Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
-        prepareBank(hbci4JavaBanking, consentTO.getPsuAccountIban(), null, false);
-//        prepareBank(hbci4JavaBanking, access.getIban(), "https://obs-qa.bv-zahlungssysteme
-//        .de/hbciTunnel/hbciTransfer.jsp", false);
+
+        ConsentTO consentTO = createConsentTO();
+        prepareBank(hbci4JavaBanking, consentTO.getPsuAccountIban(), false);
 
         CredentialsTO credentials = CredentialsTO.builder()
             .customerId(System.getProperty("login", "login"))
@@ -443,11 +442,7 @@ public class DirectAccessControllerTest {
         // sca handler will do nothing with the fake and this result in a positive validation
     }
 
-    private void prepareBank(OnlineBankingService onlineBankingService, String iban, boolean redirectPreferred) {
-        prepareBank(onlineBankingService, iban, System.getProperty("bankUrl"), redirectPreferred);
-    }
-
-    private void prepareBank(OnlineBankingService onlineBankingService, String iban, String bankUrl,
+    private void prepareBank(OnlineBankingService onlineBankingService, String iban,
                              boolean redirectPreferred) {
         if (isMock(onlineBankingService)) {
             when(onlineBankingService.bankSupported(any())).thenReturn(true);
@@ -461,7 +456,7 @@ public class DirectAccessControllerTest {
         BankEntity test_bank = bankRepository.findByBankCode(bankCode).orElseGet(() -> {
             BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", bankCode, onlineBankingService.bankApi());
             bankEntity.setName("UNITTEST BANK");
-            bankEntity.setBankingUrl(bankUrl);
+            bankEntity.setBankingUrl(System.getProperty("bankUrl"));
             bankEntity.setRedirectPreferred(redirectPreferred);
             bankEntity.setBic(System.getProperty("bic"));
             bankRepository.save(bankEntity);
@@ -471,8 +466,9 @@ public class DirectAccessControllerTest {
         if (onlineBankingService instanceof Hbci4JavaBanking && HBCIUtils.getBankInfo(bankCode) == null) {
             BankInfo bankInfo = new BankInfo();
             bankInfo.setBlz(test_bank.getBankCode());
-            bankInfo.setPinTanAddress(bankUrl);
+            bankInfo.setPinTanAddress(System.getProperty("bankUrl"));
             bankInfo.setPinTanVersion(HBCI_300);
+            bankInfo.setBic(System.getProperty("bic"));
             HBCIUtils.addBankInfo(bankInfo);
         }
     }
