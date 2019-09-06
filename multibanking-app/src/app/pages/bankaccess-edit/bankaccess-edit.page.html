@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{consent?.psuAccountIban}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="bankAccessForm" (ngSubmit)="saveBankAccess()">
+    <ion-list>
+      <ion-item>
+        <ion-label>Save Bookings</ion-label>
+        <ion-toggle formControlName="storeBookings"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Categorize Bookings</ion-label>
+        <ion-toggle formControlName="categorizeBookings"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Save anonymized Bookings</ion-label>
+        <ion-toggle formControlName="storeAnonymizedBookings"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Save Analytics</ion-label>
+        <ion-toggle formControlName="storeAnalytics"></ion-toggle>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Provide data for machine learning</ion-label>
+        <ion-toggle formControlName="provideDataForMachineLearning">
+        </ion-toggle>
+      </ion-item>
+
+      <ion-button type="submit" expand="block" [disabled]="!bankAccessForm.valid">
+        Create bank access
+      </ion-button>
+    </ion-list>
+
+  </form>
+</ion-content>

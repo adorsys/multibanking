@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Transactions</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="secondary">
+      <ion-button (click)="syncBookings()">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list class="booking-list">
+    <div *ngFor="let month of bookingMonths">
+      <ion-item-divider color="light">{{ month | date:'MMMM yyyy'}}
+      </ion-item-divider>
+      <ion-item class="booking-item" *ngFor="let booking of month.bookings" (click)="itemSelected(booking)">
+        <ion-avatar slot="start">
+          <img [src]="getLogo(booking?.bookingCategory?.logo)" />
+        </ion-avatar>
+        <ion-label [ngClass]="{'forecast': booking.forecastBooking}">
+          <h3> {{"booking.amount < 0" ? 'Payee:' : 'Payer:'}} {{ getReceiver(booking)}}
+          </h3>
+          <div [ngClass]="{'forecast': booking.forecastBooking}" *ngIf="booking.bookingCategory">
+            <p>
+              <strong>Main Category:</strong> {{ booking.bookingCategory?.mainCategory}}</p>
+            <p>
+              <strong>Sub Category:</strong> {{ booking.bookingCategory?.subCategory}}</p>
+            <p>
+              <strong>Specification:</strong> {{ booking.bookingCategory?.specification}}</p>
+          </div>
+          <div class="item__alert" *ngIf="!booking.bookingCategory">
+            <h3 float-left>not categorized</h3>
+          </div>
+        </ion-label>
+        <div slot="end">
+          <ion-label>
+            <h4 [ngClass]="{'forecast': booking.forecastBooking}">{{ booking.bookingDate | date }}</h4>
+            <h2 [ngClass]="{'amount--negative': booking.amount < 0, 'amount--positive': booking.amount > 0}">
+              {{ booking.amount | currency:'EUR':'symbol' }}
+            </h2>
+          </ion-label>
+        </div>
+      </ion-item>
+    </div>
+  </ion-list>
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>

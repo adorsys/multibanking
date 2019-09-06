@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Consent user authentication</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list *ngIf="psuMessage">
+    <ion-list-header>
+      <ion-label>
+        <h2>
+          {{psuMessage}}
+        </h2>
+      </ion-label>
+    </ion-list-header>
+    <ion-item>
+      <ion-label>
+        <p>
+          Authorisation finished?
+        </p>
+      </ion-label>
+    </ion-item>
+    <ion-button type="submit" expand="block" (click)="continue()">
+      Continue
+    </ion-button>
+  </ion-list>
+  <form [formGroup]="loginFormGroup" *ngIf="loginFormGroup && !psuMessage" (ngSubmit)="submit()">
+    <ion-list>
+      <ion-list-header>
+        <ion-label>{{ bank?.name }} -
+          {{ bank?.loginSettings.advice ? bank?.loginSettings.advice : 'Bank login data' }}
+        </ion-label>
+      </ion-list-header>
+      <ion-item *ngFor="let credential of bank.loginSettings.credentials">
+        <ion-label>{{credential.label}}</ion-label>
+        <ion-input type="{{credential.masked ? 'password' : 'text'}}" formControlName="{{ credential?.fieldName }}"
+          id="{{ credential?.fieldName }}" name="{{ credential.fieldName }}"></ion-input>
+      </ion-item>
+      <ion-button type="submit" expand="block" [disabled]="!loginFormGroup.valid">
+        Submit
+      </ion-button>
+    </ion-list>
+  </form>
+</ion-content>

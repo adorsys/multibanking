@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Consent authorisation</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <form [formGroup]="authorisationFormGroup" *ngIf="authorisationFormGroup" (ngSubmit)="submit()">
+        <ion-list>
+          <ion-list-header>
+            <ion-label>{{consentAuthStatus.challenge?.additionalInformation}}</ion-label>
+          </ion-list-header>
+          <ion-item>
+            <ion-label>TAN</ion-label>
+            <ion-input formControlName="scaAuthenticationData" id="scaAuthenticationData" name="scaAuthenticationData"></ion-input>
+          </ion-item>
+          <ion-button type="submit" expand="block" [disabled]="!authorisationFormGroup.valid">
+              Submit
+            </ion-button>
+        </ion-list>
+      </form>
+</ion-content>
