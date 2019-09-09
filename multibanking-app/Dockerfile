@@ -1,6 +1,7 @@
-FROM nginx:1.13-alpine
+FROM nginx:1.17-alpine
 
-ENV ENV=$env
+ARG build_env
+RUN echo "$build_env"
 
 # support running as arbitrary user which belogs to the root group
 RUN chmod 777 -R /var/cache/nginx /var/run /var/log/nginx
@@ -20,7 +21,6 @@ RUN apk add --update nodejs nodejs-npm \
     && npm rebuild node-sass \
     && npm install
 
-RUN ionic cordova platform remove browser && ionic cordova platform add browser
-RUN ionic cordova build browser --prod
+RUN ./build.sh "$build_env"
 
 RUN cp -r platforms/browser/www/* /usr/share/nginx/html
