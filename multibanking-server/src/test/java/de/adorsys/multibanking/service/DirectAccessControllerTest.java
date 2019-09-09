@@ -285,6 +285,9 @@ public class DirectAccessControllerTest {
         if (jsonPath.getString("scaStatus").equals(PSUAUTHENTICATED.toString())) {
             String selectAuthenticationMethodLink = jsonPath.getString("_links" + ".selectAuthenticationMethod.href");
             String sceMethodId = jsonPath.getString("scaMethods[0].id");
+            if (jsonPath.get("scaMethods.find { it.id == '901' }") != null) {
+                sceMethodId = "901";
+            }
 
             SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
                 new SelectPsuAuthenticationMethodRequestTO();
@@ -369,9 +372,12 @@ public class DirectAccessControllerTest {
 
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         doReturn(authorisationMock).when(bankingGatewayAdapterMock).getStrongCustomerAuthorisation();
-        doReturn(createAuthResponse()).when(authorisationMock).getAuthorisationStatus(bankAccess.getConsentId(), null, null);
-        doReturn(Optional.of(new ConsentEntity(bankAccess.getConsentId(), null, null, null, consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
-        doThrow(new MultibankingException(throwError)).when(authorisationMock).validateConsent(any(), any(), any(), any());
+        doReturn(createAuthResponse()).when(authorisationMock).getAuthorisationStatus(bankAccess.getConsentId(), null
+            , null);
+        doReturn(Optional.of(new ConsentEntity(bankAccess.getConsentId(), null, null, null,
+            consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
+        doThrow(new MultibankingException(throwError)).when(authorisationMock).validateConsent(any(), any(), any(),
+            any());
 
         DirectAccessController.LoadAccountsRequest loadAccountsRequest =
             new DirectAccessController.LoadAccountsRequest();
