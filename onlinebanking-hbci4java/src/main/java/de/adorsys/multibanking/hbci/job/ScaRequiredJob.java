@@ -91,7 +91,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
         }
 
-        if (hbciExecStatus.getDialogStatus().endStatus == null) {
+        if (!tan2StepRequired && hbciExecStatus.getDialogStatus().endStatus == null) {
             dialog.close();
         }
 
