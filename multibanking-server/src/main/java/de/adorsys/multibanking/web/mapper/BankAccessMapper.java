@@ -13,8 +13,9 @@ public interface BankAccessMapper {
     @Mapping(target = "tanTransportTypes", ignore = true)
     @Mapping(target = "hbciPassportState", ignore = true)
     @Mapping(target = "externalIdMap", ignore = true)
-    @Mapping(target = "bankCode", expression = "java(org.iban4j.Iban.valueOf(bankAccessTO.getIban()).getBankCode())")
-    BankAccessEntity toBankAccessEntity(BankAccessTO bankAccessTO, String userId, boolean temporary);
+    @Mapping(target = "iban", source = "iban")
+    @Mapping(target = "bankCode", expression = "java(iban != null ? org.iban4j.Iban.valueOf(iban).getBankCode() : null)")
+    BankAccessEntity toBankAccessEntity(BankAccessTO bankAccessTO, String userId, boolean temporary, String iban);
 
 }
 

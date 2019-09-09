@@ -1,10 +1,12 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.BankAccessEntity;
+import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.service.BankAccessService;
+import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.BankAccessMapper;
 import de.adorsys.multibanking.web.model.BankAccessTO;
 import io.swagger.annotations.Api;
@@ -41,6 +43,7 @@ public class BankAccessController {
     private final BankAccessRepositoryIf bankAccessRepository;
     private final UserRepositoryIf userRepository;
     private final BankAccessService bankAccessService;
+    private final ConsentService consentService;
     private final Principal principal;
 
     @ApiOperation(
@@ -51,9 +54,11 @@ public class BankAccessController {
             })})
     @PostMapping
     public ResponseEntity<Resource<BankAccessTO>> createBankAccess(@RequestBody BankAccessTO bankAccess) {
+        Consent consent = consentService.getConsent(bankAccess.getConsentId());
+
         BankAccessEntity persistedBankAccess =
             bankAccessService.createBankAccess(bankAccessMapper.toBankAccessEntity(bankAccess, principal.getName(),
-                false));
+                false, consent.getPsuAccountIban()));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(linkTo(methodOn(BankAccessController.class).getBankAccess(persistedBankAccess.getId())).toUri());
@@ -101,7 +106,7 @@ public class BankAccessController {
     public HttpEntity<Void> updateBankAccess(@PathVariable String accessId,
                                              @RequestBody BankAccessTO bankAccess) {
         bankAccessService.updateBankAccess(accessId, bankAccessMapper.toBankAccessEntity(bankAccess,
-            principal.getName(), false));
+            principal.getName(), false, null));
         log.info("Bank access [{}] updated.", accessId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

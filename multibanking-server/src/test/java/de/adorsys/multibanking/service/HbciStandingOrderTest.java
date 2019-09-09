@@ -40,6 +40,8 @@ public class HbciStandingOrderTest {
     @MockBean
     private OnlineBankingServiceProducer bankingServiceProducer;
 
+    private BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"), BankApi.HBCI);
+
     @BeforeClass
     public static void beforeClass() {
         TestConstants.setup();
@@ -53,7 +55,6 @@ public class HbciStandingOrderTest {
         when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(new Hbci4JavaBanking());
 
         bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {
-            BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"), BankApi.HBCI);
             bankRepository.save(bankEntity);
             return bankEntity;
         });
@@ -66,7 +67,7 @@ public class HbciStandingOrderTest {
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
-        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
+        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity, bankAccessEntity,
             BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
@@ -83,7 +84,7 @@ public class HbciStandingOrderTest {
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(false);
 
-        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
+        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity, bankAccessEntity,
             BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("3312345678"))

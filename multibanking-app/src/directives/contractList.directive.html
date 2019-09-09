@@ -1,6 +1,0 @@
-<div *ngFor="let interval of intervals">
-  <ion-list-header>
-    {{getIntervalLabel(interval)}}
-  </ion-list-header>
-  <contract-item [contract]="contract" *ngFor="let contract of getIntervalContracts(interval)"></contract-item>
-</div>

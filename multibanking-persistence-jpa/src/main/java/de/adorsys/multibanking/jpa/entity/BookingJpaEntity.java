@@ -46,5 +46,6 @@ public class BookingJpaEntity {
     @JoinColumn(name = "booking_category_id")
     private BookingCategoryJpaEntity bookingCategory;
     private String transactionCode;
+    private boolean camt;
 
 }

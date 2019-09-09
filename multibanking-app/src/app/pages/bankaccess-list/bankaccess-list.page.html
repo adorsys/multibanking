@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Bank Connections</ion-title>
+    <ion-buttons slot="secondary" *ngIf="admin">
+      <ion-button (click)="adminArea()">
+        <ion-icon name="settings"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item detail *ngFor="let bankAccess of bankAccesses" (click)="itemTapped(bankAccess)">
+      {{bankAccess.iban}} - {{bankAccess.bankName}}
+    </ion-item>
+  </ion-list>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="createConnection()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

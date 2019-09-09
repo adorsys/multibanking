@@ -33,10 +33,12 @@ interface BankingGatewayMapper {
     @Mapping(target = "consentStatus", ignore = true)
     ConsentTO toConsentTO(Consent consentTemplate);
 
+    @Mapping(target = "redirectId", ignore = true)
     @InheritInverseConfiguration
     Consent toConsent(ConsentTO consentTO);
 
     @Mapping(target = "bankApiConsentData", ignore = true)
+    @Mapping(target = "redirectId", ignore = true)
     CreateConsentResponse toCreateConsentResponse(CreateConsentResponseTO consentResponse);
 
     @Mapping(target = "psuId", source = "customerId")

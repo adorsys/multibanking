@@ -65,7 +65,8 @@ sts:
   keymanagement.rotation.signKeyPairs.enabled: false
   keymanagement.rotation.encKeyPairs.enabled: false
 
-bankinggateway.b2c.url: https://dev-bankinggateway-b2c.cloud.adorsys.de
+bankinggateway.b2c.url: http://localhost:8084
+#bankinggateway.b2c.url: https://dev-bankinggateway-b2c.cloud.adorsys.de
 bankinggateway.adapter.url: https://dev-bankinggateway-adapter.cloud.adorsys.de
 
 bank.import.file: /Users/alexg/Downloads/multibanking/catalogue/banks/bank-catalogue.yml

@@ -52,6 +52,8 @@ public class SyncTest {
     @Value("${RULES_URL:file:/Users/alexg/Downloads/rules_base_v4.2x.csv}")
     private File rulesFile;
 
+    private BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"), BankApi.HBCI);
+
     @BeforeClass
     public static void beforeClass() {
         TestConstants.setup();
@@ -75,7 +77,6 @@ public class SyncTest {
         }
 
         bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {
-            BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"), BankApi.HBCI);
             bankRepository.save(bankEntity);
             return bankEntity;
         });
@@ -83,11 +84,13 @@ public class SyncTest {
 
     @Test
     public void testSyncBookings() {
-        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id", System.getProperty("blz"));
+        BankAccessEntity bankAccessEntity = TestUtil.getBankAccessEntity("test-user-id", "test-access-id",
+            System.getProperty("blz"));
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
-        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankAccessEntity,
+        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity,
+            bankAccessEntity,
             BankApi.HBCI);
         BankAccountEntity bankAccountEntity = bankAccountEntities.stream()
             .filter(account -> account.getAccountNumber().equals(System.getProperty("account")))

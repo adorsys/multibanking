@@ -26,5 +26,5 @@ class AbstractStrongCustomerAuthorisationRequest extends AbstractRequest {
     private String consentId;
     private String authorisationId;
     private String psuAccountIban;
-    private Object bankApiConsentData;
+
 }

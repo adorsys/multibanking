@@ -68,11 +68,10 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
 
     @Override
     String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
-        boolean camt = Optional.ofNullable(loadBookingsRequest.getTransaction().getRawResponseType())
-            .map(rawResponseType -> rawResponseType == CAMT)
-            .orElse(false);
-
-        return camt ? "KUmsAllCamt" : "KUmsAll";
+        if (bookingsJob instanceof GVKUmsAllCamt) {
+            return "KUmsAllCamt";
+        }
+        return "KUmsAll";
     }
 
     @Override
@@ -81,14 +80,11 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
     }
 
     @Override
-    public LoadBookingsResponse createJobResponse(PinTanPassport passport, AbstractHBCIJob hbciJob) {
-        AbstractHBCIJob resultJob = Optional.ofNullable(hbciJob)
-            .orElse(this.bookingsJob);
-
-        if (resultJob.getJobResult().getJobStatus().hasErrors()) {
+    public LoadBookingsResponse createJobResponse(PinTanPassport passport) {
+        if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
             throw new MultibankingException(HBCI_ERROR,
-                resultJob.getJobResult().getJobStatus().getErrorList().stream()
+                bookingsJob.getJobResult().getJobStatus().getErrorList().stream()
                     .map(messageString -> Message.builder().renderedMessage(messageString).build())
                     .collect(Collectors.toList()));
         }
@@ -96,7 +92,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
         List<Booking> bookingList = null;
         BalancesReport balancesReport = null;
         List<String> raw = null;
-        GVRKUms bookingsResult = (GVRKUms) resultJob.getJobResult();
+        GVRKUms bookingsResult = (GVRKUms) bookingsJob.getJobResult();
         if (loadBookingsRequest.getTransaction().getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
@@ -125,21 +121,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
     }
 
     private AbstractHBCIJob createBookingsJob(PinTanPassport passport) {
-        LoadBookings.RawResponseType rawResponseType = loadBookingsRequest.getTransaction().getRawResponseType();
-        if (rawResponseType != null && passport.jobSupported(rawResponseType == CAMT ?
-            GVKUmsAllCamt.getLowlevelName() : GVKUmsAll.getLowlevelName())) {
-            throw new MultibankingException(BOOKINGS_FORMAT_NOT_SUPPORTED, rawResponseType + " not supported");
-        }
-
-        AbstractHBCIJob hbciJob = Optional.ofNullable(rawResponseType)
-            .map(format -> {
-                if (format == CAMT) {
-                    return new GVKUmsAllCamt(passport, true);
-                } else {
-                    return new GVKUmsAll(passport);
-                }
-            })
-            .orElseGet(() -> new GVKUmsAllCamt(passport, false));
+        AbstractHBCIJob hbciJob = createBookingsJobInternal(passport);
 
         hbciJob.setParam("my", getPsuKonto(passport));
 
@@ -152,6 +134,32 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
                 Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
         return hbciJob;
+    }
+
+    private AbstractHBCIJob createBookingsJobInternal(PinTanPassport passport) {
+        LoadBookings.RawResponseType rawResponseType = loadBookingsRequest.getTransaction().getRawResponseType();
+        if (rawResponseType != null && !passport.jobSupported(rawResponseType == CAMT ?
+            GVKUmsAllCamt.getLowlevelName() : GVKUmsAll.getLowlevelName())) {
+            throw new MultibankingException(BOOKINGS_FORMAT_NOT_SUPPORTED, rawResponseType + " not supported");
+        }
+
+        return Optional.ofNullable(rawResponseType)
+            .map(format -> {
+                if (format == CAMT) {
+                    return new GVKUmsAllCamt(passport, true);
+                } else {
+                    return new GVKUmsAll(passport);
+                }
+            })
+            .orElseGet(() -> {
+                if (passport.jobSupported(GVKUmsAllCamt.getLowlevelName())) {
+                    return new GVKUmsAllCamt(passport, false);
+                } else if (passport.jobSupported(GVKUmsAll.getLowlevelName())) {
+                    return new GVKUmsAll(passport);
+                } else {
+                    throw new MultibankingException(HBCI_ERROR, "transaction jobs not supported");
+                }
+            });
     }
 
 }

@@ -118,26 +118,24 @@ public interface HbciObjectMapper {
 
     default List<Booking> createBookings(GVRKUms gvrkUms) {
         List<Booking> bookings = new ArrayList<>();
-        if (gvrkUms.isOK()) {
-            List<GVRKUms.UmsLine> lines = gvrkUms.getFlatData();
-            for (GVRKUms.UmsLine line : lines) {
-                Booking booking = toBooking(line);
-                if (line != null && line.other != null) {
-                    booking.setOtherAccount(toBankAccount(line.other));
+        List<GVRKUms.UmsLine> lines = gvrkUms.getFlatData();
+        for (GVRKUms.UmsLine line : lines) {
+            Booking booking = toBooking(line);
+            if (line != null && line.other != null) {
+                booking.setOtherAccount(toBankAccount(line.other));
 
-                    String differentInitiator = Utils.extractDifferentInitiator(booking.getUsage());
-                    if (differentInitiator != null) {
-                        booking.getOtherAccount().setOwner(booking.getOtherAccount().getOwner() + " " + differentInitiator);
-                    }
-
-                    if (StringUtils.isBlank(booking.getOtherAccount().getIban())) {
-                        booking.getOtherAccount().setIban(extractIban(booking.getUsage()));
-                    }
-
+                String differentInitiator = Utils.extractDifferentInitiator(booking.getUsage());
+                if (differentInitiator != null) {
+                    booking.getOtherAccount().setOwner(booking.getOtherAccount().getOwner() + " " + differentInitiator);
                 }
 
-                bookings.add(0, booking);
+                if (StringUtils.isBlank(booking.getOtherAccount().getIban())) {
+                    booking.getOtherAccount().setIban(extractIban(booking.getUsage()));
+                }
+
             }
+
+            bookings.add(0, booking);
         }
 
         return bookings;

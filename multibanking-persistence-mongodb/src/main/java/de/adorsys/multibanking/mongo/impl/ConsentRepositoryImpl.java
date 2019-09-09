@@ -19,6 +19,12 @@ public class ConsentRepositoryImpl implements ConsentRepositoryIf {
     private final MongoEntityMapper entityMapper;
 
     @Override
+    public Optional<ConsentEntity> findByRedirectId(String id) {
+        return consentRepository.findByRedirectId(id)
+            .map(entityMapper::toConsentEntity);
+    }
+
+    @Override
     public Optional<ConsentEntity> findById(String id) {
         return consentRepository.findById(id)
             .map(entityMapper::toConsentEntity);

@@ -43,10 +43,11 @@ public class ConsentService {
             onlineBankingService.getStrongCustomerAuthorisation().createConsent(consent, bank.isRedirectPreferred(),
                 tppRedirectUri);
 
-        ConsentEntity consentEntity = consentMapper.toConsentEntity(createConsentResponse, consent.getPsuAccountIban(),
+        ConsentEntity consentEntity = consentMapper.toConsentEntity(createConsentResponse, consent.getRedirectId(), consent.getPsuAccountIban(),
             onlineBankingService.bankApi());
         consentRepository.save(consentEntity);
 
+        createConsentResponse.setRedirectId(consent.getRedirectId());
         return createConsentResponse;
     }
 
@@ -128,7 +129,20 @@ public class ConsentService {
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        return onlineBankingService.getStrongCustomerAuthorisation().getConsent(consentId);
+        Consent consent = onlineBankingService.getStrongCustomerAuthorisation().getConsent(consentId);
+        return Optional.ofNullable(consent)
+            .orElseGet(() -> consentMapper.toConsent(internalConsent));
+    }
+
+    public Consent getConsentByRedirectId(String redirectId) {
+        ConsentEntity internalConsent = consentRepository.findByRedirectId(redirectId)
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, redirectId));
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+
+        Consent consent = onlineBankingService.getStrongCustomerAuthorisation().getConsent(internalConsent.getId());
+        return Optional.ofNullable(consent)
+            .orElseGet(() -> consentMapper.toConsent(internalConsent));
     }
 
     public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId) {
@@ -147,13 +161,7 @@ public class ConsentService {
             bankingServiceProducer.getBankingService(Iban.valueOf(iban).getBankCode());
     }
 
-    Optional<ConsentEntity> validateAndGetConsent(OnlineBankingService onlineBankingService, String consentId,
-                                                  ScaStatus expectedConsentStatus) {
-        if (onlineBankingService.getStrongCustomerAuthorisation() == null) {
-            // Bank API doesn't support SCA so nothing to validate
-            return Optional.empty();
-        }
-
+    ConsentEntity validateAndGetConsent(OnlineBankingService onlineBankingService, String consentId, ScaStatus expectedConsentStatus) {
         ConsentEntity internalConsent = consentRepository.findById(consentId)
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
 
@@ -164,14 +172,13 @@ public class ConsentService {
 
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
-                case INVALID_PIN:
-                    throw new MissingConsentException();
                 case INVALID_SCA_METHOD:
                     throw new MissingConsentAuthorisationSelectionException();
                 case INVALID_CONSENT_STATUS:
                     if (expectedConsentStatus == ScaStatus.FINALISED) {
-                        // TODO don't know where to get UpdateAuthResponse
-                        throw new TransactionAuthorisationRequiredException(null, internalConsent.getId(),
+                        UpdateAuthResponse authorisationStatus = getAuthorisationStatus(internalConsent.getId(),
+                            internalConsent.getAuthorisationId());
+                        throw new TransactionAuthorisationRequiredException(authorisationStatus, internalConsent.getId(),
                             internalConsent.getAuthorisationId());
                     } else if (expectedConsentStatus == ScaStatus.SCAMETHODSELECTED) {
                         throw new MissingConsentAuthorisationSelectionException();
@@ -182,7 +189,7 @@ public class ConsentService {
             }
         }
 
-        return Optional.of(internalConsent);
+        return internalConsent;
     }
 
 }

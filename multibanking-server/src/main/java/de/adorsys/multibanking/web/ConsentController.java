@@ -79,6 +79,12 @@ public class ConsentController {
         return mapToResource(consentService.getConsent(consentId));
     }
 
+    @ApiOperation(value = "Read consent")
+    @GetMapping("redirect/{redirectId}")
+    public Resource<ConsentTO> getConsentByRedirectId(@PathVariable("redirectId") String redirectId) {
+        return mapToResource(consentService.getConsentByRedirectId(redirectId));
+    }
+
     @ApiOperation(value = "Delete consent")
     @DeleteMapping("/{consentId}")
     public HttpEntity<Void> deleteConsent(@PathVariable String consentId) {

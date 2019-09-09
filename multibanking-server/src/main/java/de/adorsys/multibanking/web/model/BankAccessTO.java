@@ -18,8 +18,8 @@ public class BankAccessTO {
     @ApiModelProperty(value = "PSD2 consent id", required = true)
     private String consentId;
 
-    @NotBlank
-    @ApiModelProperty(value = "IBAN", required = true, example = "DE51250400903312345678")
+    @ApiModelProperty(value = "IBAN", readOnly = true, accessMode =
+        ApiModelProperty.AccessMode.READ_ONLY)
     private String iban;
 
     @ApiModelProperty(value = "Bank name", example = "Deutsche Bank", readOnly = true, accessMode =

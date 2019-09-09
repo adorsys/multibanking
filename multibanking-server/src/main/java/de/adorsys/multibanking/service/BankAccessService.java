@@ -1,17 +1,12 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.domain.BankAccessEntity;
-import de.adorsys.multibanking.domain.BankAccountEntity;
-import de.adorsys.multibanking.domain.BankApiUser;
-import de.adorsys.multibanking.domain.UserEntity;
+import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.iban4j.Iban;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,22 +27,21 @@ public class BankAccessService {
     private final BankAccessRepositoryIf bankAccessRepository;
     private final BookingRepositoryIf bookingRepository;
     private final BankAccountService bankAccountService;
+    private final BankService bankService;
     private final ConsentRepositoryIf consentRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
     public BankAccessEntity createBankAccess(BankAccessEntity bankAccess) {
         userService.checkUserExists(bankAccess.getUserId());
 
-        if (StringUtils.isNoneBlank(bankAccess.getIban())) {
-            bankAccess.setBankCode(Iban.valueOf(bankAccess.getIban()).getBankCode());
-        }
-
-        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankAccess, null);
+        BankEntity bank = bankService.findBank(bankAccess.getBankCode());
+        List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bank, bankAccess, null);
 
         if (bankAccounts.isEmpty()) {
             throw new InvalidBankAccessException(bankAccess.getBankCode());
         }
 
+        bankAccess.setBankName(bank.getName());
         bankAccessRepository.save(bankAccess);
 
         bankAccounts.forEach(account -> account.setBankAccessId(bankAccess.getId()));
@@ -85,7 +79,7 @@ public class BankAccessService {
         return bankAccessRepository.findByUserIdAndId(userId, accessId).map(bankAccessEntity -> {
             bankAccessRepository.deleteByUserIdAndBankAccessId(userId, accessId);
 
-            deleteConsent(bankAccessEntity);
+            deleteConsent(bankAccessEntity.getConsentId());
 
             List<BankAccountEntity> bankAccounts = bankAccountRepository.deleteByBankAccess(accessId);
             bankAccounts.forEach(bankAccountEntity -> {
@@ -114,9 +108,10 @@ public class BankAccessService {
         });
     }
 
-    private void deleteConsent(BankAccessEntity bankAccessEntity) {
-        Optional.ofNullable(bankAccessEntity.getConsentId())
+    private void deleteConsent(String consentId) {
+        Optional.ofNullable(consentId)
             .map(consentRepository::findById)
+            .filter(Optional::isPresent)
             .map(Optional::get)
             .ifPresent(internalConsent -> {
                 OnlineBankingService bankingService =
@@ -124,6 +119,7 @@ public class BankAccessService {
                 bankingService.getStrongCustomerAuthorisation().revokeConsent(internalConsent.getId());
                 consentRepository.delete(internalConsent);
             });
+
     }
 
 }

@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.hbci;
 
 import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.Credentials;
 import de.adorsys.multibanking.domain.request.AuthenticatePsuRequest;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
@@ -16,6 +17,7 @@ interface HbciScaMapper {
     @Mapping(target = "authorisationId", expression = "java( java.util.UUID.randomUUID().toString() )")
     @Mapping(target = "bankApiConsentData", expression = "java( bankApiConsentData )")
     @Mapping(target = "redirectUrl", ignore = true)
+    @Mapping(target = "redirectId", ignore = true)
     CreateConsentResponse toCreateConsentResponse(HBCIConsent bankApiConsentData);
 
     @Mapping(target = "challenge", ignore = true)

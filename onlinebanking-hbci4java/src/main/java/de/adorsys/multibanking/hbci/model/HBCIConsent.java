@@ -28,7 +28,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-//hbci one time consent
 public class HBCIConsent {
 
     private ScaStatus status;

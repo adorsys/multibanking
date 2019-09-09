@@ -11,9 +11,17 @@ import java.util.List;
 @Data
 public class ConsentTO {
 
+    @ApiModelProperty(value = "Internal consent id", readOnly = true, accessMode =
+        ApiModelProperty.AccessMode.READ_ONLY)
+    private String id;
+
+    @ApiModelProperty(value = "Consent redirect id")
+    private String redirectId;
+
     @NotNull
     @ApiModelProperty(value = "account iban", required = true)
     private String psuAccountIban;
+
     @ApiModelProperty("URI of the TPP, where the transaction flow shall be redirected to after a Redirect.\n" +
         "        \n" +
         "        Mandated for the Redirect SCA Approach, specifically \n" +

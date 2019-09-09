@@ -38,22 +38,21 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SerializationUtils;
 import org.kapott.hbci.GV.GVTANMediaList;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.manager.HBCIVersion;
+import org.kapott.hbci.passport.PinTanPassport;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
-import static de.adorsys.multibanking.domain.ScaStatus.STARTED;
-import static de.adorsys.multibanking.hbci.job.AccountInformationJob.extractTanTransportTypes;
+import static de.adorsys.multibanking.domain.ScaStatus.*;
 
 @Slf4j
 public class Hbci4JavaBanking implements OnlineBankingService {
@@ -391,6 +390,35 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             });
     }
 
+    private List<TanTransportType> extractTanTransportTypes(PinTanPassport hbciPassport) {
+        return hbciPassport.getUserTwostepMechanisms()
+            .stream()
+            .map(id -> hbciPassport.getBankTwostepMechanisms().get(id))
+            .filter(Objects::nonNull)
+            .map(hbciTwoStepMechanism -> TanTransportType.builder()
+                .id(hbciTwoStepMechanism.getSecfunc())
+                .name(hbciTwoStepMechanism.getName())
+                .inputInfo(hbciTwoStepMechanism.getInputinfo())
+                .needTanMedia(hbciTwoStepMechanism.getNeedtanmedia().equals("2"))
+                .build())
+            .map(tanTransportType -> {
+                if (!tanTransportType.isNeedTanMedia()) {
+                    return Collections.singletonList(tanTransportType);
+                } else {
+                    return hbciPassport.getTanMedias().stream()
+                        .map(tanMediaInfo -> {
+                            TanTransportType clone = SerializationUtils.clone(tanTransportType);
+                            clone.setMedium(tanMediaInfo.mediaName);
+                            return clone;
+                        })
+                        .collect(Collectors.toList());
+                }
+            })
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+
+    }
+
     @Override
     public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
         return new StrongCustomerAuthorisable() {
@@ -406,20 +434,17 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             @Override
             public Consent getConsent(String consentId) {
-                Consent consent = new Consent();
-                consent.setConsentId(consentId);
-                return consent;
+                return null;
             }
 
             @Override
             public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication) {
-                HBCIConsent hbciConsent = (HBCIConsent) updatePsuAuthentication.getBankApiConsentData();
-
                 AuthenticatePsuRequest request = hbciMapper.toAuthenticatePsuRequest(updatePsuAuthentication);
-
                 ScaMethodsResponse response = authenticatePsu(request);
+
+                HBCIConsent hbciConsent = (HBCIConsent) updatePsuAuthentication.getBankApiConsentData();
                 hbciConsent.setTanMethodList(response.getTanTransportTypes());
-                hbciConsent.setStatus(ScaStatus.PSUAUTHENTICATED);
+                hbciConsent.setStatus(PSUAUTHENTICATED);
                 hbciConsent.setCredentials(request.getCredentials());
 
                 return hbciMapper.toUpdateAuthResponse(hbciConsent, bankApi());
@@ -428,7 +453,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             @Override
             public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
                 HBCIConsent hbciConsent = (HBCIConsent) transactionAuthorisation.getBankApiConsentData();
-                hbciConsent.setStatus(ScaStatus.FINALISED);
+                hbciConsent.setStatus(FINALISED);
                 hbciConsent.setScaAuthenticationData(transactionAuthorisation.getScaAuthenticationData());
 
                 return hbciMapper.toUpdateAuthResponse(hbciConsent, bankApi());
@@ -443,7 +468,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                     .findFirst()
                     .orElseThrow(IllegalArgumentException::new);
                 hbciConsent.setSelectedMethod(selectedMethod);
-                hbciConsent.setStatus(ScaStatus.SCAMETHODSELECTED);
+                hbciConsent.setStatus(SCAMETHODSELECTED);
 
                 return hbciMapper.toUpdateAuthResponse(hbciConsent, bankApi());
             }
@@ -465,9 +490,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                                         Object bankApiConsentData) {
                 HBCIConsent hbciConsent = (HBCIConsent) bankApiConsentData;
 
-                if (hbciConsent.getStatus() != expectedConsentStatus) {
-                    throw new MultibankingException(MultibankingError.INVALID_CONSENT_STATUS);
+                if (hbciConsent.getStatus() == SCAMETHODSELECTED || hbciConsent.getStatus() == FINALISED) {
+                    return;
                 }
+                throw new MultibankingException(MultibankingError.INVALID_CONSENT_STATUS);
             }
 
             @Override

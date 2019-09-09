@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Bank accounts</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item detail *ngFor="let bankAccount of bankAccounts" (click)="itemTapped(bankAccount)">
+      <ion-label>
+        {{bankAccount.iban}} - {{bankAccount.type}}
+      </ion-label>
+      <h2 slot="end" *ngIf="bankAccount.balances && bankAccount.balances.readyBalance" item-right>
+        {{ bankAccount.balances.readyBalance.amount | currency:'EUR':'symbol' }}</h2>
+    </ion-item>
+  </ion-list>
+</ion-content>

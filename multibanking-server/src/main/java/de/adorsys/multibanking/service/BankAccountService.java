@@ -45,7 +45,9 @@ public class BankAccountService extends AccountInformationService {
         List<BankAccountEntity> bankAccounts = bankAccountRepository.findByUserIdAndBankAccessId(userId, accessId);
 
         if (bankAccounts.isEmpty()) {
-            bankAccounts = loadBankAccountsOnline(bankAccessEntity, null);
+            BankEntity bank = bankService.findBank(bankAccessEntity.getBankCode());
+
+            bankAccounts = loadBankAccountsOnline(bank, bankAccessEntity, null);
             bankAccounts.forEach(account -> account.setBankAccessId(bankAccessEntity.getId()));
 
             bankAccountRepository.save(bankAccounts);
@@ -57,17 +59,22 @@ public class BankAccountService extends AccountInformationService {
         return bankAccounts;
     }
 
-    List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, BankApi bankApi) {
-        return loadBankAccountsOnline(bankAccess, userService.findUser(bankAccess.getUserId()), bankApi, FINALISED);
+    List<BankAccountEntity> loadBankAccountsOnline(BankEntity bankEntity, BankAccessEntity bankAccess,
+                                                   BankApi bankApi) {
+        return loadBankAccountsOnline(bankEntity, bankAccess, userService.findUser(bankAccess.getUserId()), bankApi,
+            FINALISED);
     }
 
-    public List<BankAccountEntity> loadBankAccountsOnline(BankAccessEntity bankAccess, UserEntity userEntity,
+    public List<BankAccountEntity> loadBankAccountsOnline(BankEntity bankEntity, BankAccessEntity bankAccess,
+                                                          UserEntity userEntity,
                                                           BankApi bankApi, ScaStatus expectedConsentStatus) {
         OnlineBankingService onlineBankingService = bankApi != null ?
             bankingServiceProducer.getBankingService(bankApi) :
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
-        BankEntity bankEntity = checkBankSupported(onlineBankingService, bankAccess.getBankCode());
+        if (!onlineBankingService.bankSupported(bankAccess.getBankCode())) {
+            throw new InvalidBankAccessException(bankAccess.getBankCode());
+        }
         BankApiUser bankApiUser = userService.checkApiRegistration(onlineBankingService, userEntity);
 
         List<BankAccount> bankAccounts = loadBankAccountsOnline(expectedConsentStatus, bankAccess,
@@ -91,30 +98,21 @@ public class BankAccountService extends AccountInformationService {
     private List<BankAccount> loadBankAccountsOnline(ScaStatus expectedConsentStatus, BankAccessEntity bankAccess,
                                                      OnlineBankingService onlineBankingService,
                                                      BankApiUser bankApiUser, BankEntity bankEntity) {
-        Optional<ConsentEntity> consentEntity = consentService.validateAndGetConsent(onlineBankingService,
-            bankAccess.getConsentId(),
-            expectedConsentStatus);
+        ConsentEntity consentEntity = consentService.validateAndGetConsent(onlineBankingService,
+            bankAccess.getConsentId(), expectedConsentStatus);
 
-        LoadAccounts loadAccounts = new LoadAccounts();
-        loadAccounts.setUpdateTanTransportTypes(true);
-
-        TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(loadAccounts, bankApiUser,
-            bankAccess);
+        TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(new LoadAccounts());
+        transactionRequest.setBankApiUser(bankApiUser);
+        transactionRequest.setBankAccess(bankAccess);
         transactionRequest.setBank(bankEntity);
-        transactionRequest.setBankApiConsentData(consentEntity.orElse(null));
+        transactionRequest.setHbciProduct(finTSProductConfig.getProduct());
+        transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
 
         try {
             return onlineBankingService.loadBankAccounts(transactionRequest).getBankAccounts();
         } catch (MultibankingException e) {
             throw handleMultibankingException(bankAccess, e);
         }
-    }
-
-    private BankEntity checkBankSupported(OnlineBankingService onlineBankingService, String bankCode) {
-        if (!onlineBankingService.bankSupported(bankCode)) {
-            throw new InvalidBankAccessException(bankCode);
-        }
-        return bankService.findBank(bankCode);
     }
 
     private void filterAccounts(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService,

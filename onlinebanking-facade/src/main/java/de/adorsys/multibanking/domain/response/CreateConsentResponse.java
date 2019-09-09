@@ -23,6 +23,7 @@ public class CreateConsentResponse {
 
     private String consentId;
     private String authorisationId;
+    private String redirectId;
     private String redirectUrl;
     private Object bankApiConsentData;
 }
