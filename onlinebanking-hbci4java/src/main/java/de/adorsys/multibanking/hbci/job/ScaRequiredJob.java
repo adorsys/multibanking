@@ -82,7 +82,8 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
         //check for SCA is really needed after execution
         tan2StepRequired = Optional.ofNullable(hktan)
-            .map(gvtan2Step -> KnownReturncode.W3076.searchReturnValue(gvtan2Step.getJobResult().getJobStatus().getRetVals()) == null)
+            .map(gvtan2Step -> KnownReturncode.W3076.searchReturnValue(gvtan2Step.getJobResult().getJobStatus().getRetVals()) == null
+                && KnownReturncode.W3076.searchReturnValue(gvtan2Step.getJobResult().getGlobStatus().getRetVals()) == null)
             .orElse(false);
 
         R jobResponse = createJobResponse(dialog.getPassport());
@@ -150,7 +151,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         return startHbciDialog(null, dialogRequest);
     }
 
-    HBCIExecStatus execute(HBCIDialog dialog, boolean closeDialog) {
+    private HBCIExecStatus execute(HBCIDialog dialog, boolean closeDialog) {
         HBCIExecStatus status = dialog.execute(closeDialog);
         if (!status.isOK()) {
             throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorMessages()
