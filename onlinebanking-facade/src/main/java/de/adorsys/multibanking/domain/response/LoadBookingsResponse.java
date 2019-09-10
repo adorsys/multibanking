@@ -17,6 +17,7 @@
 package de.adorsys.multibanking.domain.response;
 
 import de.adorsys.multibanking.domain.BalancesReport;
+import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.Booking;
 import lombok.Builder;
 import lombok.Data;
@@ -33,5 +34,6 @@ public class LoadBookingsResponse extends AbstractResponse {
     private List<String> rawData;
     private List<Booking> bookings;
     private BalancesReport balancesReport;
+    private List<BankAccount> bankAccounts;
 
 }

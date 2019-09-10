@@ -142,8 +142,12 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         LoadBookings loadBookings = loadBookingsRequest.getTransaction();
         RequestHeaders requestHeaders = createAisHeaders(loadBookingsRequest);
 
+        List<AccountDetails> accountDetailsList = getAccounts(requestHeaders);
+        List<BankAccount> accountList = accountDetailsList.stream()
+            .map(accountDetails -> bankingGatewayMapper.toBankAccount(accountDetails))
+            .collect(Collectors.toList());
         String resourceId = Optional.ofNullable(loadBookings.getPsuAccount().getExternalIdMap().get(bankApi()))
-            .orElseGet(() -> getAccountResourceId(loadBookingsRequest.getBankAccess().getIban(), requestHeaders));
+            .orElseGet(() -> getAccountResourceId(loadBookingsRequest.getBankAccess().getIban(), accountDetailsList));
 
         RequestParams requestParams = RequestParams.builder()
             .dateFrom(loadBookings.getDateFrom())
@@ -180,15 +184,20 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             return LoadBookingsResponse.builder()
                 .bookings(bookings)
                 .balancesReport(balancesReport)
+                .bankAccounts(accountList)
                 .build();
         } catch (FeignException e) {
             throw handeAisApiException(e);
         }
     }
 
-    private String getAccountResourceId(String iban, RequestHeaders requestHeaders) {
+    private List<AccountDetails> getAccounts(RequestHeaders requestHeaders) {
         return getAccountInformationService().getAccountList(requestHeaders, RequestParams.builder().build())
-            .getResponseBody().getAccounts()
+            .getResponseBody().getAccounts();
+    }
+
+    private String getAccountResourceId(String iban, List<AccountDetails> accountDetailsList) {
+        return accountDetailsList
             .stream()
             .filter(accountDetails -> accountDetails.getIban().equals(iban))
             .findAny()
