@@ -43,7 +43,7 @@ public class BulkPaymentJob extends ScaRequiredJob<BulkPayment, EmptyResponse> {
     private final TransactionRequest<BulkPayment> transactionRequest;
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         BulkPayment bulkPayment = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);

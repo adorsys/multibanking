@@ -36,7 +36,7 @@ public class ForeignPaymentJob extends ScaRequiredJob<ForeignPayment, EmptyRespo
     private final TransactionRequest<ForeignPayment> transactionRequest;
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         Konto src = getPsuKonto(passport);
 
         GVDTAZV gv = new GVDTAZV(passport, GVDTAZV.getLowlevelName());

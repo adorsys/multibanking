@@ -41,7 +41,7 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<FutureSinglePay
     private String jobName;
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         FutureSinglePayment singlePayment = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);

@@ -40,7 +40,7 @@ public class NewStandingOrderJob extends ScaRequiredJob<StandingOrder, EmptyResp
     private final TransactionRequest<StandingOrder> transactionRequest;
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         StandingOrder standingOrder = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);

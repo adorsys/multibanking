@@ -51,7 +51,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
     private AbstractHBCIJob bookingsJob;
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         bookingsJob = createBookingsJob(passport);
         return bookingsJob;
     }

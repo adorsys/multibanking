@@ -48,7 +48,7 @@ public class TanRequestJob extends ScaRequiredJob {
     }
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         return null;
     }
 

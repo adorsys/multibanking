@@ -62,7 +62,7 @@ public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, EmptyResponse> {
     }
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         RawSepaPayment sepaPayment = transactionRequest.getTransaction();
 
         String jobName;

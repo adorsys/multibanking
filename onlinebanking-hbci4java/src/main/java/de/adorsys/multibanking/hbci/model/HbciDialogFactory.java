@@ -16,12 +16,17 @@
 
 package de.adorsys.multibanking.hbci.model;
 
+import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import org.kapott.hbci.dialog.AbstractHbciDialog;
+import org.kapott.hbci.dialog.HBCIBpdDialog;
+import org.kapott.hbci.dialog.HBCIJobsDialog;
+import org.kapott.hbci.dialog.HBCIUpdDialog;
 import org.kapott.hbci.manager.BankInfo;
-import org.kapott.hbci.manager.HBCIDialog;
 import org.kapott.hbci.manager.HBCIProduct;
+import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.manager.HBCIUtils;
 
 import java.util.HashMap;
@@ -32,7 +37,9 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NO
 @UtilityClass
 public class HbciDialogFactory {
 
-    public static HBCIDialog startHbciDialog(HbciPassport passport, HbciDialogRequest dialogRequest) {
+    public static AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciPassport existingPassport,
+                                                  HbciDialogRequest dialogRequest,
+                                                  HBCITwoStepMechanism twoStepMechanism) {
         String bankCode = dialogRequest.getBank().getBankApiBankCode() != null
             ? dialogRequest.getBank().getBankApiBankCode()
             : dialogRequest.getBank().getBankCode();
@@ -45,14 +52,19 @@ public class HbciDialogFactory {
             .map(product -> new HBCIProduct(product.getName(), product.getVersion()))
             .orElse(null);
 
-        HbciPassport newPassport = Optional.ofNullable(passport)
-            .orElseGet(() -> createPassport(bankInfo.getPinTanVersion().getId(), bankCode,
-                dialogRequest.getCredentials().getUserId(), dialogRequest.getCredentials().getCustomerId(), hbciProduct,
-                dialogRequest.getCallback()
-            ));
+        HbciPassport newPassport = Optional.ofNullable(existingPassport)
+            .orElseGet(() -> {
+                HbciConsent hbciConsent = (HbciConsent) dialogRequest.getBankApiConsentData();
 
-        Optional.ofNullable(dialogRequest.getHbciPassportState())
-            .ifPresent(s -> HbciPassport.State.fromJson(dialogRequest.getHbciPassportState()).apply(newPassport));
+                return createPassport(bankInfo.getPinTanVersion().getId(), bankCode,
+                    hbciConsent.getCredentials().getUserId(), hbciConsent.getCredentials().getCustomerId(),
+                    hbciProduct, dialogRequest.getCallback());
+            });
+        newPassport.setCurrentSecMechInfo(twoStepMechanism);
+
+        Optional.ofNullable(dialogRequest.getBankAccess())
+            .map(BankAccess::getHbciPassportState)
+            .ifPresent(state -> HbciPassport.State.fromJson(state).apply(newPassport));
 
         Optional.ofNullable(dialogRequest.getHbciBPD())
             .ifPresent(newPassport::setBPD);
@@ -63,7 +75,7 @@ public class HbciDialogFactory {
         Optional.ofNullable(dialogRequest.getHbciSysId())
             .ifPresent(newPassport::setSysId);
 
-        newPassport.setPIN(dialogRequest.getCredentials().getPin());
+        newPassport.setPIN(((HbciConsent) dialogRequest.getBankApiConsentData()).getCredentials().getPin());
 
         String url = bankInfo.getPinTanAddress();
         String proxyPrefix = System.getProperty("proxyPrefix", null);
@@ -72,7 +84,17 @@ public class HbciDialogFactory {
         }
         newPassport.setHost(url);
 
-        return new HBCIDialog(newPassport);
+        switch (dialogType) {
+            case bpd:
+                return new HBCIBpdDialog(newPassport);
+            case upd:
+                return new HBCIUpdDialog(newPassport);
+            case jobs:
+                return new HBCIJobsDialog(newPassport);
+            default:
+                throw new IllegalStateException("Unexpected dialog tpye: " + dialogType);
+        }
+
     }
 
     public static HbciPassport createPassport(HbciPassport.State state, HbciCallback callback) {

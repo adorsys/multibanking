@@ -41,7 +41,7 @@ public class SinglePaymentJob extends ScaRequiredJob<SinglePayment, EmptyRespons
     private final TransactionRequest<SinglePayment> transactionRequest;
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         SinglePayment singlePayment = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);

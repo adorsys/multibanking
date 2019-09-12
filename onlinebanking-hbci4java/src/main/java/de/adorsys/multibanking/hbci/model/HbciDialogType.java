@@ -16,22 +16,7 @@
 
 package de.adorsys.multibanking.hbci.model;
 
-import lombok.Data;
-import org.kapott.hbci.manager.HBCITwoStepMechanism;
+public enum  HbciDialogType {
 
-@Data
-public class HbciTanSubmit {
-
-    private String dialogId;
-    private long msgNum;
-    private String orderRef;
-    private String passportState;
-    private String hbciJobName; //eg. HKCCS
-    private String originJobName; //"org.kapott.hbci.GV.GV" + jobname
-    private String originLowLevelName; //key for hbci-300.xml
-    private int originSegVersion; //segment version
-    private String sepaPain;
-    private String painVersion;
-    private HBCITwoStepMechanism twoStepMechanism;
-    private String lowLevelParams;
+    bpd, upd, jobs
 }

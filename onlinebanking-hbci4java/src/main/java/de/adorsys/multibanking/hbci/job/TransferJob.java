@@ -16,19 +16,20 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.Product;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
-import de.adorsys.multibanking.hbci.model.HBCIConsent;
 import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
+import de.adorsys.multibanking.hbci.model.HbciObjectMapper;
+import de.adorsys.multibanking.hbci.model.HbciObjectMapperImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVUmbSEPA;
-import org.kapott.hbci.manager.HBCIDialog;
+import org.kapott.hbci.dialog.AbstractHbciDialog;
+import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
@@ -38,33 +39,25 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
-import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDialog;
+import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.createDialog;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.jobs;
 
 @Slf4j
 public class TransferJob {
 
+    private HbciObjectMapper hbciObjectMapper = new HbciObjectMapperImpl();
+
     public void requestTransfer(TransactionRequest sepaTransactionRequest) {
-        HBCIConsent hbciConsent = (HBCIConsent) sepaTransactionRequest.getBankApiConsentData();
+        HbciDialogRequest dialogRequest = hbciObjectMapper.toHbciDialogRequest(sepaTransactionRequest, null);
 
-        HbciDialogRequest dialogRequest = HbciDialogRequest.builder()
-            .credentials(hbciConsent.getCredentials())
-            .hbciPassportState(sepaTransactionRequest.getBankAccess().getHbciPassportState())
-            .build();
-
-        dialogRequest.setBank(sepaTransactionRequest.getBank());
-        dialogRequest.setHbciProduct(Optional.ofNullable(sepaTransactionRequest.getHbciProduct())
-            .map(product -> new Product(product.getName(), product.getVersion()))
-            .orElse(null));
-        dialogRequest.setHbciBPD(sepaTransactionRequest.getHbciBPD());
-
-        HBCIDialog dialog = startHbciDialog(null, dialogRequest);
+        HBCIJobsDialog dialog = (HBCIJobsDialog)createDialog(jobs, null, dialogRequest, null);
 
         AbstractHBCIJob hbciJob = createHbciJob(sepaTransactionRequest.getTransaction(), dialog.getPassport(), null);
 
         dialog.addTask(hbciJob);
 
         // Let the Handler submitAuthorizationCode all jobs in one batch
-        HBCIExecStatus dialogStatus = dialog.execute(true);
+        HBCIExecStatus dialogStatus = dialog.execute();
         if (!dialogStatus.isOK()) {
             log.warn(dialogStatus.getErrorMessages().toString());
         }
@@ -75,7 +68,8 @@ public class TransferJob {
                 .collect(Collectors.toList()));
         }
 
-        dialog.execute(true);
+        dialog.execute();
+        dialog.close();
     }
 
     private AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
