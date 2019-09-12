@@ -107,12 +107,15 @@ interface BankingGatewayMapper {
         booking.setExternalId(transactionDetails.getEndToEndId());
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
 
-        if (transactionDetails.getCreditorName() != null || transactionDetails.getDebtorName() != null) {
-            BankAccount bankAccount = new BankAccount();
-            bankAccount.setOwner(transactionDetails.getCreditorName() != null ? transactionDetails.getCreditorName()
-                : transactionDetails.getDebtorName());
-            booking.setOtherAccount(bankAccount);
+        BankAccount bankAccount = new BankAccount();
+        if (transactionDetails.getCreditorName() != null || transactionDetails.getCreditorAccount() !=null) {
+            bankAccount.setOwner(transactionDetails.getCreditorName());
+            bankAccount.setIban(transactionDetails.getCreditorAccount().getIban());
+        } else if (transactionDetails.getDebtorName() != null || transactionDetails.getDebtorAccount() != null) {
+            bankAccount.setOwner(transactionDetails.getDebtorName());
+            bankAccount.setIban(transactionDetails.getDebtorAccount().getIban());
         }
+        booking.setOtherAccount(bankAccount);
 
         return booking;
     }
