@@ -16,24 +16,7 @@
 
 package de.adorsys.multibanking.hbci.model;
 
-import de.adorsys.multibanking.domain.Credentials;
-import de.adorsys.multibanking.domain.ScaStatus;
-import de.adorsys.multibanking.domain.TanTransportType;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public enum  HbciDialogType {
 
-import java.util.List;
-
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-public class HBCIConsent {
-
-    private ScaStatus status;
-    private Credentials credentials;
-    private List<TanTransportType> tanMethodList;
-    private TanTransportType selectedMethod;
-    private String scaAuthenticationData;
-    private Object hbciTanSubmit;
+    bpd, upd, jobs
 }

@@ -38,21 +38,21 @@ services:
     image: mongo:3
     ports:
       - "27017:27017"
-#  multibanking:
-#    image: adorsys/openjdk-jre-base:8-minideb
-#    working_dir: /app
-#    volumes:
-#      - ./target:/app
-#    environment:
-#      spring.profiles.active: dev-mongo
-#      server.port: 8081
-#      mongo.server: mongodb
-#      mongo.databaseName: multibanking
-#      db_secret: 1234567890123456
-#      mockConnectionUrl: http://localhost:8083
-#      SMARTANALYTICS_URL: http://localhost:8082
-#      SPRING_APPLICATION_JSON: '{"sts":{"authservers":[{"name":"keycloak","iss-url":"http://keycloak:8080/auth/realms/multibanking","jwks-url":"http://keycloak:8080/auth/realms/multibanking/protocol/openid-connect/certs"}]}}'
-#    command: java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787 -jar /app/multibanking-server.jar
-#    ports:
-#      - "8088:8081"
-#      - "8788:8787"
+  multibanking:
+    image: adorsys/openjdk-jre-base:8-minideb
+    working_dir: /app
+    volumes:
+      - ./target:/app
+    environment:
+      spring.profiles.active: dev-mongo
+      server.port: 8081
+      mongo.server: mongodb
+      mongo.databaseName: multibanking
+      db_secret: 1234567890123456
+      mockConnectionUrl: http://localhost:8083
+      SMARTANALYTICS_URL: http://localhost:8082
+      SPRING_APPLICATION_JSON: '{"sts":{"authservers":[{"name":"keycloak","iss-url":"http://keycloak:8080/auth/realms/multibanking","jwks-url":"http://keycloak:8080/auth/realms/multibanking/protocol/openid-connect/certs"}]}}'
+    command: java -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8787 -jar /app/multibanking-server.jar
+    ports:
+      - "8088:8081"
+      - "8788:8787"

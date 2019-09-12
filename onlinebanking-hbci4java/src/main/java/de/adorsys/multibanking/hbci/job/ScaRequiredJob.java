@@ -19,7 +19,6 @@ package de.adorsys.multibanking.hbci.job;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.ChallengeData;
-import de.adorsys.multibanking.domain.Product;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
@@ -34,13 +33,17 @@ import org.iban4j.Iban;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.dialog.AbstractHbciDialog;
+import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.manager.*;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
+import org.kapott.hbci.status.HBCIMsgStatus;
 import org.kapott.hbci.structures.Konto;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -49,7 +52,8 @@ import static de.adorsys.multibanking.domain.ScaApproach.EMBEDDED;
 import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
-import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.startHbciDialog;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.bpd;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.jobs;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
@@ -59,26 +63,35 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
     public R authorisationAwareExecute(HbciCallback hbciCallback) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
-        AuthorisationCodeResponse authorisationCodeResponse =
-            AuthorisationCodeResponse.builder().tanSubmit(hbciTanSubmit).build();
+        AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(hbciTanSubmit);
 
-        HBCIDialog dialog = createAndStartDialog(hbciCallback, authorisationCodeResponse);
-
+        PinTanPassport bpdPassport = fetchBpd(hbciCallback);
         //could be null in case of empty hktan requests
-        AbstractHBCIJob hbciJob = createScaMessage(dialog.getPassport());
+        AbstractHBCIJob hbciJob = createJobMessage(bpdPassport);
+
+        HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(jobs, hbciCallback, authorisationCodeResponse,
+            getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
+
+        HBCIMsgStatus dialogInitMsgStatus = dialog.dialogInit(true);
+
+        if (checkDialogInitScaRequired(dialogInitMsgStatus, dialog, hbciTanSubmit, hbciJob)) {
+            R jobResponse = createJobResponse(dialog.getPassport());
+            jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
+            return jobResponse;
+        }
 
         //hbciJobs could be null in case of tan request without corresponding hbci request (TAN verbrennen)
         boolean tan2StepRequired = hbciJob == null || dialog.getPassport().tan2StepRequired(hbciJob);
 
         GVTAN2Step hktan = null;
         if (tan2StepRequired) {
-            hktan = requestAuthorisationCode(hbciTanSubmit, dialog, hbciJob);
+            hktan = prepareHbciMessagefor2FA(hbciTanSubmit, dialog, hbciJob);
         } else {
             //No SCA needed
             dialog.addTask(hbciJob);
         }
 
-        HBCIExecStatus hbciExecStatus = execute(dialog, !tan2StepRequired);
+        executeTasks(dialog);
 
         //check for SCA is really needed after execution
         tan2StepRequired = Optional.ofNullable(hktan)
@@ -92,17 +105,50 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
         }
 
-        if (!tan2StepRequired && hbciExecStatus.getDialogStatus().endStatus == null) {
+        //sca not needed and dialog not closed
+        if (!tan2StepRequired) {
             dialog.close();
         }
 
         return jobResponse;
     }
 
-    private GVTAN2Step requestAuthorisationCode(HbciTanSubmit hbciTanSubmit, HBCIDialog dialog,
+    private boolean checkDialogInitScaRequired(HBCIMsgStatus initMsgStatus, AbstractHbciDialog dialog,
+                                               HbciTanSubmit hbciTanSubmit, AbstractHBCIJob hbciJob) {
+        if (!initMsgStatus.isOK()) {
+            throw new MultibankingException(HBCI_ERROR, initMsgStatus.getErrorList()
+                .stream()
+                .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                .collect(Collectors.toList()));
+        }
+
+        boolean scaRequired = initMsgStatus.segStatus.getRetVals().stream()
+            .anyMatch(hbciRetVal -> hbciRetVal.code.equals("0030"));
+
+        if (scaRequired) {
+            updateTanSubmit(hbciTanSubmit, dialog, hbciJob);
+            hbciTanSubmit.setHbciJobName("HKIDN");
+
+            String header = "TAN2StepRes" + hbciTanSubmit.getTwoStepMechanism().getSegversion();
+            dialog.getPassport().getCallback().tanChallengeCallback(initMsgStatus.getData().get(header + ".orderref")
+                , initMsgStatus.getData().get(header + ".challenge"), initMsgStatus.getData().get(header +
+                    ".challenge_hhd_uc"), null);
+        }
+
+        return scaRequired;
+    }
+
+    private PinTanPassport fetchBpd(HbciCallback hbciCallback) {
+        AbstractHbciDialog dialog = createDialog(bpd, hbciCallback, null, null);
+        dialog.execute();
+        dialog.close();
+        return dialog.getPassport();
+    }
+
+    private GVTAN2Step prepareHbciMessagefor2FA(HbciTanSubmit hbciTanSubmit, HBCIJobsDialog dialog,
                                                 AbstractHBCIJob hbciJob) {
-        HBCITwoStepMechanism hbciTwoStepMechanism = getUserTanTransportType(dialog);
-        dialog.getPassport().setCurrentSecMechInfo(hbciTwoStepMechanism);
+        HBCITwoStepMechanism hbciTwoStepMechanism =
+            getUserTanTransportType(dialog.getPassport().getBankTwostepMechanisms());
 
         if (hbciTwoStepMechanism.getProcess() == 1 && hbciJob == null) {
             throw new MultibankingException(INTERNAL_ERROR, "Tan requests without corresponding transaction not " +
@@ -116,16 +162,16 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         }
     }
 
-    private void updateTanSubmit(HbciTanSubmit hbciTanSubmit, HBCIDialog dialog, AbstractHBCIJob scaJob) {
+    private void updateTanSubmit(HbciTanSubmit hbciTanSubmit, AbstractHbciDialog dialog, AbstractHBCIJob scaJob) {
         hbciTanSubmit.setOriginJobName(
             Optional.ofNullable(getTransactionRequest().getTransaction())
                 .map(transaction -> getHbciJobName(transaction.getTransactionType()))
                 .orElseGet(() -> getHbciJobName(null)));
 
         hbciTanSubmit.setPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
-        hbciTanSubmit.setDialogId(dialog.getDialogID());
+        hbciTanSubmit.setDialogId(dialog.getDialogId());
         hbciTanSubmit.setMsgNum(dialog.getMsgnum());
-        hbciTanSubmit.setTwoStepMechanism(getUserTanTransportType(dialog));
+        hbciTanSubmit.setTwoStepMechanism(getUserTanTransportType(dialog.getPassport().getBankTwostepMechanisms()));
 
         Optional.ofNullable(scaJob)
             .ifPresent(hbciJob -> {
@@ -144,25 +190,26 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
             });
     }
 
-    private HBCIDialog createAndStartDialog(HbciCallback hbciCallback,
-                                            AuthorisationCodeResponse authorisationCodeResponse) {
+    private AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciCallback hbciCallback,
+                                            AuthorisationCodeResponse authorisationCodeResponse,
+                                            HBCITwoStepMechanism twoStepMechanism) {
         HbciCallback callback = createCallback(hbciCallback, authorisationCodeResponse);
         HbciDialogRequest dialogRequest = createDialogRequest(callback);
-        return startHbciDialog(null, dialogRequest);
+
+        return HbciDialogFactory.createDialog(dialogType, null, dialogRequest, twoStepMechanism);
     }
 
-    private HBCIExecStatus execute(HBCIDialog dialog, boolean closeDialog) {
-        HBCIExecStatus status = dialog.execute(closeDialog);
-        if (!status.isOK()) {
-            throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorMessages()
+    private void executeTasks(AbstractHbciDialog dialog) {
+        HBCIExecStatus execStatus = dialog.execute();
+        if (!execStatus.isOK()) {
+            throw new MultibankingException(HBCI_ERROR, execStatus.getErrorMessages()
                 .stream()
                 .map(messageString -> Message.builder().renderedMessage(messageString).build())
                 .collect(Collectors.toList()));
         }
-        return status;
     }
 
-    private GVTAN2Step hktanProcess1(HBCIDialog dialog, HBCITwoStepMechanism hbciTwoStepMechanism,
+    private GVTAN2Step hktanProcess1(HBCIJobsDialog dialog, HBCITwoStepMechanism hbciTwoStepMechanism,
                                      HbciTanSubmit hbciTanSubmit,
                                      AbstractHBCIJob hbciJob) {
         GVTAN2Step hktan = new GVTAN2Step(dialog.getPassport(), hbciJob);
@@ -190,7 +237,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         return hktan;
     }
 
-    private GVTAN2Step hktanProcess2(HBCIDialog dialog, HBCITwoStepMechanism hbciTwoStepMechanism,
+    private GVTAN2Step hktanProcess2(HBCIJobsDialog dialog, HBCITwoStepMechanism hbciTwoStepMechanism,
                                      AbstractHBCIJob hbciJob) {
         GVTAN2Step hktan = new GVTAN2Step(dialog.getPassport(), hbciJob);
         hktan.setProcess(KnownTANProcess.PROCESS2_STEP1);
@@ -235,9 +282,9 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         return Optional.ofNullable(getTransactionRequest().getTransaction().getPsuAccount());
     }
 
-    private HBCITwoStepMechanism getUserTanTransportType(HBCIDialog dialog) {
+    private HBCITwoStepMechanism getUserTanTransportType(Map<String, HBCITwoStepMechanism> bpdScaMethods) {
         return Optional.ofNullable(getConsent().getSelectedMethod())
-            .map(tanTransportType -> dialog.getPassport().getBankTwostepMechanisms().get(tanTransportType.getId()))
+            .map(tanTransportType -> bpdScaMethods.get(tanTransportType.getId()))
             .map(hbciTwoStepMechanism -> {
                 hbciTwoStepMechanism.setMedium(getConsent().getSelectedMethod().getMedium());
                 return hbciTwoStepMechanism;
@@ -298,30 +345,14 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
     }
 
     private HbciDialogRequest createDialogRequest(HbciCallback hbciCallback) {
-        TransactionRequest transactionRequest = getTransactionRequest();
-
-        HbciDialogRequest hbciDialogRequest = HbciDialogRequest.builder()
-            .credentials(getConsent().getCredentials())
-            .hbciPassportState(transactionRequest.getBankAccess().getHbciPassportState())
-            .callback(hbciCallback)
-            .build();
-
-        hbciDialogRequest.setBank(transactionRequest.getBank());
-        hbciDialogRequest.setHbciProduct(Optional.ofNullable(transactionRequest.getHbciProduct())
-            .map(product -> new Product(product.getName(), product.getVersion()))
-            .orElse(null));
-        hbciDialogRequest.setHbciBPD(transactionRequest.getHbciBPD());
-        hbciDialogRequest.setHbciUPD(transactionRequest.getHbciUPD());
-        hbciDialogRequest.setHbciSysId(transactionRequest.getHbciSysId());
-
-        return hbciDialogRequest;
+        return hbciObjectMapper.toHbciDialogRequest(getTransactionRequest(), hbciCallback);
     }
 
-    private HBCIConsent getConsent() {
-        return (HBCIConsent) getTransactionRequest().getBankApiConsentData();
+    private HbciConsent getConsent() {
+        return (HbciConsent) getTransactionRequest().getBankApiConsentData();
     }
 
-    public abstract AbstractHBCIJob createScaMessage(PinTanPassport passport);
+    public abstract AbstractHBCIJob createJobMessage(PinTanPassport passport);
 
     public abstract List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport);
 

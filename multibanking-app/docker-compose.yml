@@ -3,4 +3,4 @@ services:
   multibanking-app:
     image: adorsys/multibanking-app
     ports:
-      - "8180:80"
+      - "8180:8081"

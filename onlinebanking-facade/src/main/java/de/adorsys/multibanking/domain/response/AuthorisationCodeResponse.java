@@ -16,14 +16,14 @@
 
 package de.adorsys.multibanking.domain.response;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @Data
-@Builder
 public class AuthorisationCodeResponse {
 
-    private Object tanSubmit;
+    private final Object tanSubmit;
     private UpdateAuthResponse updateAuthResponse;
 
 }

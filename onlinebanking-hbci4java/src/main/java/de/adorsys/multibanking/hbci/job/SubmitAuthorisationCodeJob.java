@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.manager.HBCIDialog;
+import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.manager.KnownTANProcess;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
@@ -49,11 +49,12 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
     public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode) {
         HbciTanSubmit hbciTanSubmit =
-            evaluateTanSubmit((HBCIConsent) submitAuthorisationCode.getOriginTransactionRequest().getBankApiConsentData());
+            evaluateTanSubmit((HbciConsent) submitAuthorisationCode.getOriginTransactionRequest().getBankApiConsentData());
 
         HbciPassport hbciPassport = createPassport(submitAuthorisationCode, hbciTanSubmit);
 
-        HBCIDialog hbciDialog = new HBCIDialog(hbciPassport, hbciTanSubmit.getDialogId(), hbciTanSubmit.getMsgNum());
+        HBCIJobsDialog hbciDialog = new HBCIJobsDialog(hbciPassport, hbciTanSubmit.getDialogId(),
+            hbciTanSubmit.getMsgNum());
         AbstractHBCIJob hbciJob;
 
         if (hbciTanSubmit.getTwoStepMechanism().getProcess() == 1) {
@@ -62,21 +63,28 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
             hbciJob = submitProcess2(hbciTanSubmit, hbciDialog);
         }
 
-        HBCIExecStatus status = hbciDialog.execute(true);
+        HBCIExecStatus status = hbciDialog.execute();
         if (!status.isOK()) {
-            throw new MultibankingException(HBCI_ERROR, status.getDialogStatus().getErrorMessages().stream()
+            hbciDialog.close();
+            throw new MultibankingException(HBCI_ERROR, status.getErrorMessages().stream()
                 .map(messageString -> Message.builder().renderedMessage(messageString).build())
                 .collect(Collectors.toList()));
         } else {
+            if (hbciTanSubmit.getHbciJobName().equals("HKIDN")) { //sca for dialoginit was needed
+                hbciDialog.addTask(hbciJob);
+                hbciDialog.execute();
+            }
+            hbciDialog.close();
             return createResponse(hbciPassport, hbciTanSubmit, hbciJob, status);
+
         }
     }
 
     private AbstractHBCIJob submitProcess1(HbciTanSubmit hbciTanSubmit, HbciPassport hbciPassport,
-                                           HBCIDialog hbciDialog) {
+                                           HBCIJobsDialog hbciDialog) {
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
-        AbstractHBCIJob hbciJob = scaJob.createScaMessage(hbciPassport);
+        AbstractHBCIJob hbciJob = scaJob.createJobMessage(hbciPassport);
 
         if (hbciTanSubmit.getSepaPain() != null) {
             hbciJob.getConstraints().remove("_sepapain"); //prevent pain generation
@@ -87,12 +95,12 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
     }
 
     @SuppressWarnings("unchecked")
-    private AbstractHBCIJob submitProcess2(HbciTanSubmit hbciTanSubmit, HBCIDialog hbciDialog) {
+    private AbstractHBCIJob submitProcess2(HbciTanSubmit hbciTanSubmit, HBCIJobsDialog hbciDialog) {
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         AbstractHBCIJob originJob = Optional.ofNullable(hbciTanSubmit.getOriginJobName())
-            .map(s -> {
-                AbstractHBCIJob result = scaJob.createScaMessage(hbciDialog.getPassport());
+            .map(originJobName -> {
+                AbstractHBCIJob result = scaJob.createJobMessage(hbciDialog.getPassport());
                 try {
                     result.setLlParams(objectMapper().readValue(hbciTanSubmit.getLowLevelParams(), HashMap.class));
                 } catch (Exception e) {
@@ -105,6 +113,9 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
         GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport(), originJob);
         hktan.setProcess(KnownTANProcess.PROCESS2_STEP2);
+        if (hktan.getLowlevelParam("TAN2Step" + hbciTanSubmit.getTwoStepMechanism().getSegversion() + "ordersegcode") == null) {
+            hktan.setParam("ordersegcode", "HKIDN");
+        }
         hktan.setParam("orderref", hbciTanSubmit.getOrderRef());
         hktan.setParam("notlasttan", "N");
         hbciDialog.addTask(hktan, false);
@@ -121,14 +132,14 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
             new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport));
         response.setTransactionId(transactionId);
 
-        if (!status.getDialogStatus().msgStatusList.isEmpty()) {
-            response.setStatus(status.getDialogStatus().msgStatusList.get(0).segStatus.toString());
+        if (!status.getMsgStatusList().isEmpty()) {
+            response.setStatus(status.getMsgStatusList().get(0).segStatus.toString());
         }
 
         return response;
     }
 
-    private HbciTanSubmit evaluateTanSubmit(HBCIConsent hbciConsent) {
+    private HbciTanSubmit evaluateTanSubmit(HbciConsent hbciConsent) {
         if (hbciConsent.getHbciTanSubmit() instanceof HbciTanSubmit) {
             return (HbciTanSubmit) hbciConsent.getHbciTanSubmit();
         } else {
@@ -160,13 +171,13 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
                 @Override
                 public String needTAN() {
-                    return ((HBCIConsent) submitAuthorizationCode.getOriginTransactionRequest().getBankApiConsentData()).getScaAuthenticationData();
+                    return ((HbciConsent) submitAuthorizationCode.getOriginTransactionRequest().getBankApiConsentData()).getScaAuthenticationData();
                 }
             });
         state.apply(hbciPassport);
 
-        HBCIConsent hbciConsent =
-            (HBCIConsent) submitAuthorizationCode.getOriginTransactionRequest().getBankApiConsentData();
+        HbciConsent hbciConsent =
+            (HbciConsent) submitAuthorizationCode.getOriginTransactionRequest().getBankApiConsentData();
 
         hbciPassport.setPIN(hbciConsent.getCredentials().getPin());
         hbciPassport.setCurrentSecMechInfo(hbciTanSubmit.getTwoStepMechanism());

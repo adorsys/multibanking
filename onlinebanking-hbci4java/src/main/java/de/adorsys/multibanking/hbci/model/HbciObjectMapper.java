@@ -17,6 +17,7 @@
 package de.adorsys.multibanking.hbci.model;
 
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.request.AbstractRequest;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.domain.utils.Utils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +25,7 @@ import org.apache.commons.text.WordUtils;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
+import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Saldo;
 import org.kapott.hbci.structures.Value;
@@ -39,6 +41,8 @@ import static de.adorsys.multibanking.domain.utils.Utils.extractIban;
 
 @Mapper
 public interface HbciObjectMapper {
+
+    HbciDialogRequest toHbciDialogRequest(AbstractRequest transactionRequest, HbciCallback callback);
 
     default BalancesReport createBalancesReport(GVRSaldoReq gvSaldoReq, String accountNumber) {
         return gvSaldoReq.getEntries().stream()
@@ -238,4 +242,5 @@ public interface HbciObjectMapper {
         return ret;
     }
 
+    HBCITwoStepMechanism toSecMechInfo(TanTransportType selectedMethod);
 }

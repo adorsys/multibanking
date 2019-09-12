@@ -16,22 +16,24 @@
 
 package de.adorsys.multibanking.hbci.model;
 
+import de.adorsys.multibanking.domain.Credentials;
+import de.adorsys.multibanking.domain.ScaStatus;
+import de.adorsys.multibanking.domain.TanTransportType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.kapott.hbci.manager.HBCITwoStepMechanism;
+import lombok.NoArgsConstructor;
 
+import java.util.List;
+
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
-public class HbciTanSubmit {
+public class HbciConsent {
 
-    private String dialogId;
-    private long msgNum;
-    private String orderRef;
-    private String passportState;
-    private String hbciJobName; //eg. HKCCS
-    private String originJobName; //"org.kapott.hbci.GV.GV" + jobname
-    private String originLowLevelName; //key for hbci-300.xml
-    private int originSegVersion; //segment version
-    private String sepaPain;
-    private String painVersion;
-    private HBCITwoStepMechanism twoStepMechanism;
-    private String lowLevelParams;
+    private ScaStatus status;
+    private Credentials credentials;
+    private List<TanTransportType> tanMethodList;
+    private TanTransportType selectedMethod;
+    private String scaAuthenticationData;
+    private Object hbciTanSubmit;
 }

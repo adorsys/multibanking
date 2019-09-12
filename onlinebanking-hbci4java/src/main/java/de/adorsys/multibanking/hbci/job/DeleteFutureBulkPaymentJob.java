@@ -38,7 +38,7 @@ public class DeleteFutureBulkPaymentJob extends ScaRequiredJob<FutureBulkPayment
     private final TransactionRequest<FutureBulkPayment> transactionRequest;
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         FutureBulkPayment futureBulkPayment = transactionRequest.getTransaction();
 
         GVTermMultiUebSEPADel sepadelgv = new GVTermMultiUebSEPADel(passport, GVTermMultiUebSEPADel.getLowlevelName());

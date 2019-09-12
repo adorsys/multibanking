@@ -16,7 +16,7 @@ import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
-import de.adorsys.multibanking.hbci.model.HBCIConsent;
+import de.adorsys.multibanking.hbci.model.HbciConsent;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.DirectAccessController;
@@ -212,7 +212,7 @@ public class DirectAccessControllerTest {
                 TestUtil.createTanMethod(
                     "Method2"));
             UpdatePsuAuthenticationRequest updatePsuAuthentication = invocationOnMock.getArgument(0);
-            HBCIConsent hbciConsent = (HBCIConsent) updatePsuAuthentication.getBankApiConsentData();
+            HbciConsent hbciConsent = (HbciConsent) updatePsuAuthentication.getBankApiConsentData();
             hbciConsent.setStatus(ScaStatus.PSUAUTHENTICATED);
             hbciConsent.setTanMethodList(fakeList);
             UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
@@ -229,10 +229,12 @@ public class DirectAccessControllerTest {
         updateAuthResponse.setScaStatus(ScaStatus.SCAMETHODSELECTED);
         updateAuthResponse.setBankApi(BankApi.HBCI);
         updateAuthResponse.setChallenge(new ChallengeData());
+
+        AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(null);
+        authorisationCodeResponse.setUpdateAuthResponse(updateAuthResponse);
+
         LoadBookingsResponse scaRequiredResponse = LoadBookingsResponse.builder().build();
-        scaRequiredResponse.setAuthorisationCodeResponse(AuthorisationCodeResponse.builder()
-            .updateAuthResponse(updateAuthResponse)
-            .build());
+        scaRequiredResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
 
         doReturn(scaRequiredResponse)
             .doReturn(LoadBookingsResponse.builder()

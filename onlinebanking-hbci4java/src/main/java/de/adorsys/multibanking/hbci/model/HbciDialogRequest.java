@@ -16,18 +16,18 @@
 
 package de.adorsys.multibanking.hbci.model;
 
-import de.adorsys.multibanking.domain.Credentials;
 import de.adorsys.multibanking.domain.request.AbstractRequest;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
-@Builder
 @EqualsAndHashCode(callSuper = false)
 public class HbciDialogRequest extends AbstractRequest {
 
     private HbciCallback callback;
-    private String hbciPassportState;
-    private Credentials credentials;
+
 }

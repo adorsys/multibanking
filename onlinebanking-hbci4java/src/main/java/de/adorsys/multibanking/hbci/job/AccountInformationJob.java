@@ -51,7 +51,7 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAcco
     private List<BankAccount> hbciAccounts;
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         if (!passport.jobSupported("SEPAInfo"))
             throw new MultibankingException(HBCI_ERROR, "SEPAInfo job not supported");
 

@@ -61,7 +61,7 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesRe
     }
 
     @Override
-    public AbstractHBCIJob createScaMessage(PinTanPassport passport) {
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         balanceJob = new GVSaldoReq(passport);
         balanceJob.setParam("my", createAccount(loadBalanceRequest.getTransaction().getPsuAccount()));
         return balanceJob;
