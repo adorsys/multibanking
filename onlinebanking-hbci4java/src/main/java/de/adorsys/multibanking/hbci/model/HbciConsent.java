@@ -28,7 +28,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class HBCIConsent {
+public class HbciConsent {
 
     private ScaStatus status;
     private Credentials credentials;
