@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.*;
@@ -37,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 import org.kapott.hbci.GV.GVTANMediaList;
+import org.kapott.hbci.callback.AbstractHBCICallback;
 import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.exceptions.HBCI_Exception;
@@ -45,6 +47,7 @@ import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.manager.HBCIVersion;
 import org.kapott.hbci.passport.PinTanPassport;
+import org.kapott.hbci.status.HBCIMsgStatus;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +55,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.ScaStatus.*;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.bpd;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.jobs;
 
@@ -129,38 +134,43 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     private ScaMethodsResponse authenticatePsu(AuthenticatePsuRequest authenticatePsuRequest) {
-        HbciDialogRequest dialogRequest = hbciObjectMapper.toHbciDialogRequest(authenticatePsuRequest, null);
-        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(dialogRequest.getBank(), dialogRequest);
-        dialogRequest.setCallback(hbciCallback);
+        try {
+            HbciDialogRequest dialogRequest = hbciObjectMapper.toHbciDialogRequest(authenticatePsuRequest, null);
+            BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(dialogRequest);
+            dialogRequest.setCallback(hbciCallback);
 
-        PinTanPassport updPassport = fetchBpdUpd(dialogRequest);
+            PinTanPassport updPassport = fetchBpdUpd(dialogRequest);
 
-        ScaMethodsResponse response = ScaMethodsResponse.builder()
-            .tanTransportTypes(extractTanTransportTypes(updPassport))
-            .build();
-        updateUpd(hbciCallback, response);
-        return response;
+            ScaMethodsResponse response = ScaMethodsResponse.builder()
+                .tanTransportTypes(extractTanTransportTypes(updPassport))
+                .build();
+            updateUpd(hbciCallback, response);
+            return response;
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
     }
 
     @Override
     public LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> request) {
-        checkBankExists(request.getBank());
-        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBank(), request);
-
         HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
 
         try {
-            if (hbciConsent.getStatus() == FINALISED) {
-                SubmitAuthorizationCodeResponse<? extends AbstractResponse> submitAuthorizationCodeResponse =
-                    submitAuthorizationCode(new SubmitAuthorisationCode<>(request));
+            if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
+                checkBankExists(request.getBank());
+                BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request);
 
-                return (LoadAccountInformationResponse) submitAuthorizationCodeResponse.getJobResponse();
-            } else {
                 AccountInformationJob accountInformationJob = new AccountInformationJob(request);
-
                 LoadAccountInformationResponse response = accountInformationJob.authorisationAwareExecute(hbciCallback);
                 updateUpd(hbciCallback, response);
                 return response;
+            } else {
+                SubmitAuthorizationCodeResponse<? extends AbstractResponse> submitAuthorizationCodeResponse =
+                    submitAuthorizationCode(new SubmitAuthorisationCode<>(request));
+
+                removeConsentTanSubmitData(hbciConsent, submitAuthorizationCodeResponse);
+
+                return (LoadAccountInformationResponse) submitAuthorizationCodeResponse.getJobResponse();
             }
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
@@ -169,20 +179,23 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     @Override
     public LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> request) {
+        HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
         try {
-            if (((HbciConsent) request.getBankApiConsentData()).getStatus() == FINALISED) {
-                SubmitAuthorizationCodeResponse<? extends AbstractResponse> submitAuthorizationCodeResponse =
-                    submitAuthorizationCode(new SubmitAuthorisationCode<>(request));
-
-                return (LoadBookingsResponse) submitAuthorizationCodeResponse.getJobResponse();
-            } else {
+            if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
                 checkBankExists(request.getBank());
-                BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBank(), request);
+                BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request);
 
                 LoadBookingsJob loadBookingsJob = new LoadBookingsJob(request);
                 LoadBookingsResponse response = loadBookingsJob.authorisationAwareExecute(hbciCallback);
                 updateUpd(hbciCallback, response);
                 return response;
+            } else {
+                SubmitAuthorizationCodeResponse<? extends AbstractResponse> submitAuthorizationCodeResponse =
+                    submitAuthorizationCode(new SubmitAuthorisationCode<>(request));
+
+                removeConsentTanSubmitData(hbciConsent, submitAuthorizationCodeResponse);
+
+                return (LoadBookingsResponse) submitAuthorizationCodeResponse.getJobResponse();
             }
 
         } catch (HBCI_Exception e) {
@@ -191,27 +204,34 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     public LoadBalancesResponse loadBalances(TransactionRequest<LoadBalances> request) {
-        checkBankExists(request.getBank());
-        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBank(), request);
-
         HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
-
         try {
-            if (hbciConsent.getStatus() == FINALISED) {
-                SubmitAuthorizationCodeResponse<? extends AbstractResponse> submitAuthorizationCodeResponse =
-                    submitAuthorizationCode(new SubmitAuthorisationCode<>(request));
+            if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
+                checkBankExists(request.getBank());
+                BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request);
 
-                return (LoadBalancesResponse) submitAuthorizationCodeResponse.getJobResponse();
-            } else {
                 LoadBalancesJob loadBalancesJob = new LoadBalancesJob(request);
                 LoadBalancesResponse response = loadBalancesJob.authorisationAwareExecute(hbciCallback);
                 updateUpd(hbciCallback, response);
                 return response;
-            }
+            } else {
+                SubmitAuthorizationCodeResponse<? extends AbstractResponse> submitAuthorizationCodeResponse =
+                    submitAuthorizationCode(new SubmitAuthorisationCode<>(request));
 
+                removeConsentTanSubmitData(hbciConsent, submitAuthorizationCodeResponse);
+
+                return (LoadBalancesResponse) submitAuthorizationCodeResponse.getJobResponse();
+            }
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
+    }
+
+    private void removeConsentTanSubmitData(HbciConsent hbciConsent, SubmitAuthorizationCodeResponse<?
+        extends AbstractResponse> submitAuthorizationCodeResponse) {
+        hbciConsent.setHbciTanSubmit(null);
+        hbciConsent.setStatus(submitAuthorizationCodeResponse.getScaStatus());
+        hbciConsent.setScaAuthenticationData(null);
     }
 
     @Override
@@ -221,7 +241,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     public void executeTransactionWithoutSca(TransactionRequest<AbstractScaTransaction> request) {
         checkBankExists(request.getBank());
-        setRequestBpdAndCreateCallback(request.getBank(), request);
+        setRequestBpdAndCreateCallback(request);
 
         try {
             TransferJob transferJob = new TransferJob();
@@ -234,7 +254,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public AuthorisationCodeResponse initiatePayment(TransactionRequest request) {
         checkBankExists(request.getBank());
-        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request.getBank(), request);
+        BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request);
 
         try {
             ScaRequiredJob scaJob = Optional.ofNullable(request.getTransaction())
@@ -254,8 +274,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public SubmitAuthorizationCodeResponse<? extends AbstractResponse> submitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode) {
         checkBankExists(submitAuthorisationCode.getOriginTransactionRequest().getBank());
-        setRequestBpdAndCreateCallback(submitAuthorisationCode.getOriginTransactionRequest().getBank(),
-            submitAuthorisationCode.getOriginTransactionRequest());
+        setRequestBpdAndCreateCallback(submitAuthorisationCode.getOriginTransactionRequest());
         try {
             ScaRequiredJob scaJob = createScaJob(submitAuthorisationCode.getOriginTransactionRequest());
 
@@ -287,16 +306,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         });
     }
 
-    private BpdUpdHbciCallback setRequestBpdAndCreateCallback(Bank bank, AbstractRequest request) {
-        String bankCode = bank.getBankApiBankCode() != null
-            ? bank.getBankApiBankCode()
-            : bank.getBankCode();
+    private BpdUpdHbciCallback setRequestBpdAndCreateCallback(AbstractRequest request) {
+        String bankCode = Optional.ofNullable(request.getBank().getBankApiBankCode())
+            .orElse(request.getBank().getBankCode());
 
-        return Optional.ofNullable(bpdCache)
-            .map(cache -> {
-                request.setHbciBPD(cache.get(bankCode));
-                return new BpdUpdHbciCallback(bankCode, bpdCache);
-            }).orElse(null);
+        Optional.ofNullable(bpdCache).ifPresent(cache -> request.setHbciBPD(cache.get(bankCode)));
+        return new BpdUpdHbciCallback(bankCode, bpdCache);
     }
 
     private AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciDialogRequest dialogRequest,
@@ -318,11 +333,17 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     private PinTanPassport fetchBpdUpd(HbciDialogRequest dialogRequest) {
         AbstractHbciDialog bpdDialog = createDialog(bpd, dialogRequest, null);
-        bpdDialog.execute();
-        bpdDialog.close();
+        bpdDialog.execute(true);
 
         HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(jobs, dialogRequest, null);
-        dialog.dialogInit(false);
+        HBCIMsgStatus hbciMsgStatus = dialog.dialogInit(false);
+        if (!hbciMsgStatus.isOK()) {
+            throw new MultibankingException(HBCI_ERROR, hbciMsgStatus.getErrorList()
+                .stream()
+                .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                .collect(Collectors.toList()));
+        }
+
         dialog.close();
 
         if (dialog.getPassport().jobSupported(GVTANMediaList.getLowlevelName())) {
@@ -343,8 +364,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(jobs, dialogRequest, hbciTwoStepMechanism);
         dialog.dialogInit(true, "HKTAB");
         dialog.addTask(new GVTANMediaList(dialog.getPassport()));
-        dialog.execute();
-        dialog.close();
+        dialog.execute(true);
         return dialog;
     }
 
@@ -473,7 +493,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             @Override
             public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
                 HbciConsent hbciConsent = (HbciConsent) transactionAuthorisation.getBankApiConsentData();
-                hbciConsent.setStatus(FINALISED);
                 hbciConsent.setScaAuthenticationData(transactionAuthorisation.getScaAuthenticationData());
 
                 return hbciScaMapper.toUpdateAuthResponse(hbciConsent, bankApi());
@@ -510,6 +529,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                                         Object bankApiConsentData) {
                 HbciConsent hbciConsent = (HbciConsent) bankApiConsentData;
 
+                if (hbciConsent.getHbciTanSubmit() != null && hbciConsent.getScaAuthenticationData() == null) {
+                    throw new MultibankingException(MultibankingError.INVALID_CONSENT_STATUS);
+                }
+
                 if (hbciConsent.getStatus() == SCAMETHODSELECTED || hbciConsent.getStatus() == FINALISED) {
                     return;
                 }
@@ -528,7 +551,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @RequiredArgsConstructor
     @Data
     @EqualsAndHashCode(callSuper = false)
-    private static class BpdUpdHbciCallback extends HbciCallback {
+    private static class BpdUpdHbciCallback extends AbstractHBCICallback {
 
         private final String bankCode;
         private final Map<String, Map<String, String>> bpdCache;
@@ -539,10 +562,20 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         @Override
         public void status(int statusTag, Object o) {
             if (statusTag == STATUS_INST_BPD_INIT_DONE) {
-                bpdCache.put(bankCode, (Map<String, String>) o);
+                Optional.of(bpdCache).ifPresent(cache -> cache.put(bankCode, (Map<String, String>) o));
             } else if (statusTag == STATUS_INIT_UPD_DONE) {
                 this.upd = (Map<String, String>) o;
             }
+        }
+
+        @Override
+        public void callback(int reason, List<String> messages, int datatype, StringBuilder retData) {
+            if (reason == WRONG_PIN) {
+                throw new MultibankingException(INVALID_PIN, messages.stream()
+                    .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                    .collect(Collectors.toList()));
+            }
+
         }
 
         @Override

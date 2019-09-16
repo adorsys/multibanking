@@ -29,9 +29,11 @@ public class HbciTanSubmit {
     private String hbciJobName; //eg. HKCCS
     private String originJobName; //"org.kapott.hbci.GV.GV" + jobname
     private String originLowLevelName; //key for hbci-300.xml
+    private String hktanProcess; //1,2,3,4,S
     private int originSegVersion; //segment version
     private String sepaPain;
     private String painVersion;
     private HBCITwoStepMechanism twoStepMechanism;
     private String lowLevelParams;
+
 }

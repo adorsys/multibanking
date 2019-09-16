@@ -5,16 +5,19 @@ import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.SyncInProgressException;
+import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.service.BankAccountService;
 import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.web.mapper.BankAccountMapper;
+import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
 import de.adorsys.multibanking.web.model.BankAccountTO;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
@@ -42,6 +46,7 @@ public class BankAccountController {
     private final BookingService bookingService;
     private final BankAccountRepositoryIf bankAccountRepository;
     private final BankAccessRepositoryIf bankAccessRepository;
+    private final ConsentAuthorisationMapper consentAuthorisationMapper;
     private final Principal principal;
 
     @ApiOperation(
@@ -84,10 +89,11 @@ public class BankAccountController {
                 @AuthorizationScope(scope = "openid", description = "")
             })})
     @ApiResponses({
-        @ApiResponse(code = 204, message = "Sync started", response = void.class)})
+        @ApiResponse(code = 204, message = "Sync started", response = void.class),
+        @ApiResponse(code = 202, message = "Challenge response", reference = "#/definitions/Resource" +
+            "«UpdateAuthResponseTO»")})
     @PutMapping("/{accountId}/sync")
     public ResponseEntity syncBookings(@PathVariable String accessId, @PathVariable String accountId) {
-
         BankAccessEntity bankAccess = bankAccessRepository.findByUserIdAndId(principal.getName(), accessId)
             .orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accessId));
 
@@ -97,8 +103,18 @@ public class BankAccountController {
         if (bankAccount.getSyncStatus() == BankAccount.SyncStatus.SYNC) {
             throw new SyncInProgressException(bankAccount.getId());
         }
-        bookingService.syncBookings(FINALISED, bankAccess, bankAccount, null);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        try {
+            bookingService.syncBookings(FINALISED, bankAccess, bankAccount, null);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (TransactionAuthorisationRequiredException e) {
+            List<Link> links = new ArrayList<>();
+            links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(e.getConsentId(),
+                e.getAuthorisationId())).withSelfRel());
+            links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(e.getConsentId(),
+                e.getAuthorisationId(), null)).withRel("transactionAuthorisation"));
+            return ResponseEntity.accepted().body(new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(e.getResponse()), links));
+        }
     }
 
     private List<Resource<BankAccountTO>> mapToResources(List<BankAccountEntity> accountEntities, String accessId) {

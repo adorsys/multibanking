@@ -20,6 +20,7 @@ import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
+import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.dialog.HBCIBpdDialog;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
@@ -97,13 +98,13 @@ public class HbciDialogFactory {
 
     }
 
-    public static HbciPassport createPassport(HbciPassport.State state, HbciCallback callback) {
+    public static HbciPassport createPassport(HbciPassport.State state, HBCICallback callback) {
         return createPassport(state.getHbciVersion(), state.getBlz(), state.getCustomerId(), state.getUserId(),
             state.getHbciProduct(), callback);
     }
 
     private static HbciPassport createPassport(String hbciVersion, String bankCode, String customerId, String userId,
-                                               HBCIProduct hbciProduct, HbciCallback callback) {
+                                               HBCIProduct hbciProduct, HBCICallback callback) {
         HashMap<String, String> properties = new HashMap<>();
         properties.put("kernel.rewriter", "InvalidSegment,WrongStatusSegOrder,WrongSequenceNumbers,MissingMsgRef," +
             "HBCIVersion,SigIdLeadingZero,InvalidSuppHBCIVersion,SecTypeTAN,KUmsDelimiters,KUmsEmptyBDateSets");

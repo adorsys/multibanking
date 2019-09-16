@@ -22,6 +22,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV_Result.GVRTANMediaList;
+import org.kapott.hbci.callback.HBCICallback;
+import org.kapott.hbci.callback.HBCICallbackConsole;
 import org.kapott.hbci.manager.HBCIProduct;
 import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.passport.PinTanPassport;
@@ -39,9 +41,9 @@ public class HbciPassport extends PinTanPassport {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    HbciPassport(String hbciversion, Map<String, String> properties, HbciCallback hbciCallback,
+    HbciPassport(String hbciversion, Map<String, String> properties, HBCICallback hbciCallback,
                  HBCIProduct hbciProduct) {
-        super(hbciversion, properties, hbciCallback != null ? hbciCallback : new HbciCallback(), hbciProduct);
+        super(hbciversion, properties, hbciCallback != null ? hbciCallback : new HBCICallbackConsole(), hbciProduct);
     }
 
     /**

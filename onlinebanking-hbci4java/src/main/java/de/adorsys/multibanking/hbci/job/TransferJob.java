@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVUmbSEPA;
-import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
@@ -57,7 +56,7 @@ public class TransferJob {
         dialog.addTask(hbciJob);
 
         // Let the Handler submitAuthorizationCode all jobs in one batch
-        HBCIExecStatus dialogStatus = dialog.execute();
+        HBCIExecStatus dialogStatus = dialog.execute(false);
         if (!dialogStatus.isOK()) {
             log.warn(dialogStatus.getErrorMessages().toString());
         }
@@ -68,8 +67,7 @@ public class TransferJob {
                 .collect(Collectors.toList()));
         }
 
-        dialog.execute();
-        dialog.close();
+        dialog.execute(true);
     }
 
     private AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
