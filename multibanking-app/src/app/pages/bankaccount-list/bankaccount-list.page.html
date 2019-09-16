@@ -9,12 +9,12 @@
 
 <ion-content>
   <ion-list>
-    <ion-item detail *ngFor="let bankAccount of bankAccounts" (click)="itemTapped(bankAccount)">
+    <ion-item *ngFor="let bankAccount of bankAccounts" (click)="itemTapped(bankAccount)">
       <ion-label>
         {{bankAccount.iban}} - {{bankAccount.type}}
       </ion-label>
-      <h2 slot="end" *ngIf="bankAccount.balances && bankAccount.balances.readyBalance" item-right>
-        {{ bankAccount.balances.readyBalance.amount | currency:'EUR':'symbol' }}</h2>
+      <h5 slot="end" *ngIf="bankAccount.balances && bankAccount.balances.readyBalance" item-right>
+        {{ bankAccount.balances.readyBalance.amount | currency:'EUR':'symbol' }}</h5>
     </ion-item>
   </ion-list>
 </ion-content>

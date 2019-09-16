@@ -11,8 +11,11 @@
 
 <ion-content>
   <ion-list>
-    <ion-item detail *ngFor="let bankAccess of bankAccesses" (click)="itemTapped(bankAccess)">
+    <ion-item *ngFor="let bankAccess of bankAccesses" (click)="itemTapped(bankAccess)">
       {{bankAccess.iban}} - {{bankAccess.bankName}}
+      <ion-button fill="clear" slot="end" (click)="presentActionSheet($event, bankAccess)">
+        <ion-icon name="more"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">

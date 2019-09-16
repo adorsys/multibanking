@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController } from '@ionic/angular';
+import { NavController, ActionSheetController } from '@ionic/angular';
 import { KeycloakService } from 'src/app/services/auth/keycloak.service';
 import { BankAccessService } from 'src/app/services/rest/bankAccess.service';
 import { ResourceBankAccess } from 'src/multibanking-api/resourceBankAccess';
@@ -17,11 +17,16 @@ export class BankaccessListPage implements OnInit {
 
   constructor(private bankAccessService: BankAccessService,
               private navCtrl: NavController,
+              private actionSheetCtrl: ActionSheetController,
               private keycloak: KeycloakService) { }
 
   ngOnInit() {
     this.admin = this.keycloak.getRoles().filter(role => role === 'rules_admin').length > 0;
 
+    this.loadBankAccesses();
+  }
+
+  loadBankAccesses() {
     this.bankAccessService.getBankAccesses().subscribe((response) => {
       this.bankAccesses = response;
     });
@@ -37,5 +42,35 @@ export class BankaccessListPage implements OnInit {
 
   itemTapped(bankAccess: ResourceBankAccess) {
     this.navCtrl.navigateForward([`/bankconnections/${bankAccess.id}`]);
+  }
+
+  deleteBankAccess(bankAccess: ResourceBankAccess) {
+    this.bankAccessService.deleteBankAccess(bankAccess).subscribe(() =>
+      this.loadBankAccesses()
+    );
+  }
+
+  async presentActionSheet($event, bankAccess: ResourceBankAccess) {
+    $event.stopPropagation();
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: bankAccess.iban,
+      buttons: [
+        {
+          text: 'Löschen',
+          icon: 'trash',
+          role: 'destructive',
+          handler: () => {
+            this.deleteBankAccess(bankAccess);
+          }
+        }, {
+          text: 'Abbrechen',
+          role: 'cancel',
+          icon: 'close',
+          handler: () => {
+          }
+        }
+      ]
+    });
+    actionSheet.present();
   }
 }

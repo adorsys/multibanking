@@ -41,10 +41,11 @@ export class ScaMethodSelectionPage implements OnInit {
         (response) => {
           // tslint:disable-next-line:no-string-literal
           if (response._links['transactionAuthorisation']) {
-            this.navCtrl.navigateForward(`/authorisation/consents/${encodeURIComponent(this.consentId)}
-            /authorisations/${encodeURIComponent(this.authorisationId)}`);
+            // tslint:disable-next-line:max-line-length
+            this.navCtrl.navigateRoot(`/authorisation/consents/${encodeURIComponent(this.consentId)}/authorisations/${encodeURIComponent(this.authorisationId)}`);
           } else {
-            this.navCtrl.navigateRoot(`bankaccess-create/${encodeURIComponent(this.consentId)}`);
+            // tslint:disable-next-line:max-line-length
+            this.navCtrl.navigateRoot(`bankaccess-create/consents/${encodeURIComponent(this.consentId)}/authorisations/${encodeURIComponent(this.authorisationId)}`);
           }
 
         },

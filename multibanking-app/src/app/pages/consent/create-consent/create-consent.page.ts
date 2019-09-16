@@ -73,8 +73,8 @@ export class CreateConsentPage implements OnInit {
         if (redirectUrl) {
           window.location.href = redirectUrl.href;
         } else {
-          this.navCtrl.navigateForward(`/update-auth/consents/${encodeURIComponent(response.consentId)}
-          /authorisations/${encodeURIComponent(response.authorisationId)}`);
+          // tslint:disable-next-line:max-line-length
+          this.navCtrl.navigateForward(`/update-auth/consents/${encodeURIComponent(response.consentId)}/authorisations/${encodeURIComponent(response.authorisationId)}`);
         }
       },
       messages => {
