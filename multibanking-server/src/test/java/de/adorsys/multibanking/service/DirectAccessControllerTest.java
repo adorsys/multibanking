@@ -353,11 +353,6 @@ public class DirectAccessControllerTest {
     }
 
     @Test
-    public void verifyApi() {
-        verifyApi(INVALID_PIN, "INVALID_PIN");
-    }
-
-    @Test
     public void verifyApiConsentWithoutSelectedSCA() {
         verifyApi(INVALID_SCA_METHOD, "SELECT_CONSENT_AUTHORISATION");
     }
