@@ -14,11 +14,6 @@ spring:
 server:
   port: 8887
 
-logging:
-  level:
-    org.kapott.hbci.comm.CommPinTan: TRACE
-    de.adorsys.xs2a.adapter.api.AccountApi: DEBUG
-
 sts:
   audience_name: sts-service-component-example
   secret_claim_property_key: secretClaim
