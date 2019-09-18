@@ -114,15 +114,15 @@ public class SmartanalyticsRemoteConfig {
                 query = "?" + uri.getQuery() + " ";
             }
 
-            Charset charset = LoggingHandlerInterceptor.Logging.determineCharset(request.getHeaders().getContentType());
-            String requestString = LoggingHandlerInterceptor.Logging.cleanAndReduce(body, charset);
+            Charset charset = LoggingInterceptorConfig.Logging.determineCharset(request.getHeaders().getContentType());
+            String requestString = LoggingInterceptorConfig.Logging.cleanAndReduce(body, charset);
 
             log.trace("{} > {} {}{} {}", backend, request.getMethod(), request.getURI().getPath(), query,
                 requestString);
 
             ClientHttpResponse response = execution.execute(request, body);
 
-            String responseString = LoggingHandlerInterceptor.Logging.cleanAndReduce(ByteStreams.toByteArray(response.getBody()), charset);
+            String responseString = LoggingInterceptorConfig.Logging.cleanAndReduce(ByteStreams.toByteArray(response.getBody()), charset);
 
             log.trace("{} < {} {}", backend, response.getStatusCode(), responseString);
 

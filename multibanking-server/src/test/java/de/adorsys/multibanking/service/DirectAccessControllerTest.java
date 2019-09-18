@@ -23,8 +23,6 @@ import de.adorsys.multibanking.web.DirectAccessController;
 import de.adorsys.multibanking.web.model.*;
 import io.restassured.RestAssured;
 import io.restassured.filter.log.ErrorLoggingFilter;
-import io.restassured.filter.log.RequestLoggingFilter;
-import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
@@ -50,7 +48,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.LocalDate;
 import java.util.*;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT_STATUS;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_SCA_METHOD;
 import static de.adorsys.multibanking.service.TestUtil.createBooking;
 import static de.adorsys.multibanking.web.model.ScaStatusTO.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,8 +82,6 @@ public class DirectAccessControllerTest {
 
     private RequestSpecification request = RestAssured.given()
         .contentType(ContentType.JSON)
-        .filter(new RequestLoggingFilter())
-        .filter(new ResponseLoggingFilter())
         .filter(new ErrorLoggingFilter());
 
     @BeforeClass
