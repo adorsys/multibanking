@@ -551,7 +551,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @RequiredArgsConstructor
     @Data
     @EqualsAndHashCode(callSuper = false)
-    private static class BpdUpdHbciCallback extends AbstractHBCICallback {
+    public static class BpdUpdHbciCallback extends AbstractHBCICallback {
 
         private final String bankCode;
         private final Map<String, Map<String, String>> bpdCache;

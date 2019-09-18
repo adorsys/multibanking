@@ -18,9 +18,12 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
+import de.adorsys.multibanking.domain.request.AbstractRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
+import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
 import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
 import de.adorsys.multibanking.hbci.model.HbciObjectMapper;
 import de.adorsys.multibanking.hbci.model.HbciObjectMapperImpl;
@@ -28,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVUmbSEPA;
+import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
@@ -39,6 +43,7 @@ import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.createDialog;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.bpd;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.jobs;
 
 @Slf4j
@@ -48,8 +53,11 @@ public class TransferJob {
 
     public void requestTransfer(TransactionRequest sepaTransactionRequest) {
         HbciDialogRequest dialogRequest = hbciObjectMapper.toHbciDialogRequest(sepaTransactionRequest, null);
+        Hbci4JavaBanking.BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(dialogRequest);
+        dialogRequest.setCallback(hbciCallback);
 
         HBCIJobsDialog dialog = (HBCIJobsDialog)createDialog(jobs, null, dialogRequest, null);
+        dialog.getPassport().setBPD(fetchBpd(dialogRequest).getBPD());
 
         AbstractHBCIJob hbciJob = createHbciJob(sepaTransactionRequest.getTransaction(), dialog.getPassport(), null);
 
@@ -104,5 +112,17 @@ public class TransferJob {
                 return konto;
             })
             .orElse(null);
+    }
+
+    private PinTanPassport fetchBpd(HbciDialogRequest dialogRequest) {
+        AbstractHbciDialog dialog = HbciDialogFactory.createDialog(bpd, null, dialogRequest, null);
+        dialog.execute(true);
+        return dialog.getPassport();
+    }
+
+    private Hbci4JavaBanking.BpdUpdHbciCallback setRequestBpdAndCreateCallback(AbstractRequest request) {
+        String bankCode = Optional.ofNullable(request.getBank().getBankApiBankCode())
+                .orElse(request.getBank().getBankCode());
+        return new Hbci4JavaBanking.BpdUpdHbciCallback(bankCode, null);
     }
 }

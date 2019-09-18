@@ -37,6 +37,7 @@ import org.kapott.hbci.callback.AbstractHBCICallback;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
+import org.kapott.hbci.dialog.HBCIUpdDialog;
 import org.kapott.hbci.manager.*;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
@@ -67,11 +68,12 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
         AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(hbciTanSubmit);
 
-        PinTanPassport bpdPassport = fetchBpd(hbciCallback);
+        PinTanPassport bpdUpdPassport = fetchUpd(fetchBpd(hbciCallback));
 
         HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(jobs, hbciCallback, authorisationCodeResponse,
-            getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
-        dialog.getPassport().setBPD(bpdPassport.getBPD());
+            getUserTanTransportType(bpdUpdPassport.getBankTwostepMechanisms()));
+        dialog.getPassport().setBPD(bpdUpdPassport.getBPD());
+        dialog.getPassport().setUPD(bpdUpdPassport.getUPD());
 
         HBCIMsgStatus dialogInitMsgStatus = dialog.dialogInit(true);
 
@@ -143,6 +145,12 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
     private PinTanPassport fetchBpd(HBCICallback hbciCallback) {
         AbstractHbciDialog dialog = createDialog(bpd, hbciCallback, null, null);
+        dialog.execute(true);
+        return dialog.getPassport();
+    }
+
+    private PinTanPassport fetchUpd(PinTanPassport pinTanPassport) {
+        HBCIUpdDialog dialog = new HBCIUpdDialog(pinTanPassport);
         dialog.execute(true);
         return dialog.getPassport();
     }
