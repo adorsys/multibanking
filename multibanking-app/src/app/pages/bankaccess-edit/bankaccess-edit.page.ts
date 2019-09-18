@@ -6,6 +6,10 @@ import { NavController, AlertController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { ResourceConsentTO } from 'src/multibanking-api/resourceConsentTO';
 import { ConsentAuthstatusResolverService } from 'src/app/services/resolver/consent-authstatus-resolver.service';
+import { ResourceUpdateAuthResponseTO } from 'src/multibanking-api/resourceUpdateAuthResponseTO';
+import { Link } from 'src/multibanking-api/link';
+import { ConsentService } from 'src/app/services/rest/consent.service';
+import { Observable, Subscriber } from 'rxjs';
 
 @Component({
   selector: 'app-bankaccess-edit',
@@ -23,7 +27,7 @@ export class BankaccessEditPage implements OnInit {
               private formBuilder: FormBuilder,
               private activatedRoute: ActivatedRoute,
               private alertController: AlertController,
-              private authstatusResolver: ConsentAuthstatusResolverService,
+              private consentService: ConsentService,
               private navCtrl: NavController) { }
 
   ngOnInit() {
@@ -57,13 +61,64 @@ export class BankaccessEditPage implements OnInit {
         this.navCtrl.navigateRoot('/bankconnections');
       });
     } else {
-      this.bankAccessService.createBankAcccess(this.bankAccessForm.value).subscribe(
-        (response) => {
-          if (response.challenge) {
+      this.createBankAccess();
+    }
+  }
 
-          } else {
-            this.navCtrl.navigateRoot('/bankconnections');
+  private createBankAccess() {
+    this.bankAccessService.createBankAcccess(this.bankAccessForm.value).subscribe(
+      (response) => {
+        if (response.challenge) {
+          this.presentTanPrompt(response).subscribe(tan => {
+            this.submitTan(response, tan);
+          });
+        } else {
+          this.navCtrl.navigateRoot('/bankconnections');
+        }
+      },
+      messages => {
+        if (messages instanceof Array) {
+          messages.forEach(async message => {
+            const alert = await this.alertController.create({
+              message: message.renderedMessage,
+              buttons: ['OK']
+            });
+            alert.present();
+          });
+        }
+      });
+  }
+
+  presentTanPrompt(consentAuthStatus: ResourceUpdateAuthResponseTO): Observable<string> {
+    return new Observable((observer: Subscriber<string>) => {
+      this.alertController.create({
+        header: consentAuthStatus.challenge.additionalInformation,
+        inputs: [
+          {
+            name: 'TAN',
+            type: 'text',
           }
+        ],
+        buttons: [
+          {
+            text: 'Ok',
+            handler: data => {
+              observer.next(data.TAN);
+            }
+          }
+        ]
+      })
+        .then(alert => alert.present());
+    });
+  }
+
+  private submitTan(consentAuthStatus: ResourceUpdateAuthResponseTO, tan: string) {
+    // tslint:disable-next-line:no-string-literal
+    const updateAuthenticationLink: Link = consentAuthStatus._links['transactionAuthorisation'];
+    this.consentService.updateAuthentication(updateAuthenticationLink.href, { scaAuthenticationData: tan })
+      .subscribe(
+        () => {
+          this.createBankAccess();
         },
         messages => {
           if (messages instanceof Array) {
@@ -76,6 +131,5 @@ export class BankaccessEditPage implements OnInit {
             });
           }
         });
-    }
   }
 }
