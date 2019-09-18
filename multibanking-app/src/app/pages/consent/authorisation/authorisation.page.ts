@@ -41,8 +41,9 @@ export class AuthorisationPage implements OnInit {
     this.consentService.updateAuthentication(updateAuthenticationLink.href, this.authorisationFormGroup.value)
       .subscribe(
         (response) => {
-          if (response.scaStatus === 'FINALISED') {
-            this.navCtrl.navigateRoot(`bankaccess-create/${encodeURIComponent(this.consentId)}`);
+          if (response.scaStatus === 'FINALISED' || response.scaStatus === 'SCAMETHODSELECTED') {
+            // tslint:disable-next-line:max-line-length
+            this.navCtrl.navigateRoot(`bankaccess-create/consents/${encodeURIComponent(this.consentId)}/authorisations/${encodeURIComponent(this.authorisationId)}`);
           }
         },
         messages => {

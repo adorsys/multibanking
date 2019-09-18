@@ -102,12 +102,6 @@ sts:
       issUrl: ${idp.baseUrl}/auth/realms/${idp.realm}
       jwksUrl: ${idp.baseUrl}/auth/realms/${idp.realm}/protocol/openid-connect/certs
 
-logging:
-  level:
-    org.kapott.hbci.comm.CommPinTan: TRACE
-  pattern:
-    level: '%X{user}:%X{accessId} %5p'
-
 ---
 
 spring:
@@ -167,9 +161,6 @@ spring:
     - org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
     - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
-logging:
-  level:
-    org.kapott.hbci.comm.CommPinTan: INFO
 ---
 
 spring:

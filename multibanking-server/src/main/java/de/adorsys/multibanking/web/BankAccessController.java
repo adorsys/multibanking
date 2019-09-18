@@ -3,27 +3,27 @@ package de.adorsys.multibanking.web;
 import de.adorsys.multibanking.domain.BankAccessEntity;
 import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
 import de.adorsys.multibanking.service.BankAccessService;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.BankAccessMapper;
+import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
 import de.adorsys.multibanking.web.model.BankAccessTO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,26 +44,38 @@ public class BankAccessController {
     private final UserRepositoryIf userRepository;
     private final BankAccessService bankAccessService;
     private final ConsentService consentService;
+    private final ConsentAuthorisationMapper consentAuthorisationMapper;
     private final Principal principal;
 
     @ApiOperation(
-        value = "Create new bank accesses",
+        value = "Create new bank access",
         authorizations = {
             @Authorization(value = "multibanking_auth", scopes = {
                 @AuthorizationScope(scope = "openid", description = "")
             })})
+    @ApiResponses({
+        @ApiResponse(code = 201, message = "Created bank access", reference = "#/definitions/Resource«BankAccess»"),
+        @ApiResponse(code = 202, message = "Challenge response", reference = "#/definitions/Resource" +
+            "«UpdateAuthResponseTO»")})
     @PostMapping
-    public ResponseEntity<Resource<BankAccessTO>> createBankAccess(@RequestBody BankAccessTO bankAccess) {
+    public ResponseEntity createBankAccess(@RequestBody BankAccessTO bankAccess) {
         Consent consent = consentService.getConsent(bankAccess.getConsentId());
 
-        BankAccessEntity persistedBankAccess =
-            bankAccessService.createBankAccess(bankAccessMapper.toBankAccessEntity(bankAccess, principal.getName(),
-                false, consent.getPsuAccountIban()));
+        try {
+            BankAccessEntity persistedBankAccess =
+                bankAccessService.createBankAccess(bankAccessMapper.toBankAccessEntity(bankAccess,
+                    principal.getName(), false, consent.getPsuAccountIban()));
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(linkTo(methodOn(BankAccessController.class).getBankAccess(persistedBankAccess.getId())).toUri());
-
-        return new ResponseEntity<>(mapToResource(persistedBankAccess), headers, HttpStatus.CREATED);
+            return ResponseEntity.created(linkTo(methodOn(BankAccessController.class).getBankAccess(persistedBankAccess.getId())).toUri())
+                .body(mapToResource(persistedBankAccess));
+        } catch (TransactionAuthorisationRequiredException e) {
+            List<Link> links = new ArrayList<>();
+            links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(e.getConsentId(),
+                e.getAuthorisationId())).withSelfRel());
+            links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(e.getConsentId(),
+                e.getAuthorisationId(), null)).withRel("transactionAuthorisation"));
+            return ResponseEntity.accepted().body(new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(e.getResponse()), links));
+        }
     }
 
     @ApiOperation(

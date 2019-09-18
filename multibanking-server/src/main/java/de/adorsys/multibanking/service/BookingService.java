@@ -181,6 +181,9 @@ public class BookingService extends AccountInformationService {
 
     private boolean rulesVersionChanged(String userId, String accountId) {
         ConfigStatus analyticsConfigStatus = smartAnalyticsService.getAnalyticsConfigStatus();
+        if (analyticsConfigStatus.getLastChangeDate() == null) {
+            return false;
+        }
 
         return analyticsRepository.findLastAnalyticsDateByUserIdAndAccountId(userId, accountId)
             .map(lastAnalyticsDate -> {
@@ -292,7 +295,7 @@ public class BookingService extends AccountInformationService {
 
         try {
             LoadBookingsResponse response = onlineBankingService.loadBookings(loadBookingsRequest);
-            checkScaRequired(response, consentEntity, onlineBankingService);
+            checkSca(response, consentEntity, onlineBankingService);
             return response;
         } catch (MultibankingException e) {
             throw handleMultibankingException(bankAccess, e);

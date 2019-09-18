@@ -9,7 +9,6 @@ import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.exception.MissingConsentAuthorisationSelectionException;
-import de.adorsys.multibanking.exception.MissingConsentException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
@@ -43,7 +42,8 @@ public class ConsentService {
             onlineBankingService.getStrongCustomerAuthorisation().createConsent(consent, bank.isRedirectPreferred(),
                 tppRedirectUri);
 
-        ConsentEntity consentEntity = consentMapper.toConsentEntity(createConsentResponse, consent.getRedirectId(), consent.getPsuAccountIban(),
+        ConsentEntity consentEntity = consentMapper.toConsentEntity(createConsentResponse, consent.getRedirectId(),
+            consent.getPsuAccountIban(),
             onlineBankingService.bankApi());
         consentRepository.save(consentEntity);
 
@@ -161,14 +161,14 @@ public class ConsentService {
             bankingServiceProducer.getBankingService(Iban.valueOf(iban).getBankCode());
     }
 
-    ConsentEntity validateAndGetConsent(OnlineBankingService onlineBankingService, String consentId, ScaStatus expectedConsentStatus) {
+    ConsentEntity validateAndGetConsent(OnlineBankingService onlineBankingService, String consentId,
+                                        ScaStatus expectedConsentStatus) {
         ConsentEntity internalConsent = consentRepository.findById(consentId)
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
 
         try {
             onlineBankingService.getStrongCustomerAuthorisation().validateConsent(internalConsent.getId(),
-                internalConsent.getAuthorisationId(),
-                expectedConsentStatus, internalConsent.getBankApiConsentData());
+                internalConsent.getAuthorisationId(), expectedConsentStatus, internalConsent.getBankApiConsentData());
 
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
@@ -178,7 +178,8 @@ public class ConsentService {
                     if (expectedConsentStatus == ScaStatus.FINALISED) {
                         UpdateAuthResponse authorisationStatus = getAuthorisationStatus(internalConsent.getId(),
                             internalConsent.getAuthorisationId());
-                        throw new TransactionAuthorisationRequiredException(authorisationStatus, internalConsent.getId(),
+                        throw new TransactionAuthorisationRequiredException(authorisationStatus,
+                            internalConsent.getId(),
                             internalConsent.getAuthorisationId());
                     } else if (expectedConsentStatus == ScaStatus.SCAMETHODSELECTED) {
                         throw new MissingConsentAuthorisationSelectionException();

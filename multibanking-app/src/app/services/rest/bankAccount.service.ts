@@ -10,8 +10,6 @@ import { environment } from 'src/environments/environment';
 })
 export class BankAccountService extends AbstractService {
 
-  public bookingsChangedObservable = new Subject();
-
   getBankAccount(accessId: string, accountId: string): Observable<ResourceBankAccount> {
     return this.http.get(`${environment.api_url}/bankaccesses/${accessId}/accounts/${accountId}`)
       .pipe(
@@ -30,8 +28,7 @@ export class BankAccountService extends AbstractService {
   syncBookings(accessId: string, accountId: string): Observable<any> {
     return this.http.put(`${environment.api_url}/bankaccesses/${accessId}/accounts/${accountId}/sync`, {})
       .pipe(
-        catchError(this.handleError),
-        finalize(() => this.bookingsChangedObservable.next(true))
+        catchError(this.handleError)
       );
   }
 

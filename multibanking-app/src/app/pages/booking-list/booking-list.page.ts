@@ -13,6 +13,9 @@ import { BookingPeriodTO } from 'src/multibanking-api/bookingPeriodTO';
 import { AnalyticsService } from 'src/app/services/rest/analytics.service';
 import { ResourceAnalyticsTO } from 'src/multibanking-api/resourceAnalyticsTO';
 import { ImagesService } from 'src/app/services/rest/images.service';
+import { ResourceUpdateAuthResponseTO } from 'src/multibanking-api/resourceUpdateAuthResponseTO';
+import { Link } from 'src/multibanking-api/link';
+import { ConsentService } from 'src/app/services/rest/consent.service';
 
 @Component({
   selector: 'app-booking-list',
@@ -31,12 +34,13 @@ export class BookingListPage implements OnInit {
               private bankAccountService: BankAccountService,
               private bookingService: BookingService,
               private analyticsService: AnalyticsService,
+              private consentService: ConsentService,
               private toastController: ToastController,
               private alertController: AlertController,
               private loadingController: LoadingController,
               imagesService: ImagesService) {
-                this.getLogo = imagesService.getImage;
-               }
+    this.getLogo = imagesService.getImage;
+  }
 
   ngOnInit() {
     this.bankAccessId = this.activatedRoute.snapshot.paramMap.get('access-id');
@@ -47,10 +51,6 @@ export class BookingListPage implements OnInit {
     } else {
       this.loadBookings();
     }
-
-    this.bankAccountService.bookingsChangedObservable.subscribe(changed => {
-      this.loadBookings();
-    });
   }
 
   loadBookings() {
@@ -224,11 +224,16 @@ export class BookingListPage implements OnInit {
     loading.present();
 
     this.bankAccountService.syncBookings(this.bankAccessId, this.bankAccount.id).subscribe(
-      () => {
+      (response) => {
         loading.dismiss();
-        this.loadBookings();
+        if (response && response.challenge) {
+          this.presentTanPrompt(response);
+        } else {
+          this.loadBookings();
+        }
       },
       messages => {
+        loading.dismiss();
         if (messages instanceof Array) {
           messages.forEach(async message => {
             if (message.key === 'SYNC_IN_PROGRESS') {
@@ -253,7 +258,6 @@ export class BookingListPage implements OnInit {
             }
           });
         }
-        loading.dismiss();
       });
   }
 
@@ -290,5 +294,48 @@ export class BookingListPage implements OnInit {
   async presentToast(opts) {
     const toast = await this.toastController.create(opts);
     toast.present();
+  }
+
+  async presentTanPrompt(consentAuthStatus: ResourceUpdateAuthResponseTO) {
+    const alert = await this.alertController.create({
+      header: consentAuthStatus.challenge.additionalInformation,
+      inputs: [
+        {
+          name: 'TAN',
+          type: 'text',
+        }
+      ],
+      buttons: [
+        {
+          text: 'Ok',
+          handler: data => {
+            this.submitTan(consentAuthStatus, data.TAN);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  public submitTan(consentAuthStatus: ResourceUpdateAuthResponseTO, tan: string) {
+    // tslint:disable-next-line:no-string-literal
+    const updateAuthenticationLink: Link = consentAuthStatus._links['transactionAuthorisation'];
+    this.consentService.updateAuthentication(updateAuthenticationLink.href, { scaAuthenticationData: tan })
+      .subscribe(
+        () => {
+          this.syncBookings();
+        },
+        messages => {
+          if (messages instanceof Array) {
+            messages.forEach(async message => {
+              const alert = await this.alertController.create({
+                message: message.renderedMessage,
+                buttons: ['OK']
+              });
+              alert.present();
+            });
+          }
+        });
   }
 }

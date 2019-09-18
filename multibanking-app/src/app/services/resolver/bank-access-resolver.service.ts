@@ -18,6 +18,9 @@ export class BankAccessResolverService {
     this.bankAccessService.bankAccesscChangedObservable.subscribe((changeEvent: ChangeEvent<ResourceBankAccess>) => {
       if (changeEvent.eventType === EventType.Update) {
         this.selectedBankAccess = changeEvent.data;
+      } else if (changeEvent.eventType === EventType.Delete
+        && this.selectedBankAccess && this.selectedBankAccess.id === changeEvent.data.id) {
+          this.selectedBankAccess = undefined;
       }
     });
   }

@@ -35,17 +35,18 @@ abstract class AccountInformationService {
         return e;
     }
 
-    void checkScaRequired(AbstractResponse response, ConsentEntity consentEntity,
-                          OnlineBankingService onlineBankingService) {
+    void checkSca(AbstractResponse response, ConsentEntity consentEntity, OnlineBankingService onlineBankingService) {
+        Optional.ofNullable(response.getAuthorisationCodeResponse())
+            .ifPresent(authorisationCodeResponse -> {
+                onlineBankingService.getStrongCustomerAuthorisation().afterExecute(consentEntity.getBankApiConsentData(),
+                    authorisationCodeResponse);
+                consentRepository.save(consentEntity);
 
-        Optional.ofNullable(response.getAuthorisationCodeResponse()).ifPresent(authorisationCodeResponse -> {
-            onlineBankingService.getStrongCustomerAuthorisation().afterExecute(consentEntity.getBankApiConsentData(),
-                authorisationCodeResponse);
-            consentRepository.save(consentEntity);
+                throw new TransactionAuthorisationRequiredException(authorisationCodeResponse.getUpdateAuthResponse(),
+                    consentEntity.getId(), consentEntity.getAuthorisationId());
+            });
 
-            throw new TransactionAuthorisationRequiredException(authorisationCodeResponse.getUpdateAuthResponse(),
-                consentEntity.getId(), consentEntity.getAuthorisationId());
-        });
+        consentRepository.save(consentEntity);
 
     }
 

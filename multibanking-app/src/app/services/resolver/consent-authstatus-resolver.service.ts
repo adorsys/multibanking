@@ -24,6 +24,10 @@ export class ConsentAuthstatusResolverService {
     return this.getConsentAuthorisation(route.paramMap.get('consent-id'), route.paramMap.get('authorisation-id'));
   }
 
+  public setConsentAuthorisationStatus(consentAuthStatus: ResourceUpdateAuthResponseTO) {
+    this.consentAuthStatus = consentAuthStatus;
+  }
+
   public getConsentAuthorisation(consentId: string, authorisationId: string): Observable<ResourceUpdateAuthResponseTO> {
     if (!consentId) {
       return EMPTY;

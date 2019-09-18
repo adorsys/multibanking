@@ -1,6 +1,8 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
+import de.adorsys.multibanking.domain.exception.MultibankingError;
+import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
@@ -12,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+
+import static de.adorsys.multibanking.domain.exception.MultibankingError.RESOURCE_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -116,7 +120,15 @@ public class BankAccessService {
             .ifPresent(internalConsent -> {
                 OnlineBankingService bankingService =
                     bankingServiceProducer.getBankingService(internalConsent.getBankApi());
-                bankingService.getStrongCustomerAuthorisation().revokeConsent(internalConsent.getId());
+                try {
+                    bankingService.getStrongCustomerAuthorisation().revokeConsent(internalConsent.getId());
+                } catch (MultibankingException e) {
+                    if (e.getMultibankingError() == RESOURCE_NOT_FOUND) {
+                        log.warn(e.getMessage(), e);
+                    } else {
+                        throw e;
+                    }
+                }
                 consentRepository.delete(internalConsent);
             });
 

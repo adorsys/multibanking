@@ -28,15 +28,15 @@ import de.adorsys.xs2a.adapter.api.remote.AccountInformationClient;
 import de.adorsys.xs2a.adapter.model.BookingStatusTO;
 import de.adorsys.xs2a.adapter.model.PaymentProductTO;
 import de.adorsys.xs2a.adapter.model.PaymentServiceTO;
-import de.adorsys.xs2a.adapter.service.GeneralResponse;
+import de.adorsys.xs2a.adapter.service.AccountInformationService;
 import de.adorsys.xs2a.adapter.service.RequestHeaders;
 import de.adorsys.xs2a.adapter.service.RequestParams;
-import de.adorsys.xs2a.adapter.service.account.AccountDetails;
-import de.adorsys.xs2a.adapter.service.account.AccountListHolder;
-import de.adorsys.xs2a.adapter.service.account.AccountReport;
-import de.adorsys.xs2a.adapter.service.account.TransactionsReport;
-import de.adorsys.xs2a.adapter.service.ais.AccountInformationService;
+import de.adorsys.xs2a.adapter.service.Response;
 import de.adorsys.xs2a.adapter.service.impl.AccountInformationServiceImpl;
+import de.adorsys.xs2a.adapter.service.model.AccountDetails;
+import de.adorsys.xs2a.adapter.service.model.AccountListHolder;
+import de.adorsys.xs2a.adapter.service.model.AccountReport;
+import de.adorsys.xs2a.adapter.service.model.TransactionsReport;
 import feign.Feign;
 import feign.FeignException;
 import feign.Logger;
@@ -119,10 +119,10 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     public LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
         RequestHeaders aisHeaders = createAisHeaders(loadAccountInformationRequest);
 
-        GeneralResponse<AccountListHolder> accountList = getAccountInformationService().getAccountList(aisHeaders,
+        Response<AccountListHolder> accountList = getAccountInformationService().getAccountList(aisHeaders,
             RequestParams.builder().build());
 
-        List<BankAccount> bankAccounts = accountList.getResponseBody().getAccounts().stream()
+        List<BankAccount> bankAccounts = accountList.getBody().getAccounts().stream()
             .map(accountDetailsTO -> bankingGatewayMapper.toBankAccount(accountDetailsTO))
             .collect(Collectors.toList());
 
@@ -152,18 +152,17 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .bookingStatus(BookingStatusTO.BOOKED.toString()).build();
 
         try {
-
-            GeneralResponse<TransactionsReport> bookingsResponse =
+            Response<TransactionsReport> transactionList =
                 getAccountInformationService().getTransactionList(resourceId, requestHeaders, requestParams);
 
-            List<Booking> bookings = Optional.ofNullable(bookingsResponse.getResponseBody())
+            List<Booking> bookings = Optional.ofNullable(transactionList.getBody())
                 .map(TransactionsReport::getTransactions)
                 .map(AccountReport::getBooked)
                 .map(transactions -> bankingGatewayMapper.toBookings(transactions))
                 .orElse(Collections.emptyList());
 
             BalancesReport balancesReport = new BalancesReport();
-            bookingsResponse.getResponseBody().getBalances().forEach(balance -> {
+            transactionList.getBody().getBalances().forEach(balance -> {
                 switch (balance.getBalanceType()) {
                     case EXPECTED:
                         balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
@@ -188,7 +187,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private String getAccountResourceId(String iban, RequestHeaders requestHeaders) {
         return getAccountInformationService().getAccountList(requestHeaders, RequestParams.builder().build())
-            .getResponseBody().getAccounts()
+            .getBody().getAccounts()
             .stream()
             .filter(accountDetails -> accountDetails.getIban().equals(iban))
             .findAny()

@@ -18,6 +18,7 @@ package de.adorsys.multibanking.hbci.job;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
@@ -28,6 +29,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.callback.AbstractHBCICallback;
+import org.kapott.hbci.callback.HBCICallback;
+import org.kapott.hbci.callback.HBCICallbackConsole;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.manager.KnownTANProcess;
 import org.kapott.hbci.passport.PinTanPassport;
@@ -38,6 +42,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
+import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
 
@@ -63,20 +69,19 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
             hbciJob = submitProcess2(hbciTanSubmit, hbciDialog);
         }
 
-        HBCIExecStatus status = hbciDialog.execute();
-        if (!status.isOK()) {
+        HBCIExecStatus hbciExecStatus = hbciDialog.execute(false);
+        if (!hbciExecStatus.isOK()) {
             hbciDialog.close();
-            throw new MultibankingException(HBCI_ERROR, status.getErrorMessages().stream()
+            throw new MultibankingException(HBCI_ERROR, hbciExecStatus.getErrorMessages().stream()
                 .map(messageString -> Message.builder().renderedMessage(messageString).build())
                 .collect(Collectors.toList()));
         } else {
             if (hbciTanSubmit.getHbciJobName().equals("HKIDN")) { //sca for dialoginit was needed
+                hbciDialog.getPassport().updateUPD(hbciExecStatus.getMsgStatusList().get(0).getData());
                 hbciDialog.addTask(hbciJob);
-                hbciDialog.execute();
+                hbciDialog.execute(true);
             }
-            hbciDialog.close();
-            return createResponse(hbciPassport, hbciTanSubmit, hbciJob, status);
-
+            return createResponse(hbciPassport, hbciTanSubmit, hbciJob, hbciExecStatus);
         }
     }
 
@@ -117,6 +122,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
             hktan.setParam("ordersegcode", "HKIDN");
         }
         hktan.setParam("orderref", hbciTanSubmit.getOrderRef());
+        hktan.setParam("process", hbciTanSubmit.getHktanProcess() != null ? hbciTanSubmit.getHktanProcess() : "2");
         hktan.setParam("notlasttan", "N");
         hbciDialog.addTask(hktan, false);
         return originJob;
@@ -136,6 +142,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
             response.setStatus(status.getMsgStatusList().get(0).segStatus.toString());
         }
 
+        response.setScaStatus(hbciTanSubmit.getHbciJobName().equals("HKIDN") ? FINALISED : SCAMETHODSELECTED);
         return response;
     }
 
@@ -167,8 +174,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         HbciPassport.State state = HbciPassport.State.fromJson(hbciTanSubmit.getPassportState());
 
         HbciPassport hbciPassport = HbciDialogFactory.createPassport(state,
-            new HbciCallback() {
-
+            new AbstractHBCICallback() {
                 @Override
                 public String needTAN() {
                     return ((HbciConsent) submitAuthorizationCode.getOriginTransactionRequest().getBankApiConsentData()).getScaAuthenticationData();

@@ -62,7 +62,7 @@ public class SmartanalyticsRemoteConfig {
         return restTemplate;
     }
 
-    private class ErrorHandler extends DefaultResponseErrorHandler {
+    private static class ErrorHandler extends DefaultResponseErrorHandler {
 
         @Override
         public void handleError(ClientHttpResponse response) throws IOException {
@@ -93,7 +93,7 @@ public class SmartanalyticsRemoteConfig {
         }
     }
 
-    private class LoggingInterceptor implements ClientHttpRequestInterceptor {
+    private static class LoggingInterceptor implements ClientHttpRequestInterceptor {
 
         private String backend;
 
@@ -114,15 +114,15 @@ public class SmartanalyticsRemoteConfig {
                 query = "?" + uri.getQuery() + " ";
             }
 
-            Charset charset = Logging.determineCharset(request.getHeaders().getContentType());
-            String requestString = Logging.cleanAndReduce(body, charset);
+            Charset charset = LoggingHandlerInterceptor.Logging.determineCharset(request.getHeaders().getContentType());
+            String requestString = LoggingHandlerInterceptor.Logging.cleanAndReduce(body, charset);
 
             log.trace("{} > {} {}{} {}", backend, request.getMethod(), request.getURI().getPath(), query,
                 requestString);
 
             ClientHttpResponse response = execution.execute(request, body);
 
-            String responseString = Logging.cleanAndReduce(ByteStreams.toByteArray(response.getBody()), charset);
+            String responseString = LoggingHandlerInterceptor.Logging.cleanAndReduce(ByteStreams.toByteArray(response.getBody()), charset);
 
             log.trace("{} < {} {}", backend, response.getStatusCode(), responseString);
 

@@ -1,0 +1,38 @@
+<configuration>
+    <include resource="/org/springframework/boot/logging/logback/base.xml"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+                <marker>AUDIT</marker>
+            </evaluator>
+            <onMatch>DENY</onMatch>
+        </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %level [%logger{0}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT-AUDIT" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+                <marker>AUDIT</marker>
+            </evaluator>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%X{user}:%X{accessId}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STDOUT-AUDIT"/>
+    </root>
+
+    <logger name="org.kapott.hbci.comm.CommPinTan" level="TRACE"/>
+    <logger name="de.adorsys.xs2a.adapter.api.AccountApi" level="DEBUG"/>
+    <logger name="de.adorsys.multibanking.web.RestControllerLoggingHandler" level="TRACE"/>
+
+</configuration>

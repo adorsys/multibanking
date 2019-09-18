@@ -5,6 +5,7 @@ import { BankAccessService } from 'src/app/services/rest/bankAccess.service';
 import { NavController, AlertController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
 import { ResourceConsentTO } from 'src/multibanking-api/resourceConsentTO';
+import { ConsentAuthstatusResolverService } from 'src/app/services/resolver/consent-authstatus-resolver.service';
 
 @Component({
   selector: 'app-bankaccess-edit',
@@ -13,23 +14,26 @@ import { ResourceConsentTO } from 'src/multibanking-api/resourceConsentTO';
 })
 export class BankaccessEditPage implements OnInit {
 
+  consentId: string;
+  authorisationId: string;
   bankAccess: ResourceBankAccess;
-  consent: ResourceConsentTO;
   bankAccessForm: FormGroup;
 
   constructor(private bankAccessService: BankAccessService,
               private formBuilder: FormBuilder,
               private activatedRoute: ActivatedRoute,
               private alertController: AlertController,
+              private authstatusResolver: ConsentAuthstatusResolverService,
               private navCtrl: NavController) { }
 
   ngOnInit() {
-    this.consent = this.activatedRoute.snapshot.data.consent;
+    this.consentId = this.activatedRoute.snapshot.paramMap.get('consent-id').trim();
+    this.authorisationId = this.activatedRoute.snapshot.paramMap.get('authorisation-id').trim();
     this.bankAccess = this.activatedRoute.snapshot.data.bankAccess;
 
     if (!this.bankAccess) {
       this.bankAccess = {
-        consentId: this.consent.id,
+        consentId: this.consentId,
         categorizeBookings: true,
         storeBookings: true,
         storeAnalytics: true,
@@ -54,8 +58,12 @@ export class BankaccessEditPage implements OnInit {
       });
     } else {
       this.bankAccessService.createBankAcccess(this.bankAccessForm.value).subscribe(
-        () => {
-          this.navCtrl.navigateRoot('/bankconnections');
+        (response) => {
+          if (response.challenge) {
+
+          } else {
+            this.navCtrl.navigateRoot('/bankconnections');
+          }
         },
         messages => {
           if (messages instanceof Array) {

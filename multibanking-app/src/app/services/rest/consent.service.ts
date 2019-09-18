@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AbstractService } from './abstract.service';
 import { ResourceConsentTO } from 'src/multibanking-api/resourceConsentTO';
-import { environment } from 'src/environments/environment.dev';
+import { environment } from 'src/environments/environment';
 import { catchError, finalize, take, mergeMap } from 'rxjs/operators';
 import { Observable, Subject, of } from 'rxjs';
 import { ResourceUpdateAuthResponseTO } from 'src/multibanking-api/resourceUpdateAuthResponseTO';
@@ -9,6 +9,7 @@ import { UpdatePsuAuthenticationRequestTO } from 'src/multibanking-api/updatePsu
 import { ChangeEvent, EventType } from 'src/app/model/changeEvent';
 import { SelectPsuAuthenticationMethodRequestTO } from 'src/multibanking-api/selectPsuAuthenticationMethodRequestTO';
 import { ConsentTO } from 'src/multibanking-api/consentTO';
+import { TransactionAuthorisationRequestTO } from 'src/multibanking-api/transactionAuthorisationRequestTO';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class ConsentService extends AbstractService {
   public consentStatusChangedObservable = new Subject<ChangeEvent<ResourceUpdateAuthResponseTO>>();
 
   createConsent(consent: ConsentTO): Observable<any> {
+    console.log(environment.api_url);
     return this.http.post(`${environment.api_url}/consents`, consent)
       .pipe(
         catchError(this.handleError),
@@ -46,8 +48,9 @@ export class ConsentService extends AbstractService {
       );
   }
 
-  updateAuthentication(link: string, updatePsuAuthentication: UpdatePsuAuthenticationRequestTO): Observable<ResourceUpdateAuthResponseTO> {
-    return this.http.put(link, updatePsuAuthentication)
+  updateAuthentication(link: string, updateRequest: UpdatePsuAuthenticationRequestTO
+    | TransactionAuthorisationRequestTO): Observable<ResourceUpdateAuthResponseTO> {
+    return this.http.put(link, updateRequest)
       .pipe(
         take(1),
         mergeMap(newStatus => {

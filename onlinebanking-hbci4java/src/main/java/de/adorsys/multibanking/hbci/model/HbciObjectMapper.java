@@ -25,7 +25,7 @@ import org.apache.commons.text.WordUtils;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
-import org.kapott.hbci.manager.HBCITwoStepMechanism;
+import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Saldo;
 import org.kapott.hbci.structures.Value;
@@ -42,7 +42,7 @@ import static de.adorsys.multibanking.domain.utils.Utils.extractIban;
 @Mapper
 public interface HbciObjectMapper {
 
-    HbciDialogRequest toHbciDialogRequest(AbstractRequest transactionRequest, HbciCallback callback);
+    HbciDialogRequest toHbciDialogRequest(AbstractRequest transactionRequest, HBCICallback callback);
 
     default BalancesReport createBalancesReport(GVRSaldoReq gvSaldoReq, String accountNumber) {
         return gvSaldoReq.getEntries().stream()
@@ -159,6 +159,8 @@ public interface HbciObjectMapper {
     BankAccount toBankAccount(Konto konto);
 
     @Mapping(target = "bankApi", constant = "HBCI")
+    @Mapping(target = "usage", expression = "java( getUsage(line.usage.size() > 0 ? line.usage : splitEqually(line" +
+        ".additional, 27)))")
     @Mapping(target = "bookingDate", source = "bdate")
     @Mapping(target = "valutaDate", source = "valuta")
     @Mapping(target = "amount", source = "value.bigDecimalValue")
@@ -241,6 +243,4 @@ public interface HbciObjectMapper {
         }
         return ret;
     }
-
-    HBCITwoStepMechanism toSecMechInfo(TanTransportType selectedMethod);
 }

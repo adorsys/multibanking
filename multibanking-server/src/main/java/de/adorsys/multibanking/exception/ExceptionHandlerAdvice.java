@@ -87,14 +87,23 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<Messages> handleException(MultibankingException e) {
         HttpStatus httpStatus = HttpStatus.valueOf(e.getHttpResponseCode());
 
-        Messages messages = Messages.builder()
-            .message(Message.builder()
-                .key(e.getMultibankingError().toString())
-                .renderedMessage(e.getMessage())
-                .build())
+        List<Message> messages = e.getMessages().stream()
+            .map(message -> Message.builder()
+                .key(message.getKey())
+                .severity(message.getSeverity() != null
+                    ? Message.Severity.valueOf(message.getSeverity().toString())
+                    : null)
+                .field(message.getField())
+                .renderedMessage(message.getRenderedMessage())
+                .paramsMap(message.getParamsMap())
+                .build()
+            ).collect(toList());
+
+        Messages messagesContainer = Messages.builder()
+            .messages(messages)
             .build();
 
-        return handleInternal(e, messages, httpStatus);
+        return handleInternal(e, messagesContainer, httpStatus);
     }
 
     @ExceptionHandler

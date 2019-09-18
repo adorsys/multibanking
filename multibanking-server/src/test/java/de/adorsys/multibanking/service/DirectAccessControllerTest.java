@@ -334,7 +334,7 @@ public class DirectAccessControllerTest {
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
-        assertThat(jsonPath.getString("scaStatus")).isEqualTo(FINALISED.toString());
+        assertThat(jsonPath.getString("scaStatus")).isIn(SCAMETHODSELECTED.toString(), FINALISED.toString());
 
         //7. load transactions
         DirectAccessController.LoadBookingsRequest loadBookingsRequest =
@@ -350,11 +350,6 @@ public class DirectAccessControllerTest {
         return request.body(loadBookingsRequest).put(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
-    }
-
-    @Test
-    public void verifyApi() {
-        verifyApi(INVALID_PIN, "INVALID_PIN");
     }
 
     @Test

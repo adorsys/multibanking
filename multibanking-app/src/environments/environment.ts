@@ -5,12 +5,12 @@
 export const environment = {
   production: false,
   isApp: false,
-  base_url: 'http://localhost:4200',
+  base_url: 'http://localhost:8100',
   auth_url: 'http://localhost:8080/auth',
   api_url: 'http://localhost:8081/api/v1',
   smartanalytics_url: 'http://localhost:8081/api/v1',
   realm: 'multibanking',
-  client_id: 'multibanking_client'
+  client_id: 'multibanking-client'
 };
 
 /*

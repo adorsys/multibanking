@@ -76,7 +76,7 @@ export class ConsentAuthGuard implements CanActivate {
 
   private decoupled(consentAuthStatus: ResourceUpdateAuthResponseTO, state: RouterStateSnapshot,
                     consentId: string, authorisationId: string): Observable<boolean> {
-    this.router.navigate(['bankaccess-create', consentId], { skipLocationChange: true });
+    this.router.navigate(['bankaccess-create/consents', consentId, 'authorisations', authorisationId], { skipLocationChange: true });
     return of(false);
   }
 

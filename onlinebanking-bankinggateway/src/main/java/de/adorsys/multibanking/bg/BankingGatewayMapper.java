@@ -7,9 +7,9 @@ import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodReque
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
-import de.adorsys.xs2a.adapter.service.account.AccountDetails;
-import de.adorsys.xs2a.adapter.service.account.CashAccountType;
-import de.adorsys.xs2a.adapter.service.account.Transactions;
+import de.adorsys.xs2a.adapter.service.model.AccountDetails;
+import de.adorsys.xs2a.adapter.service.model.CashAccountType;
+import de.adorsys.xs2a.adapter.service.model.Transactions;
 import org.iban4j.Iban;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -107,12 +107,15 @@ interface BankingGatewayMapper {
         booking.setExternalId(transactionDetails.getEndToEndId());
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
 
-        if (transactionDetails.getCreditorName() != null || transactionDetails.getDebtorName() != null) {
-            BankAccount bankAccount = new BankAccount();
-            bankAccount.setOwner(transactionDetails.getCreditorName() != null ? transactionDetails.getCreditorName()
-                : transactionDetails.getDebtorName());
-            booking.setOtherAccount(bankAccount);
+        BankAccount bankAccount = new BankAccount();
+        if (transactionDetails.getCreditorName() != null || transactionDetails.getCreditorAccount() !=null) {
+            bankAccount.setOwner(transactionDetails.getCreditorName());
+            bankAccount.setIban(transactionDetails.getCreditorAccount().getIban());
+        } else if (transactionDetails.getDebtorName() != null || transactionDetails.getDebtorAccount() != null) {
+            bankAccount.setOwner(transactionDetails.getDebtorName());
+            bankAccount.setIban(transactionDetails.getDebtorAccount().getIban());
         }
+        booking.setOtherAccount(bankAccount);
 
         return booking;
     }
@@ -120,7 +123,7 @@ interface BankingGatewayMapper {
     @Mapping(target = "amount", source = "balanceAmount.amount")
     @Mapping(target = "date", source = "referenceDate")
     @Mapping(target = "currency", source = "balanceAmount.currency")
-    Balance toBalance(de.adorsys.xs2a.adapter.service.account.Balance balance);
+    Balance toBalance(de.adorsys.xs2a.adapter.service.model.Balance balance);
 
     List<Message> toMessages(List<MessageTO> messagesTO);
 }

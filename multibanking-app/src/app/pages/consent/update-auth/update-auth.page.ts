@@ -83,11 +83,11 @@ export class UpdateAuthPage implements OnInit {
           if (response.scaApproach === 'DECOUPLED') {
             this.psuMessage = response.psuMessage;
           } else if (response.scaStatus === 'PSUAUTHENTICATED') {
-            this.navCtrl.navigateForward(`/sca-method-selection/consents/${encodeURIComponent(this.consentId)}
-          /authorisations/${encodeURIComponent(this.authorisationId)}`);
+            // tslint:disable-next-line:max-line-length
+            this.navCtrl.navigateRoot(`/sca-method-selection/consents/${encodeURIComponent(this.consentId)}/authorisations/${encodeURIComponent(this.authorisationId)}`);
           } else {
-            this.navCtrl.navigateForward(`/authorisation/consents/${encodeURIComponent(this.consentId)}
-          /authorisations/${encodeURIComponent(this.authorisationId)}`);
+            // tslint:disable-next-line:max-line-length
+            this.navCtrl.navigateRoot(`/authorisation/consents/${encodeURIComponent(this.consentId)}/authorisations/${encodeURIComponent(this.authorisationId)}`);
           }
         },
         messages => {
@@ -104,7 +104,8 @@ export class UpdateAuthPage implements OnInit {
   }
 
   continue() {
-    this.navCtrl.navigateRoot(`/bankaccess-create/${encodeURIComponent(this.consentId)}`);
+    // tslint:disable-next-line:max-line-length
+    this.navCtrl.navigateRoot(`bankaccess-create/consents/${encodeURIComponent(this.consentId)}/authorisations/${encodeURIComponent(this.authorisationId)}`);
   }
 
 

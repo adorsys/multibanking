@@ -33,6 +33,8 @@ import org.iban4j.Iban;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.callback.AbstractHBCICallback;
+import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.manager.*;
@@ -61,19 +63,20 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
     static HbciObjectMapper hbciObjectMapper = new HbciObjectMapperImpl();
 
-    public R authorisationAwareExecute(HbciCallback hbciCallback) {
+    public R authorisationAwareExecute(HBCICallback hbciCallback) {
         HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
         AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(hbciTanSubmit);
 
         PinTanPassport bpdPassport = fetchBpd(hbciCallback);
-        //could be null in case of empty hktan requests
-        AbstractHBCIJob hbciJob = createJobMessage(bpdPassport);
 
         HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(jobs, hbciCallback, authorisationCodeResponse,
             getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
+        dialog.getPassport().setBPD(bpdPassport.getBPD());
 
         HBCIMsgStatus dialogInitMsgStatus = dialog.dialogInit(true);
 
+        //could be null in case of empty hktan requests
+        AbstractHBCIJob hbciJob = createJobMessage(dialog.getPassport());
         if (checkDialogInitScaRequired(dialogInitMsgStatus, dialog, hbciTanSubmit, hbciJob)) {
             R jobResponse = createJobResponse(dialog.getPassport());
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
@@ -138,10 +141,9 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         return scaRequired;
     }
 
-    private PinTanPassport fetchBpd(HbciCallback hbciCallback) {
+    private PinTanPassport fetchBpd(HBCICallback hbciCallback) {
         AbstractHbciDialog dialog = createDialog(bpd, hbciCallback, null, null);
-        dialog.execute();
-        dialog.close();
+        dialog.execute(true);
         return dialog.getPassport();
     }
 
@@ -190,17 +192,17 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
             });
     }
 
-    private AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciCallback hbciCallback,
+    private AbstractHbciDialog createDialog(HbciDialogType dialogType, HBCICallback hbciCallback,
                                             AuthorisationCodeResponse authorisationCodeResponse,
                                             HBCITwoStepMechanism twoStepMechanism) {
-        HbciCallback callback = createCallback(hbciCallback, authorisationCodeResponse);
+        HBCICallback callback = createCallback(hbciCallback, authorisationCodeResponse);
         HbciDialogRequest dialogRequest = createDialogRequest(callback);
 
         return HbciDialogFactory.createDialog(dialogType, null, dialogRequest, twoStepMechanism);
     }
 
     private void executeTasks(AbstractHbciDialog dialog) {
-        HBCIExecStatus execStatus = dialog.execute();
+        HBCIExecStatus execStatus = dialog.execute(false);
         if (!execStatus.isOK()) {
             throw new MultibankingException(HBCI_ERROR, execStatus.getErrorMessages()
                 .stream()
@@ -299,8 +301,8 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
             });
     }
 
-    private HbciCallback createCallback(HbciCallback hbciCallback, AuthorisationCodeResponse response) {
-        return new HbciCallback() {
+    private HBCICallback createCallback(HBCICallback hbciCallback, AuthorisationCodeResponse response) {
+        return new AbstractHBCICallback()  {
 
             @Override
             public void tanChallengeCallback(String orderRef, String challenge, String challengeHhdUc,
@@ -344,7 +346,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         };
     }
 
-    private HbciDialogRequest createDialogRequest(HbciCallback hbciCallback) {
+    private HbciDialogRequest createDialogRequest(HBCICallback hbciCallback) {
         return hbciObjectMapper.toHbciDialogRequest(getTransactionRequest(), hbciCallback);
     }
 
