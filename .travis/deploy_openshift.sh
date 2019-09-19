@@ -2,4 +2,6 @@
 set -e
 docker login ${OPENSHIFT_REGISTRY} -u ${OPENSHIFT_USER} -p ${OPENSHIFT_TOKEN}
 docker build -t ${OPENSHIFT_REGISTRY}/${OPENSHIFT_NAMESPACE}/multibanking-service:${TAG} multibanking-server/
+docker build -t ${OPENSHIFT_REGISTRY}/${OPENSHIFT_NAMESPACE}/multibanking-app:${TAG} multibanking-app/
 docker push ${OPENSHIFT_REGISTRY}/${OPENSHIFT_NAMESPACE}/multibanking-service:${TAG}
+docker push ${OPENSHIFT_REGISTRY}/${OPENSHIFT_NAMESPACE}/multibanking-app:${TAG}
