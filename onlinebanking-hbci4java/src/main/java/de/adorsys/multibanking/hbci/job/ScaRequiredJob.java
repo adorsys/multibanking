@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
 import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV.GVSEPAInfo;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.callback.AbstractHBCICallback;
@@ -120,6 +121,10 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
     private boolean checkDialogInitScaRequired(HBCIMsgStatus initMsgStatus, AbstractHbciDialog dialog,
                                                HbciTanSubmit hbciTanSubmit, AbstractHBCIJob hbciJob) {
+        if (hbciJob instanceof GVSEPAInfo) { // bugfix iban and bic must be fetched
+            return false;
+        }
+
         if (!initMsgStatus.isOK()) {
             throw new MultibankingException(HBCI_ERROR, initMsgStatus.getErrorList()
                 .stream()
