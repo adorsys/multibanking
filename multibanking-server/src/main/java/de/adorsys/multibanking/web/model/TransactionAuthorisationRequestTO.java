@@ -11,4 +11,9 @@ public class TransactionAuthorisationRequestTO {
         required = true)
     @ToString.Exclude
     private String scaAuthenticationData;
+
+    @ApiModelProperty(value = "The OAuth Token for the process if the SCA method supports it. Otherwise empty.",
+        required = true)
+    @ToString.Exclude
+    private String oauthToken;
 }
