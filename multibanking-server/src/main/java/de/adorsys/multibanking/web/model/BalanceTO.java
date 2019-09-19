@@ -17,6 +17,7 @@
 package de.adorsys.multibanking.web.model;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 public class BalanceTO {
 
     private LocalDate date;
+    @ToString.Exclude
     private BigDecimal amount;
     private String currency;
 }
