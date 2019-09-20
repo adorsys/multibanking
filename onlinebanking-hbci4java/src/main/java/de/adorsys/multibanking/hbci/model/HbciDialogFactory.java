@@ -57,8 +57,14 @@ public class HbciDialogFactory {
             .orElseGet(() -> {
                 HbciConsent hbciConsent = (HbciConsent) dialogRequest.getBankApiConsentData();
 
+                String userId = null;
+                String customerId = null;
+                if (hbciConsent.getCredentials() != null) {
+                    userId = hbciConsent.getCredentials().getUserId();
+                    customerId = hbciConsent.getCredentials().getCustomerId();
+                }
                 return createPassport(bankInfo.getPinTanVersion().getId(), bankCode,
-                    hbciConsent.getCredentials().getUserId(), hbciConsent.getCredentials().getCustomerId(),
+                    userId, customerId,
                     hbciProduct, dialogRequest.getCallback());
             });
         newPassport.setCurrentSecMechInfo(twoStepMechanism);
