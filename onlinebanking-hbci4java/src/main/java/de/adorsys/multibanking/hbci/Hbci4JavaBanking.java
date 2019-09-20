@@ -57,8 +57,8 @@ import java.util.stream.Collectors;
 import static de.adorsys.multibanking.domain.ScaStatus.*;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
-import static de.adorsys.multibanking.hbci.model.HbciDialogType.bpd;
-import static de.adorsys.multibanking.hbci.model.HbciDialogType.jobs;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.JOBS;
 
 @Slf4j
 public class Hbci4JavaBanking implements OnlineBankingService {
@@ -332,10 +332,10 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     private PinTanPassport fetchBpdUpd(HbciDialogRequest dialogRequest) {
-        AbstractHbciDialog bpdDialog = createDialog(bpd, dialogRequest, null);
+        AbstractHbciDialog bpdDialog = createDialog(BPD, dialogRequest, null);
         bpdDialog.execute(true);
 
-        HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(jobs, dialogRequest, null);
+        HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(JOBS, dialogRequest, null);
         HBCIMsgStatus hbciMsgStatus = dialog.dialogInit(false);
         if (!hbciMsgStatus.isOK()) {
             throw new MultibankingException(HBCI_ERROR, hbciMsgStatus.getErrorList()
@@ -361,7 +361,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             .orElseThrow(() -> new MultibankingException(MultibankingError.HBCI_ERROR, "no valid sca methods " +
                 "available"));
 
-        HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(jobs, dialogRequest, hbciTwoStepMechanism);
+        HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(JOBS, dialogRequest, hbciTwoStepMechanism);
         dialog.dialogInit(true, "HKTAB");
         dialog.addTask(new GVTANMediaList(dialog.getPassport()));
         dialog.execute(true);

@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.createDialog;
-import static de.adorsys.multibanking.hbci.model.HbciDialogType.jobs;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.JOBS;
 
 @Slf4j
 public class TransferJob {
@@ -49,7 +49,7 @@ public class TransferJob {
     public void requestTransfer(TransactionRequest sepaTransactionRequest) {
         HbciDialogRequest dialogRequest = hbciObjectMapper.toHbciDialogRequest(sepaTransactionRequest, null);
 
-        HBCIJobsDialog dialog = (HBCIJobsDialog)createDialog(jobs, null, dialogRequest, null);
+        HBCIJobsDialog dialog = (HBCIJobsDialog)createDialog(JOBS, null, dialogRequest, null);
 
         AbstractHBCIJob hbciJob = createHbciJob(sepaTransactionRequest.getTransaction(), dialog.getPassport(), null);
 
