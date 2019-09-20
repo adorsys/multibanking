@@ -58,6 +58,7 @@ import static de.adorsys.multibanking.domain.ScaStatus.*;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.bpd;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.upd;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.jobs;
 
 @Slf4j
@@ -335,7 +336,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         AbstractHbciDialog bpdDialog = createDialog(bpd, dialogRequest, null);
         bpdDialog.execute(true);
 
+        AbstractHbciDialog updDialog = createDialog(upd, dialogRequest, null);
+        updDialog.execute(true);
+
         HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(jobs, dialogRequest, null);
+        dialog.getPassport().setSysId(updDialog.getPassport().getSysId());
+
         HBCIMsgStatus hbciMsgStatus = dialog.dialogInit(false);
         if (!hbciMsgStatus.isOK()) {
             throw new MultibankingException(HBCI_ERROR, hbciMsgStatus.getErrorList()

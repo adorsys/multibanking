@@ -33,12 +33,14 @@ import org.kapott.hbci.callback.AbstractHBCICallback;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.callback.HBCICallbackConsole;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
+import org.kapott.hbci.dialog.HBCIUpdDialog;
 import org.kapott.hbci.manager.KnownTANProcess;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -57,7 +59,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         HbciTanSubmit hbciTanSubmit =
             evaluateTanSubmit((HbciConsent) submitAuthorisationCode.getOriginTransactionRequest().getBankApiConsentData());
 
-        HbciPassport hbciPassport = createPassport(submitAuthorisationCode, hbciTanSubmit);
+        HbciPassport hbciPassport = fetchUpd(createPassport(submitAuthorisationCode, hbciTanSubmit));
 
         HBCIJobsDialog hbciDialog = new HBCIJobsDialog(hbciPassport, hbciTanSubmit.getDialogId(),
             hbciTanSubmit.getMsgNum());
@@ -76,13 +78,19 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
                 .map(messageString -> Message.builder().renderedMessage(messageString).build())
                 .collect(Collectors.toList()));
         } else {
-            if (hbciTanSubmit.getHbciJobName().equals("HKIDN")) { //sca for dialoginit was needed
+            if (hbciTanSubmit.getHbciJobName().equals("HKIDN") && hbciJob != null) { //sca for dialoginit was needed
                 hbciDialog.getPassport().updateUPD(hbciExecStatus.getMsgStatusList().get(0).getData());
                 hbciDialog.addTask(hbciJob);
                 hbciDialog.execute(true);
             }
             return createResponse(hbciPassport, hbciTanSubmit, hbciJob, hbciExecStatus);
         }
+    }
+
+    private HbciPassport fetchUpd(HbciPassport pinTanPassport) {
+        HBCIUpdDialog dialog = new HBCIUpdDialog(pinTanPassport);
+        dialog.execute(true);
+        return (HbciPassport) dialog.getPassport();
     }
 
     private AbstractHBCIJob submitProcess1(HbciTanSubmit hbciTanSubmit, HbciPassport hbciPassport,
@@ -104,6 +112,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         AbstractHBCIJob originJob = Optional.ofNullable(hbciTanSubmit.getOriginJobName())
+            .filter(Objects::nonNull) // is null in case of TanRequestJob
             .map(originJobName -> {
                 AbstractHBCIJob result = scaJob.createJobMessage(hbciDialog.getPassport());
                 try {

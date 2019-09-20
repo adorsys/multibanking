@@ -75,6 +75,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
             getUserTanTransportType(bpdUpdPassport.getBankTwostepMechanisms()));
         dialog.getPassport().setBPD(bpdUpdPassport.getBPD());
         dialog.getPassport().setUPD(bpdUpdPassport.getUPD());
+        dialog.getPassport().setSysId(bpdUpdPassport.getSysId());
 
         HBCIMsgStatus dialogInitMsgStatus = dialog.dialogInit(true);
 
