@@ -16,6 +16,7 @@ import { ImagesService } from 'src/app/services/rest/images.service';
 import { ResourceUpdateAuthResponseTO } from 'src/multibanking-api/resourceUpdateAuthResponseTO';
 import { Link } from 'src/multibanking-api/link';
 import { ConsentService } from 'src/app/services/rest/consent.service';
+import { Observable, Subscriber } from 'rxjs';
 
 @Component({
   selector: 'app-booking-list',
@@ -227,7 +228,9 @@ export class BookingListPage implements OnInit {
       (response) => {
         loading.dismiss();
         if (response && response.challenge) {
-          this.presentTanPrompt(response);
+          this.presentTanPrompt(response).subscribe(tan => {
+            this.submitTan(response, tan);
+          });
         } else {
           this.loadBookings();
         }
@@ -296,29 +299,30 @@ export class BookingListPage implements OnInit {
     toast.present();
   }
 
-  async presentTanPrompt(consentAuthStatus: ResourceUpdateAuthResponseTO) {
-    const alert = await this.alertController.create({
-      header: consentAuthStatus.challenge.additionalInformation,
-      inputs: [
-        {
-          name: 'TAN',
-          type: 'text',
-        }
-      ],
-      buttons: [
-        {
-          text: 'Ok',
-          handler: data => {
-            this.submitTan(consentAuthStatus, data.TAN);
+  presentTanPrompt(consentAuthStatus: ResourceUpdateAuthResponseTO): Observable<string> {
+    return new Observable((observer: Subscriber<string>) => {
+      this.alertController.create({
+        header: consentAuthStatus.challenge.additionalInformation,
+        inputs: [
+          {
+            name: 'TAN',
+            type: 'text',
           }
-        }
-      ]
+        ],
+        buttons: [
+          {
+            text: 'Ok',
+            handler: data => {
+              observer.next(data.TAN);
+            }
+          }
+        ]
+      })
+        .then(alert => alert.present());
     });
-
-    await alert.present();
   }
 
-  public submitTan(consentAuthStatus: ResourceUpdateAuthResponseTO, tan: string) {
+  private submitTan(consentAuthStatus: ResourceUpdateAuthResponseTO, tan: string) {
     // tslint:disable-next-line:no-string-literal
     const updateAuthenticationLink: Link = consentAuthStatus._links['transactionAuthorisation'];
     this.consentService.updateAuthentication(updateAuthenticationLink.href, { scaAuthenticationData: tan })

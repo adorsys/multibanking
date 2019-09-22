@@ -18,5 +18,5 @@ package de.adorsys.multibanking.hbci.model;
 
 public enum  HbciDialogType {
 
-    bpd, upd, jobs
+    BPD, UPD, JOBS
 }

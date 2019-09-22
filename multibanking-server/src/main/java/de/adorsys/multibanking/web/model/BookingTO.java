@@ -3,12 +3,14 @@ package de.adorsys.multibanking.web.model;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.ToString;
 import org.springframework.hateoas.core.Relation;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
+@ToString(onlyExplicitlyIncluded = true)
 @Relation(collectionRelation = "bookingList")
 @ApiModel(description = "Single bank booking", value = "Booking")
 public class BookingTO {
@@ -16,6 +18,7 @@ public class BookingTO {
     @ApiModelProperty(value = "Booking ID")
     private String id;
 
+    @ToString.Include
     @ApiModelProperty(value = "External ID of this booking")
     private String externalId;
 

@@ -86,11 +86,11 @@ public class HbciDialogFactory {
         newPassport.setHost(url);
 
         switch (dialogType) {
-            case bpd:
+            case BPD:
                 return new HBCIBpdDialog(newPassport);
-            case upd:
+            case UPD:
                 return new HBCIUpdDialog(newPassport);
-            case jobs:
+            case JOBS:
                 return new HBCIJobsDialog(newPassport);
             default:
                 throw new IllegalStateException("Unexpected dialog tpye: " + dialogType);
