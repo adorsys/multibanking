@@ -79,7 +79,9 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         } else {
             if (hbciTanSubmit.getHbciJobName() != null && hbciTanSubmit.getHbciJobName().equals("HKIDN")) {
                 //sca for dialoginit was needed -> fints consent active, expecting response with exempted sca
-                scaJob.authorisationAwareExecute(null, hbciDialog);
+                SubmitAuthorizationCodeResponse<?> response = new SubmitAuthorizationCodeResponse<>(scaJob.authorisationAwareExecute(null, hbciDialog));
+                response.setScaStatus(FINALISED);
+                return response;
             }
             return createResponse(hbciPassport, hbciTanSubmit, hbciJob, hbciExecStatus);
         }
@@ -168,13 +170,9 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
     }
 
     private HbciPassport createPassport(SubmitAuthorisationCode submitAuthorizationCode, HbciTanSubmit hbciTanSubmit) {
-        Map<String, String> bpd = new HashMap<>();
-        bpd.put("Params." + hbciTanSubmit.getOriginLowLevelName() + "Par" + hbciTanSubmit.getOriginSegVersion() +
-            ".Par" + hbciTanSubmit.getOriginLowLevelName() + ".suppformats", hbciTanSubmit.getPainVersion());
-        bpd.put("Params." + hbciTanSubmit.getOriginLowLevelName() + "Par" + hbciTanSubmit.getOriginSegVersion() +
-            ".SegHead.code", hbciTanSubmit.getHbciJobName());
-        bpd.put("Params.TAN2StepPar" + hbciTanSubmit.getTwoStepMechanism().getSegversion() + ".SegHead.code", "HKTAN");
-        bpd.put("BPA.numgva", "100"); //dummy value
+        Map<String, String> bpd =
+            Optional.ofNullable(submitAuthorizationCode.getOriginTransactionRequest().getHbciBPD())
+                .orElseGet(() -> scaJob.fetchBpd(null).getBPD());
 
         HbciPassport.State state = HbciPassport.State.fromJson(hbciTanSubmit.getPassportState());
 

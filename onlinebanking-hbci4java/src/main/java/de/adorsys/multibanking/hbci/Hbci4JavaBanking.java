@@ -278,7 +278,12 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         try {
             ScaRequiredJob scaJob = createScaJob(submitAuthorisationCode.getOriginTransactionRequest());
 
-            return new SubmitAuthorisationCodeJob<>(scaJob).sumbitAuthorizationCode(submitAuthorisationCode);
+            SubmitAuthorizationCodeResponse submitAuthorizationCodeResponse =
+                new SubmitAuthorisationCodeJob<>(scaJob).sumbitAuthorizationCode(submitAuthorisationCode);
+
+            removeConsentTanSubmitData((HbciConsent) submitAuthorisationCode.getOriginTransactionRequest().getBankApiConsentData(), submitAuthorizationCodeResponse);
+
+            return submitAuthorizationCodeResponse;
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }

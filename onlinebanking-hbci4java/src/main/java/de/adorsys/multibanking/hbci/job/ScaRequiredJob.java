@@ -72,10 +72,11 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
     }
 
     R authorisationAwareExecute(HBCICallback hbciCallback, HBCIJobsDialog existingDialog) {
-        PinTanPassport bpdPassport = fetchBpd(hbciCallback);
-
-        R jobResponse = initDialog(hbciCallback, existingDialog, bpdPassport);
-        if (jobResponse != null) return jobResponse; //TAN required for HKIDN
+        this.dialog = existingDialog;
+        if (this.dialog == null) {
+            R jobResponse = initDialog(hbciCallback);
+            if (jobResponse != null) return jobResponse; //TAN required for HKIDN
+        }
 
         //could be null in case of empty hktan requests
         AbstractHBCIJob hbciJob = createJobMessage(dialog.getPassport());
@@ -99,28 +100,24 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
                 && KnownReturncode.W3076.searchReturnValue(gvtan2Step.getJobResult().getGlobStatus().getRetVals()) == null)
             .orElse(false);
 
-        jobResponse = createJobResponse(dialog.getPassport());
+        R jobResponse = createJobResponse(dialog.getPassport());
         if (tan2StepRequired) {
             updateTanSubmit(hbciTanSubmit, dialog, hbciJob);
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
-        }
-
-        //sca not needed and dialog not closed
-        if (!tan2StepRequired) {
+        } else {
+            //sca not needed and dialog not closed
             dialog.close();
         }
 
         return jobResponse;
     }
 
-    private R initDialog(HBCICallback hbciCallback, HBCIJobsDialog existingDialog, PinTanPassport bpdPassport) {
-        dialog = Optional.ofNullable(existingDialog)
-            .orElseGet(() -> {
-                HBCIJobsDialog newDialog = (HBCIJobsDialog) createDialog(JOBS, hbciCallback,
-                    getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
-                newDialog.getPassport().setBPD(bpdPassport.getBPD());
-                return newDialog;
-            });
+    private R initDialog(HBCICallback hbciCallback) {
+        PinTanPassport bpdPassport = fetchBpd(hbciCallback);
+
+        dialog = (HBCIJobsDialog) createDialog(JOBS, hbciCallback,
+            getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
+        dialog.getPassport().setBPD(bpdPassport.getBPD());
 
         HBCIMsgStatus dialogInitMsgStatus = dialog.dialogInit(true);
 
@@ -156,7 +153,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
         return scaRequired;
     }
 
-    private PinTanPassport fetchBpd(HBCICallback hbciCallback) {
+    PinTanPassport fetchBpd(HBCICallback hbciCallback) {
         AbstractHbciDialog dialog = createDialog(BPD, hbciCallback, null);
         dialog.execute(true);
         return dialog.getPassport();
