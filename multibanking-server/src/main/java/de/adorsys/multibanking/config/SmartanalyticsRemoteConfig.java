@@ -7,6 +7,7 @@ import com.google.common.io.ByteStreams;
 import de.adorsys.multibanking.exception.SmartanalyticsException;
 import de.adorsys.multibanking.exception.domain.Message;
 import de.adorsys.multibanking.exception.domain.Messages;
+import de.adorsys.multibanking.logging.LoggingUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -114,15 +115,15 @@ public class SmartanalyticsRemoteConfig {
                 query = "?" + uri.getQuery() + " ";
             }
 
-            Charset charset = LoggingInterceptorConfig.Logging.determineCharset(request.getHeaders().getContentType());
-            String requestString = LoggingInterceptorConfig.Logging.cleanAndReduce(body, charset);
+            Charset charset = LoggingUtils.determineCharset(request.getHeaders().getContentType());
+            String requestString = LoggingUtils.cleanAndReduce(body, charset);
 
             log.trace("{} > {} {}{} {}", backend, request.getMethod(), request.getURI().getPath(), query,
                 requestString);
 
             ClientHttpResponse response = execution.execute(request, body);
 
-            String responseString = LoggingInterceptorConfig.Logging.cleanAndReduce(ByteStreams.toByteArray(response.getBody()), charset);
+            String responseString = LoggingUtils.cleanAndReduce(ByteStreams.toByteArray(response.getBody()), charset);
 
             log.trace("{} < {} {}", backend, response.getStatusCode(), responseString);
 

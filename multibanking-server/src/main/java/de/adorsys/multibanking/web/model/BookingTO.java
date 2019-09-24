@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@ToString(onlyExplicitlyIncluded = true)
 @Relation(collectionRelation = "bookingList")
 @ApiModel(description = "Single bank booking", value = "Booking")
 public class BookingTO {

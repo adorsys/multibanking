@@ -8,8 +8,38 @@
     </appender>
 
     <appender name="STDOUT-AUDIT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%X{user}:%X{accessId}] - %msg%n</pattern>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="de.adorsys.multibanking.logging.PatternMaskingLayout">
+                <maskPattern>(?>customerId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>userId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>pin)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>pin2)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>psuId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>psuCorporateId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>password)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>iban)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>amount)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>balance)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>origValue)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>chargeValue)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>text)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>additional)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>usage)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>mandateReference)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>owner)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>accountNumber)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>mainCategory)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>subCategory)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>specification)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>provider)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>otherAccount)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>image)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>data)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>imageLink)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>psuAccountIban)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>scaAuthenticationData)\=(.*?)[)|,]</maskPattern>
+                <pattern>%d{HH:mm:ss.SSS} [%X{user}:%X{accessId}] - %msg%n</pattern>
+            </layout>
         </encoder>
     </appender>
 
@@ -17,7 +47,7 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="de.adorsys.multibanking.web.RestControllerLoggingHandler" level="TRACE" additivity="false">
+    <logger name="de.adorsys.multibanking.logging.RestControllerAspectLogging" level="TRACE" additivity="false">
         <appender-ref ref="STDOUT-AUDIT"/>
     </logger>
 

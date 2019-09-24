@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class BalancesReportTO {
+
     @ApiModelProperty(value = "Ready account balance")
     private BalanceTO readyBalance;
 

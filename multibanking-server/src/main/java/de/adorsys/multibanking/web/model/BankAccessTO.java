@@ -5,8 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import org.springframework.hateoas.core.Relation;
 
-import javax.validation.constraints.NotBlank;
-
 @Data
 @ApiModel(description = "BankAccess account information", value = "BankAccess")
 @Relation(collectionRelation = "bankAccessList")
