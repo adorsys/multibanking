@@ -47,7 +47,6 @@ import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.manager.HBCIVersion;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.status.HBCIMsgStatus;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,10 +54,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.ScaStatus.*;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
-import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
-import static de.adorsys.multibanking.hbci.model.HbciDialogType.JOBS;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.*;
 
 @Slf4j
 public class Hbci4JavaBanking implements OnlineBankingService {
@@ -197,7 +194,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
                 return (LoadBookingsResponse) submitAuthorizationCodeResponse.getJobResponse();
             }
-
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
         }
@@ -337,19 +333,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     private PinTanPassport fetchBpdUpd(HbciDialogRequest dialogRequest) {
-        AbstractHbciDialog bpdDialog = createDialog(BPD, dialogRequest, null);
-        bpdDialog.execute(true);
+        AbstractHbciDialog dialog = createDialog(BPD, dialogRequest, null);
+        dialog.execute(true);
 
-        HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(JOBS, dialogRequest, null);
-        HBCIMsgStatus hbciMsgStatus = dialog.dialogInit(false);
-        if (!hbciMsgStatus.isOK()) {
-            throw new MultibankingException(HBCI_ERROR, hbciMsgStatus.getErrorList()
-                .stream()
-                .map(messageString -> Message.builder().renderedMessage(messageString).build())
-                .collect(Collectors.toList()));
-        }
-
-        dialog.dialogEnd();
+        dialog = createDialog(UPD, dialogRequest, null);
+        dialog.execute(true);
 
         if (dialog.getPassport().jobSupported(GVTANMediaList.getLowlevelName())) {
             dialog = fetchTanMedias(dialogRequest, dialog.getPassport());

@@ -1,6 +1,7 @@
-package de.adorsys.multibanking.web;
+package de.adorsys.multibanking.logging;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -8,6 +9,8 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
+import org.springframework.hateoas.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -15,11 +18,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.List;
 
 @Slf4j
 @Aspect
 @Component
-public class RestControllerLoggingHandler {
+public class RestControllerAspectLogging {
 
     private static final Marker AUDIT_LOG = MarkerFactory.getMarker("AUDIT");
 
@@ -37,7 +42,7 @@ public class RestControllerLoggingHandler {
     @AfterReturning(pointcut = "@annotation(io.swagger.annotations.ApiOperation)",
         returning = "retVal")
     public void logAfterAllMethods(Object retVal) {
-        log.trace(AUDIT_LOG,  "Response: [{}]", retVal.toString());
+        log.trace(AUDIT_LOG, "Response: [{}]", retVal.toString());
     }
 
     private void logRequestBody(JoinPoint thisJoinPoint) {
@@ -50,10 +55,12 @@ public class RestControllerLoggingHandler {
                 if (!(annotation instanceof RequestBody))
                     continue;
                 Object requestBody = thisJoinPoint.getArgs()[index];
-                log.trace(AUDIT_LOG,  "Body: [{}]", requestBody.toString());
+                log.trace(AUDIT_LOG, "Body: [{}]", requestBody.toString());
             }
         }
     }
+
+
 }
 
 

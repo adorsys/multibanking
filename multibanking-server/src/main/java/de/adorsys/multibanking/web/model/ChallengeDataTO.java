@@ -10,6 +10,7 @@ import java.util.List;
 @ApiModel(description = "It is contained in addition to the data element 'chosenScaMethod' if challenge data is " +
     "needed for SCA")
 public class ChallengeDataTO {
+
     @ApiModelProperty(value = "PNG data (max. 512 kilobyte) to be displayed to the PSU, Base64 encoding, cp. " +
         "[RFC4648].\n" +
         "This attribute is used only, when PHOTO_OTP or CHIP_OTP is the selected SCA method."
