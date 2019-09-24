@@ -106,7 +106,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
         } else {
             //sca not needed and dialog not closed
-            dialog.close();
+            dialog.dialogEnd();
         }
 
         return jobResponse;

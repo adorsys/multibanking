@@ -349,7 +349,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 .collect(Collectors.toList()));
         }
 
-        dialog.close();
+        dialog.dialogEnd();
 
         if (dialog.getPassport().jobSupported(GVTANMediaList.getLowlevelName())) {
             dialog = fetchTanMedias(dialogRequest, dialog.getPassport());

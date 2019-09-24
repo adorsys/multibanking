@@ -72,7 +72,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
         HBCIExecStatus hbciExecStatus = hbciDialog.execute(false);
         if (!hbciExecStatus.isOK()) {
-            hbciDialog.close();
+            hbciDialog.dialogEnd();
             throw new MultibankingException(HBCI_ERROR, hbciExecStatus.getErrorMessages().stream()
                 .map(messageString -> Message.builder().renderedMessage(messageString).build())
                 .collect(Collectors.toList()));
