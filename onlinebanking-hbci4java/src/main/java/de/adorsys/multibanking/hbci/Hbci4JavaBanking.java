@@ -315,7 +315,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return new BpdUpdHbciCallback(bankCode, bpdCache);
     }
 
-    private AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciDialogRequest dialogRequest,
+    public AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciDialogRequest dialogRequest,
                                             HBCITwoStepMechanism twoStepMechanism) {
         checkBankExists(dialogRequest.getBank());
 
