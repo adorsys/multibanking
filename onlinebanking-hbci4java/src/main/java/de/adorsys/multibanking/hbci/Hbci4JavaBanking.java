@@ -136,10 +136,14 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(dialogRequest);
             dialogRequest.setCallback(hbciCallback);
 
-            PinTanPassport updPassport = fetchBpdUpd(dialogRequest);
+            PinTanPassport passport = fetchBpdUpd(dialogRequest);
+
+            if (passport.jobSupported(GVTANMediaList.getLowlevelName())) {
+                fetchTanMedias(dialogRequest, passport);
+            }
 
             ScaMethodsResponse response = ScaMethodsResponse.builder()
-                .tanTransportTypes(extractTanTransportTypes(updPassport))
+                .tanTransportTypes(extractTanTransportTypes(passport))
                 .build();
             updateUpd(hbciCallback, response);
             return response;
@@ -316,7 +320,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     public AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciDialogRequest dialogRequest,
-                                            HBCITwoStepMechanism twoStepMechanism) {
+                                           HBCITwoStepMechanism twoStepMechanism) {
         checkBankExists(dialogRequest.getBank());
 
         String bankCode = dialogRequest.getBank().getBankApiBankCode() != null
@@ -339,26 +343,27 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         dialog = createDialog(UPD, dialogRequest, null);
         dialog.execute(true);
 
-        if (dialog.getPassport().jobSupported(GVTANMediaList.getLowlevelName())) {
-            dialog = fetchTanMedias(dialogRequest, dialog.getPassport());
-        }
-
         return dialog.getPassport();
     }
 
-    private HBCIJobsDialog fetchTanMedias(HbciDialogRequest dialogRequest, PinTanPassport passport) {
-        HBCITwoStepMechanism hbciTwoStepMechanism = passport.getUserTwostepMechanisms().stream()
-            .filter(scaMethod -> !scaMethod.equals("999"))
-            .findFirst()
+    private PinTanPassport fetchTanMedias(HbciDialogRequest dialogRequest, PinTanPassport passport) {
+        List<HBCITwoStepMechanism> tanMediaNeededScaMethods = passport.getUserTwostepMechanisms().stream()
+            .filter(scaMethodId -> !scaMethodId.equals("999"))
+            .filter(scaMethodId -> {
+                HBCITwoStepMechanism hbciTwoStepMechanismBpd = passport.getBankTwostepMechanisms().get(scaMethodId);
+                return hbciTwoStepMechanismBpd != null && hbciTwoStepMechanismBpd.getNeedtanmedia().equals("2");
+            })
             .map(scaMethod -> passport.getBankTwostepMechanisms().get(scaMethod))
-            .orElseThrow(() -> new MultibankingException(MultibankingError.HBCI_ERROR, "no valid sca methods " +
-                "available"));
+            .collect(Collectors.toList());
 
-        HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(JOBS, dialogRequest, hbciTwoStepMechanism);
-        dialog.dialogInit(true, "HKTAB");
-        dialog.addTask(new GVTANMediaList(dialog.getPassport()));
-        dialog.execute(true);
-        return dialog;
+        tanMediaNeededScaMethods.forEach(twoStepMechanism -> {
+            HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(JOBS, dialogRequest, twoStepMechanism);
+            dialog.dialogInit(true, "HKTAB");
+            dialog.addTask(new GVTANMediaList(passport));
+            dialog.execute(true);
+        });
+
+        return passport;
     }
 
     @Override
@@ -437,7 +442,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 if (!tanTransportType.isNeedTanMedia()) {
                     return Collections.singletonList(tanTransportType);
                 } else {
-                    return hbciPassport.getTanMedias().stream()
+                    return hbciPassport.getTanMedias().get(tanTransportType.getId()).stream()
                         .map(tanMediaInfo -> {
                             TanTransportType clone = SerializationUtils.clone(tanTransportType);
                             clone.setMedium(tanMediaInfo.mediaName);
@@ -448,7 +453,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             })
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
-
     }
 
     @Override

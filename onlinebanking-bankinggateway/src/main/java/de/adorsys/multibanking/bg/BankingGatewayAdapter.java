@@ -23,15 +23,11 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadBookings;
 import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
-import de.adorsys.xs2a.adapter.api.AccountApi;
 import de.adorsys.xs2a.adapter.api.remote.AccountInformationClient;
 import de.adorsys.xs2a.adapter.model.BookingStatusTO;
 import de.adorsys.xs2a.adapter.model.PaymentProductTO;
 import de.adorsys.xs2a.adapter.model.PaymentServiceTO;
-import de.adorsys.xs2a.adapter.service.AccountInformationService;
-import de.adorsys.xs2a.adapter.service.RequestHeaders;
-import de.adorsys.xs2a.adapter.service.RequestParams;
-import de.adorsys.xs2a.adapter.service.Response;
+import de.adorsys.xs2a.adapter.service.*;
 import de.adorsys.xs2a.adapter.service.impl.AccountInformationServiceImpl;
 import de.adorsys.xs2a.adapter.service.model.AccountDetails;
 import de.adorsys.xs2a.adapter.service.model.AccountListHolder;
@@ -69,7 +65,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     @NonNull
     private final String xs2aAdapterBaseUrl;
     @Getter(lazy = true)
-    private final BankingGatewayB2CAisApi bankingGatewayB2CAisApi = new BankingGatewayB2CAisApi(apiClient());
+    private final BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi();
     @Getter(lazy = true)
     private final AccountInformationClient accountApi = Feign.builder()
         .contract(createSpringMvcContract())
@@ -83,6 +79,17 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         new AccountInformationServiceImpl(getAccountApi());
     private ObjectMapper objectMapper = new ObjectMapper();
     private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
+
+    private BankingGatewayB2CAisApi bankingGatewayB2CAisApi() {
+        BankingGatewayB2CAisApi b2CAisApi = new BankingGatewayB2CAisApi(apiClient());
+        b2CAisApi.getApiClient().getHttpClient().interceptors().clear();
+        b2CAisApi.getApiClient().getHttpClient().interceptors().add(
+            new HttpLoggingInterceptor(log::debug)
+                .setLevel(HttpLoggingInterceptor.Level.BODY)
+        );
+
+        return b2CAisApi;
+    }
 
     private SpringMvcContract createSpringMvcContract() {
         return new SpringMvcContract(Collections.emptyList(), new CustomConversionService());
