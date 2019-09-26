@@ -68,7 +68,6 @@ public class HbciPassport extends PinTanPassport {
         private String sysId;
 
         private List<String> allowedTwostepMechanisms;
-        private List<GVRTANMediaList.TANMediaInfo> tanMedias;
         private HBCITwoStepMechanism currentSecMechInfo;
 
         /**
@@ -85,7 +84,6 @@ public class HbciPassport extends PinTanPassport {
             hbciVersion = passport.getHBCIVersion();
             customerId = passport.getCustomerId();
             allowedTwostepMechanisms = passport.getUserTwostepMechanisms();
-            tanMedias = passport.getTanMedias();
             currentSecMechInfo = passport.getCurrentSecMechInfo();
             hbciProduct = passport.getHbciProduct();
         }
@@ -106,7 +104,6 @@ public class HbciPassport extends PinTanPassport {
             passport.setSysId(sysId);
             passport.setCustomerId(customerId);
             passport.setUserTwostepMechanisms(new ArrayList<>(allowedTwostepMechanisms));
-            passport.setTanMedias(tanMedias);
             passport.setCurrentSecMechInfo(currentSecMechInfo);
         }
 
