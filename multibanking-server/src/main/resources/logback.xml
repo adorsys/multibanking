@@ -27,16 +27,13 @@
                 <maskPattern>(?>usage)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>mandateReference)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>owner)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>accountNumber)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>mainCategory)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>subCategory)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>specification)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>provider)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>otherAccount)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>image)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>data)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>imageLink)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>psuAccountIban)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>scaAuthenticationData)\=(.*?)[)|,]</maskPattern>
                 <pattern>%d{HH:mm:ss.SSS} [%X{user}:%X{accessId}] - %msg%n</pattern>
             </layout>
