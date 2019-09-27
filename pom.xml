@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.adorsys.multibanking</groupId>
     <artifactId>multibanking</artifactId>
-    <version>5.2.11-SNAPSHOT</version>
+    <version>5.2.11</version>
     <packaging>pom</packaging>
     <name>Multibanking</name>
     <url>https://github.com/adorsys/multibanking</url>
@@ -44,8 +43,8 @@
 
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm:ssZZ</maven.build.timestamp.format>
         <maven.build-timestamp>${maven.build.timestamp}</maven.build-timestamp>
-        <scmBranch/>
-        <start-class/>
+        <scmBranch />
+        <start-class />
 
         <!-- Sonar dependencies -->
         <sonar.core.coveragePlugin>jacoco</sonar.core.coveragePlugin>
@@ -284,7 +283,7 @@
         <connection>scm:git@github.com:adorsys/multibanking.git</connection>
         <developerConnection>scm:git:git@github.com:adorsys/multibanking.git</developerConnection>
         <url>git@github.com:adorsys/multibanking.git</url>
-        <tag>HEAD</tag>
+        <tag>multibanking-5.2.11</tag>
     </scm>
     <profiles>
         <profile>
