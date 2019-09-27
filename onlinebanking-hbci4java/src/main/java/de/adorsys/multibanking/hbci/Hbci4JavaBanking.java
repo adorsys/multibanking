@@ -29,7 +29,10 @@ import de.adorsys.multibanking.domain.request.*;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.domain.transaction.*;
+import de.adorsys.multibanking.domain.transaction.LoadAccounts;
+import de.adorsys.multibanking.domain.transaction.LoadBalances;
+import de.adorsys.multibanking.domain.transaction.LoadBookings;
+import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
 import de.adorsys.multibanking.hbci.job.*;
 import de.adorsys.multibanking.hbci.model.*;
 import lombok.Data;
@@ -237,18 +240,6 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     @Override
     public boolean bookingsCategorized() {
         return false;
-    }
-
-    public void executeTransactionWithoutSca(TransactionRequest<AbstractScaTransaction> request) {
-        checkBankExists(request.getBank());
-        setRequestBpdAndCreateCallback(request);
-
-        try {
-            TransferJob transferJob = new TransferJob();
-            transferJob.requestTransfer(request);
-        } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
-        }
     }
 
     @Override
