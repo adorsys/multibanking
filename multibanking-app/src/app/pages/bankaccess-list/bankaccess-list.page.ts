@@ -40,6 +40,17 @@ export class BankaccessListPage implements OnInit {
     this.navCtrl.navigateForward([`/admin`]);
   }
 
+  logout() {
+    this.keycloak.logout()
+      .then(() => {
+        this.loginImplicit();
+      });
+  }
+
+  loginImplicit() {
+    this.keycloak.login({ prompt: 'login', redirectUri: '/bankconnections' });
+  }
+
   itemTapped(bankAccess: ResourceBankAccess) {
     this.navCtrl.navigateForward([`/bankconnections/${bankAccess.id}`]);
   }
