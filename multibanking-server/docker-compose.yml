@@ -39,7 +39,7 @@ services:
     ports:
       - "27017:27017"
   multibanking:
-    image: adorsys/openjdk-jre-base:8-minideb
+    image: adorsys/java:8
     working_dir: /app
     volumes:
       - ./target:/app
