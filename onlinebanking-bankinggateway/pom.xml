@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>5.2.15</version>
+        <version>5.2.16-SNAPSHOT</version>
     </parent>
 
     <artifactId>onlinebanking-bankinggateway</artifactId>
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-facade</artifactId>
-            <version>5.2.15</version>
+            <version>5.2.16-SNAPSHOT</version>
         </dependency>
 
         <!-- xs2a adapter -->
