@@ -21,9 +21,6 @@ export class KeycloakService {
   }
 
   static init(options?: KeycloakInitOptions): Promise<any> {
-
-    console.log('init Keycloak: ' + options);
-
     return new Promise((resolve, reject) => {
       keycloak.init(options ? options : {
         onLoad: 'check-sso',
