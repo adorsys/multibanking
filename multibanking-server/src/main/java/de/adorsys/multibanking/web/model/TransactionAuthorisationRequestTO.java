@@ -10,4 +10,9 @@ public class TransactionAuthorisationRequestTO {
         " binary, then it is base64 encoded.",
         required = true)
     private String scaAuthenticationData;
+
+    @ApiModelProperty(value = "The OAuth Token for the process if the SCA method supports it. Otherwise empty.",
+        required = true)
+    @ToString.Exclude
+    private String oauthToken;
 }

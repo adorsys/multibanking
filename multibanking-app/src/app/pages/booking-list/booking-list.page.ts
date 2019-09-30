@@ -197,10 +197,10 @@ export class BookingListPage implements OnInit {
         this.pageable = response;
         this.bookingsLoaded(response._embedded.bookingList);
 
-        infiniteScroll.complete();
+        infiniteScroll.target.complete();
       });
     } else {
-      infiniteScroll.complete();
+      infiniteScroll.target.complete();
     }
   }
 

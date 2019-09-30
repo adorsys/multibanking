@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Images</ion-title>
+    <ion-buttons slot="start">
+        <ion-back-button defaultHref="/"></ion-back-button>
+      </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button size="small" (click)="fileInput.click()">
+        <ion-icon name="cloud-upload"></ion-icon>
+        <input #fileInput type="file" multiple (change)="this.value=null;uploadImages($event)" style="display: none">
+      </ion-fab-button>
+    </ion-fab>
+  </ion-content>

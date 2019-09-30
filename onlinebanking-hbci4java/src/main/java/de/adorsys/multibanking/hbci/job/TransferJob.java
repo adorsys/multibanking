@@ -16,72 +16,41 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.exception.Message;
-import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
-import de.adorsys.multibanking.hbci.model.HbciDialogRequest;
-import de.adorsys.multibanking.hbci.model.HbciObjectMapper;
-import de.adorsys.multibanking.hbci.model.HbciObjectMapperImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVUmbSEPA;
-import org.kapott.hbci.dialog.HBCIJobsDialog;
+import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.List;
 
-import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
-import static de.adorsys.multibanking.hbci.model.HbciDialogFactory.createDialog;
-import static de.adorsys.multibanking.hbci.model.HbciDialogType.JOBS;
-
+@RequiredArgsConstructor
 @Slf4j
-public class TransferJob {
+public class TransferJob extends ScaRequiredJob<SinglePayment, EmptyResponse> {
 
-    private HbciObjectMapper hbciObjectMapper = new HbciObjectMapperImpl();
+    private final TransactionRequest<SinglePayment> transactionRequest;
 
-    public void requestTransfer(TransactionRequest sepaTransactionRequest) {
-        HbciDialogRequest dialogRequest = hbciObjectMapper.toHbciDialogRequest(sepaTransactionRequest, null);
+    @Override
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
+        SinglePayment singlePayment = transactionRequest.getTransaction();
 
-        HBCIJobsDialog dialog = (HBCIJobsDialog)createDialog(JOBS, null, dialogRequest, null);
-
-        AbstractHBCIJob hbciJob = createHbciJob(sepaTransactionRequest.getTransaction(), dialog.getPassport(), null);
-
-        dialog.addTask(hbciJob);
-
-        // Let the Handler submitAuthorizationCode all jobs in one batch
-        HBCIExecStatus dialogStatus = dialog.execute(false);
-        if (!dialogStatus.isOK()) {
-            log.warn(dialogStatus.getErrorMessages().toString());
-        }
-
-        if (hbciJob.getJobResult().getJobStatus().hasErrors()) {
-            throw new MultibankingException(HBCI_ERROR, hbciJob.getJobResult().getJobStatus().getErrorList().stream()
-                .map(messageString -> Message.builder().renderedMessage(messageString).build())
-                .collect(Collectors.toList()));
-        }
-
-        dialog.execute(true);
-    }
-
-    private AbstractSEPAGV createHbciJob(AbstractScaTransaction transaction, PinTanPassport passport,
-                                         String rawData) {
-        SinglePayment singlePayment = (SinglePayment) transaction;
-
-        Konto src = getDebtorAccount(transaction, passport);
+        Konto src = getPsuKonto(passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();
         dst.iban = singlePayment.getReceiverIban();
         dst.bic = singlePayment.getReceiverBic();
 
-        AbstractSEPAGV sepagv = new GVUmbSEPA(passport, GVUmbSEPA.getLowlevelName(), rawData);
+        AbstractSEPAGV sepagv = new GVUmbSEPA(passport, GVUmbSEPA.getLowlevelName(), null);
 
         sepagv.setParam("src", src);
         sepagv.setParam("dst", dst);
@@ -95,14 +64,28 @@ public class TransferJob {
         return sepagv;
     }
 
-    private Konto getDebtorAccount(AbstractScaTransaction sepaTransaction, PinTanPassport passport) {
-        return Optional.ofNullable(sepaTransaction.getPsuAccount())
-            .map(bankAccount -> {
-                Konto konto = passport.findAccountByAccountNumber(bankAccount.getAccountNumber());
-                konto.iban = bankAccount.getIban();
-                konto.bic = bankAccount.getBic();
-                return konto;
-            })
-            .orElse(null);
+    @Override
+    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
+        return Collections.emptyList();
+    }
+
+    @Override
+    TransactionRequest<SinglePayment> getTransactionRequest() {
+        return transactionRequest;
+    }
+
+    @Override
+    String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+        return GVUmbSEPA.getLowlevelName();
+    }
+
+    @Override
+    EmptyResponse createJobResponse(PinTanPassport passport) {
+        return new EmptyResponse();
+    }
+
+    @Override
+    public String orderIdFromJobResult(HBCIJobResult jobResult) {
+        return null;
     }
 }
