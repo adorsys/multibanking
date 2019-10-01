@@ -93,6 +93,11 @@
                 "with": "src/environments/environment.dev2.ts"
               }]
             },
+            "integ": {
+              "fileReplacements": [{
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.integ.ts"
+            },
             "local": {
               "fileReplacements": [{
                 "replace": "src/environments/environment.ts",
@@ -121,6 +126,9 @@
             },
             "dev2": {
               "browserTarget": "app:build:dev2"
+            },
+            "integ": {
+              "browserTarget": "app:build:integ"
             },
             "local": {
               "browserTarget": "app:build:local"
@@ -192,6 +200,9 @@
             },
             "dev2": {
               "browserTarget": "app:build:dev2"
+            },
+            "integ": {
+              "browserTarget": "app:build:integ"
             },
             "local": {
               "browserTarget": "app:build:local"
