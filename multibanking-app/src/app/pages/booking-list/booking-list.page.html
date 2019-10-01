@@ -25,12 +25,9 @@
           <h3> {{"booking.amount < 0" ? 'Payee:' : 'Payer:'}} {{ getReceiver(booking)}}
           </h3>
           <div [ngClass]="{'forecast': booking.forecastBooking}" *ngIf="booking.bookingCategory">
-            <p>
-              <strong>Main Category:</strong> {{ booking.bookingCategory?.mainCategory}}</p>
-            <p>
-              <strong>Sub Category:</strong> {{ booking.bookingCategory?.subCategory}}</p>
-            <p>
-              <strong>Specification:</strong> {{ booking.bookingCategory?.specification}}</p>
+            <p>Main Category: {{booking.bookingCategory?.mainCategory}}</p>
+            <p>Sub Category: {{booking.bookingCategory?.subCategory}}</p>
+            <p>Specification: {{booking.bookingCategory?.specification}}</p>
           </div>
           <div class="item__alert" *ngIf="!booking.bookingCategory">
             <h3 float-left>not categorized</h3>
