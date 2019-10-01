@@ -48,14 +48,14 @@ deploy:
  # Deploy to opehsift banking-gateway-dev
   - provider: script
     skip_cleanup: true
-    script: env TAG=latest BUILD_ENV=dev OPENSHIFT_NAMESPACE=$OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV  OPENSHIFT_USER=$OPENSHIFT_BANKING_GATEWAY_DEV_USER OPENSHIFT_TOKEN=$OPENSHIFT_BANKING_GATEWAY_TOKEN /bin/bash /bin/bash -c '.travis/deploy_openshift_multibanking_service.sh && .travis/deploy_openshift_multibanking_app.sh'
+    script: env TAG=latest BUILD_ENV=dev OPENSHIFT_NAMESPACE=$OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV  OPENSHIFT_USER=$OPENSHIFT_BANKING_GATEWAY_DEV_USER OPENSHIFT_TOKEN=$OPENSHIFT_BANKING_GATEWAY_TOKEN /bin/bash -c '.travis/deploy_openshift_multibanking_service.sh && .travis/deploy_openshift_multibanking_app.sh'
     on:
-      branch: develop
+      branch: KOA_fix_deployment
  # Deploy to opehsift banking-gateway-integ
   - provider: script
     skip_cleanup: true
     script: env TAG=latest BUILD_ENV=integ OPENSHIFT_NAMESPACE=$OPENSHIFT_NAMESPACE_BANKING_GATEWAY_INTEG  OPENSHIFT_USER=$OPENSHIFT_BANKING_GATEWAY_INTEG_USER OPENSHIFT_TOKEN=$OPENSHIFT_BANKING_GATEWAY_INTEG_TOKEN /bin/bash .travis/deploy_openshift_multibanking_app.sh
     on:
-      branch: develop
+      branch: KOA_fix_deployment
 
 
