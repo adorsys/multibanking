@@ -17,7 +17,6 @@
                 <maskPattern>(?>psuId)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>psuCorporateId)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>password)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>iban)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>amount)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>balance)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>origValue)\=(.*?)[)|,]</maskPattern>
