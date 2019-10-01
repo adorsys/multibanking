@@ -20,6 +20,10 @@ const routes: Routes = [
       {
         path: 'banks',
         loadChildren: () => import('../banks-config/banks-config.module').then(m => m.BanksConfigPageModule)
+      },
+      {
+        path: 'smartanalytics',
+        loadChildren: () => import('../smartanalytics-config/smartanalytics-config.module').then(m => m.SmartanalyticsConfigPageModule)
       }
     ]
   }

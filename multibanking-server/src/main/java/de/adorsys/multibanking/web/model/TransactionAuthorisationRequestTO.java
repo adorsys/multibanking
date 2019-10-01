@@ -10,4 +10,5 @@ public class TransactionAuthorisationRequestTO {
         " binary, then it is base64 encoded.",
         required = true)
     private String scaAuthenticationData;
+
 }

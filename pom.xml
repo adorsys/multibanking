@@ -4,7 +4,7 @@
 
     <groupId>de.adorsys.multibanking</groupId>
     <artifactId>multibanking</artifactId>
-    <version>5.2.14-SNAPSHOT</version>
+    <version>5.3.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Multibanking</name>
     <url>https://github.com/adorsys/multibanking</url>
@@ -63,7 +63,6 @@
         <module>multibanking-persistence-mongodb</module>
         <module>multibanking-persistence-jpa</module>
         <module>onlinebanking-facade</module>
-        <module>finapi-adapter</module>
         <module>onlinebanking-figo</module>
         <module>onlinebanking-finapi</module>
         <module>onlinebanking-hbci4java</module>

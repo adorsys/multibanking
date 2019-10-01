@@ -106,6 +106,7 @@ interface BankingGatewayMapper {
         booking.setCurrency(transactionDetails.getTransactionAmount().getCurrency());
         booking.setExternalId(transactionDetails.getEndToEndId());
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
+        booking.setTransactionCode(transactionDetails.getPurposeCode() == null ? null : transactionDetails.getPurposeCode().getCode());
 
         BankAccount bankAccount = new BankAccount();
         if (transactionDetails.getCreditorName() != null || transactionDetails.getCreditorAccount() !=null) {

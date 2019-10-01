@@ -8,7 +8,6 @@ const routes: Routes = [
     loadChildren: () => import('./pages/bankaccess-list/bankaccess-list.module').then(m => m.BankaccessListPageModule)
   },
   { path: 'admin', loadChildren: './pages/admin/admin.module#AdminPageModule' },
-  { path: 'banks-config', loadChildren: './pages/banks-config/banks-config.module#BanksConfigPageModule' },
   { path: 'update-auth', loadChildren: './pages/consent/update-auth/update-auth.module#UpdateAuthPageModule' },
   { path: 'sca-method-selection', loadChildren: './pages/consent/sca-method-selection/sca-method-selection.module#ScaMethodSelectionPageModule' },
   { path: 'authorisation', loadChildren: './pages/consent/authorisation/authorisation.module#AuthorisationPageModule' },

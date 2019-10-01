@@ -40,6 +40,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
+import org.iban4j.Iban;
 import org.kapott.hbci.GV.GVTANMediaList;
 import org.kapott.hbci.callback.AbstractHBCICallback;
 import org.kapott.hbci.dialog.AbstractHbciDialog;
@@ -54,9 +55,11 @@ import org.kapott.hbci.passport.PinTanPassport;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.ScaStatus.*;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NOT_SUPPORTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.*;
 
@@ -79,7 +82,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     public Hbci4JavaBanking(InputStream customBankConfigInput, boolean cacheBpdUpd) {
         if (cacheBpdUpd) {
-            bpdCache = new HashMap<>();
+            bpdCache = new ConcurrentHashMap<>();
         }
 
         try (InputStream inputStream = Optional.ofNullable(customBankConfigInput)
@@ -453,6 +456,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             @Override
             public CreateConsentResponse createConsent(Consent consent, boolean redirectPreferred,
                                                        String tppRedirectUri) {
+                String bankCode = Iban.valueOf(consent.getPsuAccountIban()).getBankCode();
+                if (!bankSupported(bankCode)) {
+                    throw new MultibankingException(BANK_NOT_SUPPORTED);
+                }
+
                 HbciConsent hbciConsent = new HbciConsent();
                 hbciConsent.setStatus(STARTED);
 

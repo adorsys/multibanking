@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{pageable?.page.totalElements}} static rules - {{rulesStatus?.rulesVersion}} -
+      {{rulesStatus?.lastChangeDate | date}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/smartanalytics"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-searchbar #rulesSearchBar type="search" debounce="500" placeholder="Rule" showCancelButton="true"
+    (ionChange)="searchRules($event)" (ionCancel)="loadRules($event)"></ion-searchbar>
+  <ion-list>
+    <ion-item *ngFor="let rule of rules" (click)="itemSelected(rule)">
+      <ion-label>
+        <p><strong>Rule id:</strong> {{ rule.ruleId}}</p>
+        <p *ngIf="rule.receiver"><strong>Receiver:</strong> {{ rule.receiver }}</p>
+        <p *ngIf="rule.creditorId"><strong>Creditor id:</strong> {{ rule.creditorId }}</p>
+      </ion-label>
+      <ion-label slot="end">
+        <p><strong>Main category:</strong> {{ rule.mainCategory}}</p>
+        <p><strong>Sub category:</strong> {{ rule.subCategory }}</p>
+        <p><strong>Specification:</strong> {{ rule.specification }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+  <ion-fab vertical="bottom" horizontal="end">
+    <ion-fab-button size="small">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="start">
+      <ion-fab-button size="small" (click)="fileInput.click()">
+        <ion-icon name="cloud-upload"></ion-icon>
+        <input #fileInput type="file" multiple (change)="this.value=null;uploadRules($event)" style="display: none">
+      </ion-fab-button>
+      <ion-fab-button (click)="downloadRules(false)">
+        <ion-icon name="download"></ion-icon>
+      </ion-fab-button>
+    </ion-fab-list>
+  </ion-fab>
+</ion-content>
