@@ -1,31 +1,29 @@
-app-booking-list {
-    .booking-list {
-        .booking-item {
-            margin: 5px 0;
-            padding: 0;
-            position: relative;
+.booking-list {
+    .booking-item {
+        margin: 5px 0;
+        padding: 0;
+        position: relative;
 
-            .item-inner {
-                ion-label.label-md {
-                    margin: 0;
-                }
+        .item-inner {
+            ion-label.label-md {
+                margin: 0;
             }
         }
     }
+}
 
-    .item__alert {
-        color: #CC3300;
-    }
+.item__alert {
+    color: #CC3300;
+}
 
-    .forecast {
-        color: #a0a0a0;
-    }
+.forecast {
+    color: #a0a0a0;
+}
 
-    .amount--negative {
-        color: #CC3300;
-    }
+.amount--negative {
+    color: #CC3300;
+}
 
-    .amount--positive {
-        color: #2d872e;
-    }
+.amount--positive {
+    color: #2d872e;
 }

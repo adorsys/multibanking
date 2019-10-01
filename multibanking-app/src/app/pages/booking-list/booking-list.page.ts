@@ -233,6 +233,7 @@ export class BookingListPage implements OnInit {
           });
         } else {
           this.loadBookings();
+          this.bankAccount.lastSync = moment().toDate();
         }
       },
       messages => {
