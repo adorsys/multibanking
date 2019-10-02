@@ -79,7 +79,8 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         } else {
             if (hbciTanSubmit.getHbciJobName() != null && hbciTanSubmit.getHbciJobName().equals("HKIDN")) {
                 //sca for dialoginit was needed -> fints consent active, expecting response with exempted sca
-                SubmitAuthorizationCodeResponse<?> response = new SubmitAuthorizationCodeResponse<>(scaJob.authorisationAwareExecute(null, hbciDialog));
+                SubmitAuthorizationCodeResponse<?> response =
+                    new SubmitAuthorizationCodeResponse<>(scaJob.authorisationAwareExecute(null, hbciDialog));
                 response.setScaStatus(FINALISED);
                 return response;
             }

@@ -65,7 +65,7 @@ public class BookingController {
                                             @PageableDefault(size = 20, sort = "valutaDate", direction =
                                                 Sort.Direction.DESC) Pageable pageable,
                                             PagedResourcesAssembler assembler) {
-        chackBankAccountExists(accessId, accountId);
+        checkBankAccountExists(accessId, accountId);
 
         if (bankAccountRepository.getSyncStatus(accountId) == BankAccount.SyncStatus.SYNC) {
             throw new SyncInProgressException(accountId);
@@ -92,7 +92,7 @@ public class BookingController {
     @GetMapping("/index")
     public Resource<BookingsIndexEntity> getBookingsIndex(@PathVariable String accessId,
                                                           @PathVariable String accountId) {
-        chackBankAccountExists(accessId, accountId);
+        checkBankAccountExists(accessId, accountId);
 
         if (bankAccountRepository.getSyncStatus(accountId) == BankAccount.SyncStatus.SYNC) {
             throw new SyncInProgressException(accountId);
@@ -112,7 +112,7 @@ public class BookingController {
             })})
     @GetMapping(path = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public HttpEntity<String> downloadBookings(@PathVariable String accessId, @PathVariable String accountId) {
-        chackBankAccountExists(accessId, accountId);
+        checkBankAccountExists(accessId, accountId);
 
         String bookingsAsCSV = bookingService.getBookingsCsv(principal.getName(), accessId, accountId);
 
@@ -128,7 +128,7 @@ public class BookingController {
     @GetMapping("/{bookingId}")
     public Resource<BookingTO> getBooking(@PathVariable String accessId, @PathVariable String accountId,
                                           @PathVariable String bookingId) {
-        chackBankAccountExists(accessId, accountId);
+        checkBankAccountExists(accessId, accountId);
 
         BookingEntity bookingEntity = bookingRepository.findByUserIdAndId(principal.getName(), bookingId)
             .orElseThrow(() -> new ResourceNotFoundException(BookingEntity.class, bookingId));
@@ -136,7 +136,7 @@ public class BookingController {
         return mapToResource(bookingEntity, accessId, accountId);
     }
 
-    private void chackBankAccountExists(String accessId, String accountId) {
+    private void checkBankAccountExists(String accessId, String accountId) {
         if (!bankAccessRepository.exists(accessId)) {
             throw new ResourceNotFoundException(BankAccessEntity.class, accessId);
         }

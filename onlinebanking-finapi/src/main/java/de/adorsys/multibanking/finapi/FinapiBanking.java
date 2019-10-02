@@ -12,10 +12,8 @@ import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadBookings;
 import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
 import de.adorsys.multibanking.domain.utils.Utils;
-import io.swagger.client.ApiClient;
-import io.swagger.client.ApiException;
-import io.swagger.client.api.*;
-import io.swagger.client.model.*;
+import de.adorsys.multibanking.finapi.api.*;
+import de.adorsys.multibanking.finapi.model.*;
 import org.adorsys.envutils.EnvProperties;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -118,8 +116,8 @@ public class FinapiBanking implements OnlineBankingService {
         BankAccess bankAccess = loadAccountInformationRequest.getBankAccess();
 
         try {
-            PageableBankList searchAllBanks = new BanksApi(createApiClient()).getAndSearchAllBanks(null,
-                bankAccess.getBankCode(), null, null, null, null, null, null, null, null);
+            PageableBankList searchAllBanks = new BanksApi(createApiClient()).getAndSearchAllBanks(null, null, null,
+                null, null, null, null, null, null, null, null, null);
             if (searchAllBanks.getBanks().size() != 1) {
                 throw new RuntimeException("Bank not supported");
             }
@@ -138,8 +136,8 @@ public class FinapiBanking implements OnlineBankingService {
 
             bankAccess.externalId(bankApi(), connections.getId().toString());
 
-            AccountList accounts = new AccountsApi(apiClient).getAndSearchAllAccounts(null, null, null,
-                Arrays.asList(connections.getId()), null, null, null, null);
+            AccountList accounts = new AccountsApi(apiClient).getAndSearchAllAccounts(null, null, null, null, null,
+                null, null, null, null);
 
             return LoadAccountInformationResponse.builder().bankAccounts(accounts.getAccounts().stream().map(account ->
                 new BankAccount()

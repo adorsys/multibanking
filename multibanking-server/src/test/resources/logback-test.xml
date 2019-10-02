@@ -43,11 +43,11 @@
         <appender-ref ref="STDOUT"/>
     </root>
 
-    <logger name="de.adorsys.multibanking.logging.RestControllerAspectLogging" level="TRACE" additivity="false">
+    <logger name="de.adorsys.multibanking.logging.RestControllerAspectLogging" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT-AUDIT"/>
     </logger>
 
-    <logger name="org.kapott.hbci.comm.CommPinTan" level="WARN"/>
+    <logger name="org.kapott.hbci.comm.CommPinTan" level="TRACE"/>
     <logger name="de.adorsys.xs2a.adapter.api.AccountApi" level="WARN"/>
 
 </configuration>

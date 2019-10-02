@@ -36,4 +36,5 @@ public class HbciConsent {
     private TanTransportType selectedMethod;
     private String scaAuthenticationData;
     private Object hbciTanSubmit;
+    private boolean withHktan = true;
 }
