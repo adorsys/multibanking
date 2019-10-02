@@ -1,0 +1,53 @@
+<configuration>
+    <include resource="/org/springframework/boot/logging/logback/base.xml"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %level [%logger{0}] %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT-AUDIT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="de.adorsys.multibanking.logging.PatternMaskingLayout">
+                <maskPattern>(?>customerId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>userId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>pin)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>pin2)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>psuId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>psuCorporateId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>password)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>amount)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>balance)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>origValue)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>chargeValue)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>text)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>additional)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>usage)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>mandateReference)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>owner)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>mainCategory)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>subCategory)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>specification)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>provider)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>image)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>data)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>imageLink)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>scaAuthenticationData)\=(.*?)[)|,]</maskPattern>
+                <pattern>%d{HH:mm:ss.SSS} [%X{user}:%X{accessId}] - %msg%n</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+    <logger name="de.adorsys.multibanking.logging.RestControllerAspectLogging" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT-AUDIT"/>
+    </logger>
+
+    <logger name="org.kapott.hbci.comm.CommPinTan" level="TRACE"/>
+    <logger name="de.adorsys.xs2a.adapter.api.AccountApi" level="WARN"/>
+
+</configuration>

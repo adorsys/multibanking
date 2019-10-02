@@ -119,7 +119,8 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
             getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
         dialog.getPassport().setBPD(bpdPassport.getBPD());
 
-        HBCIMsgStatus dialogInitMsgStatus = dialog.dialogInit(true);
+        HBCIMsgStatus dialogInitMsgStatus =
+            dialog.dialogInit(((HbciConsent) getTransactionRequest().getBankApiConsentData()).isWithHktan());
 
         if (checkDialogInitScaRequired(dialogInitMsgStatus)) {
             R jobResponse = createJobResponse(dialog.getPassport());

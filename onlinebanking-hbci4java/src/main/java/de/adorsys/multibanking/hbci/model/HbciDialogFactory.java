@@ -89,7 +89,7 @@ public class HbciDialogFactory {
             case BPD:
                 return new HBCIBpdDialog(newPassport);
             case UPD:
-                return new HBCIUpdDialog(newPassport);
+                return new HBCIUpdDialog(newPassport, true);
             case JOBS:
                 return new HBCIJobsDialog(newPassport);
             default:

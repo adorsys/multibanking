@@ -42,15 +42,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 import org.iban4j.Iban;
 import org.kapott.hbci.GV.GVTANMediaList;
+import org.kapott.hbci.GV_Result.GVRTANMediaList;
 import org.kapott.hbci.callback.AbstractHBCICallback;
 import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
+import org.kapott.hbci.dialog.HBCIUpdDialog;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.BankInfo;
 import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.manager.HBCIVersion;
 import org.kapott.hbci.passport.PinTanPassport;
+import org.kapott.hbci.status.HBCIExecStatus;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -142,14 +145,22 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(dialogRequest);
             dialogRequest.setCallback(hbciCallback);
 
-            PinTanPassport passport = fetchBpdUpd(dialogRequest);
+            HBCIExecStatus bpdExecStatus = fetchBpd(dialogRequest);
+            boolean withHktan = !bpdExecStatus.hasMessage("9400");
+            if (!withHktan) {
+                HbciConsent hbciConsent = (HbciConsent)authenticatePsuRequest.getBankApiConsentData();
+                hbciConsent.setWithHktan(withHktan);
+            }
 
+            PinTanPassport passport = fetchUpd(dialogRequest, withHktan);
+
+            Map<String, List<GVRTANMediaList.TANMediaInfo>> tanMediaMap = null;
             if (passport.jobSupported(GVTANMediaList.getLowlevelName())) {
-                fetchTanMedias(dialogRequest, passport);
+                tanMediaMap = fetchTanMedias(dialogRequest, passport);
             }
 
             ScaMethodsResponse response = ScaMethodsResponse.builder()
-                .tanTransportTypes(extractTanTransportTypes(passport))
+                .tanTransportTypes(extractTanTransportTypes(passport, tanMediaMap))
                 .build();
             updateUpd(hbciCallback, response);
             return response;
@@ -330,17 +341,21 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
-    private PinTanPassport fetchBpdUpd(HbciDialogRequest dialogRequest) {
+    private HBCIExecStatus fetchBpd(HbciDialogRequest dialogRequest) {
         AbstractHbciDialog dialog = createDialog(BPD, dialogRequest, null);
-        dialog.execute(true);
+        return dialog.execute(true);
+    }
 
-        dialog = createDialog(UPD, dialogRequest, null);
+    private PinTanPassport fetchUpd(HbciDialogRequest dialogRequest, boolean withHktan) {
+        HBCIUpdDialog dialog = (HBCIUpdDialog) createDialog(UPD, dialogRequest, null);
+        dialog.setWithHktan(withHktan);
         dialog.execute(true);
 
         return dialog.getPassport();
     }
 
-    private PinTanPassport fetchTanMedias(HbciDialogRequest dialogRequest, PinTanPassport passport) {
+    private Map<String, List<GVRTANMediaList.TANMediaInfo>> fetchTanMedias(HbciDialogRequest dialogRequest,
+                                                                           PinTanPassport passport) {
         List<HBCITwoStepMechanism> tanMediaNeededScaMethods = passport.getUserTwostepMechanisms().stream()
             .filter(scaMethodId -> !scaMethodId.equals("999"))
             .filter(scaMethodId -> {
@@ -350,14 +365,20 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             .map(scaMethod -> passport.getBankTwostepMechanisms().get(scaMethod))
             .collect(Collectors.toList());
 
+        Map<String, List<GVRTANMediaList.TANMediaInfo>> tanMediaMap = new HashMap<>();
         tanMediaNeededScaMethods.forEach(twoStepMechanism -> {
+            GVTANMediaList gvtanMediaList = new GVTANMediaList(passport);
+
             HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(JOBS, dialogRequest, twoStepMechanism);
             dialog.dialogInit(true, "HKTAB");
-            dialog.addTask(new GVTANMediaList(passport));
+            dialog.addTask(gvtanMediaList);
             dialog.execute(true);
+
+            tanMediaMap.put(twoStepMechanism.getSecfunc(),
+                ((GVRTANMediaList) gvtanMediaList.getJobResult()).mediaList());
         });
 
-        return passport;
+        return tanMediaMap;
     }
 
     @Override
@@ -421,7 +442,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             });
     }
 
-    private List<TanTransportType> extractTanTransportTypes(PinTanPassport hbciPassport) {
+    private List<TanTransportType> extractTanTransportTypes(PinTanPassport hbciPassport, Map<String,
+        List<GVRTANMediaList.TANMediaInfo>> tanMediaMap) {
         return hbciPassport.getUserTwostepMechanisms()
             .stream()
             .map(id -> hbciPassport.getBankTwostepMechanisms().get(id))
@@ -436,7 +458,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 if (!tanTransportType.isNeedTanMedia()) {
                     return Collections.singletonList(tanTransportType);
                 } else {
-                    return hbciPassport.getTanMedias().get(tanTransportType.getId()).stream()
+                    return tanMediaMap.get(tanTransportType.getId()).stream()
                         .map(tanMediaInfo -> {
                             TanTransportType clone = SerializationUtils.clone(tanTransportType);
                             clone.setMedium(tanMediaInfo.mediaName);
