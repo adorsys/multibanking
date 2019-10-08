@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { AbstractService } from './abstract.service';
 import { Observable } from 'rxjs';
 import { ResourceAnalyticsTO } from 'src/multibanking-api/resourceAnalyticsTO';
-import { environment } from 'src/environments/environment';
 import { catchError } from 'rxjs/operators';
 
 
@@ -12,7 +11,7 @@ import { catchError } from 'rxjs/operators';
 export class AnalyticsService extends AbstractService {
 
   getAnalytics(accessId: string, accountId: string): Observable<ResourceAnalyticsTO> {
-    return this.http.get(`${environment.api_url}/bankaccesses/${accessId}/accounts/${accountId}/analytics`)
+    return this.http.get(`${this.settings.apiUrl}/bankaccesses/${accessId}/accounts/${accountId}/analytics`)
     .pipe(
       catchError(this.handleError)
     );

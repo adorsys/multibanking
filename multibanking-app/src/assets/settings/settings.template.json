@@ -1,0 +1,8 @@
+{
+  "baseUrl": "${BASE_URL}",
+  "authUrl": "${AUTH_URL}",
+  "apiUrl": "${API_URL}",
+  "smartanalyticsUrl": "${SMARTANALYTICS_URL}",
+  "realm": "${REALM}",
+  "clientId": "${CLIENT_ID}"
+}

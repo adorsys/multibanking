@@ -1,6 +1,14 @@
 version: '3.1'
 services:
   multibanking-app:
+    build: .
     image: adorsys/multibanking-app
     ports:
       - "8180:8081"
+    environment:
+      - BASE_URL=http://localhost:8180
+      - AUTH_URL=http://keycloak:8080/auth
+      - API_URL=http://localhost:8088/api/v1
+      - SMARTANALYTICS_URL=http://localhost:8088/api/v1
+      - REALM=multibanking
+      - CLIENT_ID=multibanking-client

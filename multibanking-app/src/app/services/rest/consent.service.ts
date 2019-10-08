@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AbstractService } from './abstract.service';
 import { ResourceConsentTO } from 'src/multibanking-api/resourceConsentTO';
-import { environment } from 'src/environments/environment';
 import { catchError, finalize, take, mergeMap } from 'rxjs/operators';
 import { Observable, Subject, of } from 'rxjs';
 import { ResourceUpdateAuthResponseTO } from 'src/multibanking-api/resourceUpdateAuthResponseTO';
@@ -19,8 +18,7 @@ export class ConsentService extends AbstractService {
   public consentStatusChangedObservable = new Subject<ChangeEvent<ResourceUpdateAuthResponseTO>>();
 
   createConsent(consent: ConsentTO): Observable<any> {
-    console.log(environment.api_url);
-    return this.http.post(`${environment.api_url}/consents`, consent)
+    return this.http.post(`${this.settings.apiUrl}/consents`, consent)
       .pipe(
         catchError(this.handleError),
         finalize(() => this.consentStatusChangedObservable.next({ data: undefined, eventType: EventType.Delete }))
@@ -28,21 +26,21 @@ export class ConsentService extends AbstractService {
   }
 
   getConsent(consentId: string): Observable<ResourceConsentTO> {
-    return this.http.get(`${environment.api_url}/consents/${consentId}`)
+    return this.http.get(`${this.settings.apiUrl}/consents/${consentId}`)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getConsentByRedirectId(redirectId: string): Observable<ResourceConsentTO> {
-    return this.http.get(`${environment.api_url}/consents/redirect/${redirectId}`)
+    return this.http.get(`${this.settings.apiUrl}/consents/redirect/${redirectId}`)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getAuthorisationStatus(consentId: string, authorisationId: string): Observable<ResourceUpdateAuthResponseTO> {
-    return this.http.get(`${environment.api_url}/consents/${consentId}/authorisations/${authorisationId}`)
+    return this.http.get(`${this.settings.apiUrl}/consents/${consentId}/authorisations/${authorisationId}`)
       .pipe(
         catchError(this.handleError)
       );

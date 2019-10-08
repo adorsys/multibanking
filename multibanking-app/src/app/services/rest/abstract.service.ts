@@ -3,13 +3,18 @@ import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { KeycloakService } from '../auth/keycloak.service';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AbstractService {
 
-  constructor(public http: HttpClient, public keycloakService: KeycloakService) {
+  constructor(public http: HttpClient, public settingsService: SettingsService, public keycloakService: KeycloakService) {
+  }
+
+  get settings() {
+    return this.settingsService.settings;
   }
 
   handleError(error) {

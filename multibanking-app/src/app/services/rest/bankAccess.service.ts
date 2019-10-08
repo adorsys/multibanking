@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { ResourceBankAccess } from 'src/multibanking-api/resourceBankAccess';
-import { environment } from 'src/environments/environment';
 import { AbstractService } from './abstract.service';
 import { map, catchError, finalize } from 'rxjs/operators';
 import { ChangeEvent, EventType } from 'src/app/model/changeEvent';
@@ -14,7 +13,7 @@ export class BankAccessService extends AbstractService {
   public bankAccesscChangedObservable = new Subject<ChangeEvent<ResourceBankAccess>>();
 
   getBankAccesses(): Observable<ResourceBankAccess[]> {
-    return this.http.get(`${environment.api_url}/bankaccesses`)
+    return this.http.get(`${this.settings.apiUrl}/bankaccesses`)
       .pipe(
         map((res: any) => {
           return res._embedded != null ? res._embedded.bankAccessList : [];
@@ -24,14 +23,14 @@ export class BankAccessService extends AbstractService {
   }
 
   getBankAccess(accessId: string): Observable<ResourceBankAccess> {
-    return this.http.get(`${environment.api_url}/bankaccesses/${accessId}`)
+    return this.http.get(`${this.settings.apiUrl}/bankaccesses/${accessId}`)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   createBankAcccess(bankaccess: ResourceBankAccess): Observable<any> {
-    return this.http.post(`${environment.api_url}/bankaccesses`, bankaccess)
+    return this.http.post(`${this.settings.apiUrl}/bankaccesses`, bankaccess)
       .pipe(
         catchError(this.handleError),
         finalize(() => this.bankAccesscChangedObservable.next({ data: bankaccess, eventType: EventType.Create }))
@@ -39,7 +38,7 @@ export class BankAccessService extends AbstractService {
   }
 
   updateBankAcccess(bankaccess: ResourceBankAccess): Observable<any> {
-    return this.http.put(`${environment.api_url}/bankaccesses/${bankaccess.id}`, bankaccess)
+    return this.http.put(`${this.settings.apiUrl}/bankaccesses/${bankaccess.id}`, bankaccess)
       .pipe(
         catchError(this.handleError),
         finalize(() => this.bankAccesscChangedObservable.next({ data: bankaccess, eventType: EventType.Create }))
@@ -47,7 +46,7 @@ export class BankAccessService extends AbstractService {
   }
 
   deleteBankAccess(bankaccess: ResourceBankAccess): Observable<any> {
-    return this.http.delete(`${environment.api_url}/bankaccesses/${bankaccess.id}`)
+    return this.http.delete(`${this.settings.apiUrl}/bankaccesses/${bankaccess.id}`)
       .pipe(
         catchError(this.handleError),
         finalize(() => this.bankAccesscChangedObservable.next({ data: bankaccess, eventType: EventType.Create }))

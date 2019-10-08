@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage';
 import { AndroidFingerprintAuth, AFAAuthOptions } from '@ionic-native/android-fingerprint-auth/ngx';
 import { Observable, Subscriber } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { AuthService } from 'src/app/services/rest/auth.service';
 import { KeycloakService } from '../auth/keycloak.service';
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable({
   providedIn: 'root',
@@ -12,13 +12,14 @@ import { KeycloakService } from '../auth/keycloak.service';
 export class FingerPrintService {
 
   fingerPrintAuthConfig: AFAAuthOptions = {
-    clientId: environment.client_id,
+    clientId: this.settingsService.settings.clientId,
     userAuthRequired: false,
     locale: 'de_DE'
   };
 
   constructor(public androidFingerprintAuth: AndroidFingerprintAuth,
               public authService: AuthService,
+              public settingsService: SettingsService,
               public keycloak: KeycloakService,
               public storage: Storage) {
   }
@@ -86,7 +87,7 @@ export class FingerPrintService {
     if (error) {
       console.log('fingerprint not available: ' + error);
     }
-    this.androidFingerprintAuth.delete({ clientId: environment.client_id, username: '' })
+    this.androidFingerprintAuth.delete({ clientId: this.settingsService.settings.clientId, username: '' })
       .then(() => {
         this.storage.remove('token');
       })
@@ -100,7 +101,7 @@ export class FingerPrintService {
     return new Observable((observer: Subscriber<boolean>) => {
       if (activate) {
         const fingerPrintAuthConfig: AFAAuthOptions = {
-          clientId: environment.client_id,
+          clientId: this.settingsService.settings.clientId,
           password: this.keycloak.getUserName(),
           userAuthRequired: false,
           locale: 'de_DE'
@@ -119,7 +120,7 @@ export class FingerPrintService {
             observer.next(false);
           });
       } else {
-        this.androidFingerprintAuth.delete({ clientId: environment.client_id, username: this.keycloak.getUserName() })
+        this.androidFingerprintAuth.delete({ clientId: this.settingsService.settings.clientId, username: this.keycloak.getUserName() })
           .then(result => {
             this.storage.remove('token');
             this.storage.remove(this.keycloak.getUserName());
