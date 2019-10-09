@@ -25,4 +25,4 @@ cd multibanking-server
 docker-compose up
 ```
 
-Then use http://loaclhost:8088 to see provided endpoints
+Then use http://localhost:8088 to see provided endpoints
