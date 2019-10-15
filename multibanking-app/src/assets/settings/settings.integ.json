@@ -1,0 +1,8 @@
+{
+  "baseUrl": "https://integ-bankinggateway-multibanking-multibankingapp.cloud.adorsys.de",
+  "authUrl": "https://integ-bankinggateway-multibanking-multibankingkeycloak.cloud.adorsys.de/auth",
+  "apiUrl": "https://integ-bankinggateway-multibanking-multibankingservice.cloud.adorsys.de/api/v1",
+  "smartanalyticsUrl": "https://integ-bankinggateway-multibanking-multibankingservice.cloud.adorsys.de/api/v1",
+  "realm": "multibanking",
+  "clientId": "multibanking-client"
+}

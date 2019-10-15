@@ -1,0 +1,8 @@
+{
+  "baseUrl": "https://adorsys-multibanking-app-dev.cloud.adorsys.de",
+  "authUrl": "https://adorsys-multibanking-keycloak-dev.cloud.adorsys.de/auth",
+  "apiUrl": "https://adorsys-multibanking-dev.cloud.adorsys.de/api/v1",
+  "smartanalyticsUrl": "https://adorsys-multibanking-dev.cloud.adorsys.de/api/v1",
+  "realm": "multibanking",
+  "clientId": "multibanking-client"
+}

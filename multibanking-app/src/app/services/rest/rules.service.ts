@@ -2,9 +2,8 @@ import { Injectable } from '@angular/core';
 import { Subject, Observable, of } from 'rxjs';
 import { ResourceRuleEntity } from 'src/multibanking-api/resourceRuleEntity';
 import { CategoriesTree } from 'src/multibanking-api/categoriesTree';
-import { environment } from 'src/environments/environment';
 import { AbstractService } from './abstract.service';
-import { catchError, finalize, map, take, mergeMap } from 'rxjs/operators';
+import { catchError, finalize, map } from 'rxjs/operators';
 import { ResourceGroupConfig } from 'src/multibanking-api/resourceGroupConfig';
 import { ResourceContractBlacklist } from 'src/multibanking-api/resourceContractBlacklist';
 import { Pageable } from 'src/app/model/pageable';
@@ -17,14 +16,14 @@ export class RulesService extends AbstractService {
     public rulesChangedObservable = new Subject<ResourceRuleEntity>();
 
     getAvailableCategories(): Observable<CategoriesTree> {
-        return this.http.get(`${environment.smartanalytics_url}/config/booking-categories`)
+        return this.http.get(`${this.settings.smartanalyticsUrl}/config/booking-categories`)
             .pipe(
                 catchError(this.handleError)
             );
     }
 
     updateCategories(categoriesContainer): Observable<any> {
-        return this.http.post(`${environment.smartanalytics_url}/config/booking-categories`, categoriesContainer)
+        return this.http.post(`${this.settings.smartanalyticsUrl}/config/booking-categories`, categoriesContainer)
             .pipe(
                 catchError(this.handleError)
             );
@@ -34,14 +33,14 @@ export class RulesService extends AbstractService {
         const formData: FormData = new FormData();
         formData.append('categoriesFile', file, file.name);
 
-        return this.http.post(`${environment.smartanalytics_url}/config/booking-categories/upload`, formData, { responseType: 'text' })
+        return this.http.post(`${this.settings.smartanalyticsUrl}/config/booking-categories/upload`, formData, { responseType: 'text' })
             .pipe(
                 catchError(this.handleError)
             );
     }
 
     getBookingGroups(): Observable<ResourceGroupConfig> {
-        return this.http.get(`${environment.smartanalytics_url}/config/booking-groups`)
+        return this.http.get(`${this.settings.smartanalyticsUrl}/config/booking-groups`)
             .pipe(
                 catchError(this.handleError)
             );
@@ -51,14 +50,14 @@ export class RulesService extends AbstractService {
         const formData: FormData = new FormData();
         formData.append('bookingGroupsFile', file, file.name);
 
-        return this.http.post(`${environment.smartanalytics_url}/config/booking-groups/upload`, formData, { responseType: 'text' })
+        return this.http.post(`${this.settings.smartanalyticsUrl}/config/booking-groups/upload`, formData, { responseType: 'text' })
             .pipe(
                 catchError(this.handleError)
             );
     }
 
     getContractBlacklist(): Observable<ResourceContractBlacklist> {
-        return this.http.get(`${environment.smartanalytics_url}/config/contract-blacklist`)
+        return this.http.get(`${this.settings.smartanalyticsUrl}/config/contract-blacklist`)
             .pipe(
                 catchError(this.handleError)
             );
@@ -68,15 +67,15 @@ export class RulesService extends AbstractService {
         const formData: FormData = new FormData();
         formData.append('contractBlacklistFile', file, file.name);
 
-        return this.http.post(`${environment.smartanalytics_url}/config/contract-blacklist/upload`, formData, { responseType: 'text' })
+        return this.http.post(`${this.settings.smartanalyticsUrl}/config/contract-blacklist/upload`, formData, { responseType: 'text' })
             .pipe(
                 catchError(this.handleError)
             );
     }
 
     createRule(rule: ResourceRuleEntity, custom: boolean): Observable<any> {
-        const url = custom ? `${environment.api_url}/analytics/rules`
-            : `${environment.smartanalytics_url}/config/booking-rules`;
+        const url = custom ? `${this.settings.apiUrl}/analytics/rules`
+            : `${this.settings.smartanalyticsUrl}/config/booking-rules`;
 
         return this.http.post(url, rule, { responseType: 'text' })
             .pipe(
@@ -88,8 +87,8 @@ export class RulesService extends AbstractService {
     }
 
     updateRule(rule: ResourceRuleEntity): Observable<any> {
-        const url = rule.ruleId.startsWith('custom') ? `${environment.api_url}/analytics/rules/${rule.id}`
-            : `${environment.smartanalytics_url}/config/booking-rules/${rule.id}`;
+        const url = rule.ruleId.startsWith('custom') ? `${this.settings.apiUrl}/analytics/rules/${rule.id}`
+            : `${this.settings.smartanalyticsUrl}/config/booking-rules/${rule.id}`;
 
         return this.http.put(url, rule)
             .pipe(
@@ -101,14 +100,14 @@ export class RulesService extends AbstractService {
     }
 
     getRulesStatus() {
-        return this.http.get(`${environment.smartanalytics_url.replace('/api/v1', '')}/status`)
+        return this.http.get(`${this.settings.smartanalyticsUrl.replace('/api/v1', '')}/status`)
             .pipe(
                 catchError(this.handleError)
             );
     }
 
     getRules(custom: boolean): Observable<Pageable> {
-        const url = custom ? `${environment.api_url}/analytics/rules/` : `${environment.smartanalytics_url}/config/booking-rules/`;
+        const url = custom ? `${this.settings.apiUrl}/analytics/rules/` : `${this.settings.smartanalyticsUrl}/config/booking-rules/`;
 
         return this.http.get(url)
             .pipe(
@@ -124,8 +123,8 @@ export class RulesService extends AbstractService {
     }
 
     getRule(id: string): Observable<ResourceRuleEntity> {
-        const url = id.startsWith('custom') ? `${environment.api_url}/analytics/rules/${id}`
-            : `${environment.smartanalytics_url}/config/booking-rules/${id}`;
+        const url = id.startsWith('custom') ? `${this.settings.apiUrl}/analytics/rules/${id}`
+            : `${this.settings.smartanalyticsUrl}/config/booking-rules/${id}`;
 
         return this.http.get(url)
             .pipe(
@@ -135,8 +134,8 @@ export class RulesService extends AbstractService {
     }
 
     deleteRule(id, custom): Observable<any> {
-        const url = custom ? `${environment.api_url}/analytics/rules/${id}`
-            : `${environment.smartanalytics_url}/config/booking-rules/${id}`;
+        const url = custom ? `${this.settings.apiUrl}/analytics/rules/${id}`
+            : `${this.settings.smartanalyticsUrl}/config/booking-rules/${id}`;
 
         return this.http.delete(url)
             .pipe(
@@ -150,8 +149,8 @@ export class RulesService extends AbstractService {
         }
 
         const url = custom ?
-            `${environment.api_url}/analytics/rules/search?query=${keyword}&custom=${custom}` :
-            `${environment.smartanalytics_url}/config/booking-rules/search?query=${keyword}&custom=${custom}`;
+            `${this.settings.apiUrl}/analytics/rules/search?query=${keyword}&custom=${custom}` :
+            `${this.settings.smartanalyticsUrl}/config/booking-rules/search?query=${keyword}&custom=${custom}`;
 
         return this.http.get(url)
             .pipe(
@@ -164,8 +163,8 @@ export class RulesService extends AbstractService {
     }
 
     downloadRules(custom): Observable<any> {
-        const url = custom ? `${environment.api_url}/analytics/rules/download`
-            : `${environment.smartanalytics_url}/config/booking-rules/download`;
+        const url = custom ? `${this.settings.apiUrl}/analytics/rules/download`
+            : `${this.settings.smartanalyticsUrl}/config/booking-rules/download`;
 
         return this.http.get(url, { responseType: 'blob' })
             .pipe(
@@ -180,7 +179,7 @@ export class RulesService extends AbstractService {
         const formData: FormData = new FormData();
         formData.append('rulesFile', file, file.name);
 
-        return this.http.post(`${environment.smartanalytics_url}/config/booking-rules/upload`, formData, { responseType: 'text' })
+        return this.http.post(`${this.settings.smartanalyticsUrl}/config/booking-rules/upload`, formData, { responseType: 'text' })
             .pipe(
                 catchError(this.handleError)
             );

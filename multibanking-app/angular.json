@@ -83,26 +83,26 @@
             },
             "dev": {
               "fileReplacements": [{
-                "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.dev.ts"
+                "replace": "src/assets/settings.ts",
+                "with": "src/assets/settings.dev.ts"
               }]
             },
             "dev2": {
               "fileReplacements": [{
-                "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.dev2.ts"
+                "replace": "src/assets/settings.ts",
+                "with": "src/assets/settings.dev2.ts"
               }]
             },
             "integ": {
               "fileReplacements": [{
-                "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.integ.ts"
+                "replace": "src/assets/settings.ts",
+                "with": "src/assets/settings.integ.ts"
               }]
             },
             "local": {
               "fileReplacements": [{
-                "replace": "src/environments/environment.ts",
-                "with": "src/environments/environment.local.ts"
+                "replace": "src/assets/settings.ts",
+                "with": "src/assets/settings.local.ts"
               }]
             },
             "ci": {
