@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.bg;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
@@ -36,6 +37,7 @@ import de.adorsys.xs2a.adapter.service.model.TransactionsReport;
 import feign.Feign;
 import feign.FeignException;
 import feign.Logger;
+import feign.RequestInterceptor;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
@@ -64,10 +66,15 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private final String bankingGatewayBaseUrl;
     @NonNull
     private final String xs2aAdapterBaseUrl;
+    @NonNull
+    private final Interceptor interceptor;
+    @NonNull
+    private final RequestInterceptor requestInterceptor;
     @Getter(lazy = true)
     private final BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi();
     @Getter(lazy = true)
     private final AccountInformationClient accountApi = Feign.builder()
+        .requestInterceptor(requestInterceptor)
         .contract(createSpringMvcContract())
         .logLevel(Logger.Level.FULL)
         .logger(new Slf4jLogger(AccountApi.class))
@@ -87,6 +94,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             new HttpLoggingInterceptor(log::debug)
                 .setLevel(HttpLoggingInterceptor.Level.BODY)
         );
+        b2CAisApi.getApiClient().getHttpClient().interceptors().add(interceptor);
 
         return b2CAisApi;
     }

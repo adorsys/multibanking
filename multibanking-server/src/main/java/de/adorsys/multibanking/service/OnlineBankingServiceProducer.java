@@ -1,6 +1,8 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.bg.BankingGatewayAdapter;
+import de.adorsys.multibanking.correlation.FeignCorrelationIdInterceptor;
+import de.adorsys.multibanking.correlation.OkHttpCorrelationIdInterceptor;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
@@ -8,8 +10,10 @@ import de.adorsys.multibanking.figo.FigoBanking;
 import de.adorsys.multibanking.finapi.FinapiBanking;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
+import feign.RequestInterceptor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,9 +30,12 @@ public class OnlineBankingServiceProducer {
     @Value("${bankinggateway.adapter.url}")
     private String bankingAdapterBaseUrl;
 
+    private final OkHttpCorrelationIdInterceptor interceptor;
+    private final FeignCorrelationIdInterceptor requestInterceptor;
+
     @Getter(lazy = true)
     private final BankingGatewayAdapter xs2ABanking = new BankingGatewayAdapter(bankingGatewayBaseUrl,
-        bankingAdapterBaseUrl);
+        bankingAdapterBaseUrl, interceptor, requestInterceptor);
     private Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
     private FigoBanking figoBanking = new FigoBanking(BankApi.FIGO);
     private FigoBanking figoBankingAlternative = new FigoBanking(BankApi.FIGO_ALTERNATIVE);
