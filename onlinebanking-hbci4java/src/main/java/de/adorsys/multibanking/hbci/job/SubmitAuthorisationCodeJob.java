@@ -37,11 +37,15 @@ import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.manager.KnownTANProcess;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
+import org.kapott.hbci.status.HBCIMsgStatus;
+import org.kapott.hbci.status.HBCIStatus;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
@@ -82,6 +86,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
                 SubmitAuthorizationCodeResponse<?> response =
                     new SubmitAuthorizationCodeResponse<>(scaJob.authorisationAwareExecute(null, hbciDialog));
                 response.setScaStatus(FINALISED);
+                response.setWarnings(warningStatusCodesToList(hbciExecStatus)); // warnings of initial execute
                 return response;
             }
             return createResponse(hbciPassport, hbciTanSubmit, hbciJob, hbciExecStatus);
@@ -140,10 +145,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         SubmitAuthorizationCodeResponse<?> response =
             new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport));
         response.setTransactionId(transactionId);
-
-        if (!status.getMsgStatusList().isEmpty()) {
-            response.setStatus(status.getMsgStatusList().get(0).segStatus.toString());
-        }
+        response.setWarnings(warningStatusCodesToList(status));
 
         //HKIDN -> FINALISED -> further request like HKCAZ already executed
         ScaStatus scaStatus = Optional.ofNullable(hbciTanSubmit.getHbciJobName())
@@ -205,5 +207,16 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
     private String orderIdFromJobResult(HBCIJobResult jobResult) {
         return scaJob.orderIdFromJobResult(jobResult);
+    }
+
+    private List<String> warningStatusCodesToList(HBCIExecStatus hbciExecStatus) {
+        return Optional.ofNullable(hbciExecStatus)
+            .map(HBCIExecStatus::getMsgStatusList)
+            .map(list -> list.isEmpty() ? null : list.get(0))
+            .map(status -> status.segStatus)
+            .map(HBCIStatus::getWarnings)
+            .map(list -> list.stream().map(retVal -> retVal.code))
+            .orElse(Stream.empty())
+            .collect(Collectors.toList());
     }
 }
