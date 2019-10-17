@@ -4,6 +4,9 @@ import de.adorsys.multibanking.Application;
 import de.adorsys.multibanking.bg.BankingGatewayAdapter;
 import de.adorsys.multibanking.conf.FongoConfig;
 import de.adorsys.multibanking.conf.MapperConfig;
+import de.adorsys.multibanking.correlation.CorrelationId;
+import de.adorsys.multibanking.correlation.FeignCorrelationIdInterceptor;
+import de.adorsys.multibanking.correlation.OkHttpCorrelationIdInterceptor;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
@@ -67,6 +70,10 @@ public class DirectAccessControllerTest {
 
     @Autowired
     private BankRepositoryIf bankRepository;
+    @Autowired
+    private OkHttpCorrelationIdInterceptor okInterceptor;
+    @Autowired
+    private FeignCorrelationIdInterceptor feignInterceptor;
     @MockBean
     private OnlineBankingServiceProducer bankingServiceProducer;
     @MockBean
@@ -113,7 +120,7 @@ public class DirectAccessControllerTest {
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
         ConsentTO consentTO = createConsentTO();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, okInterceptor, feignInterceptor),
             consentTO.getPsuAccountIban(),
             true);
 
@@ -138,7 +145,7 @@ public class DirectAccessControllerTest {
     @Test
     public void consent_authorisation_bankinggateway_decoupled() {
         ConsentTO consentTO = createConsentTO();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, okInterceptor, feignInterceptor),
             consentTO.getPsuAccountIban(),
             false);
 
@@ -164,7 +171,7 @@ public class DirectAccessControllerTest {
     public void consent_authorisation_bankinggateway() {
         ConsentTO consentTO = createConsentTO();
 
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, okInterceptor, feignInterceptor),
             consentTO.getPsuAccountIban(),
             false);
 
@@ -251,6 +258,7 @@ public class DirectAccessControllerTest {
     public JsonPath consent_authorisation(ConsentTO consent, BankAccessTO bankAccess, CredentialsTO credentialsTO) {
         //1. create consent
         JsonPath jsonPath = request.body(consent)
+            .header(CorrelationId.CORRELATION_ID, "TEST123")
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
             .then().assertThat().statusCode(HttpStatus.CREATED.value())
             .and().extract().jsonPath();
@@ -259,12 +267,12 @@ public class DirectAccessControllerTest {
 
         assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
 
-        //2. get consent authorisation status
-        jsonPath = request.get(jsonPath.getString("_links.authorisationStatus.href"))
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
-
-        assertThat(jsonPath.getString("scaStatus")).isIn(RECEIVED.toString(), ScaStatusTO.STARTED.toString());
+//        //2. get consent authorisation status
+//        jsonPath = request.get(jsonPath.getString("_links.authorisationStatus.href"))
+//            .then().assertThat().statusCode(HttpStatus.OK.value())
+//            .and().extract().jsonPath();
+//
+//        assertThat(jsonPath.getString("scaStatus")).isIn(RECEIVED.toString(), ScaStatusTO.STARTED.toString());
 
         //3. update psu authentication
         UpdatePsuAuthenticationRequestTO updatePsuAuthentication = new UpdatePsuAuthenticationRequestTO();
@@ -272,9 +280,18 @@ public class DirectAccessControllerTest {
         updatePsuAuthentication.setPsuCorporateId(credentialsTO.getUserId());
         updatePsuAuthentication.setPassword(credentialsTO.getPin());
 
-        jsonPath = request.body(updatePsuAuthentication).put(jsonPath.getString("_links.updateAuthentication.href"))
+        String linkAuthStatus = jsonPath.getString("_links.authorisationStatus.href");
+
+        jsonPath = request.body(updatePsuAuthentication).put(linkAuthStatus + "/updatePsuAuthentication")
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
+
+        // get consent auth status after "lazy" startauth
+        jsonPath = request.get(linkAuthStatus)
+                .then().assertThat().statusCode(HttpStatus.OK.value())
+                .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("scaStatus")).isIn(RECEIVED.toString(), STARTED.toString(), SCAMETHODSELECTED.toString(), PSUAUTHENTICATED.toString());
 
         if (ScaApproachTO.valueOf(jsonPath.getString("scaApproach")) == ScaApproachTO.DECOUPLED) {
             return jsonPath;

@@ -1,41 +1,53 @@
-import { Injectable } from '@angular/core';
+import { Injectable, SkipSelf, Optional } from '@angular/core';
 import * as Keycloak from 'keycloak-js';
 import { KeycloakInitOptions, KeycloakLoginOptions } from 'keycloak-js';
 import { Storage } from '@ionic/storage';
 import { Router } from '@angular/router';
 import { environment } from 'src/environments/environment';
-
-const keycloak = Keycloak({
-  url: environment.auth_url,
-  realm: environment.realm,
-  clientId: environment.client_id
-});
+import { SettingsService } from '../settings/settings.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class KeycloakService {
 
-  constructor(public storage: Storage,
-              private router: Router) {
-  }
+  private keycloak: Keycloak.KeycloakInstance;
 
-  static init(options?: KeycloakInitOptions): Promise<any> {
+  constructor(public storage: Storage,
+              public settingsService: SettingsService,
+              @SkipSelf() @Optional() private router: Router
+              ) {}
+
+  init(options?: KeycloakOptions): Promise<any> {
     return new Promise((resolve, reject) => {
-      keycloak.init(options ? options : {
+      const { config, initOptions } = options;
+      this.keycloak = Keycloak(config ? config : {
+        url: this.settingsService.settings.authUrl,
+        realm: this.settingsService.settings.realm,
+        clientId: this.settingsService.settings.clientId
+      });
+      this.keycloak.init(initOptions ? initOptions : {
         onLoad: 'check-sso',
         checkLoginIframe: false
       }).success(() => {
-        console.log('Keycloak initialized, authenticated: ' + keycloak.authenticated);
+        console.log('Keycloak initialized, authenticated: ' + this.keycloak.authenticated);
         resolve();
       }).error((errorData: any) => {
+        console.error('Keycloak initialized error: ' + errorData);
         reject(errorData);
       });
     });
   }
 
   authenticated(): boolean {
-    return keycloak.authenticated;
+    try {
+      if (!this.keycloak.authenticated) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   login(options: KeycloakLoginOptions = {}): Promise<any> {
@@ -53,9 +65,9 @@ export class KeycloakService {
 
   loginDesktopInternal(options: KeycloakLoginOptions, resolve, reject) {
     if (options.redirectUri) {
-      options.redirectUri = environment.base_url + options.redirectUri;
+      options.redirectUri = this.settingsService.settings.baseUrl + options.redirectUri;
     }
-    keycloak.login(options)
+    this.keycloak.login(options)
       .success(() => {
         resolve();
       })
@@ -66,7 +78,7 @@ export class KeycloakService {
 
   logout(): Promise<any> {
     return new Promise((resolve, reject) => {
-      keycloak.logout()
+      this.keycloak.logout()
         .success(() => {
           resolve();
         })
@@ -78,7 +90,7 @@ export class KeycloakService {
 
   profile(): Promise<any> {
     return new Promise((resolve, reject) => {
-      keycloak.loadUserProfile()
+      this.keycloak.loadUserProfile()
         .success((profile: any) => {
           resolve(profile);
         })
@@ -90,16 +102,16 @@ export class KeycloakService {
 
   getToken(): Promise<string> {
     return new Promise<string>((resolve, reject) => {
-      if (keycloak.token) {
-        keycloak.updateToken(5)
+      if (this.keycloak.token) {
+        this.keycloak.updateToken(5)
           .success(() => {
             if (environment.isApp) {
-              this.storage.set(this.getUserName(), keycloak.refreshToken as string);
+              this.storage.set(this.getUserName(), this.keycloak.refreshToken as string);
             }
-            resolve(keycloak.token as string);
+            resolve(this.keycloak.token as string);
           })
           .error(() => {
-            keycloak.login();
+            this.keycloak.login();
           });
       } else {
         reject('Not loggen in');
@@ -108,36 +120,47 @@ export class KeycloakService {
   }
 
   getUserId(): string {
-    return keycloak.tokenParsed.sub;
+    return this.keycloak.tokenParsed.sub;
   }
 
   getUserName(): string {
-    const token: any = keycloak.tokenParsed;
+    const token: any = this.keycloak.tokenParsed;
     return token.preferred_username;
   }
 
   getFirstName(): string {
-    const token: any = keycloak.tokenParsed;
+    const token: any = this.keycloak.tokenParsed;
     return token.given_name;
   }
 
   getLastName(): string {
-    const token: any = keycloak.tokenParsed;
+    const token: any = this.keycloak.tokenParsed;
     return token.family_name;
   }
 
   getIdToken() {
-    return keycloak.idTokenParsed;
+    return this.keycloak.idTokenParsed;
   }
 
   getRefreshToken() {
-    return keycloak.refreshToken;
+    return this.keycloak.refreshToken;
   }
 
   getRoles(): string[] {
-    if (!keycloak.tokenParsed || !keycloak.tokenParsed.realm_access) {
+    if (!this.keycloak.tokenParsed || !this.keycloak.tokenParsed.realm_access) {
       return [];
     }
-    return keycloak.tokenParsed.realm_access.roles;
+    return this.keycloak.tokenParsed.realm_access.roles;
   }
+}
+
+export interface KeycloakOptions {
+  config?: KeycloakConfig;
+  initOptions?: KeycloakInitOptions;
+}
+
+export interface KeycloakConfig {
+  url: string;
+  realm: string;
+  clientId: string;
 }

@@ -79,7 +79,7 @@ export class KeycloakAuthGuard implements CanActivate {
     }
 
     initKeycloakNativeApp(observer: Subscriber<boolean>, tokens, state: RouterStateSnapshot) {
-        KeycloakService.init({ token: tokens.access_token, refreshToken: tokens.refresh_token }).then(() => {
+        this.keycloakService.init({ initOptions: { token: tokens.access_token, refreshToken: tokens.refresh_token } }).then(() => {
             console.log('Keycloak initialized, authenticated: ' + this.keycloakService.authenticated());
             if (this.keycloakService.authenticated()) {
                 this.storage.set(this.keycloakService.getUserName(), this.keycloakService.getRefreshToken()).then(() => {

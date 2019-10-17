@@ -7,9 +7,9 @@ import { ConsentService } from 'src/app/services/rest/consent.service';
 import { ResourceCreateConsentResponseTO } from 'src/multibanking-api/resourceCreateConsentResponseTO';
 import * as moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
-import { environment } from 'src/environments/environment';
 import { ConsentTO } from 'src/multibanking-api/consentTO';
 import { Link } from 'src/multibanking-api/link';
+import { SettingsService } from '../../../services/settings/settings.service';
 
 @Component({
   selector: 'app-create-consent',
@@ -26,6 +26,7 @@ export class CreateConsentPage implements OnInit {
 
   constructor(private bankService: BankService,
               private consentService: ConsentService,
+              private settingsService: SettingsService,
               private formBuilder: FormBuilder,
               private alertController: AlertController,
               private navCtrl: NavController) { }
@@ -64,7 +65,7 @@ export class CreateConsentPage implements OnInit {
       frequencyPerDay: this.createConsentForm.value.frequencyPerDay,
       recurringIndicator: this.createConsentForm.value.recurringIndicator,
       redirectId: redirectUUID,
-      tppRedirectUri: `${environment.base_url}/bankaccess-create/redirect/${redirectUUID}`,
+      tppRedirectUri: `${this.settingsService.settings.baseUrl}/bankaccess-create/redirect/${redirectUUID}`,
     };
     this.consentService.createConsent(consent).subscribe(
       (response: ResourceCreateConsentResponseTO) => {

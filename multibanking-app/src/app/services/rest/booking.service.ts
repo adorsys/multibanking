@@ -19,7 +19,7 @@ export class BookingService extends AbstractService {
       }
     });
 
-    return this.http.get(`${environment.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings`, { params })
+    return this.http.get(`${this.settings.apiUrl}/bankaccesses/${accessId}/accounts/${accountId}/bookings`, { params })
       .pipe(
         map((res: any) => res._embedded != null ? res._embedded.bookingList : []),
         catchError(this.handleError)
@@ -27,7 +27,7 @@ export class BookingService extends AbstractService {
   }
 
   getBookings(accessId, accountId): Observable<Pageable> {
-    return this.http.get(`${environment.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings`)
+    return this.http.get(`${this.settings.apiUrl}/bankaccesses/${accessId}/accounts/${accountId}/bookings`)
       .pipe(
         catchError(this.handleError)
       );
@@ -41,7 +41,7 @@ export class BookingService extends AbstractService {
   }
 
   getBooking(accessId, accountId, bookingId): Observable<ResourceBooking> {
-    return this.http.get(`${environment.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/${bookingId}`)
+    return this.http.get(`${this.settings.apiUrl}/bankaccesses/${accessId}/accounts/${accountId}/bookings/${bookingId}`)
       .pipe(
         map((res: any) => res._embedded != null ? res._embedded.bookingList : []),
         catchError(this.handleError)
@@ -49,7 +49,7 @@ export class BookingService extends AbstractService {
   }
 
   downloadBookings(accessId, accountId): Observable<any> {
-    return this.http.get(`${environment.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/download`,
+    return this.http.get(`${this.settings.apiUrl}/bankaccesses/${accessId}/accounts/${accountId}/bookings/download`,
       { responseType: 'blob' })
       .pipe(
         map(res => {
@@ -60,7 +60,7 @@ export class BookingService extends AbstractService {
   }
 
   getSearchIndex(accessId, accountId): Observable<{ [key: string]: Array<string> }> {
-    return this.http.get(`${environment.api_url}/bankaccesses/${accessId}/accounts/${accountId}/bookings/index`)
+    return this.http.get(`${this.settings.apiUrl}/bankaccesses/${accessId}/accounts/${accountId}/bookings/index`)
       .pipe(
         map((res: any) => res != null ? res.bookingIdSearchList : {}),
         catchError(this.handleError)
