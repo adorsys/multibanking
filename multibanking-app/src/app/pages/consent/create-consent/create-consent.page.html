@@ -12,7 +12,7 @@
     <ion-list>
       <ion-item>
         <ion-label position="fixed">IBAN</ion-label>
-        <ion-input formControlName="iban"></ion-input>
+        <ion-input formControlName="iban" [value]="createConsentForm.get('iban').value | iban"></ion-input>
       </ion-item>
 
       <ion-button type="submit" expand="block" [disabled]="!createConsentForm.valid">

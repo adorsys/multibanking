@@ -16,7 +16,8 @@ const routes: Routes = [
   { path: 'bankaccess-create/consents/:consent-id/authorisations/:authorisation-id', loadChildren: './pages//bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },
   { path: 'bankaccess-create/redirect/:redirect-id', loadChildren: './pages//bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },
   { path: 'bankconnections/:access-id', loadChildren: './pages/bankaccount-list/bankaccount-list.module#BankaccountListPageModule' },
-  { path: 'bankconnections/:access-id/accounts/:account-id', loadChildren: './pages/booking-list/booking-list.module#BookingListPageModule' }
+  { path: 'bankconnections/:access-id/accounts/:account-id', loadChildren: './pages/booking-list/booking-list.module#BookingListPageModule' },
+  { path: 'bankconnections/:access-id/accounts/:account-id/bookings/:booking-id', loadChildren: './pages/booking-detail/booking-detail.module#BookingDetailPageModule' }
 ];
 
 @NgModule({

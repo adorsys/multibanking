@@ -6,7 +6,7 @@ import * as moment from 'moment';
 import { Moment } from 'moment';
 import { Pageable } from 'src/app/model/pageable';
 import { BookingService } from 'src/app/services/rest/booking.service';
-import { ToastController, AlertController, LoadingController } from '@ionic/angular';
+import { ToastController, AlertController, LoadingController, NavController } from '@ionic/angular';
 import { Booking } from 'src/multibanking-api/booking';
 import { ExecutedBookingTO } from 'src/multibanking-api/executedBookingTO';
 import { BookingPeriodTO } from 'src/multibanking-api/bookingPeriodTO';
@@ -17,6 +17,7 @@ import { ResourceUpdateAuthResponseTO } from 'src/multibanking-api/resourceUpdat
 import { Link } from 'src/multibanking-api/link';
 import { ConsentService } from 'src/app/services/rest/consent.service';
 import { Observable, Subscriber } from 'rxjs';
+import { ResourceBooking } from '../../../multibanking-api/resourceBooking';
 
 @Component({
   selector: 'app-booking-list',
@@ -27,11 +28,11 @@ export class BookingListPage implements OnInit {
 
   bankAccessId: string;
   bankAccount: ResourceBankAccount;
-  getLogo: (image: string) => string;
   pageable: Pageable;
   bookingMonths: Moment[] = [];
 
   constructor(private activatedRoute: ActivatedRoute,
+              private navCtrl: NavController,
               private bankAccountService: BankAccountService,
               private bookingService: BookingService,
               private analyticsService: AnalyticsService,
@@ -39,8 +40,7 @@ export class BookingListPage implements OnInit {
               private toastController: ToastController,
               private alertController: AlertController,
               private loadingController: LoadingController,
-              imagesService: ImagesService) {
-    this.getLogo = imagesService.getImage;
+              private imagesService: ImagesService) {
   }
 
   ngOnInit() {
@@ -52,6 +52,10 @@ export class BookingListPage implements OnInit {
     } else {
       this.loadBookings();
     }
+  }
+
+  getLogo(image: string): string {
+    return this.imagesService.getImage(image);
   }
 
   loadBookings() {
@@ -269,6 +273,10 @@ export class BookingListPage implements OnInit {
     this.bookingService.downloadBookings(this.bankAccessId, this.bankAccount.id).subscribe(data => {
       this.showFile(data);
     });
+  }
+
+  itemSelected(booking: ResourceBooking) {
+    this.navCtrl.navigateForward([`/bankconnections/${this.bankAccessId}/accounts/${this.bankAccount.id}/bookings/${booking.id}`]);
   }
 
   showFile(blob) {

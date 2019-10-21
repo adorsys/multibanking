@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { CreateConsentPage } from './create-consent.page';
 import { KeycloakAuthGuard } from 'src/app/guard/keycloak-auth.guard';
+import { IbanPipe } from '../../../pipes/iban.pipe';
 
 const routes: Routes = [
   {
@@ -24,6 +25,6 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [CreateConsentPage]
+  declarations: [CreateConsentPage, IbanPipe]
 })
 export class CreateConsentPageModule {}

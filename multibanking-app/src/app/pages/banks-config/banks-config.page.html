@@ -8,7 +8,16 @@
 </ion-header>
 
 <ion-content>
-  <ion-fab vertical="bottom" horizontal="end">
+  <ion-searchbar [formControl]="searchControl"></ion-searchbar>
+  <ion-virtual-scroll [items]="banks">
+    <ion-item *virtualItem="let bank">
+      <ion-label>
+        <h2>{{bank.name}}</h2>
+        <p>{{bank.bankCode}} {{bank.bic}} {{bank.bankApi}}</p>
+      </ion-label>
+    </ion-item>
+  </ion-virtual-scroll>
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button>
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>

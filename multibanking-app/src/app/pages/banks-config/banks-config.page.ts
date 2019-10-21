@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { LoadingController, AlertController } from '@ionic/angular';
+import { FormControl } from '@angular/forms';
+import { AlertController, LoadingController } from '@ionic/angular';
+import { debounceTime } from 'rxjs/operators';
 import { BankService } from 'src/app/services/rest/bank.service';
+import { BankTO } from 'src/multibanking-api/bankTO';
 
 @Component({
   selector: 'app-banks-config',
@@ -9,11 +12,27 @@ import { BankService } from 'src/app/services/rest/bank.service';
 })
 export class BanksConfigPage implements OnInit {
 
+  public searchControl: FormControl;
+  public banks: BankTO[];
+
   constructor(private loadingController: LoadingController,
               private bankService: BankService,
-              private alertController: AlertController) { }
+              private alertController: AlertController) {
+    this.searchControl = new FormControl();
+  }
 
   ngOnInit() {
+    this.searchControl.valueChanges
+      .pipe(debounceTime(700))
+      .subscribe(search => {
+        this.setFilteredItems(search);
+      });
+  }
+
+  setFilteredItems(searchTerm) {
+    this.bankService.searchBanks(searchTerm).subscribe(bankList => {
+      this.banks = bankList;
+    });
   }
 
   async uploadBanks(input) {
