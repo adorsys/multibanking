@@ -12,12 +12,11 @@ const routes: Routes = [
   { path: 'sca-method-selection', loadChildren: './pages/consent/sca-method-selection/sca-method-selection.module#ScaMethodSelectionPageModule' },
   { path: 'authorisation', loadChildren: './pages/consent/authorisation/authorisation.module#AuthorisationPageModule' },
   { path: 'create-consent', loadChildren: './pages/consent/create-consent/create-consent.module#CreateConsentPageModule' },
-  { path: 'bankaccess-edit', loadChildren: './pages//bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },
-  { path: 'bankaccess-create/consents/:consent-id/authorisations/:authorisation-id', loadChildren: './pages//bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },
-  { path: 'bankaccess-create/redirect/:redirect-id', loadChildren: './pages//bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },
+  { path: 'bankaccess-edit', loadChildren: './pages/bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },
+  { path: 'bankaccess-create/consents/:consent-id/authorisations/:authorisation-id', loadChildren: './pages/bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },
+  { path: 'bankaccess-create/redirect/:redirect-id', loadChildren: './pages/bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },
   { path: 'bankconnections/:access-id', loadChildren: './pages/bankaccount-list/bankaccount-list.module#BankaccountListPageModule' },
-  { path: 'bankconnections/:access-id/accounts/:account-id', loadChildren: './pages/booking-list/booking-list.module#BookingListPageModule' },
-  { path: 'bankconnections/:access-id/accounts/:account-id/bookings/:booking-id', loadChildren: './pages/booking-detail/booking-detail.module#BookingDetailPageModule' }
+  { path: 'bankconnections/:access-id/accounts/:account-id', loadChildren: './pages/bankaccount-detail/bankaccount-detail.module#BankaccountDetailPageModule' }
 ];
 
 @NgModule({

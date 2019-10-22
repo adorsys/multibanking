@@ -3,6 +3,7 @@ import { ActivatedRouteSnapshot, Router } from '@angular/router';
 import { EMPTY, Observable, of } from 'rxjs';
 import { mergeMap, take } from 'rxjs/operators';
 import { ResourceBooking } from '../../../multibanking-api/resourceBooking';
+import { getHierarchicalRouteParam } from '../../utils/utils';
 import { BookingService } from './../rest/booking.service';
 
 @Injectable({
@@ -16,7 +17,10 @@ export class BookingResolverService {
               private router: Router) {}
 
   resolve(route: ActivatedRouteSnapshot): Observable<ResourceBooking> | Observable<never> {
-    return this.getBooking(route.paramMap.get('access-id'), route.paramMap.get('account-id'), route.paramMap.get('booking-id'));
+    const accessId = getHierarchicalRouteParam(route, 'access-id');
+    const accountId = getHierarchicalRouteParam(route, 'account-id');
+    const bookingId = getHierarchicalRouteParam(route, 'booking-id');
+    return this.getBooking(accessId, accountId, bookingId);
   }
 
   public getBooking(accessId: string, accountId: string, bookingId: string) {
@@ -33,7 +37,6 @@ export class BookingResolverService {
     return this.bookingService.getBooking(accessId, accountId, bookingId).pipe(
       take(1),
       mergeMap(booking => {
-        console.log(booking);
         if (booking) {
           this.selectedBooking = booking;
           return of(booking);

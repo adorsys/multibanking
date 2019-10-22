@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { BankAccountService } from 'src/app/services/rest/bankAccount.service';
 import { ResourceBooking } from 'src/multibanking-api/resourceBooking';
 import { RulesService } from '../../services/rest/rules.service';
+import { getHierarchicalRouteParam } from '../../utils/utils';
 
 @Component({
   selector: 'app-booking-detail',
@@ -21,10 +22,9 @@ export class BookingDetailPage implements OnInit {
   }
 
   ngOnInit() {
-    this.bankAccessId = this.activatedRoute.snapshot.paramMap.get('access-id');
-    this.bankAccountId = this.activatedRoute.snapshot.paramMap.get('account-id');
+    this.bankAccessId = getHierarchicalRouteParam(this.activatedRoute.snapshot, 'access-id');
+    this.bankAccountId = getHierarchicalRouteParam(this.activatedRoute.snapshot, 'account-id');
     this.booking = this.activatedRoute.snapshot.data.booking;
-    console.log(this.activatedRoute.snapshot.data.booking);
   }
 
 }

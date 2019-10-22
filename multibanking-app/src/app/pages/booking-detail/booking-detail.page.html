@@ -1,6 +1,6 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>{{ booking.bookingDate | date }} {{ booking.amount | currency:'EUR':true }}</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>{{ booking.bookingDate | date }} {{ booking.amount | currency:'EUR':'symbol' }}</ion-title>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/"></ion-back-button>
     </ion-buttons>

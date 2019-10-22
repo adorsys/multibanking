@@ -18,6 +18,7 @@ import { Link } from 'src/multibanking-api/link';
 import { ConsentService } from 'src/app/services/rest/consent.service';
 import { Observable, Subscriber } from 'rxjs';
 import { ResourceBooking } from '../../../multibanking-api/resourceBooking';
+import { getHierarchicalRouteParam } from '../../utils/utils';
 
 @Component({
   selector: 'app-booking-list',
@@ -44,7 +45,7 @@ export class BookingListPage implements OnInit {
   }
 
   ngOnInit() {
-    this.bankAccessId = this.activatedRoute.snapshot.paramMap.get('access-id');
+    this.bankAccessId = getHierarchicalRouteParam(this.activatedRoute.snapshot, 'access-id');
     this.bankAccount = this.activatedRoute.snapshot.data.bankAccount;
 
     if (!this.bankAccount.lastSync || moment(this.bankAccount.lastSync).isBefore(moment(), 'day')) {
@@ -229,7 +230,7 @@ export class BookingListPage implements OnInit {
     loading.present();
 
     this.bankAccountService.syncBookings(this.bankAccessId, this.bankAccount.id).subscribe(
-      (response) => {
+      response => {
         loading.dismiss();
         if (response && response.challenge) {
           this.presentTanPrompt(response).subscribe(tan => {
