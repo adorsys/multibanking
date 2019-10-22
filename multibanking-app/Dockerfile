@@ -14,6 +14,7 @@ RUN sed -i.bak 's/^user/#user/' /etc/nginx/nginx.conf
 WORKDIR /www/app
 
 ADD . /www/app
+RUN chmod 775 /www/app/platforms/browser/www/assets/settings/settings.json
 
 RUN apk add --update nodejs nodejs-npm \
     && npm config set unsafe-perm true \
