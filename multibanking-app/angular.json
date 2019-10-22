@@ -81,6 +81,12 @@
                 "maximumError": "5mb"
               }]
             },
+            "prod": {
+              "fileReplacements": [{
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.prod.ts"
+              }]
+            },
             "dev": {
               "fileReplacements": [{
                 "replace": "src/assets/settings.ts",
@@ -124,6 +130,9 @@
             },
             "dev": {
               "browserTarget": "app:build:dev"
+            },
+            "prod": {
+              "browserTarget": "app:build:prod"
             },
             "dev2": {
               "browserTarget": "app:build:dev2"
@@ -198,6 +207,9 @@
             },
             "dev": {
               "browserTarget": "app:build:dev"
+            },
+            "prod": {
+              "browserTarget": "app:build:prod"
             },
             "dev2": {
               "browserTarget": "app:build:dev2"
