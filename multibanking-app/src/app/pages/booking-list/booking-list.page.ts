@@ -27,6 +27,7 @@ import { getHierarchicalRouteParam } from '../../utils/utils';
 })
 export class BookingListPage implements OnInit {
 
+  backLink: string;
   bankAccessId: string;
   bankAccount: ResourceBankAccount;
   pageable: Pageable;
@@ -47,6 +48,7 @@ export class BookingListPage implements OnInit {
   ngOnInit() {
     this.bankAccessId = getHierarchicalRouteParam(this.activatedRoute.snapshot, 'access-id');
     this.bankAccount = this.activatedRoute.snapshot.data.bankAccount;
+    this.backLink = `/bankconnections/${this.bankAccessId}`;
 
     if (!this.bankAccount.lastSync || moment(this.bankAccount.lastSync).isBefore(moment(), 'day')) {
       this.syncBookings();

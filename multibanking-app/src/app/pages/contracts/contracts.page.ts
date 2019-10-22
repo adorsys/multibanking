@@ -22,6 +22,7 @@ import { SortedContracts } from './../../model/sortedContracts';
 })
 export class ContractsPage implements OnInit {
 
+  backLink: string;
   bankAccount: ResourceBankAccount;
   bankAccessId: string;
   contracts: { income: SortedContracts, expenses: SortedContracts };
@@ -40,6 +41,7 @@ export class ContractsPage implements OnInit {
   ngOnInit() {
     this.bankAccessId = getHierarchicalRouteParam(this.activatedRoute.snapshot, 'access-id');
     this.bankAccount = this.activatedRoute.snapshot.data.bankAccount;
+    this.backLink = `/bankconnections/${this.bankAccessId}`;
 
     if (!this.bankAccount.lastSync || moment(this.bankAccount.lastSync).isBefore(moment(), 'day')) {
       this.syncBookings();
