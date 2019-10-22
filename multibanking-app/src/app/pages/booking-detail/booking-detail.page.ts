@@ -12,6 +12,7 @@ import { getHierarchicalRouteParam } from '../../utils/utils';
 })
 export class BookingDetailPage implements OnInit {
 
+  backLink: string;
   bankAccessId: string;
   bankAccountId: string;
   booking: ResourceBooking;
@@ -25,6 +26,7 @@ export class BookingDetailPage implements OnInit {
     this.bankAccessId = getHierarchicalRouteParam(this.activatedRoute.snapshot, 'access-id');
     this.bankAccountId = getHierarchicalRouteParam(this.activatedRoute.snapshot, 'account-id');
     this.booking = this.activatedRoute.snapshot.data.booking;
+    this.backLink = `/bankconnections/${this.bankAccessId}/accounts/${this.bankAccountId}/bookings`;
   }
 
 }
