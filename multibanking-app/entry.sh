@@ -1,3 +1,3 @@
 #!/bin/sh
-envsubst < /www/app/platforms/browser/www/assets/settings/settings.template.json > /www/app/platforms/browser/www/assets/settings/settings.json
+envsubst < /usr/share/nginx/html/assets/settings/settings.template.json > /usr/share/nginx/html/assets/settings/settings.json
 nginx -g "daemon off;"
