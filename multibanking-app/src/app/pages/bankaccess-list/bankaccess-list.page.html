@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-title>Bank Connections</ion-title>
-    <ion-buttons slot="secondary" >
+    <ion-buttons slot="primary" >
       <ion-button (click)="adminArea()" *ngIf="admin">
         <ion-icon name="settings"></ion-icon>
       </ion-button>
@@ -15,7 +15,10 @@
 <ion-content>
   <ion-list>
     <ion-item *ngFor="let bankAccess of bankAccesses" (click)="itemTapped(bankAccess)">
-      {{bankAccess.iban}} - {{bankAccess.bankName}}
+      <ion-label>
+        <h2>{{bankAccess.bankName}}</h2>
+        <p>{{bankAccess.iban}}</p>
+      </ion-label>
       <ion-button fill="clear" slot="end" (click)="presentActionSheet($event, bankAccess)">
         <ion-icon name="more"></ion-icon>
       </ion-button>
