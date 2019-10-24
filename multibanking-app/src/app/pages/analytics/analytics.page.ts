@@ -145,7 +145,6 @@ export class AnalyticsPage implements OnInit {
     if (referenceGroup) {
       const analyticsStart: Moment = moment().subtract(12, 'month').day(1);
       const analyticsEnd: Moment = moment().add(13, 'month').day(1);
-
       referenceGroup.bookingPeriods
         .filter(period => moment(period.start).isAfter(analyticsStart) && moment(period.end).isBefore(analyticsEnd))
         .forEach(period => this.periods.push([moment(period.start), moment(period.end)]));
@@ -228,7 +227,7 @@ export class AnalyticsPage implements OnInit {
             break;
         }
       }
-    })
+    });
     return budget;
   }
 

@@ -13,11 +13,16 @@
 </ion-header>
 
 <ion-content class="analytics-content">
-  <div class="ion-padding">
-    <canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels" [options]="'{ responsive: true }'" [legend]="true"
-      [chartType]="'line'" [colors]="lineChartColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)">
-    </canvas>
-    <ion-content scrollX="true" direction="x">
+  <ion-grid class="ion-padding">
+    <ion-row justify-content-center>
+      <ion-col sizeLg="8" sizeXl="6">
+        <canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels" [options]="'{ responsive: true }'" [legend]="true"
+        [chartType]="'line'" [colors]="lineChartColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)">
+        </canvas>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+    <!-- <ion-scroll scrollX="true" direction="x">
       <ion-card *ngFor="let item of dates" [ngClass]="{'active': item === referenceDate }" (click)="newDateSelected(item)">
         <ion-card-content>
           <ion-card-title>
@@ -25,8 +30,7 @@
           </ion-card-title>
         </ion-card-content>
       </ion-card>
-    </ion-content>
-  </div>
+    </ion-scroll> -->
   <ion-list>
     <ion-item-group>
       <ion-item-divider color="light">
