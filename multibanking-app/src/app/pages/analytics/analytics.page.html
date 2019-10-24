@@ -14,7 +14,7 @@
 
 <ion-content class="analytics-content">
   <ion-grid class="ion-padding">
-    <ion-row justify-content-center>
+    <ion-row class="ion-justify-content-center">
       <ion-col sizeLg="8" sizeXl="6">
         <canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels" [options]="'{ responsive: true }'" [legend]="true"
         [chartType]="'line'" [colors]="lineChartColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)">

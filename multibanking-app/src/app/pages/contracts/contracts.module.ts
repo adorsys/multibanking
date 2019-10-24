@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 
+import { ContractItemComponent } from '../../components/contract-item/contract-item.component';
+import { ContractListComponent } from '../../components/contract-list/contract-list.component';
 import { KeycloakAuthGuard } from '../../guard/keycloak-auth.guard';
 import { CyclePipe } from '../../pipes/cycle.pipe';
 import { BankAccountsResolverService } from './../../services/resolver/bank-accounts-resolver.service';
@@ -27,6 +29,6 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [ContractsPage, CyclePipe]
+  declarations: [ContractsPage, ContractListComponent, ContractItemComponent, CyclePipe]
 })
 export class ContractsPageModule {}
