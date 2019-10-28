@@ -54,6 +54,7 @@ import org.iban4j.Iban;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.http.MediaType;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -245,7 +246,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             transactionRequest.getBank().getBankApiBankCode() != null
                 ? transactionRequest.getBank().getBankApiBankCode()
                 : transactionRequest.getBankAccess().getBankCode());
-        headers.put(RequestHeaders.ACCEPT, "*/*"); //json, camt, mt940 - adapter accepts no list
+        headers.put(RequestHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE); // try camt
         return RequestHeaders.fromMap(headers);
     }
 
