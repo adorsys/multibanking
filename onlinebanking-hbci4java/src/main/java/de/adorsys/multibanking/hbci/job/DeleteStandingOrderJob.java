@@ -20,6 +20,7 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.EmptyResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
+import de.adorsys.multibanking.hbci.model.HbciCycleMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -63,10 +64,10 @@ public class DeleteStandingOrderJob extends ScaRequiredJob<StandingOrder, EmptyR
             gvDauerSEPADel.setParam("firstdate", standingOrder.getFirstExecutionDate().toString());
         }
         if (standingOrder.getCycle() != null) {
-            gvDauerSEPADel.setParam("timeunit", hbciObjectMapper.cycleToTimeunit(standingOrder.getCycle())); // M
+            gvDauerSEPADel.setParam("timeunit", HbciCycleMapper.cycleToTimeunit(standingOrder.getCycle())); // M
             // month, W
             // week
-            gvDauerSEPADel.setParam("turnus", hbciObjectMapper.cycleToTurnus(standingOrder.getCycle())); // 1W = every
+            gvDauerSEPADel.setParam("turnus", HbciCycleMapper.cycleToTurnus(standingOrder.getCycle())); // 1W = every
             // week, 2M = every two months
         }
         gvDauerSEPADel.setParam("execday", standingOrder.getExecutionDay()); // W: 1-7, M: 1-31

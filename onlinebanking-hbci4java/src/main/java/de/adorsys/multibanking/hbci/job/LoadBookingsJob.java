@@ -103,7 +103,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
                 balancesReport = createBalancesReport(lastBoookingDay.end);
             }
 
-            bookingList = hbciObjectMapper.createBookings(bookingsResult).stream()
+            bookingList = accountStatementMapper.createBookings(bookingsResult).stream()
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
                     () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
         }
@@ -117,7 +117,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
 
     private BalancesReport createBalancesReport(Saldo saldo) {
         BalancesReport balancesReport = new BalancesReport();
-        balancesReport.setReadyBalance(hbciObjectMapper.toBalance(saldo));
+        balancesReport.setReadyBalance(accountStatementMapper.toBalance(saldo));
         return balancesReport;
     }
 

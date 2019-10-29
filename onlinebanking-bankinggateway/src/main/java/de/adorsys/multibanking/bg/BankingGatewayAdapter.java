@@ -23,10 +23,15 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadBookings;
 import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
+import de.adorsys.multibanking.parsing.StringDecoder;
+import de.adorsys.multibanking.parsing.TransactionsParser;
 import de.adorsys.xs2a.adapter.api.remote.AccountInformationClient;
+import de.adorsys.xs2a.adapter.mapper.TransactionsReportMapper;
+import de.adorsys.xs2a.adapter.mapper.TransactionsReportMapperImpl;
 import de.adorsys.xs2a.adapter.model.BookingStatusTO;
 import de.adorsys.xs2a.adapter.model.PaymentProductTO;
 import de.adorsys.xs2a.adapter.model.PaymentServiceTO;
+import de.adorsys.xs2a.adapter.model.TransactionsResponse200JsonTO;
 import de.adorsys.xs2a.adapter.service.*;
 import de.adorsys.xs2a.adapter.service.impl.AccountInformationServiceImpl;
 import de.adorsys.xs2a.adapter.service.model.AccountDetails;
@@ -74,13 +79,14 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         .logLevel(Logger.Level.FULL)
         .logger(new Slf4jLogger(AccountApi.class))
         .encoder(new JacksonEncoder())
-        .decoder(new ResponseEntityDecoder(new JacksonDecoder()))
+        .decoder(new ResponseEntityDecoder(new StringDecoder(new JacksonDecoder())))
         .target(AccountInformationClient.class, xs2aAdapterBaseUrl);
     @Getter(lazy = true)
     private final AccountInformationService accountInformationService =
         new AccountInformationServiceImpl(getAccountApi());
     private ObjectMapper objectMapper = new ObjectMapper();
     private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
+    private TransactionsReportMapper transactionsReportMapper = new TransactionsReportMapperImpl();
 
     private BankingGatewayB2CAisApi bankingGatewayB2CAisApi() {
         BankingGatewayB2CAisApi b2CAisApi = new BankingGatewayB2CAisApi(apiClient());
@@ -162,37 +168,59 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .bookingStatus(BookingStatusTO.BOOKED.toString()).build();
 
         try {
-            Response<TransactionsReport> transactionList =
-                getAccountInformationService().getTransactionList(resourceId, requestHeaders, requestParams);
+            Response<String> transactionListString = getAccountInformationService().getTransactionListAsString(resourceId, requestHeaders, requestParams);
+            Map<String, String> headersMap = transactionListString.getHeaders().getHeadersMap();
+            String contentType = headersMap.keySet().stream()
+                    .filter(header -> header.toLowerCase().contains("content-type"))
+                    .map(headersMap::get)
+                    .findFirst()
+                    .orElse("");
+            String body = transactionListString.getBody();
 
-            List<Booking> bookings = Optional.ofNullable(transactionList.getBody())
+            if (contentType.toLowerCase().contains("application/xml")) {
+                return TransactionsParser.camtStringToLoadBookingsResponse(body);
+            } else if (contentType.toLowerCase().contains("text/plain")) {
+                return TransactionsParser.mt940StringToLoadBookingsResponse(body);
+            } else {
+                return jsonStringToLoadBookingsResponse(body);
+            }
+        } catch (FeignException e) {
+            throw handeAisApiException(e);
+        } catch (Exception e) {
+            throw new MultibankingException(INTERNAL_ERROR, 500, "Error loading bookings: " + e.getMessage());
+        }
+    }
+
+    private LoadBookingsResponse jsonStringToLoadBookingsResponse(String json) throws Exception {
+        TransactionsResponse200JsonTO transactionsResponse200JsonTO = objectMapper.readValue(json, TransactionsResponse200JsonTO.class);
+        TransactionsReport transactionList = transactionsReportMapper.toTransactionsReport(transactionsResponse200JsonTO);
+        List<Booking> bookings = Optional.ofNullable(transactionList)
                 .map(TransactionsReport::getTransactions)
                 .map(AccountReport::getBooked)
                 .map(transactions -> bankingGatewayMapper.toBookings(transactions))
                 .orElse(Collections.emptyList());
 
-            BalancesReport balancesReport = new BalancesReport();
-            transactionList.getBody().getBalances().forEach(balance -> {
-                switch (balance.getBalanceType()) {
-                    case EXPECTED:
-                        balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
-                        break;
-                    case CLOSINGBOOKED:
-                        balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
-                        break;
-                    default:
-                        // ignore
-                        break;
-                }
-            });
+        BalancesReport balancesReport = new BalancesReport();
+        Optional.ofNullable(transactionList.getBalances())
+                .orElse(Collections.emptyList())
+                .forEach(balance -> {
+            switch (balance.getBalanceType()) {
+                case EXPECTED:
+                    balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
+                    break;
+                case CLOSINGBOOKED:
+                    balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
+                    break;
+                default:
+                    // ignore
+                    break;
+            }
+        });
 
-            return LoadBookingsResponse.builder()
+        return LoadBookingsResponse.builder()
                 .bookings(bookings)
                 .balancesReport(balancesReport)
                 .build();
-        } catch (FeignException e) {
-            throw handeAisApiException(e);
-        }
     }
 
     private String getAccountResourceId(String iban, RequestHeaders requestHeaders) {
@@ -213,7 +241,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             transactionRequest.getBank().getBankApiBankCode() != null
                 ? transactionRequest.getBank().getBankApiBankCode()
                 : transactionRequest.getBankAccess().getBankCode());
-        headers.put(RequestHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        headers.put(RequestHeaders.ACCEPT, MediaType.APPLICATION_XML_VALUE); // try camt
         return RequestHeaders.fromMap(headers);
     }
 

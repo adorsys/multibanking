@@ -84,7 +84,7 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAcco
 
         hbciAccounts = new ArrayList<>();
         for (Konto konto : passport.getAccounts()) {
-            BankAccount bankAccount = hbciObjectMapper.toBankAccount(konto);
+            BankAccount bankAccount = accountStatementMapper.toBankAccount(konto);
             bankAccount.externalId(BankApi.HBCI, UUID.randomUUID().toString());
             bankAccount.bankName(loadAccountInformationRequest.getBankAccess().getBankName());
             hbciAccounts.add(bankAccount);
