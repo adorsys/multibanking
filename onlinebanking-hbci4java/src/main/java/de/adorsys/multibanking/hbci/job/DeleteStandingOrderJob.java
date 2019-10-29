@@ -35,7 +35,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
-public class DeleteStandingOrderJob extends ScaRequiredJob<StandingOrder, EmptyResponse> implements HbciCycleMapper {
+public class DeleteStandingOrderJob extends ScaRequiredJob<StandingOrder, EmptyResponse> {
 
     private final TransactionRequest<StandingOrder> transactionRequest;
 
@@ -64,10 +64,10 @@ public class DeleteStandingOrderJob extends ScaRequiredJob<StandingOrder, EmptyR
             gvDauerSEPADel.setParam("firstdate", standingOrder.getFirstExecutionDate().toString());
         }
         if (standingOrder.getCycle() != null) {
-            gvDauerSEPADel.setParam("timeunit", cycleToTimeunit(standingOrder.getCycle())); // M
+            gvDauerSEPADel.setParam("timeunit", HbciCycleMapper.cycleToTimeunit(standingOrder.getCycle())); // M
             // month, W
             // week
-            gvDauerSEPADel.setParam("turnus", cycleToTurnus(standingOrder.getCycle())); // 1W = every
+            gvDauerSEPADel.setParam("turnus", HbciCycleMapper.cycleToTurnus(standingOrder.getCycle())); // 1W = every
             // week, 2M = every two months
         }
         gvDauerSEPADel.setParam("execday", standingOrder.getExecutionDay()); // W: 1-7, M: 1-31
