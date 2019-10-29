@@ -66,15 +66,11 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private final String bankingGatewayBaseUrl;
     @NonNull
     private final String xs2aAdapterBaseUrl;
-    @NonNull
-    private final Interceptor interceptor;
-    @NonNull
-    private final RequestInterceptor requestInterceptor;
     @Getter(lazy = true)
     private final BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi();
     @Getter(lazy = true)
     private final AccountInformationClient accountApi = Feign.builder()
-        .requestInterceptor(requestInterceptor)
+        .requestInterceptor(new FeignCorrelationIdInterceptor())
         .contract(createSpringMvcContract())
         .logLevel(Logger.Level.FULL)
         .logger(new Slf4jLogger(AccountApi.class))
@@ -94,7 +90,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             new HttpLoggingInterceptor(log::debug)
                 .setLevel(HttpLoggingInterceptor.Level.BODY)
         );
-        b2CAisApi.getApiClient().getHttpClient().interceptors().add(interceptor);
+        b2CAisApi.getApiClient().getHttpClient().interceptors().add(new OkHttpCorrelationIdInterceptor());
 
         return b2CAisApi;
     }

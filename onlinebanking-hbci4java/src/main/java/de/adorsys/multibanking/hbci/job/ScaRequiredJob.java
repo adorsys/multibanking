@@ -113,16 +113,19 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
     }
 
     private R initDialog(HBCICallback hbciCallback) {
+        log.info("init new hbci dialog");
         PinTanPassport bpdPassport = fetchBpd(hbciCallback);
 
         dialog = (HBCIJobsDialog) createDialog(JOBS, hbciCallback,
             getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
+
         dialog.getPassport().setBPD(bpdPassport.getBPD());
 
         HBCIMsgStatus dialogInitMsgStatus =
             dialog.dialogInit(((HbciConsent) getTransactionRequest().getBankApiConsentData()).isWithHktan());
 
         if (checkDialogInitScaRequired(dialogInitMsgStatus)) {
+            log.info("HKIDN SCA required");
             R jobResponse = createJobResponse(dialog.getPassport());
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
             return jobResponse;
