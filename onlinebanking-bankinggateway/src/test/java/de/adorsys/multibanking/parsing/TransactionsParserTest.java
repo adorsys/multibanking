@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.parsing;
 
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.mapper.TransactionsParser;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
