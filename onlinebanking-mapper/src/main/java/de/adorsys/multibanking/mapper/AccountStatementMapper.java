@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.hbci.mapper;
+package de.adorsys.multibanking.mapper;
 
 import de.adorsys.multibanking.domain.Balance;
 import de.adorsys.multibanking.domain.BalancesReport;
@@ -37,7 +37,7 @@ import java.util.List;
 import static de.adorsys.multibanking.domain.utils.Utils.extractIban;
 
 @Mapper
-public interface HbciObjectMapper {
+public interface AccountStatementMapper {
 
     default BalancesReport createBalancesReport(GVRSaldoReq gvSaldoReq, String accountNumber) {
         return gvSaldoReq.getEntries().stream()

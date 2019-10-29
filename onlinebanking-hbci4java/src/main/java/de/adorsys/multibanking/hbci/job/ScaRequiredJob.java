@@ -26,8 +26,8 @@ import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
-import de.adorsys.multibanking.hbci.mapper.HbciObjectMapper;
-import de.adorsys.multibanking.hbci.mapper.HbciObjectMapperImpl;
+import de.adorsys.multibanking.mapper.AccountStatementMapper;
+import de.adorsys.multibanking.mapper.AccountStatementMapperImpl;
 import de.adorsys.multibanking.hbci.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -64,7 +64,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends AbstractResponse> {
 
     private static HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
-    static HbciObjectMapper hbciObjectMapper = new HbciObjectMapperImpl();
+    static AccountStatementMapper accountStatementMapper = new AccountStatementMapperImpl();
 
     private HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
     private AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(hbciTanSubmit);

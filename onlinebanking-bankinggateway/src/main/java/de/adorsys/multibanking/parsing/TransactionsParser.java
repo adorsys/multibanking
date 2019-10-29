@@ -3,8 +3,8 @@ package de.adorsys.multibanking.parsing;
 import de.adorsys.multibanking.domain.BalancesReport;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
-import de.adorsys.multibanking.hbci.mapper.HbciObjectMapper;
-import de.adorsys.multibanking.hbci.mapper.HbciObjectMapperImpl;
+import de.adorsys.multibanking.mapper.AccountStatementMapper;
+import de.adorsys.multibanking.mapper.AccountStatementMapperImpl;
 import org.apache.commons.io.IOUtils;
 import org.kapott.hbci.GV.parsers.ISEPAParser;
 import org.kapott.hbci.GV.parsers.SEPAParserFactory;
@@ -17,7 +17,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TransactionsParser {
-    static HbciObjectMapper hbciObjectMapper = new HbciObjectMapperImpl();
+    static AccountStatementMapper accountStatementMapper = new AccountStatementMapperImpl();
 
     public static LoadBookingsResponse camtStringToLoadBookingsResponse(String body) {
         SepaVersion version = SepaVersion.autodetect(body);
@@ -34,7 +34,7 @@ public class TransactionsParser {
     }
 
     private static LoadBookingsResponse jobresultToLoadBookingsResponse(GVRKUms bookingsResult, String raw) {
-        List<Booking> bookings =  hbciObjectMapper.createBookings(bookingsResult).stream()
+        List<Booking> bookings =  accountStatementMapper.createBookings(bookingsResult).stream()
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
                         () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
 
@@ -57,7 +57,7 @@ public class TransactionsParser {
 
     private static BalancesReport createBalancesReport(Saldo saldo) {
         BalancesReport balancesReport = new BalancesReport();
-        balancesReport.setReadyBalance(hbciObjectMapper.toBalance(saldo));
+        balancesReport.setReadyBalance(accountStatementMapper.toBalance(saldo));
         return balancesReport;
     }
 }
