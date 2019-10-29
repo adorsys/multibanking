@@ -27,9 +27,9 @@
             <version>5.3.4-SNAPSHOT</version>
         </dependency>
 
-        <dependency> <!-- for camt mt940 -->
+        <dependency>
             <groupId>de.adorsys.multibanking</groupId>
-            <artifactId>onlinebanking-hbci4java</artifactId>
+            <artifactId>onlinebanking-mapper</artifactId>
             <version>5.3.4-SNAPSHOT</version>
         </dependency>
 
