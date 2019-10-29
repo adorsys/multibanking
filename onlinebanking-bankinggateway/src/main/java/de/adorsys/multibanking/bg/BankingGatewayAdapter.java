@@ -1,7 +1,6 @@
 package de.adorsys.multibanking.bg;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
@@ -37,7 +36,6 @@ import de.adorsys.xs2a.adapter.service.model.TransactionsReport;
 import feign.Feign;
 import feign.FeignException;
 import feign.Logger;
-import feign.RequestInterceptor;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
@@ -51,6 +49,7 @@ import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.MediaType;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -157,7 +156,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .orElseGet(() -> getAccountResourceId(loadBookingsRequest.getBankAccess().getIban(), requestHeaders));
 
         RequestParams requestParams = RequestParams.builder()
-            .dateFrom(loadBookings.getDateFrom())
+            .dateFrom(loadBookings.getDateFrom() != null ? loadBookings.getDateFrom() : LocalDate.now().minusYears(1))
             .dateTo(loadBookings.getDateTo())
             .withBalance(loadBookings.isWithBalance())
             .bookingStatus(BookingStatusTO.BOOKED.toString()).build();
