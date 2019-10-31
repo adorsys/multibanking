@@ -14,35 +14,30 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.hbci.model;
+package de.adorsys.multibanking.mapper;
 
-import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.request.AbstractRequest;
-import de.adorsys.multibanking.domain.transaction.StandingOrder;
+import de.adorsys.multibanking.domain.Balance;
+import de.adorsys.multibanking.domain.BalancesReport;
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.utils.Utils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
-import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
-import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Saldo;
 import org.kapott.hbci.structures.Value;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static de.adorsys.multibanking.domain.utils.Utils.extractIban;
 
 @Mapper
-public interface HbciObjectMapper {
-
-    HbciDialogRequest toHbciDialogRequest(AbstractRequest transactionRequest, HBCICallback callback);
+public interface AccountStatementMapper {
 
     default BalancesReport createBalancesReport(GVRSaldoReq gvSaldoReq, String accountNumber) {
         return gvSaldoReq.getEntries().stream()
@@ -68,57 +63,6 @@ public interface HbciObjectMapper {
     @Mapping(target = "amount", source = "value.bigDecimalValue")
     @Mapping(target = "date", source = "timestamp")
     Balance toBalance(Saldo saldo);
-
-    default List<StandingOrder> createStandingOrders(GVRDauerList gvrDauerList) {
-        GVRDauerList.Dauer[] lines = gvrDauerList.getEntries();
-        List<StandingOrder> standingOrders = new ArrayList<>();
-
-        for (GVRDauerList.Dauer line : lines) {
-            StandingOrder auftrag = new StandingOrder();
-
-            if (line.firstdate != null) {
-                auftrag.setFirstExecutionDate(
-                    line.firstdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-            }
-            if (line.lastdate != null) {
-                auftrag.setLastExecutionDate(
-                    line.lastdate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-            }
-            auftrag.setAmount(line.value.getBigDecimalValue());
-            auftrag.setOrderId(line.orderid);
-            auftrag.setOtherAccount(toBankAccount(line.other));
-            auftrag.setUsage(getUsage(Arrays.asList(line.usage)));
-            auftrag.setExecutionDay(line.execday);
-
-            Cycle cycle = null;
-            if (!StringUtils.endsWithIgnoreCase("M", line.timeunit)) {
-                cycle = Cycle.WEEKLY;
-            } else {
-                switch (line.turnus) {
-                    case 1:
-                        cycle = Cycle.MONTHLY;
-                        break;
-                    case 2:
-                        cycle = Cycle.TWO_MONTHLY;
-                        break;
-                    case 3:
-                        cycle = Cycle.QUARTERLY;
-                        break;
-                    case 6:
-                        cycle = Cycle.HALF_YEARLY;
-                        break;
-                    case 12:
-                        cycle = Cycle.YEARLY;
-                        break;
-                }
-            }
-            auftrag.setCycle(cycle);
-
-            standingOrders.add(auftrag);
-        }
-        return standingOrders;
-
-    }
 
     default List<Booking> createBookings(GVRKUms gvrkUms) {
         List<Booking> bookings = new ArrayList<>();
@@ -180,39 +124,6 @@ public interface HbciObjectMapper {
     @Mapping(target = "standingOrder", ignore = true)
     @Mapping(target = "bookingCategory", ignore = true)
     Booking toBooking(GVRKUms.UmsLine line);
-
-    default String cycleToTurnus(Cycle cycle) {
-        switch (cycle) {
-            case WEEKLY:
-                return "1";
-            case TWO_WEEKLY:
-                return "2";
-            case MONTHLY:
-                return "1";
-            case TWO_MONTHLY:
-                return "2";
-            case QUARTERLY:
-                return "3";
-            case HALF_YEARLY:
-                return "6";
-            case YEARLY:
-                return "12";
-            case INVALID:
-                return null;
-            default:
-                return null;
-        }
-    }
-
-    default String cycleToTimeunit(Cycle cycle) {
-        switch (cycle) {
-            case WEEKLY:
-            case TWO_WEEKLY:
-                return "W";
-            default:
-                return "M";
-        }
-    }
 
     default String getUsage(List<String> lines) {
         StringBuilder sb = new StringBuilder();

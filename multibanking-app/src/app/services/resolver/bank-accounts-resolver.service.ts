@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
+import { EMPTY, Observable, of } from 'rxjs';
+import { mergeMap, take } from 'rxjs/operators';
 import { ResourceBankAccount } from 'src/multibanking-api/resourceBankAccount';
-import { BankAccessService } from '../rest/bankAccess.service';
+
 import { BankAccountService } from '../rest/bankAccount.service';
-import { Router, ActivatedRouteSnapshot } from '@angular/router';
-import { ChangeEvent, EventType } from 'src/app/model/changeEvent';
-import { ResourceBankAccess } from 'src/multibanking-api/resourceBankAccess';
-import { Observable, EMPTY, of } from 'rxjs';
-import { take, mergeMap } from 'rxjs/operators';
+import { getHierarchicalRouteParam } from '../../utils/utils';
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +20,8 @@ export class BankAccountsResolverService {
   }
 
   resolve(route: ActivatedRouteSnapshot): Observable<ResourceBankAccount> | Observable<ResourceBankAccount[]> | Observable<never> {
-    const accessId = route.paramMap.get('access-id');
-    const accountId = route.paramMap.get('account-id');
+    const accessId = getHierarchicalRouteParam(route, 'access-id');
+    const accountId = getHierarchicalRouteParam(route, 'account-id');
     if (!accountId) {
       return this.getBankAccounts(accessId);
     } else {

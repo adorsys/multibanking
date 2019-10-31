@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +49,7 @@ public class ConsentController {
 
     @ApiOperation(value = "Create new consent")
     @PostMapping
-    public ResponseEntity<Resource<CreateConsentResponseTO>> createConsent(@RequestBody ConsentTO consent,
+    public ResponseEntity<Resource<CreateConsentResponseTO>> createConsent(@Valid @RequestBody ConsentTO consent,
                                                                            @RequestParam(required = false) BankApiTO bankApi) {
         Consent consentInput = consentMapper.toConsent(consent);
         CreateConsentResponse createConsentResponse = consentService.createConsent(consentInput,

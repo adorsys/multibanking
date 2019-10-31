@@ -1,0 +1,69 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>{{ booking.bookingDate | date }} {{ booking.amount | currency:'EUR':'symbol' }}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="backLink"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="bookingDetail-content ion-padding">
+  <ion-item>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" sizeLg="6">
+          <ion-row>
+            <ion-col size="4">Booking date:</ion-col>
+            <ion-col size="8">{{ booking.bookingDate | date }}</ion-col>
+            <ion-col size="4">Amount:</ion-col>
+            <ion-col size="8">{{ booking.amount | currency:'EUR':'symbol' }}</ion-col>
+            <ion-col size="4" *ngIf="booking.otherAccount">Receiver:</ion-col>
+            <ion-col size="8" *ngIf="booking.otherAccount">{{ booking.otherAccount.owner }}</ion-col>
+            <ion-col size="4">Standing order:</ion-col>
+            <ion-col size="8">{{ booking.standingOrder }}</ion-col>
+          </ion-row>
+        </ion-col>
+        <ion-col size="12" sizeLg="6">
+          <ion-row>
+            <ion-col size="4" *ngIf="booking.creditorId">Creditor ID:</ion-col>
+            <ion-col size="8" *ngIf="booking.creditorId">{{ booking.creditorId }}</ion-col>
+            <ion-col size="4" *ngIf="booking.mandateReference">Mandate reference:</ion-col>
+            <ion-col size="8" *ngIf="booking.mandateReference">{{ booking.mandateReference }}</ion-col>
+            <ion-col size="4">Bank API:</ion-col>
+            <ion-col size="8">{{ booking.bankApi }}</ion-col>
+          </ion-row>
+        </ion-col>
+        <ion-col size="12" sizeLg="6">
+          <ion-row>
+            <ion-col size="3" sizeLg="4">Purpose:</ion-col>
+            <ion-col size="9" sizeLg="8"><span style="white-space: normal;">{{ booking.usage }}</span></ion-col>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-item>
+  <ion-item>
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" sizeLg="6">
+          <ion-row>
+            <ion-col size="4">Rules:</ion-col>
+            <ion-col size="8">{{ booking.bookingCategory?.rules }}</ion-col>
+            <ion-col size="4">Main category:</ion-col>
+            <ion-col size="8">{{ booking.bookingCategory?.mainCategory }}</ion-col>
+            <ion-col size="4">Subcategory:</ion-col>
+            <ion-col size="8">{{ booking.bookingCategory?.subCategory }}</ion-col>
+            <ion-col size="4">Specification:</ion-col>
+            <ion-col size="8">{{ booking.bookingCategory?.specification }}</ion-col>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-item>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="editRule()">
+      <ion-icon name="create"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

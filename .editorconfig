@@ -11,6 +11,15 @@ insert_final_newline = true
 [*.md]
 trim_trailing_whitespace = false
 
+[*.ts]
+indent_style = space
+indent_size = 2
+continuation_indent_size = 2
+
+[*.html]
+indent_style = space
+indent_size = 2
+
 [*.java]
 indent_style = space
 indent_size = 4

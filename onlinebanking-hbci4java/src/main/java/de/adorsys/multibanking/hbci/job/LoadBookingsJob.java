@@ -34,6 +34,7 @@ import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Saldo;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -102,7 +103,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
                 balancesReport = createBalancesReport(lastBoookingDay.end);
             }
 
-            bookingList = hbciObjectMapper.createBookings(bookingsResult).stream()
+            bookingList = accountStatementMapper.createBookings(bookingsResult).stream()
                 .collect(Collectors.collectingAndThen(Collectors.toCollection(
                     () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
         }
@@ -116,7 +117,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
 
     private BalancesReport createBalancesReport(Saldo saldo) {
         BalancesReport balancesReport = new BalancesReport();
-        balancesReport.setReadyBalance(hbciObjectMapper.toBalance(saldo));
+        balancesReport.setReadyBalance(accountStatementMapper.toBalance(saldo));
         return balancesReport;
     }
 
@@ -125,9 +126,9 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
 
         hbciJob.setParam("my", getPsuKonto(passport));
 
-        Optional.ofNullable(loadBookingsRequest.getTransaction().getDateFrom())
-            .ifPresent(localDate -> hbciJob.setParam("startdate",
-                Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
+        LocalDate dateFrom = Optional.ofNullable(loadBookingsRequest.getTransaction().getDateFrom())
+            .orElseGet(() -> getStartDate(passport.getJobRestrictions(hbciJob.getName())));
+        hbciJob.setParam("startdate", Date.from(dateFrom.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
         Optional.ofNullable(loadBookingsRequest.getTransaction().getDateTo())
             .ifPresent(localDate -> hbciJob.setParam("enddate",
@@ -160,6 +161,19 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
                     throw new MultibankingException(HBCI_ERROR, "transaction jobs not supported");
                 }
             });
+    }
+
+    private LocalDate getStartDate(Map<String, String> jobRestrictions) {
+        String days = jobRestrictions.get("timerange");
+        LocalDate date;
+        if (days != null && days.length() > 0 && days.matches("[0-9]{1,4}")) {
+            date = LocalDate.now().minusDays(Long.parseLong(days));
+            log.info("earliest start date according to BPD: " + date.toString());
+        } else {
+            date = LocalDate.now().minusDays(90);
+        }
+
+        return date;
     }
 
 }

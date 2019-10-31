@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Contracts</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="backLink"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="syncBookings()">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list lines="none">
+    <ion-item-divider color="light">Incomings</ion-item-divider>
+    <app-contract-list [contracts]="contracts?.income"></app-contract-list>
+    <ion-item-divider color="light">Expenses</ion-item-divider>
+    <app-contract-list [contracts]="contracts?.expenses"></app-contract-list>
+  </ion-list>
+</ion-content>

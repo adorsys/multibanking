@@ -1,10 +1,10 @@
 <ion-header>
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-title>Transactions</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/"></ion-back-button>
+      <ion-back-button [defaultHref]="backLink"></ion-back-button>
     </ion-buttons>
-    <ion-buttons slot="secondary">
+    <ion-buttons slot="primary">
       <ion-button (click)="syncBookings()">
         <ion-icon name="refresh"></ion-icon>
       </ion-button>

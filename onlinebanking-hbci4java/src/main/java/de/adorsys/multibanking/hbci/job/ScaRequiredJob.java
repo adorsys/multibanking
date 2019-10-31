@@ -26,6 +26,8 @@ import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.mapper.AccountStatementMapper;
+import de.adorsys.multibanking.mapper.AccountStatementMapperImpl;
 import de.adorsys.multibanking.hbci.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -61,7 +63,8 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Slf4j
 public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends AbstractResponse> {
 
-    static HbciObjectMapper hbciObjectMapper = new HbciObjectMapperImpl();
+    private static HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
+    static AccountStatementMapper accountStatementMapper = new AccountStatementMapperImpl();
 
     private HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
     private AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(hbciTanSubmit);
@@ -113,16 +116,19 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
     }
 
     private R initDialog(HBCICallback hbciCallback) {
+        log.info("init new hbci dialog");
         PinTanPassport bpdPassport = fetchBpd(hbciCallback);
 
         dialog = (HBCIJobsDialog) createDialog(JOBS, hbciCallback,
             getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
+
         dialog.getPassport().setBPD(bpdPassport.getBPD());
 
         HBCIMsgStatus dialogInitMsgStatus =
             dialog.dialogInit(((HbciConsent) getTransactionRequest().getBankApiConsentData()).isWithHktan());
 
         if (checkDialogInitScaRequired(dialogInitMsgStatus)) {
+            log.info("HKIDN SCA required");
             R jobResponse = createJobResponse(dialog.getPassport());
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
             return jobResponse;
@@ -323,8 +329,8 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
                     if (challengeHhdUc != null) {
                         try {
-                            byte[] image = new MatrixCode(challengeHhdUc).getImage();
-                            challengeData.setImage(new String(image, UTF_8));
+                            new MatrixCode(challengeHhdUc).getImage(); //check for valid image
+                            challengeData.setImage(challengeHhdUc);
                         } catch (Exception e) {
                             challengeData.setData(Collections.singletonList(challengeHhdUc));
                         }
@@ -355,7 +361,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
     }
 
     private HbciDialogRequest createDialogRequest(HBCICallback hbciCallback) {
-        return hbciObjectMapper.toHbciDialogRequest(getTransactionRequest(), hbciCallback);
+        return hbciDialogRequestMapper.toHbciDialogRequest(getTransactionRequest(), hbciCallback);
     }
 
     private HbciConsent getConsent() {

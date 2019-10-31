@@ -1,0 +1,3 @@
+# These files are binary and should be left untouched
+# (binary is macro for -text -diff)
+mt940.txt         binary

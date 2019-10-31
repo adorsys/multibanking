@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { ConsentService } from '../rest/consent.service';
-import { ChangeEvent, EventType } from 'src/app/model/changeEvent';
-import { Router, ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, Router } from '@angular/router';
+import { EMPTY, Observable, of } from 'rxjs';
+import { mergeMap, take } from 'rxjs/operators';
+import { ChangeEvent } from 'src/app/model/changeEvent';
 import { ResourceUpdateAuthResponseTO } from 'src/multibanking-api/resourceUpdateAuthResponseTO';
-import { Observable, of, EMPTY } from 'rxjs';
-import { take, mergeMap } from 'rxjs/operators';
+import { ConsentService } from '../rest/consent.service';
 
 @Injectable({
   providedIn: 'root'

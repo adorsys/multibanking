@@ -309,8 +309,7 @@ public class BookingService extends AccountInformationService {
                                                                        BankEntity bankEntity) {
         LoadBookings loadBookings = new LoadBookings();
         loadBookings.setPsuAccount(bankAccount);
-        loadBookings.setDateFrom(bankAccount.getLastSync() != null ?
-            bankAccount.getLastSync().toLocalDate() : LocalDate.now().minusYears(1));
+        loadBookings.setDateFrom(bankAccount.getLastSync() != null ? bankAccount.getLastSync().toLocalDate() : null);
         loadBookings.setDateTo(LocalDate.now());
         loadBookings.setWithBalance(true);
 

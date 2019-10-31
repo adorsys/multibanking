@@ -4,9 +4,6 @@ import de.adorsys.multibanking.Application;
 import de.adorsys.multibanking.bg.BankingGatewayAdapter;
 import de.adorsys.multibanking.conf.FongoConfig;
 import de.adorsys.multibanking.conf.MapperConfig;
-import de.adorsys.multibanking.correlation.CorrelationId;
-import de.adorsys.multibanking.correlation.FeignCorrelationIdInterceptor;
-import de.adorsys.multibanking.correlation.OkHttpCorrelationIdInterceptor;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
@@ -70,10 +67,6 @@ public class DirectAccessControllerTest {
 
     @Autowired
     private BankRepositoryIf bankRepository;
-    @Autowired
-    private OkHttpCorrelationIdInterceptor okInterceptor;
-    @Autowired
-    private FeignCorrelationIdInterceptor feignInterceptor;
     @MockBean
     private OnlineBankingServiceProducer bankingServiceProducer;
     @MockBean
@@ -120,7 +113,7 @@ public class DirectAccessControllerTest {
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
         ConsentTO consentTO = createConsentTO();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, okInterceptor, feignInterceptor),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
             consentTO.getPsuAccountIban(),
             true);
 
@@ -145,7 +138,7 @@ public class DirectAccessControllerTest {
     @Test
     public void consent_authorisation_bankinggateway_decoupled() {
         ConsentTO consentTO = createConsentTO();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, okInterceptor, feignInterceptor),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
             consentTO.getPsuAccountIban(),
             false);
 
@@ -171,7 +164,7 @@ public class DirectAccessControllerTest {
     public void consent_authorisation_bankinggateway() {
         ConsentTO consentTO = createConsentTO();
 
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, okInterceptor, feignInterceptor),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
             consentTO.getPsuAccountIban(),
             false);
 
@@ -258,7 +251,7 @@ public class DirectAccessControllerTest {
     public JsonPath consent_authorisation(ConsentTO consent, BankAccessTO bankAccess, CredentialsTO credentialsTO) {
         //1. create consent
         JsonPath jsonPath = request.body(consent)
-            .header(CorrelationId.CORRELATION_ID, "TEST123")
+            .header("Correlation-ID", "TEST123")
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
             .then().assertThat().statusCode(HttpStatus.CREATED.value())
             .and().extract().jsonPath();
@@ -288,10 +281,11 @@ public class DirectAccessControllerTest {
 
         // get consent auth status after "lazy" startauth
         jsonPath = request.get(linkAuthStatus)
-                .then().assertThat().statusCode(HttpStatus.OK.value())
-                .and().extract().jsonPath();
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
 
-        assertThat(jsonPath.getString("scaStatus")).isIn(RECEIVED.toString(), STARTED.toString(), SCAMETHODSELECTED.toString(), PSUAUTHENTICATED.toString());
+        assertThat(jsonPath.getString("scaStatus")).isIn(RECEIVED.toString(), STARTED.toString(),
+            SCAMETHODSELECTED.toString(), PSUAUTHENTICATED.toString());
 
         if (ScaApproachTO.valueOf(jsonPath.getString("scaApproach")) == ScaApproachTO.DECOUPLED) {
             return jsonPath;

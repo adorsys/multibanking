@@ -1,7 +1,6 @@
 package de.adorsys.multibanking.bg;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
@@ -24,10 +23,14 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadBookings;
 import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
+import de.adorsys.multibanking.mapper.TransactionsParser;
 import de.adorsys.xs2a.adapter.api.remote.AccountInformationClient;
+import de.adorsys.xs2a.adapter.mapper.TransactionsReportMapper;
+import de.adorsys.xs2a.adapter.mapper.TransactionsReportMapperImpl;
 import de.adorsys.xs2a.adapter.model.BookingStatusTO;
 import de.adorsys.xs2a.adapter.model.PaymentProductTO;
 import de.adorsys.xs2a.adapter.model.PaymentServiceTO;
+import de.adorsys.xs2a.adapter.model.TransactionsResponse200JsonTO;
 import de.adorsys.xs2a.adapter.service.*;
 import de.adorsys.xs2a.adapter.service.impl.AccountInformationServiceImpl;
 import de.adorsys.xs2a.adapter.service.model.AccountDetails;
@@ -37,7 +40,7 @@ import de.adorsys.xs2a.adapter.service.model.TransactionsReport;
 import feign.Feign;
 import feign.FeignException;
 import feign.Logger;
-import feign.RequestInterceptor;
+import feign.codec.Decoder;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.slf4j.Slf4jLogger;
@@ -45,12 +48,16 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.iban4j.Iban;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringMvcContract;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.http.MediaType;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -66,26 +73,23 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private final String bankingGatewayBaseUrl;
     @NonNull
     private final String xs2aAdapterBaseUrl;
-    @NonNull
-    private final Interceptor interceptor;
-    @NonNull
-    private final RequestInterceptor requestInterceptor;
     @Getter(lazy = true)
     private final BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi();
     @Getter(lazy = true)
     private final AccountInformationClient accountApi = Feign.builder()
-        .requestInterceptor(requestInterceptor)
+        .requestInterceptor(new FeignCorrelationIdInterceptor())
         .contract(createSpringMvcContract())
         .logLevel(Logger.Level.FULL)
         .logger(new Slf4jLogger(AccountApi.class))
         .encoder(new JacksonEncoder())
-        .decoder(new ResponseEntityDecoder(new JacksonDecoder()))
+        .decoder(new ResponseEntityDecoder(new StringDecoder(new JacksonDecoder())))
         .target(AccountInformationClient.class, xs2aAdapterBaseUrl);
     @Getter(lazy = true)
     private final AccountInformationService accountInformationService =
         new AccountInformationServiceImpl(getAccountApi());
     private ObjectMapper objectMapper = new ObjectMapper();
     private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
+    private TransactionsReportMapper transactionsReportMapper = new TransactionsReportMapperImpl();
 
     private BankingGatewayB2CAisApi bankingGatewayB2CAisApi() {
         BankingGatewayB2CAisApi b2CAisApi = new BankingGatewayB2CAisApi(apiClient());
@@ -94,7 +98,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             new HttpLoggingInterceptor(log::debug)
                 .setLevel(HttpLoggingInterceptor.Level.BODY)
         );
-        b2CAisApi.getApiClient().getHttpClient().interceptors().add(interceptor);
+        b2CAisApi.getApiClient().getHttpClient().interceptors().add(new OkHttpCorrelationIdInterceptor());
 
         return b2CAisApi;
     }
@@ -132,7 +136,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     @Override
     public LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
-        RequestHeaders aisHeaders = createAisHeaders(loadAccountInformationRequest);
+        RequestHeaders aisHeaders = createAisHeaders(loadAccountInformationRequest, MediaType.APPLICATION_JSON_VALUE);
 
         Response<AccountListHolder> accountList = getAccountInformationService().getAccountList(aisHeaders,
             RequestParams.builder().build());
@@ -155,29 +159,59 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     @Override
     public LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> loadBookingsRequest) {
         LoadBookings loadBookings = loadBookingsRequest.getTransaction();
-        RequestHeaders requestHeaders = createAisHeaders(loadBookingsRequest);
 
         String resourceId = Optional.ofNullable(loadBookings.getPsuAccount().getExternalIdMap().get(bankApi()))
-            .orElseGet(() -> getAccountResourceId(loadBookingsRequest.getBankAccess().getIban(), requestHeaders));
+            .orElseGet(() -> getAccountResourceId(loadBookingsRequest.getBankAccess().getIban(),
+                createAisHeaders(loadBookingsRequest, MediaType.APPLICATION_JSON_VALUE)));
 
         RequestParams requestParams = RequestParams.builder()
-            .dateFrom(loadBookings.getDateFrom())
+            .dateFrom(loadBookings.getDateFrom() != null ? loadBookings.getDateFrom() : LocalDate.now().minusYears(1))
             .dateTo(loadBookings.getDateTo())
             .withBalance(loadBookings.isWithBalance())
             .bookingStatus(BookingStatusTO.BOOKED.toString()).build();
 
         try {
-            Response<TransactionsReport> transactionList =
-                getAccountInformationService().getTransactionList(resourceId, requestHeaders, requestParams);
+            RequestHeaders requestHeaders = createAisHeaders(loadBookingsRequest, MediaType.APPLICATION_XML_VALUE);
+            Response<String> transactionListString =
+                getAccountInformationService().getTransactionListAsString(resourceId, requestHeaders, requestParams);
+            Map<String, String> headersMap = transactionListString.getHeaders().getHeadersMap();
+            String contentType = headersMap.keySet().stream()
+                .filter(header -> header.toLowerCase().contains("content-type"))
+                .map(headersMap::get)
+                .findFirst()
+                .orElse("");
+            String body = transactionListString.getBody();
 
-            List<Booking> bookings = Optional.ofNullable(transactionList.getBody())
-                .map(TransactionsReport::getTransactions)
-                .map(AccountReport::getBooked)
-                .map(transactions -> bankingGatewayMapper.toBookings(transactions))
-                .orElse(Collections.emptyList());
+            if (contentType.toLowerCase().contains("application/xml")) {
+                return TransactionsParser.camtStringToLoadBookingsResponse(body);
+            } else if (contentType.toLowerCase().contains("text/plain")) {
+                return TransactionsParser.mt940StringToLoadBookingsResponse(body);
+            } else {
+                return jsonStringToLoadBookingsResponse(body);
+            }
+        } catch (FeignException e) {
+            throw handeAisApiException(e);
+        } catch (Exception e) {
+            throw new MultibankingException(INTERNAL_ERROR, 500, "Error loading bookings: " + e.getMessage());
+        }
+    }
 
-            BalancesReport balancesReport = new BalancesReport();
-            transactionList.getBody().getBalances().forEach(balance -> {
+    private LoadBookingsResponse jsonStringToLoadBookingsResponse(String json) throws IOException {
+        TransactionsResponse200JsonTO transactionsResponse200JsonTO = objectMapper.readValue(json,
+            TransactionsResponse200JsonTO.class);
+        TransactionsReport transactionList =
+            transactionsReportMapper.toTransactionsReport(transactionsResponse200JsonTO);
+        List<Booking> bookings = Optional.ofNullable(transactionList)
+            .map(TransactionsReport::getTransactions)
+            .map(AccountReport::getBooked)
+            .map(transactions -> bankingGatewayMapper.toBookings(transactions))
+            .orElse(Collections.emptyList());
+
+        BalancesReport balancesReport = new BalancesReport();
+        Optional.ofNullable(transactionList)
+            .map(TransactionsReport::getBalances)
+            .orElse(Collections.emptyList())
+            .forEach(balance -> {
                 switch (balance.getBalanceType()) {
                     case EXPECTED:
                         balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
@@ -191,13 +225,10 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 }
             });
 
-            return LoadBookingsResponse.builder()
-                .bookings(bookings)
-                .balancesReport(balancesReport)
-                .build();
-        } catch (FeignException e) {
-            throw handeAisApiException(e);
-        }
+        return LoadBookingsResponse.builder()
+            .bookings(bookings)
+            .balancesReport(balancesReport)
+            .build();
     }
 
     private String getAccountResourceId(String iban, RequestHeaders requestHeaders) {
@@ -210,7 +241,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .orElseThrow(() -> new MultibankingException(INVALID_ACCOUNT_REFERENCE));
     }
 
-    private RequestHeaders createAisHeaders(TransactionRequest transactionRequest) {
+    private RequestHeaders createAisHeaders(TransactionRequest transactionRequest, String mediaType) {
         Map<String, String> headers = new HashMap<>();
         headers.put(RequestHeaders.X_REQUEST_ID, UUID.randomUUID().toString());
         headers.put(RequestHeaders.CONSENT_ID, transactionRequest.getBankAccess().getConsentId());
@@ -218,7 +249,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             transactionRequest.getBank().getBankApiBankCode() != null
                 ? transactionRequest.getBank().getBankApiBankCode()
                 : transactionRequest.getBankAccess().getBankCode());
-        headers.put(RequestHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+        headers.put(RequestHeaders.ACCEPT, mediaType); // try camt
         return RequestHeaders.fromMap(headers);
     }
 
@@ -419,6 +450,21 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             addConverter(BookingStatusTO.class, String.class, BookingStatusTO::toString);
             addConverter(PaymentProductTO.class, String.class, PaymentProductTO::toString);
             addConverter(PaymentServiceTO.class, String.class, PaymentServiceTO::toString);
+        }
+    }
+
+    @RequiredArgsConstructor
+    public static class StringDecoder implements Decoder {
+        @NonNull
+        private final Decoder delegate;
+
+        @Override
+        public Object decode(feign.Response response, Type type) throws IOException {
+            if (String.class.getName().equals(type.getTypeName())) {
+                feign.Response.Body body = response.body();
+                return IOUtils.toString(body.asInputStream());
+            }
+            return delegate.decode(response, type);
         }
     }
 }

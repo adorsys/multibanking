@@ -35,6 +35,7 @@ export class KeycloakService {
       }).error((errorData: any) => {
         console.error('Keycloak initialized error: ' + errorData);
         reject(errorData);
+        this.keycloak.logout();
       });
     });
   }

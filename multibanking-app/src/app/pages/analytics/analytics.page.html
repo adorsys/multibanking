@@ -1,0 +1,88 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Analytics</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button [defaultHref]="backLink"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="primary">
+      <ion-button (click)="syncBookings()">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="analytics-content">
+  <ion-grid class="ion-padding">
+    <ion-row class="ion-justify-content-center">
+      <ion-col sizeLg="8" sizeXl="6">
+        <canvas baseChart [datasets]="lineChartData" [labels]="lineChartLabels" [options]="'{ responsive: true }'" [legend]="true"
+        [chartType]="'line'" [colors]="lineChartColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)">
+        </canvas>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+    <!-- <ion-scroll scrollX="true" direction="x">
+      <ion-card *ngFor="let item of dates" [ngClass]="{'active': item === referenceDate }" (click)="newDateSelected(item)">
+        <ion-card-content>
+          <ion-card-title>
+            {{ item | amDateFormat:'MMM YYYY' }}
+          </ion-card-title>
+        </ion-card-content>
+      </ion-card>
+    </ion-scroll> -->
+  <ion-list>
+    <ion-item-group>
+      <ion-item-divider color="light">
+          Incomings ({{ budget.periodStart | amDateFormat:'DD MMM YYYY' }} - {{ budget.periodEnd | amDateFormat:'DD MMM YYYY'}})
+      </ion-item-divider>
+      <ion-item (click)="itemSelected('Income fix', budget.incomeFix)">
+        <ion-label>
+          <h2>{{!forecast ? 'Fix incomings' : 'Estimated fix incomings' }}</h2>
+        </ion-label>
+        <h5 slot="end" [ngClass]="{'amount--negative': budget.incomeFix?.amount < 0, 'amount--positive': budget.incomeFix?.amount > 0}" item-right>
+          {{ budget.incomeFix?.amount | currency:'EUR':'symbol' }}
+        </h5>
+      </ion-item>
+      <ion-item (click)="itemSelected('Income other', budget.incomeOther)">
+        <ion-label>
+          <h2>{{!forecast ? 'Other incomings' : 'Estimated other incomings' }}</h2>
+        </ion-label>
+        <h5 slot="end" [ngClass]="{'amount--negative': budget.incomeOther?.amount < 0, 'amount--positive': budget.incomeOther?.amount > 0}" item-right>
+          {{ budget.incomeOther?.amount | currency:'EUR':'symbol' }}
+        </h5>
+      </ion-item>
+    </ion-item-group>
+    <ion-item-group>
+      <ion-item-divider color="light">
+          Expenses ({{ budget.periodStart | amDateFormat:'DD MMM YYYY' }} - {{ budget.periodEnd | amDateFormat:'DD MMM YYYY'}})
+      </ion-item-divider>
+      <ion-item (click)="itemSelected('Expenses fix', budget.expensesFix)">
+        <ion-label>
+          <h2>{{!forecast ? 'Fix expenses' : 'Estimated fix expenses' }}</h2>
+        </ion-label>
+        <h5 slot="end" [ngClass]="{'amount--negative': budget.expensesFix?.amount < 0, 'amount--positive': budget.expensesFix?.amount > 0}" item-right>
+          {{ budget.expensesFix?.amount | currency:'EUR':'symbol' }}
+        </h5>
+      </ion-item>
+      <ion-item (click)="itemSelected('Expenses variable', budget.expensesVariable)">
+        <ion-label>
+          <h2>{{!forecast ? 'Variable expenses' : 'Estimated variable expenses' }}</h2>
+        </ion-label>
+        <h5 slot="end" [ngClass]="{'amount--negative': budget.expensesVariable?.amount < 0, 'amount--positive': budget.expensesVariable?.amount > 0}" item-right>
+          {{ budget.expensesVariable?.amount | currency:'EUR':'symbol' }}
+        </h5>
+      </ion-item>
+      <ion-item (click)="itemSelected('Expenses other', budget.expensesOther)">
+        <ion-label>
+          <h2>{{!forecast ? 'Other expenses' : 'Estimated other expenses' }}</h2>
+        </ion-label>
+        <h5 slot="end" [ngClass]="{'amount--negative': budget.expensesOther?.amount < 0, 'amount--positive': budget.expensesOther?.amount > 0}" item-right>
+          {{ budget.expensesOther?.amount | currency:'EUR':'symbol' }}
+        </h5>
+      </ion-item>
+    </ion-item-group>
+  </ion-list>
+
+
+</ion-content>

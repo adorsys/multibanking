@@ -16,6 +16,8 @@ import java.util.UUID;
 
 public class LoggingRestInterceptor extends HandlerInterceptorAdapter {
 
+    private static final String CORRELATION_ID_HEADER = "Correlation-ID";
+    private static final String CORRELATION_ID = "correlationId";
     private static final String BANK_ACCESS_ID = "accessId";
 
     @Override
@@ -49,6 +51,7 @@ public class LoggingRestInterceptor extends HandlerInterceptorAdapter {
             }
 
             MDC.put(ClassicConstants.USER_MDC_KEY, userId);
+            MDC.put(CORRELATION_ID, httpServletRequest.getHeader(CORRELATION_ID_HEADER));
             MDC.put(ClassicConstants.REQUEST_REMOTE_HOST_MDC_KEY, httpServletRequest.getRemoteHost());
             MDC.put(ClassicConstants.REQUEST_REQUEST_URI, httpServletRequest.getRequestURI());
             MDC.put(ClassicConstants.REQUEST_METHOD, httpServletRequest.getMethod());
@@ -64,6 +67,8 @@ public class LoggingRestInterceptor extends HandlerInterceptorAdapter {
     }
 
     private void clearMDC() {
+        MDC.remove(CORRELATION_ID);
+        MDC.remove(BANK_ACCESS_ID);
         MDC.remove(ClassicConstants.USER_MDC_KEY);
         MDC.remove(ClassicConstants.REQUEST_REMOTE_HOST_MDC_KEY);
         MDC.remove(ClassicConstants.REQUEST_REQUEST_URI);

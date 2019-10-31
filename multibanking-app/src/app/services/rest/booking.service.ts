@@ -43,7 +43,6 @@ export class BookingService extends AbstractService {
   getBooking(accessId, accountId, bookingId): Observable<ResourceBooking> {
     return this.http.get(`${this.settings.apiUrl}/bankaccesses/${accessId}/accounts/${accountId}/bookings/${bookingId}`)
       .pipe(
-        map((res: any) => res._embedded != null ? res._embedded.bookingList : []),
         catchError(this.handleError)
       );
   }

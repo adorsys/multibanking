@@ -73,7 +73,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     private Map<String, Map<String, String>> bpdCache;
 
     private HbciScaMapper hbciScaMapper = new HbciScaMapperImpl();
-    private HbciObjectMapper hbciObjectMapper = new HbciObjectMapperImpl();
+    private HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
 
     public Hbci4JavaBanking() {
         this(null, false);
@@ -141,7 +141,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     private ScaMethodsResponse authenticatePsu(AuthenticatePsuRequest authenticatePsuRequest) {
         try {
-            HbciDialogRequest dialogRequest = hbciObjectMapper.toHbciDialogRequest(authenticatePsuRequest, null);
+            HbciDialogRequest dialogRequest = hbciDialogRequestMapper.toHbciDialogRequest(authenticatePsuRequest, null);
             BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(dialogRequest);
             dialogRequest.setCallback(hbciCallback);
 
