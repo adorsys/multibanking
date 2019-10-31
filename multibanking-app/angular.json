@@ -89,26 +89,26 @@
             },
             "dev": {
               "fileReplacements": [{
-                "replace": "src/assets/settings.ts",
-                "with": "src/assets/settings.dev.ts"
+                "replace": "src/assets/settings/settings.json",
+                "with": "src/assets/settings/settings.dev.json"
               }]
             },
             "dev2": {
               "fileReplacements": [{
-                "replace": "src/assets/settings.ts",
-                "with": "src/assets/settings.dev2.ts"
+                "replace": "src/assets/settings/settings.json",
+                "with": "src/assets/settings/settings.dev2.json"
               }]
             },
             "integ": {
               "fileReplacements": [{
-                "replace": "src/assets/settings.ts",
-                "with": "src/assets/settings.integ.ts"
+                "replace": "src/assets/settings/settings.json",
+                "with": "src/assets/settings/settings.integ.json"
               }]
             },
             "local": {
               "fileReplacements": [{
-                "replace": "src/assets/settings.ts",
-                "with": "src/assets/settings.local.ts"
+                "replace": "src/assets/settings/settings.json",
+                "with": "src/assets/settings/settings.local.json"
               }]
             },
             "ci": {
