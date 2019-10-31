@@ -329,8 +329,8 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
                     if (challengeHhdUc != null) {
                         try {
-                            byte[] image = new MatrixCode(challengeHhdUc).getImage();
-                            challengeData.setImage(new String(image, UTF_8));
+                            new MatrixCode(challengeHhdUc).getImage(); //check for valid image
+                            challengeData.setImage(challengeHhdUc);
                         } catch (Exception e) {
                             challengeData.setData(Collections.singletonList(challengeHhdUc));
                         }
