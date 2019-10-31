@@ -28,4 +28,4 @@ travis_retry() {
   return "${result}"
 }
 
-travis_retry mvn --settings .travis/settings.xml package gpg:sign deploy -Prelease -DskipTests -B -U;
+travis_retry mvn --settings .travis/settings.xml package gpg:sign deploy -Prelease -DskipTests -q -B -U;
