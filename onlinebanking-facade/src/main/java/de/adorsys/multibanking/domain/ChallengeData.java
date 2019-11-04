@@ -23,7 +23,7 @@ import java.util.List;
 @Data
 public class ChallengeData {
 
-    private byte[] image;
+    private String image;
     private List<String> data;
     private String imageLink;
     private int otpMaxLength;

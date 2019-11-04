@@ -45,6 +45,7 @@ import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.status.HBCIMsgStatus;
 import org.kapott.hbci.structures.Konto;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -328,18 +329,16 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
                 updateAuthResponse.setScaApproach(EMBEDDED);
                 authorisationCodeResponse.setUpdateAuthResponse(updateAuthResponse);
 
-                if (challenge != null) {
-                    ChallengeData challengeData = new ChallengeData();
-                    challengeData.setAdditionalInformation(challenge);
+                ChallengeData challengeData = new ChallengeData();
+                challengeData.setAdditionalInformation(challenge);
+                updateAuthResponse.setChallenge(challengeData);
 
-                    if (challengeHhdUc != null) {
-                        MatrixCode matrixCode = MatrixCode.tryParse(challengeHhdUc);
-                        if (matrixCode != null)
-                            challengeData.setImage(matrixCode.getImage());
-                        else
-                            challengeData.setData(Collections.singletonList(challengeHhdUc));
-                    }
-                    updateAuthResponse.setChallenge(challengeData);
+                if (challengeHhdUc != null) {
+                    MatrixCode matrixCode = MatrixCode.tryParse(challengeHhdUc);
+                    if (matrixCode != null)
+                        challengeData.setImage(new String(matrixCode.getImage(), StandardCharsets.ISO_8859_1));
+                    else
+                        challengeData.setData(Collections.singletonList(challengeHhdUc));
                 }
             }
 
