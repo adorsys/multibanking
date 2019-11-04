@@ -26,9 +26,9 @@ import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.hbci.model.*;
 import de.adorsys.multibanking.mapper.AccountStatementMapper;
 import de.adorsys.multibanking.mapper.AccountStatementMapperImpl;
-import de.adorsys.multibanking.hbci.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
@@ -58,14 +58,12 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.JOBS;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Slf4j
 public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends AbstractResponse> {
 
-    private static HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
     static AccountStatementMapper accountStatementMapper = new AccountStatementMapperImpl();
-
+    private static HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
     private HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
     private AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(hbciTanSubmit);
     private HBCIJobsDialog dialog;
@@ -161,9 +159,9 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
     }
 
     PinTanPassport fetchBpd(HBCICallback hbciCallback) {
-        AbstractHbciDialog dialog = createDialog(BPD, hbciCallback, null);
-        dialog.execute(true);
-        return dialog.getPassport();
+        AbstractHbciDialog bpdDialog = createDialog(BPD, hbciCallback, null);
+        bpdDialog.execute(true);
+        return bpdDialog.getPassport();
     }
 
     private GVTAN2Step prepareHbciMessagefor2FA(AbstractHBCIJob hbciJob) {
@@ -323,26 +321,25 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
                                              HHDVersion.Type type) {
                 //needed later for submitAuthorizationCode
                 hbciTanSubmit.setOrderRef(orderRef);
+
+                UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
+                updateAuthResponse.setBankApi(HBCI);
+                updateAuthResponse.setScaStatus(SCAMETHODSELECTED);
+                updateAuthResponse.setScaApproach(EMBEDDED);
+                authorisationCodeResponse.setUpdateAuthResponse(updateAuthResponse);
+
                 if (challenge != null) {
                     ChallengeData challengeData = new ChallengeData();
                     challengeData.setAdditionalInformation(challenge);
 
                     if (challengeHhdUc != null) {
-                        try {
-                            new MatrixCode(challengeHhdUc).getImage(); //check for valid image
-                            challengeData.setImage(challengeHhdUc);
-                        } catch (Exception e) {
+                        MatrixCode matrixCode = MatrixCode.tryParse(challengeHhdUc);
+                        if (matrixCode != null)
+                            challengeData.setImage(matrixCode.getImage());
+                        else
                             challengeData.setData(Collections.singletonList(challengeHhdUc));
-                        }
                     }
-
-                    UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
-                    updateAuthResponse.setBankApi(HBCI);
-                    updateAuthResponse.setScaStatus(SCAMETHODSELECTED);
-                    updateAuthResponse.setScaApproach(EMBEDDED);
                     updateAuthResponse.setChallenge(challengeData);
-
-                    authorisationCodeResponse.setUpdateAuthResponse(updateAuthResponse);
                 }
             }
 

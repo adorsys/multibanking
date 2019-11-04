@@ -38,7 +38,6 @@ import de.adorsys.multibanking.hbci.model.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 import org.iban4j.Iban;
 import org.kapott.hbci.GV.GVTANMediaList;
@@ -66,7 +65,6 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NO
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.*;
 
-@Slf4j
 public class Hbci4JavaBanking implements OnlineBankingService {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -148,7 +146,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             HBCIExecStatus bpdExecStatus = fetchBpd(dialogRequest);
             boolean withHktan = !bpdExecStatus.hasMessage("9400");
             if (!withHktan) {
-                HbciConsent hbciConsent = (HbciConsent)authenticatePsuRequest.getBankApiConsentData();
+                HbciConsent hbciConsent = (HbciConsent) authenticatePsuRequest.getBankApiConsentData();
                 hbciConsent.setWithHktan(withHktan);
             }
 
