@@ -60,12 +60,15 @@ interface BankingGatewayMapper {
     @Mapping(target = "needTanMedia", ignore = true)
     TanTransportType toTanTransportType(ScaMethodTO scaMethodTO);
 
+    List<BankAccount> toBankAccounts(List<AccountDetails> accountDetails);
+
     @Mapping(target = "country", ignore = true)
     @Mapping(target = "bankName", ignore = true)
     @Mapping(target = "owner", ignore = true)
     @Mapping(target = "syncStatus", ignore = true)
     @Mapping(target = "lastSync", ignore = true)
     @Mapping(target = "balances", ignore = true)
+    @Mapping(target = "bic", ignore = true)
     @Mapping(target = "externalIdMap", expression = "java(getExternalIdMap(accountDetails.getResourceId()))")
     @Mapping(target = "blz", expression = "java(getBlz(accountDetails))")
     @Mapping(target = "accountNumber", expression = "java(getAccountNumber(accountDetails))")

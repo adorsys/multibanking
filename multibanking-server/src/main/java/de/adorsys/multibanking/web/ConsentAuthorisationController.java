@@ -22,8 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static de.adorsys.multibanking.domain.BankApi.HBCI;
-import static de.adorsys.multibanking.domain.ScaApproach.EMBEDDED;
-import static de.adorsys.multibanking.domain.ScaApproach.REDIRECT;
+import static de.adorsys.multibanking.domain.ScaApproach.*;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
@@ -97,7 +96,7 @@ public class ConsentAuthorisationController {
             authorisationId)).withSelfRel());
         links.add(linkTo(methodOn(BankController.class).getBank(bankCode)).withRel("bank"));
 
-        if (response.getScaApproach() != REDIRECT) {
+        if (response.getScaApproach() != REDIRECT && response.getScaApproach() != OAUTH) {
             switch (response.getScaStatus()) {
                 case RECEIVED:
                 case STARTED:

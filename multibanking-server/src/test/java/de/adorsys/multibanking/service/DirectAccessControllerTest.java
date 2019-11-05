@@ -17,6 +17,7 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
+import de.adorsys.multibanking.ing.IngAdapter;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.DirectAccessController;
@@ -51,6 +52,7 @@ import java.util.*;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT_STATUS;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_SCA_METHOD;
 import static de.adorsys.multibanking.service.TestUtil.createBooking;
+import static de.adorsys.multibanking.web.model.ScaApproachTO.OAUTH;
 import static de.adorsys.multibanking.web.model.ScaStatusTO.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
@@ -75,6 +77,17 @@ public class DirectAccessControllerTest {
     private ConsentRepositoryIf consentRepository;
     @LocalServerPort
     private int port;
+
+    @Value("${ing.url}")
+    private String ingBaseUrl;
+    @Value("${pkcs12.keyStore.url}")
+    private String keyStoreUrl;
+    @Value("${pkcs12.keyStore.password}")
+    private String keyStorePassword;
+    @Value("${ing.qwac.alias}")
+    private String ingQwacAlias;
+    @Value("${ing.qseal.alias}")
+    private String ingQsealAlias;
     @Value("${bankinggateway.b2c.url}")
     private String bankingGatewayBaseUrl;
     @Value("${bankinggateway.adapter.url}")
@@ -157,6 +170,48 @@ public class DirectAccessControllerTest {
             .and().extract().jsonPath();
 
         assertThat(jsonPath.getString("scaStatus")).isIn(FINALISED.toString());
+    }
+
+    @Ignore("uses real data - please setup ENV")
+    @Test
+    public void consent_authorisation_ing() {
+        ConsentTO consentTO = createConsentTO();
+
+        prepareBank(new IngAdapter(ingBaseUrl, keyStoreUrl, keyStorePassword, ingQwacAlias, ingQsealAlias),
+            consentTO.getPsuAccountIban(), false);
+
+        //1. create consent
+        JsonPath jsonPath = request.body(consentTO)
+            .header("Correlation-ID", "TEST123")
+            .post(getRemoteMultibankingUrl() + "/api/v1/consents")
+            .then().assertThat().statusCode(HttpStatus.CREATED.value())
+            .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("_links.redirectUrl")).isNotBlank();
+
+        BankAccessTO bankAccess = createBankAccess();
+        bankAccess.setConsentId(jsonPath.getString("consentId"));
+
+        //2. get consent authorisation status
+        jsonPath = request.get(jsonPath.getString("_links.authorisationStatus.href"))
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("scaApproach")).isEqualTo(OAUTH.toString());
+
+        //3. load bookings
+        DirectAccessController.LoadBookingsRequest LoadBookingsRequest =
+            new DirectAccessController.LoadBookingsRequest();
+        LoadBookingsRequest.setBankAccess(bankAccess);
+        LoadBookingsRequest.setAuthorisationCode("8b6cd77a-aa44-4527-ab08-a58d70cca286");
+
+        jsonPath = request
+            .body(LoadBookingsRequest)
+            .post(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("bookings")).isNotBlank();
     }
 
     @Ignore("uses real data - please setup ENV")
@@ -260,12 +315,12 @@ public class DirectAccessControllerTest {
 
         assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
 
-//        //2. get consent authorisation status
-//        jsonPath = request.get(jsonPath.getString("_links.authorisationStatus.href"))
-//            .then().assertThat().statusCode(HttpStatus.OK.value())
-//            .and().extract().jsonPath();
-//
-//        assertThat(jsonPath.getString("scaStatus")).isIn(RECEIVED.toString(), ScaStatusTO.STARTED.toString());
+        //2. get consent authorisation status
+        jsonPath = request.get(jsonPath.getString("_links.authorisationStatus.href"))
+            .then().assertThat().statusCode(HttpStatus.OK.value())
+            .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("scaStatus")).isIn(RECEIVED.toString(), ScaStatusTO.STARTED.toString());
 
         //3. update psu authentication
         UpdatePsuAuthenticationRequestTO updatePsuAuthentication = new UpdatePsuAuthenticationRequestTO();

@@ -141,9 +141,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         Response<AccountListHolder> accountList = getAccountInformationService().getAccountList(aisHeaders,
             RequestParams.builder().build());
 
-        List<BankAccount> bankAccounts = accountList.getBody().getAccounts().stream()
-            .map(accountDetailsTO -> bankingGatewayMapper.toBankAccount(accountDetailsTO))
-            .collect(Collectors.toList());
+        List<BankAccount> bankAccounts = bankingGatewayMapper.toBankAccounts(accountList.getBody().getAccounts());
 
         return LoadAccountInformationResponse.builder()
             .bankAccess(loadAccountInformationRequest.getBankAccess())

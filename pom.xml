@@ -67,6 +67,7 @@
         <module>onlinebanking-figo</module>
         <module>onlinebanking-finapi</module>
         <module>onlinebanking-hbci4java</module>
+        <module>onlinebanking-ing</module>
         <module>onlinebanking-bankinggateway</module>
         <module>multibanking-pers-spi</module>
     </modules>
