@@ -6,7 +6,8 @@ import java.lang.reflect.Field;
 import java.security.Security;
 
 public class TestConstants {
-    public static final void setup() {
+
+    static void setup() {
 //        turnOffEncPolicy();
 
         System.setProperty("mongo.databaseName", "multibanking");

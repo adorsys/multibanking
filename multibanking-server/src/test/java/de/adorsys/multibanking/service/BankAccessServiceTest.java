@@ -47,13 +47,9 @@ public class BankAccessServiceTest {
     @Autowired
     private BankAccessRepositoryIf bankAccessRepository;
     @Autowired
-    private BankAccountRepositoryIf bankAccountRepository;
-    @Autowired
     private BankAccessService bankAccessService;
     @Autowired
     private DeleteExpiredUsersScheduled userScheduler;
-    @MockBean
-    private FigoBanking figoBanking;
     @MockBean
     private OnlineBankingServiceProducer bankingServiceProducer;
     @MockBean

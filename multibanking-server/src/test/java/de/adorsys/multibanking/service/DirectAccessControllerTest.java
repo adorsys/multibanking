@@ -315,8 +315,10 @@ public class DirectAccessControllerTest {
 
         assertThat(jsonPath.getString("_links.authorisationStatus.href")).isNotBlank();
 
+        String linkAuthorisationStatus = jsonPath.getString("_links.authorisationStatus.href");
+
         //2. get consent authorisation status
-        jsonPath = request.get(jsonPath.getString("_links.authorisationStatus.href"))
+        jsonPath = request.get(linkAuthorisationStatus)
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
@@ -328,14 +330,14 @@ public class DirectAccessControllerTest {
         updatePsuAuthentication.setPsuCorporateId(credentialsTO.getUserId());
         updatePsuAuthentication.setPassword(credentialsTO.getPin());
 
-        String linkAuthStatus = jsonPath.getString("_links.authorisationStatus.href");
+        String linkUpdateAuthentication = jsonPath.getString("_links.updateAuthentication.href");
 
-        jsonPath = request.body(updatePsuAuthentication).put(linkAuthStatus + "/updatePsuAuthentication")
+        jsonPath = request.body(updatePsuAuthentication).put(linkUpdateAuthentication)
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
         // get consent auth status after "lazy" startauth
-        jsonPath = request.get(linkAuthStatus)
+        jsonPath = request.get(linkAuthorisationStatus)
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
