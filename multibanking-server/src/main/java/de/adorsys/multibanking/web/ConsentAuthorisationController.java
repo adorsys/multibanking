@@ -97,30 +97,35 @@ public class ConsentAuthorisationController {
         links.add(linkTo(methodOn(BankController.class).getBank(bankCode)).withRel("bank"));
 
         if (response.getScaApproach() != REDIRECT && response.getScaApproach() != OAUTH) {
-            switch (response.getScaStatus()) {
-                case RECEIVED:
-                case STARTED:
-                case PSUIDENTIFIED:
-                    links.add(linkTo(methodOn(ConsentAuthorisationController.class).updateAuthentication(consentId,
-                        authorisationId, null)).withRel("updateAuthentication"));
-                    break;
-                case PSUAUTHENTICATED:
-                    links.add(linkTo(methodOn(ConsentAuthorisationController.class).selectAuthenticationMethod(consentId,
-                        authorisationId, null)).withRel("selectAuthenticationMethod"));
-                    break;
-                case SCAMETHODSELECTED:
-                    if (response.getScaApproach() == EMBEDDED && response.getBankApi() != HBCI) {
-                        links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
-                            authorisationId, null)).withRel("transactionAuthorisation"));
-                    }
-                    break;
-                case FINALISED:
-                case FAILED:
-                case EXEMPTED:
-                    break;
-            }
+            appendEmbeddedAuthLinks(response, consentId, authorisationId, links);
         }
 
         return new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links);
+    }
+
+    private void appendEmbeddedAuthLinks(UpdateAuthResponse response, String consentId, String authorisationId,
+                                         List<Link> links) {
+        switch (response.getScaStatus()) {
+            case RECEIVED:
+            case STARTED:
+            case PSUIDENTIFIED:
+                links.add(linkTo(methodOn(ConsentAuthorisationController.class).updateAuthentication(consentId,
+                    authorisationId, null)).withRel("updateAuthentication"));
+                break;
+            case PSUAUTHENTICATED:
+                links.add(linkTo(methodOn(ConsentAuthorisationController.class).selectAuthenticationMethod(consentId,
+                    authorisationId, null)).withRel("selectAuthenticationMethod"));
+                break;
+            case SCAMETHODSELECTED:
+                if (response.getScaApproach() == EMBEDDED && response.getBankApi() != HBCI) {
+                    links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
+                        authorisationId, null)).withRel("transactionAuthorisation"));
+                }
+                break;
+            case FINALISED:
+            case FAILED:
+            case EXEMPTED:
+                break;
+        }
     }
 }

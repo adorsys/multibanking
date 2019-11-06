@@ -71,4 +71,11 @@ export class ConsentService extends AbstractService {
       );
   }
 
+  submitAuthorisationCode(consentId: string, authorisationCode: string) {
+    return this.http.post(`${this.settings.apiUrl}/consents/${consentId}/token`,
+      { authorisationCode })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 }

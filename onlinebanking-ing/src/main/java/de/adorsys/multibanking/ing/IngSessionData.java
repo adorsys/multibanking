@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Data
 class IngSessionData {
 
+    private String tppRedirectUri;
     private ScaStatus status;
     private String accessToken;
     private LocalDateTime expirationTime;

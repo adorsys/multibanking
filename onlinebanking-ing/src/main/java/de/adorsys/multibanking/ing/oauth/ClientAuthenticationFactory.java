@@ -36,16 +36,15 @@ public class ClientAuthenticationFactory {
         return Base64.getEncoder().encodeToString(data);
     }
 
-    public ClientAuthentication newClientAuthenticationForApplicationToken() {
-        return new ClientAuthentication(signature, digest, tppSignatureCertificate, keyId, null);
+    ClientAuthentication newClientAuthenticationForApplicationToken() {
+        return newClientAuthentication(keyId, null);
     }
 
-    public ClientAuthentication newClientAuthentication(TokenResponse applicationToken) {
-        return new ClientAuthentication(signature, digest, tppSignatureCertificate, applicationToken.getClientId(),
-            applicationToken.getAccessToken());
+    ClientAuthentication newClientAuthentication(TokenResponse applicationToken) {
+        return newClientAuthentication(applicationToken.getClientId(), applicationToken.getAccessToken());
     }
 
-    public ClientAuthentication newClientAuthentication(String clientId, String accessToken) {
+    ClientAuthentication newClientAuthentication(String clientId, String accessToken) {
         return new ClientAuthentication(signature, digest, tppSignatureCertificate, clientId, accessToken);
     }
 }

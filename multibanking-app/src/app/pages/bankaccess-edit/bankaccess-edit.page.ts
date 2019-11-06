@@ -4,12 +4,11 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { BankAccessService } from 'src/app/services/rest/bankAccess.service';
 import { NavController, AlertController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
-import { ResourceConsentTO } from 'src/multibanking-api/resourceConsentTO';
-import { ConsentAuthstatusResolverService } from 'src/app/services/resolver/consent-authstatus-resolver.service';
 import { ResourceUpdateAuthResponseTO } from 'src/multibanking-api/resourceUpdateAuthResponseTO';
 import { Link } from 'src/multibanking-api/link';
 import { ConsentService } from 'src/app/services/rest/consent.service';
 import { Observable, Subscriber } from 'rxjs';
+import { ResourceConsentTO } from 'src/multibanking-api/resourceConsentTO';
 
 @Component({
   selector: 'app-bankaccess-edit',
@@ -18,8 +17,7 @@ import { Observable, Subscriber } from 'rxjs';
 })
 export class BankaccessEditPage implements OnInit {
 
-  consentId: string;
-  authorisationId: string;
+  consent: ResourceConsentTO;
   bankAccess: ResourceBankAccess;
   bankAccessForm: FormGroup;
 
@@ -31,13 +29,24 @@ export class BankaccessEditPage implements OnInit {
               private navCtrl: NavController) { }
 
   ngOnInit() {
-    this.consentId = this.activatedRoute.snapshot.paramMap.get('consent-id').trim();
-    this.authorisationId = this.activatedRoute.snapshot.paramMap.get('authorisation-id').trim();
+    this.consent = this.activatedRoute.snapshot.data.consent;
     this.bankAccess = this.activatedRoute.snapshot.data.bankAccess;
 
+    if (this.activatedRoute.snapshot.queryParams.code) {
+      this.consentService.submitAuthorisationCode(this.consent.id, this.activatedRoute.snapshot.queryParams.code).subscribe(
+        () => {
+          this.initForm();
+        }
+      );
+    } else {
+      this.initForm();
+    }
+  }
+
+  initForm() {
     if (!this.bankAccess) {
       this.bankAccess = {
-        consentId: this.consentId,
+        consentId: this.consent.id,
         categorizeBookings: true,
         storeBookings: true,
         storeAnalytics: true,

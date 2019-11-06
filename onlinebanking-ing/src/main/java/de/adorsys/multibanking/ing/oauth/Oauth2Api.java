@@ -4,6 +4,7 @@ import de.adorsys.multibanking.ing.api.AuthorizationURLResponse;
 import de.adorsys.multibanking.ing.api.TokenResponse;
 import de.adorsys.multibanking.ing.http.HttpClient;
 import de.adorsys.multibanking.ing.http.Request;
+import de.adorsys.multibanking.ing.http.StringUri;
 import de.adorsys.multibanking.ing.model.Response;
 
 import static de.adorsys.multibanking.ing.http.ResponseHandlers.jsonResponseHandler;
@@ -21,7 +22,7 @@ public class Oauth2Api {
         this.httpClient = httpClient;
     }
 
-    public Response<TokenResponse> getApplicationToken(Request.Builder.Interceptor clientAuthentication) {
+    Response<TokenResponse> getApplicationToken(Request.Builder.Interceptor clientAuthentication) {
         // When using eIDAS certificates supporting PSD2 the scope parameter is not required.
         // The scopes will be derived automatically from the PSD2 roles in the certificate.
         // When using eIDAS certificates supporting PSD2, the response will contain the client ID of your application,
@@ -31,16 +32,17 @@ public class Oauth2Api {
             .send(clientAuthentication, jsonResponseHandler(TokenResponse.class));
     }
 
-    public Response<TokenResponse> getCustomerToken(Oauth2Service.Parameters parameters,
-                                                    Request.Builder.Interceptor clientAuthentication) {
+    Response<TokenResponse> getCustomerToken(Oauth2Service.Parameters parameters,
+                                             Request.Builder.Interceptor clientAuthentication) {
 
         return httpClient.post(baseUri + TOKEN_ENDPOINT)
             .urlEncodedBody(parameters.asMap())
             .send(clientAuthentication, jsonResponseHandler(TokenResponse.class));
     }
 
-    public Response<AuthorizationURLResponse> getAuthorizationUrl(Request.Builder.Interceptor clientAuthentication) {
-        return httpClient.get(baseUri + AUTHORIZATION_ENDPOINT)
+    Response<AuthorizationURLResponse> getAuthorizationUrl(Request.Builder.Interceptor clientAuthentication,
+                                                           String redirectUri) {
+        return httpClient.get(StringUri.withQuery(baseUri + AUTHORIZATION_ENDPOINT, "redirect_uri", redirectUri))
             .send(clientAuthentication, jsonResponseHandler(AuthorizationURLResponse.class));
     }
 }

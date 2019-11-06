@@ -9,6 +9,7 @@ import de.adorsys.multibanking.web.mapper.ConsentMapper;
 import de.adorsys.multibanking.web.model.BankApiTO;
 import de.adorsys.multibanking.web.model.ConsentTO;
 import de.adorsys.multibanking.web.model.CreateConsentResponseTO;
+import de.adorsys.multibanking.web.model.TokenRequestTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -92,6 +93,15 @@ public class ConsentController {
         consentService.revokeConsent(consentId);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @ApiOperation(value = "Submit OAUTH2 authorisation code")
+    @PostMapping("/{consentId}/token")
+    public ResponseEntity submitAuthorisationCode(@PathVariable String consentId,
+                                                  @RequestBody @Valid TokenRequestTO tokenRequest) {
+        consentService.submitAuthorisationCode(consentId, tokenRequest.getAuthorisationCode());
+
+        return ResponseEntity.noContent().build();
     }
 
     private List<Resource<ConsentTO>> mapToResources(List<Consent> consents) {

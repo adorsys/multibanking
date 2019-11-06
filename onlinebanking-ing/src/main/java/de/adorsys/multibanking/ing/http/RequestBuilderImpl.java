@@ -14,7 +14,7 @@ public class RequestBuilderImpl implements Request.Builder {
     private boolean emptyBody;
     private Map<String, String> formData;
 
-    public RequestBuilderImpl(HttpClient httpClient, String method, String uri) {
+    RequestBuilderImpl(HttpClient httpClient, String method, String uri) {
         this.httpClient = httpClient;
         this.method = method;
         this.uri = uri;

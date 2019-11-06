@@ -376,6 +376,11 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             public void afterExecute(Object bankApiConsentData, AuthorisationCodeResponse authorisationCodeResponse) {
                 //noop
             }
+
+            @Override
+            public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
+                throw new UnsupportedOperationException();
+            }
         };
     }
 

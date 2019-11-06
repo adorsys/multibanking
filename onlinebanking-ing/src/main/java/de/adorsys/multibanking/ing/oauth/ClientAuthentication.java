@@ -84,7 +84,7 @@ public class ClientAuthentication implements Request.Builder.Interceptor {
             signature.update(signingString.getBytes());
             return signature.sign();
         } catch (SignatureException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 }

@@ -101,8 +101,10 @@ public class IngAdapter implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
-        IngSessionData ingSessionData = checkValidAccessToken(loadAccountInformationRequest);
+    public LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> request) {
+        IngSessionData ingSessionData = (IngSessionData) request.getBankApiConsentData();
+        checkIngSession((IngSessionData) request.getBankApiConsentData(), request.getAuthorisationCode());
+
         ClientAuthentication clientAuthentication =
             getOauth2Service().getClientAuthentication(ingSessionData.getAccessToken());
 
@@ -121,7 +123,9 @@ public class IngAdapter implements OnlineBankingService {
 
     @Override
     public LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> loadBookingsRequest) {
-        IngSessionData ingSessionData = checkValidAccessToken(loadBookingsRequest);
+        IngSessionData ingSessionData = (IngSessionData) loadBookingsRequest.getBankApiConsentData();
+        checkIngSession(ingSessionData, loadBookingsRequest.getAuthorisationCode());
+
         ClientAuthentication clientAuthentication =
             getOauth2Service().getClientAuthentication(ingSessionData.getAccessToken());
 
@@ -213,11 +217,11 @@ public class IngAdapter implements OnlineBankingService {
             @Override
             public CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred,
                                                        String tppRedirectUri) {
-                URI authorizationRequestUri =
-                    getOauth2Service().getAuthorizationRequestUri(new Oauth2Service.Parameters(new HashMap<>()));
+                URI authorizationRequestUri = getAuthorisationUri(tppRedirectUri);
 
                 IngSessionData ingSessionData = new IngSessionData();
                 ingSessionData.setStatus(STARTED);
+                ingSessionData.setTppRedirectUri(tppRedirectUri);
 
                 return ingMapper.toCreateConsentResponse(ingSessionData, authorizationRequestUri.toString());
             }
@@ -264,32 +268,41 @@ public class IngAdapter implements OnlineBankingService {
             public void afterExecute(Object bankApiConsentData, AuthorisationCodeResponse authorisationCodeResponse) {
                 //noop
             }
+
+            @Override
+            public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
+                IngSessionData ingSessionData = (IngSessionData) bankApiConsentData;
+                checkIngSession(ingSessionData, authorisationCode);
+            }
         };
     }
 
-    private IngSessionData checkValidAccessToken(TransactionRequest transactionRequest) {
-        IngSessionData ingSessionData = (IngSessionData) transactionRequest.getBankApiConsentData();
+    private URI getAuthorisationUri(String tppRedirectUri) {
+        Oauth2Service.Parameters params = new Oauth2Service.Parameters(Collections.singletonMap("redirect_uri"
+            , tppRedirectUri));
+        return getOauth2Service().getAuthorizationRequestUri(params);
+    }
 
+    private void checkIngSession(IngSessionData ingSessionData, String authorisationCode) {
         TokenResponse tokenResponse = null;
         if (ingSessionData.getAccessToken() == null) {
-            tokenResponse = Optional.ofNullable(transactionRequest.getAuthorisationCode())
+            tokenResponse = Optional.ofNullable(authorisationCode)
                 .map(this::getUserToken)
                 .orElseThrow(() -> {
-                    URI authorizationRequestUri =
-                        getOauth2Service().getAuthorizationRequestUri(new Oauth2Service.Parameters(new HashMap<>()));
+                    URI authorizationRequestUri = getAuthorisationUri(ingSessionData.getTppRedirectUri());
                     Message message = new Message();
                     message.setParamsMap(Collections.singletonMap("redirectUrl", authorizationRequestUri.toString()));
-                    return new MultibankingException(MISSING_AUTHORISATION_CODE, Collections.singletonList(message));
+                    return new MultibankingException(MISSING_AUTHORISATION_CODE, 401,
+                        Collections.singletonList(message));
                 });
         } else if (LocalDateTime.now().isAfter(ingSessionData.getExpirationTime())) {
             tokenResponse = Optional.ofNullable(ingSessionData.getRefreshToken())
                 .map(this::refreshToken)
                 .orElseThrow(() -> {
-                    URI authorizationRequestUri =
-                        getOauth2Service().getAuthorizationRequestUri(new Oauth2Service.Parameters(new HashMap<>()));
+                    URI authorizationRequestUri = getAuthorisationUri(ingSessionData.getTppRedirectUri());
                     Message message = new Message();
                     message.setParamsMap(Collections.singletonMap("redirectUrl", authorizationRequestUri.toString()));
-                    return new MultibankingException(TOKEN_EXPIRED, Collections.singletonList(message));
+                    return new MultibankingException(TOKEN_EXPIRED, 401, Collections.singletonList(message));
                 });
         }
 
@@ -297,10 +310,8 @@ public class IngAdapter implements OnlineBankingService {
             .ifPresent(response -> {
                 ingSessionData.setAccessToken(response.getAccessToken());
                 ingSessionData.setRefreshToken(response.getRefreshToken());
-                ingSessionData.setExpirationTime(LocalDateTime.now().plus(response.getExpiresInSeconds(), SECONDS));
+                ingSessionData.setExpirationTime(LocalDateTime.now().plusSeconds(response.getExpiresInSeconds()));
             });
-
-        return ingSessionData;
     }
 
     private TokenResponse refreshToken(String refreshToken) {

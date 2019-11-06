@@ -39,4 +39,6 @@ public interface StrongCustomerAuthorisable {
                          Object bankApiConsentData);
 
     void afterExecute(Object bankApiConsentData, AuthorisationCodeResponse authorisationCodeResponse);
+
+    void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode);
 }

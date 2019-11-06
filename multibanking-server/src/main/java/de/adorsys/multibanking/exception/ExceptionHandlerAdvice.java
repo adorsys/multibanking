@@ -89,7 +89,7 @@ public class ExceptionHandlerAdvice {
 
         List<Message> messages = e.getMessages().stream()
             .map(message -> Message.builder()
-                .key(message.getKey())
+                .key(message.getKey() != null ? message.getKey() : e.getMultibankingError().toString())
                 .severity(message.getSeverity() != null
                     ? Message.Severity.valueOf(message.getSeverity().toString())
                     : null)

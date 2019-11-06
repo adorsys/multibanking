@@ -561,6 +561,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 HbciConsent hbciConsent = (HbciConsent) bankApiConsentData;
                 hbciConsent.setHbciTanSubmit(authorisationCodeResponse.getTanSubmit());
             }
+
+            @Override
+            public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
+                throw new UnsupportedOperationException();
+            }
         };
     }
 

@@ -5,6 +5,7 @@ import de.adorsys.multibanking.ing.api.TokenResponse;
 import de.adorsys.multibanking.ing.http.StringUri;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 
 public class IngOauth2Service {
 
@@ -12,6 +13,7 @@ public class IngOauth2Service {
     private final ClientAuthenticationFactory clientAuthenticationFactory;
 
     private TokenResponse applicationToken;
+    private LocalDateTime applicationTokenExpirationTime;
 
     public IngOauth2Service(Oauth2Api oauth2Api, ClientAuthenticationFactory clientAuthenticationFactory) {
         this.oauth2Api = oauth2Api;
@@ -21,22 +23,22 @@ public class IngOauth2Service {
     public URI getAuthorizationRequestUri(Oauth2Service.Parameters parameters) {
         ClientAuthentication clientAuthentication =
             clientAuthenticationFactory.newClientAuthentication(getApplicationToken());
-        AuthorizationURLResponse authorizationUrlResponse = oauth2Api.getAuthorizationUrl(clientAuthentication)
+        AuthorizationURLResponse authorizationUrlResponse = oauth2Api.getAuthorizationUrl(clientAuthentication,
+            parameters.getRedirectUri())
             .getBody();
-
-        parameters.setClientId(getClientId());
 
         return URI.create(StringUri.withQuery(authorizationUrlResponse.getLocation(), parameters.asMap()));
     }
 
     private TokenResponse getApplicationToken() {
-        if (applicationToken != null) {
+        if (applicationToken != null && LocalDateTime.now().isBefore(applicationTokenExpirationTime)) {
             return applicationToken;
         }
 
         ClientAuthentication clientAuthentication =
             clientAuthenticationFactory.newClientAuthenticationForApplicationToken();
         applicationToken = oauth2Api.getApplicationToken(clientAuthentication).getBody();
+        applicationTokenExpirationTime = LocalDateTime.now().plusSeconds(applicationToken.getExpiresInSeconds());
         return applicationToken;
     }
 
