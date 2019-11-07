@@ -80,6 +80,6 @@ ing:
   qseal:
     alias: example_eidas_client_signing
 
-#bankinggateway.b2c.url: http://localhost:8084
-bankinggateway.b2c.url: https://dev-bankinggateway-b2c.cloud.adorsys.de
-bankinggateway.adapter.url: https://dev-bankinggateway-adapter.cloud.adorsys.de
+bankinggateway.b2c.url: http://localhost:8084
+#bankinggateway.b2c.url: https://dev-bankinggateway-b2c.cloud.adorsys.de
+bankinggateway.adapter.url: http://localhost:8999

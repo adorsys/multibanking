@@ -128,6 +128,9 @@ public class ConsentController {
         Optional.ofNullable(createConsentResponse.getRedirectUrl())
             .ifPresent(redirectUrl -> links.add(new Link(redirectUrl, "redirectUrl")));
 
+        Optional.ofNullable(createConsentResponse.getOauthRedirectUrl())
+                .ifPresent(oauthUrl -> links.add(new Link(oauthUrl, "oauthRedirectUrl")));
+
         return new Resource<>(consentMapper.toCreateConsentResponseTO(createConsentResponse), links);
     }
 

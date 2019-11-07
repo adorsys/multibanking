@@ -12,11 +12,69 @@
       "description": "Consent Authorisation Resource"
     },
     {
+      "name": "Banking-Gateway B2C OAuth",
+      "description": "O Auth Resource"
+    },
+    {
       "name": "Banking-Gateway B2C PIS",
       "description": "Payment Authorisation Resource"
     }
   ],
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "description": "OAuth2 for setting token"
+    }
+  },
   "paths": {
+    "/auth": {
+      "post": {
+        "tags": [
+          "Banking-Gateway B2C OAuth"
+        ],
+        "summary": "Resolve token for oauth authentication code",
+        "operationId": "resolveAuthCodeUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorizationCodeTO",
+            "description": "authorizationCodeTO",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthorizationCodeTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/OAuthToken"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    },
     "/v1/ais/consents": {
       "post": {
         "tags": [
@@ -281,6 +339,9 @@
             "bg_auth": [
               "openid"
             ]
+          },
+          {
+            "oauth2": []
           }
         ],
         "deprecated": false
@@ -837,6 +898,18 @@
       },
       "title": "AccountReferenceTO"
     },
+    "AuthorizationCodeTO": {
+      "type": "object",
+      "properties": {
+        "oauthCode": {
+          "type": "string"
+        },
+        "xs2aAuthorisationId": {
+          "type": "string"
+        }
+      },
+      "title": "AuthorizationCodeTO"
+    },
     "ChallengeDataTO": {
       "type": "object",
       "properties": {
@@ -919,6 +992,9 @@
           "type": "string"
         },
         "consentId": {
+          "type": "string"
+        },
+        "oauthRedirectUrl": {
           "type": "string"
         },
         "redirectUrl": {
@@ -1041,6 +1117,18 @@
         }
       },
       "title": "MessagesTO"
+    },
+    "OAuthToken": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string"
+        },
+        "refresh_token": {
+          "type": "string"
+        }
+      },
+      "title": "OAuthToken"
     },
     "PaymentDataTO": {
       "type": "object",
@@ -1262,7 +1350,8 @@
             "CHIP_OTP",
             "PHOTO_OTP",
             "PUSH_OTP",
-            "EMAIL"
+            "EMAIL",
+            "APP_OTP"
           ]
         },
         "authenticationVersion": {

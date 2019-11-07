@@ -130,4 +130,6 @@ interface BankingGatewayMapper {
     Balance toBalance(de.adorsys.xs2a.adapter.service.model.Balance balance);
 
     List<Message> toMessages(List<MessageTO> messagesTO);
+
+    BgSessionData toSessionData(OAuthToken token);
 }
