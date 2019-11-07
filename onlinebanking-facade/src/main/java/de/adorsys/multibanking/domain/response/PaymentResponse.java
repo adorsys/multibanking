@@ -16,22 +16,5 @@
 
 package de.adorsys.multibanking.domain.response;
 
-import de.adorsys.multibanking.domain.BalancesReport;
-import de.adorsys.multibanking.domain.Booking;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import java.util.List;
-
-@Data
-@Builder
-@EqualsAndHashCode(callSuper = false)
-public class LoadBookingsResponse extends AbstractResponse {
-
-    //possible multiple CAMT files
-    private List<String> rawData;
-    private List<Booking> bookings;
-    private BalancesReport balancesReport;
-
+public class PaymentResponse extends AbstractResponse {
 }

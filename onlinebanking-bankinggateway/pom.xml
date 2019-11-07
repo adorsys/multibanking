@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>5.3.7</version>
+        <version>5.3.8</version>
     </parent>
 
     <artifactId>onlinebanking-bankinggateway</artifactId>
@@ -16,7 +16,6 @@
         <okhttp-version>2.7.5</okhttp-version>
         <gson-version>2.8.1</gson-version>
         <gson-fire-version>1.8.3</gson-fire-version>
-        <iban4j.version>3.2.1</iban4j.version>
         <openfeign.version>10.1.0</openfeign.version>
     </properties>
 
@@ -24,13 +23,13 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-facade</artifactId>
-            <version>5.3.7</version>
+            <version>5.3.8</version>
         </dependency>
 
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-mapper</artifactId>
-            <version>5.3.7</version>
+            <version>5.3.8</version>
         </dependency>
 
         <!-- xs2a adapter -->
@@ -80,7 +79,6 @@
         <dependency>
             <groupId>org.iban4j</groupId>
             <artifactId>iban4j</artifactId>
-            <version>${iban4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

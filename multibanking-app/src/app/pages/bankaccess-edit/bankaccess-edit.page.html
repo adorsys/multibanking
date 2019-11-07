@@ -8,7 +8,7 @@
 </ion-header>
 
 <ion-content>
-  <form [formGroup]="bankAccessForm" (ngSubmit)="saveBankAccess()">
+  <form *ngIf="bankAccessForm" [formGroup]="bankAccessForm" (ngSubmit)="saveBankAccess()">
     <ion-list>
       <ion-item>
         <ion-label>Save Bookings</ion-label>

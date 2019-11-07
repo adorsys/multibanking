@@ -4,10 +4,10 @@ import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
-import de.adorsys.multibanking.domain.transaction.LoadBookings;
+import de.adorsys.multibanking.domain.transaction.LoadTransactions;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
@@ -105,8 +105,9 @@ public class BookingService extends AccountInformationService {
     }
 
     @Transactional
-    public List<BookingEntity> syncBookings(ScaStatus expectedConsentStatus, BankAccessEntity bankAccess,
-                                            BankAccountEntity bankAccount, @Nullable BankApi bankApi) {
+    public List<BookingEntity> syncBookings(ScaStatus expectedConsentStatus, String authorisationCode,
+                                            BankAccessEntity bankAccess, BankAccountEntity bankAccount,
+                                            @Nullable BankApi bankApi) {
         bankAccountRepository.updateSyncStatus(bankAccount.getId(), BankAccount.SyncStatus.SYNC);
 
         OnlineBankingService onlineBankingService = bankApi != null ?
@@ -114,7 +115,8 @@ public class BookingService extends AccountInformationService {
             bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         try {
-            LoadBookingsResponse response = loadBookingsOnline(expectedConsentStatus, onlineBankingService,
+            TransactionsResponse response = loadBookingsOnline(expectedConsentStatus, authorisationCode,
+                onlineBankingService,
                 bankAccess, bankAccount);
 
             if (!bankAccess.isTemporary()) {
@@ -138,7 +140,7 @@ public class BookingService extends AccountInformationService {
     }
 
     private List<BookingEntity> processBookings(OnlineBankingService onlineBankingService, BankAccessEntity bankAccess,
-                                                BankAccountEntity bankAccount, LoadBookingsResponse response) {
+                                                BankAccountEntity bankAccount, TransactionsResponse response) {
         List<BookingEntity> newBookings = mapBookings(bankAccount, response.getBookings());
 //        mapStandingOrders(response, newBookings);
 
@@ -274,7 +276,7 @@ public class BookingService extends AccountInformationService {
         bookingsIndexRepository.save(bookingsIndexEntity);
     }
 
-    private LoadBookingsResponse loadBookingsOnline(ScaStatus expectedConsentStatus,
+    private TransactionsResponse loadBookingsOnline(ScaStatus expectedConsentStatus, String authorisationCode,
                                                     OnlineBankingService onlineBankingService,
                                                     BankAccessEntity bankAccess, BankAccountEntity bankAccount) {
         BankApiUser bankApiUser = userService.checkApiRegistration(onlineBankingService,
@@ -290,11 +292,11 @@ public class BookingService extends AccountInformationService {
 
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
-        TransactionRequest<LoadBookings> loadBookingsRequest = createLoadBookingsRequest(bankAccess, bankAccount,
-            bankApiUser, consentEntity, bankEntity);
+        TransactionRequest<LoadTransactions> loadBookingsRequest = createLoadBookingsRequest(bankAccess, bankAccount,
+            bankApiUser, consentEntity, bankEntity, authorisationCode);
 
         try {
-            LoadBookingsResponse response = onlineBankingService.loadBookings(loadBookingsRequest);
+            TransactionsResponse response = onlineBankingService.loadTransactions(loadBookingsRequest);
             checkSca(response, consentEntity, onlineBankingService);
             return response;
         } catch (MultibankingException e) {
@@ -302,23 +304,25 @@ public class BookingService extends AccountInformationService {
         }
     }
 
-    private TransactionRequest<LoadBookings> createLoadBookingsRequest(BankAccessEntity bankAccess,
-                                                                       BankAccountEntity bankAccount,
-                                                                       BankApiUser bankApiUser,
-                                                                       ConsentEntity consentEntity,
-                                                                       BankEntity bankEntity) {
-        LoadBookings loadBookings = new LoadBookings();
+    private TransactionRequest<LoadTransactions> createLoadBookingsRequest(BankAccessEntity bankAccess,
+                                                                           BankAccountEntity bankAccount,
+                                                                           BankApiUser bankApiUser,
+                                                                           ConsentEntity consentEntity,
+                                                                           BankEntity bankEntity,
+                                                                           String authorisationCode) {
+        LoadTransactions loadBookings = new LoadTransactions();
         loadBookings.setPsuAccount(bankAccount);
         loadBookings.setDateFrom(bankAccount.getLastSync() != null ? bankAccount.getLastSync().toLocalDate() : null);
         loadBookings.setDateTo(LocalDate.now());
         loadBookings.setWithBalance(true);
 
-        TransactionRequest<LoadBookings> transactionRequest = new TransactionRequest<>(loadBookings);
+        TransactionRequest<LoadTransactions> transactionRequest = new TransactionRequest<>(loadBookings);
         transactionRequest.setBankApiUser(bankApiUser);
         transactionRequest.setBankAccess(bankAccess);
         transactionRequest.setHbciProduct(finTSProductConfig.getProduct());
         transactionRequest.setBank(bankEntity);
         transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
+        transactionRequest.setAuthorisationCode(authorisationCode);
         return transactionRequest;
     }
 

@@ -23,7 +23,7 @@ import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class BulkPayment extends AbstractScaPaymentTransaction {
+public class BulkPayment extends AbstractPayment {
 
     private List<SinglePayment> payments;
     private Boolean batchbooking; // turn off single entry in transaction list
@@ -33,8 +33,4 @@ public class BulkPayment extends AbstractScaPaymentTransaction {
         return TransactionType.BULK_PAYMENT;
     }
 
-    @Override
-    public String getRawData() {
-        return null;
-    }
 }

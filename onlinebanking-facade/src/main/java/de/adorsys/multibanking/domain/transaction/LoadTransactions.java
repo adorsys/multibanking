@@ -14,13 +14,30 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.response;
+package de.adorsys.multibanking.domain.transaction;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDate;
+
+import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.LOAD_TRANSACTIONS;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class EmptyResponse extends AbstractResponse {
+public class LoadTransactions extends AbstractTransaction {
 
+    private LoadTransactions.RawResponseType rawResponseType;
+    private LocalDate dateFrom;
+    private LocalDate dateTo;
+    private boolean withBalance;
+
+    @Override
+    public TransactionType getTransactionType() {
+        return LOAD_TRANSACTIONS;
+    }
+
+    public enum RawResponseType {
+        CAMT, MT940
+    }
 }

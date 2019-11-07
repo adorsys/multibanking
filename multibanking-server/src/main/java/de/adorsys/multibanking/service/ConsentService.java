@@ -37,17 +37,15 @@ public class ConsentService {
     public CreateConsentResponse createConsent(Consent consent, String tppRedirectUri, BankApi bankApi) {
         OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getPsuAccountIban());
         BankEntity bank = bankService.findBank(Iban.valueOf(consent.getPsuAccountIban()).getBankCode());
-
         CreateConsentResponse createConsentResponse =
             onlineBankingService.getStrongCustomerAuthorisation().createConsent(consent, bank.isRedirectPreferred(),
                 tppRedirectUri);
+        createConsentResponse.setRedirectId(consent.getRedirectId());
 
         ConsentEntity consentEntity = consentMapper.toConsentEntity(createConsentResponse, consent.getRedirectId(),
-            consent.getPsuAccountIban(),
-            onlineBankingService.bankApi());
+            consent.getPsuAccountIban(), onlineBankingService.bankApi());
         consentRepository.save(consentEntity);
 
-        createConsentResponse.setRedirectId(consent.getRedirectId());
         return createConsentResponse;
     }
 
@@ -153,6 +151,18 @@ public class ConsentService {
 
         return onlineBankingService.getStrongCustomerAuthorisation().getAuthorisationStatus(consentId,
             authorisationId, internalConsent.getBankApiConsentData());
+    }
+
+    public void submitAuthorisationCode(String consentId, String authorisationCode) {
+        ConsentEntity internalConsent = consentRepository.findById(consentId)
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
+
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+
+        onlineBankingService.getStrongCustomerAuthorisation().submitAuthorisationCode(internalConsent.getBankApiConsentData(), authorisationCode);
+
+        consentRepository.save(internalConsent);
     }
 
     private OnlineBankingService getOnlineBankingService(BankApi bankApi, String iban) {

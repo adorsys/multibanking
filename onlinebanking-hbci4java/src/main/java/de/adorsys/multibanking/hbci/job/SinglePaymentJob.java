@@ -17,8 +17,8 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.EmptyResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.response.PaymentResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class SinglePaymentJob extends ScaRequiredJob<SinglePayment, EmptyResponse> {
+public class SinglePaymentJob extends ScaRequiredJob<SinglePayment, PaymentResponse> {
 
     private final TransactionRequest<SinglePayment> transactionRequest;
 
@@ -79,8 +79,8 @@ public class SinglePaymentJob extends ScaRequiredJob<SinglePayment, EmptyRespons
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
-        return new EmptyResponse();
+    PaymentResponse createJobResponse(PinTanPassport passport) {
+        return new PaymentResponse();
     }
 
     @Override
@@ -89,8 +89,8 @@ public class SinglePaymentJob extends ScaRequiredJob<SinglePayment, EmptyRespons
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
-        if (transactionType == AbstractScaTransaction.TransactionType.FUTURE_SINGLE_PAYMENT) {
+    protected String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+        if (transactionType == AbstractTransaction.TransactionType.FUTURE_SINGLE_PAYMENT) {
             return GVTermUebSEPA.getLowlevelName();
         }
         return GVUebSEPA.getLowlevelName();

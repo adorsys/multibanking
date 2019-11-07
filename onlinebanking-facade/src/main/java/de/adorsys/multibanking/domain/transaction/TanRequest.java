@@ -21,16 +21,11 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TanRequest extends AbstractScaTransaction {
+public class TanRequest extends AbstractPayment {
 
     @Override
     public TransactionType getTransactionType() {
         return TransactionType.TAN_REQUEST;
-    }
-
-    @Override
-    public String getRawData() {
-        return null;
     }
 
 }

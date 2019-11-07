@@ -136,7 +136,8 @@ public class DirectAccessController {
         BankAccountEntity bankAccountEntity = getBankAccountEntity(loadBookingsRequest, bankAccessEntity);
 
         log.debug("load booking list from bank");
-        List<BookingEntity> bookingEntities = bookingService.syncBookings(scaStatus, bankAccessEntity,
+        List<BookingEntity> bookingEntities = bookingService.syncBookings(scaStatus,
+            loadBookingsRequest.getAuthorisationCode(), bankAccessEntity,
             bankAccountEntity, bankApiMapper.toBankApi(bankApi));
 
         return createLoadBookingsResponse(bankAccountEntity, bookingEntities);
@@ -234,6 +235,8 @@ public class DirectAccessController {
 
     @Data
     public static class LoadBookingsRequest {
+        @ApiModelProperty("Conditional: authorisation code, mandated if bank using oauth approcach")
+        String authorisationCode;
         @ApiModelProperty("Conditional: multibanking user id, mandated if bankaccess was created")
         String userId;
         @ApiModelProperty("Conditional: multibanking bank access id, mandated if bankaccess was created")

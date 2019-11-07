@@ -10,9 +10,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 public class MultibankingException extends RuntimeException {
 
-    private int httpResponseCode;
-    private List<Message> messages;
-    private MultibankingError multibankingError;
+    private final int httpResponseCode;
+    private final List<Message> messages;
+    private final MultibankingError multibankingError;
 
     public MultibankingException(MultibankingError multibankingError) {
         this(multibankingError, 400, Collections.emptyList());

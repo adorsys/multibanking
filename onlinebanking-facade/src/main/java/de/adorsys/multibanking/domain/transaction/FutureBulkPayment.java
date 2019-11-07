@@ -21,20 +21,15 @@ import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 
-import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT;
-import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT_DELETE;
+import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.FUTURE_BULK_PAYMENT;
+import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.FUTURE_BULK_PAYMENT_DELETE;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class FutureBulkPayment extends BulkPayment {
+public class FutureBulkPayment extends BulkPayment implements DeletablePayment {
 
     private LocalDate executionDate;
     private boolean delete;
-
-    @Override
-    public void delete(boolean delete) {
-        this.delete = delete;
-    }
 
     @Override
     public TransactionType getTransactionType() {

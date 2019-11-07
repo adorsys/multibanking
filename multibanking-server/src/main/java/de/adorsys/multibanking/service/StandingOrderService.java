@@ -4,9 +4,9 @@ import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
-import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
 import de.adorsys.multibanking.exception.domain.MissingPinException;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
 import lombok.RequiredArgsConstructor;
@@ -45,16 +45,16 @@ public class StandingOrderService {
             request.setBankAccess(bankAccess);
             request.setBank(bankEntity);
             request.setHbciProduct(finTSProductConfig.getProduct());
-            Object tanSubmit = bankingService.initiatePayment(request);
+            AbstractResponse response = bankingService.executePayment(request);
 
             StandingOrderEntity target = new StandingOrderEntity();
             BeanUtils.copyProperties(standingOrder, target);
             target.setCreatedDateTime(new Date());
             target.setUserId(bankAccess.getUserId());
-            target.setTanSubmitExternal(tanSubmit);
+            target.setTanSubmitExternal(response.getAuthorisationCodeResponse().getTanSubmit());
 
             standingOrderRepository.save(target);
-            return tanSubmit;
+            return response.getAuthorisationCodeResponse().getTanSubmit();
         } catch (MultibankingException e) {
             throw new de.adorsys.multibanking.exception.PaymentException(e.getMessage());
         }

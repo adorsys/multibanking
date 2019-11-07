@@ -29,6 +29,7 @@ public interface ConsentAuthorisationMapper {
     @Mapping(target = "hbciSysId", ignore = true)
     @Mapping(target = "bankApiUser", ignore = true)
     @Mapping(target = "bankAccess", ignore = true)
+    @Mapping(target = "authorisationCode", ignore = true)
     UpdatePsuAuthenticationRequest toUpdatePsuAuthenticationRequest(UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequest, ConsentEntity consentEntity, BankEntity bank);
 
     UpdateAuthResponseTO toUpdateAuthResponseTO(UpdateAuthResponse updateAuthResponse);
@@ -41,6 +42,7 @@ public interface ConsentAuthorisationMapper {
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "bankApiUser", ignore = true)
     @Mapping(target = "bankAccess", ignore = true)
+    @Mapping(target = "authorisationCode", ignore = true)
     SelectPsuAuthenticationMethodRequest toSelectPsuAuthenticationMethodRequest(SelectPsuAuthenticationMethodRequestTO selectPsuAuthenticationMethodRequest, ConsentEntity consentEntity);
 
     @Mapping(target = "consentId", source = "consentEntity.id")
@@ -51,6 +53,7 @@ public interface ConsentAuthorisationMapper {
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "bankApiUser", ignore = true)
     @Mapping(target = "bankAccess", ignore = true)
+    @Mapping(target = "authorisationCode", ignore = true)
     TransactionAuthorisationRequest toTransactionAuthorisationRequest(TransactionAuthorisationRequestTO transactionAuthorisationRequest, ConsentEntity consentEntity);
 
 }

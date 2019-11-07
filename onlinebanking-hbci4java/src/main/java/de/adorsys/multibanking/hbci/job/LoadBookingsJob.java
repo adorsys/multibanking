@@ -21,9 +21,9 @@ import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
-import de.adorsys.multibanking.domain.transaction.LoadBookings;
+import de.adorsys.multibanking.domain.response.TransactionsResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
+import de.adorsys.multibanking.domain.transaction.LoadTransactions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -41,13 +41,13 @@ import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.BOOKINGS_FORMAT_NOT_SUPPORTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
-import static de.adorsys.multibanking.domain.transaction.LoadBookings.RawResponseType.CAMT;
+import static de.adorsys.multibanking.domain.transaction.LoadTransactions.RawResponseType.CAMT;
 
 @RequiredArgsConstructor
 @Slf4j
-public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsResponse> {
+public class LoadBookingsJob extends ScaRequiredJob<LoadTransactions, TransactionsResponse> {
 
-    private final TransactionRequest<LoadBookings> loadBookingsRequest;
+    private final TransactionRequest<LoadTransactions> loadBookingsRequest;
 
     private AbstractHBCIJob bookingsJob;
 
@@ -63,12 +63,12 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
     }
 
     @Override
-    TransactionRequest<LoadBookings> getTransactionRequest() {
+    TransactionRequest<LoadTransactions> getTransactionRequest() {
         return loadBookingsRequest;
     }
 
     @Override
-    String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
         if (bookingsJob instanceof GVKUmsAllCamt) {
             return "KUmsAllCamt";
         }
@@ -81,7 +81,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
     }
 
     @Override
-    public LoadBookingsResponse createJobResponse(PinTanPassport passport) {
+    public TransactionsResponse createJobResponse(PinTanPassport passport) {
         if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
             throw new MultibankingException(HBCI_ERROR,
@@ -108,7 +108,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
                     () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
         }
 
-        return LoadBookingsResponse.builder()
+        return TransactionsResponse.builder()
             .bookings(bookingList)
             .balancesReport(balancesReport)
             .rawData(raw)
@@ -138,7 +138,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadBookings, LoadBookingsRe
     }
 
     private AbstractHBCIJob createBookingsJobInternal(PinTanPassport passport) {
-        LoadBookings.RawResponseType rawResponseType = loadBookingsRequest.getTransaction().getRawResponseType();
+        LoadTransactions.RawResponseType rawResponseType = loadBookingsRequest.getTransaction().getRawResponseType();
         if (rawResponseType != null && !passport.jobSupported(rawResponseType == CAMT ?
             GVKUmsAllCamt.getLowlevelName() : GVKUmsAll.getLowlevelName())) {
             throw new MultibankingException(BOOKINGS_FORMAT_NOT_SUPPORTED, rawResponseType + " not supported");

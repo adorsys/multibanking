@@ -4,10 +4,7 @@ import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
-import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
-import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
-import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
+import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.transaction.*;
 
 public interface OnlineBankingService {
@@ -22,19 +19,19 @@ public interface OnlineBankingService {
 
     void removeUser(BankApiUser bankApiUser);
 
-    LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest);
-
     void removeBankAccount(BankAccount bankAccount, BankApiUser bankApiUser);
-
-    LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> loadBookingsRequest);
 
     boolean bankSupported(String bankCode);
 
     boolean bookingsCategorized();
 
-    AuthorisationCodeResponse initiatePayment(TransactionRequest<AbstractScaPaymentTransaction> paymentRequest);
+    AccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest);
 
-    SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode);
+    TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadBookingsRequest);
+
+    AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest);
+
+    TransactionAuthorisationResponse transactionAuthorisation(TransactionAuthorisation transactionAuthorisation);
 
     StrongCustomerAuthorisable getStrongCustomerAuthorisation();
 }

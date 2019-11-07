@@ -31,6 +31,9 @@ public abstract class AbstractRequest {
     private BankAccess bankAccess;
     private Bank bank;
 
+    //oauth authorisation code
+    private String authorisationCode;
+
     //hbci stuff
     private Object bankApiConsentData;
     private Product hbciProduct;

@@ -15,7 +15,7 @@ spring:
   jackson.default-property-inclusion: non_null
 
 server:
-  port: 8081
+  port: 8088
   use-forward-headers: true
 
 management:
@@ -65,9 +65,19 @@ sts:
   keymanagement.rotation.signKeyPairs.enabled: false
   keymanagement.rotation.encKeyPairs.enabled: false
 
-bankinggateway.b2c.url: http://localhost:8084
-#bankinggateway.b2c.url: https://dev-bankinggateway-b2c.cloud.adorsys.de
+#bankinggateway.b2c.url: http://localhost:8084
+bankinggateway.b2c.url: https://dev-bankinggateway-b2c.cloud.adorsys.de
 bankinggateway.adapter.url: https://dev-bankinggateway-adapter.cloud.adorsys.de
+
+pkcs12.keyStore.url: classpath:/example_eidas.p12
+pkcs12.keyStore.password:
+
+ing:
+  url: https://api.sandbox.ing.com
+  qwac:
+    alias: example_eidas_client_tls
+  qseal:
+    alias: example_eidas_client_signing
 
 bank.import.file: /Users/alexg/Downloads/multibanking/catalogue/banks/bank-catalogue.yml
 
@@ -90,10 +100,10 @@ spring:
 db_secret: 1234567890123456
 
 mongo.properties.url: classpath:/mongo.properties
-swagger.login.url: http://localhost:8080/auth/realms/multibanking/protocol/openid-connect/auth
+swagger.login.url: http://keycloak:8080/auth/realms/multibanking/protocol/openid-connect/auth
 
 idp:
-  baseUrl: http://localhost:8080
+  baseUrl: http://keycloak:8080
   realm: multibanking
 
 sts:
@@ -122,10 +132,10 @@ spring:
     enabled: false
     change-log: classpath:/liquibase/changelog-master.xml
 
-swagger.login.url: http://localhost:8080/auth/realms/multibanking/protocol/openid-connect/auth
+swagger.login.url: http://keycloak:8080/auth/realms/multibanking/protocol/openid-connect/auth
 
 idp:
-  baseUrl: http://localhost:8080
+  baseUrl: http://keycloak:8080
   realm: multibanking
 
 sts:

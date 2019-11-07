@@ -24,12 +24,12 @@ import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.STANDING_ORDER;
-import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.STANDING_ORDER_DELETE;
+import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.STANDING_ORDER;
+import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.STANDING_ORDER_DELETE;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class StandingOrder extends AbstractScaPaymentTransaction {
+public class StandingOrder extends AbstractPayment implements DeletablePayment {
 
     private Cycle cycle;
     private int executionDay;
@@ -39,22 +39,12 @@ public class StandingOrder extends AbstractScaPaymentTransaction {
     private String currency;
     private BankAccount otherAccount;
     private String usage;
-    private boolean delete;
     private String purposecode;
-
-    @Override
-    public void delete(boolean delete) {
-        this.delete = delete;
-    }
+    private boolean delete;
 
     @Override
     public TransactionType getTransactionType() {
         return delete ? STANDING_ORDER_DELETE : STANDING_ORDER;
-    }
-
-    @Override
-    public String getRawData() {
-        return null;
     }
 
 }

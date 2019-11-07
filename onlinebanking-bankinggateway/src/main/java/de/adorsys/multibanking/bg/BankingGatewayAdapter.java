@@ -20,9 +20,10 @@ import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
-import de.adorsys.multibanking.domain.transaction.LoadBookings;
-import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
+import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.domain.transaction.TransactionAuthorisation;
 import de.adorsys.multibanking.mapper.TransactionsParser;
 import de.adorsys.xs2a.adapter.api.remote.AccountInformationClient;
 import de.adorsys.xs2a.adapter.mapper.TransactionsReportMapper;
@@ -60,7 +61,6 @@ import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
@@ -135,17 +135,15 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
+    public AccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
         RequestHeaders aisHeaders = createAisHeaders(loadAccountInformationRequest, MediaType.APPLICATION_JSON_VALUE);
 
         Response<AccountListHolder> accountList = getAccountInformationService().getAccountList(aisHeaders,
             RequestParams.builder().build());
 
-        List<BankAccount> bankAccounts = accountList.getBody().getAccounts().stream()
-            .map(accountDetailsTO -> bankingGatewayMapper.toBankAccount(accountDetailsTO))
-            .collect(Collectors.toList());
+        List<BankAccount> bankAccounts = bankingGatewayMapper.toBankAccounts(accountList.getBody().getAccounts());
 
-        return LoadAccountInformationResponse.builder()
+        return AccountInformationResponse.builder()
             .bankAccess(loadAccountInformationRequest.getBankAccess())
             .bankAccounts(bankAccounts)
             .build();
@@ -157,8 +155,8 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> loadBookingsRequest) {
-        LoadBookings loadBookings = loadBookingsRequest.getTransaction();
+    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadBookingsRequest) {
+        LoadTransactions loadBookings = loadBookingsRequest.getTransaction();
 
         String resourceId = Optional.ofNullable(loadBookings.getPsuAccount().getExternalIdMap().get(bankApi()))
             .orElseGet(() -> getAccountResourceId(loadBookingsRequest.getBankAccess().getIban(),
@@ -196,7 +194,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         }
     }
 
-    private LoadBookingsResponse jsonStringToLoadBookingsResponse(String json) throws IOException {
+    private TransactionsResponse jsonStringToLoadBookingsResponse(String json) throws IOException {
         TransactionsResponse200JsonTO transactionsResponse200JsonTO = objectMapper.readValue(json,
             TransactionsResponse200JsonTO.class);
         TransactionsReport transactionList =
@@ -225,7 +223,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 }
             });
 
-        return LoadBookingsResponse.builder()
+        return TransactionsResponse.builder()
             .bookings(bookings)
             .balancesReport(balancesReport)
             .build();
@@ -264,12 +262,12 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode) {
+    public TransactionAuthorisationResponse transactionAuthorisation(TransactionAuthorisation submitAuthorisationCode) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public AuthorisationCodeResponse initiatePayment(TransactionRequest request) {
+    public AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
         throw new UnsupportedOperationException();
     }
 
@@ -377,6 +375,11 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             @Override
             public void afterExecute(Object bankApiConsentData, AuthorisationCodeResponse authorisationCodeResponse) {
                 //noop
+            }
+
+            @Override
+            public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
+                throw new UnsupportedOperationException();
             }
         };
     }

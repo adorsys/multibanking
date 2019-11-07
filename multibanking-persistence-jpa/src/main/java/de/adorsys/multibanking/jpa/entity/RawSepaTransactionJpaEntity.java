@@ -1,10 +1,13 @@
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 @Entity(name = "payment_sepa")
 @Data
@@ -17,6 +20,6 @@ public class RawSepaTransactionJpaEntity extends PaymentCommonJpaEntity {
     @Column(length = 5000)
     private String painXml;
     private String service;
-    private AbstractScaTransaction.TransactionType sepaTransactionType;
+    private AbstractTransaction.TransactionType sepaTransactionType;
 
 }

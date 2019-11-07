@@ -18,5 +18,5 @@ package de.adorsys.multibanking.domain;
 
 public enum  ScaApproach {
 
-    EMBEDDED, REDIRECT, DECOUPLED
+    EMBEDDED, REDIRECT, DECOUPLED, OAUTH
 }

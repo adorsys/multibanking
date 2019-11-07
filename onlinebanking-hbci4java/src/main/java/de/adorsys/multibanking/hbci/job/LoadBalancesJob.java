@@ -21,7 +21,7 @@ import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadBalancesResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadBalances;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -78,7 +78,7 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesRe
     }
 
     @Override
-    String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
         return GVSaldoReq.getLowlevelName();
     }
 

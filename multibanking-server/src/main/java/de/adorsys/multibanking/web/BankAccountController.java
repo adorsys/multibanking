@@ -105,7 +105,7 @@ public class BankAccountController {
         }
 
         try {
-            bookingService.syncBookings(FINALISED, bankAccess, bankAccount, null);
+            bookingService.syncBookings(FINALISED, null, bankAccess, bankAccount, null);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (TransactionAuthorisationRequiredException e) {
             List<Link> links = new ArrayList<>();
