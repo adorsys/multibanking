@@ -2,15 +2,16 @@ package de.adorsys.multibanking.finapi;
 
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
-import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
-import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
-import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
+import de.adorsys.multibanking.domain.response.AbstractResponse;
+import de.adorsys.multibanking.domain.response.AccountInformationResponse;
+import de.adorsys.multibanking.domain.response.TransactionsResponse;
+import de.adorsys.multibanking.domain.response.TransactionAuthorisationResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
+import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
-import de.adorsys.multibanking.domain.transaction.LoadBookings;
-import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
+import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.domain.transaction.TransactionAuthorisation;
 import de.adorsys.multibanking.domain.utils.Utils;
 import de.adorsys.multibanking.finapi.api.*;
 import de.adorsys.multibanking.finapi.model.*;
@@ -111,7 +112,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
+    public AccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
         LOG.info("load bank accounts");
         BankAccess bankAccess = loadAccountInformationRequest.getBankAccess();
 
@@ -139,7 +140,7 @@ public class FinapiBanking implements OnlineBankingService {
             AccountList accounts = new AccountsApi(apiClient).getAndSearchAllAccounts(null, null, null, null, null,
                 null, null, null, null);
 
-            return LoadAccountInformationResponse.builder().bankAccounts(accounts.getAccounts().stream().map(account ->
+            return AccountInformationResponse.builder().bankAccounts(accounts.getAccounts().stream().map(account ->
                 new BankAccount()
                     .externalId(bankApi(), account.getId().toString())
                     .owner(account.getAccountHolderName())
@@ -171,7 +172,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> loadBookingsRequest) {
+    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadBookingsRequest) {
         BankAccount bankAccount = loadBookingsRequest.getTransaction().getPsuAccount();
 
         //TODO standing orders needed
@@ -230,7 +231,7 @@ public class FinapiBanking implements OnlineBankingService {
             }
             LOG.info("loaded [{}] bookings for account [{}]", bookingList.size(), bankAccount.getAccountNumber());
 
-            return LoadBookingsResponse.builder()
+            return TransactionsResponse.builder()
                 .balancesReport(new BalancesReport().readyBalance(Balance.builder().amount(account.getBalance()).build()))
                 .bookings(bookingList)
                 .build();
@@ -274,12 +275,12 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode) {
+    public TransactionAuthorisationResponse transactionAuthorisation(TransactionAuthorisation submitAuthorisationCode) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public AuthorisationCodeResponse initiatePayment(TransactionRequest paymentRequest) {
+    public AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
         return null;
     }
 

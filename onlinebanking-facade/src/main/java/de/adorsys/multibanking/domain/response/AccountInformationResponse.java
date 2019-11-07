@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.transaction;
+package de.adorsys.multibanking.domain.response;
 
+import de.adorsys.multibanking.domain.BankAccess;
+import de.adorsys.multibanking.domain.BankAccount;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Data
-@EqualsAndHashCode(callSuper = false)
-public abstract class AbstractScaPaymentTransaction extends AbstractScaTransaction {
+import java.util.List;
 
-    private String orderId;
-    private String paymentId;
-    private String product;
+@Data
+@Builder
+@EqualsAndHashCode(callSuper = false)
+public class AccountInformationResponse extends AbstractResponse {
+
+    private BankAccess bankAccess;
+    private List<BankAccount> bankAccounts;
 }

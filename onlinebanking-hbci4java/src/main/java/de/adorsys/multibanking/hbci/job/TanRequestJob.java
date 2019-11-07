@@ -17,8 +17,8 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.EmptyResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.response.PaymentResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -38,7 +38,7 @@ public class TanRequestJob extends ScaRequiredJob {
     }
 
     @Override
-    String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
         return null;
     }
 
@@ -58,7 +58,7 @@ public class TanRequestJob extends ScaRequiredJob {
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
-        return new EmptyResponse();
+    PaymentResponse createJobResponse(PinTanPassport passport) {
+        return new PaymentResponse();
     }
 }

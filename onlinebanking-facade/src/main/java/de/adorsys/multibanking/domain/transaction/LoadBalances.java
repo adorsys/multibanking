@@ -19,19 +19,15 @@ package de.adorsys.multibanking.domain.transaction;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_BALANCES;
+import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.LOAD_BALANCES;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LoadBalances extends AbstractScaTransaction {
+public class LoadBalances extends AbstractTransaction {
 
     @Override
     public TransactionType getTransactionType() {
         return LOAD_BALANCES;
     }
 
-    @Override
-    public String getRawData() {
-        return null;
-    }
 }

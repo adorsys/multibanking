@@ -16,7 +16,6 @@ class PaymentCommonJpaEntity {
     private BankAccountJpaEntity debtorBankAccount;
     private String orderId;
     private String paymentId;
-    private String product;
     @Lob
     private Object tanSubmitExternal;
 }

@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.transaction;
+package de.adorsys.multibanking.domain.response;
 
+import de.adorsys.multibanking.domain.BalancesReport;
+import de.adorsys.multibanking.domain.Booking;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.LocalDate;
+import java.util.List;
 
-import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.FUTURE_SINGLE_PAYMENT;
-import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.FUTURE_SINGLE_PAYMENT_DELETE;
-
-/**
- * Created by alexg on 19.10.17.
- */
 @Data
+@Builder
 @EqualsAndHashCode(callSuper = false)
-public class FutureSinglePayment extends SinglePayment implements DeletablePayment {
+public class TransactionsResponse extends AbstractResponse {
 
-    private LocalDate executionDate;
-    private boolean delete;
-
-    @Override
-    public TransactionType getTransactionType() {
-        return delete ? FUTURE_SINGLE_PAYMENT_DELETE : FUTURE_SINGLE_PAYMENT;
-    }
+    //possible multiple CAMT files
+    private List<String> rawData;
+    private List<Booking> bookings;
+    private BalancesReport balancesReport;
 
 }

@@ -17,8 +17,8 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.EmptyResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.response.PaymentResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, EmptyResponse> {
+public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, PaymentResponse> {
 
     private final TransactionRequest<RawSepaPayment> transactionRequest;
 
@@ -52,7 +52,7 @@ public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, EmptyResponse> {
     }
 
     @Override
-    String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
         return GVRawSEPA.getLowlevelName();
     }
 
@@ -80,7 +80,7 @@ public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, EmptyResponse> {
                 throw new IllegalArgumentException("unsupported raw sepa transaction: " + sepaPayment.getSepaTransactionType());
         }
 
-        GVRawSEPA sepagv = new GVRawSEPA(passport, jobName, sepaPayment.getRawData());
+        GVRawSEPA sepagv = new GVRawSEPA(passport, jobName, sepaPayment.getRawRequestData());
         sepagv.setParam("src", getPsuKonto(passport));
 
         appendPainValues(sepaPayment, sepagv);
@@ -96,8 +96,8 @@ public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, EmptyResponse> {
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
-        return new EmptyResponse();
+    PaymentResponse createJobResponse(PinTanPassport passport) {
+        return new PaymentResponse();
     }
 
     private void appendPainValues(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {

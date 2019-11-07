@@ -17,8 +17,8 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.EmptyResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.response.PaymentResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -35,7 +35,7 @@ import java.util.List;
  * Only for future payment (GVTermUebSEPA)
  */
 @RequiredArgsConstructor
-public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<FutureSinglePayment, EmptyResponse> {
+public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<FutureSinglePayment, PaymentResponse> {
 
     private final TransactionRequest<FutureSinglePayment> transactionRequest;
     private String jobName;
@@ -76,8 +76,8 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<FutureSinglePay
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
-        return new EmptyResponse();
+    PaymentResponse createJobResponse(PinTanPassport passport) {
+        return new PaymentResponse();
     }
 
     @Override
@@ -86,7 +86,7 @@ public class DeleteFutureSinglePaymentJob extends ScaRequiredJob<FutureSinglePay
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+    protected String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
         return jobName;
     }
 

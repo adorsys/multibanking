@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.response.SubmitAuthorizationCodeResponse;
-import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
+import de.adorsys.multibanking.domain.response.TransactionAuthorisationResponse;
+import de.adorsys.multibanking.domain.transaction.TransactionAuthorisation;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
 import de.adorsys.multibanking.hbci.model.HbciPassport;
@@ -37,7 +37,6 @@ import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.manager.KnownTANProcess;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
-import org.kapott.hbci.status.HBCIMsgStatus;
 import org.kapott.hbci.status.HBCIStatus;
 
 import java.util.HashMap;
@@ -58,7 +57,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
     private final J scaJob;
 
-    public SubmitAuthorizationCodeResponse sumbitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode) {
+    public TransactionAuthorisationResponse sumbitAuthorizationCode(TransactionAuthorisation submitAuthorisationCode) {
         HbciTanSubmit hbciTanSubmit =
             evaluateTanSubmit((HbciConsent) submitAuthorisationCode.getOriginTransactionRequest().getBankApiConsentData());
 
@@ -83,8 +82,8 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         } else {
             if (hbciTanSubmit.getHbciJobName() != null && hbciTanSubmit.getHbciJobName().equals("HKIDN")) {
                 //sca for dialoginit was needed -> fints consent active, expecting response with exempted sca
-                SubmitAuthorizationCodeResponse<?> response =
-                    new SubmitAuthorizationCodeResponse<>(scaJob.authorisationAwareExecute(null, hbciDialog));
+                TransactionAuthorisationResponse<?> response =
+                    new TransactionAuthorisationResponse<>(scaJob.authorisationAwareExecute(null, hbciDialog));
                 response.setScaStatus(FINALISED);
                 response.setWarnings(warningStatusCodesToList(hbciExecStatus)); // warnings of initial execute
                 return response;
@@ -136,14 +135,14 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         return originJob;
     }
 
-    private SubmitAuthorizationCodeResponse<?> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
-                                                              AbstractHBCIJob hbciJob, HBCIExecStatus status) {
+    private TransactionAuthorisationResponse<?> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
+                                                               AbstractHBCIJob hbciJob, HBCIExecStatus status) {
         String transactionId = Optional.ofNullable(hbciJob)
             .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
             .orElse(hbciTanSubmit.getOrderRef());
 
-        SubmitAuthorizationCodeResponse<?> response =
-            new SubmitAuthorizationCodeResponse<>(scaJob.createJobResponse(passport));
+        TransactionAuthorisationResponse<?> response =
+            new TransactionAuthorisationResponse<>(scaJob.createJobResponse(passport));
         response.setTransactionId(transactionId);
         response.setWarnings(warningStatusCodesToList(status));
 
@@ -172,7 +171,7 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         }
     }
 
-    private HbciPassport createPassport(SubmitAuthorisationCode submitAuthorizationCode, HbciTanSubmit hbciTanSubmit) {
+    private HbciPassport createPassport(TransactionAuthorisation submitAuthorizationCode, HbciTanSubmit hbciTanSubmit) {
         Map<String, String> bpd =
             Optional.ofNullable(submitAuthorizationCode.getOriginTransactionRequest().getHbciBPD())
                 .orElseGet(() -> scaJob.fetchBpd(null).getBPD());

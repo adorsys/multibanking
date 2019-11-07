@@ -17,8 +17,9 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.EmptyResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.response.AbstractResponse;
+import de.adorsys.multibanking.domain.response.PaymentResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
@@ -38,7 +39,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class BulkPaymentJob extends ScaRequiredJob<BulkPayment, EmptyResponse> {
+public class BulkPaymentJob extends ScaRequiredJob<BulkPayment, AbstractResponse> {
 
     private final TransactionRequest<BulkPayment> transactionRequest;
 
@@ -88,8 +89,8 @@ public class BulkPaymentJob extends ScaRequiredJob<BulkPayment, EmptyResponse> {
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
-        return new EmptyResponse();
+    PaymentResponse createJobResponse(PinTanPassport passport) {
+        return new PaymentResponse();
     }
 
     @Override
@@ -98,8 +99,8 @@ public class BulkPaymentJob extends ScaRequiredJob<BulkPayment, EmptyResponse> {
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
-        if (transactionType == AbstractScaTransaction.TransactionType.FUTURE_BULK_PAYMENT) {
+    protected String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+        if (transactionType == AbstractTransaction.TransactionType.FUTURE_BULK_PAYMENT) {
             return "TermMultiUebSEPA";
         }
         return "MultiUebSEPA";

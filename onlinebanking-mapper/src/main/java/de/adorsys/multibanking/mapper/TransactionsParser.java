@@ -2,7 +2,7 @@ package de.adorsys.multibanking.mapper;
 
 import de.adorsys.multibanking.domain.BalancesReport;
 import de.adorsys.multibanking.domain.Booking;
-import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import org.kapott.hbci.GV.parsers.ISEPAParser;
 import org.kapott.hbci.GV.parsers.SEPAParserFactory;
 import org.kapott.hbci.GV_Result.GVRKUms;
@@ -22,7 +22,7 @@ public class TransactionsParser {
     private static AccountStatementMapper accountStatementMapper = new AccountStatementMapperImpl();
 
     @SuppressWarnings("unchecked")
-    public static LoadBookingsResponse camtStringToLoadBookingsResponse(String body) {
+    public static TransactionsResponse camtStringToLoadBookingsResponse(String body) {
         SepaVersion version = SepaVersion.autodetect(body);
         ISEPAParser<List<GVRKUms.BTag>> parser = SEPAParserFactory.get(version);
         GVRKUms bookingsResult = new GVRKUms(null);
@@ -30,13 +30,13 @@ public class TransactionsParser {
         return jobresultToLoadBookingsResponse(bookingsResult, body);
     }
 
-    public static LoadBookingsResponse mt940StringToLoadBookingsResponse(String body) {
+    public static TransactionsResponse mt940StringToLoadBookingsResponse(String body) {
         GVRKUms bookingsResult = new GVRKUms(null);
         bookingsResult.appendMt940raw(new StringBuilder(Swift.decodeUmlauts(body)));
         return jobresultToLoadBookingsResponse(bookingsResult, body);
     }
 
-    private static LoadBookingsResponse jobresultToLoadBookingsResponse(GVRKUms bookingsResult, String raw) {
+    private static TransactionsResponse jobresultToLoadBookingsResponse(GVRKUms bookingsResult, String raw) {
         List<Booking> bookings = accountStatementMapper.createBookings(bookingsResult).stream()
             .collect(Collectors.collectingAndThen(Collectors.toCollection(
                 () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
@@ -51,7 +51,7 @@ public class TransactionsParser {
             }
         }
 
-        return LoadBookingsResponse.builder()
+        return TransactionsResponse.builder()
             .bookings(bookings)
             .balancesReport(balancesReport)
             .rawData(Collections.singletonList(raw))

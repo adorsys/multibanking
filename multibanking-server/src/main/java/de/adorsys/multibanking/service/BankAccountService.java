@@ -4,7 +4,7 @@ import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
+import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.exception.BankAccessAlreadyExistException;
@@ -110,7 +110,7 @@ public class BankAccountService extends AccountInformationService {
         transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
 
         try {
-            LoadAccountInformationResponse response = onlineBankingService.loadBankAccounts(transactionRequest);
+            AccountInformationResponse response = onlineBankingService.loadBankAccounts(transactionRequest);
             checkSca(response, consentEntity, onlineBankingService);
             return response.getBankAccounts();
         } catch (MultibankingException e) {

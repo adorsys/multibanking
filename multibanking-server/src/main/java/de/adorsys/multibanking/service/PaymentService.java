@@ -4,6 +4,7 @@ import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
@@ -49,13 +50,13 @@ public class PaymentService {
             request.setBankAccess(bankAccess);
             request.setBank(bankEntity);
             request.setHbciProduct(finTSProductConfig.getProduct());
-            Object tanSubmit = bankingService.initiatePayment(request);
+            AbstractResponse response = bankingService.executePayment(request);
 
             RawSepaTransactionEntity target = new RawSepaTransactionEntity();
             BeanUtils.copyProperties(payment, target);
             target.setUserId(bankAccess.getUserId());
             target.setCreatedDateTime(new Date());
-            target.setTanSubmitExternal(tanSubmit);
+            target.setTanSubmitExternal(response.getAuthorisationCodeResponse().getTanSubmit());
 
             rawSepaTransactionRepository.save(target);
             return target;
@@ -84,13 +85,13 @@ public class PaymentService {
             request.setBank(bankEntity);
             request.setHbciProduct(finTSProductConfig.getProduct());
 
-            Object tanSubmit = bankingService.initiatePayment(request);
+            AbstractResponse response = bankingService.executePayment(request);
 
             SinglePaymentEntity target = new SinglePaymentEntity();
             BeanUtils.copyProperties(payment, target);
             target.setUserId(bankAccess.getUserId());
             target.setCreatedDateTime(new Date());
-            target.setTanSubmitExternal(tanSubmit);
+            target.setTanSubmitExternal(response.getAuthorisationCodeResponse().getTanSubmit());
 
             singlePaymentRepository.save(target);
             return target;
@@ -118,13 +119,13 @@ public class PaymentService {
             request.setBank(bankEntity);
             request.setHbciProduct(finTSProductConfig.getProduct());
 
-            Object tanSubmit = bankingService.initiatePayment(request);
+            AbstractResponse response = bankingService.executePayment(request);
 
             BulkPaymentEntity target = new BulkPaymentEntity();
             BeanUtils.copyProperties(payment, target);
             target.setUserId(bankAccess.getUserId());
             target.setCreatedDateTime(new Date());
-            target.setTanSubmitExternal(tanSubmit);
+            target.setTanSubmitExternal(response.getAuthorisationCodeResponse().getTanSubmit());
 
             bulkPaymentRepository.save(target);
             return target;

@@ -20,19 +20,11 @@ import de.adorsys.multibanking.domain.BankAccount;
 import lombok.Data;
 
 @Data
-public abstract class AbstractScaTransaction {
+public abstract class AbstractTransaction {
 
     private BankAccount psuAccount;
 
     public abstract TransactionType getTransactionType();
-
-    public abstract String getRawData();
-
-    public void delete(boolean delete) {
-        if (delete) {
-            throw new IllegalStateException("delete not supported");
-        }
-    }
 
     public enum TransactionType {
         SINGLE_PAYMENT,

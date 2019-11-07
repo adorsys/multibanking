@@ -25,7 +25,7 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.hbci.model.*;
 import de.adorsys.multibanking.mapper.AccountStatementMapper;
 import de.adorsys.multibanking.mapper.AccountStatementMapperImpl;
@@ -61,7 +61,7 @@ import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.JOBS;
 
 @Slf4j
-public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends AbstractResponse> {
+public abstract class ScaRequiredJob<T extends AbstractTransaction, R extends AbstractResponse> {
 
     static AccountStatementMapper accountStatementMapper = new AccountStatementMapperImpl();
     private static HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
@@ -370,7 +370,7 @@ public abstract class ScaRequiredJob<T extends AbstractScaTransaction, R extends
 
     abstract TransactionRequest<T> getTransactionRequest();
 
-    abstract String getHbciJobName(AbstractScaTransaction.TransactionType transactionType);
+    abstract String getHbciJobName(AbstractTransaction.TransactionType transactionType);
 
     abstract R createJobResponse(PinTanPassport passport);
 

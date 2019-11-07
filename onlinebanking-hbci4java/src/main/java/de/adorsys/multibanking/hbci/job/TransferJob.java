@@ -17,8 +17,8 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.EmptyResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.response.PaymentResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
-public class TransferJob extends ScaRequiredJob<SinglePayment, EmptyResponse> {
+public class TransferJob extends ScaRequiredJob<SinglePayment, PaymentResponse> {
 
     private final TransactionRequest<SinglePayment> transactionRequest;
 
@@ -75,13 +75,13 @@ public class TransferJob extends ScaRequiredJob<SinglePayment, EmptyResponse> {
     }
 
     @Override
-    String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
         return GVUmbSEPA.getLowlevelName();
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
-        return new EmptyResponse();
+    PaymentResponse createJobResponse(PinTanPassport passport) {
+        return new PaymentResponse();
     }
 
     @Override

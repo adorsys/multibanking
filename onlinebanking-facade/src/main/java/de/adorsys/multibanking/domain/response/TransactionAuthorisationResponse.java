@@ -10,7 +10,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SubmitAuthorizationCodeResponse<T extends AbstractResponse> {
+public class TransactionAuthorisationResponse<T extends AbstractResponse> {
 
     private final T jobResponse;
     private List<String> warnings;

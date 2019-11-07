@@ -16,16 +16,7 @@
 
 package de.adorsys.multibanking.domain.transaction;
 
-import de.adorsys.multibanking.domain.request.TransactionRequest;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.RequiredArgsConstructor;
+public interface DeletablePayment {
 
-@RequiredArgsConstructor
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class SubmitAuthorisationCode<T extends AbstractScaTransaction> {
-
-    private final TransactionRequest<T> originTransactionRequest;
-
+    void setDelete(boolean value);
 }

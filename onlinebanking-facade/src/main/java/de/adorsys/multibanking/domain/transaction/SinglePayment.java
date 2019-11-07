@@ -23,7 +23,7 @@ import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class SinglePayment extends AbstractScaPaymentTransaction {
+public class SinglePayment extends AbstractPayment {
 
     private String receiver;
     private String receiverBic;
@@ -39,11 +39,6 @@ public class SinglePayment extends AbstractScaPaymentTransaction {
     @Override
     public TransactionType getTransactionType() {
         return TransactionType.SINGLE_PAYMENT;
-    }
-
-    @Override
-    public String getRawData() {
-        return null;
     }
 
 }

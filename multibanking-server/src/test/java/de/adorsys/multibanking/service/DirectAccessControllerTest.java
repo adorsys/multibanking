@@ -9,8 +9,8 @@ import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
-import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
-import de.adorsys.multibanking.domain.response.LoadBookingsResponse;
+import de.adorsys.multibanking.domain.response.AccountInformationResponse;
+import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
@@ -285,14 +285,14 @@ public class DirectAccessControllerTest {
         AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(null);
         authorisationCodeResponse.setUpdateAuthResponse(updateAuthResponse);
 
-        LoadBookingsResponse scaRequiredResponse = LoadBookingsResponse.builder().build();
+        TransactionsResponse scaRequiredResponse = TransactionsResponse.builder().build();
         scaRequiredResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
 
         doReturn(scaRequiredResponse)
-            .doReturn(LoadBookingsResponse.builder()
+            .doReturn(TransactionsResponse.builder()
                 .bookings(new ArrayList<>())
                 .build())
-            .when(hbci4JavaBanking).loadBookings(any());
+            .when(hbci4JavaBanking).loadTransactions(any());
 
         CredentialsTO credentials = CredentialsTO.builder()
             .customerId(System.getProperty("login", "login"))
@@ -462,7 +462,7 @@ public class DirectAccessControllerTest {
 
         doReturn(Optional.of(new ConsentEntity(null, null, null, null, consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
         when(bankingGatewayAdapterMock.loadBankAccounts(any()))
-            .thenReturn(LoadAccountInformationResponse.builder()
+            .thenReturn(AccountInformationResponse.builder()
                 .bankAccounts(Collections.singletonList(new BankAccount()))
                 .build()
             );
@@ -480,8 +480,8 @@ public class DirectAccessControllerTest {
         assertThat(loadBankAccountsResponse.getBankAccounts()).isNotEmpty();
 
         //load bookings
-        when(bankingGatewayAdapterMock.loadBookings(any()))
-            .thenReturn(LoadBookingsResponse.builder()
+        when(bankingGatewayAdapterMock.loadTransactions(any()))
+            .thenReturn(TransactionsResponse.builder()
                 .bookings(Collections.singletonList(createBooking()))
                 .build()
             );

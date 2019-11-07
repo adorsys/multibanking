@@ -19,30 +19,11 @@ package de.adorsys.multibanking.domain.transaction;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.LocalDate;
-
-import static de.adorsys.multibanking.domain.transaction.AbstractScaTransaction.TransactionType.LOAD_TRANSACTIONS;
-
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class LoadBookings extends AbstractScaTransaction {
+public abstract class AbstractPayment extends AbstractTransaction {
 
-    private LoadBookings.RawResponseType rawResponseType;
-    private LocalDate dateFrom;
-    private LocalDate dateTo;
-    private boolean withBalance;
+    private String orderId;
+    private String paymentId;
 
-    @Override
-    public TransactionType getTransactionType() {
-        return LOAD_TRANSACTIONS;
-    }
-
-    @Override
-    public String getRawData() {
-        return null;
-    }
-
-    public enum RawResponseType {
-        CAMT, MT940
-    }
 }

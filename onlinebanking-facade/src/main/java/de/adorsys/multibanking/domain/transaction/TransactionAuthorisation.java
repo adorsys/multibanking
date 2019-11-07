@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.response;
+package de.adorsys.multibanking.domain.transaction;
 
-import de.adorsys.multibanking.domain.BankAccess;
-import de.adorsys.multibanking.domain.BankAccount;
-import lombok.Builder;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
+@RequiredArgsConstructor
 @Data
-@Builder
 @EqualsAndHashCode(callSuper = false)
-public class LoadAccountInformationResponse extends AbstractResponse {
+public class TransactionAuthorisation<T extends AbstractTransaction> {
 
-    private BankAccess bankAccess;
-    private List<BankAccount> bankAccounts;
+    private final TransactionRequest<T> originTransactionRequest;
+
 }

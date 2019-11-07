@@ -20,8 +20,8 @@ import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.LoadAccountInformationResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.response.AccountInformationResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -44,7 +44,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Slf4j
-public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAccountInformationResponse> {
+public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, AccountInformationResponse> {
 
     private final TransactionRequest<LoadAccounts> loadAccountInformationRequest;
 
@@ -69,7 +69,7 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAcco
     }
 
     @Override
-    String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
         return GVSEPAInfo.getLowlevelName();
     }
 
@@ -79,7 +79,7 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAcco
     }
 
     @Override
-    public LoadAccountInformationResponse createJobResponse(PinTanPassport passport) {
+    public AccountInformationResponse createJobResponse(PinTanPassport passport) {
         loadAccountInformationRequest.getBankAccess().setBankName(passport.getInstName());
 
         hbciAccounts = new ArrayList<>();
@@ -90,7 +90,7 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, LoadAcco
             hbciAccounts.add(bankAccount);
         }
 
-        return LoadAccountInformationResponse.builder()
+        return AccountInformationResponse.builder()
             .bankAccess(loadAccountInformationRequest.getBankAccess())
             .bankAccounts(hbciAccounts)
             .build();

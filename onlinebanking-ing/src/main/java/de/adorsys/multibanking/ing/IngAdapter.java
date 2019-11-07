@@ -8,12 +8,13 @@ import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.*;
+import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.domain.transaction.AbstractScaPaymentTransaction;
+import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
-import de.adorsys.multibanking.domain.transaction.LoadBookings;
-import de.adorsys.multibanking.domain.transaction.SubmitAuthorisationCode;
+import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.domain.transaction.TransactionAuthorisation;
 import de.adorsys.multibanking.ing.api.Balance;
 import de.adorsys.multibanking.ing.api.*;
 import de.adorsys.multibanking.ing.http.ApacheHttpClient;
@@ -43,7 +44,6 @@ import static de.adorsys.multibanking.domain.BankApi.ING;
 import static de.adorsys.multibanking.domain.ScaStatus.STARTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
 import static de.adorsys.multibanking.ing.http.ResponseHandlers.jsonResponseHandler;
-import static java.time.temporal.ChronoUnit.SECONDS;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -101,7 +101,7 @@ public class IngAdapter implements OnlineBankingService {
     }
 
     @Override
-    public LoadAccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> request) {
+    public AccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> request) {
         IngSessionData ingSessionData = (IngSessionData) request.getBankApiConsentData();
         checkIngSession((IngSessionData) request.getBankApiConsentData(), request.getAuthorisationCode());
 
@@ -111,7 +111,7 @@ public class IngAdapter implements OnlineBankingService {
         Response<AccountsResponse> response = getHttpClient().get(ingBaseUrl + ACCOUNTS_ENDPOINT)
             .send(clientAuthentication, jsonResponseHandler(AccountsResponse.class));
 
-        return LoadAccountInformationResponse.builder()
+        return AccountInformationResponse.builder()
             .bankAccounts(ingMapper.toBankAccounts(response.getBody().getAccounts()))
             .build();
     }
@@ -122,7 +122,7 @@ public class IngAdapter implements OnlineBankingService {
     }
 
     @Override
-    public LoadBookingsResponse loadBookings(TransactionRequest<LoadBookings> loadBookingsRequest) {
+    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadBookingsRequest) {
         IngSessionData ingSessionData = (IngSessionData) loadBookingsRequest.getBankApiConsentData();
         checkIngSession(ingSessionData, loadBookingsRequest.getAuthorisationCode());
 
@@ -143,10 +143,10 @@ public class IngAdapter implements OnlineBankingService {
             queryParams
         );
 
-        Response<TransactionsResponse> transactionsResponse = getHttpClient().get(uri)
-            .send(clientAuthentication, jsonResponseHandler(TransactionsResponse.class));
+        Response<de.adorsys.multibanking.ing.api.TransactionsResponse> transactionsResponse = getHttpClient().get(uri)
+            .send(clientAuthentication, jsonResponseHandler(de.adorsys.multibanking.ing.api.TransactionsResponse.class));
 
-        return LoadBookingsResponse.builder()
+        return TransactionsResponse.builder()
             .bookings(ingMapper.mapToBookings(transactionsResponse.getBody().getTransactions().getBooked()))
             .balancesReport(getBalancesReport(clientAuthentication, resourceId))
             .build();
@@ -202,12 +202,12 @@ public class IngAdapter implements OnlineBankingService {
     }
 
     @Override
-    public AuthorisationCodeResponse initiatePayment(TransactionRequest<AbstractScaPaymentTransaction> paymentRequest) {
+    public AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public SubmitAuthorizationCodeResponse submitAuthorizationCode(SubmitAuthorisationCode submitAuthorisationCode) {
+    public TransactionAuthorisationResponse transactionAuthorisation(TransactionAuthorisation submitAuthorisationCode) {
         throw new UnsupportedOperationException();
     }
 

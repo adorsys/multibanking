@@ -17,8 +17,8 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.EmptyResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractScaTransaction;
+import de.adorsys.multibanking.domain.response.PaymentResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.ForeignPayment;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class ForeignPaymentJob extends ScaRequiredJob<ForeignPayment, EmptyResponse> {
+public class ForeignPaymentJob extends ScaRequiredJob<ForeignPayment, PaymentResponse> {
 
     private final TransactionRequest<ForeignPayment> transactionRequest;
 
@@ -42,7 +42,7 @@ public class ForeignPaymentJob extends ScaRequiredJob<ForeignPayment, EmptyRespo
         GVDTAZV gv = new GVDTAZV(passport, GVDTAZV.getLowlevelName());
 
         gv.setParam("src", src);
-        gv.setParam("dtazv", "B" + transactionRequest.getTransaction().getRawData());
+        gv.setParam("dtazv", "B" + transactionRequest.getTransaction().getRawRequestData());
         gv.verifyConstraints();
 
         return gv;
@@ -54,8 +54,8 @@ public class ForeignPaymentJob extends ScaRequiredJob<ForeignPayment, EmptyRespo
     }
 
     @Override
-    EmptyResponse createJobResponse(PinTanPassport passport) {
-        return new EmptyResponse();
+    PaymentResponse createJobResponse(PinTanPassport passport) {
+        return new PaymentResponse();
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ForeignPaymentJob extends ScaRequiredJob<ForeignPayment, EmptyRespo
     }
 
     @Override
-    protected String getHbciJobName(AbstractScaTransaction.TransactionType transactionType) {
+    protected String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
         return GVDTAZV.getLowlevelName();
     }
 
