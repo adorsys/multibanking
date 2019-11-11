@@ -45,16 +45,16 @@ import static de.adorsys.multibanking.domain.transaction.LoadTransactions.RawRes
 
 @RequiredArgsConstructor
 @Slf4j
-public class LoadBookingsJob extends ScaRequiredJob<LoadTransactions, TransactionsResponse> {
+public class LoadTransactionsJob extends ScaRequiredJob<LoadTransactions, TransactionsResponse> {
 
     private final TransactionRequest<LoadTransactions> loadBookingsRequest;
 
-    private AbstractHBCIJob bookingsJob;
+    private AbstractHBCIJob transactionsHbciJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        bookingsJob = createBookingsJob(passport);
-        return bookingsJob;
+        transactionsHbciJob = createTransactionsJob(passport);
+        return transactionsHbciJob;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadTransactions, Transactio
 
     @Override
     String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
-        if (bookingsJob instanceof GVKUmsAllCamt) {
+        if (transactionsHbciJob instanceof GVKUmsAllCamt) {
             return "KUmsAllCamt";
         }
         return "KUmsAll";
@@ -82,10 +82,10 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadTransactions, Transactio
 
     @Override
     public TransactionsResponse createJobResponse(PinTanPassport passport) {
-        if (bookingsJob.getJobResult().getJobStatus().hasErrors()) {
+        if (transactionsHbciJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
             throw new MultibankingException(HBCI_ERROR,
-                bookingsJob.getJobResult().getJobStatus().getErrorList().stream()
+                transactionsHbciJob.getJobResult().getJobStatus().getErrorList().stream()
                     .map(messageString -> Message.builder().renderedMessage(messageString).build())
                     .collect(Collectors.toList()));
         }
@@ -93,7 +93,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadTransactions, Transactio
         List<Booking> bookingList = null;
         BalancesReport balancesReport = null;
         List<String> raw = null;
-        GVRKUms bookingsResult = (GVRKUms) bookingsJob.getJobResult();
+        GVRKUms bookingsResult = (GVRKUms) transactionsHbciJob.getJobResult();
         if (loadBookingsRequest.getTransaction().getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
@@ -121,7 +121,7 @@ public class LoadBookingsJob extends ScaRequiredJob<LoadTransactions, Transactio
         return balancesReport;
     }
 
-    private AbstractHBCIJob createBookingsJob(PinTanPassport passport) {
+    private AbstractHBCIJob createTransactionsJob(PinTanPassport passport) {
         AbstractHBCIJob hbciJob = createBookingsJobInternal(passport);
 
         hbciJob.setParam("my", getPsuKonto(passport));

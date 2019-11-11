@@ -22,6 +22,7 @@ import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.response.TransactionAuthorisationResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.TransactionAuthorisation;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
@@ -125,9 +126,8 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
         GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport(), originJob);
         hktan.setProcess(KnownTANProcess.PROCESS2_STEP2);
-        if (hktan.getLowlevelParam("TAN2Step" + hbciTanSubmit.getTwoStepMechanism().getSegversion() + "ordersegcode") == null) {
-            hktan.setParam("ordersegcode", "HKIDN");
-        }
+        Optional.ofNullable(hbciTanSubmit.getHbciJobName())
+            .ifPresent(hbciSegCode -> hktan.setParam("ordersegcode", hbciSegCode));
         hktan.setParam("orderref", hbciTanSubmit.getOrderRef());
         hktan.setParam("process", hbciTanSubmit.getHktanProcess() != null ? hbciTanSubmit.getHktanProcess() : "2");
         hktan.setParam("notlasttan", "N");
@@ -148,7 +148,8 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
         //HKIDN -> FINALISED -> further request like HKCAZ already executed
         ScaStatus scaStatus = Optional.ofNullable(hbciTanSubmit.getHbciJobName())
-            .map(hbciJobName -> hbciJobName.equals("HKIDN") ? FINALISED : SCAMETHODSELECTED)
+            .map(hbciJobName -> hbciJobName.equals("HKIDN") || scaJob.getTransactionRequest().getTransaction() instanceof AbstractPayment)
+            .map(finalised -> finalised ? FINALISED : SCAMETHODSELECTED)
             .orElse(FINALISED);
 
         response.setScaStatus(scaStatus);
