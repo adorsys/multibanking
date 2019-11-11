@@ -2,16 +2,13 @@ package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.service.ConsentService;
-import de.adorsys.multibanking.service.OAuthService;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
 import de.adorsys.multibanking.web.model.SelectPsuAuthenticationMethodRequestTO;
 import de.adorsys.multibanking.web.model.TransactionAuthorisationRequestTO;
 import de.adorsys.multibanking.web.model.UpdateAuthResponseTO;
 import de.adorsys.multibanking.web.model.UpdatePsuAuthenticationRequestTO;
-import io.swagger.annotations.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.iban4j.Iban;
@@ -21,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +35,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 public class ConsentAuthorisationController {
 
     private final ConsentService consentService;
-    private final OAuthService oAuthService;
     private final ConsentAuthorisationMapper consentAuthorisationMapper;
 
     @ApiOperation(value = "Update authorisation (authenticate user)")
@@ -94,18 +89,6 @@ public class ConsentAuthorisationController {
         return ResponseEntity.ok(mapToResource(updateAuthResponse, consentId, authorisationId, bankCode));
     }
 
-    @ApiOperation(value = "submit oauth authorization code")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Response", response = UpdateAuthResponseTO.class)
-    })
-    @PostMapping("/submitOAuthCode")
-    public ResponseEntity submitAuthorizationCode(@Valid @RequestBody AuthorizationCode authorizationCode,
-                                                  @PathVariable("consentId") String consentId,
-                                                  @PathVariable("authorisationId") String authorisationId) {
-        oAuthService.submitAuthCode(consentId, authorisationId, authorizationCode.getCode());
-        return ResponseEntity.ok().build();
-    }
-
     private Resource<UpdateAuthResponseTO> mapToResource(UpdateAuthResponse response, String consentId,
                                                          String authorisationId, String bankCode) {
         List<Link> links = new ArrayList<>();
@@ -144,14 +127,5 @@ public class ConsentAuthorisationController {
             case EXEMPTED:
                 break;
         }
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class AuthorizationCode {
-        @NotNull
-        @ApiModelProperty("Authorization Code")
-        private String code;
     }
 }

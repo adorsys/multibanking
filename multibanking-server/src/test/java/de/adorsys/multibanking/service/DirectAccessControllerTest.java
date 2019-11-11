@@ -523,18 +523,18 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.oauthRedirectUrl")).isNotBlank();
 
         String consentId = jsonPath.getString("consentId");
-        String authorisationId = jsonPath.getString("authorisationId");
         String idpUrl = jsonPath.getString("_links.oauthRedirectUrl");
 
         log.info("Oauth redirect url: " + idpUrl);
         String authorizationCode = "BREAK_AND_PLACE_AUTHCODE_HERE";
 
         //3. submit auth code (break to enter auth code)
-        request.body(new ConsentAuthorisationController.AuthorizationCode(authorizationCode))
-                .post(getRemoteMultibankingUrl() + "/api/v1/consents/{consentId}/authorisations/{authorisationId}/submitOAuthCode"
-                        .replace("{authorisationId}", authorisationId)
+        TokenRequestTO tokenRequestTO = new TokenRequestTO();
+        tokenRequestTO.setAuthorisationCode(authorizationCode);
+        request.body(tokenRequestTO)
+                .post(getRemoteMultibankingUrl() + "/api/v1/consents/{consentId}/token"
                         .replace("{consentId}", consentId))
-                .then().assertThat().statusCode(HttpStatus.OK.value());
+                .then().assertThat().statusCode(HttpStatus.NO_CONTENT.value());
 
         //4. load accounts
         DirectAccessController.LoadAccountsRequest loadAccountsRequest =

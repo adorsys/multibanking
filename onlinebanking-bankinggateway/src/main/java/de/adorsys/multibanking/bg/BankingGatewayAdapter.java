@@ -11,7 +11,6 @@ import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiException;
 import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2CAisApi;
 import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2COAuthApi;
-import de.adorsys.multibanking.banking_gateway_b2c.auth.OAuth;
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
@@ -211,26 +210,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         }
     }
 
-
-    // special method for oauth
-    public BgSessionData submitOAuthAuthorizationCode(String authorisationId, String oauthCode) {
-        try {
-            AuthorizationCodeTO authorizationCodeTO = new AuthorizationCodeTO();
-            authorizationCodeTO.setXs2aAuthorisationId(authorisationId);
-            authorizationCodeTO.setOauthCode(oauthCode);
-            OAuthToken token = getBankingGatewayB2COAuthApi().resolveAuthCodeUsingPOST(authorizationCodeTO);
-
-            Optional.ofNullable(token)
-                .map(OAuthToken::getAccessToken)
-                .orElseThrow(() -> new MultibankingException(INTERNAL_ERROR, 500, "No bearer token received for auth code"));
-
-            return bankingGatewayMapper.toSessionData(token);
-        } catch (ApiException e) {
-            throw handeAisApiException(e);
-        }
-    }
-
-    private LoadBookingsResponse jsonStringToLoadBookingsResponse(String json) throws IOException {
+    private TransactionsResponse jsonStringToLoadBookingsResponse(String json) throws IOException {
         TransactionsResponse200JsonTO transactionsResponse200JsonTO = objectMapper.readValue(json,
             TransactionsResponse200JsonTO.class);
         TransactionsReport transactionList =
@@ -319,7 +299,12 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     CreateConsentResponseTO consentResponse =
                         getBankingGatewayB2CAisApi().createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, null, redirectPreferred, tppRedirectUri);
 
-                    return bankingGatewayMapper.toCreateConsentResponse(consentResponse);
+                    BgSessionData sessionData = new BgSessionData();
+                    sessionData.setAuthorisationId(consentResponse.getAuthorisationId());
+                    CreateConsentResponse createConsentResponse = bankingGatewayMapper.toCreateConsentResponse(consentResponse);
+                    createConsentResponse.setBankApiConsentData(sessionData);
+
+                    return createConsentResponse;
                 } catch (ApiException e) {
                     throw handeAisApiException(e);
                 }
@@ -423,7 +408,24 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
             @Override
             public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
-                throw new UnsupportedOperationException();
+                BgSessionData sessionData = (BgSessionData) bankApiConsentData;
+                String authorisationId = sessionData.getAuthorisationId();
+
+                try {
+                    AuthorizationCodeTO authorizationCodeTO = new AuthorizationCodeTO();
+                    authorizationCodeTO.setXs2aAuthorisationId(authorisationId);
+                    authorizationCodeTO.setOauthCode(authorisationCode);
+                    OAuthToken token = getBankingGatewayB2COAuthApi().resolveAuthCodeUsingPOST(authorizationCodeTO);
+
+                    Optional.ofNullable(token)
+                            .map(OAuthToken::getAccessToken)
+                            .orElseThrow(() -> new MultibankingException(INTERNAL_ERROR, 500, "No bearer token received for auth code"));
+
+                    sessionData.setAccessToken(token.getAccessToken());
+                    sessionData.setRefreshToken(token.getRefreshToken());
+                } catch (ApiException e) {
+                    throw handeAisApiException(e);
+                }
             }
         };
     }

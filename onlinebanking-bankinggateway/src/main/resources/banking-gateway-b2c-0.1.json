@@ -20,61 +20,7 @@
       "description": "Payment Authorisation Resource"
     }
   ],
-  "securityDefinitions": {
-    "oauth2": {
-      "type": "oauth2",
-      "flow": "accessCode",
-      "description": "OAuth2 for setting token"
-    }
-  },
   "paths": {
-    "/auth": {
-      "post": {
-        "tags": [
-          "Banking-Gateway B2C OAuth"
-        ],
-        "summary": "Resolve token for oauth authentication code",
-        "operationId": "resolveAuthCodeUsingPOST",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "authorizationCodeTO",
-            "description": "authorizationCodeTO",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/AuthorizationCodeTO"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/OAuthToken"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "$ref": "#/definitions/MessagesTO"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/MessagesTO"
-            }
-          }
-        },
-        "deprecated": false
-      }
-    },
     "/v1/ais/consents": {
       "post": {
         "tags": [
@@ -154,6 +100,11 @@
             }
           }
         },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
         "deprecated": false
       }
     },
@@ -196,6 +147,11 @@
             }
           }
         },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
         "deprecated": false
       },
       "delete": {
@@ -233,6 +189,11 @@
             }
           }
         },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
         "deprecated": false
       }
     },
@@ -285,6 +246,11 @@
             }
           }
         },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
         "deprecated": false
       }
     },
@@ -336,12 +302,12 @@
         },
         "security": [
           {
+            "oauth2": []
+          },
+          {
             "bg_auth": [
               "openid"
             ]
-          },
-          {
-            "oauth2": []
           }
         ],
         "deprecated": false
@@ -406,6 +372,9 @@
           }
         },
         "security": [
+          {
+            "oauth2": []
+          },
           {
             "bg_auth": [
               "openid"
@@ -475,6 +444,9 @@
         },
         "security": [
           {
+            "oauth2": []
+          },
+          {
             "bg_auth": [
               "openid"
             ]
@@ -543,6 +515,9 @@
         },
         "security": [
           {
+            "oauth2": []
+          },
+          {
             "bg_auth": [
               "openid"
             ]
@@ -591,6 +566,9 @@
           }
         },
         "security": [
+          {
+            "oauth2": []
+          },
           {
             "bg_auth": [
               "openid"
@@ -647,6 +625,9 @@
           }
         },
         "security": [
+          {
+            "oauth2": []
+          },
           {
             "bg_auth": [
               "openid"
@@ -716,6 +697,9 @@
         },
         "security": [
           {
+            "oauth2": []
+          },
+          {
             "bg_auth": [
               "openid"
             ]
@@ -783,6 +767,9 @@
           }
         },
         "security": [
+          {
+            "oauth2": []
+          },
           {
             "bg_auth": [
               "openid"
@@ -852,6 +839,9 @@
         },
         "security": [
           {
+            "oauth2": []
+          },
+          {
             "bg_auth": [
               "openid"
             ]
@@ -859,6 +849,59 @@
         ],
         "deprecated": false
       }
+    },
+    "/v1/token": {
+      "post": {
+        "tags": [
+          "Banking-Gateway B2C OAuth"
+        ],
+        "summary": "Resolve token for oauth authentication code",
+        "operationId": "resolveAuthCodeUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorizationCodeTO",
+            "description": "authorizationCodeTO",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthorizationCodeTO"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/OAuthToken"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          }
+        },
+        "deprecated": false
+      }
+    }
+  },
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "flow": "accessCode"
     }
   },
   "definitions": {
