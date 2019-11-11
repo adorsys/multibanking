@@ -65,6 +65,7 @@ public abstract class ScaRequiredJob<T extends AbstractTransaction, R extends Ab
 
     static AccountStatementMapper accountStatementMapper = new AccountStatementMapperImpl();
     private static HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
+
     private HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
     private AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(hbciTanSubmit);
     private HBCIJobsDialog dialog;
@@ -205,7 +206,7 @@ public abstract class ScaRequiredJob<T extends AbstractTransaction, R extends Ab
                     .ifPresent(painVersion -> hbciTanSubmit.setPainVersion(painVersion.getURN()));
                 hbciTanSubmit.setOriginLowLevelName(hbciJob.getJobName());
                 hbciTanSubmit.setOriginSegVersion(hbciJob.getSegVersion());
-                hbciTanSubmit.setHbciJobName(hbciJob.getHBCICode(false));
+                hbciTanSubmit.setHbciJobName(hbciJob.getHBCICode());
             });
     }
 
