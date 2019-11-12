@@ -17,7 +17,6 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +36,14 @@ import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
-public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, PaymentResponse> {
+public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
 
     private final TransactionRequest<RawSepaPayment> transactionRequest;
+    private GVRawSEPA hbciRawSepaJob;
 
     @Override
     TransactionRequest<RawSepaPayment> getTransactionRequest() {
@@ -80,24 +79,19 @@ public class RawSepaJob extends ScaRequiredJob<RawSepaPayment, PaymentResponse> 
                 throw new IllegalArgumentException("unsupported raw sepa transaction: " + sepaPayment.getSepaTransactionType());
         }
 
-        GVRawSEPA sepagv = new GVRawSEPA(passport, jobName, sepaPayment.getRawRequestData());
-        sepagv.setParam("src", getPsuKonto(passport));
+        hbciRawSepaJob = new GVRawSEPA(passport, jobName, sepaPayment.getRawRequestData());
+        hbciRawSepaJob.setParam("src", getPsuKonto(passport));
 
-        appendPainValues(sepaPayment, sepagv);
+        appendPainValues(sepaPayment, hbciRawSepaJob);
 
-        sepagv.verifyConstraints();
+        hbciRawSepaJob.verifyConstraints();
 
-        return sepagv;
+        return hbciRawSepaJob;
     }
 
     @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    PaymentResponse createJobResponse(PinTanPassport passport) {
-        return new PaymentResponse();
+    AbstractHBCIJob getHbciJob() {
+        return hbciRawSepaJob;
     }
 
     private void appendPainValues(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {

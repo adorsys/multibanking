@@ -6,13 +6,11 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
-import de.adorsys.multibanking.domain.response.TransactionAuthorisationResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
-import de.adorsys.multibanking.domain.transaction.TransactionAuthorisation;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -106,11 +104,6 @@ public class FigoBanking implements OnlineBankingService {
     @Override
     public boolean bookingsCategorized() {
         return false;
-    }
-
-    @Override
-    public TransactionAuthorisationResponse transactionAuthorisation(TransactionAuthorisation submitAuthorisationCode) {
-        return null;
     }
 
     @Override

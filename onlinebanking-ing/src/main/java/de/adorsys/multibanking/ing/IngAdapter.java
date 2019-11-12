@@ -7,14 +7,13 @@ import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodReque
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
-import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
+import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
-import de.adorsys.multibanking.domain.transaction.TransactionAuthorisation;
 import de.adorsys.multibanking.ing.api.Balance;
 import de.adorsys.multibanking.ing.api.*;
 import de.adorsys.multibanking.ing.http.ApacheHttpClient;
@@ -144,7 +143,8 @@ public class IngAdapter implements OnlineBankingService {
         );
 
         Response<de.adorsys.multibanking.ing.api.TransactionsResponse> transactionsResponse = getHttpClient().get(uri)
-            .send(clientAuthentication, jsonResponseHandler(de.adorsys.multibanking.ing.api.TransactionsResponse.class));
+            .send(clientAuthentication,
+                jsonResponseHandler(de.adorsys.multibanking.ing.api.TransactionsResponse.class));
 
         return TransactionsResponse.builder()
             .bookings(ingMapper.mapToBookings(transactionsResponse.getBody().getTransactions().getBooked()))
@@ -203,11 +203,6 @@ public class IngAdapter implements OnlineBankingService {
 
     @Override
     public AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public TransactionAuthorisationResponse transactionAuthorisation(TransactionAuthorisation submitAuthorisationCode) {
         throw new UnsupportedOperationException();
     }
 

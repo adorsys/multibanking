@@ -17,8 +17,6 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AbstractResponse;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
 import lombok.RequiredArgsConstructor;
@@ -27,38 +25,31 @@ import org.kapott.hbci.GV.GVTermMultiUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Only for future payment (GVTermUebSEPA)
  */
 @RequiredArgsConstructor
-public class DeleteFutureBulkPaymentJob extends ScaRequiredJob<FutureBulkPayment, AbstractResponse> {
+public class DeleteFutureBulkPaymentJob extends AbstractPaymentJob<FutureBulkPayment> {
 
     private final TransactionRequest<FutureBulkPayment> transactionRequest;
+    private GVTermMultiUebSEPADel hbciDeleteFutureBulkPaymentJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         FutureBulkPayment futureBulkPayment = transactionRequest.getTransaction();
 
-        GVTermMultiUebSEPADel sepadelgv = new GVTermMultiUebSEPADel(passport, GVTermMultiUebSEPADel.getLowlevelName());
+        hbciDeleteFutureBulkPaymentJob = new GVTermMultiUebSEPADel(passport, GVTermMultiUebSEPADel.getLowlevelName());
 
-        sepadelgv.setParam("orderid", futureBulkPayment.getOrderId());
-        sepadelgv.setParam("src", getPsuKonto(passport));
-        sepadelgv.verifyConstraints();
+        hbciDeleteFutureBulkPaymentJob.setParam("orderid", futureBulkPayment.getOrderId());
+        hbciDeleteFutureBulkPaymentJob.setParam("src", getPsuKonto(passport));
+        hbciDeleteFutureBulkPaymentJob.verifyConstraints();
 
-        return sepadelgv;
+        return hbciDeleteFutureBulkPaymentJob;
     }
 
     @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    PaymentResponse createJobResponse(PinTanPassport passport) {
-        return new PaymentResponse();
+    AbstractHBCIJob getHbciJob() {
+        return hbciDeleteFutureBulkPaymentJob;
     }
 
     @Override

@@ -32,20 +32,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
-import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.callback.AbstractHBCICallback;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.manager.KnownTANProcess;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
-import org.kapott.hbci.status.HBCIStatus;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
@@ -54,7 +50,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNA
 
 @RequiredArgsConstructor
 @Slf4j
-public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
+public class SubmitAuthorisationCodeJob<J extends ScaAwareJob> {
 
     private final J scaJob;
 
@@ -66,12 +62,11 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
 
         HBCIJobsDialog hbciDialog = new HBCIJobsDialog(hbciPassport, hbciTanSubmit.getDialogId(),
             hbciTanSubmit.getMsgNum());
-        AbstractHBCIJob hbciJob;
 
         if (hbciTanSubmit.getTwoStepMechanism().getProcess() == 1) {
-            hbciJob = submitProcess1(hbciTanSubmit, hbciPassport, hbciDialog);
+            submitProcess1(hbciTanSubmit, hbciPassport, hbciDialog);
         } else {
-            hbciJob = submitProcess2(hbciTanSubmit, hbciDialog);
+            submitProcess2(hbciTanSubmit, hbciDialog);
         }
 
         HBCIExecStatus hbciExecStatus = hbciDialog.execute(false);
@@ -84,17 +79,16 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
             if (hbciTanSubmit.getHbciJobName() != null && hbciTanSubmit.getHbciJobName().equals("HKIDN")) {
                 //sca for dialoginit was needed -> fints consent active, expecting response with exempted sca
                 TransactionAuthorisationResponse<?> response =
-                    new TransactionAuthorisationResponse<>(scaJob.authorisationAwareExecute(null, hbciDialog));
+                    new TransactionAuthorisationResponse<>(scaJob.execute(null, hbciDialog));
                 response.setScaStatus(FINALISED);
-                response.setWarnings(warningStatusCodesToList(hbciExecStatus)); // warnings of initial execute
                 return response;
             }
-            return createResponse(hbciPassport, hbciTanSubmit, hbciJob, hbciExecStatus);
+            return createResponse(hbciPassport, hbciTanSubmit, hbciExecStatus);
         }
     }
 
-    private AbstractHBCIJob submitProcess1(HbciTanSubmit hbciTanSubmit, HbciPassport hbciPassport,
-                                           HBCIJobsDialog hbciDialog) {
+    private void submitProcess1(HbciTanSubmit hbciTanSubmit, HbciPassport hbciPassport,
+                                HBCIJobsDialog hbciDialog) {
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
         AbstractHBCIJob hbciJob = scaJob.createJobMessage(hbciPassport);
@@ -104,11 +98,10 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
             hbciJob.setLowlevelParam(hbciJob.getName() + ".sepapain", hbciTanSubmit.getSepaPain());
         }
         hbciDialog.addTask(hbciJob);
-        return hbciJob;
     }
 
     @SuppressWarnings("unchecked")
-    private AbstractHBCIJob submitProcess2(HbciTanSubmit hbciTanSubmit, HBCIJobsDialog hbciDialog) {
+    private void submitProcess2(HbciTanSubmit hbciTanSubmit, HBCIJobsDialog hbciDialog) {
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         AbstractHBCIJob originJob = Optional.ofNullable(hbciTanSubmit.getOriginJobName())
@@ -132,24 +125,18 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         hktan.setParam("process", hbciTanSubmit.getHktanProcess() != null ? hbciTanSubmit.getHktanProcess() : "2");
         hktan.setParam("notlasttan", "N");
         hbciDialog.addTask(hktan, false);
-        return originJob;
     }
 
     private TransactionAuthorisationResponse<?> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
-                                                               AbstractHBCIJob hbciJob, HBCIExecStatus status) {
-        String transactionId = Optional.ofNullable(hbciJob)
-            .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
-            .orElse(hbciTanSubmit.getOrderRef());
-
+                                                               HBCIExecStatus status) {
         TransactionAuthorisationResponse<?> response =
-            new TransactionAuthorisationResponse<>(scaJob.createJobResponse(passport));
-        response.setTransactionId(transactionId);
-        response.setWarnings(warningStatusCodesToList(status));
+            new TransactionAuthorisationResponse<>(scaJob.createJobResponse(passport, hbciTanSubmit,
+                status.getMsgStatusList()));
 
         //HKIDN -> FINALISED -> further request like HKCAZ already executed
         ScaStatus scaStatus = Optional.ofNullable(hbciTanSubmit.getHbciJobName())
             .map(hbciJobName -> hbciJobName.equals("HKIDN") || scaJob.getTransactionRequest().getTransaction() instanceof AbstractPayment)
-            .map(finalised -> finalised ? FINALISED : SCAMETHODSELECTED)
+            .map(finalised -> Boolean.TRUE.equals(finalised) ? FINALISED : SCAMETHODSELECTED)
             .orElse(FINALISED);
 
         response.setScaStatus(scaStatus);
@@ -203,20 +190,5 @@ public class SubmitAuthorisationCodeJob<J extends ScaRequiredJob> {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.findAndRegisterModules();
         return objectMapper;
-    }
-
-    private String orderIdFromJobResult(HBCIJobResult jobResult) {
-        return scaJob.orderIdFromJobResult(jobResult);
-    }
-
-    private List<String> warningStatusCodesToList(HBCIExecStatus hbciExecStatus) {
-        return Optional.ofNullable(hbciExecStatus)
-            .map(HBCIExecStatus::getMsgStatusList)
-            .map(list -> list.isEmpty() ? null : list.get(0))
-            .map(status -> status.segStatus)
-            .map(HBCIStatus::getWarnings)
-            .map(list -> list.stream().map(retVal -> retVal.code))
-            .orElse(Stream.empty())
-            .collect(Collectors.toList());
     }
 }

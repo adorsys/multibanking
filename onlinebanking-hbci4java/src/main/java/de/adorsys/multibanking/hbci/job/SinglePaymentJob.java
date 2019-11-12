@@ -17,7 +17,6 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
@@ -32,13 +31,11 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-import java.util.Collections;
-import java.util.List;
-
 @RequiredArgsConstructor
-public class SinglePaymentJob extends ScaRequiredJob<SinglePayment, PaymentResponse> {
+public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment> {
 
     private final TransactionRequest<SinglePayment> transactionRequest;
+    private AbstractSEPAGV hbciSinglePaymentJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
@@ -51,36 +48,30 @@ public class SinglePaymentJob extends ScaRequiredJob<SinglePayment, PaymentRespo
         dst.iban = singlePayment.getReceiverIban();
         dst.bic = singlePayment.getReceiverBic();
 
-        AbstractSEPAGV sepagv;
         if (singlePayment instanceof FutureSinglePayment) {
-            sepagv = new GVTermUebSEPA(passport, GVTermUebSEPA.getLowlevelName());
-            sepagv.setParam("date", ((FutureSinglePayment) singlePayment).getExecutionDate().toString());
+            hbciSinglePaymentJob = new GVTermUebSEPA(passport, GVTermUebSEPA.getLowlevelName());
+            hbciSinglePaymentJob.setParam("date", ((FutureSinglePayment) singlePayment).getExecutionDate().toString());
         } else {
-            sepagv = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName());
+            hbciSinglePaymentJob = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName());
         }
 
-        sepagv.setParam("src", src);
-        sepagv.setParam("dst", dst);
-        sepagv.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
+        hbciSinglePaymentJob.setParam("src", src);
+        hbciSinglePaymentJob.setParam("dst", dst);
+        hbciSinglePaymentJob.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
         if (singlePayment.getPurpose() != null) {
-            sepagv.setParam("usage", singlePayment.getPurpose());
+            hbciSinglePaymentJob.setParam("usage", singlePayment.getPurpose());
         }
         if (singlePayment.getPurposecode() != null) {
-            sepagv.setParam("purposecode", singlePayment.getPurposecode());
+            hbciSinglePaymentJob.setParam("purposecode", singlePayment.getPurposecode());
         }
-        sepagv.verifyConstraints();
+        hbciSinglePaymentJob.verifyConstraints();
 
-        return sepagv;
+        return hbciSinglePaymentJob;
     }
 
     @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    PaymentResponse createJobResponse(PinTanPassport passport) {
-        return new PaymentResponse();
+    AbstractHBCIJob getHbciJob() {
+        return hbciSinglePaymentJob;
     }
 
     @Override

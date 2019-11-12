@@ -23,18 +23,18 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
+import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSEPAInfo;
-import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
+import org.kapott.hbci.status.HBCIMsgStatus;
 import org.kapott.hbci.structures.Konto;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +44,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Slf4j
-public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, AccountInformationResponse> {
+public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInformationResponse> {
 
     private final TransactionRequest<LoadAccounts> loadAccountInformationRequest;
 
@@ -59,11 +59,6 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, AccountI
     }
 
     @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
-    }
-
-    @Override
     TransactionRequest<LoadAccounts> getTransactionRequest() {
         return loadAccountInformationRequest;
     }
@@ -74,12 +69,8 @@ public class AccountInformationJob extends ScaRequiredJob<LoadAccounts, AccountI
     }
 
     @Override
-    public String orderIdFromJobResult(HBCIJobResult jobResult) {
-        return null;
-    }
-
-    @Override
-    public AccountInformationResponse createJobResponse(PinTanPassport passport) {
+    public AccountInformationResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
+                                                        List<HBCIMsgStatus> msgStatusList) {
         loadAccountInformationRequest.getBankAccess().setBankName(passport.getInstName());
 
         hbciAccounts = new ArrayList<>();

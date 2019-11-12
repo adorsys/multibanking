@@ -179,7 +179,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request);
 
                 AccountInformationJob accountInformationJob = new AccountInformationJob(request);
-                AccountInformationResponse response = accountInformationJob.authorisationAwareExecute(hbciCallback);
+                AccountInformationResponse response = accountInformationJob.execute(hbciCallback);
                 updateUpd(hbciCallback, response);
                 return response;
             } else {
@@ -204,7 +204,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request);
 
                 LoadTransactionsJob loadBookingsJob = new LoadTransactionsJob(request);
-                TransactionsResponse response = loadBookingsJob.authorisationAwareExecute(hbciCallback);
+                TransactionsResponse response = loadBookingsJob.execute(hbciCallback);
                 updateUpd(hbciCallback, response);
                 return response;
             } else {
@@ -228,7 +228,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request);
 
                 LoadBalancesJob loadBalancesJob = new LoadBalancesJob(request);
-                LoadBalancesResponse response = loadBalancesJob.authorisationAwareExecute(hbciCallback);
+                LoadBalancesResponse response = loadBalancesJob.execute(hbciCallback);
                 updateUpd(hbciCallback, response);
                 return response;
             } else {
@@ -252,11 +252,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 checkBankExists(request.getBank());
                 BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request);
 
-                ScaRequiredJob scaJob = Optional.ofNullable(request.getTransaction())
+                ScaAwareJob scaJob = Optional.ofNullable(request.getTransaction())
                     .map(transaction -> createScaJob(request))
                     .orElse(new TanRequestJob(request));
 
-                AbstractResponse response = scaJob.authorisationAwareExecute(hbciCallback);
+                AbstractResponse response = scaJob.execute(hbciCallback);
                 updateUpd(hbciCallback, response);
 
                 return response;
@@ -280,12 +280,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @SuppressWarnings("unchecked")
-    @Override
-    public TransactionAuthorisationResponse<? extends AbstractResponse> transactionAuthorisation(TransactionAuthorisation submitAuthorisationCode) {
+    private TransactionAuthorisationResponse<? extends AbstractResponse> transactionAuthorisation(TransactionAuthorisation submitAuthorisationCode) {
         checkBankExists(submitAuthorisationCode.getOriginTransactionRequest().getBank());
         setRequestBpdAndCreateCallback(submitAuthorisationCode.getOriginTransactionRequest());
         try {
-            ScaRequiredJob scaJob = createScaJob(submitAuthorisationCode.getOriginTransactionRequest());
+            ScaAwareJob scaJob = createScaJob(submitAuthorisationCode.getOriginTransactionRequest());
 
             TransactionAuthorisationResponse submitAuthorizationCodeResponse =
                 new SubmitAuthorisationCodeJob<>(scaJob).sumbitAuthorizationCode(submitAuthorisationCode);
@@ -392,7 +391,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @SuppressWarnings("unchecked")
-    private ScaRequiredJob createScaJob(TransactionRequest transactionRequest) {
+    private ScaAwareJob createScaJob(TransactionRequest transactionRequest) {
         switch (transactionRequest.getTransaction().getTransactionType()) {
             case SINGLE_PAYMENT:
             case FUTURE_SINGLE_PAYMENT:

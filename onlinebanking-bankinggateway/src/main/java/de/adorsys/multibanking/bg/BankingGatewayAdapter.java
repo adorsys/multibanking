@@ -23,7 +23,6 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
-import de.adorsys.multibanking.domain.transaction.TransactionAuthorisation;
 import de.adorsys.multibanking.mapper.TransactionsParser;
 import de.adorsys.xs2a.adapter.api.remote.AccountInformationClient;
 import de.adorsys.xs2a.adapter.mapper.TransactionsReportMapper;
@@ -259,11 +258,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     @Override
     public boolean bookingsCategorized() {
         return false;
-    }
-
-    @Override
-    public TransactionAuthorisationResponse transactionAuthorisation(TransactionAuthorisation submitAuthorisationCode) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

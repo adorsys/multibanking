@@ -5,16 +5,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
 @RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class TransactionAuthorisationResponse<T extends AbstractResponse> {
 
     private final T jobResponse;
-    private List<String> warnings;
-    private String transactionId;
     private ScaStatus scaStatus;
 
 }

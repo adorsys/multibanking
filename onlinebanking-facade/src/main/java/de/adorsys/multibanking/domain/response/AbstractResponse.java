@@ -9,7 +9,11 @@ import java.util.Map;
 public abstract class AbstractResponse {
 
     private AuthorisationCodeResponse authorisationCodeResponse;
+
+    private List<String> messages;
+    private List<String> warnings;
+
     private String hbciSysId;
     private Map<String, String> hbciUpd;
-    private List<String> messages;
+
 }

@@ -16,45 +16,36 @@
 
 package de.adorsys.multibanking.hbci.job;
 
-import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
-import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIMsgStatus;
 
 import java.util.List;
+import java.util.Optional;
 
-@RequiredArgsConstructor
-public class TanRequestJob extends ScaAwareJob<AbstractPayment, AbstractResponse> {
-
-    private final TransactionRequest<AbstractPayment> transactionRequest;
+abstract class AbstractPaymentJob<T extends AbstractPayment> extends ScaAwareJob<T, PaymentResponse> {
 
     @Override
-    TransactionRequest<AbstractPayment> getTransactionRequest() {
-        return transactionRequest;
-    }
-
-    @Override
-    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
-        return null;
-    }
-
-    @Override
-    AbstractResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
-                                       List<HBCIMsgStatus> msgStatusList) {
-        PaymentResponse paymentResponse = new PaymentResponse(null);
+    PaymentResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
+                                      List<HBCIMsgStatus> msgStatusList) {
+        String transactionId = Optional.ofNullable(getTransactionId())
+            .orElseGet(tanSubmit::getOrderRef);
+        PaymentResponse paymentResponse = new PaymentResponse(transactionId);
         paymentResponse.setWarnings(collectWarnings(msgStatusList));
         return paymentResponse;
     }
 
-    @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        return null;
+    private String getTransactionId() {
+        return Optional.ofNullable(getHbciJob())
+            .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
+            .orElse(null);
     }
 
+    abstract AbstractHBCIJob getHbciJob();
+
+    public abstract String orderIdFromJobResult(HBCIJobResult paymentGV);
 }

@@ -24,14 +24,15 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVKUmsAll;
 import org.kapott.hbci.GV.GVKUmsAllCamt;
 import org.kapott.hbci.GV_Result.GVRKUms;
-import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
+import org.kapott.hbci.status.HBCIMsgStatus;
 import org.kapott.hbci.structures.Saldo;
 
 import java.time.LocalDate;
@@ -45,7 +46,7 @@ import static de.adorsys.multibanking.domain.transaction.LoadTransactions.RawRes
 
 @RequiredArgsConstructor
 @Slf4j
-public class LoadTransactionsJob extends ScaRequiredJob<LoadTransactions, TransactionsResponse> {
+public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, TransactionsResponse> {
 
     private final TransactionRequest<LoadTransactions> loadBookingsRequest;
 
@@ -55,11 +56,6 @@ public class LoadTransactionsJob extends ScaRequiredJob<LoadTransactions, Transa
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         transactionsHbciJob = createTransactionsJob(passport);
         return transactionsHbciJob;
-    }
-
-    @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
     }
 
     @Override
@@ -76,12 +72,8 @@ public class LoadTransactionsJob extends ScaRequiredJob<LoadTransactions, Transa
     }
 
     @Override
-    public String orderIdFromJobResult(HBCIJobResult jobResult) {
-        return null;
-    }
-
-    @Override
-    public TransactionsResponse createJobResponse(PinTanPassport passport) {
+    public TransactionsResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
+                                                  List<HBCIMsgStatus> msgStatusList) {
         if (transactionsHbciJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
             throw new MultibankingException(HBCI_ERROR,
