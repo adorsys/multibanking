@@ -4,8 +4,12 @@ import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.*;
-import de.adorsys.multibanking.domain.transaction.*;
+import de.adorsys.multibanking.domain.response.AbstractResponse;
+import de.adorsys.multibanking.domain.response.AccountInformationResponse;
+import de.adorsys.multibanking.domain.response.TransactionsResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractPayment;
+import de.adorsys.multibanking.domain.transaction.LoadAccounts;
+import de.adorsys.multibanking.domain.transaction.LoadTransactions;
 
 public interface OnlineBankingService {
 
@@ -30,8 +34,6 @@ public interface OnlineBankingService {
     TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadBookingsRequest);
 
     AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest);
-
-    TransactionAuthorisationResponse transactionAuthorisation(TransactionAuthorisation transactionAuthorisation);
 
     StrongCustomerAuthorisable getStrongCustomerAuthorisation();
 }

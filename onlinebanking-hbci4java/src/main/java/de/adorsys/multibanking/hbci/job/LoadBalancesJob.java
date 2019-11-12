@@ -23,6 +23,7 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadBalancesResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadBalances;
+import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +31,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
-import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
+import org.kapott.hbci.status.HBCIMsgStatus;
 import org.kapott.hbci.structures.Konto;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,7 +44,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 @RequiredArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Slf4j
-public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesResponse> {
+public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesResponse> {
 
     private final TransactionRequest<LoadBalances> loadBalanceRequest;
     private AbstractHBCIJob balanceJob;
@@ -68,11 +68,6 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesRe
     }
 
     @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
-    }
-
-    @Override
     TransactionRequest<LoadBalances> getTransactionRequest() {
         return loadBalanceRequest;
     }
@@ -83,12 +78,8 @@ public class LoadBalancesJob extends ScaRequiredJob<LoadBalances, LoadBalancesRe
     }
 
     @Override
-    public String orderIdFromJobResult(HBCIJobResult jobResult) {
-        return null;
-    }
-
-    @Override
-    public LoadBalancesResponse createJobResponse(PinTanPassport passport) {
+    public LoadBalancesResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
+                                                  List<HBCIMsgStatus> msgStatusList) {
         if (balanceJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Balance job not OK");
             throw new MultibankingException(HBCI_ERROR, balanceJob.getJobResult().getJobStatus().getErrorList().stream()

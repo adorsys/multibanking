@@ -17,7 +17,6 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciCycleMapper;
@@ -30,14 +29,12 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-import java.util.Collections;
-import java.util.List;
-
 @RequiredArgsConstructor
 @Slf4j
-public class DeleteStandingOrderJob extends ScaRequiredJob<StandingOrder, PaymentResponse> {
+public class DeleteStandingOrderJob extends AbstractPaymentJob<StandingOrder> {
 
     private final TransactionRequest<StandingOrder> transactionRequest;
+    private GVDauerSEPADel hbciDeleteStandingOrderJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
@@ -50,44 +47,41 @@ public class DeleteStandingOrderJob extends ScaRequiredJob<StandingOrder, Paymen
         dst.iban = standingOrder.getOtherAccount().getIban();
         dst.bic = standingOrder.getOtherAccount().getBic();
 
-        GVDauerSEPADel gvDauerSEPADel = new GVDauerSEPADel(passport);
+        hbciDeleteStandingOrderJob = new GVDauerSEPADel(passport);
 
-        gvDauerSEPADel.setParam("src", src);
-        gvDauerSEPADel.setParam("dst", dst);
-        gvDauerSEPADel.setParam("btg", new Value(standingOrder.getAmount(), standingOrder.getCurrency()));
-        gvDauerSEPADel.setParam("usage", standingOrder.getUsage());
+        hbciDeleteStandingOrderJob.setParam("src", src);
+        hbciDeleteStandingOrderJob.setParam("dst", dst);
+        hbciDeleteStandingOrderJob.setParam("btg", new Value(standingOrder.getAmount(), standingOrder.getCurrency()));
+        hbciDeleteStandingOrderJob.setParam("usage", standingOrder.getUsage());
 
-        gvDauerSEPADel.setParam("orderid", standingOrder.getOrderId());
+        hbciDeleteStandingOrderJob.setParam("orderid", standingOrder.getOrderId());
 
         // standing order specific parameter
         if (standingOrder.getFirstExecutionDate() != null) {
-            gvDauerSEPADel.setParam("firstdate", standingOrder.getFirstExecutionDate().toString());
+            hbciDeleteStandingOrderJob.setParam("firstdate", standingOrder.getFirstExecutionDate().toString());
         }
         if (standingOrder.getCycle() != null) {
-            gvDauerSEPADel.setParam("timeunit", HbciCycleMapper.cycleToTimeunit(standingOrder.getCycle())); // M
+            hbciDeleteStandingOrderJob.setParam("timeunit",
+                HbciCycleMapper.cycleToTimeunit(standingOrder.getCycle())); // M
             // month, W
             // week
-            gvDauerSEPADel.setParam("turnus", HbciCycleMapper.cycleToTurnus(standingOrder.getCycle())); // 1W = every
+            hbciDeleteStandingOrderJob.setParam("turnus", HbciCycleMapper.cycleToTurnus(standingOrder.getCycle()));
+            // 1W = every
             // week, 2M = every two months
         }
-        gvDauerSEPADel.setParam("execday", standingOrder.getExecutionDay()); // W: 1-7, M: 1-31
+        hbciDeleteStandingOrderJob.setParam("execday", standingOrder.getExecutionDay()); // W: 1-7, M: 1-31
         if (standingOrder.getLastExecutionDate() != null) {
-            gvDauerSEPADel.setParam("lastdate", standingOrder.getLastExecutionDate().toString());
+            hbciDeleteStandingOrderJob.setParam("lastdate", standingOrder.getLastExecutionDate().toString());
         }
 
-        gvDauerSEPADel.verifyConstraints();
+        hbciDeleteStandingOrderJob.verifyConstraints();
 
-        return gvDauerSEPADel;
+        return hbciDeleteStandingOrderJob;
     }
 
     @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    PaymentResponse createJobResponse(PinTanPassport passport) {
-        return new PaymentResponse();
+    AbstractHBCIJob getHbciJob() {
+        return hbciDeleteStandingOrderJob;
     }
 
     @Override

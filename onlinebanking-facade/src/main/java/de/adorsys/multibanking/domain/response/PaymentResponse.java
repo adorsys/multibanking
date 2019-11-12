@@ -16,5 +16,15 @@
 
 package de.adorsys.multibanking.domain.response;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@AllArgsConstructor
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class PaymentResponse extends AbstractResponse {
+
+    private final String transactionId;
+
 }

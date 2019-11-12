@@ -17,7 +17,6 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import lombok.RequiredArgsConstructor;
@@ -30,14 +29,12 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-import java.util.Collections;
-import java.util.List;
-
 @RequiredArgsConstructor
 @Slf4j
-public class TransferJob extends ScaRequiredJob<SinglePayment, PaymentResponse> {
+public class TransferJob extends AbstractPaymentJob<SinglePayment> {
 
     private final TransactionRequest<SinglePayment> transactionRequest;
+    private AbstractSEPAGV hbciTransferJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
@@ -50,23 +47,18 @@ public class TransferJob extends ScaRequiredJob<SinglePayment, PaymentResponse> 
         dst.iban = singlePayment.getReceiverIban();
         dst.bic = singlePayment.getReceiverBic();
 
-        AbstractSEPAGV sepagv = new GVUmbSEPA(passport, GVUmbSEPA.getLowlevelName(), null);
+        hbciTransferJob = new GVUmbSEPA(passport, GVUmbSEPA.getLowlevelName(), null);
 
-        sepagv.setParam("src", src);
-        sepagv.setParam("dst", dst);
-        sepagv.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
+        hbciTransferJob.setParam("src", src);
+        hbciTransferJob.setParam("dst", dst);
+        hbciTransferJob.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
         if (singlePayment.getPurpose() != null) {
-            sepagv.setParam("usage", singlePayment.getPurpose());
+            hbciTransferJob.setParam("usage", singlePayment.getPurpose());
         }
 
-        sepagv.verifyConstraints();
+        hbciTransferJob.verifyConstraints();
 
-        return sepagv;
-    }
-
-    @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
+        return hbciTransferJob;
     }
 
     @Override
@@ -80,8 +72,8 @@ public class TransferJob extends ScaRequiredJob<SinglePayment, PaymentResponse> 
     }
 
     @Override
-    PaymentResponse createJobResponse(PinTanPassport passport) {
-        return new PaymentResponse();
+    AbstractHBCIJob getHbciJob() {
+        return hbciTransferJob;
     }
 
     @Override

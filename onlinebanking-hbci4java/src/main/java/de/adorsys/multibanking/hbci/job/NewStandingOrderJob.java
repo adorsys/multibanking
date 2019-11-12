@@ -17,7 +17,6 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import de.adorsys.multibanking.hbci.model.HbciCycleMapper;
@@ -31,14 +30,12 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-import java.util.Collections;
-import java.util.List;
-
 @RequiredArgsConstructor
 @Slf4j
-public class NewStandingOrderJob extends ScaRequiredJob<StandingOrder, PaymentResponse> {
+public class NewStandingOrderJob extends AbstractPaymentJob<StandingOrder> {
 
     private final TransactionRequest<StandingOrder> transactionRequest;
+    private GVDauerSEPANew hbciNewStandingOrderJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
@@ -51,45 +48,42 @@ public class NewStandingOrderJob extends ScaRequiredJob<StandingOrder, PaymentRe
         dst.iban = standingOrder.getOtherAccount().getIban();
         dst.bic = standingOrder.getOtherAccount().getBic();
 
-        GVDauerSEPANew gvDauerSEPANew = new GVDauerSEPANew(passport);
+        hbciNewStandingOrderJob = new GVDauerSEPANew(passport);
 
-        gvDauerSEPANew.setParam("src", src);
-        gvDauerSEPANew.setParam("dst", dst);
-        gvDauerSEPANew.setParam("btg", new Value(standingOrder.getAmount(), standingOrder.getCurrency()));
-        gvDauerSEPANew.setParam("usage", standingOrder.getUsage());
+        hbciNewStandingOrderJob.setParam("src", src);
+        hbciNewStandingOrderJob.setParam("dst", dst);
+        hbciNewStandingOrderJob.setParam("btg", new Value(standingOrder.getAmount(), standingOrder.getCurrency()));
+        hbciNewStandingOrderJob.setParam("usage", standingOrder.getUsage());
 
         // standing order specific parameter
         if (standingOrder.getFirstExecutionDate() != null) {
-            gvDauerSEPANew.setParam("firstdate", standingOrder.getFirstExecutionDate().toString());
+            hbciNewStandingOrderJob.setParam("firstdate", standingOrder.getFirstExecutionDate().toString());
         }
         if (standingOrder.getCycle() != null) {
-            gvDauerSEPANew.setParam("timeunit", HbciCycleMapper.cycleToTimeunit(standingOrder.getCycle())); // M
+            hbciNewStandingOrderJob.setParam("timeunit", HbciCycleMapper.cycleToTimeunit(standingOrder.getCycle()));
+            // M
             // month, W
             // week
-            gvDauerSEPANew.setParam("turnus", HbciCycleMapper.cycleToTurnus(standingOrder.getCycle())); // 1W = every
+            hbciNewStandingOrderJob.setParam("turnus", HbciCycleMapper.cycleToTurnus(standingOrder.getCycle())); //
+            // 1W = every
             // week, 2M = every two months
         }
-        gvDauerSEPANew.setParam("execday", standingOrder.getExecutionDay()); // W: 1-7, M: 1-31
+        hbciNewStandingOrderJob.setParam("execday", standingOrder.getExecutionDay()); // W: 1-7, M: 1-31
         if (standingOrder.getLastExecutionDate() != null) {
-            gvDauerSEPANew.setParam("lastdate", standingOrder.getLastExecutionDate().toString());
+            hbciNewStandingOrderJob.setParam("lastdate", standingOrder.getLastExecutionDate().toString());
         }
         if (standingOrder.getPurposecode() != null) {
-            gvDauerSEPANew.setParam("purposecode", standingOrder.getPurposecode());
+            hbciNewStandingOrderJob.setParam("purposecode", standingOrder.getPurposecode());
         }
 
-        gvDauerSEPANew.verifyConstraints();
+        hbciNewStandingOrderJob.verifyConstraints();
 
-        return gvDauerSEPANew;
+        return hbciNewStandingOrderJob;
     }
 
     @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    PaymentResponse createJobResponse(PinTanPassport passport) {
-        return new PaymentResponse();
+    AbstractHBCIJob getHbciJob() {
+        return hbciNewStandingOrderJob;
     }
 
     @Override

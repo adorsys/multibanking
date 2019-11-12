@@ -5,13 +5,11 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
-import de.adorsys.multibanking.domain.response.TransactionAuthorisationResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
-import de.adorsys.multibanking.domain.transaction.TransactionAuthorisation;
 import de.adorsys.multibanking.domain.utils.Utils;
 import de.adorsys.multibanking.finapi.api.*;
 import de.adorsys.multibanking.finapi.model.*;
@@ -272,11 +270,6 @@ public class FinapiBanking implements OnlineBankingService {
     @Override
     public boolean bookingsCategorized() {
         return true;
-    }
-
-    @Override
-    public TransactionAuthorisationResponse transactionAuthorisation(TransactionAuthorisation submitAuthorisationCode) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

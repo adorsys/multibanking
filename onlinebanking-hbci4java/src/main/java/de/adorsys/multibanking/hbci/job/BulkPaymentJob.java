@@ -17,8 +17,6 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AbstractResponse;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
@@ -35,13 +33,11 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-import java.util.Collections;
-import java.util.List;
-
 @RequiredArgsConstructor
-public class BulkPaymentJob extends ScaRequiredJob<BulkPayment, AbstractResponse> {
+public class BulkPaymentJob extends AbstractPaymentJob<BulkPayment> {
 
     private final TransactionRequest<BulkPayment> transactionRequest;
+    private AbstractSEPAGV bulkPaymentHbciJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
@@ -49,16 +45,15 @@ public class BulkPaymentJob extends ScaRequiredJob<BulkPayment, AbstractResponse
 
         Konto src = getPsuKonto(passport);
 
-        AbstractSEPAGV sepagv;
         if (bulkPayment instanceof FutureBulkPayment) {
-            sepagv = new GVTermMultiUebSEPA(passport, GVTermMultiUebSEPA.getLowlevelName());
-            sepagv.setParam("date", ((FutureBulkPayment) bulkPayment).getExecutionDate().toString());
+            bulkPaymentHbciJob = new GVTermMultiUebSEPA(passport, GVTermMultiUebSEPA.getLowlevelName());
+            bulkPaymentHbciJob.setParam("date", ((FutureBulkPayment) bulkPayment).getExecutionDate().toString());
         } else {
-            sepagv = new GVMultiUebSEPA(passport, GVMultiUebSEPA.getLowlevelName());
+            bulkPaymentHbciJob = new GVMultiUebSEPA(passport, GVMultiUebSEPA.getLowlevelName());
         }
 
-        sepagv.setParam("src", src);
-        sepagv.setParam("batchbook", BooleanUtils.isTrue(bulkPayment.getBatchbooking()) ? "1" : "0");
+        bulkPaymentHbciJob.setParam("src", src);
+        bulkPaymentHbciJob.setParam("batchbook", BooleanUtils.isTrue(bulkPayment.getBatchbooking()) ? "1" : "0");
 
         for (int i = 0; i < bulkPayment.getPayments().size(); i++) {
             SinglePayment payment = bulkPayment.getPayments().get(i);
@@ -68,29 +63,24 @@ public class BulkPaymentJob extends ScaRequiredJob<BulkPayment, AbstractResponse
             dst.iban = payment.getReceiverIban();
             dst.bic = payment.getReceiverBic();
 
-            sepagv.setParam("dst", i, dst);
-            sepagv.setParam("btg", i, new Value(payment.getAmount(), payment.getCurrency()));
+            bulkPaymentHbciJob.setParam("dst", i, dst);
+            bulkPaymentHbciJob.setParam("btg", i, new Value(payment.getAmount(), payment.getCurrency()));
             if (payment.getPurpose() != null) {
-                sepagv.setParam("usage", i, payment.getPurpose());
+                bulkPaymentHbciJob.setParam("usage", i, payment.getPurpose());
             }
             if (payment.getPurposecode() != null) {
-                sepagv.setParam("purposecode", i, payment.getPurposecode());
+                bulkPaymentHbciJob.setParam("purposecode", i, payment.getPurposecode());
             }
         }
 
-        sepagv.verifyConstraints();
+        bulkPaymentHbciJob.verifyConstraints();
 
-        return sepagv;
+        return bulkPaymentHbciJob;
     }
 
     @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    PaymentResponse createJobResponse(PinTanPassport passport) {
-        return new PaymentResponse();
+    AbstractHBCIJob getHbciJob() {
+        return bulkPaymentHbciJob;
     }
 
     @Override

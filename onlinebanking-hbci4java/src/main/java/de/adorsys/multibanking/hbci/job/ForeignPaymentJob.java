@@ -17,7 +17,6 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.ForeignPayment;
 import lombok.RequiredArgsConstructor;
@@ -27,35 +26,28 @@ import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 
-import java.util.Collections;
-import java.util.List;
-
 @RequiredArgsConstructor
-public class ForeignPaymentJob extends ScaRequiredJob<ForeignPayment, PaymentResponse> {
+public class ForeignPaymentJob extends AbstractPaymentJob<ForeignPayment> {
 
     private final TransactionRequest<ForeignPayment> transactionRequest;
+    private GVDTAZV hbciForeignPaymentJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         Konto src = getPsuKonto(passport);
 
-        GVDTAZV gv = new GVDTAZV(passport, GVDTAZV.getLowlevelName());
+        hbciForeignPaymentJob = new GVDTAZV(passport, GVDTAZV.getLowlevelName());
 
-        gv.setParam("src", src);
-        gv.setParam("dtazv", "B" + transactionRequest.getTransaction().getRawRequestData());
-        gv.verifyConstraints();
+        hbciForeignPaymentJob.setParam("src", src);
+        hbciForeignPaymentJob.setParam("dtazv", "B" + transactionRequest.getTransaction().getRawRequestData());
+        hbciForeignPaymentJob.verifyConstraints();
 
-        return gv;
+        return hbciForeignPaymentJob;
     }
 
     @Override
-    public List<AbstractHBCIJob> createAdditionalMessages(PinTanPassport passport) {
-        return Collections.emptyList();
-    }
-
-    @Override
-    PaymentResponse createJobResponse(PinTanPassport passport) {
-        return new PaymentResponse();
+    AbstractHBCIJob getHbciJob() {
+        return hbciForeignPaymentJob;
     }
 
     @Override
@@ -72,5 +64,4 @@ public class ForeignPaymentJob extends ScaRequiredJob<ForeignPayment, PaymentRes
     public String orderIdFromJobResult(HBCIJobResult paymentGV) {
         return null;
     }
-
 }
