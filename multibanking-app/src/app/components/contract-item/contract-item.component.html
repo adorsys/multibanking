@@ -8,7 +8,7 @@
     <p *ngIf="contract.subCategory">{{contract.subCategory}}</p>
     <p *ngIf="contract.specification">{{contract.specification}}</p>
   </ion-label>
-  <p slot="end">
+  <p class="ion-text-end" slot="end">
     {{contract.amount | currency:'EUR':'symbol'}}<br />
     {{contract.interval | cycle}}
   </p>

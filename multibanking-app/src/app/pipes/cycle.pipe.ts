@@ -15,7 +15,7 @@ export class CyclePipe implements PipeTransform {
         return 'bimonthly';
       case 'QUARTERLY':
         return 'quarterly';
-      case 'HALFYEARLY':
+      case 'HALF_YEARLY':
         return 'half-yearly';
       case 'YEARLY':
         return 'yearly';
