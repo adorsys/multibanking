@@ -118,18 +118,18 @@ public class ConsentController {
     private Resource<CreateConsentResponseTO> mapToResource(CreateConsentResponse createConsentResponse,
                                                             String bankCode) {
         String consentId = createConsentResponse.getConsentId();
-        String authorisationId = createConsentResponse.getAuthorisationId();
 
         List<Link> links = new ArrayList<>();
         links.add(linkTo(methodOn(BankController.class).getBank(bankCode)).withRel("bank"));
-        links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId,
-            authorisationId)).withRel("authorisationStatus"));
+
+        Optional.ofNullable(createConsentResponse.getAuthorisationId())
+            .ifPresent(authorisationId -> links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId, authorisationId)).withRel("authorisationStatus")));
 
         Optional.ofNullable(createConsentResponse.getRedirectUrl())
             .ifPresent(redirectUrl -> links.add(new Link(redirectUrl, "redirectUrl")));
 
         Optional.ofNullable(createConsentResponse.getOauthRedirectUrl())
-                .ifPresent(oauthUrl -> links.add(new Link(oauthUrl, "oauthRedirectUrl")));
+            .ifPresent(oauthUrl -> links.add(new Link(oauthUrl, "oauthRedirectUrl")));
 
         return new Resource<>(consentMapper.toCreateConsentResponseTO(createConsentResponse), links);
     }

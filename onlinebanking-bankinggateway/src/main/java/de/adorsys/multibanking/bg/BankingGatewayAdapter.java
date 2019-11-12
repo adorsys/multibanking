@@ -10,7 +10,6 @@ import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiException;
 import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2CAisApi;
-import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2COAuthApi;
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
@@ -77,8 +76,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private final String xs2aAdapterBaseUrl;
     @Getter(lazy = true)
     private final BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi();
-    @Getter(lazy = true)
-    private final BankingGatewayB2COAuthApi bankingGatewayB2COAuthApi = new BankingGatewayB2COAuthApi(apiClient());
     @Getter(lazy = true)
     private final AccountInformationClient accountApi = Feign.builder()
         .requestInterceptor(new FeignCorrelationIdInterceptor())
@@ -300,7 +297,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                         getBankingGatewayB2CAisApi().createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, null, redirectPreferred, tppRedirectUri);
 
                     BgSessionData sessionData = new BgSessionData();
-                    sessionData.setAuthorisationId(consentResponse.getAuthorisationId());
+                    sessionData.setConsentId(consentResponse.getConsentId());
                     CreateConsentResponse createConsentResponse = bankingGatewayMapper.toCreateConsentResponse(consentResponse);
                     createConsentResponse.setBankApiConsentData(sessionData);
 
@@ -409,13 +406,12 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             @Override
             public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
                 BgSessionData sessionData = (BgSessionData) bankApiConsentData;
-                String authorisationId = sessionData.getAuthorisationId();
+                String consentId = sessionData.getConsentId();
 
                 try {
                     AuthorizationCodeTO authorizationCodeTO = new AuthorizationCodeTO();
-                    authorizationCodeTO.setXs2aAuthorisationId(authorisationId);
-                    authorizationCodeTO.setOauthCode(authorisationCode);
-                    OAuthToken token = getBankingGatewayB2COAuthApi().resolveAuthCodeUsingPOST(authorizationCodeTO);
+                    authorizationCodeTO.setCode(authorisationCode);
+                    OAuthToken token = getBankingGatewayB2CAisApi().resolveAuthCodeUsingPOST(authorizationCodeTO, consentId);
 
                     Optional.ofNullable(token)
                             .map(OAuthToken::getAccessToken)

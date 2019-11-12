@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 class BgSessionData {
-    private String authorisationId;
+    private String consentId;
     private String accessToken;
     private String refreshToken;
 }

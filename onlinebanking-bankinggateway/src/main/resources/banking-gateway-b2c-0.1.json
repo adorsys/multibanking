@@ -12,10 +12,6 @@
       "description": "Consent Authorisation Resource"
     },
     {
-      "name": "Banking-Gateway B2C OAuth",
-      "description": "O Auth Resource"
-    },
-    {
       "name": "Banking-Gateway B2C PIS",
       "description": "Payment Authorisation Resource"
     }
@@ -231,6 +227,65 @@
                 "TERMINATED_BY_ASPSP",
                 "PARTIALLY_AUTHORISED"
               ]
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "deprecated": false
+      }
+    },
+    "/v1/ais/consents/{consentId}/token": {
+      "post": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Resolve token for oauth authentication code",
+        "operationId": "resolveAuthCodeUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorizationCodeTO",
+            "description": "authorizationCodeTO",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthorizationCodeTO"
+            }
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "description": "consentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/OAuthToken"
             }
           },
           "400": {
@@ -849,53 +904,6 @@
         ],
         "deprecated": false
       }
-    },
-    "/v1/token": {
-      "post": {
-        "tags": [
-          "Banking-Gateway B2C OAuth"
-        ],
-        "summary": "Resolve token for oauth authentication code",
-        "operationId": "resolveAuthCodeUsingPOST",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "authorizationCodeTO",
-            "description": "authorizationCodeTO",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/AuthorizationCodeTO"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/OAuthToken"
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "$ref": "#/definitions/MessagesTO"
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "schema": {
-              "$ref": "#/definitions/MessagesTO"
-            }
-          }
-        },
-        "deprecated": false
-      }
     }
   },
   "securityDefinitions": {
@@ -944,10 +952,7 @@
     "AuthorizationCodeTO": {
       "type": "object",
       "properties": {
-        "oauthCode": {
-          "type": "string"
-        },
-        "xs2aAuthorisationId": {
+        "code": {
           "type": "string"
         }
       },
