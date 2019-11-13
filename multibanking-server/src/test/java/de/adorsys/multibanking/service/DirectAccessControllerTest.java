@@ -8,8 +8,8 @@ import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
@@ -351,14 +351,17 @@ public class DirectAccessControllerTest {
         //4. select authentication method (optional), can be skipped by banks in case of selection not needed
         if (jsonPath.getString("scaStatus").equals(PSUAUTHENTICATED.toString())) {
             String selectAuthenticationMethodLink = jsonPath.getString("_links" + ".selectAuthenticationMethod.href");
-            String sceMethodId = jsonPath.getString("scaMethods[0].id");
+            Map<String, String> scaMethodParams = jsonPath.get("scaMethods[1]");
+
+            String scaMethodId = scaMethodParams.get("id");
             if (jsonPath.get("scaMethods.find { it.id == '901' }") != null) {
-                sceMethodId = "901";
+                scaMethodId = "901";
             }
 
             SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
                 new SelectPsuAuthenticationMethodRequestTO();
-            authenticationMethodRequestTO.setAuthenticationMethodId(sceMethodId);
+            authenticationMethodRequestTO.setAuthenticationMethodId(scaMethodId);
+            authenticationMethodRequestTO.setTanMediaName(scaMethodParams.get("medium"));
 
             jsonPath = request.body(authenticationMethodRequestTO).put(selectAuthenticationMethodLink)
                 .then().assertThat().statusCode(HttpStatus.OK.value())
@@ -374,12 +377,12 @@ public class DirectAccessControllerTest {
         //5. bookings challenge for hbci (Optional)
         //hbci case
         if (transactionAuthorisationLink == null) {
-            DirectAccessController.LoadBookingsRequest LoadBookingsRequest =
+            DirectAccessController.LoadBookingsRequest loadBookingsRequest =
                 new DirectAccessController.LoadBookingsRequest();
-            LoadBookingsRequest.setBankAccess(bankAccess);
+            loadBookingsRequest.setBankAccess(bankAccess);
 
             jsonPath = request
-                .body(LoadBookingsRequest)
+                .body(loadBookingsRequest)
                 .post(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
                 .then().assertThat().statusCode(HttpStatus.OK.value())
                 .and().extract().jsonPath();
