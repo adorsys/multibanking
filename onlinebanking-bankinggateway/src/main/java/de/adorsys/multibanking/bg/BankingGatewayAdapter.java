@@ -290,14 +290,18 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         return new StrongCustomerAuthorisable() {
             @Override
             public CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred,
-                                                       String tppRedirectUri) {
+                                                       String tppRedirectUri, Object bankApiConsentData) {
                 try {
                     String bankCode = Iban.valueOf(consentTemplate.getPsuAccountIban()).getBankCode();
                     CreateConsentResponseTO consentResponse =
-                        getBankingGatewayB2CAisApi().createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, null, redirectPreferred, tppRedirectUri);
+                        getBankingGatewayB2CAisApiSetToken(bankApiConsentData).createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, null, redirectPreferred, tppRedirectUri);
 
                     BgSessionData sessionData = new BgSessionData();
                     sessionData.setConsentId(consentResponse.getConsentId());
+                    Optional.ofNullable(bankApiConsentData).map(BgSessionData.class::cast).ifPresent( consentData -> {
+                        sessionData.setAccessToken(consentData.getAccessToken());
+                        sessionData.setRefreshToken(consentData.getRefreshToken());
+                    });
                     CreateConsentResponse createConsentResponse = bankingGatewayMapper.toCreateConsentResponse(consentResponse);
                     createConsentResponse.setBankApiConsentData(sessionData);
 

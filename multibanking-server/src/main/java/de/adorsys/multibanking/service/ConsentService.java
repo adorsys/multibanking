@@ -35,11 +35,16 @@ public class ConsentService {
     private final BankService bankService;
 
     public CreateConsentResponse createConsent(Consent consent, String tppRedirectUri, BankApi bankApi) {
+        Object bankApiConsentData = Optional.ofNullable(consent.getConsentId())
+            .flatMap(consentRepository::findById)
+            .map(ConsentEntity::getBankApiConsentData)
+            .orElse(null);
+
         OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getPsuAccountIban());
         BankEntity bank = bankService.findBank(Iban.valueOf(consent.getPsuAccountIban()).getBankCode());
         CreateConsentResponse createConsentResponse =
             onlineBankingService.getStrongCustomerAuthorisation().createConsent(consent, bank.isRedirectPreferred(),
-                tppRedirectUri);
+                tppRedirectUri, bankApiConsentData);
         createConsentResponse.setRedirectId(consent.getRedirectId());
 
         ConsentEntity consentEntity = consentMapper.toConsentEntity(createConsentResponse, consent.getRedirectId(),

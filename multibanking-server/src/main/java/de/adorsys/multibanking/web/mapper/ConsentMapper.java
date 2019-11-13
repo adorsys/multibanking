@@ -16,7 +16,7 @@ public interface ConsentMapper {
     @Mapping(target = "tppRedirectUri", ignore = true)
     ConsentTO toConsentTO(Consent consent);
 
-    @Mapping(target = "consentId", ignore = true)
+    @Mapping(target = "consentId", source = "id")
     Consent toConsent(ConsentTO consent);
 
     @Mapping(target = "consentId", source = "id")

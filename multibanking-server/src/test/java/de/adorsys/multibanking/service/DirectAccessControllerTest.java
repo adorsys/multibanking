@@ -29,6 +29,7 @@ import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -128,16 +129,23 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
-        ConsentTO consentTO = createConsentTO();
         prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
-            consentTO.getPsuAccountIban(),
-            true);
+                createConsentTO().getPsuAccountIban(),
+                true);
 
-        JsonPath jsonPath = request.body(createConsentTO())
+        doRedirect(null);
+    }
+
+    private String doRedirect(String prestepConsentId) {
+        ConsentTO consent = createConsentTO();
+        consent.setId(prestepConsentId);
+
+        JsonPath jsonPath = request.body(consent)
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
             .then().assertThat().statusCode(HttpStatus.CREATED.value())
             .and().extract().jsonPath();
 
+        String consentId = jsonPath.getString("consentId");
         String statusLink = jsonPath.getString("_links.authorisationStatus.href");
 
         System.out.println(jsonPath.getString("_links.redirectUrl.href"));
@@ -148,6 +156,8 @@ public class DirectAccessControllerTest {
             .and().extract().jsonPath();
 
         assertThat(jsonPath.getString("scaStatus")).isIn(FINALISED.toString());
+
+        return consentId;
     }
 
     @Ignore("uses real data - please setup ENV")
@@ -507,14 +517,14 @@ public class DirectAccessControllerTest {
 
     @Ignore("uses real data - please setup ENV")
     @Test
-    public void consent_authorisation_bankinggateway_oauth_integrated() {
+    public void consent_authorisation_bankinggateway_oauth() {
         ConsentTO consentTO = createConsentTO();
 
         prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
                 consentTO.getPsuAccountIban(),
                 true);
 
-        //1. initial call for prestep
+        //1. initial call
         JsonPath jsonPath = request.body(consentTO)
                 .post(getRemoteMultibankingUrl() + "/api/v1/consents")
                 .then().assertThat().statusCode(HttpStatus.CREATED.value())
@@ -523,18 +533,24 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("_links.oauthRedirectUrl")).isNotBlank();
 
         String consentId = jsonPath.getString("consentId");
+        String authorisationId = jsonPath.getString("authorisationId");
         String idpUrl = jsonPath.getString("_links.oauthRedirectUrl");
 
         log.info("Oauth redirect url: " + idpUrl);
         String authorizationCode = "BREAK_AND_PLACE_AUTHCODE_HERE";
 
-        //3. submit auth code (break to enter auth code)
+        //2. submit auth code (break to enter auth code)
         TokenRequestTO tokenRequestTO = new TokenRequestTO();
         tokenRequestTO.setAuthorisationCode(authorizationCode);
         request.body(tokenRequestTO)
                 .post(getRemoteMultibankingUrl() + "/api/v1/consents/{consentId}/token"
                         .replace("{consentId}", consentId))
                 .then().assertThat().statusCode(HttpStatus.NO_CONTENT.value());
+
+        //3. perform prestep consent creation (only prestep)
+        if (StringUtils.isEmpty(authorisationId)) {
+            consentId = doRedirect(consentId); // replace pseudo consent id with final id
+        }
 
         //4. load accounts
         DirectAccessController.LoadAccountsRequest loadAccountsRequest =
@@ -551,7 +567,7 @@ public class DirectAccessControllerTest {
 
         assertThat(loadBankAccountsResponse.getBankAccounts()).isNotEmpty();
 
-        //5.  load bookings
+        //5. load bookings
         DirectAccessController.LoadBookingsRequest loadBookingsRequest =
                 new DirectAccessController.LoadBookingsRequest();
         loadBookingsRequest.setUserId(loadBankAccountsResponse.getBankAccounts().get(0).getUserId());
