@@ -211,7 +211,7 @@ public class IngAdapter implements OnlineBankingService {
         return new StrongCustomerAuthorisable() {
             @Override
             public CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred,
-                                                       String tppRedirectUri) {
+                                                       String tppRedirectUri, Object bankApiConsentData) {
                 URI authorizationRequestUri = getAuthorisationUri(tppRedirectUri);
 
                 IngSessionData ingSessionData = new IngSessionData();

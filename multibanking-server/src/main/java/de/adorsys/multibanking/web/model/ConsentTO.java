@@ -11,8 +11,7 @@ import java.util.List;
 @Data
 public class ConsentTO {
 
-    @ApiModelProperty(value = "Internal consent id", readOnly = true, accessMode =
-        ApiModelProperty.AccessMode.READ_ONLY)
+    @ApiModelProperty(value = "Consent id")
     private String id;
 
     @ApiModelProperty(value = "Consent redirect id")

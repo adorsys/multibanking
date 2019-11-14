@@ -65,6 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/v1/direct/**").permitAll()
             .antMatchers("/api/v1/consents/**").permitAll()
             .antMatchers("/status").permitAll()
+            .antMatchers("/api/v1/oauth/**").permitAll()
             .antMatchers(HttpMethod.GET, "/api/v1/bank/**").permitAll()
             .antMatchers(HttpMethod.GET, "/api/v1/banks/**").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/bank/**").hasAuthority(RULES_ADMIN_ROLE)

@@ -25,5 +25,6 @@ public class CreateConsentResponse {
     private String authorisationId;
     private String redirectId;
     private String redirectUrl;
+    private String oauthRedirectUrl;
     private Object bankApiConsentData;
 }

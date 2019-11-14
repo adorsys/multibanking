@@ -474,7 +474,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             @Override
             public CreateConsentResponse createConsent(Consent consent, boolean redirectPreferred,
-                                                       String tppRedirectUri) {
+                                                       String tppRedirectUri, Object bankApiConsentData) {
                 String bankCode = Iban.valueOf(consent.getPsuAccountIban()).getBankCode();
                 if (!bankSupported(bankCode)) {
                     throw new MultibankingException(BANK_NOT_SUPPORTED);
