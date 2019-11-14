@@ -11,9 +11,13 @@
  */
 
 
-export interface SelectPsuAuthenticationMethodRequestTO { 
+export interface SelectPsuAuthenticationMethodRequestTO {
     /**
      * An identification provided by the ASPSP for the later identification of the authentication method selection.
      */
     authenticationMethodId: string;
+    /**
+     * TAN media name
+     */
+    tanMediaName?: string;
 }

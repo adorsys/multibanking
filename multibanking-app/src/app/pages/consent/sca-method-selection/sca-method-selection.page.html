@@ -9,8 +9,11 @@
     <ion-radio-group [(ngModel)]="scaMethod">
       <!-- http://localhost:4200/sca-method-selection/consents/hKKYHI46KfUk6xL_J1BCLTHMZ80CZvqHjrcXMc-GcfgJhq-lyRePlxCwf2duj12LirBAibKDkrhGr9-LQDqZKsz9MpaJIQIH3NJX8IHgetw%3D_%3D_psGLvQpt9Q%0A%20%20%20%20%20%20/authorisations/5d70f300fabb1a0001e52c41 -->
       <ion-item *ngFor="let item of consentAuthStatus.scaMethods">
-        <ion-label>{{item.type}} {{item.name}}</ion-label>
-        <ion-radio slot="start" value="{{item.id}}"></ion-radio>
+        <ion-label>
+            <h2>{{item.type}} {{item.name}}</h2>
+            <p *ngIf="item.medium">{{item.medium}}</p>
+        </ion-label>
+        <ion-radio slot="start" [value]="item"></ion-radio>
       </ion-item>
     </ion-radio-group>
     <ion-button type="submit" expand="block" (click)="submit()">
