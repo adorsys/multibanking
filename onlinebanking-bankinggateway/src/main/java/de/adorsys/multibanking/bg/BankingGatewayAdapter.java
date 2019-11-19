@@ -74,8 +74,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     @NonNull
     private final String xs2aAdapterBaseUrl;
     @Getter(lazy = true)
-    private final BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi();
-    @Getter(lazy = true)
     private final AccountInformationClient accountApi = Feign.builder()
         .requestInterceptor(new FeignCorrelationIdInterceptor())
         .contract(createSpringMvcContract())
@@ -288,7 +286,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 try {
                     String bankCode = Iban.valueOf(consentTemplate.getPsuAccountIban()).getBankCode();
                     CreateConsentResponseTO consentResponse =
-                        getBankingGatewayB2CAisApiSetToken(bankApiConsentData).createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, null, redirectPreferred, tppRedirectUri);
+                        getBankingGatewayB2CAisApi(bankApiConsentData).createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, null, redirectPreferred, tppRedirectUri);
 
                     BgSessionData sessionData = new BgSessionData();
                     sessionData.setConsentId(consentResponse.getConsentId());
@@ -308,7 +306,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             @Override
             public Consent getConsent(String consentId) {
                 try {
-                    return bankingGatewayMapper.toConsent(getBankingGatewayB2CAisApi().getConsentUsingGET(consentId)); // TODO Bearer token
+                    return bankingGatewayMapper.toConsent(getBankingGatewayB2CAisApi(null).getConsentUsingGET(consentId)); // TODO Bearer token
                 } catch (ApiException e) {
                     throw handeAisApiException(e);
                 }
@@ -320,7 +318,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequestTO =
                         bankingGatewayMapper.toUpdatePsuAuthenticationRequestTO(updatePsuAuthentication.getCredentials());
                     ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponse =
-                        getBankingGatewayB2CAisApiSetToken(updatePsuAuthentication.getBankApiConsentData()).updatePsuAuthenticationUsingPUT(updatePsuAuthenticationRequestTO
+                        getBankingGatewayB2CAisApi(updatePsuAuthentication.getBankApiConsentData()).updatePsuAuthenticationUsingPUT(updatePsuAuthenticationRequestTO
                             , updatePsuAuthentication.getAuthorisationId(), updatePsuAuthentication.getConsentId());
 
                     return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponse, bankApi());
@@ -333,7 +331,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod) {
                 try {
                     ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponse =
-                        getBankingGatewayB2CAisApiSetToken(selectPsuAuthenticationMethod.getBankApiConsentData()).selectPsuAuthenticationMethodUsingPUT(bankingGatewayMapper.toSelectPsuAuthenticationMethodRequestTO(selectPsuAuthenticationMethod), selectPsuAuthenticationMethod.getAuthorisationId(), selectPsuAuthenticationMethod.getConsentId());
+                        getBankingGatewayB2CAisApi(selectPsuAuthenticationMethod.getBankApiConsentData()).selectPsuAuthenticationMethodUsingPUT(bankingGatewayMapper.toSelectPsuAuthenticationMethodRequestTO(selectPsuAuthenticationMethod), selectPsuAuthenticationMethod.getAuthorisationId(), selectPsuAuthenticationMethod.getConsentId());
 
                     return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponse, bankApi());
                 } catch (ApiException e) {
@@ -345,7 +343,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
                 try {
                     ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponse =
-                        getBankingGatewayB2CAisApiSetToken(transactionAuthorisation.getBankApiConsentData()).transactionAuthorisationUsingPUT(bankingGatewayMapper.toTransactionAuthorisationRequestTO(transactionAuthorisation), transactionAuthorisation.getAuthorisationId(), transactionAuthorisation.getConsentId());
+                        getBankingGatewayB2CAisApi(transactionAuthorisation.getBankApiConsentData()).transactionAuthorisationUsingPUT(bankingGatewayMapper.toTransactionAuthorisationRequestTO(transactionAuthorisation), transactionAuthorisation.getAuthorisationId(), transactionAuthorisation.getConsentId());
 
                     return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponse, bankApi());
                 } catch (ApiException e) {
@@ -358,7 +356,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                                                              Object bankApiConsentData) {
                 try {
                     ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponse =
-                       getBankingGatewayB2CAisApiSetToken(bankApiConsentData).getConsentAuthorisationStatusUsingGET(authorisationId, consentId);
+                        getBankingGatewayB2CAisApi(bankApiConsentData).getConsentAuthorisationStatusUsingGET(authorisationId, consentId);
 
                     return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponse, bankApi());
                 } catch (ApiException e) {
@@ -369,7 +367,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             @Override
             public void revokeConsent(String consentId) {
                 try {
-                    getBankingGatewayB2CAisApi().revokeConsentUsingDELETE(consentId); // TODO Bearer token
+                    getBankingGatewayB2CAisApi(null).revokeConsentUsingDELETE(consentId); // TODO Bearer token
                 } catch (ApiException e) {
                     throw handeAisApiException(e);
                 }
@@ -379,7 +377,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             public void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus,
                                         Object bankApiConsentData) {
                 try {
-                    Optional.of(getBankingGatewayB2CAisApiSetToken(bankApiConsentData).getConsentAuthorisationStatusUsingGET(authorisationId,
+                    Optional.of(getBankingGatewayB2CAisApi(bankApiConsentData).getConsentAuthorisationStatusUsingGET(authorisationId,
                         consentId))
                         .map(consentStatus -> ScaStatus.valueOf(consentStatus.getScaStatus().getValue()))
                         .filter(consentStatus -> consentStatus == expectedConsentStatus)
@@ -394,11 +392,11 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 //noop
             }
 
-            private BankingGatewayB2CAisApi getBankingGatewayB2CAisApiSetToken(Object bankApiConsentData) {
-                BankingGatewayB2CAisApi bankingGatewayB2CAisApi1 = getBankingGatewayB2CAisApi();
+            private BankingGatewayB2CAisApi getBankingGatewayB2CAisApi(Object bankApiConsentData) {
+                BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi();
                 Optional.ofNullable(bankApiConsentData).map(BgSessionData.class::cast).map(BgSessionData::getAccessToken)
-                        .ifPresent(token -> bankingGatewayB2CAisApi1.getApiClient().setAccessToken(token));
-                return bankingGatewayB2CAisApi1;
+                        .ifPresent(token -> bankingGatewayB2CAisApi.getApiClient().setAccessToken(token));
+                return bankingGatewayB2CAisApi;
             }
 
             @Override
@@ -409,7 +407,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 try {
                     AuthorizationCodeTO authorizationCodeTO = new AuthorizationCodeTO();
                     authorizationCodeTO.setCode(authorisationCode);
-                    OAuthToken token = getBankingGatewayB2CAisApi().resolveAuthCodeUsingPOST(authorizationCodeTO, consentId);
+                    OAuthToken token = getBankingGatewayB2CAisApi(null).resolveAuthCodeUsingPOST(authorizationCodeTO, consentId);
 
                     Optional.ofNullable(token)
                             .map(OAuthToken::getAccessToken)
