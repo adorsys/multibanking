@@ -8,8 +8,12 @@
     <p *ngIf="contract.subCategory">{{contract.subCategory}}</p>
     <p *ngIf="contract.specification">{{contract.specification}}</p>
   </ion-label>
-  <p slot="end">
-    {{contract.amount | currency:'EUR':'symbol'}}<br />
-    {{contract.interval | cycle}}
-  </p>
+  <div class="ion-text-end" slot="end">
+    <ion-label>
+      <h4 class="interval">{{contract.interval | cycle}}</h4>
+      <h2 [ngClass]="{'amount--negative': contract.amount < 0, 'amount--positive': contract.amount > 0}">
+        {{contract.amount | currency:'EUR':'symbol'}}
+      </h2>
+    </ion-label>
+  </div>
 </ion-item>

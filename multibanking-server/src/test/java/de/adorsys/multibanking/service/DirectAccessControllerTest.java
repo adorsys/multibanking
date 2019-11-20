@@ -8,8 +8,8 @@ import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
-import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
+import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
@@ -20,6 +20,7 @@ import de.adorsys.multibanking.hbci.model.HbciConsent;
 import de.adorsys.multibanking.ing.IngAdapter;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
+import de.adorsys.multibanking.web.ConsentAuthorisationController;
 import de.adorsys.multibanking.web.DirectAccessController;
 import de.adorsys.multibanking.web.model.*;
 import io.restassured.RestAssured;
@@ -27,6 +28,8 @@ import io.restassured.filter.log.ErrorLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.specification.RequestSpecification;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -61,6 +64,7 @@ import static org.mockito.ArgumentMatchers.nullable;
 import static org.mockito.Mockito.*;
 import static org.mockito.internal.util.MockUtil.isMock;
 
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {Application.class, FongoConfig.class, MapperConfig.class}, webEnvironment =
     SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -125,16 +129,23 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
-        ConsentTO consentTO = createConsentTO();
         prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
-            consentTO.getPsuAccountIban(),
-            true);
+                createConsentTO().getPsuAccountIban(),
+                true);
 
-        JsonPath jsonPath = request.body(createConsentTO())
+        doRedirect(null);
+    }
+
+    private String doRedirect(String prestepConsentId) {
+        ConsentTO consent = createConsentTO();
+        consent.setId(prestepConsentId);
+
+        JsonPath jsonPath = request.body(consent)
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
             .then().assertThat().statusCode(HttpStatus.CREATED.value())
             .and().extract().jsonPath();
 
+        String consentId = jsonPath.getString("consentId");
         String statusLink = jsonPath.getString("_links.authorisationStatus.href");
 
         System.out.println(jsonPath.getString("_links.redirectUrl.href"));
@@ -145,6 +156,8 @@ public class DirectAccessControllerTest {
             .and().extract().jsonPath();
 
         assertThat(jsonPath.getString("scaStatus")).isIn(FINALISED.toString());
+
+        return consentId;
     }
 
     @Ignore("uses real data - please setup ENV")
@@ -248,6 +261,7 @@ public class DirectAccessControllerTest {
         consent_authorisation(consentTO, createBankAccess(), credentials);
     }
 
+    @Ignore
     @Test
     public void consent_authorisation_hbci_mock() {
         ConsentTO consentTO = createConsentTO();
@@ -351,14 +365,17 @@ public class DirectAccessControllerTest {
         //4. select authentication method (optional), can be skipped by banks in case of selection not needed
         if (jsonPath.getString("scaStatus").equals(PSUAUTHENTICATED.toString())) {
             String selectAuthenticationMethodLink = jsonPath.getString("_links" + ".selectAuthenticationMethod.href");
-            String sceMethodId = jsonPath.getString("scaMethods[0].id");
+            Map<String, String> scaMethodParams = jsonPath.get("scaMethods[1]");
+
+            String scaMethodId = scaMethodParams.get("id");
             if (jsonPath.get("scaMethods.find { it.id == '901' }") != null) {
-                sceMethodId = "901";
+                scaMethodId = "901";
             }
 
             SelectPsuAuthenticationMethodRequestTO authenticationMethodRequestTO =
                 new SelectPsuAuthenticationMethodRequestTO();
-            authenticationMethodRequestTO.setAuthenticationMethodId(sceMethodId);
+            authenticationMethodRequestTO.setAuthenticationMethodId(scaMethodId);
+            authenticationMethodRequestTO.setTanMediaName(scaMethodParams.get("medium"));
 
             jsonPath = request.body(authenticationMethodRequestTO).put(selectAuthenticationMethodLink)
                 .then().assertThat().statusCode(HttpStatus.OK.value())
@@ -374,12 +391,12 @@ public class DirectAccessControllerTest {
         //5. bookings challenge for hbci (Optional)
         //hbci case
         if (transactionAuthorisationLink == null) {
-            DirectAccessController.LoadBookingsRequest LoadBookingsRequest =
+            DirectAccessController.LoadBookingsRequest loadBookingsRequest =
                 new DirectAccessController.LoadBookingsRequest();
-            LoadBookingsRequest.setBankAccess(bankAccess);
+            loadBookingsRequest.setBankAccess(bankAccess);
 
             jsonPath = request
-                .body(LoadBookingsRequest)
+                .body(loadBookingsRequest)
                 .post(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
                 .then().assertThat().statusCode(HttpStatus.OK.value())
                 .and().extract().jsonPath();
@@ -392,7 +409,7 @@ public class DirectAccessControllerTest {
         //6. send tan
         TransactionAuthorisationRequestTO transactionAuthorisationRequestTO =
             new TransactionAuthorisationRequestTO();
-        transactionAuthorisationRequestTO.setScaAuthenticationData("0000");
+        transactionAuthorisationRequestTO.setScaAuthenticationData("123456");
 
         jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
             ".transactionAuthorisation.href"))
@@ -501,6 +518,74 @@ public class DirectAccessControllerTest {
         assertThat(loadBookingsResponse.getBookings()).isNotEmpty();
     }
 
+    @Ignore("uses real data - please setup ENV")
+    @Test
+    public void consent_authorisation_bankinggateway_oauth() {
+        ConsentTO consentTO = createConsentTO();
+
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+                consentTO.getPsuAccountIban(),
+                true);
+
+        //1. initial call
+        JsonPath jsonPath = request.body(consentTO)
+                .post(getRemoteMultibankingUrl() + "/api/v1/consents")
+                .then().assertThat().statusCode(HttpStatus.CREATED.value())
+                .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("_links.oauthRedirectUrl")).isNotBlank();
+
+        String consentId = jsonPath.getString("consentId");
+        String authorisationId = jsonPath.getString("authorisationId");
+        String idpUrl = jsonPath.getString("_links.oauthRedirectUrl");
+
+        log.info("Oauth redirect url: " + idpUrl);
+        String authorizationCode = "BREAK_AND_PLACE_AUTHCODE_HERE";
+
+        //2. submit auth code (break to enter auth code)
+        TokenRequestTO tokenRequestTO = new TokenRequestTO();
+        tokenRequestTO.setAuthorisationCode(authorizationCode);
+        request.body(tokenRequestTO)
+                .post(getRemoteMultibankingUrl() + "/api/v1/consents/{consentId}/token"
+                        .replace("{consentId}", consentId))
+                .then().assertThat().statusCode(HttpStatus.NO_CONTENT.value());
+
+        //3. perform prestep consent creation (only prestep)
+        if (StringUtils.isEmpty(authorisationId)) {
+            consentId = doRedirect(consentId); // replace pseudo consent id with final id
+        }
+
+        //4. load accounts
+        DirectAccessController.LoadAccountsRequest loadAccountsRequest =
+                new DirectAccessController.LoadAccountsRequest();
+        BankAccessTO bankAccess = new BankAccessTO();
+        bankAccess.setConsentId(consentId);
+        loadAccountsRequest.setBankAccess(bankAccess);
+
+        DirectAccessController.LoadBankAccountsResponse loadBankAccountsResponse = request
+                .body(loadAccountsRequest)
+                .put(getRemoteMultibankingUrl() + "/api/v1/direct/accounts")
+                .then().assertThat().statusCode(HttpStatus.OK.value())
+                .extract().body().as(DirectAccessController.LoadBankAccountsResponse.class);
+
+        assertThat(loadBankAccountsResponse.getBankAccounts()).isNotEmpty();
+
+        //5. load bookings
+        DirectAccessController.LoadBookingsRequest loadBookingsRequest =
+                new DirectAccessController.LoadBookingsRequest();
+        loadBookingsRequest.setUserId(loadBankAccountsResponse.getBankAccounts().get(0).getUserId());
+        loadBookingsRequest.setAccessId(loadBankAccountsResponse.getBankAccounts().get(0).getBankAccessId());
+        loadBookingsRequest.setAccountId(loadBankAccountsResponse.getBankAccounts().get(0).getId());
+
+        DirectAccessController.LoadBookingsResponse loadBookingsResponse = request
+                .body(loadBookingsRequest)
+                .put(getRemoteMultibankingUrl() + "/api/v1/direct/bookings")
+                .then().assertThat().statusCode(HttpStatus.OK.value())
+                .extract().body().as(DirectAccessController.LoadBookingsResponse.class);
+
+        assertThat(loadBookingsResponse.getBookings()).isNotEmpty();
+    }
+
     private void fakeConsentValidation(OnlineBankingService onlineBankingService) {
         // mock the sca handler
         when(onlineBankingService.getStrongCustomerAuthorisation()).thenReturn(mock(StrongCustomerAuthorisable.class));
@@ -549,7 +634,8 @@ public class DirectAccessControllerTest {
     }
 
     private ConsentTO createConsentTO() {
-        String iban = System.getProperty("iban", "DE60900000020000000001");
+        // String iban = System.getProperty("iban", "DE60900000020000000001");
+        String iban = System.getProperty("iban", "DE16900010021234567890");
 
         ConsentTO consentTO = new ConsentTO();
         consentTO.setAccounts(Collections.singletonList(new AccountReferenceTO(iban, null)));
@@ -559,7 +645,7 @@ public class DirectAccessControllerTest {
         consentTO.setValidUntil(LocalDate.now().plusDays(1));
         consentTO.setRecurringIndicator(false);
         consentTO.setFrequencyPerDay(1);
-        consentTO.setTppRedirectUri("https://www.google.com");
+        consentTO.setTppRedirectUri("https://gurk.adorsys.de");
 
         return consentTO;
     }

@@ -12,7 +12,7 @@ import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 
 public interface StrongCustomerAuthorisable {
 
-    CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred, String tppRedirectUri);
+    CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred, String tppRedirectUri, Object bankApiConsentData);
 
     Consent getConsent(String consentId);
 

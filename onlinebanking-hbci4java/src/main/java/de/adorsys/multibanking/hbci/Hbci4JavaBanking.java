@@ -58,9 +58,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.ScaStatus.*;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NOT_SUPPORTED;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_PIN;
-import static de.adorsys.multibanking.hbci.model.HbciDialogType.*;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
+import static de.adorsys.multibanking.hbci.model.HbciDialogType.UPD;
 
 public class Hbci4JavaBanking implements OnlineBankingService {
 
@@ -154,13 +154,13 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             PinTanPassport passport = fetchUpd(dialogRequest, withHktan);
 
-            Map<String, List<GVRTANMediaList.TANMediaInfo>> tanMediaMap = null;
+            List<GVRTANMediaList.TANMediaInfo> tanMediaList = null;
             if (passport.jobSupported(GVTANMediaList.getLowlevelName())) {
-                tanMediaMap = fetchTanMedias(dialogRequest, passport);
+                tanMediaList = fetchTanMedias(dialogRequest, passport);
             }
 
             ScaMethodsResponse response = ScaMethodsResponse.builder()
-                .tanTransportTypes(extractTanTransportTypes(passport, tanMediaMap))
+                .tanTransportTypes(extractTanTransportTypes(passport, tanMediaList))
                 .build();
             updateUpd(hbciCallback, response);
             return response;
@@ -287,7 +287,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             ScaAwareJob scaJob = createScaJob(submitAuthorisationCode.getOriginTransactionRequest());
 
             TransactionAuthorisationResponse submitAuthorizationCodeResponse =
-                new SubmitAuthorisationCodeJob<>(scaJob).sumbitAuthorizationCode(submitAuthorisationCode);
+                new SubmitAuthorisationCodeJob(scaJob).sumbitAuthorizationCode(submitAuthorisationCode);
 
             afterTransactionAuthorisation((HbciConsent) submitAuthorisationCode.getOriginTransactionRequest().getBankApiConsentData(), submitAuthorizationCodeResponse.getScaStatus());
 
@@ -357,8 +357,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return dialog.getPassport();
     }
 
-    private Map<String, List<GVRTANMediaList.TANMediaInfo>> fetchTanMedias(HbciDialogRequest dialogRequest,
-                                                                           PinTanPassport passport) {
+    private List<GVRTANMediaList.TANMediaInfo> fetchTanMedias(HbciDialogRequest dialogRequest,
+                                                              PinTanPassport passport) {
         List<HBCITwoStepMechanism> tanMediaNeededScaMethods = passport.getUserTwostepMechanisms().stream()
             .filter(scaMethodId -> !scaMethodId.equals("999"))
             .filter(scaMethodId -> {
@@ -368,20 +368,14 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             .map(scaMethod -> passport.getBankTwostepMechanisms().get(scaMethod))
             .collect(Collectors.toList());
 
-        Map<String, List<GVRTANMediaList.TANMediaInfo>> tanMediaMap = new HashMap<>();
-        tanMediaNeededScaMethods.forEach(twoStepMechanism -> {
-            GVTANMediaList gvtanMediaList = new GVTANMediaList(passport);
+        GVTANMediaList gvtanMediaList = new GVTANMediaList(passport);
 
-            HBCIJobsDialog dialog = (HBCIJobsDialog) createDialog(JOBS, dialogRequest, twoStepMechanism);
-            dialog.dialogInit(true, "HKTAB");
-            dialog.addTask(gvtanMediaList);
-            dialog.execute(true);
+        HBCIJobsDialog dialog = new HBCIJobsDialog(passport);
+        dialog.dialogInit(true, "HKTAB");
+        dialog.addTask(gvtanMediaList);
+        dialog.execute(true);
 
-            tanMediaMap.put(twoStepMechanism.getSecfunc(),
-                ((GVRTANMediaList) gvtanMediaList.getJobResult()).mediaList());
-        });
-
-        return tanMediaMap;
+        return ((GVRTANMediaList) gvtanMediaList.getJobResult()).mediaList();
     }
 
     @Override
@@ -445,8 +439,8 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             });
     }
 
-    private List<TanTransportType> extractTanTransportTypes(PinTanPassport hbciPassport, Map<String,
-        List<GVRTANMediaList.TANMediaInfo>> tanMediaMap) {
+    private List<TanTransportType> extractTanTransportTypes(PinTanPassport hbciPassport,
+                                                            List<GVRTANMediaList.TANMediaInfo> tanMediaList) {
         return hbciPassport.getUserTwostepMechanisms()
             .stream()
             .map(id -> hbciPassport.getBankTwostepMechanisms().get(id))
@@ -461,7 +455,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
                 if (!tanTransportType.isNeedTanMedia()) {
                     return Collections.singletonList(tanTransportType);
                 } else {
-                    return tanMediaMap.get(tanTransportType.getId()).stream()
+                    return tanMediaList.stream()
                         .map(tanMediaInfo -> {
                             TanTransportType clone = SerializationUtils.clone(tanTransportType);
                             clone.setMedium(tanMediaInfo.mediaName);
@@ -480,7 +474,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
             @Override
             public CreateConsentResponse createConsent(Consent consent, boolean redirectPreferred,
-                                                       String tppRedirectUri) {
+                                                       String tppRedirectUri, Object bankApiConsentData) {
                 String bankCode = Iban.valueOf(consent.getPsuAccountIban()).getBankCode();
                 if (!bankSupported(bankCode)) {
                     throw new MultibankingException(BANK_NOT_SUPPORTED);
@@ -525,8 +519,11 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
                 TanTransportType selectedMethod = hbciConsent.getTanMethodList().stream()
                     .filter(tanTransportType -> tanTransportType.getId().equals(selectPsuAuthenticationMethod.getAuthenticationMethodId()))
+                    .filter(tanTransportType -> selectPsuAuthenticationMethod.getTanMediaName() == null
+                        || selectPsuAuthenticationMethod.getTanMediaName().equals(tanTransportType.getMedium()))
                     .findFirst()
-                    .orElseThrow(IllegalArgumentException::new);
+                    .orElseThrow(() -> new MultibankingException(INVALID_SCA_METHOD));
+
                 hbciConsent.setSelectedMethod(selectedMethod);
                 hbciConsent.setStatus(SCAMETHODSELECTED);
 

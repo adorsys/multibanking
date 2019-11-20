@@ -24,5 +24,6 @@ import lombok.EqualsAndHashCode;
 public class SelectPsuAuthenticationMethodRequest extends AbstractStrongCustomerAuthorisationRequest {
 
     private String authenticationMethodId;
+    private String tanMediaName;
 
 }

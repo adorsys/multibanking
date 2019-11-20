@@ -50,9 +50,9 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNA
 
 @RequiredArgsConstructor
 @Slf4j
-public class SubmitAuthorisationCodeJob<J extends ScaAwareJob> {
+public class SubmitAuthorisationCodeJob {
 
-    private final J scaJob;
+    private final ScaAwareJob scaJob;
 
     public TransactionAuthorisationResponse sumbitAuthorizationCode(TransactionAuthorisation submitAuthorisationCode) {
         HbciTanSubmit hbciTanSubmit =
@@ -127,9 +127,9 @@ public class SubmitAuthorisationCodeJob<J extends ScaAwareJob> {
         hbciDialog.addTask(hktan, false);
     }
 
-    private TransactionAuthorisationResponse<?> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
-                                                               HBCIExecStatus status) {
-        TransactionAuthorisationResponse<?> response =
+    private TransactionAuthorisationResponse createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
+                                                            HBCIExecStatus status) {
+        TransactionAuthorisationResponse response =
             new TransactionAuthorisationResponse<>(scaJob.createJobResponse(passport, hbciTanSubmit,
                 status.getMsgStatusList()));
 

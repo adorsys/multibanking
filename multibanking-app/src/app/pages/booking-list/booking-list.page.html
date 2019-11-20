@@ -33,7 +33,7 @@
             <h3 class="ion-float-left">not categorized</h3>
           </div>
         </ion-label>
-        <div slot="end">
+        <div class="ion-text-end" slot="end">
           <ion-label>
             <h4 [ngClass]="{'forecast': booking.forecastBooking}">{{ booking.bookingDate | date }}</h4>
             <h2 [ngClass]="{'amount--negative': booking.amount < 0, 'amount--positive': booking.amount > 0}">

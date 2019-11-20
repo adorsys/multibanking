@@ -96,6 +96,11 @@
             }
           }
         },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
         "deprecated": false
       }
     },
@@ -138,6 +143,11 @@
             }
           }
         },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
         "deprecated": false
       },
       "delete": {
@@ -175,6 +185,11 @@
             }
           }
         },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
         "deprecated": false
       }
     },
@@ -227,6 +242,70 @@
             }
           }
         },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
+        "deprecated": false
+      }
+    },
+    "/v1/ais/consents/{consentId}/token": {
+      "post": {
+        "tags": [
+          "Banking-Gateway B2C AIS"
+        ],
+        "summary": "Resolve token for oauth authentication code",
+        "operationId": "resolveAuthCodeUsingPOST",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "authorizationCodeTO",
+            "description": "authorizationCodeTO",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/AuthorizationCodeTO"
+            }
+          },
+          {
+            "name": "consentId",
+            "in": "path",
+            "description": "consentId",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/OAuthToken"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "schema": {
+              "$ref": "#/definitions/MessagesTO"
+            }
+          }
+        },
+        "security": [
+          {
+            "oauth2": []
+          }
+        ],
         "deprecated": false
       }
     },
@@ -277,6 +356,9 @@
           }
         },
         "security": [
+          {
+            "oauth2": []
+          },
           {
             "bg_auth": [
               "openid"
@@ -346,6 +428,9 @@
         },
         "security": [
           {
+            "oauth2": []
+          },
+          {
             "bg_auth": [
               "openid"
             ]
@@ -413,6 +498,9 @@
           }
         },
         "security": [
+          {
+            "oauth2": []
+          },
           {
             "bg_auth": [
               "openid"
@@ -482,6 +570,9 @@
         },
         "security": [
           {
+            "oauth2": []
+          },
+          {
             "bg_auth": [
               "openid"
             ]
@@ -530,6 +621,9 @@
           }
         },
         "security": [
+          {
+            "oauth2": []
+          },
           {
             "bg_auth": [
               "openid"
@@ -586,6 +680,9 @@
           }
         },
         "security": [
+          {
+            "oauth2": []
+          },
           {
             "bg_auth": [
               "openid"
@@ -655,6 +752,9 @@
         },
         "security": [
           {
+            "oauth2": []
+          },
+          {
             "bg_auth": [
               "openid"
             ]
@@ -722,6 +822,9 @@
           }
         },
         "security": [
+          {
+            "oauth2": []
+          },
           {
             "bg_auth": [
               "openid"
@@ -791,6 +894,9 @@
         },
         "security": [
           {
+            "oauth2": []
+          },
+          {
             "bg_auth": [
               "openid"
             ]
@@ -798,6 +904,12 @@
         ],
         "deprecated": false
       }
+    }
+  },
+  "securityDefinitions": {
+    "oauth2": {
+      "type": "oauth2",
+      "flow": "accessCode"
     }
   },
   "definitions": {
@@ -836,6 +948,15 @@
         }
       },
       "title": "AccountReferenceTO"
+    },
+    "AuthorizationCodeTO": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string"
+        }
+      },
+      "title": "AuthorizationCodeTO"
     },
     "ChallengeDataTO": {
       "type": "object",
@@ -919,6 +1040,9 @@
           "type": "string"
         },
         "consentId": {
+          "type": "string"
+        },
+        "oauthRedirectUrl": {
           "type": "string"
         },
         "redirectUrl": {
@@ -1041,6 +1165,18 @@
         }
       },
       "title": "MessagesTO"
+    },
+    "OAuthToken": {
+      "type": "object",
+      "properties": {
+        "access_token": {
+          "type": "string"
+        },
+        "refresh_token": {
+          "type": "string"
+        }
+      },
+      "title": "OAuthToken"
     },
     "PaymentDataTO": {
       "type": "object",
@@ -1262,7 +1398,8 @@
             "CHIP_OTP",
             "PHOTO_OTP",
             "PUSH_OTP",
-            "EMAIL"
+            "EMAIL",
+            "APP_OTP"
           ]
         },
         "authenticationVersion": {

@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ResourceUpdateAuthResponseTO } from 'src/multibanking-api/resourceUpdateAuthResponseTO';
-import { NavController, AlertController } from '@ionic/angular';
 import { ActivatedRoute } from '@angular/router';
+import { AlertController, NavController } from '@ionic/angular';
 import { ConsentService } from 'src/app/services/rest/consent.service';
-import { environment } from 'src/environments/environment';
 import { Link } from 'src/multibanking-api/link';
+import { ResourceUpdateAuthResponseTO } from 'src/multibanking-api/resourceUpdateAuthResponseTO';
+import { TanTransportTypeTO } from 'src/multibanking-api/tanTransportTypeTO';
 
 @Component({
   selector: 'app-sca-method-selection',
@@ -13,8 +13,7 @@ import { Link } from 'src/multibanking-api/link';
 })
 export class ScaMethodSelectionPage implements OnInit {
 
-  scaMethod: string;
-
+  scaMethod: TanTransportTypeTO;
   consentAuthStatus: ResourceUpdateAuthResponseTO;
   consentId: string;
   authorisationId: string;
@@ -29,14 +28,20 @@ export class ScaMethodSelectionPage implements OnInit {
     this.consentId = this.activatedRoute.snapshot.paramMap.get('consent-id');
     this.authorisationId = this.activatedRoute.snapshot.paramMap.get('authorisation-id');
     this.consentAuthStatus = this.activatedRoute.snapshot.data.consentAuthStatus;
-    this.scaMethod = this.consentAuthStatus.scaMethods[0].id;
+    this.scaMethod = this.consentAuthStatus.scaMethods[0];
   }
 
   public submit() {
     // tslint:disable-next-line:no-string-literal
     const selectAuthenticationMethodLink: Link = this.consentAuthStatus._links['selectAuthenticationMethod'];
 
-    this.consentService.scaMethodSelection(selectAuthenticationMethodLink.href, { authenticationMethodId: this.scaMethod })
+    this.consentService.scaMethodSelection(
+      selectAuthenticationMethodLink.href,
+      {
+        authenticationMethodId: this.scaMethod.id,
+        ...(this.scaMethod.medium ? { tanMediaName: this.scaMethod.medium } : {})
+      }
+    )
       .subscribe(
         (response) => {
           // tslint:disable-next-line:no-string-literal
