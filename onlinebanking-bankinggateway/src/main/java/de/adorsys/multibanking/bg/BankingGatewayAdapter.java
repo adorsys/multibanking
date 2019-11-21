@@ -81,6 +81,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         .logger(new Slf4jLogger(AccountApi.class))
         .encoder(new JacksonEncoder())
         .decoder(new ResponseEntityDecoder(new StringDecoder(new JacksonDecoder())))
+        .errorDecoder(new FeignTppMessageDecoder())
         .target(AccountInformationClient.class, xs2aAdapterBaseUrl);
     @Getter(lazy = true)
     private final AccountInformationService accountInformationService =
@@ -179,7 +180,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .bookingStatus(BookingStatusTO.BOOKED.toString()).build();
 
         try {
-            RequestHeaders requestHeaders = createAisHeaders(loadBookingsRequest, MediaType.APPLICATION_XML_VALUE, token);
+            RequestHeaders requestHeaders = createAisHeaders(loadBookingsRequest, MediaType.APPLICATION_JSON_VALUE, token);
             Response<String> transactionListString =
                 getAccountInformationService().getTransactionListAsString(resourceId, requestHeaders, requestParams);
             Map<String, String> headersMap = transactionListString.getHeaders().getHeadersMap();
@@ -199,7 +200,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             }
         } catch (FeignException e) {
             throw handeAisApiException(e);
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new MultibankingException(INTERNAL_ERROR, 500, "Error loading bookings: " + e.getMessage());
         }
     }
@@ -257,7 +258,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             transactionRequest.getBank().getBankApiBankCode() != null
                 ? transactionRequest.getBank().getBankApiBankCode()
                 : transactionRequest.getBankAccess().getBankCode());
-        headers.put(RequestHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE); // TODO try camt
+        headers.put(RequestHeaders.ACCEPT, mediaType);
         Optional.ofNullable(bearerToken).ifPresent(token -> headers.put(RequestHeaders.AUTHORIZATION, String.format("Bearer %s", token)));
         return RequestHeaders.fromMap(headers);
     }

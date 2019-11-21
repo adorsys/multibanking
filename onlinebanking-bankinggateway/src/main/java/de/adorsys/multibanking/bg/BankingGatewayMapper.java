@@ -9,6 +9,7 @@ import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.xs2a.adapter.service.model.AccountDetails;
 import de.adorsys.xs2a.adapter.service.model.CashAccountType;
+import de.adorsys.xs2a.adapter.service.model.TppMessage;
 import de.adorsys.xs2a.adapter.service.model.Transactions;
 import org.iban4j.Iban;
 import org.mapstruct.InheritInverseConfiguration;
@@ -130,4 +131,9 @@ interface BankingGatewayMapper {
     Balance toBalance(de.adorsys.xs2a.adapter.service.model.Balance balance);
 
     List<Message> toMessages(List<MessageTO> messagesTO);
+
+    @Mapping(target = "severity", source = "category")
+    @Mapping(target = "key", source = "code")
+    @Mapping(target = "renderedMessage", source = "text")
+    Message toMessage(TppMessage tppMessage);
 }
