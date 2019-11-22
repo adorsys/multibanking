@@ -27,6 +27,7 @@ interface IngMapper {
     @Mapping(target = "authorisationId", expression = "java( java.util.UUID.randomUUID().toString() )")
     @Mapping(target = "bankApiConsentData", expression = "java( bankApiConsentData )")
     @Mapping(target = "redirectId", ignore = true)
+    @Mapping(target = "oauthRedirectUrl", ignore = true)
     CreateConsentResponse toCreateConsentResponse(IngSessionData bankApiConsentData, String redirectUrl);
 
     @Mapping(target = "challenge", ignore = true)

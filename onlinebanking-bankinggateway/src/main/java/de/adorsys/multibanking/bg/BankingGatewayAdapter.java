@@ -163,14 +163,14 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         //noop
     }
 
-    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadBookingsRequest) {
-        LoadTransactions loadBookings = loadBookingsRequest.getTransaction();
-        String token = Optional.ofNullable(loadBookingsRequest.getBankApiConsentData()).map(BgSessionData.class::cast).map(BgSessionData::getAccessToken).orElse(null);
+    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadTransactionsRequest) {
+        LoadTransactions loadBookings = loadTransactionsRequest.getTransaction();
+        String token = Optional.ofNullable(loadTransactionsRequest.getBankApiConsentData()).map(BgSessionData.class::cast).map(BgSessionData::getAccessToken).orElse(null);
 
 
         String resourceId = Optional.ofNullable(loadBookings.getPsuAccount().getExternalIdMap().get(bankApi()))
-            .orElseGet(() -> getAccountResourceId(loadBookingsRequest.getBankAccess().getIban(),
-                createAisHeaders(loadBookingsRequest, MediaType.APPLICATION_JSON_VALUE, token)));
+            .orElseGet(() -> getAccountResourceId(loadTransactionsRequest.getBankAccess().getIban(),
+                createAisHeaders(loadTransactionsRequest, MediaType.APPLICATION_JSON_VALUE, token)));
 
         RequestParams requestParams = RequestParams.builder()
             .dateFrom(loadBookings.getDateFrom() != null ? loadBookings.getDateFrom() : LocalDate.now().minusYears(1))
@@ -179,7 +179,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .bookingStatus(BookingStatusTO.BOOKED.toString()).build();
 
         try {
-            RequestHeaders requestHeaders = createAisHeaders(loadBookingsRequest, MediaType.APPLICATION_XML_VALUE, token);
+            RequestHeaders requestHeaders = createAisHeaders(loadTransactionsRequest, MediaType.APPLICATION_XML_VALUE, token);
             Response<String> transactionListString =
                 getAccountInformationService().getTransactionListAsString(resourceId, requestHeaders, requestParams);
             Map<String, String> headersMap = transactionListString.getHeaders().getHeadersMap();
@@ -273,7 +273,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
+    public PaymentResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
         throw new UnsupportedOperationException();
     }
 
@@ -467,13 +467,10 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 return toMultibankingException(e, INVALID_PIN);
             case 404:
                 return toMultibankingException(e, RESOURCE_NOT_FOUND);
-            case 400:
-            case 500:
-                return toMultibankingException(e, BANKING_GATEWAY_ERROR);
             case 429:
                 return new MultibankingException(INVALID_CONSENT, 429, "consent access exceeded");
             default:
-                throw new MultibankingException(BANKING_GATEWAY_ERROR, 500, e.getMessage());
+                return toMultibankingException(e, BANKING_GATEWAY_ERROR);
         }
     }
 

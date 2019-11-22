@@ -24,7 +24,6 @@ import lombok.EqualsAndHashCode;
 public class RawSepaPayment extends AbstractPayment {
 
     private String painXml;
-    private String service;
     private TransactionType sepaTransactionType;
 
     @Override

@@ -1,6 +1,8 @@
 package de.adorsys.multibanking.config;
 
 import com.mongodb.*;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
 import de.adorsys.smartanalytics.config.EnableSmartanalyticsMongoPersistence;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -10,8 +12,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
+import org.springframework.data.mongodb.core.SimpleMongoClientDbFactory;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
@@ -23,7 +25,7 @@ import java.util.Optional;
 @EnableMongoRepositories(basePackages = "de.adorsys.multibanking.mongo.repository")
 @EnableSmartanalyticsMongoPersistence
 @PropertySource(value = "${mongo.properties.url}", ignoreResourceNotFound = true)
-public class MongoConfig extends AbstractMongoConfiguration {
+public class MongoConfig extends AbstractMongoClientConfiguration {
 
     private final Environment env;
 
@@ -36,26 +38,6 @@ public class MongoConfig extends AbstractMongoConfiguration {
     @Bean
     public GridFsTemplate gridFsTemplate() throws Exception {
         return new GridFsTemplate(mongoDbFactory(), mappingMongoConverter());
-    }
-
-    @Bean
-    @Override
-    public MongoClient mongoClient() {
-        MongoClientOptions mongoClientOptions = new MongoClientOptions.Builder()
-            .connectionsPerHost(50)
-            .writeConcern(WriteConcern.JOURNALED)
-            .readPreference(ReadPreference.secondaryPreferred())
-            .build();
-
-        ServerAddress serverAddress = getServerAddress();
-
-        if (StringUtils.isEmpty(env.getProperty("mongo.userName"))) {
-            return new MongoClient(serverAddress, mongoClientOptions);
-        } else {
-            MongoCredential mongoCredential = createMongoCredential();
-
-            return new MongoClient(serverAddress, mongoCredential, mongoClientOptions);
-        }
     }
 
     private MongoCredential createMongoCredential() {
@@ -72,21 +54,60 @@ public class MongoConfig extends AbstractMongoConfiguration {
             password.toCharArray());
     }
 
-    private ServerAddress getServerAddress() {
+    private ConnectionString getConnectionString() {
         return Optional.ofNullable(env.getProperty("mongo.server"))
+            .map(server -> server.startsWith("mongodb://") ? server : "mongodb://" + server)
+            .map(ConnectionString::new)
+            .orElseThrow(() -> new IllegalStateException("missing env property mongo.server"));
+    }
+
+    @Bean
+    @Override
+    public MongoClient mongoClient() {
+        MongoClientSettings.Builder mongoClientSettingsBuilder = MongoClientSettings.builder()
+            .applyConnectionString(getConnectionString())
+            .writeConcern(WriteConcern.JOURNALED)
+            .readPreference(ReadPreference.secondaryPreferred());
+
+        if (StringUtils.isEmpty(env.getProperty("mongo.userName"))) {
+            return MongoClients.create(mongoClientSettingsBuilder.build());
+        } else {
+            return MongoClients.create(mongoClientSettingsBuilder.credential(createMongoCredential()).build());
+        }
+    }
+
+    @Deprecated
+    @Bean
+    public com.mongodb.MongoClient mongoClientOld() {
+        MongoClientOptions mongoClientOptions = new MongoClientOptions.Builder()
+            .connectionsPerHost(50)
+            .writeConcern(WriteConcern.JOURNALED)
+            .readPreference(ReadPreference.secondaryPreferred())
+            .build();
+
+        ServerAddress serverAddress = Optional.ofNullable(env.getProperty("mongo.server"))
             .map(server -> server.replace("mongodb://", "").split(":"))
             .map(serverParts -> new ServerAddress(serverParts[0],
                 1 < serverParts.length ? Integer.valueOf(serverParts[1]) : ServerAddress.defaultPort()))
             .orElseThrow(() -> new IllegalStateException("missing env property mongo.server"));
+
+        if (StringUtils.isEmpty(env.getProperty("mongo.userName"))) {
+            return new com.mongodb.MongoClient(serverAddress, mongoClientOptions);
+        } else {
+            MongoCredential mongoCredential = createMongoCredential();
+
+            return new com.mongodb.MongoClient(serverAddress, mongoCredential, mongoClientOptions);
+        }
     }
 
     @Override
     public MongoDbFactory mongoDbFactory() {
         return Optional.ofNullable(env.getProperty("mongo.databaseName"))
-            .map(databaseName -> new SimpleMongoDbFactory(mongoClient(), databaseName))
+            .map(databaseName -> new SimpleMongoClientDbFactory(mongoClient(), databaseName))
             .orElseThrow(() -> new IllegalStateException("missing env property mongo.databaseName"));
 
     }
+
 }
 
 

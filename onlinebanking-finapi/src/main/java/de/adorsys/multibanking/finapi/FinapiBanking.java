@@ -2,8 +2,8 @@ package de.adorsys.multibanking.finapi;
 
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
+import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
@@ -170,13 +170,13 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadBookingsRequest) {
-        BankAccount bankAccount = loadBookingsRequest.getTransaction().getPsuAccount();
+    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadTransactionsRequest) {
+        BankAccount bankAccount = loadTransactionsRequest.getTransaction().getPsuAccount();
 
         //TODO standing orders needed
         LOG.debug("load bookings for account [{}]", bankAccount.getAccountNumber());
         ApiClient apiClient = createUserApiClient();
-        apiClient.setAccessToken(authorizeUser(loadBookingsRequest.getBankApiUser()));
+        apiClient.setAccessToken(authorizeUser(loadTransactionsRequest.getBankApiUser()));
 
         List<Long> accountIds = Arrays.asList(Long.parseLong(bankAccount.getExternalIdMap().get(bankApi())));
         List<String> order = Arrays.asList("id,desc");
@@ -188,7 +188,7 @@ public class FinapiBanking implements OnlineBankingService {
             //wait finapi loaded bookings
             Account account = waitAccountSynced(bankAccount, apiClient);
             //wait finapi categorized bookings
-            waitBookingsCategorized(loadBookingsRequest.getBankAccess(), apiClient);
+            waitBookingsCategorized(loadTransactionsRequest.getBankAccess(), apiClient);
 
             while (nextPage == null || transactionsResponse.getPaging().getPage() < transactionsResponse.getPaging().getPageCount()) {
                 transactionsResponse = new TransactionsApi(apiClient).getAndSearchAllTransactions("bankView", null,
@@ -273,7 +273,7 @@ public class FinapiBanking implements OnlineBankingService {
     }
 
     @Override
-    public AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
+    public PaymentResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
         return null;
     }
 

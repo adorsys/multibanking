@@ -49,7 +49,9 @@ public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesRespo
     private final TransactionRequest<LoadBalances> loadBalanceRequest;
     private AbstractHBCIJob balanceJob;
 
-    private Konto createAccount(BankAccount bankAccount) {
+    private Konto createAccount() {
+        BankAccount bankAccount = loadBalanceRequest.getTransaction().getPsuAccount();
+
         Konto account = new Konto();
         account.bic = bankAccount.getBic();
         account.number = bankAccount.getAccountNumber();
@@ -63,7 +65,7 @@ public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesRespo
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         balanceJob = new GVSaldoReq(passport);
-        balanceJob.setParam("my", createAccount(loadBalanceRequest.getTransaction().getPsuAccount()));
+        balanceJob.setParam("my", createAccount());
         return balanceJob;
     }
 

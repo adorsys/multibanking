@@ -10,8 +10,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <smartanalytics.version>2.3.5</smartanalytics.version>
-        <banking-gateway-service.version>0.1-SNAPSHOT</banking-gateway-service.version>
+        <smartanalytics.version>2.3.8</smartanalytics.version>
         <sts.version>0.26.0</sts.version>
         <swagger.version>2.9.2</swagger.version>
         <mongobee.version>0.12</mongobee.version>

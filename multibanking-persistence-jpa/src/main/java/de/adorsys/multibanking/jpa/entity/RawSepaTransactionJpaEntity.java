@@ -19,7 +19,7 @@ public class RawSepaTransactionJpaEntity extends PaymentCommonJpaEntity {
     private Long id;
     @Column(length = 5000)
     private String painXml;
-    private String service;
+
     private AbstractTransaction.TransactionType sepaTransactionType;
 
 }

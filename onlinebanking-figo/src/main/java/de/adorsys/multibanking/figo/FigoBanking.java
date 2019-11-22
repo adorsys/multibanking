@@ -3,8 +3,8 @@ package de.adorsys.multibanking.figo;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
+import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
@@ -107,7 +107,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
+    public PaymentResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
         return null;
     }
 
@@ -253,9 +253,9 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadBookingsRequest) {
-        BankApiUser bankApiUser = loadBookingsRequest.getBankApiUser();
-        BankAccount bankAccount = loadBookingsRequest.getTransaction().getPsuAccount();
+    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadTransactionsRequest) {
+        BankApiUser bankApiUser = loadTransactionsRequest.getBankApiUser();
+        BankAccount bankAccount = loadTransactionsRequest.getTransaction().getPsuAccount();
 
         try {
             TokenResponse tokenResponse = figoConnection.credentialLogin(bankApiUser.getApiUserId() + "@admb.de",
@@ -284,7 +284,7 @@ public class FigoBanking implements OnlineBankingService {
                 .map(transaction -> FigoMapping.mapBooking(transaction, bankApi))
                 .collect(Collectors.toList());
 
-            updateTanTransportTypes(loadBookingsRequest.getBankAccess(), session.getAccounts());
+            updateTanTransportTypes(loadTransactionsRequest.getBankAccess(), session.getAccounts());
 
             return TransactionsResponse.builder()
                 .bookings(bookings)

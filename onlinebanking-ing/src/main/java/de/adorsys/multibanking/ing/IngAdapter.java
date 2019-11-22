@@ -14,6 +14,7 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.domain.transaction.PaymentStatusReqest;
 import de.adorsys.multibanking.ing.api.Balance;
 import de.adorsys.multibanking.ing.api.*;
 import de.adorsys.multibanking.ing.http.ApacheHttpClient;
@@ -121,21 +122,21 @@ public class IngAdapter implements OnlineBankingService {
     }
 
     @Override
-    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadBookingsRequest) {
-        IngSessionData ingSessionData = (IngSessionData) loadBookingsRequest.getBankApiConsentData();
-        checkIngSession(ingSessionData, loadBookingsRequest.getAuthorisationCode());
+    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadTransactionsRequest) {
+        IngSessionData ingSessionData = (IngSessionData) loadTransactionsRequest.getBankApiConsentData();
+        checkIngSession(ingSessionData, loadTransactionsRequest.getAuthorisationCode());
 
         ClientAuthentication clientAuthentication =
             getOauth2Service().getClientAuthentication(ingSessionData.getAccessToken());
 
         String resourceId =
-            Optional.ofNullable(loadBookingsRequest.getTransaction().getPsuAccount().getExternalIdMap().get(bankApi()))
-                .orElseGet(() -> getAccountResourceId(loadBookingsRequest.getBankAccess().getIban(),
+            Optional.ofNullable(loadTransactionsRequest.getTransaction().getPsuAccount().getExternalIdMap().get(bankApi()))
+                .orElseGet(() -> getAccountResourceId(loadTransactionsRequest.getBankAccess().getIban(),
                     clientAuthentication).toString());
 
         Map<String, Object> queryParams = new LinkedHashMap<>();
-        queryParams.put("dateFrom", loadBookingsRequest.getTransaction().getDateFrom());
-        queryParams.put("dateTo", loadBookingsRequest.getTransaction().getDateTo());
+        queryParams.put("dateFrom", loadTransactionsRequest.getTransaction().getDateFrom());
+        queryParams.put("dateTo", loadTransactionsRequest.getTransaction().getDateTo());
 
         String uri = StringUri.withQuery(
             ingBaseUrl + TRANSACTIONS_ENDPOINT.replace("{{accountId}}", Objects.requireNonNull(resourceId)),
@@ -202,7 +203,7 @@ public class IngAdapter implements OnlineBankingService {
     }
 
     @Override
-    public AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
+    public PaymentResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
         throw new UnsupportedOperationException();
     }
 

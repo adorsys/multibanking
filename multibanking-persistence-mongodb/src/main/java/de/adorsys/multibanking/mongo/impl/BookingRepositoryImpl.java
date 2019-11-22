@@ -43,8 +43,7 @@ public class BookingRepositoryImpl implements BookingRepositoryIf {
     public List<BookingEntity> findByUserIdAndAccountIdAndBankApi(String userId, String bankAccountId,
                                                                   BankApi bankApi) {
         return entityMapper.mapToBookingEntities(bookingRepository.findByUserIdAndAccountIdAndBankApi(userId,
-            bankAccountId, bankApi,
-            new Sort(Sort.Direction.DESC, "valutaDate")));
+            bankAccountId, bankApi, Sort.by(Sort.Direction.DESC, "valutaDate")));
     }
 
     @Override
