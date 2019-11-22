@@ -14,7 +14,6 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
-import de.adorsys.multibanking.domain.transaction.PaymentStatusReqest;
 import de.adorsys.multibanking.ing.api.Balance;
 import de.adorsys.multibanking.ing.api.*;
 import de.adorsys.multibanking.ing.http.ApacheHttpClient;
