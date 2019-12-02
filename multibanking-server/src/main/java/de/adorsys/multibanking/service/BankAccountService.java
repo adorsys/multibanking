@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
@@ -37,7 +36,6 @@ public class BankAccountService extends AccountInformationService {
     private final ConsentService consentService;
     private final UserService userService;
     private final BankService bankService;
-    private final FinTSProductConfig finTSProductConfig;
 
     public List<BankAccountEntity> getBankAccounts(String userId, String accessId) {
         BankAccessEntity bankAccessEntity = bankAccessRepository.findByUserIdAndId(userId, accessId)
@@ -106,7 +104,6 @@ public class BankAccountService extends AccountInformationService {
         transactionRequest.setBankApiUser(bankApiUser);
         transactionRequest.setBankAccess(bankAccess);
         transactionRequest.setBank(bankEntity);
-        transactionRequest.setHbciProduct(finTSProductConfig.getProduct());
         transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
 
         try {

@@ -19,7 +19,7 @@ package de.adorsys.multibanking.domain;
 /**
  * The predicted cycles for a category.
  */
-public enum Cycle {
+public enum Frequency {
     /**
      * every week
      */

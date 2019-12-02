@@ -32,7 +32,7 @@ public class Contract {
     private String hotline;
     private String email;
     private String mandateReference;
-    private Cycle interval;
+    private Frequency interval;
     private boolean cancelled;
 
     private BigDecimal amount;

@@ -24,8 +24,6 @@ import de.adorsys.multibanking.domain.response.LoadBalancesResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadBalances;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -33,39 +31,23 @@ import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIMsgStatus;
-import org.kapott.hbci.structures.Konto;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
-@Data
 @RequiredArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 @Slf4j
 public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesResponse> {
 
     private final TransactionRequest<LoadBalances> loadBalanceRequest;
     private AbstractHBCIJob balanceJob;
 
-    private Konto createAccount() {
-        BankAccount bankAccount = loadBalanceRequest.getTransaction().getPsuAccount();
-
-        Konto account = new Konto();
-        account.bic = bankAccount.getBic();
-        account.number = bankAccount.getAccountNumber();
-        account.iban = bankAccount.getIban();
-        account.blz = bankAccount.getBlz();
-        account.curr = bankAccount.getCurrency();
-        account.country = bankAccount.getCountry();
-        return account;
-    }
-
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         balanceJob = new GVSaldoReq(passport);
-        balanceJob.setParam("my", createAccount());
+        balanceJob.setParam("my", getPsuKonto(passport));
         return balanceJob;
     }
 

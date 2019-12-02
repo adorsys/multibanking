@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.mongo.entity;
 
-import de.adorsys.multibanking.domain.transaction.StandingOrder;
+import de.adorsys.multibanking.domain.StandingOrder;
 import de.adorsys.multibanking.mongo.encrypt.Encrypted;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +16,7 @@ import java.util.Date;
 @Document
 @Encrypted(exclude = {"_id", "accountId", "userId"})
 @CompoundIndexes({
-        @CompoundIndex(name = "account_index", def = "{'userId': 1, 'accountId': 1}")
+    @CompoundIndex(name = "account_index", def = "{'userId': 1, 'accountId': 1}")
 })
 public class StandingOrderMongoEntity extends StandingOrder {
 

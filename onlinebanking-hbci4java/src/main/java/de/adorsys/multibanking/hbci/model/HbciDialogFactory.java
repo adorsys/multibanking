@@ -49,17 +49,13 @@ public class HbciDialogFactory {
             .orElseThrow(() -> new MultibankingException(BANK_NOT_SUPPORTED,
                 "Bank [" + bankCode + "] not supported"));
 
-        HBCIProduct hbciProduct = Optional.ofNullable(dialogRequest.getHbciProduct())
-            .map(product -> new HBCIProduct(product.getName(), product.getVersion()))
-            .orElse(null);
-
         HbciPassport newPassport = Optional.ofNullable(existingPassport)
             .orElseGet(() -> {
                 HbciConsent hbciConsent = (HbciConsent) dialogRequest.getBankApiConsentData();
 
                 return createPassport(bankInfo.getPinTanVersion().getId(), bankCode,
                     hbciConsent.getCredentials().getUserId(), hbciConsent.getCredentials().getCustomerId(),
-                    hbciProduct, dialogRequest.getCallback());
+                    hbciConsent.getHbciProduct(), dialogRequest.getCallback());
             });
         newPassport.setCurrentSecMechInfo(twoStepMechanism);
 
@@ -95,7 +91,6 @@ public class HbciDialogFactory {
             default:
                 throw new IllegalStateException("Unexpected dialog tpye: " + dialogType);
         }
-
     }
 
     public static HbciPassport createPassport(HbciPassport.State state, HBCICallback callback) {

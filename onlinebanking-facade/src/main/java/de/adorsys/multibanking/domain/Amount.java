@@ -17,10 +17,15 @@
 package de.adorsys.multibanking.domain;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
+import java.util.Currency;
+
+@RequiredArgsConstructor
 @Data
-public class Product {
+public class Amount {
 
-    private final String name;
-    private final String version;
+    private final Currency currency;
+    private final BigDecimal value;
 }

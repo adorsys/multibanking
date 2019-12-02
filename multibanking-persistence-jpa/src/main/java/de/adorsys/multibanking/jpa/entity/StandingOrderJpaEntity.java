@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.Cycle;
+import de.adorsys.multibanking.domain.Frequency;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,7 +17,7 @@ public class StandingOrderJpaEntity extends PaymentCommonJpaEntity {
     @GeneratedValue
     private Long id;
     private String accountId;
-    private Cycle cycle;
+    private Frequency cycle;
     private int executionDay;
     private LocalDate firstExecutionDate;
     private LocalDate lastExecutionDate;

@@ -11,9 +11,7 @@ import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.domain.transaction.AbstractPayment;
-import de.adorsys.multibanking.domain.transaction.LoadAccounts;
-import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.domain.transaction.*;
 import de.adorsys.multibanking.ing.api.Balance;
 import de.adorsys.multibanking.ing.api.*;
 import de.adorsys.multibanking.ing.http.ApacheHttpClient;
@@ -152,6 +150,16 @@ public class IngAdapter implements OnlineBankingService {
             .build();
     }
 
+    @Override
+    public StandingOrdersResponse loadStandingOrders(TransactionRequest<LoadStandingOrders> loadStandingOrdersRequest) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public LoadBalancesResponse loadBalances(TransactionRequest<LoadBalances> request) {
+        throw new UnsupportedOperationException();
+    }
+
     private BalancesReport getBalancesReport(ClientAuthentication clientAuthentication, String resourceId) {
         String uri = StringUri.withQuery(
             ingBaseUrl + BALANCES_ENDPOINT.replace("{{accountId}}", Objects.requireNonNull(resourceId)),
@@ -232,7 +240,7 @@ public class IngAdapter implements OnlineBankingService {
             }
 
             @Override
-            public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
+            public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisationRequest) {
                 throw new UnsupportedOperationException();
             }
 
@@ -268,6 +276,11 @@ public class IngAdapter implements OnlineBankingService {
             public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
                 IngSessionData ingSessionData = (IngSessionData) bankApiConsentData;
                 checkIngSession(ingSessionData, authorisationCode);
+            }
+
+            @Override
+            public PaymentStatusResponse getPaymentStatus(TransactionRequest<PaymentStatusReqest> request) {
+                throw new UnsupportedOperationException();
             }
         };
     }

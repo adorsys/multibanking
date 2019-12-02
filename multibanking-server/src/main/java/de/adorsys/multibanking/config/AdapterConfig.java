@@ -6,12 +6,16 @@ import de.adorsys.multibanking.figo.FigoBanking;
 import de.adorsys.multibanking.finapi.FinapiBanking;
 import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
 import de.adorsys.multibanking.ing.IngAdapter;
+import lombok.extern.slf4j.Slf4j;
+import org.kapott.hbci.manager.HBCIProduct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 
+@Slf4j
 @Configuration
 public class AdapterConfig {
 
@@ -29,10 +33,16 @@ public class AdapterConfig {
     private String ingQwacAlias;
     @Value("${ing.qseal.alias}")
     private String ingQsealAlias;
+    @Value("${fints.id:}")
+    private String fintsProduct;
+    @Value("${fints.version:}")
+    private String fintsProductVersion;
+    @Value("${info.project.version:null}")
+    private String moduleVersion;
 
     private IngAdapter ingAdapter;
     private BankingGatewayAdapter bankingGatewayAdapter;
-    private Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(true);
+    private Hbci4JavaBanking hbci4JavaBanking;
     private FigoBanking figoBanking = new FigoBanking(BankApi.FIGO);
     private FigoBanking figoBankingAlternative = new FigoBanking(BankApi.FIGO_ALTERNATIVE);
     private FinapiBanking finapiBanking = new FinapiBanking();
@@ -43,6 +53,13 @@ public class AdapterConfig {
             ingQsealAlias);
         bankingGatewayAdapter = new BankingGatewayAdapter(bankingGatewayBaseUrl,
             bankingAdapterBaseUrl);
+
+        if (StringUtils.isEmpty(fintsProductVersion)) {
+            log.warn("missing FinTS product configuration");
+            hbci4JavaBanking = new Hbci4JavaBanking(new HBCIProduct(fintsProduct, moduleVersion), true);
+        } else {
+            hbci4JavaBanking = new Hbci4JavaBanking(new HBCIProduct(fintsProduct, fintsProductVersion), true);
+        }
     }
 
     @Bean

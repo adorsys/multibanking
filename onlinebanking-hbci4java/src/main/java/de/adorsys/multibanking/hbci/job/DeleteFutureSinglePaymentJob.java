@@ -27,9 +27,6 @@ import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-/**
- * Only for future payment (GVTermUebSEPA)
- */
 @RequiredArgsConstructor
 public class DeleteFutureSinglePaymentJob extends AbstractPaymentJob<FutureSinglePayment> {
 

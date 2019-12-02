@@ -28,6 +28,7 @@ public abstract class AbstractTransaction {
 
     public enum TransactionType {
         SINGLE_PAYMENT,
+        INSTANT_PAYMENT,
         FOREIGN_PAYMENT,
         FUTURE_SINGLE_PAYMENT,
         FUTURE_SINGLE_PAYMENT_DELETE,
@@ -40,6 +41,8 @@ public abstract class AbstractTransaction {
         TAN_REQUEST,
         LOAD_BANKACCOUNTS,
         LOAD_BALANCES,
-        LOAD_TRANSACTIONS
+        LOAD_TRANSACTIONS,
+        LOAD_STANDING_ORDERS,
+        GET_PAYMENT_STATUS
     }
 }

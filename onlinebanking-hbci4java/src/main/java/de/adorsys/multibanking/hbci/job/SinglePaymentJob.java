@@ -21,10 +21,7 @@ import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import lombok.RequiredArgsConstructor;
-import org.kapott.hbci.GV.AbstractHBCIJob;
-import org.kapott.hbci.GV.AbstractSEPAGV;
-import org.kapott.hbci.GV.GVTermUebSEPA;
-import org.kapott.hbci.GV.GVUebSEPA;
+import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV_Result.GVRTermUeb;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
@@ -52,7 +49,11 @@ public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment> {
             hbciSinglePaymentJob = new GVTermUebSEPA(passport, GVTermUebSEPA.getLowlevelName());
             hbciSinglePaymentJob.setParam("date", ((FutureSinglePayment) singlePayment).getExecutionDate().toString());
         } else {
-            hbciSinglePaymentJob = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName());
+            if (singlePayment.isInstantPayment()) {
+                hbciSinglePaymentJob = new GVInstantUebSEPA(passport, GVInstantUebSEPA.getLowlevelName());
+            } else {
+                hbciSinglePaymentJob = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName());
+            }
         }
 
         hbciSinglePaymentJob.setParam("src", src);

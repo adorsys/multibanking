@@ -3,14 +3,10 @@ package de.adorsys.multibanking.figo;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AccountInformationResponse;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
-import de.adorsys.multibanking.domain.response.TransactionsResponse;
+import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.domain.transaction.AbstractPayment;
-import de.adorsys.multibanking.domain.transaction.LoadAccounts;
-import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.domain.transaction.*;
 import me.figo.FigoConnection;
 import me.figo.FigoException;
 import me.figo.FigoSession;
@@ -293,6 +289,16 @@ public class FigoBanking implements OnlineBankingService {
         } catch (IOException | FigoException | InterruptedException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    public StandingOrdersResponse loadStandingOrders(TransactionRequest<LoadStandingOrders> loadStandingOrdersRequest) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public LoadBalancesResponse loadBalances(TransactionRequest<LoadBalances> request) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

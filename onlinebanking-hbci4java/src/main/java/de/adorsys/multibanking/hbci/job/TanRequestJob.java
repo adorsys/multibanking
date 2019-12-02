@@ -17,11 +17,9 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
-import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -48,7 +46,7 @@ public class TanRequestJob extends AbstractPaymentJob<AbstractPayment> {
 
     @Override
     PaymentResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
-                                       List<HBCIMsgStatus> msgStatusList) {
+                                      List<HBCIMsgStatus> msgStatusList) {
         PaymentResponse paymentResponse = new PaymentResponse(null);
         paymentResponse.setWarnings(collectWarnings(msgStatusList));
         return paymentResponse;

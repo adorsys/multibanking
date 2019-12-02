@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain;
 
-import lombok.*;
+import lombok.Data;
 
-@NoArgsConstructor
-@RequiredArgsConstructor
+import java.time.LocalDate;
+
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class TransactionAuthorisationRequest extends AbstractStrongCustomerAuthorisationRequest {
+public class StandingOrder {
 
-    private @NonNull String scaAuthenticationData;
+    private String creditorName;
+    private String creditorAccount;
+    private Amount transactionAmount;
+    private String remittanceInformationUnstructured;
+    private String bankTransactionCode;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private String executionRule;
+    private Frequency frequency;
+    private int dayOfExecution;
 }

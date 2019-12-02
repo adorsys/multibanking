@@ -2,14 +2,10 @@ package de.adorsys.multibanking.finapi;
 
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AccountInformationResponse;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
-import de.adorsys.multibanking.domain.response.TransactionsResponse;
+import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.domain.transaction.AbstractPayment;
-import de.adorsys.multibanking.domain.transaction.LoadAccounts;
-import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.domain.transaction.*;
 import de.adorsys.multibanking.domain.utils.Utils;
 import de.adorsys.multibanking.finapi.api.*;
 import de.adorsys.multibanking.finapi.model.*;
@@ -234,8 +230,18 @@ public class FinapiBanking implements OnlineBankingService {
                 .bookings(bookingList)
                 .build();
         } catch (ApiException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    public StandingOrdersResponse loadStandingOrders(TransactionRequest<LoadStandingOrders> loadStandingOrdersRequest) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public LoadBalancesResponse loadBalances(TransactionRequest<LoadBalances> request) {
+        throw new UnsupportedOperationException();
     }
 
     private Account waitAccountSynced(BankAccount bankAccount, ApiClient apiClient) throws ApiException {

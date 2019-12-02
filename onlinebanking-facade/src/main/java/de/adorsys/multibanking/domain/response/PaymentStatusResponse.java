@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain.response;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
-@NoArgsConstructor
 @RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TransactionAuthorisationRequest extends AbstractStrongCustomerAuthorisationRequest {
+public class PaymentStatusResponse extends AbstractResponse {
 
-    private @NonNull String scaAuthenticationData;
 }

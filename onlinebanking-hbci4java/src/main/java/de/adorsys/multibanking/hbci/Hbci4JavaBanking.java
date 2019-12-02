@@ -44,10 +44,7 @@ import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.dialog.HBCIUpdDialog;
 import org.kapott.hbci.exceptions.HBCI_Exception;
-import org.kapott.hbci.manager.BankInfo;
-import org.kapott.hbci.manager.HBCITwoStepMechanism;
-import org.kapott.hbci.manager.HBCIUtils;
-import org.kapott.hbci.manager.HBCIVersion;
+import org.kapott.hbci.manager.*;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 
@@ -66,19 +63,22 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private Map<String, Map<String, String>> bpdCache;
+    private HBCIProduct hbciProduct;
 
     private HbciScaMapper hbciScaMapper = new HbciScaMapperImpl();
     private HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
 
-    public Hbci4JavaBanking() {
-        this(null, false);
+    public Hbci4JavaBanking(HBCIProduct hbciProduct) {
+        this(hbciProduct, null, false);
     }
 
-    public Hbci4JavaBanking(boolean cacheBpdUpd) {
-        this(null, cacheBpdUpd);
+    public Hbci4JavaBanking(HBCIProduct hbciProduct, boolean cacheBpdUpd) {
+        this(hbciProduct, null, cacheBpdUpd);
     }
 
-    public Hbci4JavaBanking(InputStream customBankConfigInput, boolean cacheBpdUpd) {
+    public Hbci4JavaBanking(HBCIProduct hbciProduct, InputStream customBankConfigInput, boolean cacheBpdUpd) {
+        this.hbciProduct = hbciProduct;
+
         if (cacheBpdUpd) {
             bpdCache = new ConcurrentHashMap<>();
         }
@@ -220,6 +220,32 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         }
     }
 
+    @Override
+    public StandingOrdersResponse loadStandingOrders(TransactionRequest<LoadStandingOrders> loadStandingOrdersRequest) {
+        HbciConsent hbciConsent = (HbciConsent) loadStandingOrdersRequest.getBankApiConsentData();
+        try {
+            if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
+                checkBankExists(loadStandingOrdersRequest.getBank());
+                BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(loadStandingOrdersRequest);
+
+                LoadStandingOrdersJob loadStandingOrdersJob = new LoadStandingOrdersJob(loadStandingOrdersRequest);
+                StandingOrdersResponse response = loadStandingOrdersJob.execute(hbciCallback);
+                updateUpd(hbciCallback, response);
+                return response;
+            } else {
+                TransactionAuthorisationResponse<? extends AbstractResponse> submitAuthorizationCodeResponse =
+                    transactionAuthorisation(new TransactionAuthorisation<>(loadStandingOrdersRequest));
+
+                afterTransactionAuthorisation(hbciConsent, submitAuthorizationCodeResponse.getScaStatus());
+
+                return (StandingOrdersResponse) submitAuthorizationCodeResponse.getJobResponse();
+            }
+        } catch (HBCI_Exception e) {
+            throw handleHbciException(e);
+        }
+    }
+
+    @Override
     public LoadBalancesResponse loadBalances(TransactionRequest<LoadBalances> request) {
         HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
         try {
@@ -327,13 +353,13 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         return new BpdUpdHbciCallback(bankCode, bpdCache);
     }
 
-    public AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciDialogRequest dialogRequest,
+    public AbstractHbciDialog createDialog(HbciDialogType dialogType,
+                                           HbciDialogRequest dialogRequest,
                                            HBCITwoStepMechanism twoStepMechanism) {
         checkBankExists(dialogRequest.getBank());
 
-        String bankCode = dialogRequest.getBank().getBankApiBankCode() != null
-            ? dialogRequest.getBank().getBankApiBankCode()
-            : dialogRequest.getBank().getBankCode();
+        String bankCode = Optional.ofNullable(dialogRequest.getBank().getBankApiBankCode())
+            .orElse(dialogRequest.getBank().getBankCode());
 
         Optional.ofNullable(bpdCache)
             .ifPresent(cache -> dialogRequest.setHbciBPD(cache.get(bankCode)));
@@ -379,6 +405,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
         switch (transactionRequest.getTransaction().getTransactionType()) {
             case SINGLE_PAYMENT:
             case FUTURE_SINGLE_PAYMENT:
+            case INSTANT_PAYMENT:
                 return new SinglePaymentJob(transactionRequest);
             case FOREIGN_PAYMENT:
                 return new ForeignPaymentJob(transactionRequest);
@@ -472,6 +499,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
                 HbciConsent hbciConsent = new HbciConsent();
                 hbciConsent.setStatus(STARTED);
+                hbciConsent.setHbciProduct(hbciProduct);
 
                 return hbciScaMapper.toCreateConsentResponse(hbciConsent);
             }
@@ -496,9 +524,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             }
 
             @Override
-            public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
-                HbciConsent hbciConsent = (HbciConsent) transactionAuthorisation.getBankApiConsentData();
-                hbciConsent.setScaAuthenticationData(transactionAuthorisation.getScaAuthenticationData());
+            public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisationRequest) {
+                HbciConsent hbciConsent = (HbciConsent) transactionAuthorisationRequest.getBankApiConsentData();
+                hbciConsent.setScaAuthenticationData(transactionAuthorisationRequest.getScaAuthenticationData());
 
                 return hbciScaMapper.toUpdateAuthResponse(hbciConsent, bankApi());
             }
@@ -557,6 +585,22 @@ public class Hbci4JavaBanking implements OnlineBankingService {
             @Override
             public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
                 throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public PaymentStatusResponse getPaymentStatus(TransactionRequest<PaymentStatusReqest> request) {
+                try {
+                    checkBankExists(request.getBank());
+                    BpdUpdHbciCallback hbciCallback = setRequestBpdAndCreateCallback(request);
+
+                    InstantPaymentStatusJob instantPaymentStatusJob = new InstantPaymentStatusJob(request);
+                    PaymentStatusResponse response = instantPaymentStatusJob.execute(hbciCallback);
+                    updateUpd(hbciCallback, response);
+
+                    return response;
+                } catch (HBCI_Exception e) {
+                    throw handleHbciException(e);
+                }
             }
         };
     }

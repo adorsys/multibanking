@@ -54,7 +54,7 @@ public class HbciSinglePaymentTest {
 
     @Before
     public void beforeTest() throws IOException {
-        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(banksConfigUrl.openStream(), true);
+        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(null, banksConfigUrl.openStream(), true);
 
         MockitoAnnotations.initMocks(this);
         when(bankingServiceProducer.getBankingService(anyString())).thenReturn(hbci4JavaBanking);
@@ -74,7 +74,8 @@ public class HbciSinglePaymentTest {
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
-        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity, bankAccessEntity,
+        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity,
+            bankAccessEntity,
             BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
@@ -101,7 +102,8 @@ public class HbciSinglePaymentTest {
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
-        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity, bankAccessEntity,
+        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity,
+            bankAccessEntity,
             BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))

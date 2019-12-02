@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
@@ -29,7 +28,6 @@ public class PaymentService {
     private final RawSepaTransactionRepositoryIf rawSepaTransactionRepository;
     private final SinglePaymentRepositoryIf singlePaymentRepository;
     private final BulkPaymentRepositoryIf bulkPaymentRepository;
-    private final FinTSProductConfig finTSProductConfig;
 
     RawSepaTransactionEntity createSepaRawPayment(BankAccessEntity bankAccess, Credentials credentials,
                                                   RawSepaPayment payment) {
@@ -49,7 +47,6 @@ public class PaymentService {
             request.setBankApiUser(bankApiUser);
             request.setBankAccess(bankAccess);
             request.setBank(bankEntity);
-            request.setHbciProduct(finTSProductConfig.getProduct());
             AbstractResponse response = bankingService.executePayment(request);
 
             RawSepaTransactionEntity target = new RawSepaTransactionEntity();
@@ -83,7 +80,6 @@ public class PaymentService {
             request.setBankApiUser(bankApiUser);
             request.setBankAccess(bankAccess);
             request.setBank(bankEntity);
-            request.setHbciProduct(finTSProductConfig.getProduct());
 
             AbstractResponse response = bankingService.executePayment(request);
 
@@ -117,7 +113,6 @@ public class PaymentService {
             request.setBankApiUser(bankApiUser);
             request.setBankAccess(bankAccess);
             request.setBank(bankEntity);
-            request.setHbciProduct(finTSProductConfig.getProduct());
 
             AbstractResponse response = bankingService.executePayment(request);
 

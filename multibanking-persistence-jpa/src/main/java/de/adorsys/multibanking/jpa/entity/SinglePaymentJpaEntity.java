@@ -28,5 +28,5 @@ public class SinglePaymentJpaEntity extends PaymentCommonJpaEntity {
     private String purposecode;
     private BigDecimal amount;
     private String currency;
-
+    private boolean instantPayment;
 }

@@ -29,6 +29,7 @@ import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.hbci.model.*;
 import de.adorsys.multibanking.mapper.AccountStatementMapper;
 import de.adorsys.multibanking.mapper.AccountStatementMapperImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
@@ -61,6 +62,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNA
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.JOBS;
 
+@RequiredArgsConstructor
 @Slf4j
 public abstract class ScaAwareJob<T extends AbstractTransaction, R extends AbstractResponse> {
 
@@ -222,12 +224,12 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
     private HBCIExecStatus executeTasks(AbstractHbciDialog dialog) {
         HBCIExecStatus execStatus = dialog.execute(false);
-        if (!execStatus.isOK()) {
-            throw new MultibankingException(HBCI_ERROR, execStatus.getErrorMessages()
-                .stream()
-                .map(messageString -> Message.builder().renderedMessage(messageString).build())
-                .collect(Collectors.toList()));
-        }
+//        if (!execStatus.isOK()) {
+//            throw new MultibankingException(HBCI_ERROR, execStatus.getErrorMessages()
+//                .stream()
+//                .map(messageString -> Message.builder().renderedMessage(messageString).build())
+//                .collect(Collectors.toList()));
+//        }
         return execStatus;
     }
 

@@ -35,10 +35,11 @@ public class SinglePayment extends AbstractPayment {
     private String purposecode;
     private BigDecimal amount;
     private String currency;
+    private boolean instantPayment;
 
     @Override
     public TransactionType getTransactionType() {
-        return TransactionType.SINGLE_PAYMENT;
+        return instantPayment ? TransactionType.INSTANT_PAYMENT : TransactionType.SINGLE_PAYMENT;
     }
 
 }

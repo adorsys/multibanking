@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain.response;
 
-import lombok.*;
+import de.adorsys.multibanking.domain.StandingOrder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@NoArgsConstructor
-@RequiredArgsConstructor
+import java.util.List;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TransactionAuthorisationRequest extends AbstractStrongCustomerAuthorisationRequest {
+public class StandingOrdersResponse extends AbstractResponse {
 
-    private @NonNull String scaAuthenticationData;
+    private final List<StandingOrder> standingOrders;
+
 }

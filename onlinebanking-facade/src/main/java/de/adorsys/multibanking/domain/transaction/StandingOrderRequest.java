@@ -17,7 +17,7 @@
 package de.adorsys.multibanking.domain.transaction;
 
 import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.Cycle;
+import de.adorsys.multibanking.domain.Frequency;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -29,9 +29,9 @@ import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.Tra
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class StandingOrder extends AbstractPayment implements DeletablePayment {
+public class StandingOrderRequest extends AbstractPayment implements DeletablePayment {
 
-    private Cycle cycle;
+    private Frequency cycle;
     private int executionDay;
     private LocalDate firstExecutionDate;
     private LocalDate lastExecutionDate;

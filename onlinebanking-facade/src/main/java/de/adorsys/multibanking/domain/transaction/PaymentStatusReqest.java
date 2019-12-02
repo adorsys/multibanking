@@ -14,15 +14,21 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain.transaction;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@NoArgsConstructor
-@RequiredArgsConstructor
+import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.GET_PAYMENT_STATUS;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class TransactionAuthorisationRequest extends AbstractStrongCustomerAuthorisationRequest {
+public class PaymentStatusReqest extends AbstractTransaction {
 
-    private @NonNull String scaAuthenticationData;
+    private String paymentId;
+
+    @Override
+    public TransactionType getTransactionType() {
+        return GET_PAYMENT_STATUS;
+    }
 }
