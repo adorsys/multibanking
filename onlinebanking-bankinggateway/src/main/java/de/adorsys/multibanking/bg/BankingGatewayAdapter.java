@@ -286,7 +286,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     }
 
     @Override
-    public PaymentResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
+    public PaymentResponse executePayment(TransactionRequest<? extends AbstractPayment> paymentRequest) {
         throw new UnsupportedOperationException();
     }
 

@@ -103,7 +103,7 @@ public class FigoBanking implements OnlineBankingService {
     }
 
     @Override
-    public PaymentResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
+    public PaymentResponse executePayment(TransactionRequest<? extends AbstractPayment> paymentRequest) {
         return null;
     }
 
