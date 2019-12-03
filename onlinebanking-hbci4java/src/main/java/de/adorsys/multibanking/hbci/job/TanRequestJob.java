@@ -18,8 +18,8 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.PaymentResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
+import de.adorsys.multibanking.domain.transaction.TanRequest;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -30,12 +30,12 @@ import org.kapott.hbci.status.HBCIMsgStatus;
 import java.util.List;
 
 @RequiredArgsConstructor
-public class TanRequestJob extends AbstractPaymentJob<AbstractPayment> {
+public class TanRequestJob extends AbstractPaymentJob<TanRequest> {
 
-    private final TransactionRequest<AbstractPayment> transactionRequest;
+    private final TransactionRequest<TanRequest> transactionRequest;
 
     @Override
-    TransactionRequest<AbstractPayment> getTransactionRequest() {
+    TransactionRequest<TanRequest> getTransactionRequest() {
         return transactionRequest;
     }
 

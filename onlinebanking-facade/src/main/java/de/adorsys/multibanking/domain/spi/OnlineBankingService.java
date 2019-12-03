@@ -33,7 +33,7 @@ public interface OnlineBankingService {
 
     LoadBalancesResponse loadBalances(TransactionRequest<LoadBalances> request);
 
-    PaymentResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest);
+    PaymentResponse executePayment(TransactionRequest<? extends AbstractPayment> paymentRequest);
 
     StrongCustomerAuthorisable getStrongCustomerAuthorisation();
 }

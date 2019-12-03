@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDauerSEPANew;
-import org.kapott.hbci.GV_Result.GVRDauerNew;
+import org.kapott.hbci.GV_Result.GVRPayment;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
@@ -98,6 +98,6 @@ public class NewStandingOrderJob extends AbstractPaymentJob<StandingOrderRequest
 
     @Override
     public String orderIdFromJobResult(HBCIJobResult paymentGV) {
-        return ((GVRDauerNew) paymentGV).getOrderId();
+        return ((GVRPayment) paymentGV).getOrderId();
     }
 }

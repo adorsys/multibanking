@@ -271,7 +271,7 @@ public class Hbci4JavaBanking implements OnlineBankingService {
     }
 
     @Override
-    public PaymentResponse executePayment(TransactionRequest<AbstractPayment> request) {
+    public PaymentResponse executePayment(TransactionRequest<? extends AbstractPayment> request) {
         HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
@@ -280,9 +280,9 @@ public class Hbci4JavaBanking implements OnlineBankingService {
 
                 AbstractPaymentJob paymentJob = Optional.ofNullable(request.getTransaction())
                     .map(transaction -> (AbstractPaymentJob) createScaJob(request))
-                    .orElse(new TanRequestJob(request));
+                    .orElse(new TanRequestJob((TransactionRequest<TanRequest>)request));
 
-                PaymentResponse response = paymentJob.execute(hbciCallback);
+                PaymentResponse response = (PaymentResponse)paymentJob.execute(hbciCallback);
                 updateUpd(hbciCallback, response);
 
                 return response;

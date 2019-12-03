@@ -31,11 +31,6 @@ import java.util.Optional;
 public abstract class AbstractPaymentJob<T extends AbstractPayment> extends ScaAwareJob<T, PaymentResponse> {
 
     @Override
-    public PaymentResponse execute(HBCICallback hbciCallback) {
-        return super.execute(hbciCallback);
-    }
-
-    @Override
     PaymentResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
                                       List<HBCIMsgStatus> msgStatusList) {
         String transactionId = Optional.ofNullable(getTransactionId())

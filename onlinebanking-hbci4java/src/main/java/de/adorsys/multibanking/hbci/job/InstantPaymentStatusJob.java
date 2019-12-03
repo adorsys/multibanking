@@ -35,10 +35,11 @@ import java.util.List;
 public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, PaymentStatusResponse> {
 
     private final TransactionRequest<PaymentStatusReqest> paymentStatusReqest;
+    private GVInstanstUebSEPAStatus paymentStatusHbciJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        GVInstanstUebSEPAStatus paymentStatusHbciJob = new GVInstanstUebSEPAStatus(passport);
+        paymentStatusHbciJob = new GVInstanstUebSEPAStatus(passport);
         paymentStatusHbciJob.setParam("my", getPsuKonto(passport));
         paymentStatusHbciJob.setParam("orderid", paymentStatusReqest.getTransaction().getPaymentId());
         return paymentStatusHbciJob;
@@ -57,6 +58,6 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
     @Override
     public PaymentStatusResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
                                                    List<HBCIMsgStatus> msgStatusList) {
-        return null;
+        return new PaymentStatusResponse();
     }
 }

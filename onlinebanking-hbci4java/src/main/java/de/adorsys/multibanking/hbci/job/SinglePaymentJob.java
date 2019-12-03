@@ -22,7 +22,7 @@ import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.*;
-import org.kapott.hbci.GV_Result.GVRTermUeb;
+import org.kapott.hbci.GV_Result.GVRPayment;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
@@ -90,7 +90,7 @@ public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment> {
 
     @Override
     public String orderIdFromJobResult(HBCIJobResult paymentGV) {
-        return paymentGV instanceof GVRTermUeb ? ((GVRTermUeb) paymentGV).getOrderId() : null; // no order id for
+        return paymentGV instanceof GVRPayment ? ((GVRPayment) paymentGV).getOrderId() : null; // no order id for
         // single payment
     }
 }
