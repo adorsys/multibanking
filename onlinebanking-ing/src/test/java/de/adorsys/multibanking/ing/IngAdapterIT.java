@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.ing;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.ing.http.ApacheHttpClient;
 import de.adorsys.multibanking.ing.http.Pkcs12KeyStore;
@@ -25,7 +26,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 
 @Ignore
-public class IngAdapterTest {
+public class IngAdapterIT {
 
     private static final String BASE_URL = "https://api.sandbox.ing.com";
     private static final String KEYSTORE_FILENAME = "example_eidas.p12";
@@ -37,14 +38,14 @@ public class IngAdapterTest {
 
     @BeforeClass
     public static void prepareAdapter() throws Exception {
-        URL keyStoreUrl = IngAdapterTest.class.getClassLoader().getResource(KEYSTORE_FILENAME).toURI().toURL();
+        URL keyStoreUrl = IngAdapterIT.class.getClassLoader().getResource(KEYSTORE_FILENAME).toURI().toURL();
         ingAdapter = new IngAdapter(BASE_URL, keyStoreUrl.toString(), "", QWAC_ALIAS,
             QSEAL_ALIAS);
     }
 
     @Test
     public void testAis() throws Exception {
-        URL keyStoreUrl = IngAdapterTest.class.getClassLoader().getResource(KEYSTORE_FILENAME).toURI().toURL();
+        URL keyStoreUrl = IngAdapterIT.class.getClassLoader().getResource(KEYSTORE_FILENAME).toURI().toURL();
         Pkcs12KeyStore keyStore = new Pkcs12KeyStore(keyStoreUrl, "".toCharArray());
         Oauth2Api oauth2Api = new Oauth2Api(BASE_URL, createHttpClient(keyStore));
         ClientAuthenticationFactory clientAuthenticationFactory = clientAuthenticationFactory(keyStore);
@@ -55,7 +56,8 @@ public class IngAdapterTest {
 
         assert authorizationRequestUri.toString().startsWith("https://developer.ing.com/openbanking/get-started");
 
-        TransactionRequest<LoadAccounts> loadAccountsRequest = new TransactionRequest<>(new LoadAccounts());
+        TransactionRequest<LoadAccounts> loadAccountsRequest =
+            TransactionRequestFactory.create(new LoadAccounts(), null, null, null, null);
         loadAccountsRequest.setAuthorisationCode(AUTHORISATION_CODE);
 
         ingAdapter.loadBankAccounts(loadAccountsRequest);

@@ -3,7 +3,7 @@ package de.adorsys.multibanking.service;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
-import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
+import de.adorsys.multibanking.hbci.HbciBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -48,9 +48,9 @@ public class HbciBulkPaymentTest {
     @Before
     public void beforeTest() {
         MockitoAnnotations.initMocks(this);
-        when(bankingServiceProducer.getBankingService(anyString())).thenReturn(new Hbci4JavaBanking(null));
-        when(bankingServiceProducer.getBankingService(BankApi.FIGO)).thenReturn(new Hbci4JavaBanking(null));
-        when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(new Hbci4JavaBanking(null));
+        when(bankingServiceProducer.getBankingService(anyString())).thenReturn(new HbciBanking(null));
+        when(bankingServiceProducer.getBankingService(BankApi.FIGO)).thenReturn(new HbciBanking(null));
+        when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(new HbciBanking(null));
 
         bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {
             BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", System.getProperty("blz"), BankApi.HBCI);

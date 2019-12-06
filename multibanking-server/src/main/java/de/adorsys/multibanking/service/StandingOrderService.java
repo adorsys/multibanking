@@ -3,8 +3,10 @@ package de.adorsys.multibanking.service;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.domain.transaction.StandingOrderRequest;
 import de.adorsys.multibanking.exception.domain.MissingPinException;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
@@ -38,10 +40,8 @@ public class StandingOrderService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = new TransactionRequest<>(standingOrder);
-            request.setBankApiUser(bankApiUser);
-            request.setBankAccess(bankAccess);
-            request.setBank(bankEntity);
+            TransactionRequest<StandingOrderRequest> request =
+                TransactionRequestFactory.create(standingOrder, bankApiUser, bankAccess, bankEntity, null);
             AbstractResponse response = bankingService.executePayment(request);
 
             StandingOrderEntity target = new StandingOrderEntity();

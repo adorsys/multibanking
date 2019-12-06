@@ -285,7 +285,7 @@ public class FinapiBanking implements OnlineBankingService {
 
     @Override
     public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     private ApiClient createApiClient() {

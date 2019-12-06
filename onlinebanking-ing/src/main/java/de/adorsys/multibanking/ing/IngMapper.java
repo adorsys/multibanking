@@ -11,6 +11,7 @@ import de.adorsys.multibanking.ing.api.Transaction;
 import org.iban4j.Iban;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
@@ -33,9 +34,8 @@ interface IngMapper {
     @Mapping(target = "challenge", ignore = true)
     @Mapping(target = "psuMessage", ignore = true)
     @Mapping(target = "scaMethods", ignore = true)
-    @Mapping(target = "scaStatus", source = "ingSessionData.status")
-    @Mapping(target = "scaApproach", constant = "OAUTH")
-    UpdateAuthResponse toUpdateAuthResponse(IngSessionData ingSessionData, BankApi bankApi);
+    UpdateAuthResponse toUpdateAuthResponse(IngSessionData ingSessionData,
+                                            @MappingTarget UpdateAuthResponse updateAuthResponse);
 
     List<Booking> mapToBookings(List<Transaction> transactions);
 

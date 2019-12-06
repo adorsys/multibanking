@@ -3,6 +3,7 @@ package de.adorsys.multibanking.service;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
@@ -313,11 +314,10 @@ public class BookingService extends AccountInformationService {
         loadBookings.setDateTo(LocalDate.now());
         loadBookings.setWithBalance(true);
 
-        TransactionRequest<LoadTransactions> transactionRequest = new TransactionRequest<>(loadBookings);
-        transactionRequest.setBankApiUser(bankApiUser);
-        transactionRequest.setBankAccess(bankAccess);
-        transactionRequest.setBank(bankEntity);
-        transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
+        TransactionRequest<LoadTransactions> transactionRequest =
+            TransactionRequestFactory.create(loadBookings, bankApiUser, bankAccess, bankEntity,
+                consentEntity.getBankApiConsentData());
+
         transactionRequest.setAuthorisationCode(authorisationCode);
         return transactionRequest;
     }
@@ -351,10 +351,8 @@ public class BookingService extends AccountInformationService {
         if (externalAccountId == null) {
             BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
-            TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(new LoadAccounts());
-            transactionRequest.setBankApiUser(bankApiUser);
-            transactionRequest.setBankAccess(bankAccess);
-            transactionRequest.setBank(bankEntity);
+            TransactionRequest<LoadAccounts> transactionRequest = TransactionRequestFactory.create(new LoadAccounts()
+                , bankApiUser, bankAccess, bankEntity, null);
 
             List<BankAccount> apiBankAccounts =
                 onlineBankingService.loadBankAccounts(transactionRequest).getBankAccounts();

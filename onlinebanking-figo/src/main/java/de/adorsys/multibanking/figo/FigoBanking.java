@@ -303,7 +303,7 @@ public class FigoBanking implements OnlineBankingService {
 
     @Override
     public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     private TaskStatusResponse submitPin(String taskToken, String pin, FigoSession session) throws FigoException,

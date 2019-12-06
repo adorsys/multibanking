@@ -4,7 +4,7 @@ import de.adorsys.multibanking.bg.BankingGatewayAdapter;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.figo.FigoBanking;
 import de.adorsys.multibanking.finapi.FinapiBanking;
-import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
+import de.adorsys.multibanking.hbci.HbciBanking;
 import de.adorsys.multibanking.ing.IngAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.manager.HBCIProduct;
@@ -42,7 +42,7 @@ public class AdapterConfig {
 
     private IngAdapter ingAdapter;
     private BankingGatewayAdapter bankingGatewayAdapter;
-    private Hbci4JavaBanking hbci4JavaBanking;
+    private HbciBanking hbci4JavaBanking;
     private FigoBanking figoBanking = new FigoBanking(BankApi.FIGO);
     private FigoBanking figoBankingAlternative = new FigoBanking(BankApi.FIGO_ALTERNATIVE);
     private FinapiBanking finapiBanking = new FinapiBanking();
@@ -56,9 +56,9 @@ public class AdapterConfig {
 
         if (StringUtils.isEmpty(fintsProductVersion)) {
             log.warn("missing FinTS product configuration");
-            hbci4JavaBanking = new Hbci4JavaBanking(new HBCIProduct(fintsProduct, moduleVersion), true);
+            hbci4JavaBanking = new HbciBanking(new HBCIProduct(fintsProduct, moduleVersion));
         } else {
-            hbci4JavaBanking = new Hbci4JavaBanking(new HBCIProduct(fintsProduct, fintsProductVersion), true);
+            hbci4JavaBanking = new HbciBanking(new HBCIProduct(fintsProduct, fintsProductVersion));
         }
     }
 
@@ -73,7 +73,7 @@ public class AdapterConfig {
     }
 
     @Bean
-    public Hbci4JavaBanking hbci4JavaBanking() {
+    public HbciBanking hbci4JavaBanking() {
         return hbci4JavaBanking;
     }
 

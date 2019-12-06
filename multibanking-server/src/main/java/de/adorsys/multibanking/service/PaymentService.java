@@ -3,6 +3,7 @@ package de.adorsys.multibanking.service;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.BulkPayment;
@@ -43,10 +44,9 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = new TransactionRequest<>(payment);
-            request.setBankApiUser(bankApiUser);
-            request.setBankAccess(bankAccess);
-            request.setBank(bankEntity);
+            TransactionRequest<RawSepaPayment> request =
+                TransactionRequestFactory.create(payment, bankApiUser, bankAccess, bankEntity, null);
+
             AbstractResponse response = bankingService.executePayment(request);
 
             RawSepaTransactionEntity target = new RawSepaTransactionEntity();
@@ -76,10 +76,8 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = new TransactionRequest<>(payment);
-            request.setBankApiUser(bankApiUser);
-            request.setBankAccess(bankAccess);
-            request.setBank(bankEntity);
+            TransactionRequest<SinglePayment> request =
+                TransactionRequestFactory.create(payment, bankApiUser, bankAccess, bankEntity, null);
 
             AbstractResponse response = bankingService.executePayment(request);
 
@@ -109,10 +107,8 @@ public class PaymentService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = new TransactionRequest<>(payment);
-            request.setBankApiUser(bankApiUser);
-            request.setBankAccess(bankAccess);
-            request.setBank(bankEntity);
+            TransactionRequest<BulkPayment> request =
+                TransactionRequestFactory.create(payment, bankApiUser, bankAccess, bankEntity, null);
 
             AbstractResponse response = bankingService.executePayment(request);
 

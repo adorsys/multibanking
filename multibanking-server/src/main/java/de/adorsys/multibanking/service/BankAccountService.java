@@ -3,6 +3,7 @@ package de.adorsys.multibanking.service;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
@@ -100,11 +101,9 @@ public class BankAccountService extends AccountInformationService {
         ConsentEntity consentEntity = consentService.validateAndGetConsent(onlineBankingService,
             bankAccess.getConsentId(), expectedConsentStatus);
 
-        TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(new LoadAccounts());
-        transactionRequest.setBankApiUser(bankApiUser);
-        transactionRequest.setBankAccess(bankAccess);
-        transactionRequest.setBank(bankEntity);
-        transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
+        TransactionRequest<LoadAccounts> transactionRequest =
+            TransactionRequestFactory.create(new LoadAccounts(), bankApiUser, bankAccess, bankEntity,
+                consentEntity.getBankApiConsentData());
 
         try {
             AccountInformationResponse response = onlineBankingService.loadBankAccounts(transactionRequest);

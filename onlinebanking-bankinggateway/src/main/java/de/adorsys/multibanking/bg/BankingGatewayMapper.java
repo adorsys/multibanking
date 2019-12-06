@@ -14,6 +14,7 @@ import org.iban4j.Iban;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.math.BigDecimal;
 import java.util.EnumMap;
@@ -47,7 +48,7 @@ interface BankingGatewayMapper {
     UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(Credentials credentials);
 
     UpdateAuthResponse toUpdateAuthResponseTO(ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponseTO,
-                                              BankApi bankApi);
+                                              @MappingTarget UpdateAuthResponse updateAuthResponse);
 
     SelectPsuAuthenticationMethodRequestTO toSelectPsuAuthenticationMethodRequestTO(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod);
 

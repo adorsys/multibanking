@@ -39,4 +39,10 @@ public class HbciConsent {
     private String scaAuthenticationData;
     private Object hbciTanSubmit;
     private boolean withHktan = true;
+
+    public void afterTransactionAuthorisation(ScaStatus scaStatus) {
+        setHbciTanSubmit(null);
+        setStatus(scaStatus);
+        setScaAuthenticationData(null);
+    }
 }

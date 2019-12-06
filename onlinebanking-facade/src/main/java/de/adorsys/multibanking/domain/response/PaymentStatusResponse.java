@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.domain.response;
 
+import de.adorsys.multibanking.domain.PaymentStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +26,6 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode(callSuper = false)
 public class PaymentStatusResponse extends AbstractResponse {
 
-//    1: in Terminierung
-//2: abgelehnt von erster Inkassostelle
-//3: in Bearbeitung
-//4: Creditoren-seitig verarbeitet, Buchung veranlasst
-//5: R-Transaktion wurde veranlasst
-//6: Auftrag fehlgeschagen
-//7: Auftrag ausgeführt; Geld für den Zahlungsempfänger verfügbar
-//8: Abgelehnt durch Zahlungsdienstleister des Zahlers
-//9: Abgelehnt durch Zahlungsdienstleister des Zahlungsempfängers
+    private final PaymentStatus paymentStatus;
 
 }

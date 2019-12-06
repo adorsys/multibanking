@@ -4,7 +4,7 @@ import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.exception.MissingConsentException;
-import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
+import de.adorsys.multibanking.hbci.HbciBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -54,7 +54,7 @@ public class HbciSinglePaymentTest {
 
     @Before
     public void beforeTest() throws IOException {
-        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(null, banksConfigUrl.openStream(), true);
+        HbciBanking hbci4JavaBanking = new HbciBanking(null, banksConfigUrl.openStream());
 
         MockitoAnnotations.initMocks(this);
         when(bankingServiceProducer.getBankingService(anyString())).thenReturn(hbci4JavaBanking);

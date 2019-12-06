@@ -6,7 +6,7 @@ import de.adorsys.multibanking.domain.BankEntity;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.figo.FigoBanking;
 import de.adorsys.multibanking.finapi.FinapiBanking;
-import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
+import de.adorsys.multibanking.hbci.HbciBanking;
 import de.adorsys.multibanking.ing.IngAdapter;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class OnlineBankingServiceProducer {
 
     private final IngAdapter ingAdapter;
     private final BankingGatewayAdapter bankingGatewayAdapter;
-    private final Hbci4JavaBanking hbci4JavaBanking;
+    private final HbciBanking hbci4JavaBanking;
     private final FigoBanking figoBanking;
     private final FigoBanking figoBankingAlternative;
     private final FinapiBanking finapiBanking;

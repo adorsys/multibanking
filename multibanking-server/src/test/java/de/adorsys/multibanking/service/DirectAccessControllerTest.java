@@ -15,7 +15,7 @@ import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.exception.domain.Messages;
-import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
+import de.adorsys.multibanking.hbci.HbciBanking;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
 import de.adorsys.multibanking.ing.IngAdapter;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
@@ -51,6 +51,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.time.LocalDate;
 import java.util.*;
 
+import static de.adorsys.multibanking.domain.BankApi.HBCI;
+import static de.adorsys.multibanking.domain.ScaApproach.EMBEDDED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_CONSENT_STATUS;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_SCA_METHOD;
 import static de.adorsys.multibanking.service.TestUtil.createBooking;
@@ -113,7 +115,7 @@ public class DirectAccessControllerTest {
     @Test
     public void createConsent_should_return_a_authorisationStatus_link_hbci() {
         ConsentTO consentTO = createConsentTO();
-        prepareBank(new Hbci4JavaBanking(null, true), consentTO.getPsuAccountIban(), false);
+        prepareBank(new HbciBanking(null), consentTO.getPsuAccountIban(), false);
 
         JsonPath jsonPath = request.body(consentTO)
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
@@ -246,7 +248,7 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_hbci() {
-        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(null, true);
+        HbciBanking hbci4JavaBanking = new HbciBanking(null);
 
         ConsentTO consentTO = createConsentTO();
         prepareBank(hbci4JavaBanking, consentTO.getPsuAccountIban(), false);
@@ -265,7 +267,7 @@ public class DirectAccessControllerTest {
     public void consent_authorisation_hbci_mock() {
         ConsentTO consentTO = createConsentTO();
 
-        Hbci4JavaBanking hbci4JavaBanking = spy(new Hbci4JavaBanking(null, true));
+        HbciBanking hbci4JavaBanking = spy(new HbciBanking(null));
         prepareBank(hbci4JavaBanking, consentTO.getPsuAccountIban(), false);
 
         //mock hbci authenticate "authenticatePsu" that's why we need to use an answer to manipulate the consent
@@ -280,19 +282,14 @@ public class DirectAccessControllerTest {
             HbciConsent hbciConsent = (HbciConsent) updatePsuAuthentication.getBankApiConsentData();
             hbciConsent.setStatus(ScaStatus.PSUAUTHENTICATED);
             hbciConsent.setTanMethodList(fakeList);
-            UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
-            updateAuthResponse.setScaApproach(ScaApproach.EMBEDDED);
-            updateAuthResponse.setScaStatus(ScaStatus.PSUAUTHENTICATED);
-            updateAuthResponse.setBankApi(BankApi.HBCI);
+            UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse(HBCI, EMBEDDED, ScaStatus.PSUAUTHENTICATED);
+
             updateAuthResponse.setScaMethods(fakeList);
             return updateAuthResponse;
         }).when(strongCustomerAuthorisable).updatePsuAuthentication(any());
 
         //mock bookings response
-        UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
-        updateAuthResponse.setScaApproach(ScaApproach.EMBEDDED);
-        updateAuthResponse.setScaStatus(ScaStatus.SCAMETHODSELECTED);
-        updateAuthResponse.setBankApi(BankApi.HBCI);
+        UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse(HBCI, EMBEDDED, ScaStatus.SCAMETHODSELECTED);
         updateAuthResponse.setChallenge(new ChallengeData());
 
         AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(null);
@@ -364,7 +361,7 @@ public class DirectAccessControllerTest {
         //4. select authentication method (optional), can be skipped by banks in case of selection not needed
         if (jsonPath.getString("scaStatus").equals(PSUAUTHENTICATED.toString())) {
             String selectAuthenticationMethodLink = jsonPath.getString("_links" + ".selectAuthenticationMethod.href");
-            Map<String, String> scaMethodParams = jsonPath.get("scaMethods[1]");
+            Map<String, String> scaMethodParams = jsonPath.get("scaMethods[0]");
 
             String scaMethodId = scaMethodParams.get("id");
             if (jsonPath.get("scaMethods.find { it.id == '901' }") != null) {
@@ -450,7 +447,7 @@ public class DirectAccessControllerTest {
 
         StrongCustomerAuthorisable authorisationMock = mock(StrongCustomerAuthorisable.class);
         doReturn(authorisationMock).when(bankingGatewayAdapterMock).getStrongCustomerAuthorisation();
-        doReturn(createAuthResponse()).when(authorisationMock).getAuthorisationStatus(bankAccess.getConsentId(), null
+        doReturn(new UpdateAuthResponse(HBCI, EMBEDDED, ScaStatus.SCAMETHODSELECTED)).when(authorisationMock).getAuthorisationStatus(bankAccess.getConsentId(), null
             , null);
         doReturn(Optional.of(new ConsentEntity(bankAccess.getConsentId(), null, null, null,
             consentTO.getPsuAccountIban(), null))).when(consentRepository).findById(bankAccess.getConsentId());
@@ -614,7 +611,7 @@ public class DirectAccessControllerTest {
             return bankEntity;
         });
 
-        if (onlineBankingService instanceof Hbci4JavaBanking && HBCIUtils.getBankInfo(bankCode) == null) {
+        if (onlineBankingService instanceof HbciBanking && HBCIUtils.getBankInfo(bankCode) == null) {
             BankInfo bankInfo = new BankInfo();
             bankInfo.setBlz(test_bank.getBankCode());
             bankInfo.setPinTanAddress(System.getProperty("bankUrl"));
@@ -622,14 +619,6 @@ public class DirectAccessControllerTest {
             bankInfo.setBic(System.getProperty("bic"));
             HBCIUtils.addBankInfo(bankInfo);
         }
-    }
-
-    private UpdateAuthResponse createAuthResponse() {
-        UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
-        updateAuthResponse.setScaApproach(ScaApproach.EMBEDDED);
-        updateAuthResponse.setScaStatus(ScaStatus.SCAMETHODSELECTED);
-
-        return updateAuthResponse;
     }
 
     private ConsentTO createConsentTO() {

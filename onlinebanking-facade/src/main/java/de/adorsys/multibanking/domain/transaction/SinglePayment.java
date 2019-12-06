@@ -20,6 +20,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -35,6 +36,7 @@ public class SinglePayment extends AbstractPayment {
     private String purposecode;
     private BigDecimal amount;
     private String currency;
+    private LocalDateTime submittedTime;
     private boolean instantPayment;
 
     @Override
