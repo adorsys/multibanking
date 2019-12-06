@@ -30,9 +30,7 @@ import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.status.HBCIMsgStatus;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
@@ -62,8 +60,7 @@ public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesRespo
     }
 
     @Override
-    public LoadBalancesResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
-                                                  List<HBCIMsgStatus> msgStatusList) {
+    public LoadBalancesResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
         if (balanceJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Balance job not OK");
             throw new MultibankingException(HBCI_ERROR, balanceJob.getJobResult().getJobStatus().getErrorList().stream()

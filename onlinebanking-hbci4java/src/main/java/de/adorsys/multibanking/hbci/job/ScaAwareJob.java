@@ -19,6 +19,7 @@ package de.adorsys.multibanking.hbci.job;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.ChallengeData;
+import de.adorsys.multibanking.domain.PsuMessage;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
@@ -98,7 +99,8 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
             dialog.addTask(hbciJob);
         }
 
-        HBCIExecStatus hbciExecStatus = executeTasks(dialog);
+        HBCIExecStatus hbciExecStatus = dialog.execute(false);
+        checkExecuteStatus(hbciExecStatus);
 
         //check for SCA is really needed after execution
         tan2StepRequired = Optional.ofNullable(hktan)
@@ -106,7 +108,9 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
                 && KnownReturncode.W3076.searchReturnValue(gvtan2Step.getJobResult().getGlobStatus().getRetVals()) == null)
             .orElse(false);
 
-        R jobResponse = createJobResponse(dialog.getPassport(), hbciTanSubmit, hbciExecStatus.getMsgStatusList());
+        R jobResponse = createJobResponse(dialog.getPassport(), hbciTanSubmit);
+        jobResponse.setMessages(collectMessages(hbciExecStatus.getMsgStatusList()));
+
         if (tan2StepRequired) {
             updateTanSubmit(hbciTanSubmit, dialog, hbciJob);
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
@@ -132,8 +136,8 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
         if (checkDialogInitScaRequired(dialogInitMsgStatus)) {
             log.info("HKIDN SCA required");
-            R jobResponse = createJobResponse(dialog.getPassport(), hbciTanSubmit,
-                Collections.singletonList(dialogInitMsgStatus));
+            R jobResponse = createJobResponse(dialog.getPassport(), hbciTanSubmit
+            );
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
             return jobResponse;
         }
@@ -222,15 +226,13 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         return HbciDialogFactory.createDialog(dialogType, null, dialogRequest, twoStepMechanism);
     }
 
-    private HBCIExecStatus executeTasks(AbstractHbciDialog dialog) {
-        HBCIExecStatus execStatus = dialog.execute(false);
+    protected void checkExecuteStatus(HBCIExecStatus execStatus) {
         if (!execStatus.isOK()) {
             throw new MultibankingException(HBCI_ERROR, execStatus.getErrorMessages()
                 .stream()
                 .map(messageString -> Message.builder().renderedMessage(messageString).build())
                 .collect(Collectors.toList()));
         }
-        return execStatus;
     }
 
     private GVTAN2Step hktanProcess1(HBCITwoStepMechanism hbciTwoStepMechanism, AbstractHBCIJob hbciJob) {
@@ -359,12 +361,12 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         };
     }
 
-    List<String> collectWarnings(List<HBCIMsgStatus> msgStatusList) {
+    List<PsuMessage> collectMessages(List<HBCIMsgStatus> msgStatusList) {
         return Optional.ofNullable(msgStatusList)
             .map(list -> list.isEmpty() ? null : list.get(0))
             .map(status -> status.segStatus)
-            .map(HBCIStatus::getWarnings)
-            .map(list -> list.stream().map(retVal -> retVal.code))
+            .map(HBCIStatus::getRetVals)
+            .map(list -> list.stream().map(retVal -> new PsuMessage(retVal.code, retVal.text)))
             .orElse(Stream.empty())
             .collect(Collectors.toList());
     }
@@ -383,6 +385,6 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
     abstract String getHbciJobName(AbstractTransaction.TransactionType transactionType);
 
-    abstract R createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit, List<HBCIMsgStatus> msgStatusList);
+    abstract R createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit);
 
 }

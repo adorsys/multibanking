@@ -25,9 +25,6 @@ import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.status.HBCIMsgStatus;
-
-import java.util.List;
 
 @RequiredArgsConstructor
 public class TanRequestJob extends AbstractPaymentJob<TanRequest> {
@@ -45,11 +42,8 @@ public class TanRequestJob extends AbstractPaymentJob<TanRequest> {
     }
 
     @Override
-    PaymentResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
-                                      List<HBCIMsgStatus> msgStatusList) {
-        PaymentResponse paymentResponse = new PaymentResponse(null);
-        paymentResponse.setWarnings(collectWarnings(msgStatusList));
-        return paymentResponse;
+    PaymentResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
+        return new PaymentResponse(null);
     }
 
     @Override

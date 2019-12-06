@@ -86,7 +86,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
                 response.setScaStatus(FINALISED);
                 return response;
             }
-            return createResponse(hbciPassport, hbciTanSubmit, hbciExecStatus);
+            return createResponse(hbciPassport, hbciTanSubmit);
         }
     }
 
@@ -130,11 +130,10 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
         hbciDialog.addTask(hktan, false);
     }
 
-    private TransactionAuthorisationResponse<R> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
-                                                               HBCIExecStatus status) {
+    private TransactionAuthorisationResponse<R> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit) {
         TransactionAuthorisationResponse<R> response =
-            new TransactionAuthorisationResponse<>(scaJob.createJobResponse(passport, hbciTanSubmit,
-                status.getMsgStatusList()));
+            new TransactionAuthorisationResponse<>(scaJob.createJobResponse(passport, hbciTanSubmit
+            ));
 
         //HKIDN -> FINALISED -> further request like HKCAZ already executed
         ScaStatus scaStatus = Optional.ofNullable(hbciTanSubmit.getHbciJobName())

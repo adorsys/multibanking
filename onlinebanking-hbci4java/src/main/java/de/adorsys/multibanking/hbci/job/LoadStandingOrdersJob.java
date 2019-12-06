@@ -29,7 +29,6 @@ import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDauerSEPAList;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.status.HBCIMsgStatus;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -66,8 +65,7 @@ public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, Stand
     }
 
     @Override
-    public StandingOrdersResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
-                                                    List<HBCIMsgStatus> msgStatusList) {
+    public StandingOrdersResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
         List<StandingOrder> standingOrders = ((GVRDauerList) standingOrdersHbciJob.getJobResult()).getEntries().stream()
             .map(dauerAuftrag -> {
                 StandingOrder standingOrder = new StandingOrder();

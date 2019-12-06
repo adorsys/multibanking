@@ -35,14 +35,13 @@ import org.kapott.hbci.manager.HBCIUtils;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
 
@@ -51,8 +50,6 @@ public class HbciIntegrationIT {
 
     private static final String SCA_METHOD_ID = "901";
 
-    private URL testDtazvUrl;
-
     private String iban;
     private String psuId;
     private String psuCorporateId;
@@ -60,9 +57,9 @@ public class HbciIntegrationIT {
 
     private HbciBanking hbci4JavaBanking = new HbciBanking(null);
 
-    private static String readFile(String filePath, Charset charset) {
+    private static String readFile(String filePath) {
         StringBuilder contentBuilder = new StringBuilder();
-        try (Stream<String> stream = Files.lines(Paths.get(filePath), charset)) {
+        try (Stream<String> stream = Files.lines(Paths.get(filePath), ISO_8859_1)) {
             stream.forEach(s -> contentBuilder.append(s).append("\n"));
         } catch (IOException e) {
             e.printStackTrace();
@@ -77,20 +74,12 @@ public class HbciIntegrationIT {
         this.psuCorporateId = System.getProperty("login2", "psuCorporateId");
         this.pin = System.getProperty("pin", "pin");
 
-        try {
-            this.testDtazvUrl =
-                Objects.requireNonNull(HbciIntegrationIT.class.getClassLoader().getResource("test-dtazv.txt")).toURI().toURL();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-
         BankInfo bankInfo = new BankInfo();
         bankInfo.setBlz(Iban.valueOf(iban).getBankCode());
         bankInfo.setPinTanAddress(System.getProperty("bankUrl"));
         bankInfo.setPinTanVersion(HBCI_300);
         bankInfo.setBic(System.getProperty("bic"));
         HBCIUtils.addBankInfo(bankInfo);
-
     }
 
     @Test
@@ -132,7 +121,7 @@ public class HbciIntegrationIT {
     }
 
     @Test
-    public void hbciInstantPayment() {
+    public void hbciInstantPayment() throws InterruptedException {
         BankAccount bankAccount = new BankAccount();
         bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
         bankAccount.setIban(iban);
@@ -146,12 +135,14 @@ public class HbciIntegrationIT {
         payment.setInstantPayment(true);
 
         PaymentResponse paymentResponse = hbciSubmitTransaction(payment);
-        log.info("Order-ID: {}", paymentResponse.getTransactionId());
         assertThat(paymentResponse.getTransactionId()).isNotBlank();
+
+        Thread.sleep(31000L);
+        PaymentStatusResponse paymentStatusResponse = hbciInstantPaymentStatus(paymentResponse.getTransactionId());
+        assertThat(paymentStatusResponse).isNotNull();
     }
 
-    @Test
-    public void hbciInstantPaymentStatus() {
+    private PaymentStatusResponse hbciInstantPaymentStatus(String instantPaymentId) {
         TanTransportType tanTransportType = new TanTransportType();
         tanTransportType.setId(SCA_METHOD_ID);
 
@@ -175,7 +166,7 @@ public class HbciIntegrationIT {
 
         PaymentStatusReqest paymentStatusReqest = new PaymentStatusReqest();
         paymentStatusReqest.setPsuAccount(bankAccount);
-        paymentStatusReqest.setPaymentId("375282296812529313155C6RR6EF69");
+        paymentStatusReqest.setPaymentId(instantPaymentId);
 
         TransactionRequest<PaymentStatusReqest> transactionRequest =
             TransactionRequestFactory.create(paymentStatusReqest, null, bankAccess, bank, hbciConsent);
@@ -183,7 +174,7 @@ public class HbciIntegrationIT {
         PaymentStatusResponse paymentStatus =
             hbci4JavaBanking.getStrongCustomerAuthorisation().getPaymentStatus(transactionRequest);
 
-        assertThat(paymentStatus).isNotNull();
+        return paymentStatus;
     }
 
     @Test
@@ -208,9 +199,12 @@ public class HbciIntegrationIT {
     }
 
     @Test
-    public void hbciDTAZV() {
+    public void hbciDTAZV() throws Exception {
+        URL testDtazvUrl = Objects.requireNonNull(HbciIntegrationIT.class.getClassLoader().getResource("test-dtazv" +
+            ".txt")).toURI().toURL();
+
         ForeignPayment payment = new ForeignPayment();
-        payment.setDtazv(readFile(testDtazvUrl.getPath(), StandardCharsets.ISO_8859_1));
+        payment.setDtazv(readFile(testDtazvUrl.getPath()));
 
         BankAccount bankAccount = new BankAccount();
         bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());

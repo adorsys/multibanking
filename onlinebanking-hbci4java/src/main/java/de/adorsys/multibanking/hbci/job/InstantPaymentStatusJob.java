@@ -28,9 +28,7 @@ import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVInstanstUebSEPAStatus;
 import org.kapott.hbci.GV_Result.GVRInstantUebSEPAStatus;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.status.HBCIMsgStatus;
-
-import java.util.List;
+import org.kapott.hbci.status.HBCIExecStatus;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -58,8 +56,12 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
     }
 
     @Override
-    public PaymentStatusResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
-                                                   List<HBCIMsgStatus> msgStatusList) {
+    protected void checkExecuteStatus(HBCIExecStatus execStatus) {
+        //noop
+    }
+
+    @Override
+    public PaymentStatusResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
         GVRInstantUebSEPAStatus hbciStatus = (GVRInstantUebSEPAStatus) paymentStatusHbciJob.getJobResult();
 
 //        1: in Terminierung
@@ -71,7 +73,7 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
 //        7: Auftrag ausgeführt; Geld für den Zahlungsempfänger verfügbar
 //        8: Abgelehnt durch Zahlungsdienstleister des Zahlers
 //        9: Abgelehnt durch Zahlungsdienstleister des Zahlungsempfängers
-        PaymentStatus paymentStatus;
+        PaymentStatus paymentStatus = null;
         switch (hbciStatus.getStatus()) {
             case 1:
                 paymentStatus = PaymentStatus.CANC;
@@ -101,7 +103,7 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
                 paymentStatus = PaymentStatus.RJCT;
                 break;
             default:
-                throw new IllegalArgumentException("unexpected payment status: " + hbciStatus.getStatus());
+                log.warn("unexpected payment status: " + hbciStatus.getStatus());
         }
 
         return new PaymentStatusResponse(paymentStatus);
