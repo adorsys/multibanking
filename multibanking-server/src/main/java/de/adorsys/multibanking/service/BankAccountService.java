@@ -1,9 +1,9 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
@@ -37,7 +37,6 @@ public class BankAccountService extends AccountInformationService {
     private final ConsentService consentService;
     private final UserService userService;
     private final BankService bankService;
-    private final FinTSProductConfig finTSProductConfig;
 
     public List<BankAccountEntity> getBankAccounts(String userId, String accessId) {
         BankAccessEntity bankAccessEntity = bankAccessRepository.findByUserIdAndId(userId, accessId)
@@ -102,12 +101,9 @@ public class BankAccountService extends AccountInformationService {
         ConsentEntity consentEntity = consentService.validateAndGetConsent(onlineBankingService,
             bankAccess.getConsentId(), expectedConsentStatus);
 
-        TransactionRequest<LoadAccounts> transactionRequest = new TransactionRequest<>(new LoadAccounts());
-        transactionRequest.setBankApiUser(bankApiUser);
-        transactionRequest.setBankAccess(bankAccess);
-        transactionRequest.setBank(bankEntity);
-        transactionRequest.setHbciProduct(finTSProductConfig.getProduct());
-        transactionRequest.setBankApiConsentData(consentEntity.getBankApiConsentData());
+        TransactionRequest<LoadAccounts> transactionRequest =
+            TransactionRequestFactory.create(new LoadAccounts(), bankApiUser, bankAccess, bankEntity,
+                consentEntity.getBankApiConsentData());
 
         try {
             AccountInformationResponse response = onlineBankingService.loadBankAccounts(transactionRequest);

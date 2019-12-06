@@ -18,13 +18,13 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
-import de.adorsys.multibanking.domain.transaction.StandingOrder;
+import de.adorsys.multibanking.domain.transaction.StandingOrderRequest;
 import de.adorsys.multibanking.hbci.model.HbciCycleMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDauerSEPANew;
-import org.kapott.hbci.GV_Result.GVRDauerNew;
+import org.kapott.hbci.GV_Result.GVRPayment;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
@@ -32,14 +32,14 @@ import org.kapott.hbci.structures.Value;
 
 @RequiredArgsConstructor
 @Slf4j
-public class NewStandingOrderJob extends AbstractPaymentJob<StandingOrder> {
+public class NewStandingOrderJob extends AbstractPaymentJob<StandingOrderRequest> {
 
-    private final TransactionRequest<StandingOrder> transactionRequest;
+    private final TransactionRequest<StandingOrderRequest> transactionRequest;
     private GVDauerSEPANew hbciNewStandingOrderJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        StandingOrder standingOrder = transactionRequest.getTransaction();
+        StandingOrderRequest standingOrder = transactionRequest.getTransaction();
 
         Konto src = getPsuKonto(passport);
 
@@ -87,7 +87,7 @@ public class NewStandingOrderJob extends AbstractPaymentJob<StandingOrder> {
     }
 
     @Override
-    TransactionRequest<StandingOrder> getTransactionRequest() {
+    TransactionRequest<StandingOrderRequest> getTransactionRequest() {
         return transactionRequest;
     }
 
@@ -98,6 +98,6 @@ public class NewStandingOrderJob extends AbstractPaymentJob<StandingOrder> {
 
     @Override
     public String orderIdFromJobResult(HBCIJobResult paymentGV) {
-        return ((GVRDauerNew) paymentGV).getOrderId();
+        return ((GVRPayment) paymentGV).getOrderId();
     }
 }

@@ -25,9 +25,6 @@ import org.kapott.hbci.GV.GVTermMultiUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 
-/**
- * Only for future payment (GVTermUebSEPA)
- */
 @RequiredArgsConstructor
 public class DeleteFutureBulkPaymentJob extends AbstractPaymentJob<FutureBulkPayment> {
 

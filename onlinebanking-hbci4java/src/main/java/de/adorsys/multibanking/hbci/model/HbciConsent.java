@@ -22,6 +22,7 @@ import de.adorsys.multibanking.domain.TanTransportType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.kapott.hbci.manager.HBCIProduct;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ import java.util.List;
 @Data
 public class HbciConsent {
 
+    private HBCIProduct hbciProduct;
     private ScaStatus status;
     private Credentials credentials;
     private List<TanTransportType> tanMethodList;
@@ -37,4 +39,10 @@ public class HbciConsent {
     private String scaAuthenticationData;
     private Object hbciTanSubmit;
     private boolean withHktan = true;
+
+    public void afterTransactionAuthorisation(ScaStatus scaStatus) {
+        setHbciTanSubmit(null);
+        setStatus(scaStatus);
+        setScaAuthenticationData(null);
+    }
 }

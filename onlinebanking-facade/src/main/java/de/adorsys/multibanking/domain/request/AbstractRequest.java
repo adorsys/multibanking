@@ -19,7 +19,6 @@ package de.adorsys.multibanking.domain.request;
 import de.adorsys.multibanking.domain.Bank;
 import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankApiUser;
-import de.adorsys.multibanking.domain.Product;
 import lombok.Data;
 
 import java.util.Map;
@@ -31,12 +30,12 @@ public abstract class AbstractRequest {
     private BankAccess bankAccess;
     private Bank bank;
 
+    private Object bankApiConsentData;
+
     //oauth authorisation code
     private String authorisationCode;
 
     //hbci stuff
-    private Object bankApiConsentData;
-    private Product hbciProduct;
     private Map<String, String> hbciBPD;
     private Map<String, String> hbciUPD;
     private String hbciSysId;

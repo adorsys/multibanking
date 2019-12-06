@@ -21,8 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
+import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.TransactionAuthorisationResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.TransactionAuthorisation;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
@@ -50,15 +52,16 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNA
 
 @RequiredArgsConstructor
 @Slf4j
-public class SubmitAuthorisationCodeJob {
+public class TransactionAuthorisationJob<T extends AbstractTransaction, R extends AbstractResponse> {
 
-    private final ScaAwareJob scaJob;
+    private final ScaAwareJob<T, R> scaJob;
+    private final TransactionAuthorisation<T> transactionAuthorisation;
 
-    public TransactionAuthorisationResponse sumbitAuthorizationCode(TransactionAuthorisation submitAuthorisationCode) {
+    public TransactionAuthorisationResponse<R> execute() {
         HbciTanSubmit hbciTanSubmit =
-            evaluateTanSubmit((HbciConsent) submitAuthorisationCode.getOriginTransactionRequest().getBankApiConsentData());
+            evaluateTanSubmit((HbciConsent) transactionAuthorisation.getOriginTransactionRequest().getBankApiConsentData());
 
-        HbciPassport hbciPassport = createPassport(submitAuthorisationCode, hbciTanSubmit);
+        HbciPassport hbciPassport = createPassport(transactionAuthorisation, hbciTanSubmit);
 
         HBCIJobsDialog hbciDialog = new HBCIJobsDialog(hbciPassport, hbciTanSubmit.getDialogId(),
             hbciTanSubmit.getMsgNum());
@@ -78,7 +81,7 @@ public class SubmitAuthorisationCodeJob {
         } else {
             if (hbciTanSubmit.getHbciJobName() != null && hbciTanSubmit.getHbciJobName().equals("HKIDN")) {
                 //sca for dialoginit was needed -> fints consent active, expecting response with exempted sca
-                TransactionAuthorisationResponse<?> response =
+                TransactionAuthorisationResponse<R> response =
                     new TransactionAuthorisationResponse<>(scaJob.execute(null, hbciDialog));
                 response.setScaStatus(FINALISED);
                 return response;
@@ -127,9 +130,9 @@ public class SubmitAuthorisationCodeJob {
         hbciDialog.addTask(hktan, false);
     }
 
-    private TransactionAuthorisationResponse createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
-                                                            HBCIExecStatus status) {
-        TransactionAuthorisationResponse response =
+    private TransactionAuthorisationResponse<R> createResponse(PinTanPassport passport, HbciTanSubmit hbciTanSubmit,
+                                                               HBCIExecStatus status) {
+        TransactionAuthorisationResponse<R> response =
             new TransactionAuthorisationResponse<>(scaJob.createJobResponse(passport, hbciTanSubmit,
                 status.getMsgStatusList()));
 
@@ -159,9 +162,10 @@ public class SubmitAuthorisationCodeJob {
         }
     }
 
-    private HbciPassport createPassport(TransactionAuthorisation submitAuthorizationCode, HbciTanSubmit hbciTanSubmit) {
+    private HbciPassport createPassport(TransactionAuthorisation<T> transactionAuthorisation,
+                                        HbciTanSubmit hbciTanSubmit) {
         Map<String, String> bpd =
-            Optional.ofNullable(submitAuthorizationCode.getOriginTransactionRequest().getHbciBPD())
+            Optional.ofNullable(transactionAuthorisation.getOriginTransactionRequest().getHbciBPD())
                 .orElseGet(() -> scaJob.fetchBpd(null).getBPD());
 
         HbciPassport.State state = HbciPassport.State.fromJson(hbciTanSubmit.getPassportState());
@@ -170,13 +174,13 @@ public class SubmitAuthorisationCodeJob {
             new AbstractHBCICallback() {
                 @Override
                 public String needTAN() {
-                    return ((HbciConsent) submitAuthorizationCode.getOriginTransactionRequest().getBankApiConsentData()).getScaAuthenticationData();
+                    return ((HbciConsent) transactionAuthorisation.getOriginTransactionRequest().getBankApiConsentData()).getScaAuthenticationData();
                 }
             });
         state.apply(hbciPassport);
 
         HbciConsent hbciConsent =
-            (HbciConsent) submitAuthorizationCode.getOriginTransactionRequest().getBankApiConsentData();
+            (HbciConsent) transactionAuthorisation.getOriginTransactionRequest().getBankApiConsentData();
 
         hbciPassport.setPIN(hbciConsent.getCredentials().getPin());
         hbciPassport.setCurrentSecMechInfo(hbciTanSubmit.getTwoStepMechanism());
@@ -191,4 +195,5 @@ public class SubmitAuthorisationCodeJob {
         objectMapper.findAndRegisterModules();
         return objectMapper;
     }
+
 }

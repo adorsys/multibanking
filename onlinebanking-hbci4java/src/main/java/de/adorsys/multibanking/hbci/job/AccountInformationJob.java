@@ -24,8 +24,6 @@ import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -40,15 +38,11 @@ import java.util.UUID;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
-@Data
 @RequiredArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 @Slf4j
 public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInformationResponse> {
 
     private final TransactionRequest<LoadAccounts> loadAccountInformationRequest;
-
-    private List<BankAccount> hbciAccounts;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
@@ -73,7 +67,7 @@ public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInfo
                                                         List<HBCIMsgStatus> msgStatusList) {
         loadAccountInformationRequest.getBankAccess().setBankName(passport.getInstName());
 
-        hbciAccounts = new ArrayList<>();
+        List<BankAccount> hbciAccounts = new ArrayList<>();
         for (Konto konto : passport.getAccounts()) {
             BankAccount bankAccount = accountStatementMapper.toBankAccount(konto);
             bankAccount.externalId(BankApi.HBCI, UUID.randomUUID().toString());

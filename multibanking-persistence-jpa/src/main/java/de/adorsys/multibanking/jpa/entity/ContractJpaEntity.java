@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.jpa.entity;
 
-import de.adorsys.multibanking.domain.Cycle;
+import de.adorsys.multibanking.domain.Frequency;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -27,7 +27,7 @@ public class ContractJpaEntity {
     private String email;
     private String mandateReference;
     @Column(name = "cycle")
-    private Cycle interval;
+    private Frequency interval;
     private boolean cancelled;
 
     private BigDecimal amount;

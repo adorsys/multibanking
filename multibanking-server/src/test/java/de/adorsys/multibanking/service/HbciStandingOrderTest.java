@@ -1,8 +1,8 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.transaction.StandingOrder;
-import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
+import de.adorsys.multibanking.domain.transaction.StandingOrderRequest;
+import de.adorsys.multibanking.hbci.HbciBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
@@ -50,9 +50,9 @@ public class HbciStandingOrderTest {
     @Before
     public void beforeTest() {
         MockitoAnnotations.initMocks(this);
-        when(bankingServiceProducer.getBankingService(anyString())).thenReturn(new Hbci4JavaBanking());
-        when(bankingServiceProducer.getBankingService(BankApi.FIGO)).thenReturn(new Hbci4JavaBanking());
-        when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(new Hbci4JavaBanking());
+        when(bankingServiceProducer.getBankingService(anyString())).thenReturn(new HbciBanking(null));
+        when(bankingServiceProducer.getBankingService(BankApi.FIGO)).thenReturn(new HbciBanking(null));
+        when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(new HbciBanking(null));
 
         bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {
             bankRepository.save(bankEntity);
@@ -67,7 +67,8 @@ public class HbciStandingOrderTest {
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(true);
 
-        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity, bankAccessEntity,
+        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity,
+            bankAccessEntity,
             BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals(System.getProperty("account")))
@@ -84,13 +85,14 @@ public class HbciStandingOrderTest {
         bankAccessEntity.setCategorizeBookings(false);
         bankAccessEntity.setStoreAnalytics(false);
 
-        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity, bankAccessEntity,
+        List<BankAccountEntity> bankAccountEntities = bankAccountService.loadBankAccountsOnline(bankEntity,
+            bankAccessEntity,
             BankApi.HBCI);
         BankAccountEntity bankAccountEntitity = bankAccountEntities.stream()
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("3312345678"))
             .findFirst().get();
 
-        StandingOrder standingOrder = new StandingOrder();
+        StandingOrderRequest standingOrder = new StandingOrderRequest();
         standingOrder.setOtherAccount(new BankAccount());
         standingOrder.getOtherAccount().setIban("DE56760905000002257793");
         standingOrder.getOtherAccount().setOwner("Alexander Geist");
@@ -98,7 +100,7 @@ public class HbciStandingOrderTest {
         standingOrder.getOtherAccount().setBic("PBNKDEFF");
         standingOrder.setUsage("Dauerauftrag Test4");
 
-        standingOrder.setCycle(Cycle.MONTHLY);
+        standingOrder.setCycle(Frequency.MONTHLY);
         standingOrder.setExecutionDay(1);
         standingOrder.setFirstExecutionDate(LocalDate.now().plusMonths(1).with(TemporalAdjusters.firstDayOfMonth()));
         standingOrder.setLastExecutionDate(LocalDate.now().plusMonths(1).with(TemporalAdjusters.firstDayOfMonth()).plusYears(2));

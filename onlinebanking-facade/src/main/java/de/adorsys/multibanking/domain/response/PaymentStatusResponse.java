@@ -14,39 +14,18 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.response;
 
-/**
- * The predicted cycles for a category.
- */
-public enum Cycle {
-    /**
-     * every week
-     */
-    WEEKLY,
-    /**
-     * every 2nd week.
-     */
-    TWO_WEEKLY,
-    /**
-     * every month.
-     */
-    MONTHLY,
-    /**
-     * every 2nd month.
-     */
-    TWO_MONTHLY,
-    /**
-     * every 3 months.
-     */
-    QUARTERLY,
-    /**
-     * every 6 months.
-     */
-    HALF_YEARLY,
-    /**
-     * every 12 months.
-     */
-    YEARLY,
-    INVALID
+import de.adorsys.multibanking.domain.PaymentStatus;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class PaymentStatusResponse extends AbstractResponse {
+
+    private final PaymentStatus paymentStatus;
+
 }

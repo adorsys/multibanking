@@ -1,7 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.hbci.Hbci4JavaBanking;
+import de.adorsys.multibanking.hbci.HbciBanking;
 import de.adorsys.multibanking.pers.spi.repository.AnalyticsRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import de.adorsys.smartanalytics.core.RulesService;
@@ -64,7 +64,7 @@ public class SyncTest {
         String params = "25040090=X-BANK|Köln|HYVEDEM1093|99|https://obs-qa.bv-zahlungssysteme.de|https://obs-qa" +
             ".bv-zahlungssysteme.de/hbciTunnel/hbciTransfer.jsp|300|300|";
 
-        Hbci4JavaBanking hbci4JavaBanking = new Hbci4JavaBanking(IOUtils.toInputStream(params, "ISO-8859-1"), true);
+        HbciBanking hbci4JavaBanking = new HbciBanking(null, IOUtils.toInputStream(params, "ISO-8859-1"));
 //        hbci4JavaBanking = new Hbci4JavaBanking(null);
 
         MockitoAnnotations.initMocks(this);

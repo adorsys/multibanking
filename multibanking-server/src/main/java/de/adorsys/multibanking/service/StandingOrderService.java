@@ -1,12 +1,13 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.config.FinTSProductConfig;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.domain.transaction.StandingOrder;
+import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import de.adorsys.multibanking.domain.transaction.StandingOrderRequest;
 import de.adorsys.multibanking.exception.domain.MissingPinException;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,8 @@ public class StandingOrderService {
     private final UserService userService;
     private final StandingOrderRepositoryIf standingOrderRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
-    private final FinTSProductConfig finTSProductConfig;
 
-    Object createStandingOrder(BankAccessEntity bankAccess, Credentials credentials, StandingOrder standingOrder) {
+    Object createStandingOrder(BankAccessEntity bankAccess, Credentials credentials, StandingOrderRequest standingOrder) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankingService,
@@ -40,11 +40,8 @@ public class StandingOrderService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest request = new TransactionRequest<>(standingOrder);
-            request.setBankApiUser(bankApiUser);
-            request.setBankAccess(bankAccess);
-            request.setBank(bankEntity);
-            request.setHbciProduct(finTSProductConfig.getProduct());
+            TransactionRequest<StandingOrderRequest> request =
+                TransactionRequestFactory.create(standingOrder, bankApiUser, bankAccess, bankEntity, null);
             AbstractResponse response = bankingService.executePayment(request);
 
             StandingOrderEntity target = new StandingOrderEntity();
@@ -60,7 +57,7 @@ public class StandingOrderService {
         }
     }
 
-    void submitStandingOrder(StandingOrder standingOrder, Object tanSubmit, BankAccessEntity bankAccess,
+    void submitStandingOrder(StandingOrderRequest standingOrder, Object tanSubmit, BankAccessEntity bankAccess,
                              Credentials credentials, String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 

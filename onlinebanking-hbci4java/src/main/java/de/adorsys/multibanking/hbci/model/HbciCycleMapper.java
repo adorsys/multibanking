@@ -1,9 +1,9 @@
 package de.adorsys.multibanking.hbci.model;
 
-import de.adorsys.multibanking.domain.Cycle;
+import de.adorsys.multibanking.domain.Frequency;
 
 public class HbciCycleMapper {
-    public static String cycleToTurnus(Cycle cycle) {
+    public static String cycleToTurnus(Frequency cycle) {
         switch (cycle) {
             case WEEKLY:
                 return "1";
@@ -26,7 +26,7 @@ public class HbciCycleMapper {
         }
     }
 
-    public static String cycleToTimeunit(Cycle cycle) {
+    public static String cycleToTimeunit(Frequency cycle) {
         switch (cycle) {
             case WEEKLY:
             case TWO_WEEKLY:

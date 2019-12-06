@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.request;
+package de.adorsys.multibanking.domain;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.RequiredArgsConstructor;
 
+import java.math.BigDecimal;
+import java.util.Currency;
+
+@RequiredArgsConstructor
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class AuthenticatePsuRequest extends AbstractRequest {
+public class Amount {
 
-    private String psuAccountIban;
-    private String paymentId;
-    private String paymentProduct;
-    private String paymentService;
-    private String consentId;
-
+    private final Currency currency;
+    private final BigDecimal value;
 }

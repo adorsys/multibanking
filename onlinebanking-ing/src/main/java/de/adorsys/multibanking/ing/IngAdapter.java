@@ -1,27 +1,29 @@
 package de.adorsys.multibanking.ing;
 
-import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.exception.Message;
+import de.adorsys.multibanking.domain.BalancesReport;
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
-import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
-import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
-import de.adorsys.multibanking.domain.transaction.AbstractPayment;
-import de.adorsys.multibanking.domain.transaction.LoadAccounts;
-import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.domain.transaction.*;
+import de.adorsys.multibanking.ing.api.Account;
+import de.adorsys.multibanking.ing.api.AccountsResponse;
 import de.adorsys.multibanking.ing.api.Balance;
-import de.adorsys.multibanking.ing.api.*;
+import de.adorsys.multibanking.ing.api.BalancesResponse;
 import de.adorsys.multibanking.ing.http.ApacheHttpClient;
 import de.adorsys.multibanking.ing.http.HttpClient;
 import de.adorsys.multibanking.ing.http.Pkcs12KeyStore;
 import de.adorsys.multibanking.ing.http.StringUri;
 import de.adorsys.multibanking.ing.model.Response;
-import de.adorsys.multibanking.ing.oauth.*;
+import de.adorsys.multibanking.ing.oauth.ClientAuthentication;
+import de.adorsys.multibanking.ing.oauth.ClientAuthenticationFactory;
+import de.adorsys.multibanking.ing.oauth.IngOauth2Service;
+import de.adorsys.multibanking.ing.oauth.Oauth2Api;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -32,16 +34,14 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import java.net.URI;
 import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static de.adorsys.multibanking.domain.BankApi.ING;
-import static de.adorsys.multibanking.domain.ScaStatus.STARTED;
-import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_ACCOUNT_REFERENCE;
 import static de.adorsys.multibanking.ing.http.ResponseHandlers.jsonResponseHandler;
 
 @RequiredArgsConstructor
@@ -63,12 +63,16 @@ public class IngAdapter implements OnlineBankingService {
     @NonNull
     private final String qsealAlias;
 
-    @Getter(lazy = true)
+    @Getter(lazy = true, value = AccessLevel.PRIVATE)
     private final Pkcs12KeyStore keyStore = createKeyStore();
-    @Getter(lazy = true)
+    @Getter(lazy = true, value = AccessLevel.PRIVATE)
     private final HttpClient httpClient = createHttpClient();
-    @Getter(lazy = true)
+    @Getter(lazy = true, value = AccessLevel.PRIVATE)
     private final IngOauth2Service oauth2Service = createOauthService();
+    @Getter(lazy = true, value = AccessLevel.PRIVATE)
+    private final IngSessionHandler ingSessionHandler = new IngSessionHandler(getOauth2Service());
+    @Getter(lazy = true, value = AccessLevel.PRIVATE)
+    private final IngScaHandler ingScaHandler = new IngScaHandler(getIngSessionHandler());
 
     private IngMapper ingMapper = new IngMapperImpl();
 
@@ -102,7 +106,8 @@ public class IngAdapter implements OnlineBankingService {
     @Override
     public AccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> request) {
         IngSessionData ingSessionData = (IngSessionData) request.getBankApiConsentData();
-        checkIngSession((IngSessionData) request.getBankApiConsentData(), request.getAuthorisationCode());
+        getIngSessionHandler().checkIngSession((IngSessionData) request.getBankApiConsentData(),
+            request.getAuthorisationCode());
 
         ClientAuthentication clientAuthentication =
             getOauth2Service().getClientAuthentication(ingSessionData.getAccessToken());
@@ -121,21 +126,21 @@ public class IngAdapter implements OnlineBankingService {
     }
 
     @Override
-    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadBookingsRequest) {
-        IngSessionData ingSessionData = (IngSessionData) loadBookingsRequest.getBankApiConsentData();
-        checkIngSession(ingSessionData, loadBookingsRequest.getAuthorisationCode());
+    public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadTransactionsRequest) {
+        IngSessionData ingSessionData = (IngSessionData) loadTransactionsRequest.getBankApiConsentData();
+        getIngSessionHandler().checkIngSession(ingSessionData, loadTransactionsRequest.getAuthorisationCode());
 
         ClientAuthentication clientAuthentication =
             getOauth2Service().getClientAuthentication(ingSessionData.getAccessToken());
 
         String resourceId =
-            Optional.ofNullable(loadBookingsRequest.getTransaction().getPsuAccount().getExternalIdMap().get(bankApi()))
-                .orElseGet(() -> getAccountResourceId(loadBookingsRequest.getBankAccess().getIban(),
+            Optional.ofNullable(loadTransactionsRequest.getTransaction().getPsuAccount().getExternalIdMap().get(bankApi()))
+                .orElseGet(() -> getAccountResourceId(loadTransactionsRequest.getBankAccess().getIban(),
                     clientAuthentication).toString());
 
         Map<String, Object> queryParams = new LinkedHashMap<>();
-        queryParams.put("dateFrom", loadBookingsRequest.getTransaction().getDateFrom());
-        queryParams.put("dateTo", loadBookingsRequest.getTransaction().getDateTo());
+        queryParams.put("dateFrom", loadTransactionsRequest.getTransaction().getDateFrom());
+        queryParams.put("dateTo", loadTransactionsRequest.getTransaction().getDateTo());
 
         String uri = StringUri.withQuery(
             ingBaseUrl + TRANSACTIONS_ENDPOINT.replace("{{accountId}}", Objects.requireNonNull(resourceId)),
@@ -150,6 +155,16 @@ public class IngAdapter implements OnlineBankingService {
             .bookings(ingMapper.mapToBookings(transactionsResponse.getBody().getTransactions().getBooked()))
             .balancesReport(getBalancesReport(clientAuthentication, resourceId))
             .build();
+    }
+
+    @Override
+    public StandingOrdersResponse loadStandingOrders(TransactionRequest<LoadStandingOrders> loadStandingOrdersRequest) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public LoadBalancesResponse loadBalances(TransactionRequest<LoadBalances> request) {
+        throw new UnsupportedOperationException();
     }
 
     private BalancesReport getBalancesReport(ClientAuthentication clientAuthentication, String resourceId) {
@@ -202,127 +217,13 @@ public class IngAdapter implements OnlineBankingService {
     }
 
     @Override
-    public AbstractResponse executePayment(TransactionRequest<AbstractPayment> paymentRequest) {
+    public PaymentResponse executePayment(TransactionRequest<? extends AbstractPayment> paymentRequest) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public StrongCustomerAuthorisable getStrongCustomerAuthorisation() {
-        return new StrongCustomerAuthorisable() {
-            @Override
-            public CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred,
-                                                       String tppRedirectUri, Object bankApiConsentData) {
-                URI authorizationRequestUri = getAuthorisationUri(tppRedirectUri);
-
-                IngSessionData ingSessionData = new IngSessionData();
-                ingSessionData.setStatus(STARTED);
-                ingSessionData.setTppRedirectUri(tppRedirectUri);
-
-                return ingMapper.toCreateConsentResponse(ingSessionData, authorizationRequestUri.toString());
-            }
-
-            @Override
-            public Consent getConsent(String consentId) {
-                return null;
-            }
-
-            @Override
-            public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisation) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void revokeConsent(String consentId) {
-                //noop
-            }
-
-            @Override
-            public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId,
-                                                             Object bankApiConsentData) {
-                IngSessionData ingSessionData = (IngSessionData) bankApiConsentData;
-                return ingMapper.toUpdateAuthResponse(ingSessionData, bankApi());
-            }
-
-            @Override
-            public void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus,
-                                        Object bankApiConsentData) {
-                //noop
-            }
-
-            @Override
-            public void afterExecute(Object bankApiConsentData, AuthorisationCodeResponse authorisationCodeResponse) {
-                //noop
-            }
-
-            @Override
-            public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
-                IngSessionData ingSessionData = (IngSessionData) bankApiConsentData;
-                checkIngSession(ingSessionData, authorisationCode);
-            }
-        };
-    }
-
-    private URI getAuthorisationUri(String tppRedirectUri) {
-        Oauth2Service.Parameters params = new Oauth2Service.Parameters(Collections.singletonMap("redirect_uri"
-            , tppRedirectUri));
-        return getOauth2Service().getAuthorizationRequestUri(params);
-    }
-
-    private void checkIngSession(IngSessionData ingSessionData, String authorisationCode) {
-        TokenResponse tokenResponse = null;
-        if (ingSessionData.getAccessToken() == null) {
-            tokenResponse = Optional.ofNullable(authorisationCode)
-                .map(this::getUserToken)
-                .orElseThrow(() -> {
-                    URI authorizationRequestUri = getAuthorisationUri(ingSessionData.getTppRedirectUri());
-                    Message message = new Message();
-                    message.setParamsMap(Collections.singletonMap("redirectUrl", authorizationRequestUri.toString()));
-                    return new MultibankingException(MISSING_AUTHORISATION_CODE, 401,
-                        Collections.singletonList(message));
-                });
-        } else if (LocalDateTime.now().isAfter(ingSessionData.getExpirationTime())) {
-            tokenResponse = Optional.ofNullable(ingSessionData.getRefreshToken())
-                .map(this::refreshToken)
-                .orElseThrow(() -> {
-                    URI authorizationRequestUri = getAuthorisationUri(ingSessionData.getTppRedirectUri());
-                    Message message = new Message();
-                    message.setParamsMap(Collections.singletonMap("redirectUrl", authorizationRequestUri.toString()));
-                    return new MultibankingException(TOKEN_EXPIRED, 401, Collections.singletonList(message));
-                });
-        }
-
-        Optional.ofNullable(tokenResponse)
-            .ifPresent(response -> {
-                ingSessionData.setAccessToken(response.getAccessToken());
-                ingSessionData.setRefreshToken(response.getRefreshToken());
-                ingSessionData.setExpirationTime(LocalDateTime.now().plusSeconds(response.getExpiresInSeconds()));
-            });
-    }
-
-    private TokenResponse refreshToken(String refreshToken) {
-        Map<String, String> parametersMap = new HashMap<>();
-        parametersMap.put("grant_type", "refresh_token");
-        parametersMap.put("refresh_token", refreshToken);
-
-        return getOauth2Service().getToken(new Oauth2Service.Parameters(parametersMap));
-    }
-
-    private TokenResponse getUserToken(String authorisationCode) {
-        Map<String, String> parametersMap = new HashMap<>();
-        parametersMap.put("grant_type", "authorization_code");
-        parametersMap.put("code", authorisationCode);
-
-        return getOauth2Service().getToken(new Oauth2Service.Parameters(parametersMap));
+        return getIngScaHandler();
     }
 
     private IngOauth2Service createOauthService() {

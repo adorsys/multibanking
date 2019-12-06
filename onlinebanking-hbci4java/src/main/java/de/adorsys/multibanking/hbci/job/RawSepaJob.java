@@ -21,10 +21,7 @@ import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.kapott.hbci.GV.AbstractHBCIJob;
-import org.kapott.hbci.GV.GVDauerSEPANew;
-import org.kapott.hbci.GV.GVRawSEPA;
-import org.kapott.hbci.GV.GVUebSEPA;
+import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV.parsers.ISEPAParser;
 import org.kapott.hbci.GV.parsers.SEPAParserFactory;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -68,6 +65,9 @@ public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
         switch (sepaPayment.getSepaTransactionType()) {
             case SINGLE_PAYMENT:
                 jobName = GVUebSEPA.getLowlevelName();
+                break;
+            case INSTANT_PAYMENT:
+                jobName = GVInstantUebSEPA.getLowlevelName();
                 break;
             case BULK_PAYMENT:
                 jobName = "SammelUebSEPA";

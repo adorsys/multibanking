@@ -91,50 +91,9 @@ public interface JpaEntityMapper {
 
     BookingsIndexEntity mapToBookingsIndexEntity(BookingsIndexJpaEntity bookingsIndexJpaEntity);
 
-    BulkPaymentJpaEntity mapToBulkPaymentJpaEntity(BulkPaymentEntity target);
-
     List<ContractEntity> mapToContractEntities(List<ContractJpaEntity> byUserIdAndAccountId);
 
     List<ContractJpaEntity> mapToContractJpaEntities(List<ContractEntity> contractEntities);
-
-    MlAnonymizedBookingEntity mapToMlAnonymizedBookingEntity(MlAnonymizedBookingJpaEntity mlAnonymizedBookingJpaEntity);
-
-    List<MlAnonymizedBookingEntity> mapToMlAnonymizedBookingEntities(List<MlAnonymizedBookingJpaEntity> byUserId);
-
-    MlAnonymizedBookingJpaEntity mapToMlAnonymizedBookingJpaEntity(MlAnonymizedBookingEntity booking);
-
-    @Mapping(target = "psuAccount.balances", ignore = true)
-    @Mapping(target = "psuAccount.externalIdMap", ignore = true)
-    RawSepaTransactionEntity mapToRawSepaTransactionEntity(RawSepaTransactionJpaEntity rawSepaTransactionJpaEntity);
-
-    @Mapping(target = "debtorBankAccount.id", ignore = true)
-    @Mapping(target = "debtorBankAccount.bankAccessId", ignore = true)
-    @Mapping(target = "debtorBankAccount.userId", ignore = true)
-    RawSepaTransactionJpaEntity mapToRawSepaTransactionJpaEntity(RawSepaTransactionEntity paymentEntity);
-
-    @Mapping(target = "psuAccount.balances", ignore = true)
-    @Mapping(target = "psuAccount.externalIdMap", ignore = true)
-    SinglePaymentEntity mapToPaymentEntity(SinglePaymentJpaEntity paymentJpaEntity);
-
-    @Mapping(target = "debtorBankAccount.id", ignore = true)
-    @Mapping(target = "debtorBankAccount.bankAccessId", ignore = true)
-    @Mapping(target = "debtorBankAccount.userId", ignore = true)
-    SinglePaymentJpaEntity mapToPaymentJpaEntity(SinglePaymentEntity paymentJpaEntity);
-
-    @Mapping(target = "debtorBankAccount.id", ignore = true)
-    @Mapping(target = "debtorBankAccount.bankAccessId", ignore = true)
-    @Mapping(target = "debtorBankAccount.userId", ignore = true)
-    StandingOrderJpaEntity mapToStandingOrderJpaEntity(StandingOrderEntity paymentJpaEntity);
-
-    @Mapping(target = "psuAccount.balances", ignore = true)
-    @Mapping(target = "psuAccount.externalIdMap", ignore = true)
-    @Mapping(target = "otherAccount.balances", ignore = true)
-    @Mapping(target = "otherAccount.externalIdMap", ignore = true)
-    StandingOrderEntity mapToStandingOrderEntity(StandingOrderJpaEntity paymentJpaEntity);
-
-    List<StandingOrderEntity> mapToStandingOrderEntities(List<StandingOrderJpaEntity> byUserIdAndAccountId);
-
-    List<StandingOrderJpaEntity> mapToStandingOrderJpaEntities(List<StandingOrderEntity> standingOrders);
 
     UserEntity mapToUserEntity(UserJpaEntity userJpaEntity);
 

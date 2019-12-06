@@ -21,13 +21,14 @@ import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
+import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIMsgStatus;
 
 import java.util.List;
 import java.util.Optional;
 
-abstract class AbstractPaymentJob<T extends AbstractPayment> extends ScaAwareJob<T, PaymentResponse> {
+public abstract class AbstractPaymentJob<T extends AbstractPayment> extends ScaAwareJob<T, PaymentResponse> {
 
     @Override
     PaymentResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,

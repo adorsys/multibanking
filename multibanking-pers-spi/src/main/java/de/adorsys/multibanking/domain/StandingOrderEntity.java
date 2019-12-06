@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.domain;
 
-import de.adorsys.multibanking.domain.transaction.StandingOrder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

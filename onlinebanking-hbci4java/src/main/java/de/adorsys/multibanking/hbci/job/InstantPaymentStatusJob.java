@@ -1,0 +1,109 @@
+/*
+ * Copyright 2018-2019 adorsys GmbH & Co KG
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package de.adorsys.multibanking.hbci.job;
+
+import de.adorsys.multibanking.domain.PaymentStatus;
+import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.response.PaymentStatusResponse;
+import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
+import de.adorsys.multibanking.domain.transaction.PaymentStatusReqest;
+import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV.GVInstanstUebSEPAStatus;
+import org.kapott.hbci.GV_Result.GVRInstantUebSEPAStatus;
+import org.kapott.hbci.passport.PinTanPassport;
+import org.kapott.hbci.status.HBCIMsgStatus;
+
+import java.util.List;
+
+@RequiredArgsConstructor
+@Slf4j
+public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, PaymentStatusResponse> {
+
+    private final TransactionRequest<PaymentStatusReqest> paymentStatusReqest;
+    private GVInstanstUebSEPAStatus paymentStatusHbciJob;
+
+    @Override
+    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
+        paymentStatusHbciJob = new GVInstanstUebSEPAStatus(passport);
+        paymentStatusHbciJob.setParam("my", getPsuKonto(passport));
+        paymentStatusHbciJob.setParam("orderid", paymentStatusReqest.getTransaction().getPaymentId());
+        return paymentStatusHbciJob;
+    }
+
+    @Override
+    TransactionRequest<PaymentStatusReqest> getTransactionRequest() {
+        return paymentStatusReqest;
+    }
+
+    @Override
+    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+        return GVInstanstUebSEPAStatus.getLowlevelName();
+    }
+
+    @Override
+    public PaymentStatusResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
+                                                   List<HBCIMsgStatus> msgStatusList) {
+        GVRInstantUebSEPAStatus hbciStatus = (GVRInstantUebSEPAStatus) paymentStatusHbciJob.getJobResult();
+
+//        1: in Terminierung
+//        2: abgelehnt von erster Inkassostelle
+//        3: in Bearbeitung
+//        4: Creditoren-seitig verarbeitet, Buchung veranlasst
+//        5: R-Transaktion wurde veranlasst
+//        6: Auftrag fehlgeschagen
+//        7: Auftrag ausgeführt; Geld für den Zahlungsempfänger verfügbar
+//        8: Abgelehnt durch Zahlungsdienstleister des Zahlers
+//        9: Abgelehnt durch Zahlungsdienstleister des Zahlungsempfängers
+        PaymentStatus paymentStatus;
+        switch (hbciStatus.getStatus()) {
+            case 1:
+                paymentStatus = PaymentStatus.CANC;
+                break;
+            case 2:
+                paymentStatus = PaymentStatus.RJCT;
+                break;
+            case 3:
+                paymentStatus = PaymentStatus.PDNG;
+                break;
+            case 4:
+                paymentStatus = PaymentStatus.ACCC;
+                break;
+            case 5:
+                paymentStatus = PaymentStatus.CANC;
+                break;
+            case 6:
+                paymentStatus = PaymentStatus.RJCT;
+                break;
+            case 7:
+                paymentStatus = PaymentStatus.ACSC;
+                break;
+            case 8:
+                paymentStatus = PaymentStatus.RJCT;
+                break;
+            case 9:
+                paymentStatus = PaymentStatus.RJCT;
+                break;
+            default:
+                throw new IllegalArgumentException("unexpected payment status: " + hbciStatus.getStatus());
+        }
+
+        return new PaymentStatusResponse(paymentStatus);
+    }
+}

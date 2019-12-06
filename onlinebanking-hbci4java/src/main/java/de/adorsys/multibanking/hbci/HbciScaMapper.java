@@ -1,13 +1,11 @@
 package de.adorsys.multibanking.hbci;
 
-import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.domain.request.AuthenticatePsuRequest;
-import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 @Mapper
 interface HbciScaMapper {
@@ -17,18 +15,13 @@ interface HbciScaMapper {
     @Mapping(target = "bankApiConsentData", expression = "java( bankApiConsentData )")
     @Mapping(target = "redirectUrl", ignore = true)
     @Mapping(target = "redirectId", ignore = true)
+    @Mapping(target = "oauthRedirectUrl", ignore = true)
     CreateConsentResponse toCreateConsentResponse(HbciConsent bankApiConsentData);
 
     @Mapping(target = "challenge", ignore = true)
     @Mapping(target = "psuMessage", ignore = true)
     @Mapping(target = "scaMethods", source = "hbciConsent.tanMethodList")
-    @Mapping(target = "scaStatus", source = "hbciConsent.status")
-    @Mapping(target = "scaApproach", constant = "EMBEDDED")
-    UpdateAuthResponse toUpdateAuthResponse(HbciConsent hbciConsent, BankApi bankApi);
-
-    @Mapping(target = "paymentId", ignore = true)
-    @Mapping(target = "paymentProduct", ignore = true)
-    @Mapping(target = "paymentService", ignore = true)
-    AuthenticatePsuRequest toAuthenticatePsuRequest(UpdatePsuAuthenticationRequest updatePsuAuthentication);
+    UpdateAuthResponse toUpdateAuthResponse(HbciConsent hbciConsent,
+                                            @MappingTarget UpdateAuthResponse updateAuthResponse);
 
 }

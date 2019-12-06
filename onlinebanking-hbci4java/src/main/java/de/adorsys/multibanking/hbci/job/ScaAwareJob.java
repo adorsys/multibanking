@@ -29,6 +29,7 @@ import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.hbci.model.*;
 import de.adorsys.multibanking.mapper.AccountStatementMapper;
 import de.adorsys.multibanking.mapper.AccountStatementMapperImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
@@ -61,6 +62,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNA
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.JOBS;
 
+@RequiredArgsConstructor
 @Slf4j
 public abstract class ScaAwareJob<T extends AbstractTransaction, R extends AbstractResponse> {
 
@@ -85,7 +87,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         //could be null in case of empty hktan requests
         AbstractHBCIJob hbciJob = createJobMessage(dialog.getPassport());
 
-        //hbciJobs could be null in case of tan request without corresponding hbci request (TAN verbrennen)
+        //hbciJob could be null in case of tan request without corresponding hbci request (TAN verbrennen)
         boolean tan2StepRequired = hbciJob == null || dialog.getPassport().tan2StepRequired(hbciJob);
 
         GVTAN2Step hktan = null;
@@ -327,10 +329,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
                 //needed later for submitAuthorizationCode
                 hbciTanSubmit.setOrderRef(orderRef);
 
-                UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse();
-                updateAuthResponse.setBankApi(HBCI);
-                updateAuthResponse.setScaStatus(SCAMETHODSELECTED);
-                updateAuthResponse.setScaApproach(EMBEDDED);
+                UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse(HBCI, EMBEDDED, SCAMETHODSELECTED);
                 authorisationCodeResponse.setUpdateAuthResponse(updateAuthResponse);
 
                 ChallengeData challengeData = new ChallengeData();

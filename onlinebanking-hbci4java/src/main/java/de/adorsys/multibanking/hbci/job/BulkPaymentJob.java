@@ -27,7 +27,7 @@ import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVMultiUebSEPA;
 import org.kapott.hbci.GV.GVTermMultiUebSEPA;
-import org.kapott.hbci.GV_Result.GVRTermUeb;
+import org.kapott.hbci.GV_Result.GVRPayment;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
@@ -98,6 +98,6 @@ public class BulkPaymentJob extends AbstractPaymentJob<BulkPayment> {
 
     @Override
     public String orderIdFromJobResult(HBCIJobResult paymentGV) {
-        return paymentGV instanceof GVRTermUeb ? ((GVRTermUeb) paymentGV).getOrderId() : null;
+        return paymentGV instanceof GVRPayment ? ((GVRPayment) paymentGV).getOrderId() : null;
     }
 }

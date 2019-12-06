@@ -3,7 +3,10 @@ package de.adorsys.multibanking.figo;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
 import de.adorsys.multibanking.domain.utils.Utils;
-import me.figo.models.*;
+import me.figo.models.Account;
+import me.figo.models.Challenge;
+import me.figo.models.TanScheme;
+import me.figo.models.Transaction;
 import org.apache.commons.lang3.StringUtils;
 
 import java.time.ZoneId;
@@ -16,36 +19,19 @@ import java.util.Map;
  */
 public class FigoMapping {
 
-    private static final Map<Cycle, String> FIGO_CYCLE = new HashMap<>();
+    private static final Map<Frequency, String> FIGO_CYCLE = new HashMap<>();
     private static final Map<SinglePayment.TransactionType, String> FIGO_TRANSFER = new HashMap<>();
 
     static {
-        FIGO_CYCLE.put(Cycle.WEEKLY, "weekly");
-        FIGO_CYCLE.put(Cycle.MONTHLY, "monthly");
-        FIGO_CYCLE.put(Cycle.TWO_MONTHLY, "two monthly");
-        FIGO_CYCLE.put(Cycle.QUARTERLY, "quarterly");
-        FIGO_CYCLE.put(Cycle.HALF_YEARLY, "half yearly");
-        FIGO_CYCLE.put(Cycle.YEARLY, "yearly");
+        FIGO_CYCLE.put(Frequency.WEEKLY, "weekly");
+        FIGO_CYCLE.put(Frequency.MONTHLY, "monthly");
+        FIGO_CYCLE.put(Frequency.TWO_MONTHLY, "two monthly");
+        FIGO_CYCLE.put(Frequency.QUARTERLY, "quarterly");
+        FIGO_CYCLE.put(Frequency.HALF_YEARLY, "half yearly");
+        FIGO_CYCLE.put(Frequency.YEARLY, "yearly");
 
         FIGO_TRANSFER.put(SinglePayment.TransactionType.SINGLE_PAYMENT, "SEPA transfer");
         FIGO_TRANSFER.put(SinglePayment.TransactionType.STANDING_ORDER, "SEPA standing order");
-    }
-
-    public static de.adorsys.multibanking.domain.transaction.StandingOrder mapStandingOrder(StandingOrder figoStandingOrder) {
-        de.adorsys.multibanking.domain.transaction.StandingOrder standingOrder =
-            new de.adorsys.multibanking.domain.transaction.StandingOrder();
-        standingOrder.setOrderId(figoStandingOrder.getStandingOrderId());
-        standingOrder.setExecutionDay(figoStandingOrder.getExecutionDay());
-        standingOrder.setAmount(figoStandingOrder.getAmount());
-        standingOrder.setUsage(figoStandingOrder.getPurposeText());
-        standingOrder.setCycle(Cycle.valueOf(figoStandingOrder.getInterval().toString()));
-        standingOrder.setOtherAccount(new BankAccount()
-            .owner(figoStandingOrder.getName())
-            .accountNumber(figoStandingOrder.getAccountNumber())
-            .blz(figoStandingOrder.getBankCode())
-            .currency(figoStandingOrder.getCurrency())
-        );
-        return standingOrder;
     }
 
     public static BankAccount mapBankAccount(Account account, BankApi bankApi) {

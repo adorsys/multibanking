@@ -48,7 +48,7 @@ import static de.adorsys.multibanking.domain.transaction.LoadTransactions.RawRes
 @Slf4j
 public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, TransactionsResponse> {
 
-    private final TransactionRequest<LoadTransactions> loadBookingsRequest;
+    private final TransactionRequest<LoadTransactions> loadTransactionsRequest;
 
     private AbstractHBCIJob transactionsHbciJob;
 
@@ -60,7 +60,7 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
 
     @Override
     TransactionRequest<LoadTransactions> getTransactionRequest() {
-        return loadBookingsRequest;
+        return loadTransactionsRequest;
     }
 
     @Override
@@ -86,10 +86,10 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
         BalancesReport balancesReport = null;
         List<String> raw = null;
         GVRKUms bookingsResult = (GVRKUms) transactionsHbciJob.getJobResult();
-        if (loadBookingsRequest.getTransaction().getRawResponseType() != null) {
+        if (loadTransactionsRequest.getTransaction().getRawResponseType() != null) {
             raw = bookingsResult.getRaw();
         } else {
-            if (loadBookingsRequest.getTransaction().isWithBalance() && !bookingsResult.getDataPerDay().isEmpty()) {
+            if (loadTransactionsRequest.getTransaction().isWithBalance() && !bookingsResult.getDataPerDay().isEmpty()) {
                 GVRKUms.BTag lastBoookingDay =
                     bookingsResult.getDataPerDay().get(bookingsResult.getDataPerDay().size() - 1);
                 balancesReport = createBalancesReport(lastBoookingDay.end);
@@ -118,11 +118,11 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
 
         hbciJob.setParam("my", getPsuKonto(passport));
 
-        LocalDate dateFrom = Optional.ofNullable(loadBookingsRequest.getTransaction().getDateFrom())
+        LocalDate dateFrom = Optional.ofNullable(loadTransactionsRequest.getTransaction().getDateFrom())
             .orElseGet(() -> getStartDate(passport.getJobRestrictions(hbciJob.getName())));
         hbciJob.setParam("startdate", Date.from(dateFrom.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-        Optional.ofNullable(loadBookingsRequest.getTransaction().getDateTo())
+        Optional.ofNullable(loadTransactionsRequest.getTransaction().getDateTo())
             .ifPresent(localDate -> hbciJob.setParam("enddate",
                 Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
@@ -130,7 +130,8 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
     }
 
     private AbstractHBCIJob createBookingsJobInternal(PinTanPassport passport) {
-        LoadTransactions.RawResponseType rawResponseType = loadBookingsRequest.getTransaction().getRawResponseType();
+        LoadTransactions.RawResponseType rawResponseType =
+            loadTransactionsRequest.getTransaction().getRawResponseType();
         if (rawResponseType != null && !passport.jobSupported(rawResponseType == CAMT ?
             GVKUmsAllCamt.getLowlevelName() : GVKUmsAll.getLowlevelName())) {
             throw new MultibankingException(BOOKINGS_FORMAT_NOT_SUPPORTED, rawResponseType + " not supported");

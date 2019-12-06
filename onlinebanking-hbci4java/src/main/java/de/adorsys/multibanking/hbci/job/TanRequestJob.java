@@ -17,25 +17,25 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.PaymentResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractPayment;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
+import de.adorsys.multibanking.domain.transaction.TanRequest;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.AbstractHBCIJob;
+import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIMsgStatus;
 
 import java.util.List;
 
 @RequiredArgsConstructor
-public class TanRequestJob extends ScaAwareJob<AbstractPayment, AbstractResponse> {
+public class TanRequestJob extends AbstractPaymentJob<TanRequest> {
 
-    private final TransactionRequest<AbstractPayment> transactionRequest;
+    private final TransactionRequest<TanRequest> transactionRequest;
 
     @Override
-    TransactionRequest<AbstractPayment> getTransactionRequest() {
+    TransactionRequest<TanRequest> getTransactionRequest() {
         return transactionRequest;
     }
 
@@ -45,11 +45,21 @@ public class TanRequestJob extends ScaAwareJob<AbstractPayment, AbstractResponse
     }
 
     @Override
-    AbstractResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
-                                       List<HBCIMsgStatus> msgStatusList) {
+    PaymentResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
+                                      List<HBCIMsgStatus> msgStatusList) {
         PaymentResponse paymentResponse = new PaymentResponse(null);
         paymentResponse.setWarnings(collectWarnings(msgStatusList));
         return paymentResponse;
+    }
+
+    @Override
+    AbstractHBCIJob getHbciJob() {
+        return null;
+    }
+
+    @Override
+    public String orderIdFromJobResult(HBCIJobResult paymentGV) {
+        return null;
     }
 
     @Override

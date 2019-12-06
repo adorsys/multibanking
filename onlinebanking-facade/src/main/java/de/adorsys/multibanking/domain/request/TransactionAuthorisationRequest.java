@@ -16,12 +16,13 @@
 
 package de.adorsys.multibanking.domain.request;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
+@NoArgsConstructor
+@RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class TransactionAuthorisationRequest extends AbstractStrongCustomerAuthorisationRequest {
 
-    private String scaAuthenticationData;
+    private @NonNull String scaAuthenticationData;
 }
