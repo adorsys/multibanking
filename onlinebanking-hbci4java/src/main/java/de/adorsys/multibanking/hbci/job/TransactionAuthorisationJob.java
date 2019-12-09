@@ -54,6 +54,10 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNA
 @Slf4j
 public class TransactionAuthorisationJob<T extends AbstractTransaction, R extends AbstractResponse> {
 
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .findAndRegisterModules();
+
     private final ScaAwareJob<T, R> scaJob;
     private final TransactionAuthorisation<T> transactionAuthorisation;
 
@@ -111,7 +115,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
             .map(originJobName -> {
                 AbstractHBCIJob result = scaJob.createJobMessage(hbciDialog.getPassport());
                 try {
-                    result.setLlParams(objectMapper().readValue(hbciTanSubmit.getLowLevelParams(), HashMap.class));
+                    result.setLlParams(objectMapper.readValue(hbciTanSubmit.getLowLevelParams(), HashMap.class));
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new MultibankingException(INTERNAL_ERROR, 500, e.getMessage());
@@ -155,7 +159,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
 
     private HbciTanSubmit deserializeTanSubmit(byte[] data) {
         try {
-            return objectMapper().readValue(data, HbciTanSubmit.class);
+            return objectMapper.readValue(data, HbciTanSubmit.class);
         } catch (Exception e) {
             throw new IllegalStateException("Could not deserialize HbciTanSubmit", e);
         }
@@ -186,13 +190,6 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
         hbciPassport.setBPD(bpd);
 
         return hbciPassport;
-    }
-
-    private ObjectMapper objectMapper() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.findAndRegisterModules();
-        return objectMapper;
     }
 
 }
