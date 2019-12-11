@@ -3,9 +3,11 @@ package de.adorsys.multibanking.exception;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.exception.domain.Message;
 import de.adorsys.multibanking.exception.domain.Messages;
+import de.adorsys.multibanking.logging.RestControllerAspectLogging;
 import lombok.extern.slf4j.Slf4j;
 import org.iban4j.InvalidCheckDigitException;
 import org.kapott.hbci.exceptions.HBCI_Exception;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
@@ -32,6 +34,7 @@ import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.exception.domain.Message.Severity.ERROR;
+import static de.adorsys.multibanking.logging.RestControllerAspectLogging.AUDIT_LOG;
 import static java.util.stream.Collectors.toList;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -285,11 +288,15 @@ public class ExceptionHandlerAdvice {
             log.error("Exception {} from Controller: {}", throwable.getClass(), throwable);
         }
 
+        ResponseEntity<Messages> responseEntity;
         if (messages == null) {
-            return new ResponseEntity<>(httpStatus);
+            responseEntity = new ResponseEntity<>(httpStatus);
         } else {
-            return new ResponseEntity<>(messages, httpStatus);
+            responseEntity = new ResponseEntity<>(messages, httpStatus);
         }
+
+        LoggerFactory.getLogger(RestControllerAspectLogging.class).trace(AUDIT_LOG, "Response: [{}]", responseEntity);
+        return responseEntity;
     }
 
 }
