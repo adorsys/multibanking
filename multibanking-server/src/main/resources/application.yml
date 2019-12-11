@@ -22,6 +22,10 @@ management:
   context-path: /management
   security:
     enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
 
 info:
   project:
