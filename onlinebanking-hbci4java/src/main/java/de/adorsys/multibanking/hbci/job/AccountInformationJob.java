@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSEPAInfo;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.status.HBCIMsgStatus;
 import org.kapott.hbci.structures.Konto;
 
 import java.util.ArrayList;
@@ -63,8 +62,7 @@ public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInfo
     }
 
     @Override
-    public AccountInformationResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
-                                                        List<HBCIMsgStatus> msgStatusList) {
+    public AccountInformationResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
         loadAccountInformationRequest.getBankAccess().setBankName(passport.getInstName());
 
         List<BankAccount> hbciAccounts = new ArrayList<>();

@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain.response;
+package de.adorsys.multibanking.domain;
 
-import de.adorsys.multibanking.domain.PaymentStatus;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.List;
-
+@Getter
 @RequiredArgsConstructor
-@Data
-@EqualsAndHashCode(callSuper = false)
-public class PaymentStatusResponse extends AbstractResponse {
+public class PsuMessage {
 
-    private final PaymentStatus paymentStatus;
+    private final String code;
+    private final String text;
 }

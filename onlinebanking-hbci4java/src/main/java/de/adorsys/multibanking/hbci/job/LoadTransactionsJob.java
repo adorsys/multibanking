@@ -32,7 +32,6 @@ import org.kapott.hbci.GV.GVKUmsAll;
 import org.kapott.hbci.GV.GVKUmsAllCamt;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.passport.PinTanPassport;
-import org.kapott.hbci.status.HBCIMsgStatus;
 import org.kapott.hbci.structures.Saldo;
 
 import java.time.LocalDate;
@@ -72,8 +71,7 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
     }
 
     @Override
-    public TransactionsResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit,
-                                                  List<HBCIMsgStatus> msgStatusList) {
+    public TransactionsResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
         if (transactionsHbciJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
             throw new MultibankingException(HBCI_ERROR,

@@ -26,7 +26,7 @@ import java.util.List;
 @Component
 public class RestControllerAspectLogging {
 
-    private static final Marker AUDIT_LOG = MarkerFactory.getMarker("AUDIT");
+    public static final Marker AUDIT_LOG = MarkerFactory.getMarker("AUDIT");
 
     @Before("@annotation(io.swagger.annotations.ApiOperation)")
     public void logBefore(final JoinPoint joinPoint) {

@@ -7,9 +7,9 @@ import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodReque
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
-import de.adorsys.xs2a.adapter.service.model.AccountDetails;
-import de.adorsys.xs2a.adapter.service.model.CashAccountType;
-import de.adorsys.xs2a.adapter.service.model.Transactions;
+import de.adorsys.multibanking.xs2a_adapter.model.AccountDetails;
+import de.adorsys.multibanking.xs2a_adapter.model.TppMessage400AIS;
+import de.adorsys.multibanking.xs2a_adapter.model.TransactionDetails;
 import org.iban4j.Iban;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -90,18 +90,18 @@ interface BankingGatewayMapper {
         return Iban.valueOf(accountDetails.getIban()).getAccountNumber();
     }
 
-    default BankAccountType getAccounType(CashAccountType cashAccountType) {
-        return fromXS2AType(cashAccountType.toString());
+    default BankAccountType getAccounType(String cashAccountType) {
+        return fromXS2AType(cashAccountType);
     }
 
-    List<Booking> toBookings(List<Transactions> transactionDetails);
+    List<Booking> toBookings(List<TransactionDetails> transactionDetails);
 
     @Mapping(source = "valueDate", target = "valutaDate")
     @Mapping(source = "transactionAmount.amount", target = "amount")
     @Mapping(source = "transactionAmount.currency", target = "currency")
     @Mapping(source = "endToEndId", target = "externalId")
     @Mapping(source = "remittanceInformationUnstructured", target = "usage")
-    default Booking toBooking(Transactions transactionDetails) {
+    default Booking toBooking(TransactionDetails transactionDetails) {
         Booking booking = new Booking();
         booking.setBankApi(XS2A);
         booking.setBookingDate(transactionDetails.getBookingDate());
@@ -110,10 +110,11 @@ interface BankingGatewayMapper {
         booking.setCurrency(transactionDetails.getTransactionAmount().getCurrency());
         booking.setExternalId(transactionDetails.getEndToEndId());
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
-        booking.setTransactionCode(transactionDetails.getPurposeCode() == null ? null : transactionDetails.getPurposeCode().getCode());
+        booking.setTransactionCode(transactionDetails.getPurposeCode() == null ? null :
+            transactionDetails.getPurposeCode().toString());
 
         BankAccount bankAccount = new BankAccount();
-        if (transactionDetails.getCreditorName() != null || transactionDetails.getCreditorAccount() !=null) {
+        if (transactionDetails.getCreditorName() != null || transactionDetails.getCreditorAccount() != null) {
             bankAccount.setOwner(transactionDetails.getCreditorName());
             bankAccount.setIban(transactionDetails.getCreditorAccount().getIban());
         } else if (transactionDetails.getDebtorName() != null || transactionDetails.getDebtorAccount() != null) {
@@ -128,7 +129,14 @@ interface BankingGatewayMapper {
     @Mapping(target = "amount", source = "balanceAmount.amount")
     @Mapping(target = "date", source = "referenceDate")
     @Mapping(target = "currency", source = "balanceAmount.currency")
-    Balance toBalance(de.adorsys.xs2a.adapter.service.model.Balance balance);
+    Balance toBalance(de.adorsys.multibanking.xs2a_adapter.model.Balance balance);
 
-    List<Message> toMessages(List<MessageTO> messagesTO);
+    List<Message> toMessages(List<TppMessage400AIS> messagesTO);
+
+    @Mapping(target = "severity", source = "category")
+    @Mapping(target = "key", source = "code")
+    @Mapping(target = "renderedMessage", source = "text")
+    @Mapping(target = "field", ignore = true)
+    @Mapping(target = "paramsMap", ignore = true)
+    Message toMessage(TppMessage400AIS tppMessage400AIS);
 }
