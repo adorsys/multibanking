@@ -32,6 +32,7 @@ import org.kapott.hbci.sepa.SepaVersion;
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -124,11 +125,7 @@ public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
         List<Map<String, String>> sepaResults = new ArrayList<>();
         ISEPAParser<List<Map<String, String>>> parser =
             SEPAParserFactory.get(SepaVersion.autodetect(painXml));
-        try {
-            parser.parse(new ByteArrayInputStream(painXml.getBytes(CommPinTan.ENCODING)), sepaResults);
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalArgumentException(e);
-        }
+        parser.parse(new ByteArrayInputStream(painXml.getBytes(StandardCharsets.UTF_8)), sepaResults);
         return sepaResults;
     }
 }
