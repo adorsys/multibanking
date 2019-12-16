@@ -27,6 +27,7 @@ public abstract class AbstractTransaction {
     public abstract TransactionType getTransactionType();
 
     public enum TransactionType {
+        TRANSFER_PAYMENT,
         SINGLE_PAYMENT,
         INSTANT_PAYMENT,
         FOREIGN_PAYMENT,

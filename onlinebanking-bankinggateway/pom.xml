@@ -61,7 +61,7 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- needed for swagger generated classes -->
+        <!-- swagger generated client -->
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>

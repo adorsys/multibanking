@@ -1,13 +1,17 @@
 package de.adorsys.multibanking.config;
 
+import com.nimbusds.jwt.JWTClaimsSet;
 import de.adorsys.multibanking.domain.UserSecret;
-import de.adorsys.multibanking.service.SecretClaimDecryptionService;
 import de.adorsys.sts.filter.JWTAuthenticationFilter;
+import de.adorsys.sts.keymanagement.service.DecryptionService;
 import de.adorsys.sts.token.authentication.TokenAuthenticationService;
 import de.adorsys.sts.tokenauth.BearerToken;
 import de.adorsys.sts.tokenauth.BearerTokenValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
@@ -28,7 +32,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
@@ -38,13 +44,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String RULES_ADMIN_ROLE = "rules_admin";
 
     private final Environment environment;
-    private final SecretClaimDecryptionService secretClaimDecryptionService;
 
+    @Value("${sts.audience_name:}")
+    private String audience;
+    @Value("${sts.secret_claim_property_key:}")
+    private String secretClaimPropertyKey;
     @Autowired(required = false)
     private TokenAuthenticationService tokenAuthenticationService;
-
     @Autowired(required = false)
-    private BearerTokenValidator bearerTokenValidator;
+    private DecryptionService decryptionService;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -100,7 +108,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Primary
     @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
     public UserSecret getRequestScopeUserSecret() {
-        return new UserSecret(secretClaimDecryptionService.decryptSecretClaim());
+        return new UserSecret(decryptSecretClaim());
     }
 
     @Bean
@@ -119,6 +127,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+    }
+
+    private String decryptSecretClaim() {
+        return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+            .filter(authentication -> authentication.getCredentials() instanceof JWTClaimsSet)
+            .map(authentication -> {
+                JWTClaimsSet credentials = (JWTClaimsSet) authentication.getCredentials();
+                JSONObject encryptedSecretClaims = (JSONObject) credentials.getClaim(secretClaimPropertyKey);
+                String encryptedSecretClaim = encryptedSecretClaims.getAsString(audience);
+
+                if (encryptedSecretClaim == null) {
+                    log.warn("missing secret claim");
+                    return null;
+                }
+
+                return decryptionService.decrypt(encryptedSecretClaim);
+            })
+            .orElse(null);
     }
 
 }

@@ -279,6 +279,8 @@ public class HbciBanking implements OnlineBankingService {
             case FUTURE_SINGLE_PAYMENT:
             case INSTANT_PAYMENT:
                 return (ScaAwareJob<T, R>) new SinglePaymentJob((TransactionRequest<SinglePayment>) transactionRequest);
+            case TRANSFER_PAYMENT:
+                return (ScaAwareJob<T, R>) new TransferJob((TransactionRequest<SinglePayment>) transactionRequest);
             case FOREIGN_PAYMENT:
                 return (ScaAwareJob<T, R>) new ForeignPaymentJob((TransactionRequest<ForeignPayment>) transactionRequest);
             case BULK_PAYMENT:
