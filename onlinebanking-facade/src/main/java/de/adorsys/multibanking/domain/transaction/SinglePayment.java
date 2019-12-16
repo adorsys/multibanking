@@ -38,10 +38,17 @@ public class SinglePayment extends AbstractPayment {
     private String currency;
     private LocalDateTime submittedTime;
     private boolean instantPayment;
+    private boolean transfer;
 
     @Override
     public TransactionType getTransactionType() {
-        return instantPayment ? TransactionType.INSTANT_PAYMENT : TransactionType.SINGLE_PAYMENT;
+        if (transfer) {
+            return TransactionType.TRANSFER_PAYMENT;
+        } else if (instantPayment) {
+            return TransactionType.INSTANT_PAYMENT;
+        } else {
+            return TransactionType.SINGLE_PAYMENT;
+        }
     }
 
 }
