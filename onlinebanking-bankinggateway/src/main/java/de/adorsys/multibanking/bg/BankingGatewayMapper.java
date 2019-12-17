@@ -47,8 +47,8 @@ interface BankingGatewayMapper {
     @Mapping(target = "password", source = "pin")
     UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(Credentials credentials);
 
-    UpdateAuthResponse toUpdateAuthResponseTO(ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponseTO,
-                                              @MappingTarget UpdateAuthResponse updateAuthResponse);
+    UpdateAuthResponse toUpdateAuthResponse(ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponseTO,
+                                            @MappingTarget UpdateAuthResponse updateAuthResponse);
 
     SelectPsuAuthenticationMethodRequestTO toSelectPsuAuthenticationMethodRequestTO(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod);
 
@@ -139,4 +139,8 @@ interface BankingGatewayMapper {
     @Mapping(target = "field", ignore = true)
     @Mapping(target = "paramsMap", ignore = true)
     Message toMessage(TppMessage400AIS tppMessage400AIS);
+
+    ScaApproach toScaApproach(ResourceOfUpdateAuthResponseTO.ScaApproachEnum scaApproach);
+
+    ScaStatus toScaStatus(ResourceOfUpdateAuthResponseTO.ScaStatusEnum scaStatus);
 }

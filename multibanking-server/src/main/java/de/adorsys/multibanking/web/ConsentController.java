@@ -97,11 +97,11 @@ public class ConsentController {
 
     @ApiOperation(value = "Submit OAUTH2 authorisation code")
     @PostMapping("/{consentId}/token")
-    public ResponseEntity submitAuthorisationCode(@PathVariable String consentId,
+    public ResponseEntity<Void> submitAuthorisationCode(@PathVariable String consentId,
                                                   @RequestBody @Valid TokenRequestTO tokenRequest) {
         consentService.submitAuthorisationCode(consentId, tokenRequest.getAuthorisationCode());
 
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private List<Resource<ConsentTO>> mapToResources(List<Consent> consents) {
