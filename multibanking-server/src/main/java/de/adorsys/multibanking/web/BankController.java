@@ -36,11 +36,13 @@ public class BankController {
     private final BankMapper bankMapper;
     private final BankService bankService;
 
+    @ApiOperation("get bank by bank code")
     @GetMapping(value = "/{bankCode}")
     public Resource<BankTO> getBank(@PathVariable String bankCode) {
         return mapToResource(bankService.findBank(bankCode));
     }
 
+    @ApiOperation("find bank")
     @GetMapping
     public Resources<Resource<BankTO>> searchBank(@RequestParam String query) {
         return new Resources<>(mapToResources(bankService.search(query)));

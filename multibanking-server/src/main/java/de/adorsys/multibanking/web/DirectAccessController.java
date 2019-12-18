@@ -4,7 +4,6 @@ import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
-import de.adorsys.multibanking.metrics.MetricsCollector;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
@@ -82,7 +81,7 @@ public class DirectAccessController {
         @ApiResponse(code = 200, message = "Response", response = UpdateAuthResponseTO.class)})
     @PutMapping("/accounts")
     public ResponseEntity<LoadBankAccountsResponse> loadBankAccounts(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
-                                           @RequestParam(required = false) BankApiTO bankApi) {
+                                                                     @RequestParam(required = false) BankApiTO bankApi) {
         return doLoadBankAccounts(loadAccountsRequest, bankApi, FINALISED);
     }
 
