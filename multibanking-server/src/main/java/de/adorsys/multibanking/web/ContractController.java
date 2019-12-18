@@ -11,6 +11,7 @@ import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.ContractRepositoryIf;
 import de.adorsys.multibanking.web.mapper.ContractMapper;
 import de.adorsys.multibanking.web.model.ContractTO;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -28,6 +29,7 @@ import java.util.List;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Timed("contract")
 @Api(tags = "Multibanking contract")
 @RequiredArgsConstructor
 @UserResource

@@ -4,6 +4,7 @@ import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
+import de.adorsys.multibanking.metrics.MetricsCollector;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.UserRepositoryIf;
@@ -80,7 +81,7 @@ public class DirectAccessController {
     @ApiResponses({
         @ApiResponse(code = 200, message = "Response", response = UpdateAuthResponseTO.class)})
     @PutMapping("/accounts")
-    public ResponseEntity loadBankAccounts(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
+    public ResponseEntity<LoadBankAccountsResponse> loadBankAccounts(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
                                            @RequestParam(required = false) BankApiTO bankApi) {
         return doLoadBankAccounts(loadAccountsRequest, bankApi, FINALISED);
     }
@@ -103,13 +104,13 @@ public class DirectAccessController {
         @ApiResponse(code = 200, message = "Response", response = LoadBookingsResponse.class)})
     @ApiOperation(value = "Read account bookings")
     @PutMapping("/bookings")
-    public ResponseEntity loadBookings(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
-                                       @RequestParam(required = false) BankApiTO bankApi) {
+    public ResponseEntity<LoadBookingsResponse> loadBookings(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
+                                                             @RequestParam(required = false) BankApiTO bankApi) {
         return doLoadBookings(loadBookingsRequest, bankApi, FINALISED);
     }
 
-    private ResponseEntity doLoadBankAccounts(LoadAccountsRequest loadAccountsRequest,
-                                              BankApiTO bankApi, ScaStatus scaStatus) {
+    private ResponseEntity<LoadBankAccountsResponse> doLoadBankAccounts(LoadAccountsRequest loadAccountsRequest,
+                                                                        BankApiTO bankApi, ScaStatus scaStatus) {
         UserEntity userEntity = createTemporaryUser();
         BankAccessEntity bankAccessEntity = prepareBankAccess(loadAccountsRequest.getBankAccess(), userEntity);
         BankEntity bankEntity = bankService.findBank(bankAccessEntity.getBankCode());
@@ -129,8 +130,8 @@ public class DirectAccessController {
         return createLoadBankAccountsResponse(bankAccounts);
     }
 
-    private ResponseEntity doLoadBookings(LoadBookingsRequest loadBookingsRequest,
-                                          BankApiTO bankApi, ScaStatus scaStatus) {
+    private ResponseEntity<LoadBookingsResponse> doLoadBookings(LoadBookingsRequest loadBookingsRequest,
+                                                                BankApiTO bankApi, ScaStatus scaStatus) {
         log.debug("process start > load booking list");
         BankAccessEntity bankAccessEntity = getBankAccessEntity(loadBookingsRequest);
         BankAccountEntity bankAccountEntity = getBankAccountEntity(loadBookingsRequest, bankAccessEntity);
@@ -251,6 +252,5 @@ public class DirectAccessController {
     public static class LoadBookingsResponse {
         List<BookingTO> bookings;
         BalancesReportTO balances;
-
     }
 }

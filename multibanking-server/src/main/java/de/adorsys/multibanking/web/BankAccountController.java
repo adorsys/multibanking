@@ -14,6 +14,7 @@ import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.web.mapper.BankAccountMapper;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
 import de.adorsys.multibanking.web.model.BankAccountTO;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Timed("bank-account")
 @Api(tags = "Multibanking bankaccount")
 @Slf4j
 @UserResource

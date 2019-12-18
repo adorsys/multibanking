@@ -13,6 +13,7 @@ import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.*;
 import de.adorsys.multibanking.web.model.*;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Timed("direct-access2")
 @Api(tags = "Multibanking direct access v2")
 @UserResource
 @RestController

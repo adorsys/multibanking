@@ -50,7 +50,7 @@ public class AsyncConfig implements AsyncConfigurer {
         return new SimpleAsyncUncaughtExceptionHandler();
     }
 
-    public class ExceptionHandlingAsyncTaskExecutor implements AsyncTaskExecutor,
+    private static class ExceptionHandlingAsyncTaskExecutor implements AsyncTaskExecutor,
         InitializingBean, DisposableBean {
 
         private final Logger log = LoggerFactory.getLogger(ExceptionHandlingAsyncTaskExecutor.class);

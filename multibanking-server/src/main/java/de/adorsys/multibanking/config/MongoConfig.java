@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.SimpleMongoClientDbFactory;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.lang.NonNull;
 
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     private final Environment env;
 
     @Override
-    protected String getDatabaseName() {
+    protected @NonNull String getDatabaseName() {
         return Optional.ofNullable(env.getProperty("mongo.databaseName"))
             .orElseThrow(() -> new IllegalStateException("missing env property mongo.databaseName"));
     }
@@ -63,7 +64,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
     @Bean
     @Override
-    public MongoClient mongoClient() {
+    public @NonNull MongoClient mongoClient() {
         MongoClientSettings.Builder mongoClientSettingsBuilder = MongoClientSettings.builder()
             .applyConnectionString(getConnectionString())
             .writeConcern(WriteConcern.JOURNALED)
@@ -88,7 +89,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
         ServerAddress serverAddress = Optional.ofNullable(env.getProperty("mongo.server"))
             .map(server -> server.replace("mongodb://", "").split(":"))
             .map(serverParts -> new ServerAddress(serverParts[0],
-                1 < serverParts.length ? Integer.valueOf(serverParts[1]) : ServerAddress.defaultPort()))
+                1 < serverParts.length ? Integer.parseInt(serverParts[1]) : ServerAddress.defaultPort()))
             .orElseThrow(() -> new IllegalStateException("missing env property mongo.server"));
 
         if (StringUtils.isEmpty(env.getProperty("mongo.userName"))) {
@@ -101,7 +102,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
     }
 
     @Override
-    public MongoDbFactory mongoDbFactory() {
+    public @NonNull MongoDbFactory mongoDbFactory() {
         return Optional.ofNullable(env.getProperty("mongo.databaseName"))
             .map(databaseName -> new SimpleMongoClientDbFactory(mongoClient(), databaseName))
             .orElseThrow(() -> new IllegalStateException("missing env property mongo.databaseName"));

@@ -228,7 +228,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("bookings")).isNotBlank();
     }
 
-    @Ignore("uses real data - please setup ENV")
+//    @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway() {
         ConsentTO consentTO = createConsentTO();
@@ -332,7 +332,7 @@ public class DirectAccessControllerTest {
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
-        assertThat(jsonPath.getString("scaStatus")).isIn(RECEIVED.toString(), ScaStatusTO.STARTED.toString());
+        assertThat(jsonPath.getString("scaStatus")).isIn(RECEIVED.toString(), STARTED.toString());
 
         //3. update psu authentication
         UpdatePsuAuthenticationRequestTO updatePsuAuthentication = new UpdatePsuAuthenticationRequestTO();
@@ -345,6 +345,8 @@ public class DirectAccessControllerTest {
         jsonPath = request.body(updatePsuAuthentication).put(linkUpdateAuthentication)
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
+
+        assertThat(jsonPath.getString("scaStatus")).isIn(PSUAUTHENTICATED.toString(), SCAMETHODSELECTED.toString());
 
         // get consent auth status after "lazy" startauth
         jsonPath = request.get(linkAuthorisationStatus)
@@ -514,7 +516,7 @@ public class DirectAccessControllerTest {
         assertThat(loadBookingsResponse.getBookings()).isNotEmpty();
     }
 
-    @Ignore("uses real data - please setup ENV")
+//    @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway_oauth() {
         ConsentTO consentTO = createConsentTO();
