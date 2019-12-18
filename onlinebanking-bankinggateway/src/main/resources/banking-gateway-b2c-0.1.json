@@ -952,6 +952,9 @@
     "AuthorizationCodeTO": {
       "type": "object",
       "properties": {
+        "bankCode": {
+          "type": "string"
+        },
         "code": {
           "type": "string"
         }

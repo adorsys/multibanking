@@ -49,6 +49,7 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
 
             BgSessionData sessionData = new BgSessionData();
             sessionData.setConsentId(consentResponse.getConsentId());
+            sessionData.setBankCode(bankCode);
             Optional.ofNullable(bankApiConsentData).map(BgSessionData.class::cast).ifPresent(consentData -> {
                 sessionData.setAccessToken(consentData.getAccessToken());
                 sessionData.setRefreshToken(consentData.getRefreshToken());
@@ -192,6 +193,7 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
         try {
             AuthorizationCodeTO authorizationCodeTO = new AuthorizationCodeTO();
             authorizationCodeTO.setCode(authorisationCode);
+            authorizationCodeTO.setBankCode(sessionData.getBankCode());
 
             BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
                 sessionData);
