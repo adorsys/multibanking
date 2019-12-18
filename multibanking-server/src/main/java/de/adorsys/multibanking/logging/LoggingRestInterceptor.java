@@ -4,6 +4,7 @@ import ch.qos.logback.classic.ClassicConstants;
 import org.slf4j.MDC;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
 public class LoggingRestInterceptor extends HandlerInterceptorAdapter {
 
     private static final String CORRELATION_ID_HEADER = "Correlation-ID";

@@ -9,6 +9,7 @@ import de.adorsys.multibanking.exception.SyncInProgressException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -25,6 +26,7 @@ import java.security.Principal;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Timed("standing-order")
 @Api(tags = "Multibanking standing order")
 @RequiredArgsConstructor
 @UserResource

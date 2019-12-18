@@ -9,6 +9,7 @@ import de.adorsys.multibanking.pers.spi.repository.BookingRuleRepositoryIf;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.web.mapper.RuleMapper;
 import de.adorsys.multibanking.web.model.RuleTO;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -35,6 +36,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Timed("custom-rule")
 @Api(tags = "Multibanking custom rule")
 @RequiredArgsConstructor
 @Slf4j

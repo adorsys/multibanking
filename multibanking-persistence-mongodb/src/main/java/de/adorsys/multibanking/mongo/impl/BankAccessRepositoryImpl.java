@@ -32,12 +32,6 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
     }
 
     @Override
-    public Optional<BankAccessEntity> findOne(String id) {
-        return bankAccessRepository.findById(id)
-            .map(entityMapper::mapToBankAccessEntity);
-    }
-
-    @Override
     public List<BankAccessEntity> findByUserId(String userId) {
         return entityMapper.mapToBankAccessEntities(bankAccessRepository.findByUserId(userId));
     }

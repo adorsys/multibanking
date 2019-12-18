@@ -5,6 +5,7 @@ import de.adorsys.multibanking.service.BankService;
 import de.adorsys.multibanking.web.mapper.BankMapper;
 import de.adorsys.multibanking.web.model.BankTO;
 import de.adorsys.smartanalytics.exception.FileUploadException;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -24,6 +25,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Timed("bank")
 @Api(tags = "Multibanking banks")
 @RequiredArgsConstructor
 @UserResource
@@ -34,11 +36,13 @@ public class BankController {
     private final BankMapper bankMapper;
     private final BankService bankService;
 
+    @ApiOperation("get bank by bank code")
     @GetMapping(value = "/{bankCode}")
     public Resource<BankTO> getBank(@PathVariable String bankCode) {
         return mapToResource(bankService.findBank(bankCode));
     }
 
+    @ApiOperation("find bank")
     @GetMapping
     public Resources<Resource<BankTO>> searchBank(@RequestParam String query) {
         return new Resources<>(mapToResources(bankService.search(query)));

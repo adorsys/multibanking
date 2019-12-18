@@ -7,6 +7,7 @@ import de.adorsys.multibanking.web.model.SelectPsuAuthenticationMethodRequestTO;
 import de.adorsys.multibanking.web.model.TransactionAuthorisationRequestTO;
 import de.adorsys.multibanking.web.model.UpdateAuthResponseTO;
 import de.adorsys.multibanking.web.model.UpdatePsuAuthenticationRequestTO;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import static de.adorsys.multibanking.domain.ScaApproach.*;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Timed("consent-authorisation")
 @Api(tags = "Multibanking consent authorisation")
 @RequiredArgsConstructor
 @Slf4j
