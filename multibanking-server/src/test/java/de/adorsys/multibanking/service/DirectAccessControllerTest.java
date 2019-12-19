@@ -228,7 +228,7 @@ public class DirectAccessControllerTest {
         assertThat(jsonPath.getString("bookings")).isNotBlank();
     }
 
-//    @Ignore("uses real data - please setup ENV")
+    @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway() {
         ConsentTO consentTO = createConsentTO();
@@ -516,7 +516,7 @@ public class DirectAccessControllerTest {
         assertThat(loadBookingsResponse.getBookings()).isNotEmpty();
     }
 
-//    @Ignore("uses real data - please setup ENV")
+    @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway_oauth() {
         ConsentTO consentTO = createConsentTO();

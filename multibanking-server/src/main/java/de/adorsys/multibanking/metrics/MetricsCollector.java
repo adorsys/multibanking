@@ -21,7 +21,7 @@ public class MetricsCollector {
 
     public void count(String tag, String bankCode, BankApi bankApi, Throwable exception) {
         meterRegistry.counter(tag, Tags.of(Tag.of("bank_code", bankCode),
-            Tag.of("bank_api", bankApi.toString()),
+            Tag.of("bank_api", bankApi == null ? "undefined" : bankApi.toString()),
             Tag.of("outcome", exception == null ? "SUCCESS" : "ERROR"),
             getExceptionTag(exception))
         ).increment();
