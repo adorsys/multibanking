@@ -10,8 +10,6 @@ import java.util.Optional;
  */
 public interface BankRepositoryIf {
 
-    Optional<String> findBankingUrl(String bankCode);
-
     Optional<BankEntity> findByBankCode(String bankCode);
 
     void save(BankEntity bank);

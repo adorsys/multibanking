@@ -24,14 +24,9 @@ public class BankRepositoryImpl implements BankRepositoryIf {
     private final HibernateSearchService hibernateSearchService;
 
     @Override
-    public Optional<String> findBankingUrl(String bankCode) {
-        return Optional.ofNullable(bankRepository.findBankingUrl(bankCode));
-    }
-
-    @Override
     public Optional<BankEntity> findByBankCode(String blz) {
         return bankRepository.findByBankCode(blz)
-                .map(entityMapper::mapToBankEntity);
+            .map(entityMapper::mapToBankEntity);
     }
 
     @Override

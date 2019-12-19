@@ -10,6 +10,7 @@ import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.exception.BankAccessAlreadyExistException;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
+import de.adorsys.multibanking.metrics.MetricsCollector;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +38,7 @@ public class BankAccountService extends AccountInformationService {
     private final ConsentService consentService;
     private final UserService userService;
     private final BankService bankService;
+    private final MetricsCollector metricsCollector;
 
     public List<BankAccountEntity> getBankAccounts(String userId, String accessId) {
         BankAccessEntity bankAccessEntity = bankAccessRepository.findByUserIdAndId(userId, accessId)
@@ -83,6 +85,7 @@ public class BankAccountService extends AccountInformationService {
         if (onlineBankingService.bankApi() == BankApi.FIGO) {
             filterAccounts(bankAccess, onlineBankingService, bankAccounts);
         }
+
         return Optional.ofNullable(bankAccounts)
             .map(Collection::stream)
             .orElseGet(Stream::empty)
@@ -108,9 +111,16 @@ public class BankAccountService extends AccountInformationService {
         try {
             AccountInformationResponse response = onlineBankingService.loadBankAccounts(transactionRequest);
             checkSca(response, consentEntity, onlineBankingService);
+
+            metricsCollector.count("loadAccounts", bankAccess.getBankCode(), onlineBankingService.bankApi());
+
             return response.getBankAccounts();
         } catch (MultibankingException e) {
-            throw handleMultibankingException(bankAccess, e);
+            metricsCollector.count("loadAccounts", bankAccess.getBankCode(), onlineBankingService.bankApi(), e);
+            throw handleMultibankingException(bankAccess, (MultibankingException) e);
+        } catch (Exception e) {
+            metricsCollector.count("loadAccounts", bankAccess.getBankCode(), onlineBankingService.bankApi(), e);
+            throw e;
         }
     }
 

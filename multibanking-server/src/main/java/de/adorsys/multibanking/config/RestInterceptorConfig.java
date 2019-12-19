@@ -1,18 +1,20 @@
 package de.adorsys.multibanking.config;
 
 import de.adorsys.multibanking.logging.LoggingRestInterceptor;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Configuration
-public class LoggingInterceptorConfig implements WebMvcConfigurer {
+public class RestInterceptorConfig implements WebMvcConfigurer {
+
+    private final LoggingRestInterceptor loggingRestInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new LoggingRestInterceptor());
+        registry.addInterceptor(loggingRestInterceptor);
     }
 
 }

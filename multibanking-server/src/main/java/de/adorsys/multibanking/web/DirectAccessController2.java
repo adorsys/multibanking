@@ -13,6 +13,7 @@ import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.*;
 import de.adorsys.multibanking.web.model.*;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Timed("direct-access2")
 @Api(tags = "Multibanking direct access v2")
 @UserResource
 @RestController
@@ -69,7 +71,7 @@ public class DirectAccessController2 {
     public ResponseEntity loadAccounts(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
                                        @RequestParam(required = false) BankApiTO bankApi) {
         try {
-            return doLoadBankAccounts(loadAccountsRequest, bankApi, SCAMETHODSELECTED);
+            return doLoadBankAccounts(loadAccountsRequest, bankApi);
         } catch (TransactionAuthorisationRequiredException e) {
             log.debug("process finished < return challenge");
             return createChallengeResponse(e.getResponse(), e.getConsentId(), e.getAuthorisationId());
@@ -85,7 +87,7 @@ public class DirectAccessController2 {
     public ResponseEntity loadTransactions(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
                                            @RequestParam(required = false) BankApiTO bankApi) {
         try {
-            return doLoadBookings(loadBookingsRequest, bankApi, SCAMETHODSELECTED);
+            return doLoadBookings(loadBookingsRequest, bankApi);
         } catch (TransactionAuthorisationRequiredException e) {
             log.debug("process finished < return challenge");
             return createChallengeResponse(e.getResponse(), e.getConsentId(), e.getAuthorisationId());
@@ -93,14 +95,14 @@ public class DirectAccessController2 {
     }
 
     private ResponseEntity<LoadBankAccountsResponse> doLoadBankAccounts(LoadAccountsRequest loadAccountsRequest,
-                                                                        BankApiTO bankApi, ScaStatus scaStatus) {
+                                                                        BankApiTO bankApi) {
         UserEntity userEntity = createTemporaryUser();
         BankAccessEntity bankAccessEntity = prepareBankAccess(loadAccountsRequest.getBankAccess(), userEntity);
         BankEntity bankEntity = bankService.findBank(bankAccessEntity.getBankCode());
 
         log.debug("load bank account list from bank");
         List<BankAccountEntity> bankAccounts = bankAccountService.loadBankAccountsOnline(bankEntity, bankAccessEntity,
-            userEntity, bankApiMapper.toBankApi(bankApi), scaStatus);
+            userEntity, bankApiMapper.toBankApi(bankApi), SCAMETHODSELECTED);
 
         //persisting externalId for further request
         log.debug("save bank account list to db");
@@ -113,14 +115,14 @@ public class DirectAccessController2 {
         return createLoadBankAccountsResponse(bankAccounts);
     }
 
-    private ResponseEntity doLoadBookings(LoadBookingsRequest loadBookingsRequest,
-                                          BankApiTO bankApi, ScaStatus scaStatus) {
+    private ResponseEntity<LoadBookingsResponse> doLoadBookings(LoadBookingsRequest loadBookingsRequest,
+                                          BankApiTO bankApi) {
         log.debug("process start > load booking list");
         BankAccessEntity bankAccessEntity = getBankAccessEntity(loadBookingsRequest);
         BankAccountEntity bankAccountEntity = getBankAccountEntity(loadBookingsRequest, bankAccessEntity);
 
         log.debug("load booking list from bank");
-        List<BookingEntity> bookingEntities = bookingService.syncBookings(scaStatus,
+        List<BookingEntity> bookingEntities = bookingService.syncBookings(SCAMETHODSELECTED,
             loadBookingsRequest.getAuthorisationCode(), bankAccessEntity,
             bankAccountEntity, bankApiMapper.toBankApi(bankApi));
 

@@ -3,12 +3,16 @@ package de.adorsys.multibanking.config;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.common.io.ByteStreams;
 import de.adorsys.multibanking.exception.SmartanalyticsException;
 import de.adorsys.multibanking.exception.domain.Message;
 import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.logging.LoggingUtils;
+import de.adorsys.sts.tokenauth.BearerToken;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.impl.client.HttpClients;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,10 +21,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.hateoas.hal.Jackson2HalModule;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.BufferingClientHttpRequestFactory;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.*;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.lang.NonNull;
 import org.springframework.web.client.DefaultResponseErrorHandler;
@@ -44,7 +45,7 @@ public class SmartanalyticsRemoteConfig {
 
     @Bean
     @Qualifier("smartanalytics")
-    public RestTemplate restTemplate(AuthorizationClientRequestFactory authorizationClientRequestFactory) {
+    public RestTemplate restTemplate() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.registerModule(new Jackson2HalModule());
@@ -55,7 +56,7 @@ public class SmartanalyticsRemoteConfig {
         converter.setObjectMapper(mapper);
 
         final RestTemplate restTemplate =
-            new RestTemplate(new BufferingClientHttpRequestFactory(authorizationClientRequestFactory));
+            new RestTemplate(new BufferingClientHttpRequestFactory(new AuthorizationClientRequestFactory()));
         restTemplate.setUriTemplateHandler(new DefaultUriBuilderFactory(smartanalyticsUrl));
         restTemplate.setErrorHandler(new ErrorHandler());
         restTemplate.setMessageConverters(Collections.singletonList(converter));
@@ -123,12 +124,31 @@ public class SmartanalyticsRemoteConfig {
 
             ClientHttpResponse response = execution.execute(request, body);
 
-            String responseString = LoggingUtils.cleanAndReduce(ByteStreams.toByteArray(response.getBody()), charset);
+            String responseString = LoggingUtils.cleanAndReduce(IOUtils.toByteArray(response.getBody()), charset);
 
             log.trace("{} < {} {}", backend, response.getStatusCode(), responseString);
 
             return response;
         }
+    }
 
+    private static class AuthorizationClientRequestFactory extends HttpComponentsClientHttpRequestFactory implements ClientHttpRequestFactory {
+
+        private static final String AUTHORIZATION_HEADER = "Authorization";
+
+        @Autowired
+        private BearerToken bearerToken;
+
+        public AuthorizationClientRequestFactory() {
+            super(HttpClients.custom()
+                .disableCookieManagement()
+                .build()
+            );
+        }
+
+        @Override
+        protected void postProcessHttpRequest(HttpUriRequest request) {
+            request.setHeader(AUTHORIZATION_HEADER, bearerToken.getToken());
+        }
     }
 }

@@ -24,19 +24,9 @@ public class BankRepositoryImpl implements BankRepositoryIf {
     private final MongoEntityMapper entityMapper;
 
     @Override
-    public Optional<String> findBankingUrl(String bankCode) {
-        Query query = new Query(
-                Criteria.where("bankCode").is(bankCode)
-        );
-        query.fields().include("bankingUrl");
-        return Optional.ofNullable(mongoTemplate.findOne(query, BankMongoEntity.class))
-                .map(BankMongoEntity::getBankingUrl);
-    }
-
-    @Override
     public Optional<BankEntity> findByBankCode(String blz) {
         return bankRepositoryMongodb.findByBankCode(blz)
-                .map(entityMapper::mapToBankEntity);
+            .map(entityMapper::mapToBankEntity);
     }
 
     @Override
@@ -59,11 +49,12 @@ public class BankRepositoryImpl implements BankRepositoryIf {
         Collection<String> terms = new HashSet<>((Arrays.asList(text.split(" "))));
 
         Criteria[] criterias = terms
-                .stream()
-                .map(s -> Criteria.where("searchIndex").regex(s.toLowerCase(), "iu"))
-                .toArray(Criteria[]::new);
+            .stream()
+            .map(s -> Criteria.where("searchIndex").regex(s.toLowerCase(), "iu"))
+            .toArray(Criteria[]::new);
 
-        return entityMapper.mapToBankEntities(mongoTemplate.find(Query.query(new Criteria().andOperator(criterias)), BankMongoEntity.class));
+        return entityMapper.mapToBankEntities(mongoTemplate.find(Query.query(new Criteria().andOperator(criterias)),
+            BankMongoEntity.class));
     }
 
 }

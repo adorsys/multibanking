@@ -10,6 +10,7 @@ import de.adorsys.multibanking.web.model.BankApiTO;
 import de.adorsys.multibanking.web.model.ConsentTO;
 import de.adorsys.multibanking.web.model.CreateConsentResponseTO;
 import de.adorsys.multibanking.web.model.TokenRequestTO;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Timed("consent")
 @Api(tags = "Multibanking consent")
 @RequiredArgsConstructor
 @Slf4j
@@ -97,11 +99,11 @@ public class ConsentController {
 
     @ApiOperation(value = "Submit OAUTH2 authorisation code")
     @PostMapping("/{consentId}/token")
-    public ResponseEntity submitAuthorisationCode(@PathVariable String consentId,
+    public ResponseEntity<Void> submitAuthorisationCode(@PathVariable String consentId,
                                                   @RequestBody @Valid TokenRequestTO tokenRequest) {
         consentService.submitAuthorisationCode(consentId, tokenRequest.getAuthorisationCode());
 
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private List<Resource<ConsentTO>> mapToResources(List<Consent> consents) {

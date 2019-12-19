@@ -11,6 +11,7 @@ import de.adorsys.multibanking.pers.spi.repository.SinglePaymentRepositoryIf;
 import de.adorsys.multibanking.service.PaymentService;
 import de.adorsys.multibanking.web.mapper.CredentialsMapper;
 import de.adorsys.multibanking.web.model.CredentialsTO;
+import io.micrometer.core.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
@@ -29,6 +30,7 @@ import java.security.Principal;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Timed("payment")
 @Api(tags = "Multibanking payment")
 @RequiredArgsConstructor
 @UserResource
