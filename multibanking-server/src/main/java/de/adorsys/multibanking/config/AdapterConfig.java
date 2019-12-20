@@ -54,9 +54,9 @@ public class AdapterConfig {
         bankingGatewayAdapter = new BankingGatewayAdapter(bankingGatewayBaseUrl,
             bankingAdapterBaseUrl);
 
-        if (StringUtils.isEmpty(fintsProductVersion)) {
+        if (StringUtils.isEmpty(fintsProduct)) {
             log.warn("missing FinTS product configuration");
-            hbci4JavaBanking = new HbciBanking(new HBCIProduct(fintsProduct, moduleVersion));
+            hbci4JavaBanking = new HbciBanking(null);
         } else {
             hbci4JavaBanking = new HbciBanking(new HBCIProduct(fintsProduct, fintsProductVersion));
         }

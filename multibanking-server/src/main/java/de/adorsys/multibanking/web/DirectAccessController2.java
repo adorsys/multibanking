@@ -80,7 +80,7 @@ public class DirectAccessController2 {
 
     @ApiOperation(value = "read bookings")
     @ApiResponses({
-        @ApiResponse(code = 201, message = "Bookings response", response = LoadBankAccountsResponse.class),
+        @ApiResponse(code = 201, message = "Bookings response", response = LoadBookingsResponse.class),
         @ApiResponse(code = 202, message = "Challenge response", reference = "#/definitions/Resource" +
             "«UpdateAuthResponseTO»")})
     @PostMapping("/bookings")
