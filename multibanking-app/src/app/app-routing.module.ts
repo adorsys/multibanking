@@ -12,6 +12,7 @@ const routes: Routes = [
   { path: 'sca-method-selection', loadChildren: './pages/consent/sca-method-selection/sca-method-selection.module#ScaMethodSelectionPageModule' },
   { path: 'authorisation', loadChildren: './pages/consent/authorisation/authorisation.module#AuthorisationPageModule' },
   { path: 'create-consent', loadChildren: './pages/consent/create-consent/create-consent.module#CreateConsentPageModule' },
+  { path: 'create-consent/:consent-id', loadChildren: './pages/consent/create-consent/create-consent.module#CreateConsentPageModule' },
   { path: 'bankaccess-edit', loadChildren: './pages/bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },
   { path: 'bankaccess-create/consents/:consent-id/authorisations/:authorisation-id', loadChildren: './pages/bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },
   { path: 'bankaccess-create/redirect/:redirect-id', loadChildren: './pages/bankaccess-edit/bankaccess-edit.module#BankaccessEditPageModule' },

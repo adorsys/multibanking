@@ -35,7 +35,11 @@ export class BankaccessEditPage implements OnInit {
     if (this.activatedRoute.snapshot.queryParams.code) {
       this.consentService.submitAuthorisationCode(this.consent.id, this.activatedRoute.snapshot.queryParams.code).subscribe(
         () => {
-          this.initForm();
+          if (this.consent.temporary) {
+            this.navCtrl.navigateRoot(`/create-consent/${encodeURIComponent(this.consent.id)}`);
+          } else {
+            this.initForm();
+          }
         }
       );
     } else {

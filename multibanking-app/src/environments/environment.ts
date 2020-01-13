@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   isApp: false,
-  base_url: 'http://localhost:8100',
+  base_url: 'http://localhost:4200',
   auth_url: 'http://keycloak:8080/auth',
   api_url: 'http://localhost:8088/api/v1',
   smartanalytics_url: 'http://localhost:8088/api/v1',

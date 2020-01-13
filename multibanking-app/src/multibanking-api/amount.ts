@@ -9,11 +9,9 @@
  * https://github.com/swagger-api/swagger-codegen.git
  * Do not edit the class manually.
  */
-import { Booking } from './booking';
-import { Rule } from './rule';
 
 
-export interface AnalyticsRequest { 
-    bookings?: Array<Booking>;
-    customRules?: Array<Rule>;
+export interface Amount { 
+    currency?: string;
+    value?: number;
 }
