@@ -35,6 +35,7 @@ interface BankingGatewayMapper {
     ConsentTO toConsentTO(Consent consentTemplate);
 
     @Mapping(target = "redirectId", ignore = true)
+    @Mapping(target = "temporary", ignore = true)
     @InheritInverseConfiguration
     Consent toConsent(ConsentTO consentTO);
 
@@ -131,7 +132,9 @@ interface BankingGatewayMapper {
     @Mapping(target = "currency", source = "balanceAmount.currency")
     Balance toBalance(de.adorsys.multibanking.xs2a_adapter.model.Balance balance);
 
-    List<Message> toMessages(List<TppMessage400AIS> messagesTO);
+    List<Message> toMessagesFromTppMessage400AIS(List<TppMessage400AIS> messages);
+
+    List<Message> toMessages(List<MessageTO> messageTOList);
 
     @Mapping(target = "severity", source = "category")
     @Mapping(target = "key", source = "code")
@@ -143,4 +146,5 @@ interface BankingGatewayMapper {
     ScaApproach toScaApproach(ResourceOfUpdateAuthResponseTO.ScaApproachEnum scaApproach);
 
     ScaStatus toScaStatus(ResourceOfUpdateAuthResponseTO.ScaStatusEnum scaStatus);
+
 }

@@ -37,6 +37,7 @@ import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
+@Deprecated
 @Api(tags = "Multibanking direct access")
 @UserResource
 @RestController

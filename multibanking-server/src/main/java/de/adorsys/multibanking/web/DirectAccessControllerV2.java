@@ -44,7 +44,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping(path = "api/v2/direct")
-public class DirectAccessController2 {
+public class DirectAccessControllerV2 {
 
     private final BookingMapper bookingMapper;
     private final BankApiMapper bankApiMapper;

@@ -8,7 +8,7 @@ import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.exception.MissingConsentAuthorisationSelectionException;
+import de.adorsys.multibanking.exception.MissingScaMethodSelectionException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
 import de.adorsys.multibanking.metrics.MetricsCollector;
@@ -37,9 +37,8 @@ public class ConsentService {
     private final MetricsCollector metricsCollector;
 
     public CreateConsentResponse createConsent(Consent consent, String tppRedirectUri, BankApi bankApi) {
-        Object bankApiConsentData = Optional.ofNullable(consent.getConsentId())
+        ConsentEntity tempConsentEntity = Optional.ofNullable(consent.getConsentId())
             .flatMap(consentRepository::findById)
-            .map(ConsentEntity::getBankApiConsentData)
             .orElse(null);
 
         OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getPsuAccountIban());
@@ -48,11 +47,17 @@ public class ConsentService {
         try {
             CreateConsentResponse createConsentResponse =
                 onlineBankingService.getStrongCustomerAuthorisation().createConsent(consent, bank.isRedirectPreferred(),
-                    tppRedirectUri, bankApiConsentData);
+                    tppRedirectUri, tempConsentEntity != null ? tempConsentEntity.getBankApiConsentData() : null);
             createConsentResponse.setRedirectId(consent.getRedirectId());
+
+            if (tempConsentEntity != null) { //remove temporary created (oauth prestep required) consent entity
+                consentRepository.delete(tempConsentEntity);
+            }
 
             ConsentEntity consentEntity = consentMapper.toConsentEntity(createConsentResponse, consent.getRedirectId(),
                 consent.getPsuAccountIban(), onlineBankingService.bankApi());
+
+            consentEntity.setTemporary(createConsentResponse.getConsentId() == null);
             consentRepository.save(consentEntity);
 
             metricsCollector.count("createConsent", bank.getBankCode(), onlineBankingService.bankApi());
@@ -148,7 +153,6 @@ public class ConsentService {
                 onlineBankingService.bankApi(), e);
             throw e;
         }
-
     }
 
     public void revokeConsent(String consentId) {
@@ -169,33 +173,44 @@ public class ConsentService {
     public Consent getConsent(String consentId) {
         ConsentEntity internalConsent = consentRepository.findById(consentId)
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
+
+        if (internalConsent.isTemporary()) {
+            return consentMapper.toConsent(internalConsent);
+        }
+
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        Consent consent = onlineBankingService.getStrongCustomerAuthorisation().getConsent(consentId);
-        return Optional.ofNullable(consent)
-            .orElseGet(() -> consentMapper.toConsent(internalConsent));
+        return onlineBankingService.getStrongCustomerAuthorisation().getConsent(consentId);
     }
 
     public Consent getConsentByRedirectId(String redirectId) {
         ConsentEntity internalConsent = consentRepository.findByRedirectId(redirectId)
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, redirectId));
+
+        if (internalConsent.isTemporary()) {
+            return consentMapper.toConsent(internalConsent);
+        }
+
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        Consent consent = onlineBankingService.getStrongCustomerAuthorisation().getConsent(internalConsent.getId());
-        return Optional.ofNullable(consent)
-            .orElseGet(() -> consentMapper.toConsent(internalConsent));
+        return onlineBankingService.getStrongCustomerAuthorisation().getConsent(internalConsent.getId());
     }
 
-    public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId) {
+    public UpdateAuthResponse getAuthorisationStatus(String consentId) {
         ConsentEntity internalConsent = consentRepository.findById(consentId)
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
-        OnlineBankingService onlineBankingService =
-            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        return onlineBankingService.getStrongCustomerAuthorisation().getAuthorisationStatus(consentId,
-            authorisationId, internalConsent.getBankApiConsentData());
+        return getAuthorisationStatus(internalConsent);
+    }
+
+    public UpdateAuthResponse getAuthorisationStatus(ConsentEntity consentEntity) {
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(consentEntity.getBankApi());
+
+        return onlineBankingService.getStrongCustomerAuthorisation().getAuthorisationStatus(consentEntity.getId(),
+            consentEntity.getAuthorisationId(), consentEntity.getBankApiConsentData());
     }
 
     public void submitAuthorisationCode(String consentId, String authorisationCode) {
@@ -228,16 +243,14 @@ public class ConsentService {
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
                 case INVALID_SCA_METHOD:
-                    throw new MissingConsentAuthorisationSelectionException();
+                    throw new MissingScaMethodSelectionException();
                 case INVALID_CONSENT_STATUS:
                     if (expectedConsentStatus == ScaStatus.FINALISED) {
-                        UpdateAuthResponse authorisationStatus = getAuthorisationStatus(internalConsent.getId(),
-                            internalConsent.getAuthorisationId());
+                        UpdateAuthResponse authorisationStatus = getAuthorisationStatus(internalConsent);
                         throw new TransactionAuthorisationRequiredException(authorisationStatus,
-                            internalConsent.getId(),
-                            internalConsent.getAuthorisationId());
+                            internalConsent.getId(), internalConsent.getAuthorisationId());
                     } else if (expectedConsentStatus == ScaStatus.SCAMETHODSELECTED) {
-                        throw new MissingConsentAuthorisationSelectionException();
+                        throw new MissingScaMethodSelectionException();
                     }
                     throw e;
                 default:

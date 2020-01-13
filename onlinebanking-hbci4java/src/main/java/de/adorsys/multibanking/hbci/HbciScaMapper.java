@@ -7,6 +7,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import static de.adorsys.multibanking.domain.ScaApproach.EMBEDDED;
+
 @Mapper
 interface HbciScaMapper {
 
@@ -16,6 +18,7 @@ interface HbciScaMapper {
     @Mapping(target = "redirectUrl", ignore = true)
     @Mapping(target = "redirectId", ignore = true)
     @Mapping(target = "oauthRedirectUrl", ignore = true)
+    @Mapping(target = "scaApproach", constant = "EMBEDDED")
     CreateConsentResponse toCreateConsentResponse(HbciConsent bankApiConsentData);
 
     @Mapping(target = "challenge", ignore = true)

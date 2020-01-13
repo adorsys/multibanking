@@ -16,6 +16,7 @@ public interface ConsentMapper {
     @Mapping(target = "tppRedirectUri", ignore = true)
     ConsentTO toConsentTO(Consent consent);
 
+    @Mapping(target = "temporary", ignore = true)
     @Mapping(target = "consentId", source = "id")
     Consent toConsent(ConsentTO consent);
 
@@ -33,6 +34,7 @@ public interface ConsentMapper {
     @Mapping(target = "id", source = "createConsentResponse.consentId")
     @Mapping(target = "authorisationId", source = "createConsentResponse.authorisationId")
     @Mapping(target = "bankApiConsentData", source = "createConsentResponse.bankApiConsentData")
-    ConsentEntity toConsentEntity(CreateConsentResponse createConsentResponse, String redirectId, String psuAccountIban, BankApi bankApi);
-
+    @Mapping(target = "temporary", ignore = true)
+    ConsentEntity toConsentEntity(CreateConsentResponse createConsentResponse, String redirectId,
+                                  String psuAccountIban, BankApi bankApi);
 }

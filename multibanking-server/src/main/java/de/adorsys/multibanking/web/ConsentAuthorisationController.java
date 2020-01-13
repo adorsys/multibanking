@@ -85,8 +85,7 @@ public class ConsentAuthorisationController {
                                                                                         @PathVariable String authorisationId) {
         String bankCode = Iban.valueOf(consentService.getInternalConsent(consentId).getPsuAccountIban()).getBankCode();
 
-        UpdateAuthResponse updateAuthResponse = consentService.getAuthorisationStatus(consentId,
-            authorisationId);
+        UpdateAuthResponse updateAuthResponse = consentService.getAuthorisationStatus(consentId);
 
         return ResponseEntity.ok(mapToResource(updateAuthResponse, consentId, authorisationId, bankCode));
     }

@@ -37,8 +37,6 @@ public class AdapterConfig {
     private String fintsProduct;
     @Value("${fints.version:}")
     private String fintsProductVersion;
-    @Value("${info.project.version:null}")
-    private String moduleVersion;
 
     private IngAdapter ingAdapter;
     private BankingGatewayAdapter bankingGatewayAdapter;

@@ -14,6 +14,9 @@ public class ConsentTO {
     @ApiModelProperty(value = "Consent id")
     private String id;
 
+    @ApiModelProperty(value = "Defines consent as temporary in case of OAUTH_PRESTEP appraoch")
+    private boolean temporary;
+
     @ApiModelProperty(value = "Consent redirect id")
     private String redirectId;
 

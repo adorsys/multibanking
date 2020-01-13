@@ -2,6 +2,7 @@ package de.adorsys.multibanking.bg;
 
 import de.adorsys.multibanking.banking_gateway_b2c.ApiException;
 import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2CAisApi;
+import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2COAuthApi;
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
 import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.domain.ScaApproach;
@@ -18,7 +19,6 @@ import de.adorsys.multibanking.domain.response.PaymentStatusResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.PaymentStatusReqest;
-import de.adorsys.multibanking.xs2a_adapter.model.Error400NGAIS;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.iban4j.Iban;
@@ -26,6 +26,7 @@ import org.iban4j.Iban;
 import java.util.Optional;
 
 import static de.adorsys.multibanking.bg.ApiClientFactory.bankingGatewayB2CAisApi;
+import static de.adorsys.multibanking.bg.ApiClientFactory.bankingGatewayB2COAuthApi;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
 
@@ -37,25 +38,28 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
 
     @Override
-    public CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred,
+    public CreateConsentResponse createConsent(Consent consent, boolean redirectPreferred,
                                                String tppRedirectUri, Object bankApiConsentData) {
         try {
-            String bankCode = Iban.valueOf(consentTemplate.getPsuAccountIban()).getBankCode();
+            String bankCode = Iban.valueOf(consent.getPsuAccountIban()).getBankCode();
             BankingGatewayB2CAisApi aisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
                 (BgSessionData) bankApiConsentData);
             CreateConsentResponseTO consentResponse =
-                aisApi.createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, null
+                aisApi.createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consent), bankCode, null, null
                     , redirectPreferred, tppRedirectUri);
 
             BgSessionData sessionData = new BgSessionData();
             sessionData.setConsentId(consentResponse.getConsentId());
             sessionData.setBankCode(bankCode);
-            Optional.ofNullable(bankApiConsentData).map(BgSessionData.class::cast).ifPresent(consentData -> {
-                sessionData.setAccessToken(consentData.getAccessToken());
-                sessionData.setRefreshToken(consentData.getRefreshToken());
-            });
-            CreateConsentResponse createConsentResponse =
-                bankingGatewayMapper.toCreateConsentResponse(consentResponse);
+
+            Optional.ofNullable(bankApiConsentData)
+                .map(BgSessionData.class::cast)
+                .ifPresent(consentData -> {
+                    sessionData.setAccessToken(consentData.getAccessToken());
+                    sessionData.setRefreshToken(consentData.getRefreshToken());
+                });
+
+            CreateConsentResponse createConsentResponse = bankingGatewayMapper.toCreateConsentResponse(consentResponse);
             createConsentResponse.setBankApiConsentData(sessionData);
 
             return createConsentResponse;
@@ -188,16 +192,14 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     @Override
     public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
         BgSessionData sessionData = (BgSessionData) bankApiConsentData;
-        String consentId = sessionData.getConsentId();
 
         try {
             AuthorizationCodeTO authorizationCodeTO = new AuthorizationCodeTO();
             authorizationCodeTO.setCode(authorisationCode);
             authorizationCodeTO.setBankCode(sessionData.getBankCode());
 
-            BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
-                sessionData);
-            OAuthToken token = bankingGatewayB2CAisApi.resolveAuthCodeUsingPOST(authorizationCodeTO, consentId);
+            BankingGatewayB2COAuthApi bankingGatewayB2COAuthApi = bankingGatewayB2COAuthApi(bankingGatewayBaseUrl);
+            OAuthToken token = bankingGatewayB2COAuthApi.resolveAuthCodeUsingPOST(authorizationCodeTO);
 
             Optional.ofNullable(token)
                 .map(OAuthToken::getAccessToken)
@@ -231,10 +233,10 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
 
     private MultibankingException toMultibankingException(ApiException e, MultibankingError multibankingError) {
         try {
-            Error400NGAIS messagesTO = ObjectMapperConfig.getObjectMapper().readValue(e.getResponseBody(),
-                Error400NGAIS.class);
+            MessagesTO messagesTO = ObjectMapperConfig.getObjectMapper().readValue(e.getResponseBody(),
+                MessagesTO.class);
             return new MultibankingException(multibankingError, e.getCode(),
-                bankingGatewayMapper.toMessages(messagesTO.getTppMessages()));
+                bankingGatewayMapper.toMessages(messagesTO.getMessageList()));
         } catch (Exception e2) {
             return new MultibankingException(BANKING_GATEWAY_ERROR, 500, e.getMessage());
         }

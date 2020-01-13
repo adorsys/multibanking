@@ -31,6 +31,7 @@ public class ConsentJpaEntity {
     private String id;
     private String authorisationId;
     private String redirectId;
+    private boolean temporary;
     private BankApi bankApi;
     private String psuAccountIban;
     @Lob

@@ -4,6 +4,7 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
 import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2CAisApi;
+import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2COAuthApi;
 import de.adorsys.multibanking.xs2a_adapter.api.AccountInformationServiceAisApi;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
@@ -17,25 +18,13 @@ public class ApiClientFactory {
 
     public static AccountInformationServiceAisApi accountInformationServiceAisApi(String baseUrl,
                                                                                   BgSessionData bgSessionData) {
-        return Optional.ofNullable(bgSessionData)
-            .map(BgSessionData::getAccessToken)
-            .map(token -> {
-                AccountInformationServiceAisApi aisApi = accountInformationServiceAisApi(baseUrl);
-                aisApi.getApiClient().setAccessToken(token);
-                return aisApi;
-            })
-            .orElseGet(() -> accountInformationServiceAisApi(baseUrl));
+        return accountInformationServiceAisApi(baseUrl, bgSessionData.getAccessToken());
     }
 
-    private static AccountInformationServiceAisApi accountInformationServiceAisApi(String baseUrl) {
+    private static AccountInformationServiceAisApi accountInformationServiceAisApi(String baseUrl, String accessToken) {
         AccountInformationServiceAisApi accountInformationServiceAisApi =
             new AccountInformationServiceAisApi(apiClientXs2aAdapter(baseUrl));
-        accountInformationServiceAisApi.getApiClient().getHttpClient().interceptors().clear();
-        accountInformationServiceAisApi.getApiClient().getHttpClient().interceptors().add(
-            new HttpLoggingInterceptor(log::debug)
-                .setLevel(HttpLoggingInterceptor.Level.BODY)
-        );
-        accountInformationServiceAisApi.getApiClient().getHttpClient().interceptors().add(new OkHttpCorrelationIdInterceptor());
+        accountInformationServiceAisApi.getApiClient().getHttpClient().interceptors().add(new OkHttpHeaderInterceptor(accessToken));
 
         return accountInformationServiceAisApi;
     }
@@ -74,26 +63,17 @@ public class ApiClientFactory {
         return apiClient;
     }
 
-    public static BankingGatewayB2CAisApi bankingGatewayB2CAisApi(String baseUrl, BgSessionData bgSessionData) {
-        return Optional.ofNullable(bgSessionData)
-            .map(BgSessionData::getAccessToken)
-            .map(token -> {
-                BankingGatewayB2CAisApi aisApi = bankingGatewayB2CAisApi(baseUrl);
-                aisApi.getApiClient().setAccessToken(token);
-                return aisApi;
-            })
-            .orElseGet(() -> bankingGatewayB2CAisApi(baseUrl));
+    public static BankingGatewayB2COAuthApi bankingGatewayB2COAuthApi(String baseUrl) {
+        return new BankingGatewayB2COAuthApi(apiClientBankingGateway(baseUrl));
     }
 
-    private static BankingGatewayB2CAisApi bankingGatewayB2CAisApi(String baseUrl) {
-        BankingGatewayB2CAisApi b2CAisApi = new BankingGatewayB2CAisApi(apiClientBankingGateway(baseUrl));
-        b2CAisApi.getApiClient().getHttpClient().interceptors().clear();
-        b2CAisApi.getApiClient().getHttpClient().interceptors().add(
-            new HttpLoggingInterceptor(log::debug)
-                .setLevel(HttpLoggingInterceptor.Level.BODY)
-        );
-        b2CAisApi.getApiClient().getHttpClient().interceptors().add(new OkHttpCorrelationIdInterceptor());
+    public static BankingGatewayB2CAisApi bankingGatewayB2CAisApi(String baseUrl, BgSessionData bgSessionData) {
+        return bankingGatewayB2CAisApi(baseUrl, bgSessionData != null ? bgSessionData.getAccessToken() : null);
+    }
 
+    private static BankingGatewayB2CAisApi bankingGatewayB2CAisApi(String baseUrl, String accessToken) {
+        BankingGatewayB2CAisApi b2CAisApi = new BankingGatewayB2CAisApi(apiClientBankingGateway(baseUrl));
+        b2CAisApi.getApiClient().getHttpClient().interceptors().add(new OkHttpHeaderInterceptor(accessToken));
         return b2CAisApi;
     }
 
@@ -104,8 +84,9 @@ public class ApiClientFactory {
     private static ApiClient apiClientBankingGateway(String baseUrl, String acceptHeader, String contentTypeHeader) {
         OkHttpClient client = new OkHttpClient();
         client.setReadTimeout(600, TimeUnit.SECONDS);
+
         client.interceptors().add(
-            new HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+            new HttpLoggingInterceptor(log::debug).setLevel(HttpLoggingInterceptor.Level.BODY)
         );
 
         ApiClient apiClient = new ApiClient() {

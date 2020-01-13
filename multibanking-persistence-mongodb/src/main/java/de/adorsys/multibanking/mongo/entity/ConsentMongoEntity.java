@@ -19,6 +19,7 @@ public class ConsentMongoEntity {
     private String authorisationId;
     @Indexed
     private String redirectId;
+    private boolean temporary;
     private BankApi bankApi;
     private String psuAccountIban;
     private Object bankApiConsentData;
