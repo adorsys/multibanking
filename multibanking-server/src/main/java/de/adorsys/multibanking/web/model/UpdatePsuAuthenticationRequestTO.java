@@ -1,19 +1,20 @@
 package de.adorsys.multibanking.web.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
+@Schema(name = "PSU authentication request")
 @Data
 public class UpdatePsuAuthenticationRequestTO {
 
     @NotBlank
-    @ApiModelProperty(value = "Password", required = true)
+    @Schema(description = "Password", required = true)
     private String psuId;
     private String psuCorporateId;
 
     @NotBlank
-    @ApiModelProperty(value = "Password", required = true)
+    @Schema(description = "Password", required = true)
     private String password;
 }

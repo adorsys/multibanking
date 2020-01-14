@@ -12,10 +12,9 @@ import de.adorsys.multibanking.service.PaymentService;
 import de.adorsys.multibanking.web.mapper.CredentialsMapper;
 import de.adorsys.multibanking.web.model.CredentialsTO;
 import io.micrometer.core.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Resource;
@@ -31,7 +30,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Timed("payment")
-@Api(tags = "Multibanking payment")
+@Tag(name = "Payment")
 @RequiredArgsConstructor
 @UserResource
 @RestController
@@ -45,12 +44,8 @@ public class PaymentController {
     private final Principal principal;
     private final CredentialsMapper credentialsMapper;
 
-    @ApiOperation(
-        value = "Read payment",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read payment", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{paymentId}")
     public Resource<SinglePaymentEntity> getPayment(@PathVariable String accessId, @PathVariable String accountId,
                                                     @PathVariable String paymentId) {
@@ -60,12 +55,8 @@ public class PaymentController {
         return mapToResource(accessId, accountId, paymentEntity);
     }
 
-    @ApiOperation(
-        value = "Create new payment",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Create new payment", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @PostMapping
     public HttpEntity<Void> createPayment(@PathVariable String accessId, @PathVariable String accountId,
                                           @RequestBody CreatePaymentRequest paymentRequest) {
@@ -84,12 +75,8 @@ public class PaymentController {
         return new ResponseEntity<>(headers, HttpStatus.CREATED);
     }
 
-    @ApiOperation(
-        value = "Submit payment",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Submit payment", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @PostMapping("/{paymentId}/submit")
     public HttpEntity<Void> submitPayment(@PathVariable String accessId, @PathVariable String accountId,
                                           @PathVariable String paymentId,

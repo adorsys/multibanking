@@ -1,23 +1,24 @@
 package de.adorsys.multibanking.web.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+@Schema(name = "Balances report")
 @Data
 public class BalancesReportTO {
 
-    @ApiModelProperty(value = "Ready account balance")
+    @Schema(description = "Ready account balance")
     private BalanceTO readyBalance;
 
-    @ApiModelProperty(value = "Unreleased account balance")
+    @Schema(description = "Unreleased account balance")
     private BalanceTO unreadyBalance;
 
-    @ApiModelProperty(value = "Credit balance")
+    @Schema(description = "Credit balance")
     private BalanceTO creditBalance;
 
-    @ApiModelProperty(value = "Available balance")
+    @Schema(description = "Available balance")
     private BalanceTO availableBalance;
 
-    @ApiModelProperty(value = "Used balance")
+    @Schema(description = "Used balance")
     private BalanceTO usedBalance;
 }

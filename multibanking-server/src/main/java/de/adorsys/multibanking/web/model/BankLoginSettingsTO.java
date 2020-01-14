@@ -1,9 +1,11 @@
 package de.adorsys.multibanking.web.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
 
+@Schema(name = "Bank login info")
 @Data
 public class BankLoginSettingsTO {
 

@@ -14,7 +14,11 @@ import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.*;
 import de.adorsys.multibanking.web.model.*;
 import io.micrometer.core.annotation.Timed;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +42,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Timed("direct-access2")
-@Api(tags = "Multibanking direct access v2")
+@Tag(name = "Direct access v2")
 @UserResource
 @RestController
 @Slf4j
@@ -62,11 +66,13 @@ public class DirectAccessControllerV2 {
     @Value("${threshold_temporaryData:15}")
     private Integer thresholdTemporaryData;
 
-    @ApiOperation(value = "read bank accounts")
-    @ApiResponses({
-        @ApiResponse(code = 201, message = "Accounts response", response = LoadBankAccountsResponse.class),
-        @ApiResponse(code = 202, message = "Challenge response", reference = "#/definitions/Resource" +
-            "«UpdateAuthResponseTO»")})
+    @Operation(description = "read bank accounts")
+    @ApiResponse(responseCode = "200", description = "Accounts response", content = {
+        @Content(schema = @Schema(implementation = LoadBankAccountsResponse.class))
+    })
+    @ApiResponse(responseCode = "202", description = "Challenge response", content = {
+        @Content(schema = @Schema(ref = "#/components/schemas/ResourceUpdateAuthResponseTO"))
+    })
     @PostMapping("/accounts")
     public ResponseEntity loadAccounts(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
                                        @RequestParam(required = false) BankApiTO bankApi) {
@@ -78,11 +84,13 @@ public class DirectAccessControllerV2 {
         }
     }
 
-    @ApiOperation(value = "read bookings")
-    @ApiResponses({
-        @ApiResponse(code = 201, message = "Bookings response", response = LoadBookingsResponse.class),
-        @ApiResponse(code = 202, message = "Challenge response", reference = "#/definitions/Resource" +
-            "«UpdateAuthResponseTO»")})
+    @Operation(description = "read bookings")
+    @ApiResponse(responseCode = "200", description = "Bookings response", content = {
+        @Content(schema = @Schema(implementation = LoadBookingsResponse.class))
+    })
+    @ApiResponse(responseCode = "202", description = "Challenge response", content = {
+        @Content(schema = @Schema(ref = "#/components/schemas/ResourceUpdateAuthResponseTO"))
+    })
     @PostMapping("/bookings")
     public ResponseEntity loadTransactions(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
                                            @RequestParam(required = false) BankApiTO bankApi) {
@@ -116,7 +124,7 @@ public class DirectAccessControllerV2 {
     }
 
     private ResponseEntity<LoadBookingsResponse> doLoadBookings(LoadBookingsRequest loadBookingsRequest,
-                                          BankApiTO bankApi) {
+                                                                BankApiTO bankApi) {
         log.debug("process start > load booking list");
         BankAccessEntity bankAccessEntity = getBankAccessEntity(loadBookingsRequest);
         BankAccountEntity bankAccountEntity = getBankAccountEntity(loadBookingsRequest, bankAccessEntity);
@@ -204,13 +212,13 @@ public class DirectAccessControllerV2 {
             authorisationId)).withSelfRel());
         links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
             authorisationId, null)).withRel("transactionAuthorisation"));
-        return ResponseEntity.ok(new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links));
+        return ResponseEntity.accepted().body(new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links));
     }
 
     @Data
     public static class LoadAccountsRequest {
         @NotNull
-        @ApiModelProperty("Bankaccess properties")
+        @Schema(description = "Bankaccess properties")
         BankAccessTO bankAccess;
     }
 
@@ -221,15 +229,15 @@ public class DirectAccessControllerV2 {
 
     @Data
     public static class LoadBookingsRequest {
-        @ApiModelProperty("Conditional: authorisation code, mandated if bank using oauth approcach")
+        @Schema(description = "Conditional: authorisation code, mandated if bank using oauth approcach")
         String authorisationCode;
-        @ApiModelProperty("Conditional: multibanking user id, mandated if bankaccess was created")
+        @Schema(description = "Conditional: multibanking user id, mandated if bankaccess was created")
         String userId;
-        @ApiModelProperty("Conditional: multibanking bank access id, mandated if bankaccess was created")
+        @Schema(description = "Conditional: multibanking bank access id, mandated if bankaccess was created")
         String accessId;
-        @ApiModelProperty("Conditional: multibanking bank account id, mandated if bankaccess was created")
+        @Schema(description = "Conditional: multibanking bank account id, mandated if bankaccess was created")
         String accountId;
-        @ApiModelProperty("Conditional: bankaccess properties, mandated if bankaccess was not created")
+        @Schema(description = "Conditional: bankaccess properties, mandated if bankaccess was not created")
         BankAccessTO bankAccess;
     }
 

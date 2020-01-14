@@ -1,7 +1,6 @@
 package de.adorsys.multibanking.web.model;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.hateoas.core.Relation;
 
@@ -10,42 +9,42 @@ import java.time.LocalDateTime;
 
 @Data
 @Relation(collectionRelation = "bankAccountList")
-@ApiModel(description = "The bank account object", value = "BankAccount")
+@Schema(name = "Bank account", description = "The bank account object")
 public class BankAccountTO {
 
     @NotNull
-    @ApiModelProperty(value = "Account ID")
+    @Schema(description = "Account ID")
     private String id;
-    @ApiModelProperty(value = "User ID")
+    @Schema(description = "User ID")
     private String userId;
     @NotNull
-    @ApiModelProperty(value = "Bank Access Id")
+    @Schema(description = "Bank Access Id")
     private String bankAccessId;
-    @ApiModelProperty(value = "Bank account balances")
+    @Schema(description = "Bank account balances")
     private BalancesReportTO balances;
-    @ApiModelProperty(value = "Name of the account owner", example = "EDEKA")
+    @Schema(description = "Name of the account owner", example = "EDEKA")
     private String owner;
-    @ApiModelProperty(value = "ISO-2 country of this bank account", example = "DE")
+    @Schema(description = "ISO-2 country of this bank account", example = "DE")
     private String country;
-    @ApiModelProperty(value = "Bank code", example = "29999999")
+    @Schema(description = "Bank code", example = "29999999")
     private String blz;
-    @ApiModelProperty(value = "Bank name", example = "Mock Bank")
+    @Schema(description = "Bank name", example = "Mock Bank")
     private String bankName;
-    @ApiModelProperty(value = "Account number", example = "1234567890")
+    @Schema(description = "Account number", example = "1234567890")
     private String accountNumber;
-    @ApiModelProperty(value = "Type of this bank account", example = "GIRO")
+    @Schema(description = "Type of this bank account", example = "GIRO")
     private BankAccountTypeTO type;
-    @ApiModelProperty(value = "Currency of this bank account", example = "EURO")
+    @Schema(description = "Currency of this bank account", example = "EURO")
     private String currency;
-    @ApiModelProperty(value = "Name of this bank account")
+    @Schema(description = "Name of this bank account")
     private String name;
-    @ApiModelProperty(value = "Bank identification code", example = "EDEKDEHHXXX")
+    @Schema(description = "Bank identification code", example = "EDEKDEHHXXX")
     private String bic;
-    @ApiModelProperty(value = "International bank account number", example = "DE50200907003443582071", required = true)
+    @Schema(description = "International bank account number", example = "DE50200907003443582071", required = true)
     private String iban;
-    @ApiModelProperty(value = "Synchronisation status", example = "PENDING")
+    @Schema(description = "Synchronisation status", example = "PENDING")
     private SyncStatusTO syncStatus;
-    @ApiModelProperty(value = "Last Synchronisation date", example = "2017-12-01")
+    @Schema(description = "Last Synchronisation date", example = "2017-12-01")
     private LocalDateTime lastSync;
 
     public enum SyncStatusTO {

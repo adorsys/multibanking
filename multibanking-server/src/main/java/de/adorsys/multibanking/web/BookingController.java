@@ -12,10 +12,9 @@ import de.adorsys.multibanking.web.mapper.BookingMapper;
 import de.adorsys.multibanking.web.model.BankApiTO;
 import de.adorsys.multibanking.web.model.BookingTO;
 import io.micrometer.core.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +36,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Timed("booking")
-@Api(tags = "Multibanking booking")
+@Tag(name = "Booking")
 @AllArgsConstructor
 @UserResource
 @RestController
@@ -53,12 +52,8 @@ public class BookingController {
     private final Principal principal;
 
     @SuppressWarnings("unchecked")
-    @ApiOperation(
-        value = "Read account bookings",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read account bookings", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
     public Resources<BookingTO> getBookings(@PathVariable String accessId,
                                             @PathVariable String accountId,
@@ -85,12 +80,8 @@ public class BookingController {
             });
     }
 
-    @ApiOperation(
-        value = "Read account bookings search index",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read account bookings search index", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/index")
     public Resource<BookingsIndexEntity> getBookingsIndex(@PathVariable String accessId,
                                                           @PathVariable String accountId) {
@@ -106,12 +97,8 @@ public class BookingController {
         return new Resource<>(bookingsIndexEntity);
     }
 
-    @ApiOperation(
-        value = "Download bookings",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Download bookings", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping(path = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public HttpEntity<String> downloadBookings(@PathVariable String accessId, @PathVariable String accountId) {
         checkBankAccountExists(accessId, accountId);
@@ -121,12 +108,8 @@ public class BookingController {
         return ResponseEntity.ok().body(bookingsAsCSV);
     }
 
-    @ApiOperation(
-        value = "Read booking",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read booking", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{bookingId}")
     public Resource<BookingTO> getBooking(@PathVariable String accessId, @PathVariable String accountId,
                                           @PathVariable String bookingId) {

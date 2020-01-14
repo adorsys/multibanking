@@ -6,10 +6,9 @@ import de.adorsys.multibanking.web.mapper.BankMapper;
 import de.adorsys.multibanking.web.model.BankTO;
 import de.adorsys.smartanalytics.exception.FileUploadException;
 import io.micrometer.core.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.Resources;
@@ -26,7 +25,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Timed("bank")
-@Api(tags = "Multibanking banks")
+@Tag(name = "Bank")
 @RequiredArgsConstructor
 @UserResource
 @RestController
@@ -36,24 +35,20 @@ public class BankController {
     private final BankMapper bankMapper;
     private final BankService bankService;
 
-    @ApiOperation("get bank by bank code")
+    @Operation(description = "get bank by bank code")
     @GetMapping(value = "/{bankCode}")
     public Resource<BankTO> getBank(@PathVariable String bankCode) {
         return mapToResource(bankService.findBank(bankCode));
     }
 
-    @ApiOperation("find bank")
+    @Operation(description = "find bank")
     @GetMapping
     public Resources<Resource<BankTO>> searchBank(@RequestParam String query) {
         return new Resources<>(mapToResources(bankService.search(query)));
     }
 
-    @ApiOperation(
-        value = "Upload banks configuration file",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Upload banks configuration file", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @PostMapping("/upload")
     public HttpEntity<Void> uploadBanks(@RequestParam MultipartFile banksFile) {
         if (!banksFile.isEmpty()) {

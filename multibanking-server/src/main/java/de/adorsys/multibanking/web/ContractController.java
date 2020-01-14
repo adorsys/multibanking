@@ -12,10 +12,9 @@ import de.adorsys.multibanking.pers.spi.repository.ContractRepositoryIf;
 import de.adorsys.multibanking.web.mapper.ContractMapper;
 import de.adorsys.multibanking.web.model.ContractTO;
 import io.micrometer.core.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +29,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Timed("contract")
-@Api(tags = "Multibanking contract")
+@Tag(name = "Contract")
 @RequiredArgsConstructor
 @UserResource
 @RestController
@@ -43,12 +42,8 @@ public class ContractController {
     private final BankAccountRepositoryIf bankAccountRepository;
     private final Principal principal;
 
-    @ApiOperation(
-        value = "Read account contracts",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read account contracts", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
     public Resources<ContractTO> getContracts(@PathVariable String accessId, @PathVariable String accountId) {
         if (!bankAccessRepository.exists(accessId)) {

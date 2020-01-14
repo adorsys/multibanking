@@ -13,7 +13,11 @@ import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.*;
 import de.adorsys.multibanking.web.model.*;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +42,8 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Deprecated
-@Api(tags = "Multibanking direct access")
+@Schema(deprecated = true)
+@Tag(name = "Direct access")
 @UserResource
 @RestController
 @Slf4j
@@ -62,9 +67,10 @@ public class DirectAccessController {
     @Value("${threshold_temporaryData:15}")
     private Integer thresholdTemporaryData;
 
-    @ApiOperation(value = "create challenge for accounts")
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "Response", response = UpdateAuthResponseTO.class)
+    @Operation(description = "create challenge for accounts")
+    @ApiResponse(responseCode = "200", content = {
+        @Content(schema = @Schema(implementation = UpdateAuthResponseTO.class)),
+        @Content(schema = @Schema(implementation = LoadBankAccountsResponse.class))
     })
     @PostMapping("/accounts")
     public ResponseEntity createHbciAccountsChallenge(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
@@ -77,18 +83,21 @@ public class DirectAccessController {
         }
     }
 
-    @ApiOperation(value = "Read bank accounts")
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "Response", response = UpdateAuthResponseTO.class)})
+    @Operation(description = "Read bank accounts")
+    @ApiResponse(responseCode = "200", content = {
+        @Content(schema = @Schema(implementation = LoadBankAccountsResponse.class))
+    })
     @PutMapping("/accounts")
     public ResponseEntity<LoadBankAccountsResponse> loadBankAccounts(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
                                                                      @RequestParam(required = false) BankApiTO bankApi) {
         return doLoadBankAccounts(loadAccountsRequest, bankApi, FINALISED);
     }
 
-    @ApiOperation(value = "create challenge for bookings")
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "Response", response = LoadBookingsResponse.class)})
+    @Operation(description = "create challenge for bookings")
+    @ApiResponse(responseCode = "200", content = {
+        @Content(schema = @Schema(implementation = UpdateAuthResponseTO.class)),
+        @Content(schema = @Schema(implementation = LoadBookingsResponse.class))
+    })
     @PostMapping("/bookings")
     public ResponseEntity createHbciBookingsChallenge(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
                                                       @RequestParam(required = false) BankApiTO bankApi) {
@@ -100,9 +109,10 @@ public class DirectAccessController {
         }
     }
 
-    @ApiResponses({
-        @ApiResponse(code = 200, message = "Response", response = LoadBookingsResponse.class)})
-    @ApiOperation(value = "Read account bookings")
+    @ApiResponse(responseCode = "200", content = {
+        @Content(schema = @Schema(implementation = LoadBookingsResponse.class))
+    })
+    @Operation(description = "Read account bookings")
     @PutMapping("/bookings")
     public ResponseEntity<LoadBookingsResponse> loadBookings(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,
                                                              @RequestParam(required = false) BankApiTO bankApi) {
@@ -225,7 +235,7 @@ public class DirectAccessController {
     @Data
     public static class LoadAccountsRequest {
         @NotNull
-        @ApiModelProperty("Bankaccess properties")
+        @Schema(description = "Bankaccess properties")
         BankAccessTO bankAccess;
     }
 
@@ -236,15 +246,15 @@ public class DirectAccessController {
 
     @Data
     public static class LoadBookingsRequest {
-        @ApiModelProperty("Conditional: authorisation code, mandated if bank using oauth approcach")
+        @Schema(description = "Conditional: authorisation code, mandated if bank using oauth approcach")
         String authorisationCode;
-        @ApiModelProperty("Conditional: multibanking user id, mandated if bankaccess was created")
+        @Schema(description = "Conditional: multibanking user id, mandated if bankaccess was created")
         String userId;
-        @ApiModelProperty("Conditional: multibanking bank access id, mandated if bankaccess was created")
+        @Schema(description = "Conditional: multibanking bank access id, mandated if bankaccess was created")
         String accessId;
-        @ApiModelProperty("Conditional: multibanking bank account id, mandated if bankaccess was created")
+        @Schema(description = "Conditional: multibanking bank account id, mandated if bankaccess was created")
         String accountId;
-        @ApiModelProperty("Conditional: bankaccess properties, mandated if bankaccess was not created")
+        @Schema(description = "Conditional: bankaccess properties, mandated if bankaccess was not created")
         BankAccessTO bankAccess;
     }
 

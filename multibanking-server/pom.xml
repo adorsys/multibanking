@@ -10,12 +10,11 @@
     <packaging>jar</packaging>
 
     <properties>
-        <smartanalytics.version>2.3.8</smartanalytics.version>
+        <smartanalytics.version>2.3.9</smartanalytics.version>
         <sts.version>0.26.0</sts.version>
-        <swagger.version>2.9.2</swagger.version>
         <mongobee.version>0.12</mongobee.version>
         <mongo-java-server.version>1.9.8</mongo-java-server.version>
-        <swagger-annotations.version>1.5.22</swagger-annotations.version>
+        <springdoc.version>1.2.26</springdoc.version>
     </properties>
 
     <dependencies>
@@ -29,6 +28,12 @@
             <groupId>de.adorsys.sts</groupId>
             <artifactId>sts-spring</artifactId>
             <version>${sts.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.swagger</groupId>
+                    <artifactId>swagger-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.adorsys.sts</groupId>
@@ -91,6 +96,12 @@
             <groupId>de.adorsys.smartanalytics</groupId>
             <artifactId>smartanalytics-core</artifactId>
             <version>${smartanalytics.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.swagger</groupId>
+                    <artifactId>swagger-annotations</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- monitoring -->
@@ -149,21 +160,23 @@
             <version>${org.mapstruct.version}</version>
         </dependency>
 
-        <!-- swagger -->
+        <!-- OpenAPI -->
+
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${swagger.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${swagger.version}</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-security</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>io.swagger</groupId>
+            <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
-            <version>${swagger-annotations.version}</version>
         </dependency>
 
         <!-- test -->

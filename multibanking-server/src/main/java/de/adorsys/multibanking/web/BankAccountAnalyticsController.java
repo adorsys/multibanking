@@ -12,10 +12,9 @@ import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.web.mapper.AnalyticsMapper;
 import de.adorsys.multibanking.web.model.AnalyticsTO;
 import io.micrometer.core.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 
 @Timed("analytics")
-@Api(tags = "Multibanking analytics")
+@Tag(name = "Analytics")
 @RequiredArgsConstructor
 @UserResource
 @RestController
@@ -39,12 +38,8 @@ public class BankAccountAnalyticsController {
     private final BankAccountRepositoryIf bankAccountRepository;
     private final Principal principal;
 
-    @ApiOperation(
-        value = "Read account analytics",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read account analytics", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
     public Resource<AnalyticsTO> getAccountAnalytics(@PathVariable String accessId,
                                                      @PathVariable String accountId) {

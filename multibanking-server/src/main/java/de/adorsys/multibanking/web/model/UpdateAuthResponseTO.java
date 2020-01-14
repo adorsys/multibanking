@@ -1,27 +1,28 @@
 package de.adorsys.multibanking.web.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
 
+@Schema(name = "Consent authorisation response")
 @Data
 public class UpdateAuthResponseTO {
 
-    @ApiModelProperty(value = "This data element might be contained, if SCA is required and if the PSU has a choice " +
+    @Schema(description = "This data element might be contained, if SCA is required and if the PSU has a choice " +
         "between different authentication methods. These methods shall be presented towards the PSU for selection by " +
         "the TPP.")
     private List<TanTransportTypeTO> scaMethods;
 
     private ScaStatusTO scaStatus;
 
-    @ApiModelProperty(value = "It is contained in addition to the data element " +
+    @Schema(description = "It is contained in addition to the data element " +
         "'chosenScaMethod' if challenge data is needed for SCA.")
     private ChallengeDataTO challenge;
 
-    @ApiModelProperty(value = "Text to be displayed to the PSU")
+    @Schema(description = "Text to be displayed to the PSU")
     private String psuMessage;
 
-    @ApiModelProperty(value = "Type of sca approach to identify challenge handling")
+    @Schema(description = "Type of sca approach to identify challenge handling")
     private ScaApproachTO scaApproach;
 }

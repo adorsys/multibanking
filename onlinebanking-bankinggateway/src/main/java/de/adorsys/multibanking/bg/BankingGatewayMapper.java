@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static de.adorsys.multibanking.domain.BankAccountType.fromXS2AType;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Mapper
 interface BankingGatewayMapper {
@@ -93,6 +94,10 @@ interface BankingGatewayMapper {
 
     default BankAccountType getAccounType(String cashAccountType) {
         return fromXS2AType(cashAccountType);
+    }
+
+    default String byteToString(byte[] value) {
+        return new String(value, UTF_8);
     }
 
     List<Booking> toBookings(List<TransactionDetails> transactionDetails);

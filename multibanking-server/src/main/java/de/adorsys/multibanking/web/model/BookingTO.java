@@ -1,7 +1,6 @@
 package de.adorsys.multibanking.web.model;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.ToString;
 import org.springframework.hateoas.core.Relation;
@@ -11,83 +10,82 @@ import java.time.LocalDate;
 
 @Data
 @Relation(collectionRelation = "bookingList")
-@ApiModel(description = "Single bank booking", value = "Booking")
+@Schema(name = "Bank", description = "Single bank booking")
 public class BookingTO {
 
-    @ApiModelProperty(value = "Booking ID")
+    @Schema(description = "Booking ID")
     private String id;
 
     @ToString.Include
-    @ApiModelProperty(value = "External ID of this booking")
+    @Schema(description = "External ID of this booking")
     private String externalId;
 
-    @ApiModelProperty(value = "Opposite bank account")
+    @Schema(description = "Opposite bank account")
     private BankAccountTO otherAccount;
 
-    @ApiModelProperty(value = "Date on which the transaction gets effective", example = "2018-02-28")
+    @Schema(description = "Date on which the transaction gets effective", example = "2018-02-28")
     private LocalDate valutaDate;
 
-    @ApiModelProperty(value = "Booking date", example = "2018-02-28")
+    @Schema(description = "Booking date", example = "2018-02-28")
     private LocalDate bookingDate;
 
-    @ApiModelProperty(value = "Target amount", example = "-19.93")
+    @Schema(description = "Target amount", example = "-19.93")
     private BigDecimal amount;
 
-    @ApiModelProperty(value = "Currency", example = "EUR")
+    @Schema(description = "Currency", example = "EUR")
     private String currency;
 
-    @ApiModelProperty(value = "Does this reverses a preexisting booking", example = "false")
+    @Schema(description = "Does this reverses a preexisting booking", example = "false")
     private boolean reversal;
 
-    @ApiModelProperty(value = "Account balance after this booking", example = "1849.1")
+    @Schema(description = "Account balance after this booking", example = "1849.1")
     private BigDecimal balance;
 
-    @ApiModelProperty(value = "Reference of the opposite party", example = "NONREF")
+    @Schema(description = "Reference of the opposite party", example = "NONREF")
     private String customerRef;
 
-    @ApiModelProperty(value = "Reference of the corresponding institution")
+    @Schema(description = "Reference of the corresponding institution")
     private String instRef;
 
-    @ApiModelProperty(value = "Original value", example = "-19.93")
+    @Schema(description = "Original value", example = "-19.93")
     private BigDecimal origValue;
 
-    @ApiModelProperty(value = "Charge value", example = "-19.93")
+    @Schema(description = "Charge value", example = "-19.93")
     private BigDecimal chargeValue;
 
-    @ApiModelProperty(value = "Transaction information", example = "KARTENZAHLUNG")
+    @Schema(description = "Transaction information", example = "KARTENZAHLUNG")
     private String text;
 
-    @ApiModelProperty(value = "Additional transaction information", example = "KARTENZAHLUNG")
+    @Schema(description = "Additional transaction information", example = "KARTENZAHLUNG")
     private String additional;
 
-    @ApiModelProperty(value = "Primanota")
+    @Schema(description = "Primanota")
     private String primanota;
 
-    @ApiModelProperty(value = "Usage of this transaction", example = "Svwz+2018-02-27t11.47.44 Karte3 2020-12 " +
+    @Schema(description = "Usage of this transaction", example = "Svwz+2018-02-27t11.47.44 Karte3 2020-12 " +
         "Abwa+6850 Edeka//Nuernberg/De")
     private String usage;
 
-    @ApiModelProperty
     private String addkey;
 
-    @ApiModelProperty(value = "Is this a SEPA transaction", example = "true")
+    @Schema(description = "Is this a SEPA transaction", example = "true")
     private boolean sepa;
 
-    @ApiModelProperty(value = "Is this a standing order transaction", example = "false")
+    @Schema(description = "Is this a standing order transaction", example = "false")
     private boolean standingOrder;
 
-    @ApiModelProperty(value = "Creditor ID", example = "5aab866d31a02a0001f72cd5")
+    @Schema(description = "Creditor ID", example = "5aab866d31a02a0001f72cd5")
     private String creditorId;
 
-    @ApiModelProperty(value = "Reference for the SEPA mandate")
+    @Schema(description = "Reference for the SEPA mandate")
     private String mandateReference;
 
-    @ApiModelProperty(value = "Origin of this booking", example = "MOCK")
+    @Schema(description = "Origin of this booking", example = "MOCK")
     private BankApiTO bankApi;
 
-    @ApiModelProperty(value = "Category of this booking")
+    @Schema(description = "Category of this booking")
     private BookingCategoryTO bookingCategory;
 
-    @ApiModelProperty(value = "Transaction type as DTA Tx Key code", example = "4")
+    @Schema(description = "Transaction type as DTA Tx Key code", example = "4")
     private String transactionCode;
 }

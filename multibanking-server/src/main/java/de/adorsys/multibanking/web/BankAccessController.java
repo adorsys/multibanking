@@ -12,7 +12,12 @@ import de.adorsys.multibanking.web.mapper.BankAccessMapper;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
 import de.adorsys.multibanking.web.model.BankAccessTO;
 import io.micrometer.core.annotation.Timed;
-import io.swagger.annotations.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Link;
@@ -33,7 +38,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Timed("bank-access")
-@Api(tags = "Multibanking bankaccess")
+@Tag(name = "Bankaccess")
 @RequiredArgsConstructor
 @Slf4j
 @UserResource
@@ -49,16 +54,14 @@ public class BankAccessController {
     private final ConsentAuthorisationMapper consentAuthorisationMapper;
     private final Principal principal;
 
-    @ApiOperation(
-        value = "Create new bank access",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
-    @ApiResponses({
-        @ApiResponse(code = 201, message = "Created bank access", reference = "#/definitions/Resource«BankAccess»"),
-        @ApiResponse(code = 202, message = "Challenge response", reference = "#/definitions/Resource" +
-            "«UpdateAuthResponseTO»")})
+    @Operation(description = "Create new bank access", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
+    @ApiResponse(responseCode = "201", description = "Created bank access", content = {
+        @Content(schema = @Schema(ref = "#/components/schemas/ResourceBankAccess"))
+    })
+    @ApiResponse(responseCode = "202", description = "Challenge response", content = {
+        @Content(schema = @Schema(ref = "#/components/schemas/ResourceUpdateAuthResponseTO"))
+    })
     @PostMapping
     public ResponseEntity createBankAccess(@RequestBody BankAccessTO bankAccess) {
         Consent consent = consentService.getConsent(bankAccess.getConsentId());
@@ -80,12 +83,8 @@ public class BankAccessController {
         }
     }
 
-    @ApiOperation(
-        value = "Read bank accesses",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read bank accesses", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
     public Resources<Resource<BankAccessTO>> getBankAccesses() {
         if (!userRepository.exists(principal.getName())) {
@@ -96,12 +95,8 @@ public class BankAccessController {
         return new Resources<>(mapToResources(accessEntities));
     }
 
-    @ApiOperation(
-        value = "Read bank access",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read bank access", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{accessId}")
     public Resource<BankAccessTO> getBankAccess(@PathVariable String accessId) {
         BankAccessEntity bankAccessEntity = bankAccessRepository.findByUserIdAndId(principal.getName(), accessId)
@@ -110,12 +105,8 @@ public class BankAccessController {
         return mapToResource(bankAccessEntity);
     }
 
-    @ApiOperation(
-        value = "Update bank access",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Update bank access", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @PutMapping("/{accessId}")
     public HttpEntity<Void> updateBankAccess(@PathVariable String accessId,
                                              @RequestBody BankAccessTO bankAccess) {
@@ -126,12 +117,8 @@ public class BankAccessController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @ApiOperation(
-        value = "Delete bank accesses",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Delete bank accesses", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @DeleteMapping("/{accessId}")
     public HttpEntity<Void> deleteBankAccess(@PathVariable String accessId) {
         if (bankAccessService.deleteBankAccess(principal.getName(), accessId)) {

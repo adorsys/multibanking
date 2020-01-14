@@ -1,10 +1,12 @@
 package de.adorsys.multibanking.web.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.hateoas.core.Relation;
 
 import java.math.BigDecimal;
 
+@Schema(name = "Contract")
 @Relation(collectionRelation = "contractList")
 @Data
 public class ContractTO {
