@@ -5,7 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
-@Schema(name = "PSU authentication request")
+@Schema(name = "PsuAuthentication")
 @Data
 public class UpdatePsuAuthenticationRequestTO {
 

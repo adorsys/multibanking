@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.util.Map;
 import java.util.Set;
 
-@Schema(name = "Booking category")
+@Schema(name = "BookingCategory")
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor

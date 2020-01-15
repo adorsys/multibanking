@@ -18,7 +18,7 @@ package de.adorsys.multibanking.web.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(name = "SCA status")
+@Schema(name = "ScaStatus")
 public enum ScaStatusTO {
 
     RECEIVED, STARTED, PSUIDENTIFIED, PSUAUTHENTICATED, SCAMETHODSELECTED, FINALISED, FAILED, EXEMPTED

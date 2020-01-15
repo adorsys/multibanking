@@ -33,332 +33,6 @@
     }
   ],
   "paths": {
-    "/v1/consents/{consentId}/authorisations/{authorisationId}/updatePsuAuthentication": {
-      "put": {
-        "tags": [
-          "AIS"
-        ],
-        "description": "Update authorisation (authenticate user)",
-        "operationId": "updatePsuAuthentication",
-        "parameters": [
-          {
-            "name": "consentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authorisationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePsuAuthenticationRequestTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "default response",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResourceUpdateAuthResponseTO"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bg_auth": [
-              "openid"
-            ]
-          }
-        ]
-      }
-    },
-    "/v1/consents/{consentId}/authorisations/{authorisationId}/selectPsuAuthenticationMethod": {
-      "put": {
-        "tags": [
-          "AIS"
-        ],
-        "description": "Update authorisation (select SCA method)",
-        "operationId": "selectPsuAuthenticationMethod",
-        "parameters": [
-          {
-            "name": "consentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authorisationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SelectPsuAuthenticationMethodRequestTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "default response",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResourceUpdateAuthResponseTO"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bg_auth": [
-              "openid"
-            ]
-          }
-        ]
-      }
-    },
-    "/v1/consents/{consentId}/authorisations/{authorisationId}/transactionAuthorisation": {
-      "put": {
-        "tags": [
-          "AIS"
-        ],
-        "description": "Update authorisation (authorize transaction)",
-        "operationId": "transactionAuthorisation",
-        "parameters": [
-          {
-            "name": "consentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authorisationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TransactionAuthorisationRequestTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "default response",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResourceUpdateAuthResponseTO"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bg_auth": [
-              "openid"
-            ]
-          }
-        ]
-      }
-    },
-    "/v1/consents/{consentId}/authorisations/{authorisationId}": {
-      "get": {
-        "tags": [
-          "AIS"
-        ],
-        "description": "Get consent authorisation status",
-        "operationId": "getConsentAuthorisationStatus",
-        "parameters": [
-          {
-            "name": "consentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "authorisationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "default response",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/ResourceUpdateAuthResponseTO"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bg_auth": [
-              "openid"
-            ]
-          }
-        ]
-      }
-    },
-    "/v1/ais/consents/{consentId}/status": {
-      "get": {
-        "tags": [
-          "AIS"
-        ],
-        "description": "Get AIS consent status by consent id",
-        "operationId": "getConsentStatus",
-        "parameters": [
-          {
-            "name": "consentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "default response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "RECEIVED",
-                    "REJECTED",
-                    "VALID",
-                    "REVOKEDBYPSU",
-                    "EXPIRED",
-                    "TERMINATEDBYTPP",
-                    "TERMINATED_BY_ASPSP",
-                    "PARTIALLY_AUTHORISED"
-                  ]
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bg_auth": [
-              "openid"
-            ]
-          }
-        ]
-      }
-    },
-    "/v1/ais/consents/{consentId}": {
-      "get": {
-        "tags": [
-          "AIS"
-        ],
-        "description": "Get AIS consent by consent id",
-        "operationId": "getConsent",
-        "parameters": [
-          {
-            "name": "consentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "default response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ConsentTO"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bg_auth": [
-              "openid"
-            ]
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "AIS"
-        ],
-        "description": "Revoke consent by consent id",
-        "operationId": "revokeConsent",
-        "parameters": [
-          {
-            "name": "consentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "default response"
-          }
-        },
-        "security": [
-          {
-            "bg_auth": [
-              "openid"
-            ]
-          }
-        ]
-      }
-    },
     "/v1/ais/consents": {
       "post": {
         "tags": [
@@ -427,6 +101,652 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ]
+      }
+    },
+    "/v1/ais/consents/{consentId}": {
+      "get": {
+        "tags": [
+          "AIS"
+        ],
+        "description": "Get AIS consent by consent id",
+        "operationId": "getConsent",
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "AIS"
+        ],
+        "description": "Revoke consent by consent id",
+        "operationId": "revokeConsent",
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "default response"
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ]
+      }
+    },
+    "/v1/ais/consents/{consentId}/status": {
+      "get": {
+        "tags": [
+          "AIS"
+        ],
+        "description": "Get AIS consent status by consent id",
+        "operationId": "getConsentStatus",
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "default response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "RECEIVED",
+                    "REJECTED",
+                    "VALID",
+                    "REVOKEDBYPSU",
+                    "EXPIRED",
+                    "TERMINATEDBYTPP",
+                    "TERMINATED_BY_ASPSP",
+                    "PARTIALLY_AUTHORISED"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ]
+      }
+    },
+    "/v1/consents/{consentId}/authorisations/{authorisationId}": {
+      "get": {
+        "tags": [
+          "AIS"
+        ],
+        "description": "Get consent authorisation status",
+        "operationId": "getConsentAuthorisationStatus",
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceUpdateAuthResponseTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ]
+      }
+    },
+    "/v1/consents/{consentId}/authorisations/{authorisationId}/selectPsuAuthenticationMethod": {
+      "put": {
+        "tags": [
+          "AIS"
+        ],
+        "description": "Update authorisation (select SCA method)",
+        "operationId": "selectPsuAuthenticationMethod",
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectPsuAuthenticationMethodRequestTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceUpdateAuthResponseTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ]
+      }
+    },
+    "/v1/consents/{consentId}/authorisations/{authorisationId}/transactionAuthorisation": {
+      "put": {
+        "tags": [
+          "AIS"
+        ],
+        "description": "Update authorisation (authorize transaction)",
+        "operationId": "transactionAuthorisation",
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TransactionAuthorisationRequestTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceUpdateAuthResponseTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bg_auth": [
+              "openid"
+            ]
+          }
+        ]
+      }
+    },
+    "/v1/consents/{consentId}/authorisations/{authorisationId}/updatePsuAuthentication": {
+      "put": {
+        "tags": [
+          "AIS"
+        ],
+        "description": "Update authorisation (authenticate user)",
+        "operationId": "updatePsuAuthentication",
+        "parameters": [
+          {
+            "name": "consentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "authorisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePsuAuthenticationRequestTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourceUpdateAuthResponseTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -464,6 +784,117 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/payments/{paymentId}": {
+      "get": {
+        "tags": [
+          "PIS"
+        ],
+        "description": "Get payment information",
+        "operationId": "getPayment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResourcePaymentDataTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -475,13 +906,13 @@
         ]
       }
     },
-    "/v1/payments/{paymentId}/authorisations/{authorisationId}/updatePsuAuthentication": {
-      "put": {
+    "/v1/payments/{paymentId}/authorisations/{authorisationId}": {
+      "get": {
         "tags": [
           "PIS"
         ],
-        "description": "Update authorisation (authenticate user)",
-        "operationId": "updatePsuAuthentication_1",
+        "description": "Get payment authorisation status",
+        "operationId": "getPaymentAuthorisationStatus",
         "parameters": [
           {
             "name": "paymentId",
@@ -500,15 +931,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdatePsuAuthenticationRequestTO"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "default response",
@@ -516,6 +938,46 @@
               "*/*": {
                 "schema": {
                   "$ref": "#/components/schemas/ResourceUpdateAuthResponseTO"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
                 }
               }
             }
@@ -574,6 +1036,46 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -629,6 +1131,46 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -640,13 +1182,13 @@
         ]
       }
     },
-    "/v1/payments/{paymentId}/authorisations/{authorisationId}": {
-      "get": {
+    "/v1/payments/{paymentId}/authorisations/{authorisationId}/updatePsuAuthentication": {
+      "put": {
         "tags": [
           "PIS"
         ],
-        "description": "Get payment authorisation status",
-        "operationId": "getPaymentAuthorisationStatus",
+        "description": "Update authorisation (authenticate user)",
+        "operationId": "updatePsuAuthentication_1",
         "parameters": [
           {
             "name": "paymentId",
@@ -665,6 +1207,15 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePsuAuthenticationRequestTO"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "default response",
@@ -675,41 +1226,43 @@
                 }
               }
             }
-          }
-        },
-        "security": [
-          {
-            "bg_auth": [
-              "openid"
-            ]
-          }
-        ]
-      }
-    },
-    "/v1/payments/{paymentId}": {
-      "get": {
-        "tags": [
-          "PIS"
-        ],
-        "description": "Get payment information",
-        "operationId": "getPayment",
-        "parameters": [
-          {
-            "name": "paymentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
+          },
+          "400": {
             "description": "default response",
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ResourcePaymentDataTO"
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "405": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessagesTO"
                 }
               }
             }
@@ -727,6 +1280,48 @@
   },
   "components": {
     "schemas": {
+      "MessageTO": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "ERROR",
+              "WARNING",
+              "INFO"
+            ]
+          },
+          "field": {
+            "type": "string"
+          },
+          "renderedMessage": {
+            "type": "string"
+          },
+          "paramsMap": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "MessagesTO": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string"
+          },
+          "messageList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageTO"
+            }
+          }
+        }
+      },
       "UpdatePsuAuthenticationRequestTO": {
         "required": [
           "password"

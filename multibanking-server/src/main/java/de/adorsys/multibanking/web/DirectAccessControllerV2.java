@@ -71,7 +71,7 @@ public class DirectAccessControllerV2 {
         @Content(schema = @Schema(implementation = LoadBankAccountsResponse.class))
     })
     @ApiResponse(responseCode = "202", description = "Challenge response", content = {
-        @Content(schema = @Schema(ref = "#/components/schemas/ResourceUpdateAuthResponseTO"))
+        @Content(schema = @Schema(ref = "#/components/schemas/ResourceConsentAuthorisationResponse"))
     })
     @PostMapping("/accounts")
     public ResponseEntity loadAccounts(@Valid @RequestBody LoadAccountsRequest loadAccountsRequest,
@@ -89,7 +89,7 @@ public class DirectAccessControllerV2 {
         @Content(schema = @Schema(implementation = LoadBookingsResponse.class))
     })
     @ApiResponse(responseCode = "202", description = "Challenge response", content = {
-        @Content(schema = @Schema(ref = "#/components/schemas/ResourceUpdateAuthResponseTO"))
+        @Content(schema = @Schema(ref = "#/components/schemas/ResourceConsentAuthorisationResponse"))
     })
     @PostMapping("/bookings")
     public ResponseEntity loadTransactions(@Valid @RequestBody LoadBookingsRequest loadBookingsRequest,

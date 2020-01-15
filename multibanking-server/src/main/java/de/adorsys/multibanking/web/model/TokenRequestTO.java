@@ -5,7 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
-@Schema(name = "Token request")
+@Schema(name = "TokenRequest")
 @Data
 public class TokenRequestTO {
 

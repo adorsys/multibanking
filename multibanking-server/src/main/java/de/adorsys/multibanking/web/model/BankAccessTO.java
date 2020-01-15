@@ -7,7 +7,7 @@ import org.springframework.hateoas.core.Relation;
 import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
 
 @Data
-@Schema(description = "BankAccess information", name = "Bankaccess")
+@Schema(name = "BankAccess", description = "Bank access information")
 @Relation(collectionRelation = "bankAccessList")
 public class BankAccessTO {
 

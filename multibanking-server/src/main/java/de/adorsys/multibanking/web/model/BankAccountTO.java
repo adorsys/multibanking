@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Relation(collectionRelation = "bankAccountList")
-@Schema(name = "Bank account", description = "The bank account object")
+@Schema(name = "BankAccount", description = "The bank account object")
 public class BankAccountTO {
 
     @NotNull

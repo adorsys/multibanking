@@ -88,7 +88,7 @@ public class BankAccountController {
         @Content(schema = @Schema(implementation = void.class))
     })
     @ApiResponse(responseCode = "202", description = "Challenge response", content = {
-        @Content(schema = @Schema(ref = "#/components/schemas/ResourceUpdateAuthResponseTO"))
+        @Content(schema = @Schema(ref = "#/components/schemas/ResourceConsentAuthorisationResponse"))
     })
     @PutMapping("/{accountId}/sync")
     public ResponseEntity syncBookings(@PathVariable String accessId, @PathVariable String accountId) {

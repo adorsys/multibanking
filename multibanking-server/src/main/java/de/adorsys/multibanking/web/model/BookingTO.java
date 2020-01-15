@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Data
 @Relation(collectionRelation = "bookingList")
-@Schema(name = "Bank", description = "Single bank booking")
+@Schema(name = "Booking", description = "Single bank booking")
 public class BookingTO {
 
     @Schema(description = "Booking ID")

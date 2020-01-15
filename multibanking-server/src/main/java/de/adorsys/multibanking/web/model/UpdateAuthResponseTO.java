@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 
-@Schema(name = "Consent authorisation response")
+@Schema(name = "ConsentAuthorisationResponse")
 @Data
 public class UpdateAuthResponseTO {
 

@@ -21,6 +21,7 @@ import de.adorsys.multibanking.web.model.TransactionAuthorisationRequestTO;
 import de.adorsys.multibanking.web.model.UpdatePsuAuthenticationRequestTO;
 import lombok.RequiredArgsConstructor;
 import org.iban4j.Iban;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -231,6 +232,7 @@ public class ConsentService {
             bankingServiceProducer.getBankingService(Iban.valueOf(iban).getBankCode());
     }
 
+    //TODO refactor validation, check for missing inputs like pin, scamethod, tan
     ConsentEntity validateAndGetConsent(OnlineBankingService onlineBankingService, String consentId,
                                         ScaStatus expectedConsentStatus) {
         ConsentEntity internalConsent = consentRepository.findById(consentId)
@@ -239,7 +241,6 @@ public class ConsentService {
         try {
             onlineBankingService.getStrongCustomerAuthorisation().validateConsent(internalConsent.getId(),
                 internalConsent.getAuthorisationId(), expectedConsentStatus, internalConsent.getBankApiConsentData());
-
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
                 case INVALID_SCA_METHOD:

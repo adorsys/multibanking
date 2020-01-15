@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-@Schema(name = "Booking period")
+@Schema(name = "BookingPeriod")
 @Data
 public class BookingPeriodTO {
 

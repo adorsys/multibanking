@@ -6,7 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Schema(name = "Booking group")
+@Schema(name = "BookingGroup")
 @Data
 public class BookingGroupTO {
 

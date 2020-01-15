@@ -18,7 +18,7 @@ package de.adorsys.multibanking.web.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "The banking access backend")
+@Schema(name = "BankApi", description = "The banking access backend")
 public enum BankApiTO {
     HBCI, FIGO, FINAPI, XS2A, FIGO_ALTERNATIVE, ING
 }

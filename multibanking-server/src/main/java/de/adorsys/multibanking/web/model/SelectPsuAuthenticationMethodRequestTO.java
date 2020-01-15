@@ -5,7 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
-@Schema(name = "Select SCA method request")
+@Schema(name = "SelectScaMethod")
 @Data
 public class SelectPsuAuthenticationMethodRequestTO {
     @Schema(description = "An identification provided by the ASPSP for the later identification of the " +

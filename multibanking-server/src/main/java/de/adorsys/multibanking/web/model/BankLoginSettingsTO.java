@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 
-@Schema(name = "Bank login info")
+@Schema(name = "BankLoginInfo")
 @Data
 public class BankLoginSettingsTO {
 

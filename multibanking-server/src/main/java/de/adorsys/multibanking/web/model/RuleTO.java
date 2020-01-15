@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.springframework.hateoas.core.Relation;
 
-@Schema(name = "Analytics rule")
+@Schema(name = "AnalyticsRule")
 @Relation(collectionRelation = "ruleList")
 @Data
 public class RuleTO {

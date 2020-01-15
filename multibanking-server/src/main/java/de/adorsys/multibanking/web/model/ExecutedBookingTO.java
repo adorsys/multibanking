@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.time.LocalDate;
 
-@Schema(name = "Executed Booking")
+@Schema(name = "ExecutedBooking")
 @Data
 public class ExecutedBookingTO {
 

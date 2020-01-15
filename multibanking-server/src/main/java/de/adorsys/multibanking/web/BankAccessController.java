@@ -60,7 +60,7 @@ public class BankAccessController {
         @Content(schema = @Schema(ref = "#/components/schemas/ResourceBankAccess"))
     })
     @ApiResponse(responseCode = "202", description = "Challenge response", content = {
-        @Content(schema = @Schema(ref = "#/components/schemas/ResourceUpdateAuthResponseTO"))
+        @Content(schema = @Schema(ref = "#/components/schemas/ResourceConsentAuthorisationResponse"))
     })
     @PostMapping
     public ResponseEntity createBankAccess(@RequestBody BankAccessTO bankAccess) {

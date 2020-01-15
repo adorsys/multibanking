@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Schema(name = "Account reference")
+@Schema(name = "Accountreference")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
