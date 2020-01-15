@@ -8,9 +8,10 @@ import de.adorsys.multibanking.domain.request.UpdatePsuAuthenticationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.exception.MissingConsentAuthorisationSelectionException;
+import de.adorsys.multibanking.exception.MissingScaMethodSelectionException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.exception.TransactionAuthorisationRequiredException;
+import de.adorsys.multibanking.metrics.MetricsCollector;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
 import de.adorsys.multibanking.web.mapper.ConsentMapper;
@@ -20,6 +21,7 @@ import de.adorsys.multibanking.web.model.TransactionAuthorisationRequestTO;
 import de.adorsys.multibanking.web.model.UpdatePsuAuthenticationRequestTO;
 import lombok.RequiredArgsConstructor;
 import org.iban4j.Iban;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -33,25 +35,39 @@ public class ConsentService {
     private final ConsentAuthorisationMapper consentAuthorisationMapper;
     private final ConsentMapper consentMapper;
     private final BankService bankService;
+    private final MetricsCollector metricsCollector;
 
     public CreateConsentResponse createConsent(Consent consent, String tppRedirectUri, BankApi bankApi) {
-        Object bankApiConsentData = Optional.ofNullable(consent.getConsentId())
+        ConsentEntity tempConsentEntity = Optional.ofNullable(consent.getConsentId())
             .flatMap(consentRepository::findById)
-            .map(ConsentEntity::getBankApiConsentData)
             .orElse(null);
 
         OnlineBankingService onlineBankingService = getOnlineBankingService(bankApi, consent.getPsuAccountIban());
         BankEntity bank = bankService.findBank(Iban.valueOf(consent.getPsuAccountIban()).getBankCode());
-        CreateConsentResponse createConsentResponse =
-            onlineBankingService.getStrongCustomerAuthorisation().createConsent(consent, bank.isRedirectPreferred(),
-                tppRedirectUri, bankApiConsentData);
-        createConsentResponse.setRedirectId(consent.getRedirectId());
 
-        ConsentEntity consentEntity = consentMapper.toConsentEntity(createConsentResponse, consent.getRedirectId(),
-            consent.getPsuAccountIban(), onlineBankingService.bankApi());
-        consentRepository.save(consentEntity);
+        try {
+            CreateConsentResponse createConsentResponse =
+                onlineBankingService.getStrongCustomerAuthorisation().createConsent(consent, bank.isRedirectPreferred(),
+                    tppRedirectUri, tempConsentEntity != null ? tempConsentEntity.getBankApiConsentData() : null);
+            createConsentResponse.setRedirectId(consent.getRedirectId());
 
-        return createConsentResponse;
+            if (tempConsentEntity != null) { //remove temporary created (oauth prestep required) consent entity
+                consentRepository.delete(tempConsentEntity);
+            }
+
+            ConsentEntity consentEntity = consentMapper.toConsentEntity(createConsentResponse, consent.getRedirectId(),
+                consent.getPsuAccountIban(), onlineBankingService.bankApi());
+
+            consentEntity.setTemporary(createConsentResponse.getConsentId() == null);
+            consentRepository.save(consentEntity);
+
+            metricsCollector.count("createConsent", bank.getBankCode(), onlineBankingService.bankApi());
+
+            return createConsentResponse;
+        } catch (Exception e) {
+            metricsCollector.count("createConsent", bank.getBankCode(), onlineBankingService.bankApi(), e);
+            throw e;
+        }
     }
 
     public UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequestTO, String consentId) {
@@ -66,12 +82,20 @@ public class ConsentService {
             consentAuthorisationMapper.toUpdatePsuAuthenticationRequest(updatePsuAuthenticationRequestTO,
                 internalConsent, bank);
 
-        UpdateAuthResponse response =
-            onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequest);
+        try {
+            UpdateAuthResponse response =
+                onlineBankingService.getStrongCustomerAuthorisation().updatePsuAuthentication(updatePsuAuthenticationRequest);
 
-        internalConsent.setBankApiConsentData(updatePsuAuthenticationRequest.getBankApiConsentData());
-        consentRepository.save(internalConsent);
-        return response;
+            internalConsent.setBankApiConsentData(updatePsuAuthenticationRequest.getBankApiConsentData());
+            consentRepository.save(internalConsent);
+
+            metricsCollector.count("updatePsuAuthentication", bank.getBankCode(), onlineBankingService.bankApi());
+
+            return response;
+        } catch (Exception e) {
+            metricsCollector.count("updatePsuAuthentication", bank.getBankCode(), onlineBankingService.bankApi(), e);
+            throw e;
+        }
     }
 
     public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequestTO selectPsuAuthenticationMethodRequestTO, String consentId) {
@@ -85,11 +109,22 @@ public class ConsentService {
             consentAuthorisationMapper.toSelectPsuAuthenticationMethodRequest(selectPsuAuthenticationMethodRequestTO,
                 internalConsent);
 
-        UpdateAuthResponse response =
-            onlineBankingService.getStrongCustomerAuthorisation().selectPsuAuthenticationMethod(selectPsuAuthenticationMethodRequest);
-        internalConsent.setBankApiConsentData(selectPsuAuthenticationMethodRequest.getBankApiConsentData());
-        consentRepository.save(internalConsent);
-        return response;
+        try {
+
+            UpdateAuthResponse response =
+                onlineBankingService.getStrongCustomerAuthorisation().selectPsuAuthenticationMethod(selectPsuAuthenticationMethodRequest);
+            internalConsent.setBankApiConsentData(selectPsuAuthenticationMethodRequest.getBankApiConsentData());
+            consentRepository.save(internalConsent);
+
+            metricsCollector.count("selectPsuAuthenticationMethod",
+                Iban.valueOf(internalConsent.getPsuAccountIban()).getBankCode(), onlineBankingService.bankApi());
+
+            return response;
+        } catch (Exception e) {
+            metricsCollector.count("selectPsuAuthenticationMethod",
+                Iban.valueOf(internalConsent.getPsuAccountIban()).getBankCode(), onlineBankingService.bankApi(), e);
+            throw e;
+        }
     }
 
     public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequestTO transactionAuthorisationRequestTO,
@@ -104,11 +139,21 @@ public class ConsentService {
             consentAuthorisationMapper.toTransactionAuthorisationRequest(transactionAuthorisationRequestTO,
                 internalConsent);
 
-        UpdateAuthResponse response =
-            onlineBankingService.getStrongCustomerAuthorisation().authorizeConsent(transactionAuthorisationRequest);
-        internalConsent.setBankApiConsentData(transactionAuthorisationRequest.getBankApiConsentData());
-        consentRepository.save(internalConsent);
-        return response;
+        try {
+            UpdateAuthResponse response =
+                onlineBankingService.getStrongCustomerAuthorisation().authorizeConsent(transactionAuthorisationRequest);
+            internalConsent.setBankApiConsentData(transactionAuthorisationRequest.getBankApiConsentData());
+            consentRepository.save(internalConsent);
+
+            metricsCollector.count("authorizeConsent", Iban.valueOf(internalConsent.getPsuAccountIban()).getBankCode(),
+                onlineBankingService.bankApi());
+
+            return response;
+        } catch (Exception e) {
+            metricsCollector.count("authorizeConsent", Iban.valueOf(internalConsent.getPsuAccountIban()).getBankCode(),
+                onlineBankingService.bankApi(), e);
+            throw e;
+        }
     }
 
     public void revokeConsent(String consentId) {
@@ -129,33 +174,44 @@ public class ConsentService {
     public Consent getConsent(String consentId) {
         ConsentEntity internalConsent = consentRepository.findById(consentId)
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
+
+        if (internalConsent.isTemporary()) {
+            return consentMapper.toConsent(internalConsent);
+        }
+
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        Consent consent = onlineBankingService.getStrongCustomerAuthorisation().getConsent(consentId);
-        return Optional.ofNullable(consent)
-            .orElseGet(() -> consentMapper.toConsent(internalConsent));
+        return onlineBankingService.getStrongCustomerAuthorisation().getConsent(consentId);
     }
 
     public Consent getConsentByRedirectId(String redirectId) {
         ConsentEntity internalConsent = consentRepository.findByRedirectId(redirectId)
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, redirectId));
+
+        if (internalConsent.isTemporary()) {
+            return consentMapper.toConsent(internalConsent);
+        }
+
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        Consent consent = onlineBankingService.getStrongCustomerAuthorisation().getConsent(internalConsent.getId());
-        return Optional.ofNullable(consent)
-            .orElseGet(() -> consentMapper.toConsent(internalConsent));
+        return onlineBankingService.getStrongCustomerAuthorisation().getConsent(internalConsent.getId());
     }
 
-    public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId) {
+    public UpdateAuthResponse getAuthorisationStatus(String consentId) {
         ConsentEntity internalConsent = consentRepository.findById(consentId)
             .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
-        OnlineBankingService onlineBankingService =
-            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        return onlineBankingService.getStrongCustomerAuthorisation().getAuthorisationStatus(consentId,
-            authorisationId, internalConsent.getBankApiConsentData());
+        return getAuthorisationStatus(internalConsent);
+    }
+
+    public UpdateAuthResponse getAuthorisationStatus(ConsentEntity consentEntity) {
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(consentEntity.getBankApi());
+
+        return onlineBankingService.getStrongCustomerAuthorisation().getAuthorisationStatus(consentEntity.getId(),
+            consentEntity.getAuthorisationId(), consentEntity.getBankApiConsentData());
     }
 
     public void submitAuthorisationCode(String consentId, String authorisationCode) {
@@ -176,6 +232,7 @@ public class ConsentService {
             bankingServiceProducer.getBankingService(Iban.valueOf(iban).getBankCode());
     }
 
+    //TODO refactor validation, check for missing inputs like pin, scamethod, tan
     ConsentEntity validateAndGetConsent(OnlineBankingService onlineBankingService, String consentId,
                                         ScaStatus expectedConsentStatus) {
         ConsentEntity internalConsent = consentRepository.findById(consentId)
@@ -184,20 +241,17 @@ public class ConsentService {
         try {
             onlineBankingService.getStrongCustomerAuthorisation().validateConsent(internalConsent.getId(),
                 internalConsent.getAuthorisationId(), expectedConsentStatus, internalConsent.getBankApiConsentData());
-
         } catch (MultibankingException e) {
             switch (e.getMultibankingError()) {
                 case INVALID_SCA_METHOD:
-                    throw new MissingConsentAuthorisationSelectionException();
+                    throw new MissingScaMethodSelectionException();
                 case INVALID_CONSENT_STATUS:
                     if (expectedConsentStatus == ScaStatus.FINALISED) {
-                        UpdateAuthResponse authorisationStatus = getAuthorisationStatus(internalConsent.getId(),
-                            internalConsent.getAuthorisationId());
+                        UpdateAuthResponse authorisationStatus = getAuthorisationStatus(internalConsent);
                         throw new TransactionAuthorisationRequiredException(authorisationStatus,
-                            internalConsent.getId(),
-                            internalConsent.getAuthorisationId());
+                            internalConsent.getId(), internalConsent.getAuthorisationId());
                     } else if (expectedConsentStatus == ScaStatus.SCAMETHODSELECTED) {
-                        throw new MissingConsentAuthorisationSelectionException();
+                        throw new MissingScaMethodSelectionException();
                     }
                     throw e;
                 default:

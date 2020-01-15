@@ -1,16 +1,17 @@
 package de.adorsys.multibanking.web.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@Schema(name = "Accountreference")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class AccountReferenceTO {
 
-    @ApiModelProperty(value = "account iban", required = true)
+    @Schema(description = "account iban", required = true)
     private String iban;
     private String currency;
 }

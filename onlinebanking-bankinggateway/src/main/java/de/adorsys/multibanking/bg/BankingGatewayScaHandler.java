@@ -1,7 +1,8 @@
 package de.adorsys.multibanking.bg;
 
 import de.adorsys.multibanking.banking_gateway_b2c.ApiException;
-import de.adorsys.multibanking.banking_gateway_b2c.api.BankingGatewayB2CAisApi;
+import de.adorsys.multibanking.banking_gateway_b2c.api.AisApi;
+import de.adorsys.multibanking.banking_gateway_b2c.api.OAuthApi;
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
 import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.domain.ScaApproach;
@@ -18,7 +19,6 @@ import de.adorsys.multibanking.domain.response.PaymentStatusResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.PaymentStatusReqest;
-import de.adorsys.multibanking.xs2a_adapter.model.Error400NGAIS;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.iban4j.Iban;
@@ -26,6 +26,7 @@ import org.iban4j.Iban;
 import java.util.Optional;
 
 import static de.adorsys.multibanking.bg.ApiClientFactory.bankingGatewayB2CAisApi;
+import static de.adorsys.multibanking.bg.ApiClientFactory.bankingGatewayB2COAuthApi;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.*;
 
@@ -37,24 +38,28 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
 
     @Override
-    public CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred,
+    public CreateConsentResponse createConsent(Consent consent, boolean redirectPreferred,
                                                String tppRedirectUri, Object bankApiConsentData) {
         try {
-            String bankCode = Iban.valueOf(consentTemplate.getPsuAccountIban()).getBankCode();
-            BankingGatewayB2CAisApi aisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
+            String bankCode = Iban.valueOf(consent.getPsuAccountIban()).getBankCode();
+            AisApi aisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
                 (BgSessionData) bankApiConsentData);
             CreateConsentResponseTO consentResponse =
-                aisApi.createConsentUsingPOST(bankingGatewayMapper.toConsentTO(consentTemplate), bankCode, null, null
-                    , redirectPreferred, tppRedirectUri);
+                aisApi.createConsent(bankCode, bankingGatewayMapper.toConsentTO(consent), null, null,
+                    redirectPreferred, tppRedirectUri);
 
             BgSessionData sessionData = new BgSessionData();
             sessionData.setConsentId(consentResponse.getConsentId());
-            Optional.ofNullable(bankApiConsentData).map(BgSessionData.class::cast).ifPresent(consentData -> {
-                sessionData.setAccessToken(consentData.getAccessToken());
-                sessionData.setRefreshToken(consentData.getRefreshToken());
-            });
-            CreateConsentResponse createConsentResponse =
-                bankingGatewayMapper.toCreateConsentResponse(consentResponse);
+            sessionData.setBankCode(bankCode);
+
+            Optional.ofNullable(bankApiConsentData)
+                .map(BgSessionData.class::cast)
+                .ifPresent(consentData -> {
+                    sessionData.setAccessToken(consentData.getAccessToken());
+                    sessionData.setRefreshToken(consentData.getRefreshToken());
+                });
+
+            CreateConsentResponse createConsentResponse = bankingGatewayMapper.toCreateConsentResponse(consentResponse);
             createConsentResponse.setBankApiConsentData(sessionData);
 
             return createConsentResponse;
@@ -66,7 +71,7 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     @Override
     public Consent getConsent(String consentId) {
         try {
-            return bankingGatewayMapper.toConsent(bankingGatewayB2CAisApi(bankingGatewayBaseUrl, null).getConsentUsingGET(consentId)); //
+            return bankingGatewayMapper.toConsent(bankingGatewayB2CAisApi(bankingGatewayBaseUrl, null).getConsent(consentId)); //
             // TODO Bearer token
         } catch (ApiException e) {
             throw handeAisApiException(e);
@@ -79,16 +84,16 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
             UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequestTO =
                 bankingGatewayMapper.toUpdatePsuAuthenticationRequestTO(updatePsuAuthentication.getCredentials());
 
-            BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl, null);
+            AisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl, null);
 
-            ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponse =
-                bankingGatewayB2CAisApi.updatePsuAuthenticationUsingPUT(updatePsuAuthenticationRequestTO
-                    , updatePsuAuthentication.getAuthorisationId(), updatePsuAuthentication.getConsentId());
+            ResourceUpdateAuthResponseTO resourceUpdateAuthResponse =
+                bankingGatewayB2CAisApi.updatePsuAuthentication(updatePsuAuthentication.getConsentId(),
+                    updatePsuAuthentication.getAuthorisationId(), updatePsuAuthenticationRequestTO);
 
-            return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponse,
+            return bankingGatewayMapper.toUpdateAuthResponse(resourceUpdateAuthResponse,
                 new UpdateAuthResponse(XS2A,
-                    ScaApproach.valueOf(resourceUpdateAuthResponse.getScaApproach().toString()),
-                    ScaStatus.valueOf(resourceUpdateAuthResponse.getScaStatus().toString())));
+                    bankingGatewayMapper.toScaApproach(resourceUpdateAuthResponse.getScaApproach()),
+                    bankingGatewayMapper.toScaStatus(resourceUpdateAuthResponse.getScaStatus())));
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }
@@ -97,12 +102,14 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     @Override
     public UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod) {
         try {
-            BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl, null);
+            AisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl, null);
 
-            ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponse =
-                bankingGatewayB2CAisApi.selectPsuAuthenticationMethodUsingPUT(bankingGatewayMapper.toSelectPsuAuthenticationMethodRequestTO(selectPsuAuthenticationMethod), selectPsuAuthenticationMethod.getAuthorisationId(), selectPsuAuthenticationMethod.getConsentId());
+            ResourceUpdateAuthResponseTO resourceUpdateAuthResponse =
+                bankingGatewayB2CAisApi.selectPsuAuthenticationMethod(selectPsuAuthenticationMethod.getConsentId(),
+                    selectPsuAuthenticationMethod.getAuthorisationId(),
+                    bankingGatewayMapper.toSelectPsuAuthenticationMethodRequestTO(selectPsuAuthenticationMethod));
 
-            return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponse,
+            return bankingGatewayMapper.toUpdateAuthResponse(resourceUpdateAuthResponse,
                 new UpdateAuthResponse(XS2A,
                     ScaApproach.valueOf(resourceUpdateAuthResponse.getScaApproach().toString()),
                     ScaStatus.valueOf(resourceUpdateAuthResponse.getScaStatus().toString())));
@@ -114,18 +121,17 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     @Override
     public UpdateAuthResponse authorizeConsent(TransactionAuthorisationRequest transactionAuthorisationRequest) {
         try {
-            BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
+            AisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
                 (BgSessionData) transactionAuthorisationRequest.getBankApiConsentData());
 
             TransactionAuthorisationRequestTO transactionAuthorisationRequestTO =
                 bankingGatewayMapper.toTransactionAuthorisationRequestTO(transactionAuthorisationRequest);
 
-            ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponse =
-                bankingGatewayB2CAisApi.transactionAuthorisationUsingPUT(transactionAuthorisationRequestTO,
-                    transactionAuthorisationRequest.getAuthorisationId(),
-                    transactionAuthorisationRequest.getConsentId());
+            ResourceUpdateAuthResponseTO resourceUpdateAuthResponse =
+                bankingGatewayB2CAisApi.transactionAuthorisation(transactionAuthorisationRequest.getConsentId(),
+                    transactionAuthorisationRequest.getAuthorisationId(), transactionAuthorisationRequestTO);
 
-            return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponse,
+            return bankingGatewayMapper.toUpdateAuthResponse(resourceUpdateAuthResponse,
                 new UpdateAuthResponse(XS2A,
                     ScaApproach.valueOf(resourceUpdateAuthResponse.getScaApproach().toString()),
                     ScaStatus.valueOf(resourceUpdateAuthResponse.getScaStatus().toString())));
@@ -138,13 +144,12 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     public UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId,
                                                      Object bankApiConsentData) {
         try {
-            BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
+            AisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
                 (BgSessionData) bankApiConsentData);
-            ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponse =
-                bankingGatewayB2CAisApi.getConsentAuthorisationStatusUsingGET(authorisationId,
-                    consentId);
+            ResourceUpdateAuthResponseTO resourceUpdateAuthResponse =
+                bankingGatewayB2CAisApi.getConsentAuthorisationStatus(consentId, authorisationId);
 
-            return bankingGatewayMapper.toUpdateAuthResponseTO(resourceUpdateAuthResponse,
+            return bankingGatewayMapper.toUpdateAuthResponse(resourceUpdateAuthResponse,
                 new UpdateAuthResponse(XS2A,
                     ScaApproach.valueOf(resourceUpdateAuthResponse.getScaApproach().toString()),
                     ScaStatus.valueOf(resourceUpdateAuthResponse.getScaStatus().toString())));
@@ -156,8 +161,8 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     @Override
     public void revokeConsent(String consentId) {
         try {
-            BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl, null);
-            bankingGatewayB2CAisApi.revokeConsentUsingDELETE(consentId); // TODO Bearer token
+            AisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl, null);
+            bankingGatewayB2CAisApi.revokeConsent(consentId); // TODO Bearer token
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }
@@ -167,12 +172,12 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     public void validateConsent(String consentId, String authorisationId, ScaStatus expectedConsentStatus,
                                 Object bankApiConsentData) {
         try {
-            BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
+            AisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
                 (BgSessionData) bankApiConsentData);
 
-            Optional.of(bankingGatewayB2CAisApi.getConsentAuthorisationStatusUsingGET(authorisationId, consentId))
+            Optional.of(bankingGatewayB2CAisApi.getConsentAuthorisationStatus(consentId, authorisationId))
                 .map(consentStatus -> ScaStatus.valueOf(consentStatus.getScaStatus().getValue()))
-                .filter(consentStatus -> consentStatus == expectedConsentStatus)
+                .filter(consentStatus -> consentStatus == ScaStatus.SCAMETHODSELECTED || consentStatus == ScaStatus.FINALISED)
                 .orElseThrow(() -> new MultibankingException(MultibankingError.INVALID_CONSENT_STATUS));
         } catch (ApiException e) {
             throw handeAisApiException(e);
@@ -187,14 +192,14 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     @Override
     public void submitAuthorisationCode(Object bankApiConsentData, String authorisationCode) {
         BgSessionData sessionData = (BgSessionData) bankApiConsentData;
-        String consentId = sessionData.getConsentId();
 
         try {
             AuthorizationCodeTO authorizationCodeTO = new AuthorizationCodeTO();
             authorizationCodeTO.setCode(authorisationCode);
+            authorizationCodeTO.setBankCode(sessionData.getBankCode());
 
-            BankingGatewayB2CAisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl, sessionData);
-            OAuthToken token = bankingGatewayB2CAisApi.resolveAuthCodeUsingPOST(authorizationCodeTO, consentId);
+            OAuthApi bankingGatewayB2COAuthApi = bankingGatewayB2COAuthApi(bankingGatewayBaseUrl);
+            OAuthToken token = bankingGatewayB2COAuthApi.resolveAuthCode(authorizationCodeTO);
 
             Optional.ofNullable(token)
                 .map(OAuthToken::getAccessToken)
@@ -228,10 +233,10 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
 
     private MultibankingException toMultibankingException(ApiException e, MultibankingError multibankingError) {
         try {
-            Error400NGAIS messagesTO = ObjectMapperConfig.getObjectMapper().readValue(e.getResponseBody(),
-                Error400NGAIS.class);
+            MessagesTO messagesTO = ObjectMapperConfig.getObjectMapper().readValue(e.getResponseBody(),
+                MessagesTO.class);
             return new MultibankingException(multibankingError, e.getCode(),
-                bankingGatewayMapper.toMessages(messagesTO.getTppMessages()));
+                bankingGatewayMapper.toMessages(messagesTO.getMessageList()));
         } catch (Exception e2) {
             return new MultibankingException(BANKING_GATEWAY_ERROR, 500, e.getMessage());
         }

@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.web.model;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.Future;
@@ -8,42 +8,48 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
+import static io.swagger.v3.oas.annotations.media.Schema.AccessMode.READ_ONLY;
+
+@Schema(name = "Consent")
 @Data
 public class ConsentTO {
 
-    @ApiModelProperty(value = "Consent id")
+    @Schema(description = "Consent id", accessMode = READ_ONLY)
     private String id;
 
-    @ApiModelProperty(value = "Consent redirect id")
+    @Schema(description = "Defines consent as temporary in case of OAUTH_PRESTEP appraoch", accessMode = READ_ONLY)
+    private boolean temporary;
+
+    @Schema(description = "Consent redirect id")
     private String redirectId;
 
     @NotNull
-    @ApiModelProperty(value = "account iban", required = true)
+    @Schema(description = "account iban", required = true)
     private String psuAccountIban;
 
-    @ApiModelProperty("URI of the TPP, where the transaction flow shall be redirected to after a Redirect.\n" +
+    @Schema(description = "URI of the TPP, where the transaction flow shall be redirected to after a Redirect.\n" +
         "        \n" +
         "        Mandated for the Redirect SCA Approach, specifically \n" +
         "        when TPP-Redirect-Preferred equals \"true\".\n" +
         "        It is recommended to always use this header field.")
     private String tppRedirectUri;
 
-    @ApiModelProperty("consent accounts for details")
+    @Schema(description = "consent accounts for details")
     private List<AccountReferenceTO> accounts;
-    @ApiModelProperty("consent accounts for balances")
+    @Schema(description = "consent accounts for balances")
     private List<AccountReferenceTO> balances;
-    @ApiModelProperty("consent accounts for transactions")
+    @Schema(description = "consent accounts for transactions")
     private List<AccountReferenceTO> transactions;
 
     @NotNull
-    @ApiModelProperty("recurring indicator")
+    @Schema(description = "recurring indicator")
     private boolean recurringIndicator;
     @Future
     @NotNull
-    @ApiModelProperty("consent valid date")
+    @Schema(description = "consent valid date")
     private LocalDate validUntil;
     @NotNull
-    @ApiModelProperty("allowed access frequency per day")
+    @Schema(description = "allowed access frequency per day")
     private int frequencyPerDay;
 
 }

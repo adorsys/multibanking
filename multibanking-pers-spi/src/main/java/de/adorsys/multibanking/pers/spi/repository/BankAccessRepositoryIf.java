@@ -7,8 +7,6 @@ import java.util.Optional;
 
 public interface BankAccessRepositoryIf {
 
-    Optional<BankAccessEntity> findOne(String id);
-
     Optional<BankAccessEntity> findByUserIdAndId(String userId, String id);
 
     List<BankAccessEntity> findByUserId(String userId);

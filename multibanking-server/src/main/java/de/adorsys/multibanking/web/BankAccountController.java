@@ -14,7 +14,13 @@ import de.adorsys.multibanking.service.BookingService;
 import de.adorsys.multibanking.web.mapper.BankAccountMapper;
 import de.adorsys.multibanking.web.mapper.ConsentAuthorisationMapper;
 import de.adorsys.multibanking.web.model.BankAccountTO;
-import io.swagger.annotations.*;
+import io.micrometer.core.annotation.Timed;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.Link;
@@ -33,7 +39,8 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@Api(tags = "Multibanking bankaccount")
+@Timed("bank-account")
+@Tag(name = "Bankaccount")
 @Slf4j
 @UserResource
 @RestController
@@ -49,26 +56,19 @@ public class BankAccountController {
     private final ConsentAuthorisationMapper consentAuthorisationMapper;
     private final Principal principal;
 
-    @ApiOperation(
-        value = "Read bank accounts",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
-    @ApiResponses({
-        @ApiResponse(code = 400, message = "Consent authorisation required", response = Messages.class)})
+    @Operation(description = "Read bank accounts", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
+    @ApiResponse(responseCode = "400", description = "Consent authorisation required", content = {
+        @Content(schema = @Schema(implementation = Messages.class))
+    })
     @GetMapping
     public Resources<Resource<BankAccountTO>> getBankAccounts(@PathVariable String accessId) {
         List<BankAccountEntity> bankAccounts = bankAccountService.getBankAccounts(principal.getName(), accessId);
         return new Resources<>(mapToResources(bankAccounts, accessId));
     }
 
-    @ApiOperation(
-        value = "Read bank account",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read bank account", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{accountId}")
     public Resource<BankAccountTO> getBankAccount(@PathVariable String accessId,
                                                   @PathVariable("accountId") String accountId) {
@@ -82,16 +82,14 @@ public class BankAccountController {
         return mapToResource(bankAccountEntity, accessId);
     }
 
-    @ApiOperation(
-        value = "Trigger account sync",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
-    @ApiResponses({
-        @ApiResponse(code = 204, message = "Sync started", response = void.class),
-        @ApiResponse(code = 202, message = "Challenge response", reference = "#/definitions/Resource" +
-            "«UpdateAuthResponseTO»")})
+    @Operation(description = "Trigger account sync", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
+    @ApiResponse(responseCode = "204", description = "Sync started", content = {
+        @Content(schema = @Schema(implementation = void.class))
+    })
+    @ApiResponse(responseCode = "202", description = "Challenge response", content = {
+        @Content(schema = @Schema(ref = "#/components/schemas/ResourceConsentAuthorisationResponse"))
+    })
     @PutMapping("/{accountId}/sync")
     public ResponseEntity syncBookings(@PathVariable String accessId, @PathVariable String accountId) {
         BankAccessEntity bankAccess = bankAccessRepository.findByUserIdAndId(principal.getName(), accessId)

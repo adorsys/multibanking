@@ -24,6 +24,8 @@ import java.util.List;
 @Data
 public class Consent {
 
+    private boolean temporary; //true on case of oauth prestep
+
     private String consentId;
 
     private String redirectId;

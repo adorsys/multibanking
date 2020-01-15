@@ -7,4 +7,5 @@ class BgSessionData {
     private String consentId;
     private String accessToken;
     private String refreshToken;
+    private String bankCode;
 }

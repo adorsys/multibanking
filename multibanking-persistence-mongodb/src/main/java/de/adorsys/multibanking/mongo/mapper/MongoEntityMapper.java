@@ -8,6 +8,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface MongoEntityMapper {
+    
     AccountAnalyticsEntity mapToAccountAnalyticsEntity(AccountAnalyticsMongoEntity accountAnalyticsEntity);
 
     AccountAnalyticsMongoEntity mapToAccountAnalyticsMongoEntity(AccountAnalyticsEntity accountAnalyticsEntity);
@@ -55,12 +56,6 @@ public interface MongoEntityMapper {
     List<ContractEntity> mapToContractEntities(List<ContractMongoEntity> byUserIdAndAccountId);
 
     List<ContractMongoEntity> mapToContractMongoEntities(List<ContractEntity> contractEntities);
-
-    MlAnonymizedBookingEntity mapToMlAnonymizedBookingEntity(MlAnonymizedBookingMongoEntity mlAnonymizedBookingMongoEntity);
-
-    List<MlAnonymizedBookingEntity> mapToMlAnonymizedBookingEntities(List<MlAnonymizedBookingMongoEntity> byUserId);
-
-    MlAnonymizedBookingMongoEntity mapToMlAnonymizedBookingMongoEntity(MlAnonymizedBookingEntity booking);
 
     RawSepaTransactionEntity mapToRawSepaTransactionEntity(RawSepaTransactionMongoEntity rawSepaTransactionMongoEntity);
 

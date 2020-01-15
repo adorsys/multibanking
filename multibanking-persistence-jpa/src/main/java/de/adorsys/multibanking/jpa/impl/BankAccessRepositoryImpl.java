@@ -22,13 +22,7 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 
     @Override
     public Optional<BankAccessEntity> findByUserIdAndId(String userId, String id) {
-        return bankAccessRepository.findByUserIdAndId(userId, new Long(id))
-            .map(entityMapper::mapToBankAccessEntity);
-    }
-
-    @Override
-    public Optional<BankAccessEntity> findOne(String id) {
-        return bankAccessRepository.findById(new Long(id))
+        return bankAccessRepository.findByUserIdAndId(userId, Long.parseLong(id))
             .map(entityMapper::mapToBankAccessEntity);
     }
 
@@ -46,17 +40,17 @@ public class BankAccessRepositoryImpl implements BankAccessRepositoryIf {
 
     @Override
     public String getBankCode(String id) {
-        return bankAccessRepository.getBankCode(new Long(id));
+        return bankAccessRepository.getBankCode(Long.parseLong(id));
     }
 
     @Override
     public boolean exists(String id) {
-        return bankAccessRepository.existsById(new Long(id));
+        return bankAccessRepository.existsById(Long.parseLong(id));
     }
 
     @Override
     public boolean deleteByUserIdAndBankAccessId(String userId, String id) {
-        bankAccessRepository.deleteByUserIdAndId(userId, new Long(id));
+        bankAccessRepository.deleteByUserIdAndId(userId, Long.parseLong(id));
         return true;
     }
 }

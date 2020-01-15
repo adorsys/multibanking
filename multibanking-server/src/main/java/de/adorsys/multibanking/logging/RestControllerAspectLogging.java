@@ -28,7 +28,7 @@ public class RestControllerAspectLogging {
 
     public static final Marker AUDIT_LOG = MarkerFactory.getMarker("AUDIT");
 
-    @Before("@annotation(io.swagger.annotations.ApiOperation)")
+    @Before("@annotation(io.swagger.v3.oas.annotations.Operation)")
     public void logBefore(final JoinPoint joinPoint) {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder
             .currentRequestAttributes())
@@ -39,7 +39,7 @@ public class RestControllerAspectLogging {
         this.logRequestBody(joinPoint);
     }
 
-    @AfterReturning(pointcut = "@annotation(io.swagger.annotations.ApiOperation)",
+    @AfterReturning(pointcut = "@annotation(io.swagger.v3.oas.annotations.Operation)",
         returning = "retVal")
     public void logAfterAllMethods(Object retVal) {
         log.trace(AUDIT_LOG, "Response: [{}]", retVal.toString());

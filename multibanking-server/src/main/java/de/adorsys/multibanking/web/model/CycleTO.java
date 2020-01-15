@@ -16,9 +16,9 @@
 
 package de.adorsys.multibanking.web.model;
 
-/**
- * The predicted cycles for a category.
- */
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(name = "Cycle")
 public enum CycleTO {
     /**
      * every week

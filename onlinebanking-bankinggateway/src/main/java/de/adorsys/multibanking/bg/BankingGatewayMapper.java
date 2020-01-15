@@ -23,6 +23,7 @@ import java.util.Map;
 
 import static de.adorsys.multibanking.domain.BankAccountType.fromXS2AType;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Mapper
 interface BankingGatewayMapper {
@@ -35,6 +36,7 @@ interface BankingGatewayMapper {
     ConsentTO toConsentTO(Consent consentTemplate);
 
     @Mapping(target = "redirectId", ignore = true)
+    @Mapping(target = "temporary", ignore = true)
     @InheritInverseConfiguration
     Consent toConsent(ConsentTO consentTO);
 
@@ -47,8 +49,8 @@ interface BankingGatewayMapper {
     @Mapping(target = "password", source = "pin")
     UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(Credentials credentials);
 
-    UpdateAuthResponse toUpdateAuthResponseTO(ResourceOfUpdateAuthResponseTO resourceUpdateAuthResponseTO,
-                                              @MappingTarget UpdateAuthResponse updateAuthResponse);
+    UpdateAuthResponse toUpdateAuthResponse(ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO,
+                                            @MappingTarget UpdateAuthResponse updateAuthResponse);
 
     SelectPsuAuthenticationMethodRequestTO toSelectPsuAuthenticationMethodRequestTO(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod);
 
@@ -94,6 +96,10 @@ interface BankingGatewayMapper {
         return fromXS2AType(cashAccountType);
     }
 
+    default String byteToString(byte[] value) {
+        return new String(value, UTF_8);
+    }
+
     List<Booking> toBookings(List<TransactionDetails> transactionDetails);
 
     @Mapping(source = "valueDate", target = "valutaDate")
@@ -131,7 +137,9 @@ interface BankingGatewayMapper {
     @Mapping(target = "currency", source = "balanceAmount.currency")
     Balance toBalance(de.adorsys.multibanking.xs2a_adapter.model.Balance balance);
 
-    List<Message> toMessages(List<TppMessage400AIS> messagesTO);
+    List<Message> toMessagesFromTppMessage400AIS(List<TppMessage400AIS> messages);
+
+    List<Message> toMessages(List<MessageTO> messageTOList);
 
     @Mapping(target = "severity", source = "category")
     @Mapping(target = "key", source = "code")
@@ -139,4 +147,9 @@ interface BankingGatewayMapper {
     @Mapping(target = "field", ignore = true)
     @Mapping(target = "paramsMap", ignore = true)
     Message toMessage(TppMessage400AIS tppMessage400AIS);
+
+    ScaApproach toScaApproach(ResourceUpdateAuthResponseTO.ScaApproachEnum scaApproach);
+
+    ScaStatus toScaStatus(ResourceUpdateAuthResponseTO.ScaStatusEnum scaStatus);
+
 }

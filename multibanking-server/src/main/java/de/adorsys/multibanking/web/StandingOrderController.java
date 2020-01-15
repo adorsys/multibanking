@@ -9,10 +9,10 @@ import de.adorsys.multibanking.exception.SyncInProgressException;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.BankAccountRepositoryIf;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
+import io.micrometer.core.annotation.Timed;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Resources;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +25,8 @@ import java.security.Principal;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@Api(tags = "Multibanking standing order")
+@Timed("standing-order")
+@Tag(name = "Standing order")
 @RequiredArgsConstructor
 @UserResource
 @RestController
@@ -37,12 +38,8 @@ public class StandingOrderController {
     private final BankAccountRepositoryIf bankAccountRepository;
     private final Principal principal;
 
-    @ApiOperation(
-        value = "Read account standing orders",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read account standing orders", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
     public Resources<StandingOrderEntity> getStandingOrders(@PathVariable String accessId,
                                                             @PathVariable String accountId) {

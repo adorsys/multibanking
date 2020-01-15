@@ -10,8 +10,10 @@ import de.adorsys.multibanking.web.model.BankApiTO;
 import de.adorsys.multibanking.web.model.ConsentTO;
 import de.adorsys.multibanking.web.model.CreateConsentResponseTO;
 import de.adorsys.multibanking.web.model.TokenRequestTO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.micrometer.core.annotation.Timed;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.iban4j.Iban;
@@ -34,7 +36,8 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@Api(tags = "Multibanking consent")
+@Timed("consent")
+@Tag(name = "Consent")
 @RequiredArgsConstructor
 @Slf4j
 @UserResource
@@ -48,7 +51,7 @@ public class ConsentController {
     private final BankAccessRepositoryIf bankAccessRepository;
     private final Principal principal;
 
-    @ApiOperation(value = "Create new consent")
+    @Operation(description = "Create new consent")
     @PostMapping
     public ResponseEntity<Resource<CreateConsentResponseTO>> createConsent(@Valid @RequestBody ConsentTO consent,
                                                                            @RequestParam(required = false) BankApiTO bankApi) {
@@ -64,7 +67,8 @@ public class ConsentController {
             Iban.valueOf(consentInput.getPsuAccountIban()).getBankCode()), headers, HttpStatus.CREATED);
     }
 
-    @ApiOperation(value = "Read user consents")
+    @Operation(description = "Read user consents", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
     public Resources<Resource<ConsentTO>> getConsents() {
         List<Consent> consents = bankAccessRepository.findByUserId(principal.getName())
@@ -75,19 +79,21 @@ public class ConsentController {
         return new Resources<>(mapToResources(consents));
     }
 
-    @ApiOperation(value = "Read consent")
+    @Operation(description = "Read consent", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{consentId}")
     public Resource<ConsentTO> getConsent(@PathVariable("consentId") String consentId) {
         return mapToResource(consentService.getConsent(consentId));
     }
 
-    @ApiOperation(value = "Read consent")
+    @Operation(description = "Read consent", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("redirect/{redirectId}")
     public Resource<ConsentTO> getConsentByRedirectId(@PathVariable("redirectId") String redirectId) {
         return mapToResource(consentService.getConsentByRedirectId(redirectId));
     }
 
-    @ApiOperation(value = "Delete consent")
+    @Operation(description = "Delete consent")
     @DeleteMapping("/{consentId}")
     public HttpEntity<Void> deleteConsent(@PathVariable String consentId) {
         consentService.revokeConsent(consentId);
@@ -95,13 +101,13 @@ public class ConsentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @ApiOperation(value = "Submit OAUTH2 authorisation code")
+    @Operation(description = "Submit OAuth2 authorisation code")
     @PostMapping("/{consentId}/token")
-    public ResponseEntity submitAuthorisationCode(@PathVariable String consentId,
-                                                  @RequestBody @Valid TokenRequestTO tokenRequest) {
+    public ResponseEntity<Void> submitAuthorisationCode(@PathVariable String consentId,
+                                                        @RequestBody @Valid TokenRequestTO tokenRequest) {
         consentService.submitAuthorisationCode(consentId, tokenRequest.getAuthorisationCode());
 
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     private List<Resource<ConsentTO>> mapToResources(List<Consent> consents) {

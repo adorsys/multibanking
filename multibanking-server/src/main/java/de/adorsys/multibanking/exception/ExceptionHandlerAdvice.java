@@ -4,11 +4,11 @@ import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.exception.domain.Message;
 import de.adorsys.multibanking.exception.domain.Messages;
 import de.adorsys.multibanking.logging.RestControllerAspectLogging;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.iban4j.InvalidCheckDigitException;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.NestedExceptionUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.servlet.ServletRequest;
@@ -36,24 +37,29 @@ import java.util.stream.Collectors;
 import static de.adorsys.multibanking.exception.domain.Message.Severity.ERROR;
 import static de.adorsys.multibanking.logging.RestControllerAspectLogging.AUDIT_LOG;
 import static java.util.stream.Collectors.toList;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.util.StringUtils.hasText;
 
+@RequiredArgsConstructor
 @Slf4j
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 
     private static final String VALIDATION_ERROR = "VALIDATION_ERROR";
     private static final String INVALD_FORMAT = "INVALID_FORMAT";
+    private static final String LOG_FORMAT = "Error: [{}] from Controller: [{}]";
 
+    @ResponseStatus
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleException(Exception e) {
-        return handleInternal(e);
+    public ResponseEntity<Messages> handleException(Exception e, HandlerMethod handlerMethod) {
+        return handleInternal(e, handlerMethod);
     }
 
+    @ResponseStatus(code = BAD_REQUEST)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleException(HBCI_Exception e) {
+    public ResponseEntity<Messages> handleException(HBCI_Exception e, HandlerMethod handlerMethod) {
         Throwable e2 = e;
         List<Message> messages = new ArrayList<>();
 
@@ -68,27 +74,29 @@ public class ExceptionHandlerAdvice {
             e2 = e2.getCause();
         }
 
-        return handleInternal(e, Messages.builder().messages(messages).build(), HttpStatus.BAD_REQUEST);
+        return handleInternal(e, Messages.builder().messages(messages).build(), BAD_REQUEST, handlerMethod);
     }
 
+    @ResponseStatus(code = INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleException(CompletionException e) {
+    public ResponseEntity<Messages> handleException(CompletionException e, HandlerMethod handlerMethod) {
         Throwable cause = e.getCause();
 
         if (HttpStatusCodeException.class.isAssignableFrom(cause.getClass())) {
-            return handleHttpStatusCodeException((HttpStatusCodeException) cause);
+            return handleHttpStatusCodeException((HttpStatusCodeException) cause, handlerMethod);
         } else if (ParametrizedMessageException.class.isAssignableFrom(cause.getClass())) {
-            return handleException((ParametrizedMessageException) cause);
+            return handleException((ParametrizedMessageException) cause, handlerMethod);
         }
 
-        return handleInternal(e);
+        return handleInternal(e, handlerMethod);
     }
 
+    @ResponseStatus
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleException(MultibankingException e) {
-        HttpStatus httpStatus = HttpStatus.valueOf(e.getHttpResponseCode());
+    public ResponseEntity<Messages> handleException(MultibankingException e, HandlerMethod handlerMethod) {
+        HttpStatus httpStatus = valueOf(e.getHttpResponseCode());
 
         List<Message> messages = e.getMessages().stream()
             .map(message -> Message.builder()
@@ -106,12 +114,14 @@ public class ExceptionHandlerAdvice {
             .messages(messages)
             .build();
 
-        return handleInternal(e, messagesContainer, httpStatus);
+        return handleInternal(e, messagesContainer, httpStatus, handlerMethod);
     }
 
+    @ResponseStatus(code = FORBIDDEN)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleAccessDeniedException(ServletRequest request, AccessDeniedException e) {
+    public ResponseEntity<Messages> handleAccessDeniedException(ServletRequest request, AccessDeniedException e,
+                                                                HandlerMethod handlerMethod) {
         try {
             HttpServletRequest httpServletRequest = (HttpServletRequest) request;
             log.info("User [{}] access denied to [{}] [{}]", httpServletRequest.getRemoteUser(),
@@ -120,32 +130,37 @@ public class ExceptionHandlerAdvice {
             log.info("Can't LOG: {}", ex.getMessage());
         }
 
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(FORBIDDEN);
     }
 
+    @ResponseStatus
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleException(ParametrizedMessageException e) {
+    public ResponseEntity<Messages> handleException(ParametrizedMessageException e, HandlerMethod handlerMethod) {
 
         ResponseStatus responseStatus = AnnotationUtils.findAnnotation(e.getClass(), ResponseStatus.class);
         if (responseStatus != null) {
             Messages messages = Messages.createError(responseStatus.reason(), e.getLocalizedMessage(),
                 e.getParamsMap());
-            return handleInternal(e, messages, responseStatus.code());
+            return handleInternal(e, messages, responseStatus.code(), handlerMethod);
         } else {
-            return handleException(e);
+            return handleException(e, handlerMethod);
         }
     }
 
+    @ResponseStatus
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleHttpStatusCodeException(HttpStatusCodeException e) {
-        return handleInternal(e, null, e.getStatusCode());
+    public ResponseEntity<Messages> handleHttpStatusCodeException(HttpStatusCodeException e,
+                                                                  HandlerMethod handlerMethod) {
+        return handleInternal(e, null, e.getStatusCode(), handlerMethod);
     }
 
+    @ResponseStatus(code = BAD_REQUEST)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e) {
+    public ResponseEntity<Messages> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e,
+                                                                              HandlerMethod handlerMethod) {
         Message message = Message.builder()
             .key(INVALD_FORMAT)
             .severity(Message.Severity.ERROR)
@@ -153,12 +168,14 @@ public class ExceptionHandlerAdvice {
             .renderedMessage(e.getMessage()).build();
 
         return handleInternal(e, Messages.builder().messages(Collections.singletonList(message)).build(),
-            HttpStatus.BAD_REQUEST);
+            BAD_REQUEST, handlerMethod);
     }
 
+    @ResponseStatus(code = BAD_REQUEST)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Messages> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
+                                                                          HandlerMethod handlerMethod) {
         Collection<Message> messages = ex.getBindingResult().getFieldErrors().stream()
             .map(fieldError -> Message.builder()
                 .key(VALIDATION_ERROR)
@@ -180,15 +197,13 @@ public class ExceptionHandlerAdvice {
             messages.add(message);
         }
 
-        return handleInternal(
-            ex,
-            Messages.builder().messages(messages).build(),
-            HttpStatus.BAD_REQUEST);
+        return handleInternal(ex, Messages.builder().messages(messages).build(), BAD_REQUEST, handlerMethod);
     }
 
+    @ResponseStatus(code = BAD_REQUEST)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleMethodBindException(BindException ex) {
+    public ResponseEntity<Messages> handleMethodBindException(BindException ex, HandlerMethod handlerMethod) {
         Collection<Message> messages = ex.getBindingResult().getFieldErrors().stream()
             .map(fieldError -> Message.builder()
                 .key(VALIDATION_ERROR)
@@ -210,15 +225,14 @@ public class ExceptionHandlerAdvice {
             );
         }
 
-        return handleInternal(
-            ex,
-            Messages.builder().messages(messages).build(),
-            HttpStatus.BAD_REQUEST);
+        return handleInternal(ex, Messages.builder().messages(messages).build(), BAD_REQUEST, handlerMethod);
     }
 
+    @ResponseStatus(code = BAD_REQUEST)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleConstraintViolationException(ConstraintViolationException e) {
+    public ResponseEntity<Messages> handleConstraintViolationException(ConstraintViolationException e,
+                                                                       HandlerMethod handlerMethod) {
         Collection<Message> messages = e.getConstraintViolations().stream()
             .map(cv -> Message.builder()
                 .key(VALIDATION_ERROR)
@@ -228,40 +242,46 @@ public class ExceptionHandlerAdvice {
                 .build())
             .collect(toList());
 
-        return handleInternal(e, Messages.builder().messages(messages).build(), HttpStatus.BAD_REQUEST);
+        return handleInternal(e, Messages.builder().messages(messages).build(), BAD_REQUEST, handlerMethod);
     }
 
+    @ResponseStatus(code = BAD_REQUEST)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleUnsatisfiedServletRequestParameterException(ServletRequestBindingException ex) {
-        return handleInternal(ex, null, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Messages> handleUnsatisfiedServletRequestParameterException(ServletRequestBindingException ex, HandlerMethod handlerMethod) {
+        return handleInternal(ex, null, BAD_REQUEST, handlerMethod);
     }
 
+    @ResponseStatus(code = BAD_REQUEST)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
-        return handleInternal(ex, null, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<Messages> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex,
+                                                                          HandlerMethod handlerMethod) {
+        return handleInternal(ex, null, BAD_REQUEST, handlerMethod);
     }
 
+    @ResponseStatus(code = METHOD_NOT_ALLOWED)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
-        return handleInternal(ex, null, HttpStatus.METHOD_NOT_ALLOWED);
+    public ResponseEntity<Messages> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex, HandlerMethod handlerMethod) {
+        return handleInternal(ex, null, METHOD_NOT_ALLOWED, handlerMethod);
     }
 
+    @ResponseStatus(code = BAD_REQUEST)
     @ExceptionHandler
     @ResponseBody
-    public ResponseEntity<Messages> handleInvalidCheckDigitException(InvalidCheckDigitException ex) {
+    public ResponseEntity<Messages> handleInvalidCheckDigitException(InvalidCheckDigitException ex,
+                                                                     HandlerMethod handlerMethod) {
         return handleInternal(ex, Messages.builder()
             .message(Message.builder()
                 .key("INVALID_IBAN")
                 .field("iban")
                 .severity(ERROR)
                 .build())
-            .build(), HttpStatus.BAD_REQUEST);
+            .build(), BAD_REQUEST, handlerMethod);
     }
 
-    private ResponseEntity<Messages> handleInternal(Throwable throwable) {
+    private ResponseEntity<Messages> handleInternal(Throwable throwable, HandlerMethod handlerMethod) {
         ResponseStatus responseStatus = AnnotationUtils.findAnnotation(throwable.getClass(), ResponseStatus.class);
 
         Messages messages;
@@ -273,19 +293,26 @@ public class ExceptionHandlerAdvice {
 
         HttpStatus statusCode = Optional.ofNullable(responseStatus)
             .map(ResponseStatus::code)
-            .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
+            .orElse(INTERNAL_SERVER_ERROR);
 
-        return handleInternal(throwable, messages, statusCode);
+        return handleInternal(throwable, messages, statusCode, handlerMethod);
     }
 
-    private ResponseEntity<Messages> handleInternal(Throwable throwable, Messages messages, HttpStatus httpStatus) {
-        if (httpStatus == HttpStatus.NOT_FOUND) {
-            log.info("Exception {} from Controller: {}", throwable.getClass(), throwable.getMessage());
+    private ResponseEntity<Messages> handleInternal(Throwable throwable, Messages messages, HttpStatus httpStatus,
+                                                    HandlerMethod handlerMethod) {
+        String controller = handlerMethod.getMethod().getDeclaringClass().getSimpleName();
+        String message = throwable instanceof MultibankingException
+            ? ((MultibankingException) throwable).getMultibankingError().toString()
+            : throwable.getMessage();
+
+        if (httpStatus == NOT_FOUND) {
+            log.info(LOG_FORMAT, message, controller);
         } else if (httpStatus.is4xxClientError()) {
-            log.warn("Exception {} from Controller: {}", throwable.getClass(),
-                NestedExceptionUtils.buildMessage(throwable.getMessage(), throwable.getCause()));
+            log.warn(LOG_FORMAT, message, controller);
+            log.warn(throwable.getMessage(), throwable);
         } else {
-            log.error("Exception {} from Controller: {}", throwable.getClass(), throwable);
+            log.error(LOG_FORMAT, message, controller);
+            log.error(throwable.getMessage(), throwable);
         }
 
         ResponseEntity<Messages> responseEntity;

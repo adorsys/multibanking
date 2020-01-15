@@ -9,10 +9,10 @@ import de.adorsys.multibanking.pers.spi.repository.BookingRuleRepositoryIf;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.web.mapper.RuleMapper;
 import de.adorsys.multibanking.web.model.RuleTO;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.Authorization;
-import io.swagger.annotations.AuthorizationScope;
+import io.micrometer.core.annotation.Timed;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
@@ -35,7 +35,8 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@Api(tags = "Multibanking custom rule")
+@Timed("custom-rule")
+@Tag(name = "Custom rule")
 @RequiredArgsConstructor
 @Slf4j
 @UserResource
@@ -47,24 +48,16 @@ public class CustomRulesController {
     private final AnalyticsService analyticsService;
     private final BookingRuleRepositoryIf rulesRepository;
 
-    @ApiOperation(
-        value = "Create user custom rule",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Create user custom rule", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @PostMapping
     public HttpEntity<Void> createRule(@RequestBody RuleTO rule) {
         analyticsService.createCustomRule(ruleMapper.toRuleEntity(rule));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @ApiOperation(
-        value = "Read user custom rule",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read user custom rule", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("{ruleId}")
     public Resource<RuleTO> getRule(@PathVariable String ruleId) {
         RuleEntity ruleEntity = rulesRepository.findByRuleId(ruleId)
@@ -73,24 +66,16 @@ public class CustomRulesController {
         return mapToResource(ruleEntity);
     }
 
-    @ApiOperation(
-        value = "Update user custom rule",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Update user custom rule", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @PutMapping("{ruleId}")
     public HttpEntity<Void> updateRule(@PathVariable String ruleId, @RequestBody RuleTO rule) {
         analyticsService.updateCustomRule(ruleMapper.toRuleEntity(rule));
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @ApiOperation(
-        value = "Delete user custom rule",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Delete user custom rule", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @DeleteMapping("{ruleId}")
     public HttpEntity<Void> deleteRule(@PathVariable String ruleId) {
         analyticsService.deleteRule(ruleId);
@@ -99,12 +84,8 @@ public class CustomRulesController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @ApiOperation(
-        value = "Read user custom rules",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Read user custom rules", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
     public Resources<Resource<RuleTO>> getRules(@PageableDefault(size = 20) Pageable pageable,
                                                 PagedResourcesAssembler<RuleTO> assembler) {
@@ -112,23 +93,15 @@ public class CustomRulesController {
         return assembler.toResource(pageableResult.map(ruleMapper::toRuleTO));
     }
 
-    @ApiOperation(
-        value = "Search user custom rules",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Search user custom rules", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/search")
     public Resources<Resource<RuleTO>> searchRules(@RequestParam String query) {
         return new Resources<>(mapToResources(rulesRepository.search(query)));
     }
 
-    @ApiOperation(
-        value = "Download user custom rules",
-        authorizations = {
-            @Authorization(value = "multibanking_auth", scopes = {
-                @AuthorizationScope(scope = "openid", description = "")
-            })})
+    @Operation(description = "Download user custom rules", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping(path = "/download", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public HttpEntity<InputStreamResource> downloadRules() throws JsonProcessingException {
         List<RuleTO> rules = ruleMapper.toRuleTOs(rulesRepository.findAll());

@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.mongo.impl;
 
 import de.adorsys.multibanking.domain.ConsentEntity;
+import de.adorsys.multibanking.mongo.entity.ConsentMongoEntity;
 import de.adorsys.multibanking.mongo.mapper.MongoEntityMapper;
 import de.adorsys.multibanking.mongo.repository.ConsentRepositoryMongodb;
 import de.adorsys.multibanking.pers.spi.repository.ConsentRepositoryIf;
@@ -32,7 +33,8 @@ public class ConsentRepositoryImpl implements ConsentRepositoryIf {
 
     @Override
     public void save(ConsentEntity consentEntity) {
-        consentRepository.save(entityMapper.toConsentMongoEntity(consentEntity));
+        ConsentMongoEntity save = consentRepository.save(entityMapper.toConsentMongoEntity(consentEntity));
+        consentEntity.setId(save.getId());
     }
 
     @Override

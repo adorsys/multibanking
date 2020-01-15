@@ -37,8 +37,6 @@ public class AdapterConfig {
     private String fintsProduct;
     @Value("${fints.version:}")
     private String fintsProductVersion;
-    @Value("${info.project.version:null}")
-    private String moduleVersion;
 
     private IngAdapter ingAdapter;
     private BankingGatewayAdapter bankingGatewayAdapter;
@@ -54,9 +52,9 @@ public class AdapterConfig {
         bankingGatewayAdapter = new BankingGatewayAdapter(bankingGatewayBaseUrl,
             bankingAdapterBaseUrl);
 
-        if (StringUtils.isEmpty(fintsProductVersion)) {
+        if (StringUtils.isEmpty(fintsProduct)) {
             log.warn("missing FinTS product configuration");
-            hbci4JavaBanking = new HbciBanking(new HBCIProduct(fintsProduct, moduleVersion));
+            hbci4JavaBanking = new HbciBanking(null);
         } else {
             hbci4JavaBanking = new HbciBanking(new HBCIProduct(fintsProduct, fintsProductVersion));
         }

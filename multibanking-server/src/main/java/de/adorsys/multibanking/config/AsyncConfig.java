@@ -1,8 +1,6 @@
 package de.adorsys.multibanking.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.aop.interceptor.SimpleAsyncUncaughtExceptionHandler;
 import org.springframework.beans.factory.DisposableBean;
@@ -11,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -50,10 +49,9 @@ public class AsyncConfig implements AsyncConfigurer {
         return new SimpleAsyncUncaughtExceptionHandler();
     }
 
-    public class ExceptionHandlingAsyncTaskExecutor implements AsyncTaskExecutor,
+    @Slf4j
+    private static class ExceptionHandlingAsyncTaskExecutor implements AsyncTaskExecutor,
         InitializingBean, DisposableBean {
-
-        private final Logger log = LoggerFactory.getLogger(ExceptionHandlingAsyncTaskExecutor.class);
 
         private final AsyncTaskExecutor executor;
 
@@ -62,12 +60,12 @@ public class AsyncConfig implements AsyncConfigurer {
         }
 
         @Override
-        public void execute(Runnable task) {
+        public void execute(@NonNull Runnable task) {
             executor.execute(createWrappedRunnable(task));
         }
 
         @Override
-        public void execute(Runnable task, long startTimeout) {
+        public void execute(@NonNull Runnable task, long startTimeout) {
             executor.execute(createWrappedRunnable(task), startTimeout);
         }
 
@@ -97,12 +95,14 @@ public class AsyncConfig implements AsyncConfigurer {
         }
 
         @Override
-        public Future<?> submit(Runnable task) {
+        public @NonNull
+        Future<?> submit(@NonNull Runnable task) {
             return executor.submit(createWrappedRunnable(task));
         }
 
         @Override
-        public <T> Future<T> submit(Callable<T> task) {
+        public @NonNull
+        <T> Future<T> submit(@NonNull Callable<T> task) {
             return executor.submit(createCallable(task));
         }
 

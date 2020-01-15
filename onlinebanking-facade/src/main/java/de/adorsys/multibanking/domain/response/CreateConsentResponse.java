@@ -16,11 +16,13 @@
 
 package de.adorsys.multibanking.domain.response;
 
+import de.adorsys.multibanking.domain.ScaApproach;
 import lombok.Data;
 
 @Data
 public class CreateConsentResponse {
 
+    private ScaApproach scaApproach;
     private String consentId;
     private String authorisationId;
     private String redirectId;

@@ -8,6 +8,7 @@ import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.metrics.MetricsCollector;
 import de.adorsys.multibanking.pers.spi.repository.*;
 import de.adorsys.multibanking.service.analytics.AnalyticsService;
 import de.adorsys.multibanking.service.analytics.SmartAnalyticsIf;
@@ -48,6 +49,7 @@ public class BookingService extends AccountInformationService {
     private final UserService userService;
     private final OnlineBankingServiceProducer bankingServiceProducer;
     private final SmartAnalyticsMapper smartAnalyticsMapper;
+    private final MetricsCollector metricsCollector;
 
     public String getBookingsCsv(String userId, String accessId, String accountId) {
         List<BookingEntity> bookings = getBookings(userId, accessId, accountId);
@@ -134,7 +136,12 @@ public class BookingService extends AccountInformationService {
             bankAccount.setLastSync(LocalDateTime.now());
             bankAccountRepository.save(bankAccount);
 
+            metricsCollector.count("syncBookings", bankAccess.getBankCode(), onlineBankingService.bankApi());
+
             return result;
+        } catch (Exception e) {
+            metricsCollector.count("syncBookings", bankAccess.getBankCode(), onlineBankingService.bankApi(), e);
+            throw e;
         } finally {
             bankAccountRepository.updateSyncStatus(bankAccount.getId(), BankAccount.SyncStatus.PENDING);
         }
