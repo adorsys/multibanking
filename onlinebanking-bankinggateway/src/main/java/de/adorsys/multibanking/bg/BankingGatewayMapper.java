@@ -10,6 +10,7 @@ import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.xs2a_adapter.model.AccountDetails;
 import de.adorsys.multibanking.xs2a_adapter.model.TppMessage400AIS;
 import de.adorsys.multibanking.xs2a_adapter.model.TransactionDetails;
+import org.apache.commons.codec.binary.Base64;
 import org.iban4j.Iban;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -152,4 +153,10 @@ interface BankingGatewayMapper {
 
     ScaStatus toScaStatus(ResourceUpdateAuthResponseTO.ScaStatusEnum scaStatus);
 
+    @Mapping(target = "image", expression = "java(encodeBase64(challengeData.getImage()))")
+    ChallengeData toChallengeData(ChallengeDataTO challengeData);
+
+    default String encodeBase64(byte[] bytes) {
+        return Base64.encodeBase64String(bytes);
+    }
 }
