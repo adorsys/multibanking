@@ -32,6 +32,7 @@ import de.adorsys.multibanking.mapper.AccountStatementMapper;
 import de.adorsys.multibanking.mapper.AccountStatementMapperImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.iban4j.Iban;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -341,7 +342,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
                 if (challengeHhdUc != null) {
                     MatrixCode matrixCode = MatrixCode.tryParse(challengeHhdUc);
                     if (matrixCode != null)
-                        challengeData.setImage(new String(matrixCode.getImage(), StandardCharsets.ISO_8859_1));
+                        challengeData.setImage(Base64.encodeBase64String(matrixCode.getImage()));
                     else
                         challengeData.setData(Collections.singletonList(challengeHhdUc));
                 }
