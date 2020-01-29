@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -37,7 +38,7 @@ public class MultibankingException extends RuntimeException {
     }
 
     public MultibankingException(MultibankingError multibankingError, int httpResponseCode, List<Message> messages) {
-        super(messages.toString());
+        super(Optional.ofNullable(messages).map(List::toString).orElse("no message"));
         this.messages = messages;
         this.multibankingError = multibankingError;
         this.httpResponseCode = httpResponseCode;
