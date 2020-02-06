@@ -30,6 +30,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static de.adorsys.multibanking.domain.transaction.LoadTransactions.BookingStatus.BOOKED;
+
 @Slf4j
 @AllArgsConstructor
 @Service
@@ -316,6 +318,7 @@ public class BookingService extends AccountInformationService {
                                                                            BankEntity bankEntity,
                                                                            String authorisationCode) {
         LoadTransactions loadBookings = new LoadTransactions();
+        loadBookings.setBookingStatus(BOOKED);
         loadBookings.setPsuAccount(bankAccount);
         loadBookings.setDateFrom(bankAccount.getLastSync() != null ? bankAccount.getLastSync().toLocalDate() : null);
         loadBookings.setDateTo(LocalDate.now());
