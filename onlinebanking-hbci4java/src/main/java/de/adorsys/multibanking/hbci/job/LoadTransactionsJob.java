@@ -85,7 +85,7 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
         List<String> raw = null;
         GVRKUms bookingsResult = (GVRKUms) transactionsHbciJob.getJobResult();
         if (loadTransactionsRequest.getTransaction().getRawResponseType() != null) {
-            raw = bookingsResult.getRaw();
+            raw = bookingsResult.getRaw(loadTransactionsRequest.getTransaction().getBookingStatus() == LoadTransactions.BookingStatus.PENDING);
         } else {
             if (loadTransactionsRequest.getTransaction().isWithBalance() && !bookingsResult.getDataPerDay().isEmpty()) {
                 GVRKUms.BTag lastBoookingDay =
@@ -128,11 +128,9 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
     }
 
     private AbstractHBCIJob createBookingsJobInternal(PinTanPassport passport) {
-        LoadTransactions.RawResponseType rawResponseType =
-            loadTransactionsRequest.getTransaction().getRawResponseType();
-        if (rawResponseType != null && !passport.jobSupported(rawResponseType == CAMT ?
-            GVKUmsAllCamt.getLowlevelName() : GVKUmsAll.getLowlevelName())) {
-            throw new MultibankingException(BOOKINGS_FORMAT_NOT_SUPPORTED, rawResponseType + " not supported");
+        LoadTransactions.RawResponseType rawResponseType = loadTransactionsRequest.getTransaction().getRawResponseType();
+        if (rawResponseType != null && !passport.jobSupported(rawResponseType == CAMT ? GVKUmsAllCamt.getLowlevelName() : GVKUmsAll.getLowlevelName())) {
+            throw new MultibankingException(BOOKINGS_FORMAT_NOT_SUPPORTED, "hbci transcations format not supported: " + rawResponseType);
         }
 
         return Optional.ofNullable(rawResponseType)

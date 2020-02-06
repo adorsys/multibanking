@@ -59,7 +59,9 @@ public class ConsentService {
                 consent.getPsuAccountIban(), onlineBankingService.bankApi());
 
             consentEntity.setTemporary(createConsentResponse.getConsentId() == null);
+
             consentRepository.save(consentEntity);
+            createConsentResponse.setConsentId(consentEntity.getId());
 
             metricsCollector.count("createConsent", bank.getBankCode(), onlineBankingService.bankApi());
 

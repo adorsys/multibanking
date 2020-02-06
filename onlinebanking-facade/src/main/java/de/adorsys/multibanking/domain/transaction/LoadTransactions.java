@@ -28,6 +28,7 @@ import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.Tra
 public class LoadTransactions extends AbstractTransaction {
 
     private LoadTransactions.RawResponseType rawResponseType;
+    private BookingStatus bookingStatus;
     private LocalDate dateFrom;
     private LocalDate dateTo;
     private boolean withBalance;
@@ -39,5 +40,10 @@ public class LoadTransactions extends AbstractTransaction {
 
     public enum RawResponseType {
         CAMT, MT940
+    }
+
+    public enum BookingStatus {
+        PENDING,
+        BOOKED,
     }
 }
