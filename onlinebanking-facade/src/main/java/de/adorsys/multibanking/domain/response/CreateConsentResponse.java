@@ -18,9 +18,11 @@ package de.adorsys.multibanking.domain.response;
 
 import de.adorsys.multibanking.domain.ScaApproach;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
-public class CreateConsentResponse {
+public class CreateConsentResponse extends AbstractResponse {
 
     private ScaApproach scaApproach;
     private String consentId;
@@ -28,5 +30,5 @@ public class CreateConsentResponse {
     private String redirectId;
     private String redirectUrl;
     private String oauthRedirectUrl;
-    private Object bankApiConsentData;
+
 }

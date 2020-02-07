@@ -18,18 +18,18 @@ package de.adorsys.multibanking.domain.response;
 
 import de.adorsys.multibanking.domain.*;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
-@RequiredArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 @Data
-public class UpdateAuthResponse {
+public class UpdateAuthResponse extends AbstractResponse {
 
     private final BankApi bankApi;
     private final ScaApproach scaApproach;
     private final ScaStatus scaStatus;
     private List<TanTransportType> scaMethods;
     private ChallengeData challenge;
-    private String psuMessage;
+
 }

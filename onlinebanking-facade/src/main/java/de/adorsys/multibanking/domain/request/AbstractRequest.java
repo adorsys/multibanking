@@ -21,8 +21,6 @@ import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.BankApiUser;
 import lombok.Data;
 
-import java.util.Map;
-
 @Data
 public abstract class AbstractRequest {
 
@@ -34,10 +32,4 @@ public abstract class AbstractRequest {
 
     //oauth authorisation code
     private String authorisationCode;
-
-    //hbci stuff
-    private Map<String, String> hbciBPD;
-    private Map<String, String> hbciUPD;
-    private String hbciSysId;
-
 }

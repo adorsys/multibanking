@@ -11,11 +11,9 @@ import java.util.Optional;
 public abstract class AbstractResponse {
 
     private AuthorisationCodeResponse authorisationCodeResponse;
-
     private List<PsuMessage> messages;
 
-    private String hbciSysId;
-    private Map<String, String> hbciUpd;
+    private Object bankApiConsentData;
 
     public boolean containsMessage(String messageCode) {
         return Optional.ofNullable(messages)
@@ -23,7 +21,6 @@ public abstract class AbstractResponse {
                 .anyMatch(psuMessage -> psuMessage.getCode() != null && messageCode.equals(psuMessage.getCode()))
             )
             .isPresent();
-
     }
 
 }

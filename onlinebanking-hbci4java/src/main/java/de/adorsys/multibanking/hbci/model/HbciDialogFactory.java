@@ -39,8 +39,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NO
 @UtilityClass
 public class HbciDialogFactory {
 
-    public static AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciPassport existingPassport,
-                                                  HbciDialogRequest dialogRequest,
+    public static AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciDialogRequest dialogRequest,
                                                   HBCITwoStepMechanism twoStepMechanism) {
         String bankCode = Optional.ofNullable(dialogRequest.getBank().getBankApiBankCode())
             .orElse(dialogRequest.getBank().getBankCode());
@@ -49,14 +48,11 @@ public class HbciDialogFactory {
             .orElseThrow(() -> new MultibankingException(BANK_NOT_SUPPORTED,
                 "Bank [" + bankCode + "] not supported"));
 
-        HbciPassport newPassport = Optional.ofNullable(existingPassport)
-            .orElseGet(() -> {
-                HbciConsent hbciConsent = (HbciConsent) dialogRequest.getBankApiConsentData();
+        HbciConsent hbciConsent = (HbciConsent) dialogRequest.getBankApiConsentData();
+        HbciPassport newPassport = createPassport(bankInfo.getPinTanVersion().getId(), bankCode,
+            hbciConsent.getCredentials().getUserId(), hbciConsent.getCredentials().getCustomerId(),
+            hbciConsent.getHbciProduct(), dialogRequest.getCallback());
 
-                return createPassport(bankInfo.getPinTanVersion().getId(), bankCode,
-                    hbciConsent.getCredentials().getUserId(), hbciConsent.getCredentials().getCustomerId(),
-                    hbciConsent.getHbciProduct(), dialogRequest.getCallback());
-            });
         newPassport.setCurrentSecMechInfo(twoStepMechanism);
 
         Optional.ofNullable(dialogRequest.getBankAccess())
@@ -66,10 +62,10 @@ public class HbciDialogFactory {
         Optional.ofNullable(HbciCacheHandler.getBpdCache().get(bankCode))
             .ifPresent(newPassport::setBPD);
 
-        Optional.ofNullable(dialogRequest.getHbciUPD())
+        Optional.ofNullable(hbciConsent.getHbciUpd())
             .ifPresent(newPassport::setUPD);
 
-        Optional.ofNullable(dialogRequest.getHbciSysId())
+        Optional.ofNullable(hbciConsent.getHbciSysId())
             .ifPresent(newPassport::setSysId);
 
         newPassport.setPIN(((HbciConsent) dialogRequest.getBankApiConsentData()).getCredentials().getPin());

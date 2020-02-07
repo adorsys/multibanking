@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 import org.kapott.hbci.manager.HBCIProduct;
 
 import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,7 +39,10 @@ public class HbciConsent {
     private TanTransportType selectedMethod;
     private String scaAuthenticationData;
     private Object hbciTanSubmit;
-    private boolean withHktan = true;
+    private boolean withHktan = true; //ING hack, anoymous dialog & hktan for dialog not supported
+
+    private String hbciSysId;
+    private Map<String, String> hbciUpd;
 
     public void afterTransactionAuthorisation(ScaStatus scaStatus) {
         setHbciTanSubmit(null);

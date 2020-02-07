@@ -23,6 +23,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.kapott.hbci.callback.HBCICallback;
 
+import java.util.Map;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -30,5 +32,6 @@ import org.kapott.hbci.callback.HBCICallback;
 public class HbciDialogRequest extends AbstractRequest {
 
     private HBCICallback callback;
+
 
 }

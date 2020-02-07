@@ -40,8 +40,7 @@ import java.io.InputStream;
 import java.util.Optional;
 
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
-import static de.adorsys.multibanking.hbci.HbciCacheHandler.setRequestBpdAndCreateCallback;
-import static de.adorsys.multibanking.hbci.HbciCacheHandler.updateUpd;
+import static de.adorsys.multibanking.hbci.HbciCacheHandler.createCallback;
 import static de.adorsys.multibanking.hbci.HbciExceptionHandler.handleHbciException;
 
 public class HbciBanking implements OnlineBankingService {
@@ -119,11 +118,11 @@ public class HbciBanking implements OnlineBankingService {
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
-                HbciBpdUpdCallback hbciCallback = setRequestBpdAndCreateCallback(request);
+                HbciBpdUpdCallback hbciCallback = createCallback(request);
 
                 AccountInformationJob accountInformationJob = new AccountInformationJob(request);
                 AccountInformationResponse response = accountInformationJob.execute(hbciCallback);
-                updateUpd(hbciCallback, response);
+                hbciCallback.updateConsentUpd((HbciConsent) request.getBankApiConsentData());
                 return response;
             } else {
                 TransactionAuthorisationResponse<? extends AbstractResponse> transactionAuthorisationResponse =
@@ -143,11 +142,11 @@ public class HbciBanking implements OnlineBankingService {
         HbciConsent hbciConsent = (HbciConsent) loadTransactionsRequest.getBankApiConsentData();
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
-                HbciBpdUpdCallback hbciCallback = setRequestBpdAndCreateCallback(loadTransactionsRequest);
+                HbciBpdUpdCallback hbciCallback = createCallback(loadTransactionsRequest);
 
                 LoadTransactionsJob loadBookingsJob = new LoadTransactionsJob(loadTransactionsRequest);
                 TransactionsResponse response = loadBookingsJob.execute(hbciCallback);
-                updateUpd(hbciCallback, response);
+                hbciCallback.updateConsentUpd((HbciConsent) loadTransactionsRequest.getBankApiConsentData());
                 return response;
             } else {
                 TransactionAuthorisationResponse<? extends AbstractResponse> transactionAuthorisationResponse =
@@ -167,11 +166,11 @@ public class HbciBanking implements OnlineBankingService {
         HbciConsent hbciConsent = (HbciConsent) loadStandingOrdersRequest.getBankApiConsentData();
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
-                HbciBpdUpdCallback hbciCallback = setRequestBpdAndCreateCallback(loadStandingOrdersRequest);
+                HbciBpdUpdCallback hbciCallback = createCallback(loadStandingOrdersRequest);
 
                 LoadStandingOrdersJob loadStandingOrdersJob = new LoadStandingOrdersJob(loadStandingOrdersRequest);
                 StandingOrdersResponse response = loadStandingOrdersJob.execute(hbciCallback);
-                updateUpd(hbciCallback, response);
+                hbciCallback.updateConsentUpd((HbciConsent) loadStandingOrdersRequest.getBankApiConsentData());
                 return response;
             } else {
                 TransactionAuthorisationResponse<? extends AbstractResponse> transactionAuthorisationResponse =
@@ -191,11 +190,11 @@ public class HbciBanking implements OnlineBankingService {
         HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
-                HbciBpdUpdCallback hbciCallback = setRequestBpdAndCreateCallback(request);
+                HbciBpdUpdCallback hbciCallback = createCallback(request);
 
                 LoadBalancesJob loadBalancesJob = new LoadBalancesJob(request);
                 LoadBalancesResponse response = loadBalancesJob.execute(hbciCallback);
-                updateUpd(hbciCallback, response);
+                hbciCallback.updateConsentUpd((HbciConsent) request.getBankApiConsentData());
                 return response;
             } else {
                 TransactionAuthorisationResponse<? extends AbstractResponse> transactionAuthorisationResponse =
@@ -215,12 +214,12 @@ public class HbciBanking implements OnlineBankingService {
         HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
-                HbciBpdUpdCallback hbciCallback = setRequestBpdAndCreateCallback(request);
+                HbciBpdUpdCallback hbciCallback = createCallback(request);
 
                 ScaAwareJob<? extends AbstractPayment, PaymentResponse> paymentJob = createScaJob(request);
 
                 PaymentResponse response = paymentJob.execute(hbciCallback);
-                updateUpd(hbciCallback, response);
+                hbciCallback.updateConsentUpd((HbciConsent) request.getBankApiConsentData());
 
                 return response;
             } else {
@@ -242,7 +241,7 @@ public class HbciBanking implements OnlineBankingService {
     }
 
     private <T extends AbstractTransaction, R extends AbstractResponse> TransactionAuthorisationResponse<R> transactionAuthorisation(TransactionAuthorisation<T> transactionAuthorisation) {
-        setRequestBpdAndCreateCallback(transactionAuthorisation.getOriginTransactionRequest());
+        createCallback(transactionAuthorisation.getOriginTransactionRequest());
         try {
             ScaAwareJob<T, R> scaJob = createScaJob(transactionAuthorisation.getOriginTransactionRequest());
 

@@ -52,8 +52,7 @@ import static de.adorsys.multibanking.domain.ScaApproach.EMBEDDED;
 import static de.adorsys.multibanking.domain.ScaStatus.*;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NOT_SUPPORTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_SCA_METHOD;
-import static de.adorsys.multibanking.hbci.HbciCacheHandler.setRequestBpdAndCreateCallback;
-import static de.adorsys.multibanking.hbci.HbciCacheHandler.updateUpd;
+import static de.adorsys.multibanking.hbci.HbciCacheHandler.createCallback;
 import static de.adorsys.multibanking.hbci.HbciExceptionHandler.handleHbciException;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.UPD;
@@ -108,7 +107,7 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
     private ScaMethodsResponse authenticatePsu(UpdatePsuAuthenticationRequest authenticatePsuRequest) {
         try {
             HbciDialogRequest dialogRequest = hbciDialogRequestMapper.toHbciDialogRequest(authenticatePsuRequest, null);
-            HbciBpdUpdCallback hbciCallback = setRequestBpdAndCreateCallback(dialogRequest);
+            HbciBpdUpdCallback hbciCallback = createCallback(dialogRequest);
             dialogRequest.setCallback(hbciCallback);
 
             HBCIExecStatus bpdExecStatus = fetchBpd(dialogRequest);
@@ -128,7 +127,7 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
             ScaMethodsResponse response = ScaMethodsResponse.builder()
                 .tanTransportTypes(extractTanTransportTypes(passport, tanMediaList))
                 .build();
-            updateUpd(hbciCallback, response);
+            response.setBankApiConsentData(hbciCallback.updateConsentUpd((HbciConsent) authenticatePsuRequest.getBankApiConsentData()));
             return response;
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
@@ -205,11 +204,11 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
     @Override
     public PaymentStatusResponse getPaymentStatus(TransactionRequest<PaymentStatusReqest> request) {
         try {
-            HbciBpdUpdCallback hbciCallback = setRequestBpdAndCreateCallback(request);
+            HbciBpdUpdCallback hbciCallback = createCallback(request);
 
             InstantPaymentStatusJob instantPaymentStatusJob = new InstantPaymentStatusJob(request);
             PaymentStatusResponse response = instantPaymentStatusJob.execute(hbciCallback);
-            updateUpd(hbciCallback, response);
+            hbciCallback.updateConsentUpd((HbciConsent) request.getBankApiConsentData());
 
             return response;
         } catch (HBCI_Exception e) {
@@ -218,12 +217,12 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
     }
 
     private HBCIExecStatus fetchBpd(HbciDialogRequest dialogRequest) {
-        AbstractHbciDialog dialog = HbciDialogFactory.createDialog(BPD, null, dialogRequest, null);
+        AbstractHbciDialog dialog = HbciDialogFactory.createDialog(BPD, dialogRequest, null);
         return dialog.execute(true);
     }
 
     private PinTanPassport fetchUpd(HbciDialogRequest dialogRequest, boolean withHktan) {
-        HBCIUpdDialog dialog = (HBCIUpdDialog) HbciDialogFactory.createDialog(UPD, null, dialogRequest, null);
+        HBCIUpdDialog dialog = (HBCIUpdDialog) HbciDialogFactory.createDialog(UPD, dialogRequest, null);
         dialog.setWithHktan(withHktan);
         dialog.execute(true);
 

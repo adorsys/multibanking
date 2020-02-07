@@ -18,6 +18,7 @@ package de.adorsys.multibanking.hbci;
 
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
+import de.adorsys.multibanking.hbci.model.HbciConsent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -64,5 +65,11 @@ class HbciBpdUpdCallback extends AbstractHBCICallback {
         if (statusTag == STATUS_INIT_SYSID_DONE) {
             this.sysId = o[1].toString();
         }
+    }
+
+    public HbciConsent updateConsentUpd(HbciConsent consent) {
+        Optional.ofNullable(upd).ifPresent(consent::setHbciUpd);
+        Optional.ofNullable(sysId).ifPresent(consent::setHbciSysId);
+        return consent;
     }
 }
