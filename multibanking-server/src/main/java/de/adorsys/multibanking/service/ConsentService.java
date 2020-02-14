@@ -117,8 +117,10 @@ public class ConsentService {
             internalConsent.setBankApiConsentData(selectPsuAuthenticationMethodRequest.getBankApiConsentData());
             consentRepository.save(internalConsent);
 
+            String tanMedia = response.getChallenge() != null ? response.getChallenge().getOtpFormat() : null;
+
             metricsCollector.count("selectPsuAuthenticationMethod",
-                Iban.valueOf(internalConsent.getPsuAccountIban()).getBankCode(), onlineBankingService.bankApi());
+                Iban.valueOf(internalConsent.getPsuAccountIban()).getBankCode(), onlineBankingService.bankApi(), null, tanMedia);
 
             return response;
         } catch (Exception e) {
