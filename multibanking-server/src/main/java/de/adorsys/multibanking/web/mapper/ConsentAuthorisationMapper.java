@@ -23,20 +23,15 @@ public interface ConsentAuthorisationMapper {
     @Mapping(target = "credentials.customerId", source = "updatePsuAuthenticationRequest.psuId")
     @Mapping(target = "credentials.userId", source = "updatePsuAuthenticationRequest.psuCorporateId")
     @Mapping(target = "credentials.pin", source = "updatePsuAuthenticationRequest.password")
-    @Mapping(target = "hbciBPD", ignore = true)
-    @Mapping(target = "hbciUPD", ignore = true)
-    @Mapping(target = "hbciSysId", ignore = true)
     @Mapping(target = "bankApiUser", ignore = true)
     @Mapping(target = "bankAccess", ignore = true)
     @Mapping(target = "authorisationCode", ignore = true)
     UpdatePsuAuthenticationRequest toUpdatePsuAuthenticationRequest(UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequest, ConsentEntity consentEntity, BankEntity bank);
 
+    @Mapping(target = "psuMessage", ignore = true)
     UpdateAuthResponseTO toUpdateAuthResponseTO(UpdateAuthResponse updateAuthResponse);
 
     @Mapping(target = "consentId", source = "consentEntity.id")
-    @Mapping(target = "hbciBPD", ignore = true)
-    @Mapping(target = "hbciUPD", ignore = true)
-    @Mapping(target = "hbciSysId", ignore = true)
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "bankApiUser", ignore = true)
     @Mapping(target = "bankAccess", ignore = true)
@@ -44,9 +39,6 @@ public interface ConsentAuthorisationMapper {
     SelectPsuAuthenticationMethodRequest toSelectPsuAuthenticationMethodRequest(SelectPsuAuthenticationMethodRequestTO selectPsuAuthenticationMethodRequest, ConsentEntity consentEntity);
 
     @Mapping(target = "consentId", source = "consentEntity.id")
-    @Mapping(target = "hbciBPD", ignore = true)
-    @Mapping(target = "hbciUPD", ignore = true)
-    @Mapping(target = "hbciSysId", ignore = true)
     @Mapping(target = "bank", ignore = true)
     @Mapping(target = "bankApiUser", ignore = true)
     @Mapping(target = "bankAccess", ignore = true)

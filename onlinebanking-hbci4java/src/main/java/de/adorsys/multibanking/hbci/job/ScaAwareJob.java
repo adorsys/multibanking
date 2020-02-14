@@ -48,7 +48,6 @@ import org.kapott.hbci.status.HBCIMsgStatus;
 import org.kapott.hbci.status.HBCIStatus;
 import org.kapott.hbci.structures.Konto;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -132,8 +131,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
         dialog.getPassport().setBPD(bpdPassport.getBPD());
 
-        HBCIMsgStatus dialogInitMsgStatus =
-            dialog.dialogInit(((HbciConsent) getTransactionRequest().getBankApiConsentData()).isWithHktan());
+        HBCIMsgStatus dialogInitMsgStatus = dialog.dialogInit(((HbciConsent) getTransactionRequest().getBankApiConsentData()).isWithHktan());
 
         if (checkDialogInitScaRequired(dialogInitMsgStatus)) {
             log.info("HKIDN SCA required");
@@ -224,7 +222,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         HBCICallback callback = createCallback(hbciCallback);
         HbciDialogRequest dialogRequest = createDialogRequest(callback);
 
-        return HbciDialogFactory.createDialog(dialogType, null, dialogRequest, twoStepMechanism);
+        return HbciDialogFactory.createDialog(dialogType, dialogRequest, twoStepMechanism);
     }
 
     protected void checkExecuteStatus(HBCIExecStatus execStatus) {

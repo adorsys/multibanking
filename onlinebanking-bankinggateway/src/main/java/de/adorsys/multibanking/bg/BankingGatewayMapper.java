@@ -41,6 +41,8 @@ interface BankingGatewayMapper {
     @InheritInverseConfiguration
     Consent toConsent(ConsentTO consentTO);
 
+    @Mapping(target = "authorisationCodeResponse", ignore = true)
+    @Mapping(target = "messages", ignore = true)
     @Mapping(target = "bankApiConsentData", ignore = true)
     @Mapping(target = "redirectId", ignore = true)
     CreateConsentResponse toCreateConsentResponse(CreateConsentResponseTO consentResponse);
@@ -50,6 +52,9 @@ interface BankingGatewayMapper {
     @Mapping(target = "password", source = "pin")
     UpdatePsuAuthenticationRequestTO toUpdatePsuAuthenticationRequestTO(Credentials credentials);
 
+    @Mapping(target = "authorisationCodeResponse", ignore = true)
+    @Mapping(target = "messages", ignore = true)
+    @Mapping(target = "bankApiConsentData", ignore = true)
     UpdateAuthResponse toUpdateAuthResponse(ResourceUpdateAuthResponseTO resourceUpdateAuthResponseTO,
                                             @MappingTarget UpdateAuthResponse updateAuthResponse);
 

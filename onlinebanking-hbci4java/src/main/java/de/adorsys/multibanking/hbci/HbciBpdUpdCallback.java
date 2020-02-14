@@ -18,11 +18,13 @@ package de.adorsys.multibanking.hbci;
 
 import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
+import de.adorsys.multibanking.hbci.model.HbciConsent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.callback.AbstractHBCICallback;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -64,5 +66,14 @@ class HbciBpdUpdCallback extends AbstractHBCICallback {
         if (statusTag == STATUS_INIT_SYSID_DONE) {
             this.sysId = o[1].toString();
         }
+    }
+
+    public HbciConsent updateConsentUpd(HbciConsent consent) {
+        Optional.ofNullable(upd).ifPresent(consent::setHbciUpd);
+        Optional.ofNullable(sysId).ifPresent(consent::setHbciSysId);
+        if (upd != null || sysId != null) {
+            consent.setHbciCacheUpdateTime(LocalDateTime.now());
+        }
+        return consent;
     }
 }

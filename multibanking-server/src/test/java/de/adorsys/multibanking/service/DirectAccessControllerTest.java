@@ -4,6 +4,7 @@ import de.adorsys.multibanking.Application;
 import de.adorsys.multibanking.bg.BankingGatewayAdapter;
 import de.adorsys.multibanking.conf.FongoConfig;
 import de.adorsys.multibanking.conf.MapperConfig;
+import de.adorsys.multibanking.config.MongoMapKeyDotReplacementConfiguration;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
@@ -67,7 +68,7 @@ import static org.mockito.internal.util.MockUtil.isMock;
 
 @Slf4j
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {Application.class, FongoConfig.class, MapperConfig.class}, webEnvironment =
+@SpringBootTest(classes = {Application.class, FongoConfig.class, MongoMapKeyDotReplacementConfiguration.class, MapperConfig.class}, webEnvironment =
     SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 public class DirectAccessControllerTest {
@@ -115,7 +116,7 @@ public class DirectAccessControllerTest {
     @Test
     public void createConsent_should_return_a_authorisationStatus_link_hbci() {
         ConsentTO consentTO = createConsentTO();
-        prepareBank(new HbciBanking(null), consentTO.getPsuAccountIban(), false);
+        prepareBank(new HbciBanking(null, 0, 0), consentTO.getPsuAccountIban(), false);
 
         JsonPath jsonPath = request.body(consentTO)
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
@@ -248,7 +249,7 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_hbci() {
-        HbciBanking hbci4JavaBanking = new HbciBanking(null);
+        HbciBanking hbci4JavaBanking = new HbciBanking(null, 0, 0);
 
         ConsentTO consentTO = createConsentTO();
         prepareBank(hbci4JavaBanking, consentTO.getPsuAccountIban(), false);
@@ -267,7 +268,7 @@ public class DirectAccessControllerTest {
     public void consent_authorisation_hbci_mock() {
         ConsentTO consentTO = createConsentTO();
 
-        HbciBanking hbci4JavaBanking = spy(new HbciBanking(null));
+        HbciBanking hbci4JavaBanking = spy(new HbciBanking(null, 0, 0));
         prepareBank(hbci4JavaBanking, consentTO.getPsuAccountIban(), false);
 
         //mock hbci authenticate "authenticatePsu" that's why we need to use an answer to manipulate the consent
@@ -396,8 +397,7 @@ public class DirectAccessControllerTest {
             jsonPath = request
                 .body(loadBookingsRequest)
                 .post(getRemoteMultibankingUrl() + "/api/v2/direct/bookings")
-                .then().assertThat().statusCode(HttpStatus.OK.value())
-                .and().extract().jsonPath();
+                .then().extract().jsonPath();
 
             if (jsonPath.get("bookings") != null) {
                 //response contains bookings -> sca not needed

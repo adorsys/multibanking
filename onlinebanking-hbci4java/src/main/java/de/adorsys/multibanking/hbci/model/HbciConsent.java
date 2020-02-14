@@ -24,7 +24,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.kapott.hbci.manager.HBCIProduct;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,11 +43,27 @@ public class HbciConsent {
     private TanTransportType selectedMethod;
     private String scaAuthenticationData;
     private Object hbciTanSubmit;
-    private boolean withHktan = true;
+    private boolean withHktan = true; //ING hack, anoymous dialog & hktan for dialog not supported
+
+    private LocalDateTime hbciCacheUpdateTime;
+    private String hbciSysId;
+    private Map<String, String> hbciUpd;
 
     public void afterTransactionAuthorisation(ScaStatus scaStatus) {
         setHbciTanSubmit(null);
         setStatus(scaStatus);
         setScaAuthenticationData(null);
+    }
+
+    public void checkUpdCache(long sysIdExpirationTimeMs, long updExpirationTimeMs) {
+        Optional.ofNullable(hbciCacheUpdateTime)
+            .ifPresent(cacheUpdateTime -> {
+                if (cacheUpdateTime.plus(sysIdExpirationTimeMs, MILLIS).isBefore(LocalDateTime.now())) {
+                    hbciSysId = null;
+                }
+                if (cacheUpdateTime.plus(updExpirationTimeMs, MILLIS).isBefore(LocalDateTime.now())) {
+                    hbciUpd = null;
+                }
+            });
     }
 }

@@ -50,9 +50,9 @@ public class HbciStandingOrderTest {
     @Before
     public void beforeTest() {
         MockitoAnnotations.initMocks(this);
-        when(bankingServiceProducer.getBankingService(anyString())).thenReturn(new HbciBanking(null));
-        when(bankingServiceProducer.getBankingService(BankApi.FIGO)).thenReturn(new HbciBanking(null));
-        when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(new HbciBanking(null));
+        when(bankingServiceProducer.getBankingService(anyString())).thenReturn(new HbciBanking(null, 0, 0));
+        when(bankingServiceProducer.getBankingService(BankApi.FIGO)).thenReturn(new HbciBanking(null, 0, 0));
+        when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(new HbciBanking(null, 0, 0));
 
         bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {
             bankRepository.save(bankEntity);
