@@ -64,7 +64,7 @@ public class SyncTest {
         String params = "25040090=X-BANK|Köln|HYVEDEM1093|99|https://obs-qa.bv-zahlungssysteme.de|https://obs-qa" +
             ".bv-zahlungssysteme.de/hbciTunnel/hbciTransfer.jsp|300|300|";
 
-        HbciBanking hbci4JavaBanking = new HbciBanking(null, IOUtils.toInputStream(params, "ISO-8859-1"));
+        HbciBanking hbci4JavaBanking = new HbciBanking(null, IOUtils.toInputStream(params, "ISO-8859-1"), 0, 0);
 //        hbci4JavaBanking = new Hbci4JavaBanking(null);
 
         MockitoAnnotations.initMocks(this);

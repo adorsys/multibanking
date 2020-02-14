@@ -55,7 +55,7 @@ public class HbciIntegrationIT {
     private String psuCorporateId;
     private String pin;
 
-    private HbciBanking hbci4JavaBanking = new HbciBanking(null);
+    private HbciBanking hbci4JavaBanking = new HbciBanking(null, 0, 0);
 
     private static String readFile(String filePath) {
         StringBuilder contentBuilder = new StringBuilder();

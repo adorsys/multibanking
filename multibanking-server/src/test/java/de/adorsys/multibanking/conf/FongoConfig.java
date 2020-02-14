@@ -12,11 +12,9 @@ import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-/**
- * Created by alexg on 11.04.17.
- */
 @Configuration
 @EnableMongoRepositories(basePackages = "de.adorsys.multibanking.mongo.repository")
 @EnableSmartanalyticsMongoPersistence
@@ -30,7 +28,9 @@ public class FongoConfig extends AbstractMongoConfiguration {
 
     @Bean
     public MongoTemplate mongoTemplate(MongoClient mongoClient) {
-        return new MongoTemplate(mongoDbFactory(mongoClient));
+        MongoTemplate mongoTemplate = new MongoTemplate(mongoDbFactory(mongoClient));
+        ((MappingMongoConverter) mongoTemplate.getConverter()).setMapKeyDotReplacement("#");
+        return mongoTemplate;
     }
 
     @Bean

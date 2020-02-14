@@ -21,7 +21,6 @@ import de.adorsys.multibanking.web.model.TransactionAuthorisationRequestTO;
 import de.adorsys.multibanking.web.model.UpdatePsuAuthenticationRequestTO;
 import lombok.RequiredArgsConstructor;
 import org.iban4j.Iban;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;

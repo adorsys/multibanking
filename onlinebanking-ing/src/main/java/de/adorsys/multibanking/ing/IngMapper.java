@@ -28,12 +28,17 @@ interface IngMapper {
     @Mapping(target = "authorisationId", expression = "java( java.util.UUID.randomUUID().toString() )")
     @Mapping(target = "bankApiConsentData", expression = "java( bankApiConsentData )")
     @Mapping(target = "redirectId", ignore = true)
+    @Mapping(target = "authorisationCodeResponse", ignore = true)
+    @Mapping(target = "messages", ignore = true)
     @Mapping(target = "oauthRedirectUrl", ignore = true)
+    @Mapping(target = "scaApproach", constant = "OAUTH")
     CreateConsentResponse toCreateConsentResponse(IngSessionData bankApiConsentData, String redirectUrl);
 
     @Mapping(target = "challenge", ignore = true)
-    @Mapping(target = "psuMessage", ignore = true)
     @Mapping(target = "scaMethods", ignore = true)
+    @Mapping(target = "authorisationCodeResponse", ignore = true)
+    @Mapping(target = "messages", ignore = true)
+    @Mapping(target = "bankApiConsentData", ignore = true)
     UpdateAuthResponse toUpdateAuthResponse(IngSessionData ingSessionData,
                                             @MappingTarget UpdateAuthResponse updateAuthResponse);
 

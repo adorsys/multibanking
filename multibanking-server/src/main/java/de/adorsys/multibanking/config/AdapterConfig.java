@@ -37,6 +37,10 @@ public class AdapterConfig {
     private String fintsProduct;
     @Value("${fints.version:}")
     private String fintsProductVersion;
+    @Value("${fints.sysIdCacheExpirationMs:0}")
+    private long fintsSysIdCacheExpirationMs;
+    @Value("${fints.sysUpdCacheExpirationMs:0}")
+    private long fintsUpdCacheExpirationMs;
 
     private IngAdapter ingAdapter;
     private BankingGatewayAdapter bankingGatewayAdapter;
@@ -54,9 +58,9 @@ public class AdapterConfig {
 
         if (StringUtils.isEmpty(fintsProduct)) {
             log.warn("missing FinTS product configuration");
-            hbci4JavaBanking = new HbciBanking(null);
+            hbci4JavaBanking = new HbciBanking(null, fintsSysIdCacheExpirationMs, fintsUpdCacheExpirationMs);
         } else {
-            hbci4JavaBanking = new HbciBanking(new HBCIProduct(fintsProduct, fintsProductVersion));
+            hbci4JavaBanking = new HbciBanking(new HBCIProduct(fintsProduct, fintsProductVersion), fintsSysIdCacheExpirationMs, fintsUpdCacheExpirationMs);
         }
     }
 

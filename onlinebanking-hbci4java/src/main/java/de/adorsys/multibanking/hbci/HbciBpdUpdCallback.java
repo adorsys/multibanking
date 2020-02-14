@@ -24,6 +24,7 @@ import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.callback.AbstractHBCICallback;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,6 +71,9 @@ class HbciBpdUpdCallback extends AbstractHBCICallback {
     public HbciConsent updateConsentUpd(HbciConsent consent) {
         Optional.ofNullable(upd).ifPresent(consent::setHbciUpd);
         Optional.ofNullable(sysId).ifPresent(consent::setHbciSysId);
+        if (upd != null || sysId != null) {
+            consent.setHbciCacheUpdateTime(LocalDateTime.now());
+        }
         return consent;
     }
 }

@@ -61,6 +61,9 @@ import static de.adorsys.multibanking.hbci.model.HbciDialogType.UPD;
 public class HbciScaHandler implements StrongCustomerAuthorisable {
 
     private final HBCIProduct hbciProduct;
+    private final long sysIdExpirationTimeMs;
+    private final long updExpirationTimeMs;
+
     private HbciScaMapper hbciScaMapper = new HbciScaMapperImpl();
     private HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
 
@@ -110,10 +113,12 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
             HbciBpdUpdCallback hbciCallback = createCallback(dialogRequest);
             dialogRequest.setCallback(hbciCallback);
 
+            HbciConsent hbciConsent = (HbciConsent) authenticatePsuRequest.getBankApiConsentData();
+            hbciConsent.checkUpdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+
             HBCIExecStatus bpdExecStatus = fetchBpd(dialogRequest);
             boolean withHktan = !bpdExecStatus.hasMessage("9400");
             if (!withHktan) {
-                HbciConsent hbciConsent = (HbciConsent) authenticatePsuRequest.getBankApiConsentData();
                 hbciConsent.setWithHktan(false);
             }
 
@@ -127,7 +132,7 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
             ScaMethodsResponse response = ScaMethodsResponse.builder()
                 .tanTransportTypes(extractTanTransportTypes(passport, tanMediaList))
                 .build();
-            response.setBankApiConsentData(hbciCallback.updateConsentUpd((HbciConsent) authenticatePsuRequest.getBankApiConsentData()));
+            response.setBankApiConsentData(hbciCallback.updateConsentUpd(hbciConsent));
             return response;
         } catch (HBCI_Exception e) {
             throw handleHbciException(e);
@@ -204,11 +209,14 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
     @Override
     public PaymentStatusResponse getPaymentStatus(TransactionRequest<PaymentStatusReqest> request) {
         try {
+            HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
+            hbciConsent.checkUpdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+
             HbciBpdUpdCallback hbciCallback = createCallback(request);
 
             InstantPaymentStatusJob instantPaymentStatusJob = new InstantPaymentStatusJob(request);
             PaymentStatusResponse response = instantPaymentStatusJob.execute(hbciCallback);
-            hbciCallback.updateConsentUpd((HbciConsent) request.getBankApiConsentData());
+            response.setBankApiConsentData(hbciCallback.updateConsentUpd(hbciConsent));
 
             return response;
         } catch (HBCI_Exception e) {
