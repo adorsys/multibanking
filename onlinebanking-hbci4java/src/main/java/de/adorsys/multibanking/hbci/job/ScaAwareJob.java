@@ -100,7 +100,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         }
 
         HBCIExecStatus hbciExecStatus = dialog.execute(false);
-//        checkExecuteStatus(hbciExecStatus);
+        checkExecuteStatus(hbciExecStatus);
 
         //check for SCA is really needed after execution
         tan2StepRequired = Optional.ofNullable(hktan)
@@ -144,12 +144,12 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
     }
 
     private boolean checkDialogInitScaRequired(HBCIMsgStatus initMsgStatus) {
-//        if (!initMsgStatus.isOK()) {
-//            throw new MultibankingException(HBCI_ERROR, initMsgStatus.getErrorList()
-//                .stream()
-//                .map(messageString -> Message.builder().renderedMessage(messageString).build())
-//                .collect(Collectors.toList()));
-//        }
+        if (!initMsgStatus.isOK()) {
+            throw new MultibankingException(HBCI_ERROR, initMsgStatus.getErrorList()
+                .stream()
+                .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                .collect(Collectors.toList()));
+        }
 
         boolean scaRequired = initMsgStatus.segStatus.getRetVals().stream()
             .anyMatch(hbciRetVal -> hbciRetVal.code.equals("0030"));
