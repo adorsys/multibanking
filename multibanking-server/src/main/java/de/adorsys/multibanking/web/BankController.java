@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.BankEntity;
+import de.adorsys.multibanking.metrics.MetricsCollector;
 import de.adorsys.multibanking.service.BankService;
 import de.adorsys.multibanking.web.mapper.BankMapper;
 import de.adorsys.multibanking.web.model.BankTO;
@@ -24,7 +25,6 @@ import static java.util.stream.Collectors.toList;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@Timed("bank")
 @Tag(name = "Bank")
 @RequiredArgsConstructor
 @UserResource
@@ -34,19 +34,33 @@ public class BankController {
 
     private final BankMapper bankMapper;
     private final BankService bankService;
+    private final MetricsCollector metricsCollector;
 
     @Operation(description = "get bank by bank code")
     @GetMapping(value = "/{bankCode}")
     public Resource<BankTO> getBank(@PathVariable String bankCode) {
-        return mapToResource(bankService.findBank(bankCode));
+        long start = System.currentTimeMillis();
+        Exception exception = null;
+
+        try {
+            return mapToResource(bankService.findBank(bankCode));
+        } catch (Exception e) {
+            exception = e;
+            throw e;
+        } finally {
+            long duration = System.currentTimeMillis() - start;
+            metricsCollector.time("bank", bankCode, null, exception, duration);
+        }
     }
 
+    @Timed("bank")
     @Operation(description = "find bank")
     @GetMapping
     public Resources<Resource<BankTO>> searchBank(@RequestParam String query) {
         return new Resources<>(mapToResources(bankService.search(query)));
     }
 
+    @Timed("bank")
     @Operation(description = "Upload banks configuration file", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @PostMapping("/upload")
