@@ -41,7 +41,7 @@ public interface AccountStatementMapper {
 
     default BalancesReport createBalancesReport(GVRSaldoReq gvSaldoReq, String accountNumber) {
         return gvSaldoReq.getEntries().stream()
-            .filter(info -> info.konto.number.equals(accountNumber))
+            .filter(info -> StringUtils.stripStart(info.konto.number, "0").equals(StringUtils.stripStart(accountNumber, "0")))
             .findAny()
             .map(this::toBalancesReport)
             .orElse(null);
