@@ -116,8 +116,8 @@ public interface AccountStatementMapper {
     @Mapping(target = "balance", expression = "java(new BigDecimal(HBCIUtils.bigDecimal2String(line.saldo.value.getBigDecimalValue())))")
     @Mapping(target = "externalId", expression = "java(\"B-\" + line.valuta.getTime() + \"_\" + line.value" +
         ".getLongValue() + \"_\" + line.saldo.value.getLongValue())")
-    @Mapping(target = "origValue", expression = "java(new BigDecimal(HBCIUtils.bigDecimal2String(line.orig_value.getBigDecimalValue())))")
-    @Mapping(target = "chargeValue", expression = "java(new BigDecimal(HBCIUtils.bigDecimal2String(line.charge_value.getBigDecimalValue())))")
+    @Mapping(target = "origValue", expression = "java(line.orig_value == null ? null : new BigDecimal(HBCIUtils.bigDecimal2String(line.orig_value.getBigDecimalValue())))")
+    @Mapping(target = "chargeValue", expression = "java(line.charge_value == null ? null : new BigDecimal(HBCIUtils.bigDecimal2String(line.charge_value.getBigDecimalValue())))")
     @Mapping(target = "creditorId", expression = "java(de.adorsys.multibanking.domain.utils.Utils.extractCreditorId" +
         "(booking.getUsage()))")
     @Mapping(target = "mandateReference", expression = "java(de.adorsys.multibanking.domain.utils.Utils" +
