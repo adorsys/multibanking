@@ -28,8 +28,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDauerSEPAList;
 import org.kapott.hbci.GV_Result.GVRDauerList;
+import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.passport.PinTanPassport;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Currency;
@@ -72,17 +74,13 @@ public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, Stand
                 standingOrder.setCreditorAccount(dauerAuftrag.other.iban);
                 standingOrder.setCreditorName(dauerAuftrag.other.name);
                 standingOrder.setTransactionAmount(new Amount(Currency.getInstance(dauerAuftrag.value.getCurr()),
-                    dauerAuftrag.value.getBigDecimalValue()));
+                    new BigDecimal(HBCIUtils.bigDecimal2String(dauerAuftrag.value.getBigDecimalValue()))));
                 standingOrder.setRemittanceInformationUnstructured(dauerAuftrag.usage);
                 standingOrder.setBankTransactionCode(dauerAuftrag.orderid);
-                Optional.ofNullable(dauerAuftrag.firstdate).ifPresent(date -> {
-                    standingOrder.setStartDate(LocalDateTime.ofInstant(date.toInstant(),
-                        ZoneOffset.UTC).toLocalDate());
-                });
-                Optional.ofNullable(dauerAuftrag.lastdate).ifPresent(date -> {
-                    standingOrder.setEndDate(LocalDateTime.ofInstant(date.toInstant(),
-                        ZoneOffset.UTC).toLocalDate());
-                });
+                Optional.ofNullable(dauerAuftrag.firstdate).ifPresent(date ->
+                    standingOrder.setStartDate(LocalDateTime.ofInstant(date.toInstant(), ZoneOffset.UTC).toLocalDate()));
+                Optional.ofNullable(dauerAuftrag.lastdate).ifPresent(date ->
+                    standingOrder.setEndDate(LocalDateTime.ofInstant(date.toInstant(), ZoneOffset.UTC).toLocalDate()));
                 standingOrder.setDayOfExecution(dauerAuftrag.execday);
 
                 switch (dauerAuftrag.turnus) {

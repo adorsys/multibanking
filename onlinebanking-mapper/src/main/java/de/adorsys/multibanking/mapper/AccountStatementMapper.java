@@ -25,18 +25,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import org.kapott.hbci.GV_Result.GVRKUms;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
+import org.kapott.hbci.manager.HBCIUtils;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Saldo;
 import org.kapott.hbci.structures.Value;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import static de.adorsys.multibanking.domain.utils.Utils.extractIban;
 
-@Mapper
+@Mapper(imports = {BigDecimal.class, HBCIUtils.class})
 public interface AccountStatementMapper {
 
     default BalancesReport createBalancesReport(GVRSaldoReq gvSaldoReq, String accountNumber) {
@@ -55,12 +57,12 @@ public interface AccountStatementMapper {
     BalancesReport toBalancesReport(GVRSaldoReq.Info saldoInfo);
 
     @Mapping(target = "currency", source = "curr")
-    @Mapping(target = "amount", source = "bigDecimalValue")
+    @Mapping(target = "amount", expression = "java(new BigDecimal(HBCIUtils.bigDecimal2String(value.getBigDecimalValue())))")
     @Mapping(target = "date", ignore = true)
     Balance toBalance(Value value);
 
     @Mapping(target = "currency", source = "value.curr")
-    @Mapping(target = "amount", source = "value.bigDecimalValue")
+    @Mapping(target = "amount", expression = "java(new BigDecimal(HBCIUtils.bigDecimal2String(saldo.value.getBigDecimalValue())))")
     @Mapping(target = "date", source = "timestamp")
     Balance toBalance(Saldo saldo);
 
@@ -107,15 +109,15 @@ public interface AccountStatementMapper {
         ".additional, 27)))")
     @Mapping(target = "bookingDate", source = "bdate")
     @Mapping(target = "valutaDate", source = "valuta")
-    @Mapping(target = "amount", source = "value.bigDecimalValue")
+    @Mapping(target = "amount", expression = "java(new BigDecimal(HBCIUtils.bigDecimal2String(line.value.getBigDecimalValue())))")
     @Mapping(target = "currency", source = "value.curr")
     @Mapping(target = "reversal", source = "storno")
     @Mapping(target = "transactionCode", source = "purposecode")
-    @Mapping(target = "balance", source = "saldo.value.bigDecimalValue")
+    @Mapping(target = "balance", expression = "java(new BigDecimal(HBCIUtils.bigDecimal2String(line.saldo.value.getBigDecimalValue())))")
     @Mapping(target = "externalId", expression = "java(\"B-\" + line.valuta.getTime() + \"_\" + line.value" +
         ".getLongValue() + \"_\" + line.saldo.value.getLongValue())")
-    @Mapping(target = "origValue", source = "orig_value.bigDecimalValue")
-    @Mapping(target = "chargeValue", source = "charge_value.bigDecimalValue")
+    @Mapping(target = "origValue", expression = "java(new BigDecimal(HBCIUtils.bigDecimal2String(line.orig_value.getBigDecimalValue())))")
+    @Mapping(target = "chargeValue", expression = "java(new BigDecimal(HBCIUtils.bigDecimal2String(line.charge_value.getBigDecimalValue())))")
     @Mapping(target = "creditorId", expression = "java(de.adorsys.multibanking.domain.utils.Utils.extractCreditorId" +
         "(booking.getUsage()))")
     @Mapping(target = "mandateReference", expression = "java(de.adorsys.multibanking.domain.utils.Utils" +
