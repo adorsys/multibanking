@@ -107,7 +107,7 @@ public class ApiClientFactory {
         client.setReadTimeout(600, TimeUnit.SECONDS);
 
         client.interceptors().add(
-            new HttpLoggingInterceptor(log::debug).setLevel(HttpLoggingInterceptor.Level.BODY)
+            new HttpLoggingInterceptor(log::debug).setLevel(HttpLoggingInterceptor.Level.HEADERS)
         );
 
         ApiClient apiClient = new ApiClient() {
