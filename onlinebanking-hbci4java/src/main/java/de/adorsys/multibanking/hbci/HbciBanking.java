@@ -262,7 +262,7 @@ public class HbciBanking implements OnlineBankingService {
 
             TransactionAuthorisationJob<T, R> transactionAuthorisationJob = new TransactionAuthorisationJob<>(scaJob,
                 transactionAuthorisation);
-            TransactionAuthorisationResponse<R> response = transactionAuthorisationJob.execute();
+            TransactionAuthorisationResponse<R> response = transactionAuthorisationJob.execute(true);
 
             HbciConsent hbciConsent =
                 ((HbciConsent) transactionAuthorisation.getOriginTransactionRequest().getBankApiConsentData());

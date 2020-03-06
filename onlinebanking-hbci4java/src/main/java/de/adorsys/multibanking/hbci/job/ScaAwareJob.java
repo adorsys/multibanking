@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.ChallengeData;
 import de.adorsys.multibanking.domain.PsuMessage;
-import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
@@ -45,6 +44,7 @@ import org.kapott.hbci.manager.*;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.status.HBCIMsgStatus;
+import org.kapott.hbci.status.HBCIRetVal;
 import org.kapott.hbci.status.HBCIStatus;
 import org.kapott.hbci.structures.Konto;
 
@@ -109,7 +109,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
             .orElse(false);
 
         R jobResponse = createJobResponse(dialog.getPassport(), hbciTanSubmit);
-        jobResponse.setMessages(collectMessages(hbciExecStatus.getMsgStatusList()));
+        jobResponse.setMessages(msgStatusListToPsuMessages(hbciExecStatus.getMsgStatusList()));
 
         if (tan2StepRequired) {
             updateTanSubmit(hbciTanSubmit, dialog, hbciJob);
@@ -145,10 +145,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
     private boolean checkDialogInitScaRequired(HBCIMsgStatus initMsgStatus) {
         if (!initMsgStatus.isOK()) {
-            throw new MultibankingException(HBCI_ERROR, initMsgStatus.getErrorList()
-                .stream()
-                .map(messageString -> Message.builder().renderedMessage(messageString).build())
-                .collect(Collectors.toList()));
+            throw new MultibankingException(HBCI_ERROR, msgStatusListToPsuMessages(Collections.singletonList(initMsgStatus)));
         }
 
         boolean scaRequired = initMsgStatus.segStatus.getRetVals().stream()
@@ -227,10 +224,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
     protected void checkExecuteStatus(HBCIExecStatus execStatus) {
         if (!execStatus.isOK()) {
-            throw new MultibankingException(HBCI_ERROR, execStatus.getErrorMessages()
-                .stream()
-                .map(messageString -> Message.builder().renderedMessage(messageString).build())
-                .collect(Collectors.toList()));
+            throw new MultibankingException(HBCI_ERROR, msgStatusListToPsuMessages(execStatus.getMsgStatusList()));
         }
     }
 
@@ -360,11 +354,17 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         };
     }
 
-    List<PsuMessage> collectMessages(List<HBCIMsgStatus> msgStatusList) {
+    List<PsuMessage> msgStatusListToPsuMessages(List<HBCIMsgStatus> msgStatusList) {
         return Optional.ofNullable(msgStatusList)
             .map(list -> list.isEmpty() ? null : list.get(0))
             .map(status -> status.segStatus)
             .map(HBCIStatus::getRetVals)
+            .map(this::collectMessages)
+            .orElse(Collections.emptyList());
+    }
+
+    List<PsuMessage> collectMessages(List<HBCIRetVal> hbciReturnValues) {
+        return Optional.ofNullable(hbciReturnValues)
             .map(list -> list.stream().map(retVal -> new PsuMessage(retVal.code, retVal.text)))
             .orElse(Stream.empty())
             .collect(Collectors.toList());

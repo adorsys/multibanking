@@ -17,7 +17,6 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BankAccount;
-import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadBalancesResponse;
@@ -30,8 +29,6 @@ import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import org.kapott.hbci.passport.PinTanPassport;
-
-import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
@@ -63,9 +60,7 @@ public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesRespo
     public LoadBalancesResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
         if (balanceJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Balance job not OK");
-            throw new MultibankingException(HBCI_ERROR, balanceJob.getJobResult().getJobStatus().getErrorList().stream()
-                .map(messageString -> Message.builder().renderedMessage(messageString).build())
-                .collect(Collectors.toList()));
+            throw new MultibankingException(HBCI_ERROR, collectMessages(balanceJob.getJobResult().getJobStatus().getRetVals()));
         }
 
         BankAccount bankAccount = loadBalanceRequest.getTransaction().getPsuAccount();

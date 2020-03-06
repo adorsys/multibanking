@@ -201,12 +201,12 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
             OAuthApi bankingGatewayB2COAuthApi = bankingGatewayB2COAuthApi(bankingGatewayBaseUrl);
             OAuthToken token = bankingGatewayB2COAuthApi.resolveAuthCode(authorizationCodeTO);
 
-            Optional.ofNullable(token)
+            String accessToken = Optional.ofNullable(token)
                 .map(OAuthToken::getAccessToken)
                 .orElseThrow(() -> new MultibankingException(INTERNAL_ERROR, 500, "No bearer token received " +
                     "for auth code"));
 
-            sessionData.setAccessToken(token.getAccessToken());
+            sessionData.setAccessToken(accessToken);
             sessionData.setRefreshToken(token.getRefreshToken());
         } catch (ApiException e) {
             throw handeAisApiException(e);
@@ -235,7 +235,7 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
         try {
             MessagesTO messagesTO = ObjectMapperConfig.getObjectMapper().readValue(e.getResponseBody(),
                 MessagesTO.class);
-            return new MultibankingException(multibankingError, e.getCode(),
+            return new MultibankingException(multibankingError, e.getCode(), null,
                 bankingGatewayMapper.toMessages(messagesTO.getMessageList()));
         } catch (Exception e2) {
             return new MultibankingException(BANKING_GATEWAY_ERROR, 500, e.getMessage());
