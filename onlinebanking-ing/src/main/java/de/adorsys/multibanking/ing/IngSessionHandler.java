@@ -31,8 +31,7 @@ public class IngSessionHandler {
                     URI authorizationRequestUri = getAuthorisationUri(ingSessionData.getTppRedirectUri());
                     Message message = new Message();
                     message.setParamsMap(Collections.singletonMap("redirectUrl", authorizationRequestUri.toString()));
-                    return new MultibankingException(MISSING_AUTHORISATION_CODE, 401,
-                        Collections.singletonList(message));
+                    return new MultibankingException(MISSING_AUTHORISATION_CODE, 401, null, Collections.singletonList(message));
                 });
         } else if (LocalDateTime.now().isAfter(ingSessionData.getExpirationTime())) {
             tokenResponse = Optional.ofNullable(ingSessionData.getRefreshToken())
@@ -41,7 +40,7 @@ public class IngSessionHandler {
                     URI authorizationRequestUri = getAuthorisationUri(ingSessionData.getTppRedirectUri());
                     Message message = new Message();
                     message.setParamsMap(Collections.singletonMap("redirectUrl", authorizationRequestUri.toString()));
-                    return new MultibankingException(TOKEN_EXPIRED, 401, Collections.singletonList(message));
+                    return new MultibankingException(TOKEN_EXPIRED, 401, null, Collections.singletonList(message));
                 });
         }
 

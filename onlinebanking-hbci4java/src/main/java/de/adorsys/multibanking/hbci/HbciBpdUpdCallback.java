@@ -16,7 +16,7 @@
 
 package de.adorsys.multibanking.hbci;
 
-import de.adorsys.multibanking.domain.exception.Message;
+import de.adorsys.multibanking.domain.PsuMessage;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
 import lombok.Data;
@@ -56,7 +56,7 @@ class HbciBpdUpdCallback extends AbstractHBCICallback {
     public void callback(int reason, List<String> messages, int datatype, StringBuilder retData) {
         if (reason == WRONG_PIN) {
             throw new MultibankingException(INVALID_PIN, messages.stream()
-                .map(messageString -> Message.builder().renderedMessage(messageString).build())
+                .map(messageString -> new PsuMessage(null, messageString))
                 .collect(Collectors.toList()));
         }
     }

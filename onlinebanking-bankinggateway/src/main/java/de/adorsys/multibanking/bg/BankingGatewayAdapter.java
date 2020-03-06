@@ -246,7 +246,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         try {
             Error400NGAIS messagesTO = ObjectMapperConfig.getObjectMapper().readValue(e.getResponseBody(),
                 Error400NGAIS.class);
-            return new MultibankingException(multibankingError, e.getCode(),
+            return new MultibankingException(multibankingError, e.getCode(), null,
                 bankingGatewayMapper.toMessagesFromTppMessage400AIS(messagesTO.getTppMessages()));
         } catch (Exception e2) {
             return new MultibankingException(multibankingError, 500, e.getMessage());

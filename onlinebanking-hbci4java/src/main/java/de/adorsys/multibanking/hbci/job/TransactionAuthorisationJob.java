@@ -19,7 +19,6 @@ package de.adorsys.multibanking.hbci.job;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.ScaStatus;
-import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.TransactionAuthorisationResponse;
@@ -43,7 +42,6 @@ import org.kapott.hbci.status.HBCIExecStatus;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
@@ -59,16 +57,17 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .findAndRegisterModules();
 
+    private HBCIJobsDialog hbciDialog;
     private final ScaAwareJob<T, R> scaJob;
     private final TransactionAuthorisation<T> transactionAuthorisation;
 
-    public TransactionAuthorisationResponse<R> execute() {
+    public TransactionAuthorisationResponse<R> execute(boolean closeDialog) {
         HbciTanSubmit hbciTanSubmit =
             evaluateTanSubmit((HbciConsent) transactionAuthorisation.getOriginTransactionRequest().getBankApiConsentData());
 
         HbciPassport hbciPassport = createPassport(transactionAuthorisation, hbciTanSubmit);
 
-        HBCIJobsDialog hbciDialog = new HBCIJobsDialog(hbciPassport, hbciTanSubmit.getDialogId(),
+        hbciDialog = new HBCIJobsDialog(hbciPassport, hbciTanSubmit.getDialogId(),
             hbciTanSubmit.getMsgNum());
 
         if (hbciTanSubmit.getTwoStepMechanism().getProcess() == 1) {
@@ -79,15 +78,14 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
 
         HBCIExecStatus hbciExecStatus = hbciDialog.execute(false);
         if (!hbciExecStatus.isOK()) {
-            hbciDialog.dialogEnd();
-            throw new MultibankingException(HBCI_ERROR, hbciExecStatus.getErrorMessages().stream()
-                .map(messageString -> Message.builder().renderedMessage(messageString).build())
-                .collect(Collectors.toList()));
+            if (closeDialog) {
+                hbciDialog.dialogEnd();
+            }
+            throw new MultibankingException(HBCI_ERROR, scaJob.msgStatusListToPsuMessages(hbciExecStatus.getMsgStatusList()));
         } else {
-            if (hbciTanSubmit.getHbciJobName() != null && hbciTanSubmit.getHbciJobName().equals("HKIDN")) {
+            if ("HKIDN".equals(hbciTanSubmit.getHbciJobName())) {
                 //sca for dialoginit was needed -> fints consent active, expecting response with exempted sca
-                TransactionAuthorisationResponse<R> response =
-                    new TransactionAuthorisationResponse<>(scaJob.execute(null, hbciDialog));
+                TransactionAuthorisationResponse<R> response = new TransactionAuthorisationResponse<>(scaJob.execute(null, hbciDialog));
                 response.setScaStatus(FINALISED);
                 return response;
             }

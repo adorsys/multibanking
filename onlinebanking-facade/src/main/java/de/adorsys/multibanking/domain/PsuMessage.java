@@ -25,4 +25,13 @@ public class PsuMessage {
 
     private final String code;
     private final String text;
+
+    @Override
+    public String toString() {
+        if (code != null) {
+            return code + ":" + text;
+        } else {
+            return text;
+        }
+    }
 }

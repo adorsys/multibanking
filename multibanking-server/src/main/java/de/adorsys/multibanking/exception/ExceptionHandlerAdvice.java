@@ -98,7 +98,7 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<Messages> handleException(MultibankingException e, HandlerMethod handlerMethod) {
         HttpStatus httpStatus = valueOf(e.getHttpResponseCode());
 
-        List<Message> messages = Optional.ofNullable(e.getMessages()).orElse(Collections.emptyList()).stream()
+        List<Message> messages = Optional.ofNullable(e.getTppMessages()).orElse(Collections.emptyList()).stream()
             .map(message -> Message.builder()
                 .key(message.getKey() != null ? message.getKey() : e.getMultibankingError().toString())
                 .severity(message.getSeverity() != null
@@ -109,6 +109,13 @@ public class ExceptionHandlerAdvice {
                 .paramsMap(message.getParamsMap())
                 .build()
             ).collect(toList());
+
+        messages.addAll(Optional.ofNullable(e.getPsuMessages()).orElse(Collections.emptyList()).stream()
+            .map(message -> Message.builder()
+                .key(e.getMultibankingError().toString())
+                .renderedMessage(message.toString())
+                .build()
+            ).collect(toList()));
 
         Messages messagesContainer = Messages.builder()
             .messages(messages)

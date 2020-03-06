@@ -18,7 +18,6 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BalancesReport;
 import de.adorsys.multibanking.domain.Booking;
-import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
@@ -74,10 +73,7 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
     public TransactionsResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
         if (transactionsHbciJob.getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
-            throw new MultibankingException(HBCI_ERROR,
-                transactionsHbciJob.getJobResult().getJobStatus().getErrorList().stream()
-                    .map(messageString -> Message.builder().renderedMessage(messageString).build())
-                    .collect(Collectors.toList()));
+            throw new MultibankingException(HBCI_ERROR, collectMessages(transactionsHbciJob.getJobResult().getJobStatus().getRetVals()));
         }
 
         List<Booking> bookingList = null;
