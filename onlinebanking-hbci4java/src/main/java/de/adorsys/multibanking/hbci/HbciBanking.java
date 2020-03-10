@@ -260,12 +260,10 @@ public class HbciBanking implements OnlineBankingService {
         try {
             ScaAwareJob<T, R> scaJob = createScaJob(transactionAuthorisation.getOriginTransactionRequest());
 
-            TransactionAuthorisationJob<T, R> transactionAuthorisationJob = new TransactionAuthorisationJob<>(scaJob,
-                transactionAuthorisation);
-            TransactionAuthorisationResponse<R> response = transactionAuthorisationJob.execute(true);
+            TransactionAuthorisationJob<T, R> transactionAuthorisationJob = new TransactionAuthorisationJob<>(scaJob, transactionAuthorisation);
+            TransactionAuthorisationResponse<R> response = transactionAuthorisationJob.execute();
 
-            HbciConsent hbciConsent =
-                ((HbciConsent) transactionAuthorisation.getOriginTransactionRequest().getBankApiConsentData());
+            HbciConsent hbciConsent = ((HbciConsent) transactionAuthorisation.getOriginTransactionRequest().getBankApiConsentData());
             hbciConsent.afterTransactionAuthorisation(response.getScaStatus());
 
             return response;

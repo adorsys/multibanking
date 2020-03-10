@@ -44,6 +44,7 @@ public class HbciConsent {
     private String scaAuthenticationData;
     private Object hbciTanSubmit;
     private boolean withHktan = true; //ING hack, anoymous dialog & hktan for dialog not supported
+    private boolean closeDialog = true; //TARGO hack, easytan status polling require open diealog for hktan
 
     private LocalDateTime hbciCacheUpdateTime;
     private String hbciSysId;
