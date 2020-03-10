@@ -42,7 +42,7 @@ public class ApiClientFactory {
     }
 
     private static de.adorsys.multibanking.xs2a_adapter.ApiClient apiClientXs2aAdapter(String baseUrl) {
-        return apiClientXs2aAdapter(baseUrl, null, null);
+        return apiClientXs2aAdapter(baseUrl, "*/*", null);
     }
 
     private static de.adorsys.multibanking.xs2a_adapter.ApiClient apiClientXs2aAdapter(String baseUrl,
@@ -51,7 +51,7 @@ public class ApiClientFactory {
         OkHttpClient client = new OkHttpClient();
         client.setReadTimeout(600, TimeUnit.SECONDS);
         client.interceptors().add(
-            new HttpLoggingInterceptor(log::debug).setLevel(HttpLoggingInterceptor.Level.BODY)
+            new HttpLoggingInterceptor(log::debug).setLevel(HttpLoggingInterceptor.Level.HEADERS)
         );
 
         de.adorsys.multibanking.xs2a_adapter.ApiClient apiClient =
