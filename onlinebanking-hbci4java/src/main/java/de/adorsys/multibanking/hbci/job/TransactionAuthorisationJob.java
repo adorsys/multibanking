@@ -57,17 +57,16 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .findAndRegisterModules();
 
-    private HBCIJobsDialog hbciDialog;
     private final ScaAwareJob<T, R> scaJob;
     private final TransactionAuthorisation<T> transactionAuthorisation;
 
-    public TransactionAuthorisationResponse<R> execute(boolean closeDialog) {
-        HbciTanSubmit hbciTanSubmit =
-            evaluateTanSubmit((HbciConsent) transactionAuthorisation.getOriginTransactionRequest().getBankApiConsentData());
+    public TransactionAuthorisationResponse<R> execute() {
+        HbciConsent consent = (HbciConsent) transactionAuthorisation.getOriginTransactionRequest().getBankApiConsentData();
+        HbciTanSubmit hbciTanSubmit = evaluateTanSubmit(consent);
 
         HbciPassport hbciPassport = createPassport(transactionAuthorisation, hbciTanSubmit);
 
-        hbciDialog = new HBCIJobsDialog(hbciPassport, hbciTanSubmit.getDialogId(),
+        HBCIJobsDialog hbciDialog = new HBCIJobsDialog(hbciPassport, hbciTanSubmit.getDialogId(),
             hbciTanSubmit.getMsgNum());
 
         if (hbciTanSubmit.getTwoStepMechanism().getProcess() == 1) {
@@ -78,7 +77,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
 
         HBCIExecStatus hbciExecStatus = hbciDialog.execute(false);
         if (!hbciExecStatus.isOK()) {
-            if (closeDialog) {
+            if (consent.isCloseDialog()) {
                 hbciDialog.dialogEnd();
             }
             throw new MultibankingException(HBCI_ERROR, scaJob.msgStatusListToPsuMessages(hbciExecStatus.getMsgStatusList()));
@@ -88,6 +87,8 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
                 TransactionAuthorisationResponse<R> response = new TransactionAuthorisationResponse<>(scaJob.execute(null, hbciDialog));
                 response.setScaStatus(FINALISED);
                 return response;
+            } else if (consent.isCloseDialog()) {
+                hbciDialog.dialogEnd();
             }
             return createResponse(hbciPassport, hbciTanSubmit);
         }
