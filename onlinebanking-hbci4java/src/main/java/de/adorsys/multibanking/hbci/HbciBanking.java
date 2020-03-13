@@ -129,7 +129,7 @@ public class HbciBanking implements OnlineBankingService {
 
                 AccountInformationJob accountInformationJob = new AccountInformationJob(request);
                 AccountInformationResponse response = accountInformationJob.execute(hbciCallback);
-                hbciCallback.updateConsentUpd(hbciConsent);
+                response.setBankApiConsentData(hbciCallback.updateConsentUpd(hbciConsent));
                 return response;
             } else {
                 TransactionAuthorisationResponse<? extends AbstractResponse> transactionAuthorisationResponse =
@@ -155,7 +155,7 @@ public class HbciBanking implements OnlineBankingService {
 
                 LoadTransactionsJob loadBookingsJob = new LoadTransactionsJob(loadTransactionsRequest);
                 TransactionsResponse response = loadBookingsJob.execute(hbciCallback);
-                hbciCallback.updateConsentUpd(hbciConsent);
+                response.setBankApiConsentData(hbciCallback.updateConsentUpd(hbciConsent));
                 return response;
             } else {
                 TransactionAuthorisationResponse<? extends AbstractResponse> transactionAuthorisationResponse =
@@ -181,7 +181,7 @@ public class HbciBanking implements OnlineBankingService {
 
                 LoadStandingOrdersJob loadStandingOrdersJob = new LoadStandingOrdersJob(loadStandingOrdersRequest);
                 StandingOrdersResponse response = loadStandingOrdersJob.execute(hbciCallback);
-                hbciCallback.updateConsentUpd(hbciConsent);
+                response.setBankApiConsentData(hbciCallback.updateConsentUpd(hbciConsent));
                 return response;
             } else {
                 TransactionAuthorisationResponse<? extends AbstractResponse> transactionAuthorisationResponse =
@@ -207,7 +207,7 @@ public class HbciBanking implements OnlineBankingService {
 
                 LoadBalancesJob loadBalancesJob = new LoadBalancesJob(request);
                 LoadBalancesResponse response = loadBalancesJob.execute(hbciCallback);
-                hbciCallback.updateConsentUpd(hbciConsent);
+                response.setBankApiConsentData(hbciCallback.updateConsentUpd(hbciConsent));
                 return response;
             } else {
                 TransactionAuthorisationResponse<? extends AbstractResponse> transactionAuthorisationResponse =
@@ -234,7 +234,7 @@ public class HbciBanking implements OnlineBankingService {
                 ScaAwareJob<? extends AbstractPayment, PaymentResponse> paymentJob = createScaJob(request);
 
                 PaymentResponse response = paymentJob.execute(hbciCallback);
-                hbciCallback.updateConsentUpd(hbciConsent);
+                response.setBankApiConsentData(hbciCallback.updateConsentUpd(hbciConsent));
 
                 return response;
             } else {

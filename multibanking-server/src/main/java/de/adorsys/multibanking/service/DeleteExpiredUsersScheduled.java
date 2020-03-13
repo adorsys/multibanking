@@ -48,7 +48,11 @@ public class DeleteExpiredUsersScheduled {
             count.incrementAndGet();
         });
 
-        log.info("delete job done, [{}] users deleted", count);
+        if (count.intValue() > 0) {
+            log.info("delete job done, [{}] users deleted", count);
+        } else {
+            log.trace("delete job done, no user deleted");
+        }
     }
 
     @Bean
