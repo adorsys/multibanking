@@ -130,9 +130,13 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 null, null, null, null, null);
 
             ApiResponse<Object> apiResponse = aisApi.getApiClient().execute(aisCall, String.class);
-            String contentType = apiResponse.getHeaders().keySet().stream()
+            String contentTypeKey = apiResponse.getHeaders().keySet().stream()
                 .filter(header -> header.toLowerCase().contains("content-type"))
                 .findFirst()
+                .orElse("");
+
+            String contentType = Optional.ofNullable(apiResponse.getHeaders().get(contentTypeKey))
+                .map(list -> list.get(0))
                 .orElse("");
 
             if (contentType.toLowerCase().contains("application/xml")) {

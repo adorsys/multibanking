@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.mapper;
 
 import de.adorsys.multibanking.domain.BalancesReport;
+import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import org.kapott.hbci.GV.parsers.ISEPAParser;
@@ -40,6 +41,8 @@ public class TransactionsParser {
         List<Booking> bookings = accountStatementMapper.createBookings(bookingsResult).stream()
             .collect(Collectors.collectingAndThen(Collectors.toCollection(
                 () -> new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
+
+        bookings.forEach(booking -> booking.setBankApi(BankApi.XS2A));
 
         BalancesReport balancesReport = null;
         if (!bookingsResult.getDataPerDay().isEmpty()) {
