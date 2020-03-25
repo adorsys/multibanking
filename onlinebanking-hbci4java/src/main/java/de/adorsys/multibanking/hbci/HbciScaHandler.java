@@ -31,6 +31,7 @@ import de.adorsys.multibanking.domain.transaction.PaymentStatusReqest;
 import de.adorsys.multibanking.hbci.job.InstantPaymentStatusJob;
 import de.adorsys.multibanking.hbci.model.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
 import org.iban4j.Iban;
 import org.kapott.hbci.GV.GVTANMediaList;
@@ -57,6 +58,7 @@ import static de.adorsys.multibanking.hbci.HbciExceptionHandler.handleHbciExcept
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.UPD;
 
+@Slf4j
 @RequiredArgsConstructor
 public class HbciScaHandler implements StrongCustomerAuthorisable {
 
@@ -77,7 +79,8 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
             .orElse(false);
 
         if (!bankSupported) {
-            throw new MultibankingException(BANK_NOT_SUPPORTED);
+            log.error("Bank not supported for bank code " + bankCode);
+            throw new MultibankingException(BANK_NOT_SUPPORTED, 400, "Bank code " + bankCode + " not supported");
         }
 
         HbciConsent hbciConsent = new HbciConsent();

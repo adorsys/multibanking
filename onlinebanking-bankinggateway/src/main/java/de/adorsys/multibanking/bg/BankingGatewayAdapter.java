@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.bg;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.squareup.okhttp.Call;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
@@ -15,13 +16,13 @@ import de.adorsys.multibanking.xs2a_adapter.ApiResponse;
 import de.adorsys.multibanking.xs2a_adapter.api.AccountInformationServiceAisApi;
 import de.adorsys.multibanking.xs2a_adapter.model.*;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.json.XML;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
 
 import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServiceAisApi;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
@@ -130,9 +131,13 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 null, null, null, null, null);
 
             ApiResponse<Object> apiResponse = aisApi.getApiClient().execute(aisCall, String.class);
-            String contentType = apiResponse.getHeaders().keySet().stream()
+            String contentTypeKey = apiResponse.getHeaders().keySet().stream()
                 .filter(header -> header.toLowerCase().contains("content-type"))
                 .findFirst()
+                .orElse("");
+
+            String contentType = Optional.ofNullable(apiResponse.getHeaders().get(contentTypeKey))
+                .map(list -> list.get(0))
                 .orElse("");
 
             if (contentType.toLowerCase().contains("application/xml")) {
@@ -196,7 +201,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private String getAccountResourceId(BgSessionData bgSessionData, String iban, String bankCode, String consentId) {
         try {
-            AccountList accountList = getAccountList(bgSessionData, bankCode, consentId, false);
+             AccountList accountList = getAccountList(bgSessionData, bankCode, consentId, false);
 
             return accountList.getAccounts()
                 .stream()
@@ -248,10 +253,55 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 Error400NGAIS.class);
             return new MultibankingException(multibankingError, e.getCode(), null,
                 bankingGatewayMapper.toMessagesFromTppMessage400AIS(messagesTO.getTppMessages()));
+        } catch (JsonParseException jpe) {
+            // try xml
+            TppMessage400AIS messageTO  = Optional.ofNullable(e.getResponseBody())
+                .filter(xml -> xml.startsWith("<"))
+                .map(uncheckFunction(string -> XML.toJSONObject(string)))
+                .map(jsonObject -> findTppMessage(jsonObject))
+                .map(uncheckFunction(message -> ObjectMapperConfig.getObjectMapper().readValue(message.toString(), TppMessage400AIS.class)))
+                .orElse(null);
+
+            if (messageTO != null) {
+                return new MultibankingException(multibankingError, e.getCode(), null,
+                    Arrays.asList(bankingGatewayMapper.toMessage(messageTO)));
+            } else {
+                return new MultibankingException(multibankingError, 500, e.getMessage());
+            }
         } catch (Exception e2) {
             return new MultibankingException(multibankingError, 500, e.getMessage());
         }
     }
 
+    private static JSONObject findTppMessage(JSONObject jsonObject) {
+        JSONObject message = null;
+        for (Iterator key = jsonObject.keys(); key.hasNext();) {
+            String nextKey = (String) key.next();
+            Object next = jsonObject.get(nextKey);
+            if ("tppMessages".equals(nextKey)) {
+                message = (JSONObject) next;
+            }
+            if (next instanceof JSONObject) {
+                JSONObject override = findTppMessage((JSONObject) next);
+                message = override != null ? override : message;
+            }
+        }
+        return message;
+    }
+
+    private static <T, R> Function<T, R> uncheckFunction(CheckedFunction<T, R> throwingFunction) {
+        return i -> {
+            try {
+                return throwingFunction.apply(i);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        };
+    }
+
+    @FunctionalInterface
+    public interface CheckedFunction<T, R> {
+        R apply(T t) throws IOException;
+    }
 }
 
