@@ -35,7 +35,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID
 @RequiredArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-class HbciBpdUpdCallback extends AbstractHBCICallback {
+public class HbciBpdUpdCallback extends AbstractHBCICallback {
 
     private final String bankCode;
     private final Map<String, Map<String, String>> bpdCache;
@@ -69,11 +69,17 @@ class HbciBpdUpdCallback extends AbstractHBCICallback {
     }
 
     public HbciConsent updateConsentUpd(HbciConsent consent) {
-        Optional.ofNullable(upd).ifPresent(consent::setHbciUpd);
-        Optional.ofNullable(sysId).ifPresent(consent::setHbciSysId);
-        if (upd != null || sysId != null) {
-            consent.setHbciCacheUpdateTime(LocalDateTime.now());
-        }
+        Optional.ofNullable(upd).ifPresent(upd -> {
+            consent.setHbciUpd(upd);
+            consent.setUpdCacheUpdateTime(LocalDateTime.now());
+            consent.setSysIdUpdUpdated(true);
+        });
+        Optional.ofNullable(sysId).ifPresent(sysId -> {
+            consent.setHbciSysId(sysId);
+            consent.setSysIdCacheUpdateTime(LocalDateTime.now());
+            consent.setSysIdUpdUpdated(true);
+        });
+
         return consent;
     }
 }

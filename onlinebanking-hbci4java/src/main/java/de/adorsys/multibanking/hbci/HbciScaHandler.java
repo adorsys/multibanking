@@ -117,7 +117,7 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
             dialogRequest.setCallback(hbciCallback);
 
             HbciConsent hbciConsent = (HbciConsent) authenticatePsuRequest.getBankApiConsentData();
-            hbciConsent.checkUpdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+            hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
 
             HBCIExecStatus bpdExecStatus = fetchBpd(dialogRequest);
             boolean withHktan = !bpdExecStatus.hasMessage("9400");
@@ -213,7 +213,7 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
     public PaymentStatusResponse getPaymentStatus(TransactionRequest<PaymentStatusReqest> request) {
         try {
             HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
-            hbciConsent.checkUpdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+            hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
 
             HbciBpdUpdCallback hbciCallback = createCallback(request);
 

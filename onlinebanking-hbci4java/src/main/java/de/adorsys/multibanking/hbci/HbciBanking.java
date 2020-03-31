@@ -121,7 +121,7 @@ public class HbciBanking implements OnlineBankingService {
     @Override
     public AccountInformationResponse loadBankAccounts(TransactionRequest<LoadAccounts> request) {
         HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
-        hbciConsent.checkUpdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+        hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
@@ -147,7 +147,7 @@ public class HbciBanking implements OnlineBankingService {
     @Override
     public TransactionsResponse loadTransactions(TransactionRequest<LoadTransactions> loadTransactionsRequest) {
         HbciConsent hbciConsent = (HbciConsent) loadTransactionsRequest.getBankApiConsentData();
-        hbciConsent.checkUpdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+        hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
@@ -173,7 +173,7 @@ public class HbciBanking implements OnlineBankingService {
     @Override
     public StandingOrdersResponse loadStandingOrders(TransactionRequest<LoadStandingOrders> loadStandingOrdersRequest) {
         HbciConsent hbciConsent = (HbciConsent) loadStandingOrdersRequest.getBankApiConsentData();
-        hbciConsent.checkUpdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+        hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
@@ -199,7 +199,7 @@ public class HbciBanking implements OnlineBankingService {
     @Override
     public LoadBalancesResponse loadBalances(TransactionRequest<LoadBalances> request) {
         HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
-        hbciConsent.checkUpdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+        hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
@@ -225,7 +225,7 @@ public class HbciBanking implements OnlineBankingService {
     @Override
     public PaymentResponse executePayment(TransactionRequest<? extends AbstractPayment> request) {
         HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
-        hbciConsent.checkUpdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+        hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {

@@ -16,12 +16,14 @@
 
 package de.adorsys.multibanking.hbci.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.adorsys.multibanking.domain.Credentials;
 import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.TanTransportType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.manager.HBCIProduct;
 
 import java.time.LocalDateTime;
@@ -31,6 +33,7 @@ import java.util.Optional;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 
+@Slf4j
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -46,8 +49,13 @@ public class HbciConsent {
     private boolean withHktan = true; //ING hack, anoymous dialog & hktan for dialog not supported
     private boolean closeDialog = true; //TARGO hack, easytan status polling require open diealog for hktan
 
-    private LocalDateTime hbciCacheUpdateTime;
+    @JsonIgnore
+    private boolean sysIdUpdUpdated;
+
+    private LocalDateTime sysIdCacheUpdateTime;
     private String hbciSysId;
+
+    private LocalDateTime updCacheUpdateTime;
     private Map<String, String> hbciUpd;
 
     public void afterTransactionAuthorisation(ScaStatus scaStatus) {
@@ -56,14 +64,19 @@ public class HbciConsent {
         setScaAuthenticationData(null);
     }
 
-    public void checkUpdCache(long sysIdExpirationTimeMs, long updExpirationTimeMs) {
-        Optional.ofNullable(hbciCacheUpdateTime)
+    public void checkUpdSysIdCache(long sysIdExpirationTimeMs, long updExpirationTimeMs) {
+        Optional.ofNullable(sysIdCacheUpdateTime)
             .ifPresent(cacheUpdateTime -> {
                 if (cacheUpdateTime.plus(sysIdExpirationTimeMs, MILLIS).isBefore(LocalDateTime.now())) {
                     hbciSysId = null;
+                    log.debug("sysid expired");
                 }
+            });
+        Optional.ofNullable(updCacheUpdateTime)
+            .ifPresent(cacheUpdateTime -> {
                 if (cacheUpdateTime.plus(updExpirationTimeMs, MILLIS).isBefore(LocalDateTime.now())) {
                     hbciUpd = null;
+                    log.debug("upd expired");
                 }
             });
     }
