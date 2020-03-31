@@ -16,10 +16,10 @@ public abstract class AbstractResponse {
 
     public boolean containsMessage(String messageCode) {
         return Optional.ofNullable(messages)
-            .filter(psuMessages -> psuMessages.stream()
+            .map(psuMessages -> psuMessages.stream()
                 .anyMatch(psuMessage -> psuMessage.getCode() != null && messageCode.equals(psuMessage.getCode()))
             )
-            .isPresent();
+            .orElse(false);
     }
 
 }
