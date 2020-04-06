@@ -90,6 +90,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
             } else if (consent.isCloseDialog()) {
                 hbciDialog.dialogEnd();
             }
+            hbciTanSubmit.setMsgNum(hbciTanSubmit.getMsgNum() + 1);
             return createResponse(hbciPassport, hbciTanSubmit, hbciExecStatus);
         }
     }
