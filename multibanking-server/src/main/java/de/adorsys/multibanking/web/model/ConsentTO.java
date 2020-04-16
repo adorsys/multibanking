@@ -23,6 +23,10 @@ public class ConsentTO {
     @Schema(description = "Consent redirect id")
     private String redirectId;
 
+    // @NotNull
+    @Schema(description = "Consent psu id")
+    private String psuId;
+
     @NotNull
     @Schema(description = "account iban", required = true)
     private String psuAccountIban;

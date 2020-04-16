@@ -45,7 +45,7 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
             AisApi aisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
                 (BgSessionData) bankApiConsentData);
             CreateConsentResponseTO consentResponse =
-                aisApi.createConsent(bankCode, bankingGatewayMapper.toConsentTO(consent), null, null,
+                aisApi.createConsent(bankCode, bankingGatewayMapper.toConsentTO(consent), consent.getPsuId(), null,
                     redirectPreferred, tppRedirectUri);
 
             BgSessionData sessionData = new BgSessionData();

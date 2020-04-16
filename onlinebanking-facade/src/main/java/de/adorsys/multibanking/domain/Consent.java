@@ -30,6 +30,8 @@ public class Consent {
 
     private String redirectId;
 
+    private String psuId;
+
     private String psuAccountIban;
 
     // Requested access services for a consent.
