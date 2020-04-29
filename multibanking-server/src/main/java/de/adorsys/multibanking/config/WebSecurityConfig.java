@@ -71,6 +71,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/v2/direct/**").permitAll()
             .antMatchers(HttpMethod.POST, "/api/v1/consents/**").permitAll()
             .antMatchers(HttpMethod.DELETE, "/api/v1/consents/**").permitAll()
+            .antMatchers(HttpMethod.GET, "/api/v1/consents/**").permitAll()
             .antMatchers("/api/v1/consents/**/authorisations/**").permitAll()
             .antMatchers("/status").permitAll()
             .antMatchers(HttpMethod.GET, "/api/v1/bank/**").permitAll()

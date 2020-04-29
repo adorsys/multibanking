@@ -17,6 +17,7 @@
 package de.adorsys.multibanking.domain.spi;
 
 import de.adorsys.multibanking.domain.Consent;
+import de.adorsys.multibanking.domain.ConsentStatus;
 import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
@@ -33,7 +34,9 @@ public interface StrongCustomerAuthorisable {
     CreateConsentResponse createConsent(Consent consentTemplate, boolean redirectPreferred, String tppRedirectUri,
                                         Object bankApiConsentData);
 
-    Consent getConsent(String consentId);
+    Consent getConsent(String consentId, Object bankApiConsentData);
+
+    ConsentStatus getConsentStatus(String consentId, Object bankApiConsentData);
 
     UpdateAuthResponse updatePsuAuthentication(UpdatePsuAuthenticationRequest updatePsuAuthentication);
 
@@ -41,7 +44,7 @@ public interface StrongCustomerAuthorisable {
 
     UpdateAuthResponse selectPsuAuthenticationMethod(SelectPsuAuthenticationMethodRequest selectPsuAuthenticationMethod);
 
-    void revokeConsent(String consentId);
+    void revokeConsent(String consentId, Object bankApiConsentData);
 
     UpdateAuthResponse getAuthorisationStatus(String consentId, String authorisationId, Object bankApiConsentData);
 

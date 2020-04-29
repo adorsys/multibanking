@@ -121,7 +121,7 @@ public class BankAccessService {
                 OnlineBankingService bankingService =
                     bankingServiceProducer.getBankingService(internalConsent.getBankApi());
                 try {
-                    bankingService.getStrongCustomerAuthorisation().revokeConsent(internalConsent.getId());
+                    bankingService.getStrongCustomerAuthorisation().revokeConsent(internalConsent.getId(), internalConsent.getBankApiConsentData());
                 } catch (MultibankingException e) {
                     if (e.getMultibankingError() == RESOURCE_NOT_FOUND) {
                         log.warn(e.getMessage(), e);

@@ -5,6 +5,7 @@ import de.adorsys.multibanking.banking_gateway_b2c.api.AisApi;
 import de.adorsys.multibanking.banking_gateway_b2c.api.OAuthApi;
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
 import de.adorsys.multibanking.domain.Consent;
+import de.adorsys.multibanking.domain.ConsentStatus;
 import de.adorsys.multibanking.domain.ScaApproach;
 import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
@@ -69,10 +70,20 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     }
 
     @Override
-    public Consent getConsent(String consentId) {
+    public Consent getConsent(String consentId, Object bankApiConsentData) {
         try {
-            return bankingGatewayMapper.toConsent(bankingGatewayB2CAisApi(bankingGatewayBaseUrl, null).getConsent(consentId)); //
-            // TODO Bearer token
+            return bankingGatewayMapper.toConsent(bankingGatewayB2CAisApi(bankingGatewayBaseUrl, (BgSessionData) bankApiConsentData).getConsent(consentId));
+            // TODO Bearer token required?
+        } catch (ApiException e) {
+            throw handeAisApiException(e);
+        }
+    }
+
+    @Override
+    public ConsentStatus getConsentStatus(String consentId, Object bankApiConsentData) {
+        try {
+            String consentStatus = bankingGatewayB2CAisApi(bankingGatewayBaseUrl, (BgSessionData) bankApiConsentData).getConsentStatus(consentId);
+            return ConsentStatus.valueOf(consentStatus);
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }
@@ -159,10 +170,10 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
     }
 
     @Override
-    public void revokeConsent(String consentId) {
+    public void revokeConsent(String consentId, Object bankApiConsentData) {
         try {
-            AisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl, null);
-            bankingGatewayB2CAisApi.revokeConsent(consentId); // TODO Bearer token
+            AisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl, (BgSessionData) bankApiConsentData);
+            bankingGatewayB2CAisApi.revokeConsent(consentId);
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }
