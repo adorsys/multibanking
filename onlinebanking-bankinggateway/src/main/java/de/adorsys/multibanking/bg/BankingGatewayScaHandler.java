@@ -186,6 +186,15 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
             AisApi bankingGatewayB2CAisApi = bankingGatewayB2CAisApi(bankingGatewayBaseUrl,
                 (BgSessionData) bankApiConsentData);
 
+            boolean valid = Optional.ofNullable(bankingGatewayB2CAisApi.getConsentStatus(consentId))
+                .map(ConsentStatus::valueOf)
+                .map(ConsentStatus.VALID::equals)
+                .orElse(false);
+
+            if (valid) {
+                return;
+            }
+
             Optional.of(bankingGatewayB2CAisApi.getConsentAuthorisationStatus(consentId, authorisationId))
                 .map(consentStatus -> ScaStatus.valueOf(consentStatus.getScaStatus().getValue()))
                 .filter(consentStatus -> consentStatus == ScaStatus.SCAMETHODSELECTED || consentStatus == ScaStatus.FINALISED)
