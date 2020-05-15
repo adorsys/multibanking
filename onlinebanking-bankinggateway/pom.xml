@@ -125,7 +125,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/banking-gateway-b2c-0.1.json</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/banking-gateway-b2c-0.2.json</inputSpec>
                             <output>${basedir}/target/generated-sources</output>
                             <language>java</language>
                             <generateApiTests>false</generateApiTests>
