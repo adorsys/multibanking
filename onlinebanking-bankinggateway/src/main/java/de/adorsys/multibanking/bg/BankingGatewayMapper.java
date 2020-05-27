@@ -118,8 +118,10 @@ interface BankingGatewayMapper {
         booking.setBankApi(XS2A);
         booking.setBookingDate(transactionDetails.getBookingDate());
         booking.setValutaDate(transactionDetails.getValueDate());
-        booking.setAmount(new BigDecimal(transactionDetails.getTransactionAmount().getAmount()));
-        booking.setCurrency(transactionDetails.getTransactionAmount().getCurrency());
+        if (transactionDetails.getTransactionAmount() != null) {
+            booking.setAmount(new BigDecimal(transactionDetails.getTransactionAmount().getAmount()));
+            booking.setCurrency(transactionDetails.getTransactionAmount().getCurrency());
+        }
         booking.setExternalId(transactionDetails.getEndToEndId());
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
         booking.setTransactionCode(transactionDetails.getPurposeCode() == null ? null :
@@ -128,10 +130,10 @@ interface BankingGatewayMapper {
         BankAccount bankAccount = new BankAccount();
         if (transactionDetails.getCreditorName() != null || transactionDetails.getCreditorAccount() != null) {
             bankAccount.setOwner(transactionDetails.getCreditorName());
-            bankAccount.setIban(transactionDetails.getCreditorAccount().getIban());
+            bankAccount.setIban(transactionDetails.getCreditorAccount() != null ? transactionDetails.getCreditorAccount().getIban() : null);
         } else if (transactionDetails.getDebtorName() != null || transactionDetails.getDebtorAccount() != null) {
             bankAccount.setOwner(transactionDetails.getDebtorName());
-            bankAccount.setIban(transactionDetails.getDebtorAccount().getIban());
+            bankAccount.setIban(transactionDetails.getDebtorAccount() != null ? transactionDetails.getDebtorAccount().getIban() : null);
         }
         booking.setOtherAccount(bankAccount);
 

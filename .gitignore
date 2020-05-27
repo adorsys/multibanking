@@ -25,3 +25,6 @@ keycloak-admin-cli-3.4.3.Final.jar
 multibanking-server/de.adorsys.multibanking.jpa.entity.BankJpaEntity
 .env
 keycloak-admin-cli-7.0.0.jar
+bank-catalogue.yml
+banks.yml
+blz-test.properties

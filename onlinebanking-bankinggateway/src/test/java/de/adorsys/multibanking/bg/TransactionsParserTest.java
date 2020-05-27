@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.parsing;
+package de.adorsys.multibanking.bg;
 
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.mapper.TransactionsParser;
@@ -27,5 +27,13 @@ public class TransactionsParserTest {
         assertNotNull(loadBookingsResponse);
         assertEquals("Wrong count of bookings", 5, loadBookingsResponse.getBookings().size());
         assertEquals("Wrong balance", BigDecimal.valueOf(3507505.87), loadBookingsResponse.getBalancesReport().getReadyBalance().getAmount());
+    }
+
+    @Test
+    public void testJson() throws Exception {
+        String json = IOUtils.toString(TransactionsParserTest.class.getResourceAsStream("/transactions.json"));
+        TransactionsResponse loadBookingsResponse = new BankingGatewayAdapter(null, null).jsonStringToLoadBookingsResponse(json);
+        assertNotNull(loadBookingsResponse);
+        assertEquals("Wrong count of bookings", 30, loadBookingsResponse.getBookings().size());
     }
 }

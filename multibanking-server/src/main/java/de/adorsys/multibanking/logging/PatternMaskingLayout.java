@@ -41,7 +41,7 @@ public class PatternMaskingLayout extends PatternLayout {
                 }
             });
         }
-        return sb.toString();
+        String maskedMessage = sb.toString();
+        return maskedMessage.replaceAll("\\*{10,}", "****###****");
     }
-    
 }
