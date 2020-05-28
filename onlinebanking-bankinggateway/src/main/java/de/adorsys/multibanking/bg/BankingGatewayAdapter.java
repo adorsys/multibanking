@@ -21,6 +21,7 @@ import org.json.XML;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 
@@ -177,7 +178,9 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         bookings.forEach(
             x -> {
                 if (x.getExternalId() == null) {
-                    x.setExternalId(UUID.randomUUID().toString());
+                    x.setExternalId(
+                        "B-" + x.getValutaDate() + "_" + x.getChargeValue() + "_" + x.getAmount() + "_" + UUID.randomUUID().toString()
+                    );
                 }
             }
         );
