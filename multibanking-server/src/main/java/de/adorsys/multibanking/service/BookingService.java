@@ -215,7 +215,7 @@ public class BookingService extends AccountInformationService {
 
     }
 
-    private void saveAnalytics(AnalyticsResult analyticsResult, BankAccessEntity bankAccess,
+    void saveAnalytics(AnalyticsResult analyticsResult, BankAccessEntity bankAccess,
                                BankAccountEntity bankAccount, List<BookingEntity> bookingEntities) {
         if (analyticsResult == null) {
             return;
@@ -228,6 +228,7 @@ public class BookingService extends AccountInformationService {
             .forEach(bookingGroup ->
                 bookingGroup.getBookingPeriods().forEach(period ->
                     period.getBookings().forEach(executedBooking -> bookingEntities.stream()
+                        .filter(bookingEntity -> bookingEntity.getExternalId() != null)
                         .filter(bookingEntity -> bookingEntity.getExternalId().equals(executedBooking.getBookingId()))
                         .findFirst()
                         .ifPresent(bookingEntity -> executedBooking.setBookingId(bookingEntity.getId())))));
