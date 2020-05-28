@@ -157,7 +157,12 @@ public class BookingService extends AccountInformationService {
         List<BookingEntity> existingBookings = bookingRepository.findByUserIdAndAccountIdAndBankApi(
             bankAccess.getUserId(), bankAccount.getId(), onlineBankingService.bankApi());
 
-        List<BookingEntity> mergedBookings = mergeBookings(existingBookings, newBookings);
+        List<BookingEntity> mergedBookings = null;
+        if (existingBookings.size() > 0) {
+            mergedBookings = mergeBookings(existingBookings, newBookings);
+        } else {
+            mergedBookings = newBookings;
+        }
 
         if (mergedBookings.size() == existingBookings.size() && !rulesVersionChanged(bankAccess.getUserId(),
             bankAccount.getId())) {
@@ -332,7 +337,7 @@ public class BookingService extends AccountInformationService {
         return transactionRequest;
     }
 
-    private List<BookingEntity> mapBookings(BankAccountEntity bankAccount, List<Booking> bookings) {
+    List<BookingEntity> mapBookings(BankAccountEntity bankAccount, List<Booking> bookings) {
         return bookings.stream()
             .map(booking -> {
                 BookingEntity target = new BookingEntity();
@@ -344,12 +349,12 @@ public class BookingService extends AccountInformationService {
             .collect(Collectors.toList());
     }
 
-    private List<BookingEntity> mergeBookings(List<BookingEntity> dbBookings,
+    List<BookingEntity> mergeBookings(List<BookingEntity> dbBookings,
                                               List<BookingEntity> newBookings) {
         return Stream.of(dbBookings, newBookings)
             .flatMap(Collection::stream)
             .collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
-                new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
+                new TreeSet<>(Comparator.comparing(Booking::getExternalId, Comparator.nullsLast(Comparator.naturalOrder())))), ArrayList::new));
     }
 
     //only for figo

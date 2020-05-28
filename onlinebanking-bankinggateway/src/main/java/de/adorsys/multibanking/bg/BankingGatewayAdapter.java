@@ -165,7 +165,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         throw new UnsupportedOperationException();
     }
 
-    TransactionsResponse jsonStringToLoadBookingsResponse(String json) throws IOException {
+    public TransactionsResponse jsonStringToLoadBookingsResponse(String json) throws IOException {
         TransactionsResponse200Json transactionsResponse200JsonTO =
             ObjectMapperConfig.getObjectMapper().readValue(json, TransactionsResponse200Json.class);
         List<Booking> bookings = Optional.ofNullable(transactionsResponse200JsonTO)
