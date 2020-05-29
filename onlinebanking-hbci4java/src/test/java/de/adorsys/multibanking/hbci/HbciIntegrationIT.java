@@ -20,9 +20,7 @@ import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
-import de.adorsys.multibanking.domain.response.AbstractResponse;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
-import de.adorsys.multibanking.domain.response.PaymentStatusResponse;
+import de.adorsys.multibanking.domain.response.*;
 import de.adorsys.multibanking.domain.transaction.*;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
@@ -48,8 +47,7 @@ import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
 @Slf4j
 public class HbciIntegrationIT {
 
-    private static final String SCA_METHOD_ID = "901";
-
+    private String scaMethodId;
     private String iban;
     private String psuId;
     private String psuCorporateId;
@@ -71,15 +69,149 @@ public class HbciIntegrationIT {
     public void prepareEnv() {
         this.iban = System.getProperty("iban", Iban.random().toString());
         this.psuId = System.getProperty("login", "psd2test2");
-        this.psuCorporateId = System.getProperty("login2", "psuCorporateId");
+        this.psuCorporateId = System.getProperty("login2", null);
         this.pin = System.getProperty("pin", "pin");
+        this.scaMethodId = System.getProperty("scaMethodId", "901");
 
-        BankInfo bankInfo = new BankInfo();
-        bankInfo.setBlz(Iban.valueOf(iban).getBankCode());
-        bankInfo.setPinTanAddress(System.getProperty("bankUrl"));
-        bankInfo.setPinTanVersion(HBCI_300);
-        bankInfo.setBic(System.getProperty("bic"));
-        HBCIUtils.addBankInfo(bankInfo);
+        BankInfo bankInfo = Optional.ofNullable(HBCIUtils.getBankInfo(Iban.valueOf(this.iban).getBankCode()))
+            .orElseGet(() -> {
+                BankInfo newBank = new BankInfo();
+                newBank.setBlz(Iban.valueOf(this.iban).getBankCode());
+                newBank.setPinTanVersion(HBCI_300);
+                newBank.setBic(System.getProperty("bic"));
+                HBCIUtils.addBankInfo(newBank);
+                return newBank;
+            });
+
+        Optional.ofNullable(System.getProperty("bankUrl"))
+            .ifPresent(bankInfo::setPinTanAddress);
+    }
+
+    @Test
+    public void hbciLoadAccounts() {
+        TanTransportType tanTransportType = new TanTransportType();
+        tanTransportType.setId(scaMethodId);
+
+        HbciConsent hbciConsent = new HbciConsent();
+        hbciConsent.setSelectedMethod(tanTransportType);
+        hbciConsent.setCredentials(Credentials.builder()
+            .userId(psuCorporateId)
+            .customerId(psuId)
+            .pin(pin)
+            .build());
+
+        BankAccess bankAccess = new BankAccess();
+        bankAccess.setBankCode(Iban.valueOf(iban).getBankCode());
+
+        Bank bank = new Bank();
+        bank.setBankCode(bankAccess.getBankCode());
+
+        LoadAccounts loadAccounts = new LoadAccounts();
+        loadAccounts.setWithBalances(true);
+        TransactionRequest<LoadAccounts> loadAccountsRequest = TransactionRequestFactory.create(loadAccounts, null, bankAccess, bank, hbciConsent);
+
+        AccountInformationResponse response = hbci4JavaBanking.loadBankAccounts(loadAccountsRequest);
+
+        if (response.getAuthorisationCodeResponse() != null) {
+            hbciConsent.setHbciTanSubmit(response.getAuthorisationCodeResponse().getTanSubmit());
+            hbciConsent.setScaAuthenticationData("12456");
+
+            response = hbci4JavaBanking.loadBankAccounts(loadAccountsRequest);
+        }
+        assertThat(response.getBankAccounts()).isNotEmpty();
+    }
+
+    @Test
+    public void hbciLoadBalances() {
+        TanTransportType tanTransportType = new TanTransportType();
+        tanTransportType.setId(scaMethodId);
+
+        HbciConsent hbciConsent = new HbciConsent();
+        hbciConsent.setSelectedMethod(tanTransportType);
+        hbciConsent.setCredentials(Credentials.builder()
+            .userId(psuCorporateId)
+            .customerId(psuId)
+            .pin(pin)
+            .build());
+
+        BankAccess bankAccess = new BankAccess();
+        bankAccess.setBankCode(Iban.valueOf(iban).getBankCode());
+
+        Bank bank = new Bank();
+        bank.setBankCode(bankAccess.getBankCode());
+
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
+        bankAccount.setIban(iban);
+
+        LoadBalances loadBalances = new LoadBalances();
+        loadBalances.setPsuAccount(bankAccount);
+        TransactionRequest<LoadBalances> loadBalancesRequest = TransactionRequestFactory.create(loadBalances, null, bankAccess, bank, hbciConsent);
+
+        LoadBalancesResponse response = hbci4JavaBanking.loadBalances(loadBalancesRequest);
+
+        if (response.getAuthorisationCodeResponse() != null) {
+            hbciConsent.setHbciTanSubmit(response.getAuthorisationCodeResponse().getTanSubmit());
+            hbciConsent.setScaAuthenticationData("12456");
+
+            response = hbci4JavaBanking.loadBalances(loadBalancesRequest);
+        }
+
+        assertThat(response.getBankAccount().getBalances()).isNotNull();
+    }
+
+    @Test
+    public void hbciLoadStandingOrders() {
+        TanTransportType tanTransportType = new TanTransportType();
+        tanTransportType.setId(scaMethodId);
+
+        HbciConsent hbciConsent = new HbciConsent();
+        hbciConsent.setSelectedMethod(tanTransportType);
+        hbciConsent.setCredentials(Credentials.builder()
+            .userId(psuCorporateId)
+            .customerId(psuId)
+            .pin(pin)
+            .build());
+
+        BankAccess bankAccess = new BankAccess();
+        bankAccess.setBankCode(Iban.valueOf(iban).getBankCode());
+
+        Bank bank = new Bank();
+        bank.setBankCode(bankAccess.getBankCode());
+
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
+        bankAccount.setIban(iban);
+
+        LoadStandingOrders loadStandingOrders = new LoadStandingOrders();
+        loadStandingOrders.setPsuAccount(bankAccount);
+        TransactionRequest<LoadStandingOrders> loadStandingOrdersRequest = TransactionRequestFactory.create(loadStandingOrders, null, bankAccess, bank, hbciConsent);
+
+        StandingOrdersResponse response = hbci4JavaBanking.loadStandingOrders(loadStandingOrdersRequest);
+
+        if (response.getAuthorisationCodeResponse() != null) {
+            hbciConsent.setHbciTanSubmit(response.getAuthorisationCodeResponse().getTanSubmit());
+            hbciConsent.setScaAuthenticationData("12456");
+
+            response = hbci4JavaBanking.loadStandingOrders(loadStandingOrdersRequest);
+        }
+
+        assertThat(response.getStandingOrders()).isNotNull();
+    }
+
+    @Test
+    public void hbciRequestTan() {
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
+        bankAccount.setIban(iban);
+
+        TanRequest tanRequest = new TanRequest();
+        tanRequest.setPsuAccount(bankAccount);
+
+        PaymentResponse paymentResponse = hbciSubmitTransaction(tanRequest);
+        log.info("Order-ID: {}", paymentResponse.getTransactionId());
+
+        assertThat(paymentResponse).isNotNull();
     }
 
     @Test
@@ -144,7 +276,7 @@ public class HbciIntegrationIT {
 
     private PaymentStatusResponse hbciInstantPaymentStatus(String instantPaymentId) {
         TanTransportType tanTransportType = new TanTransportType();
-        tanTransportType.setId(SCA_METHOD_ID);
+        tanTransportType.setId(scaMethodId);
 
         HbciConsent hbciConsent = new HbciConsent();
         hbciConsent.setSelectedMethod(tanTransportType);
@@ -301,7 +433,7 @@ public class HbciIntegrationIT {
 
     private PaymentResponse hbciSubmitTransaction(AbstractPayment payment) {
         TanTransportType tanTransportType = new TanTransportType();
-        tanTransportType.setId(SCA_METHOD_ID);
+        tanTransportType.setId(scaMethodId);
 
         HbciConsent hbciConsent = new HbciConsent();
         hbciConsent.setSelectedMethod(tanTransportType);
