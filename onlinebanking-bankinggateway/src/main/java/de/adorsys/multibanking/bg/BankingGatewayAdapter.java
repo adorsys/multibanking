@@ -173,16 +173,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .map(transactions -> bankingGatewayMapper.toBookings(transactions))
             .orElse(Collections.emptyList());
 
-        bookings.forEach(
-            x -> {
-                if (x.getExternalId() == null) {
-                    x.setExternalId(
-                        "B-" + x.getValutaDate() + "_" + x.getChargeValue() + "_" + x.getAmount() + "_" + UUID.randomUUID().toString()
-                    );
-                }
-            }
-        );
-
         BalancesReport balancesReport = new BalancesReport();
         Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getBalances)

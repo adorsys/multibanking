@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static de.adorsys.multibanking.domain.BankAccountType.fromXS2AType;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
@@ -108,11 +109,6 @@ interface BankingGatewayMapper {
 
     List<Booking> toBookings(List<TransactionDetails> transactionDetails);
 
-    @Mapping(source = "valueDate", target = "valutaDate")
-    @Mapping(source = "transactionAmount.amount", target = "amount")
-    @Mapping(source = "transactionAmount.currency", target = "currency")
-    @Mapping(source = "endToEndId", target = "externalId")
-    @Mapping(source = "remittanceInformationUnstructured", target = "usage")
     default Booking toBooking(TransactionDetails transactionDetails) {
         Booking booking = new Booking();
         booking.setBankApi(XS2A);
@@ -122,7 +118,7 @@ interface BankingGatewayMapper {
             booking.setAmount(new BigDecimal(transactionDetails.getTransactionAmount().getAmount()));
             booking.setCurrency(transactionDetails.getTransactionAmount().getCurrency());
         }
-        booking.setExternalId(transactionDetails.getEndToEndId());
+        booking.setExternalId("B-" + booking.getValutaDate() + "_" + booking.getAmount() + "_" + UUID.randomUUID().toString());
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
         booking.setTransactionCode(transactionDetails.getPurposeCode() == null ? null :
             transactionDetails.getPurposeCode().toString());

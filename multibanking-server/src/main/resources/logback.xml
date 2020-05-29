@@ -23,7 +23,7 @@
                 <maskPattern>(?>chargeValue)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>text)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>additional)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>usage)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>usage)\=(.*?)[)|,](?= addkey=)</maskPattern>
                 <maskPattern>(?>mandateReference)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>owner)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>mainCategory)\=(.*?)[)|,]</maskPattern>
@@ -34,6 +34,7 @@
                 <maskPattern>(?>data)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>imageLink)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>scaAuthenticationData)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>iban)\=(.*?)[)|,]</maskPattern>
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %X{correlationId} %msg%n</pattern>
             </layout>
         </encoder>
@@ -55,7 +56,7 @@
                 <maskPattern>(?>chargeValue)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>text)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>additional)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>usage)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>usage)\=(.*?)[)|,](?= addkey=)</maskPattern>
                 <maskPattern>(?>mandateReference)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>owner)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>mainCategory)\=(.*?)[)|,]</maskPattern>
@@ -66,6 +67,7 @@
                 <maskPattern>(?>data)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>imageLink)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>scaAuthenticationData)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>iban)\=(.*?)[)|,]</maskPattern>
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %X{correlationId} %msg%n</pattern>
             </layout>
         </encoder>

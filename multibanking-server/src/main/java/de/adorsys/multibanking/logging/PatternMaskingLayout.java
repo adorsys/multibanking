@@ -27,7 +27,7 @@ public class PatternMaskingLayout extends PatternLayout {
         return maskMessage(super.doLayout(event)); // calling superclass method is required
     }
 
-    private String maskMessage(String message) {
+    String maskMessage(String message) {
         if (multilinePattern == null) {
             return message;
         }
