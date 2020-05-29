@@ -20,11 +20,13 @@ import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
+import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
+import de.adorsys.multibanking.domain.transaction.LoadBalances;
+import de.adorsys.multibanking.hbci.model.HbciConsent;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSEPAInfo;
@@ -37,18 +39,26 @@ import java.util.UUID;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
-@RequiredArgsConstructor
 @Slf4j
 public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInformationResponse> {
 
     private final TransactionRequest<LoadAccounts> loadAccountInformationRequest;
+    private AbstractHBCIJob sepaInfoJob;
+
+    public AccountInformationJob(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
+        this.loadAccountInformationRequest = loadAccountInformationRequest;
+        if (loadAccountInformationRequest.getTransaction().isWithBalances()) {
+            ((HbciConsent) loadAccountInformationRequest.getBankApiConsentData()).setCloseDialog(false);
+        }
+    }
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         if (!passport.jobSupported("SEPAInfo"))
             throw new MultibankingException(HBCI_ERROR, "SEPAInfo job not supported");
 
-        return new GVSEPAInfo(passport);
+        sepaInfoJob = new GVSEPAInfo(passport);
+        return sepaInfoJob;
     }
 
     @Override
@@ -71,6 +81,20 @@ public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInfo
             bankAccount.externalId(BankApi.HBCI, UUID.randomUUID().toString());
             bankAccount.bankName(loadAccountInformationRequest.getBankAccess().getBankName());
             hbciAccounts.add(bankAccount);
+        }
+
+        //if sca needed, skip loading balances
+        if (sepaInfoJob.getJobResult().isOK() && loadAccountInformationRequest.getTransaction().isWithBalances()) {
+            hbciAccounts.forEach(bankAccount -> {
+                LoadBalances loadBalances = new LoadBalances();
+                loadBalances.setPsuAccount(bankAccount);
+
+                TransactionRequest<LoadBalances> loadBalancesRequest =
+                    TransactionRequestFactory.create(loadBalances, null, loadAccountInformationRequest.getBankAccess(),
+                        loadAccountInformationRequest.getBank(), loadAccountInformationRequest.getBankApiConsentData());
+                new LoadBalancesJob(loadBalancesRequest).execute(null, this.dialog);
+            });
+            this.dialog.dialogEnd();
         }
 
         return AccountInformationResponse.builder()

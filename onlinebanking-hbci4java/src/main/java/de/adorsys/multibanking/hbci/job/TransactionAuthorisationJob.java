@@ -31,6 +31,7 @@ import de.adorsys.multibanking.hbci.model.HbciPassport;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.callback.AbstractHBCICallback;
@@ -81,18 +82,22 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
                 hbciDialog.dialogEnd();
             }
             throw new MultibankingException(HBCI_ERROR, scaJob.msgStatusListToPsuMessages(hbciExecStatus.getMsgStatusList()));
-        } else {
-            if ("HKIDN".equals(hbciTanSubmit.getHbciJobName())) {
-                //sca for dialoginit was needed -> fints consent active, expecting response with exempted sca
-                TransactionAuthorisationResponse<R> response = new TransactionAuthorisationResponse<>(scaJob.execute(null, hbciDialog));
-                response.setScaStatus(FINALISED);
-                return response;
-            } else if (consent.isCloseDialog()) {
-                hbciDialog.dialogEnd();
-            }
-            hbciTanSubmit.setMsgNum(hbciTanSubmit.getMsgNum() + 1);
-            return createResponse(hbciPassport, hbciTanSubmit, hbciExecStatus);
         }
+
+        if (StringUtils.equals("HKIDN", hbciTanSubmit.getHbciJobName())) {
+            if (!hbciExecStatus.getMsgStatusList().isEmpty()) {
+                hbciPassport.updateUPD(hbciExecStatus.getMsgStatusList().get(0).getData());
+            }
+
+            //sca for dialoginit was needed -> fints consent active, expecting response with exempted sca
+            TransactionAuthorisationResponse<R> response = new TransactionAuthorisationResponse<>(scaJob.execute(null, hbciDialog));
+            response.setScaStatus(FINALISED);
+            return response;
+        } else if (consent.isCloseDialog()) {
+            hbciDialog.dialogEnd();
+        }
+        hbciTanSubmit.setMsgNum(hbciTanSubmit.getMsgNum() + 1);
+        return createResponse(hbciPassport, hbciTanSubmit, hbciExecStatus);
     }
 
     private void submitProcess1(HbciTanSubmit hbciTanSubmit, HbciPassport hbciPassport,

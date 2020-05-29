@@ -25,6 +25,8 @@ import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.Tra
 @EqualsAndHashCode(callSuper = false)
 public class LoadAccounts extends AbstractTransaction {
 
+    private boolean withBalances = false;
+
     @Override
     public TransactionType getTransactionType() {
         return LOAD_BANKACCOUNTS;
