@@ -21,7 +21,6 @@ import org.json.XML;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 
@@ -78,7 +77,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             BgSessionData bgSessionData = (BgSessionData) loadAccountInformationRequest.getBankApiConsentData();
 
             AccountList accountList = getAccountList(bgSessionData, bankCode,
-                loadAccountInformationRequest.getBankAccess().getConsentId(), false);
+                loadAccountInformationRequest.getBankAccess().getConsentId());
 
             List<BankAccount> bankAccounts = bankingGatewayMapper.toBankAccounts(accountList.getAccounts());
 
@@ -91,11 +90,10 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         }
     }
 
-    private AccountList getAccountList(BgSessionData bgSessionData, String bankCode, String consentId,
-                                       boolean withBalance) throws ApiException {
+    private AccountList getAccountList(BgSessionData bgSessionData, String bankCode, String consentId) throws ApiException {
         AccountInformationServiceAisApi aisApi = accountInformationServiceAisApi(xs2aAdapterBaseUrl, bgSessionData);
 
-        return aisApi.getAccountList(UUID.randomUUID(), consentId, null, bankCode, null, withBalance, null, null,
+        return aisApi.getAccountList(UUID.randomUUID(), consentId, null, bankCode, null, false, null, null,
             null, null,
             null, null, null, null, null, null, null, null, null);
     }
@@ -212,7 +210,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private String getAccountResourceId(BgSessionData bgSessionData, String iban, String bankCode, String consentId) {
         try {
-             AccountList accountList = getAccountList(bgSessionData, bankCode, consentId, false);
+            AccountList accountList = getAccountList(bgSessionData, bankCode, consentId);
 
             return accountList.getAccounts()
                 .stream()
@@ -266,16 +264,16 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 bankingGatewayMapper.toMessagesFromTppMessage400AIS(messagesTO.getTppMessages()));
         } catch (JsonParseException jpe) {
             // try xml
-            TppMessage400AIS messageTO  = Optional.ofNullable(e.getResponseBody())
+            TppMessage400AIS messageTO = Optional.ofNullable(e.getResponseBody())
                 .filter(xml -> xml.startsWith("<"))
-                .map(uncheckFunction(string -> XML.toJSONObject(string)))
-                .map(jsonObject -> findTppMessage(jsonObject))
+                .map(uncheckFunction(XML::toJSONObject))
+                .map(BankingGatewayAdapter::findTppMessage)
                 .map(uncheckFunction(message -> ObjectMapperConfig.getObjectMapper().readValue(message.toString(), TppMessage400AIS.class)))
                 .orElse(null);
 
             if (messageTO != null) {
                 return new MultibankingException(multibankingError, e.getCode(), null,
-                    Arrays.asList(bankingGatewayMapper.toMessage(messageTO)));
+                    Collections.singletonList(bankingGatewayMapper.toMessage(messageTO)));
             } else {
                 return new MultibankingException(multibankingError, 500, e.getMessage());
             }
@@ -286,7 +284,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private static JSONObject findTppMessage(JSONObject jsonObject) {
         JSONObject message = null;
-        for (Iterator key = jsonObject.keys(); key.hasNext();) {
+        for (Iterator key = jsonObject.keys(); key.hasNext(); ) {
             String nextKey = (String) key.next();
             Object next = jsonObject.get(nextKey);
             if ("tppMessages".equals(nextKey)) {
@@ -305,7 +303,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             try {
                 return throwingFunction.apply(i);
             } catch (Exception ex) {
-                throw new RuntimeException(ex);
+                throw new IllegalStateException(ex);
             }
         };
     }

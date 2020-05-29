@@ -72,7 +72,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
     private HbciTanSubmit hbciTanSubmit = new HbciTanSubmit();
     private AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(hbciTanSubmit);
-    private HBCIJobsDialog dialog;
+    protected HBCIJobsDialog dialog;
 
     public R execute(HBCICallback hbciCallback) {
         return execute(hbciCallback, null);
@@ -114,7 +114,9 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         if (tan2StepRequired) {
             updateTanSubmit(hbciTanSubmit, dialog, hbciJob);
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
-        } else {
+        }
+
+        if (getConsent().isCloseDialog()) {
             //sca not needed and dialog not closed
             dialog.dialogEnd();
         }
@@ -126,17 +128,14 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         log.info("init new hbci dialog");
         PinTanPassport bpdPassport = fetchBpd(hbciCallback);
 
-        dialog = (HBCIJobsDialog) createDialog(JOBS, hbciCallback,
-            getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
-
+        dialog = (HBCIJobsDialog) createDialog(JOBS, hbciCallback, getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
         dialog.getPassport().setBPD(bpdPassport.getBPD());
 
-        HBCIMsgStatus dialogInitMsgStatus = dialog.dialogInit(((HbciConsent) getTransactionRequest().getBankApiConsentData()).isWithHktan());
+        HBCIMsgStatus dialogInitMsgStatus = dialog.dialogInit(getConsent().isWithHktan());
 
         if (checkDialogInitScaRequired(dialogInitMsgStatus)) {
             log.info("HKIDN SCA required");
-            R jobResponse = createJobResponse(dialog.getPassport(), hbciTanSubmit
-            );
+            R jobResponse = createJobResponse(dialog.getPassport(), hbciTanSubmit);
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
             return jobResponse;
         }

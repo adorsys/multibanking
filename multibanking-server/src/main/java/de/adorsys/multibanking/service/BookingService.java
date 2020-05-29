@@ -121,8 +121,7 @@ public class BookingService extends AccountInformationService {
                 bankAccess.getConsentId(), expectedConsentStatus);
 
             TransactionsResponse response = loadBookingsOnline(consentEntity, authorisationCode,
-                onlineBankingService,
-                bankAccess, bankAccount);
+                onlineBankingService, bankAccess, bankAccount);
 
             if (!bankAccess.isTemporary()) {
                 //update bankaccess, passportstate changed
@@ -330,9 +329,8 @@ public class BookingService extends AccountInformationService {
         loadBookings.setDateTo(LocalDate.now());
         loadBookings.setWithBalance(true);
 
-        TransactionRequest<LoadTransactions> transactionRequest =
-            TransactionRequestFactory.create(loadBookings, bankApiUser, bankAccess, bankEntity,
-                consentEntity.getBankApiConsentData());
+        TransactionRequest<LoadTransactions> transactionRequest = TransactionRequestFactory.create(loadBookings,
+            bankApiUser, bankAccess, bankEntity, consentEntity.getBankApiConsentData());
 
         transactionRequest.setAuthorisationCode(authorisationCode);
         return transactionRequest;
