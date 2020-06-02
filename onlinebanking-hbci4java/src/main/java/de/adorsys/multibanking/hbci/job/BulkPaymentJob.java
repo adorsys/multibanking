@@ -43,7 +43,7 @@ public class BulkPaymentJob extends AbstractPaymentJob<BulkPayment> {
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         BulkPayment bulkPayment = transactionRequest.getTransaction();
 
-        Konto src = getPsuKonto(passport);
+        Konto src = getHbciKonto(passport);
 
         if (bulkPayment instanceof FutureBulkPayment) {
             bulkPaymentHbciJob = new GVTermMultiUebSEPA(passport, GVTermMultiUebSEPA.getLowlevelName());

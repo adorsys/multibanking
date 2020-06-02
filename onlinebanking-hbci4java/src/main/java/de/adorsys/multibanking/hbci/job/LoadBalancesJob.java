@@ -42,7 +42,7 @@ public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesRespo
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         balanceJob = new GVSaldoReq(passport);
-        balanceJob.setParam("my", getPsuKonto(passport));
+        balanceJob.setParam("my", getHbciKonto(passport));
         return balanceJob;
     }
 
