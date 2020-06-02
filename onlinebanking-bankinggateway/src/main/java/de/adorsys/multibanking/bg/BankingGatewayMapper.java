@@ -18,10 +18,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.math.BigDecimal;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static de.adorsys.multibanking.domain.BankAccountType.fromXS2AType;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
@@ -118,7 +115,6 @@ interface BankingGatewayMapper {
             booking.setAmount(new BigDecimal(transactionDetails.getTransactionAmount().getAmount()));
             booking.setCurrency(transactionDetails.getTransactionAmount().getCurrency());
         }
-        booking.setExternalId("B-" + booking.getValutaDate() + "_" + booking.getAmount() + "_" + UUID.randomUUID().toString());
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
         booking.setTransactionCode(transactionDetails.getPurposeCode() == null ? null :
             transactionDetails.getPurposeCode().toString());
@@ -132,7 +128,19 @@ interface BankingGatewayMapper {
             bankAccount.setIban(transactionDetails.getDebtorAccount() != null ? transactionDetails.getDebtorAccount().getIban() : null);
         }
         booking.setOtherAccount(bankAccount);
-
+        booking.setExternalId(
+            Integer.toString(Objects.hash(
+                booking.getBookingDate(),
+                booking.getValutaDate(),
+                booking.getAmount(),
+                booking.getCurrency(),
+                booking.getUsage(),
+                transactionDetails.getEndToEndId(),
+                booking.getTransactionCode(),
+                booking.getOtherAccount().getOwner(),
+                booking.getOtherAccount().getIban()
+            ))
+        );
         return booking;
     }
 
