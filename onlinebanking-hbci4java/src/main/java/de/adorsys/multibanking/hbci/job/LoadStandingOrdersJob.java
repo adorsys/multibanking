@@ -52,7 +52,7 @@ public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, Stand
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         standingOrdersHbciJob = new GVDauerSEPAList(passport);
-        standingOrdersHbciJob.setParam("src", getPsuKonto(passport));
+        standingOrdersHbciJob.setParam("src", getHbciKonto(passport));
         return standingOrdersHbciJob;
     }
 

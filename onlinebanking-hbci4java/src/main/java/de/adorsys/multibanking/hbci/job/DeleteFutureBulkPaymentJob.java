@@ -38,7 +38,7 @@ public class DeleteFutureBulkPaymentJob extends AbstractPaymentJob<FutureBulkPay
         hbciDeleteFutureBulkPaymentJob = new GVTermMultiUebSEPADel(passport, GVTermMultiUebSEPADel.getLowlevelName());
 
         hbciDeleteFutureBulkPaymentJob.setParam("orderid", futureBulkPayment.getOrderId());
-        hbciDeleteFutureBulkPaymentJob.setParam("src", getPsuKonto(passport));
+        hbciDeleteFutureBulkPaymentJob.setParam("src", getHbciKonto(passport));
         hbciDeleteFutureBulkPaymentJob.verifyConstraints();
 
         return hbciDeleteFutureBulkPaymentJob;

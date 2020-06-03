@@ -25,12 +25,10 @@ import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV.parsers.ISEPAParser;
 import org.kapott.hbci.GV.parsers.SEPAParserFactory;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.comm.CommPinTan;
 import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.sepa.SepaVersion;
 
 import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -81,7 +79,7 @@ public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
         }
 
         hbciRawSepaJob = new GVRawSEPA(passport, jobName, sepaPayment.getRawRequestData());
-        hbciRawSepaJob.setParam("src", getPsuKonto(passport));
+        hbciRawSepaJob.setParam("src", getHbciKonto(passport));
 
         appendPainValues(sepaPayment, hbciRawSepaJob);
 

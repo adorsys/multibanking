@@ -114,10 +114,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         if (tan2StepRequired) {
             updateTanSubmit(hbciTanSubmit, dialog, hbciJob);
             jobResponse.setAuthorisationCodeResponse(authorisationCodeResponse);
-        }
-
-        if (getConsent().isCloseDialog()) {
-            //sca not needed and dialog not closed
+        } else if (getConsent().isCloseDialog()) { //sca not needed
             dialog.dialogEnd();
         }
 
@@ -264,7 +261,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
         //Schritt 1: HKUEB und HKTAN <-> HITAN
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
-        hktan.setParam("orderaccount", getPsuKonto(dialog.getPassport()));
+        hktan.setParam("orderaccount", getHbciKonto(dialog.getPassport()));
         Optional.ofNullable(hbciJob)
             .map(AbstractHBCIJob::getHBCICode)
             .ifPresent(hbciCode -> hktan.setParam("ordersegcode", hbciCode));
@@ -281,10 +278,12 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         return hktan;
     }
 
-    Konto getPsuKonto(PinTanPassport passport) {
+    Konto getHbciKonto(PinTanPassport passport) {
         return getPsuAccount()
             .map(account -> {
-                Konto konto = passport.findAccountByAccountNumber(Iban.valueOf(account.getIban()).getAccountNumber());
+                String accountNumber = account.getAccountNumber() != null ? account.getAccountNumber() : Iban.valueOf(account.getIban()).getAccountNumber();
+
+                Konto konto = passport.findAccountByAccountNumber(accountNumber);
                 konto.iban = account.getIban();
                 konto.bic = Optional.ofNullable(account.getBic())
                     .orElse(HBCIUtils.getBankInfo(konto.blz).getBic());

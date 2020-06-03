@@ -34,7 +34,7 @@ public class ForeignPaymentJob extends AbstractPaymentJob<ForeignPayment> {
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        Konto src = getPsuKonto(passport);
+        Konto src = getHbciKonto(passport);
 
         hbciForeignPaymentJob = new GVDTAZV(passport, GVDTAZV.getLowlevelName());
 

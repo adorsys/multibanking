@@ -110,7 +110,7 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
     private AbstractHBCIJob createTransactionsJob(PinTanPassport passport) {
         AbstractHBCIJob hbciJob = createBookingsJobInternal(passport);
 
-        hbciJob.setParam("my", getPsuKonto(passport));
+        hbciJob.setParam("my", getHbciKonto(passport));
 
         LocalDate dateFrom = Optional.ofNullable(loadTransactionsRequest.getTransaction().getDateFrom())
             .orElseGet(() -> getStartDate(passport.getJobRestrictions(hbciJob.getName())));

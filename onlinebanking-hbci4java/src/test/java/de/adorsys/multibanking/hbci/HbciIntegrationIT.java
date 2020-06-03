@@ -48,6 +48,7 @@ import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
 public class HbciIntegrationIT {
 
     private String scaMethodId;
+    private String scaTanMedia;
     private String iban;
     private String psuId;
     private String psuCorporateId;
@@ -72,6 +73,7 @@ public class HbciIntegrationIT {
         this.psuCorporateId = System.getProperty("login2", null);
         this.pin = System.getProperty("pin", "pin");
         this.scaMethodId = System.getProperty("scaMethodId", "901");
+        this.scaTanMedia = System.getProperty("scaTanMedia");
 
         BankInfo bankInfo = Optional.ofNullable(HBCIUtils.getBankInfo(Iban.valueOf(this.iban).getBankCode()))
             .orElseGet(() -> {
@@ -87,10 +89,10 @@ public class HbciIntegrationIT {
             .ifPresent(bankInfo::setPinTanAddress);
     }
 
-    @Test
-    public void hbciLoadAccounts() {
+    private HbciConsent createHbciConsent() {
         TanTransportType tanTransportType = new TanTransportType();
         tanTransportType.setId(scaMethodId);
+        tanTransportType.setMedium(scaTanMedia);
 
         HbciConsent hbciConsent = new HbciConsent();
         hbciConsent.setSelectedMethod(tanTransportType);
@@ -99,12 +101,33 @@ public class HbciIntegrationIT {
             .customerId(psuId)
             .pin(pin)
             .build());
+        return hbciConsent;
+    }
 
+    private BankAccess createBankAccess() {
         BankAccess bankAccess = new BankAccess();
         bankAccess.setBankCode(Iban.valueOf(iban).getBankCode());
+        return bankAccess;
+    }
 
+    private Bank createBank(BankAccess bankAccess) {
         Bank bank = new Bank();
         bank.setBankCode(bankAccess.getBankCode());
+        return bank;
+    }
+
+    private BankAccount createBankAccount() {
+        BankAccount bankAccount = new BankAccount();
+        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
+        bankAccount.setIban(iban);
+        return bankAccount;
+    }
+
+    @Test
+    public void hbciLoadAccounts() {
+        HbciConsent hbciConsent = createHbciConsent();
+        BankAccess bankAccess = createBankAccess();
+        Bank bank = createBank(bankAccess);
 
         LoadAccounts loadAccounts = new LoadAccounts();
         loadAccounts.setWithBalances(true);
@@ -123,29 +146,12 @@ public class HbciIntegrationIT {
 
     @Test
     public void hbciLoadBalances() {
-        TanTransportType tanTransportType = new TanTransportType();
-        tanTransportType.setId(scaMethodId);
-
-        HbciConsent hbciConsent = new HbciConsent();
-        hbciConsent.setSelectedMethod(tanTransportType);
-        hbciConsent.setCredentials(Credentials.builder()
-            .userId(psuCorporateId)
-            .customerId(psuId)
-            .pin(pin)
-            .build());
-
-        BankAccess bankAccess = new BankAccess();
-        bankAccess.setBankCode(Iban.valueOf(iban).getBankCode());
-
-        Bank bank = new Bank();
-        bank.setBankCode(bankAccess.getBankCode());
-
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
+        HbciConsent hbciConsent = createHbciConsent();
+        BankAccess bankAccess = createBankAccess();
+        Bank bank = createBank(bankAccess);
 
         LoadBalances loadBalances = new LoadBalances();
-        loadBalances.setPsuAccount(bankAccount);
+        loadBalances.setPsuAccount(createBankAccount());
         TransactionRequest<LoadBalances> loadBalancesRequest = TransactionRequestFactory.create(loadBalances, null, bankAccess, bank, hbciConsent);
 
         LoadBalancesResponse response = hbci4JavaBanking.loadBalances(loadBalancesRequest);
@@ -162,29 +168,12 @@ public class HbciIntegrationIT {
 
     @Test
     public void hbciLoadStandingOrders() {
-        TanTransportType tanTransportType = new TanTransportType();
-        tanTransportType.setId(scaMethodId);
-
-        HbciConsent hbciConsent = new HbciConsent();
-        hbciConsent.setSelectedMethod(tanTransportType);
-        hbciConsent.setCredentials(Credentials.builder()
-            .userId(psuCorporateId)
-            .customerId(psuId)
-            .pin(pin)
-            .build());
-
-        BankAccess bankAccess = new BankAccess();
-        bankAccess.setBankCode(Iban.valueOf(iban).getBankCode());
-
-        Bank bank = new Bank();
-        bank.setBankCode(bankAccess.getBankCode());
-
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
+        HbciConsent hbciConsent = createHbciConsent();
+        BankAccess bankAccess = createBankAccess();
+        Bank bank = createBank(bankAccess);
 
         LoadStandingOrders loadStandingOrders = new LoadStandingOrders();
-        loadStandingOrders.setPsuAccount(bankAccount);
+        loadStandingOrders.setPsuAccount(createBankAccount());
         TransactionRequest<LoadStandingOrders> loadStandingOrdersRequest = TransactionRequestFactory.create(loadStandingOrders, null, bankAccess, bank, hbciConsent);
 
         StandingOrdersResponse response = hbci4JavaBanking.loadStandingOrders(loadStandingOrdersRequest);
@@ -200,13 +189,31 @@ public class HbciIntegrationIT {
     }
 
     @Test
-    public void hbciRequestTan() {
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
+    public void hbciLoadTransactions() {
+        HbciConsent hbciConsent = createHbciConsent();
+        BankAccess bankAccess = createBankAccess();
+        Bank bank = createBank(bankAccess);
 
+        LoadTransactions loadTransactions = new LoadTransactions();
+        loadTransactions.setPsuAccount(createBankAccount());
+        TransactionRequest<LoadTransactions> loadTransactionsRequest = TransactionRequestFactory.create(loadTransactions, null, bankAccess, bank, hbciConsent);
+
+        TransactionsResponse response = hbci4JavaBanking.loadTransactions(loadTransactionsRequest);
+
+        if (response.getAuthorisationCodeResponse() != null) {
+            hbciConsent.setHbciTanSubmit(response.getAuthorisationCodeResponse().getTanSubmit());
+            hbciConsent.setScaAuthenticationData("12456");
+
+            response = hbci4JavaBanking.loadTransactions(loadTransactionsRequest);
+        }
+
+        assertThat(response.getBookings()).isNotEmpty();
+    }
+
+    @Test
+    public void hbciRequestTan() {
         TanRequest tanRequest = new TanRequest();
-        tanRequest.setPsuAccount(bankAccount);
+        tanRequest.setPsuAccount(createBankAccount());
 
         PaymentResponse paymentResponse = hbciSubmitTransaction(tanRequest);
         log.info("Order-ID: {}", paymentResponse.getTransactionId());
@@ -216,16 +223,12 @@ public class HbciIntegrationIT {
 
     @Test
     public void hbciSinglePayment() {
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
-
         SinglePayment payment = new SinglePayment();
         payment.setReceiverIban("DE56760905000002257793");
-        payment.setReceiver("Alexander Geist");
+        payment.setReceiver("Maxx Mustermann");
         payment.setAmount(new BigDecimal("120.00"));
         payment.setPurpose("test130");
-        payment.setPsuAccount(bankAccount);
+        payment.setPsuAccount(createBankAccount());
 
         PaymentResponse paymentResponse = hbciSubmitTransaction(payment);
         log.info("Order-ID: {}", paymentResponse.getTransactionId());
@@ -235,16 +238,12 @@ public class HbciIntegrationIT {
 
     @Test
     public void hbciFuturePayment() {
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
-
         FutureSinglePayment payment = new FutureSinglePayment();
         payment.setReceiverIban("DE56760905000002257793");
-        payment.setReceiver("Alexander Geist");
+        payment.setReceiver("Maxx Mustermann");
         payment.setAmount(new BigDecimal("120.00"));
         payment.setPurpose("test130");
-        payment.setPsuAccount(bankAccount);
+        payment.setPsuAccount(createBankAccount());
         payment.setExecutionDate(LocalDate.now().plusDays(2));
 
         PaymentResponse paymentResponse = hbciSubmitTransaction(payment);
@@ -254,16 +253,12 @@ public class HbciIntegrationIT {
 
     @Test
     public void hbciInstantPayment() throws InterruptedException {
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
-
         SinglePayment payment = new SinglePayment();
         payment.setReceiverIban("DE56760905000002257793");
-        payment.setReceiver("Alexander Geist");
+        payment.setReceiver("Maxx Mustermann");
         payment.setAmount(new BigDecimal("12.00"));
         payment.setPurpose("test130");
-        payment.setPsuAccount(bankAccount);
+        payment.setPsuAccount(createBankAccount());
         payment.setInstantPayment(true);
 
         PaymentResponse paymentResponse = hbciSubmitTransaction(payment);
@@ -275,53 +270,28 @@ public class HbciIntegrationIT {
     }
 
     private PaymentStatusResponse hbciInstantPaymentStatus(String instantPaymentId) {
-        TanTransportType tanTransportType = new TanTransportType();
-        tanTransportType.setId(scaMethodId);
-
-        HbciConsent hbciConsent = new HbciConsent();
-        hbciConsent.setSelectedMethod(tanTransportType);
-        hbciConsent.setCredentials(Credentials.builder()
-            .userId(psuCorporateId)
-            .customerId(psuId)
-            .pin(pin)
-            .build());
-
-        BankAccess bankAccess = new BankAccess();
-        bankAccess.setBankCode(Iban.valueOf(iban).getBankCode());
-
-        Bank bank = new Bank();
-        bank.setBankCode(bankAccess.getBankCode());
-
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
+        HbciConsent hbciConsent = createHbciConsent();
+        BankAccess bankAccess = createBankAccess();
+        Bank bank = createBank(bankAccess);
 
         PaymentStatusReqest paymentStatusReqest = new PaymentStatusReqest();
-        paymentStatusReqest.setPsuAccount(bankAccount);
+        paymentStatusReqest.setPsuAccount(createBankAccount());
         paymentStatusReqest.setPaymentId(instantPaymentId);
 
         TransactionRequest<PaymentStatusReqest> transactionRequest =
             TransactionRequestFactory.create(paymentStatusReqest, null, bankAccess, bank, hbciConsent);
 
-        PaymentStatusResponse paymentStatus =
-            hbci4JavaBanking.getStrongCustomerAuthorisation().getPaymentStatus(transactionRequest);
-
-        return paymentStatus;
+        return hbci4JavaBanking.getStrongCustomerAuthorisation().getPaymentStatus(transactionRequest);
     }
 
     @Test
     public void hbciPayment() {
         FutureSinglePayment payment = new FutureSinglePayment();
         payment.setReceiverIban("DE56760905000002257793");
-        payment.setReceiver("Alexander Geist");
+        payment.setReceiver("Maxx Mustermann");
         payment.setAmount(new BigDecimal("12.00"));
         payment.setPurpose("test130");
-
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
-
-        payment.setPsuAccount(bankAccount);
+        payment.setPsuAccount(createBankAccount());
         payment.setExecutionDate(LocalDate.now().plusDays(10));
 
         PaymentResponse paymentResponse = hbciSubmitTransaction(payment);
@@ -337,12 +307,7 @@ public class HbciIntegrationIT {
 
         ForeignPayment payment = new ForeignPayment();
         payment.setDtazv(readFile(testDtazvUrl.getPath()));
-
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
-
-        payment.setPsuAccount(bankAccount);
+        payment.setPsuAccount(createBankAccount());
 
         PaymentResponse paymentResponse = hbciSubmitTransaction(payment);
         log.info("Order-ID: {}", paymentResponse.getTransactionId());
@@ -361,11 +326,7 @@ public class HbciIntegrationIT {
         standingOrder.setFirstExecutionDate(LocalDate.now().withDayOfMonth(3).plusMonths(1));
         standingOrder.setLastExecutionDate(LocalDate.now().withDayOfMonth(3).plusMonths(8));
         standingOrder.setDelete(true);
-
-        BankAccount debtorAccount = new BankAccount();
-        debtorAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        debtorAccount.setIban(iban);
-        standingOrder.setPsuAccount(debtorAccount);
+        standingOrder.setPsuAccount(createBankAccount());
 
         BankAccount other = new BankAccount();
         other.setIban("DE56760905000002257793");
@@ -380,29 +341,16 @@ public class HbciIntegrationIT {
 
     @Test
     public void hbciTransfer() {
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
-
         SinglePayment payment = new SinglePayment();
         payment.setReceiverIban("DE51250400903312345678");
         payment.setReceiver("Selber");
         payment.setAmount(new BigDecimal("12.00"));
         payment.setPurpose("test umbuchung");
-        payment.setPsuAccount(bankAccount);
+        payment.setPsuAccount(createBankAccount());
 
-        HbciConsent hbciConsent = new HbciConsent();
-        hbciConsent.setCredentials(Credentials.builder()
-            .userId(psuCorporateId)
-            .customerId(psuId)
-            .pin(pin)
-            .build());
-
-        BankAccess bankAccess = new BankAccess();
-        bankAccess.setBankCode(Iban.valueOf(iban).getAccountNumber());
-
-        Bank bank = new Bank();
-        bank.setBankCode(bankAccess.getBankCode());
+        HbciConsent hbciConsent = createHbciConsent();
+        BankAccess bankAccess = createBankAccess();
+        Bank bank = createBank(bankAccess);
 
         TransactionRequest<AbstractPayment> transactionRequest =
             TransactionRequestFactory.create(payment, null, bankAccess, bank, hbciConsent);
@@ -418,12 +366,7 @@ public class HbciIntegrationIT {
         payment.setExecutionDate(LocalDate.now().plusDays(1));
         payment.setOrderId("Test-Order-Id");
         payment.setDelete(true);
-
-        BankAccount bankAccount = new BankAccount();
-        bankAccount.setAccountNumber(Iban.valueOf(iban).getAccountNumber());
-        bankAccount.setIban(iban);
-
-        payment.setPsuAccount(bankAccount);
+        payment.setPsuAccount(createBankAccount());
 
         PaymentResponse paymentResponse = hbciSubmitTransaction(payment);
         log.info("Order-ID: {}", paymentResponse.getTransactionId());
@@ -432,22 +375,9 @@ public class HbciIntegrationIT {
     }
 
     private PaymentResponse hbciSubmitTransaction(AbstractPayment payment) {
-        TanTransportType tanTransportType = new TanTransportType();
-        tanTransportType.setId(scaMethodId);
-
-        HbciConsent hbciConsent = new HbciConsent();
-        hbciConsent.setSelectedMethod(tanTransportType);
-        hbciConsent.setCredentials(Credentials.builder()
-            .userId(psuCorporateId)
-            .customerId(psuId)
-            .pin(pin)
-            .build());
-
-        BankAccess bankAccess = new BankAccess();
-        bankAccess.setBankCode(Iban.valueOf(iban).getBankCode());
-
-        Bank bank = new Bank();
-        bank.setBankCode(bankAccess.getBankCode());
+        HbciConsent hbciConsent = createHbciConsent();
+        BankAccess bankAccess = createBankAccess();
+        Bank bank = createBank(bankAccess);
 
         TransactionRequest<AbstractPayment> transactionRequest =
             TransactionRequestFactory.create(payment, null, bankAccess, bank, hbciConsent);
