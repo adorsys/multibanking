@@ -411,7 +411,7 @@
         "valueDate": "2017-10-25",
         "transactionAmount": {
           "currency": "******",
-          "amount": "100.00"
+          "amount": "-75.0"
         },
         "creditorName": "******",
         "creditorAccount": {
@@ -431,7 +431,7 @@
         "valueDate": "2017-10-25",
         "transactionAmount": {
           "currency": "******",
-          "amount": "100.00"
+          "amount": "-20.0"
         },
         "creditorName": "******",
         "remittanceInformationUnstructured": "******",
@@ -444,7 +444,7 @@
         "valueDate": "2017-10-25",
         "transactionAmount": {
           "currency": "******",
-          "amount": "100.00"
+          "amount": "-103.37"
         },
         "creditorName": "******",
         "creditorAccount": {
@@ -541,7 +541,7 @@
         "currency": "******",
         "amount": "100.00"
       },
-      "balanceType": "******",
+      "balanceType": "OPENINGBOOKED",
       "referenceDate": "2017-10-25"
     },
     {

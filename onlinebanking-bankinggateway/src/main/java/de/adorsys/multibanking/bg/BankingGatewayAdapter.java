@@ -15,11 +15,13 @@ import de.adorsys.multibanking.xs2a_adapter.ApiException;
 import de.adorsys.multibanking.xs2a_adapter.ApiResponse;
 import de.adorsys.multibanking.xs2a_adapter.api.AccountInformationServiceAisApi;
 import de.adorsys.multibanking.xs2a_adapter.model.*;
+import de.adorsys.multibanking.xs2a_adapter.model.Balance;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.json.XML;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
@@ -173,6 +175,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .map(transactions -> bankingGatewayMapper.toBookings(transactions))
             .orElse(Collections.emptyList());
 
+        List<Balance> openingBookedList = new ArrayList<>();
         BalancesReport balancesReport = new BalancesReport();
         Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getBalances)
@@ -186,11 +189,24 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                         case CLOSINGBOOKED:
                             balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
                             break;
+                        case OPENINGBOOKED:
+                            openingBookedList.add(balance);
+                            break;
                         default:
                             // ignore
                             break;
                     }
                 }));
+
+        if (openingBookedList.size() > 0) {
+            BigDecimal balance = new BigDecimal(openingBookedList.get(0).getBalanceAmount().getAmount());
+            for(Booking booking : bookings) {
+                balance = balance.add(booking.getAmount());
+                booking.setBalance(balance);
+            }
+        } else {
+            log.error("Cannot calculate balances since no openingbooked is available");
+        }
 
         return TransactionsResponse.builder()
             .bookings(bookings)
