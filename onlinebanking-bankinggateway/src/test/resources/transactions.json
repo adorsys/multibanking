@@ -541,7 +541,7 @@
         "currency": "******",
         "amount": "100.00"
       },
-      "balanceType": "OPENINGBOOKED",
+      "balanceType": "openingBooked",
       "referenceDate": "2017-10-25"
     },
     {
@@ -549,7 +549,8 @@
         "currency": "******",
         "amount": "100.00"
       },
-      "balanceType": "******",
+      "lastChangeDateTime": "2020-06-18T20:15:30+01:00",
+      "balanceType": "closingBooked",
       "referenceDate": "2017-10-25"
     }
   ]

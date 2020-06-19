@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.bg;
 
-import com.fasterxml.jackson.core.JsonParseException;
+import com.google.gson.JsonSyntaxException;
 import com.squareup.okhttp.Call;
 import de.adorsys.multibanking.domain.*;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServiceAisApi;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
@@ -166,47 +167,55 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         throw new UnsupportedOperationException();
     }
 
-    public TransactionsResponse jsonStringToLoadBookingsResponse(String json) throws IOException {
+    public TransactionsResponse jsonStringToLoadBookingsResponse(String json) {
         TransactionsResponse200Json transactionsResponse200JsonTO =
-            ObjectMapperConfig.getObjectMapper().readValue(json, TransactionsResponse200Json.class);
+            GsonConfig.getGson().fromJson(json, TransactionsResponse200Json.class);
         List<Booking> bookings = Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getTransactions)
             .map(AccountReport::getBooked)
             .map(transactions -> bankingGatewayMapper.toBookings(transactions))
             .orElse(Collections.emptyList());
 
-        List<Balance> openingBookedList = new ArrayList<>();
         BalancesReport balancesReport = new BalancesReport();
         Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getBalances)
-            .orElse(new BalanceList())
-            .forEach(balance -> Optional.ofNullable(balance.getBalanceType())
-                .ifPresent(balanceType -> {
-                    switch (balance.getBalanceType()) {
-                        case EXPECTED:
-                            balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
-                            break;
-                        case CLOSINGBOOKED:
-                            balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
-                            break;
-                        case OPENINGBOOKED:
-                            openingBookedList.add(balance);
-                            break;
-                        default:
-                            // ignore
-                            break;
-                    }
-                }));
+            .map(List::stream).orElse(Stream.empty())
+            .filter(balance -> balance.getBalanceType() != null)
+            .forEach(balance -> {
+                switch (balance.getBalanceType()) {
+                    case EXPECTED:
+                        balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
+                        break;
+                    case CLOSINGBOOKED:
+                        balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
+                        break;
+                    default:
+                        // ignore
+                        break;
+                }
+            });
 
-        if (openingBookedList.size() > 0) {
-            BigDecimal balance = new BigDecimal(openingBookedList.get(0).getBalanceAmount().getAmount());
-            for(Booking booking : bookings) {
-                balance = balance.add(booking.getAmount());
-                booking.setBalance(balance);
-            }
-        } else {
-            log.error("Cannot calculate balances since no openingbooked is available");
-        }
+        Optional.ofNullable(transactionsResponse200JsonTO)
+            .map(TransactionsResponse200Json::getBalances)
+            .map(List::stream).orElse(Stream.empty())
+            .filter(balance -> BalanceType.OPENINGBOOKED.equals(balance.getBalanceType()))
+            .findFirst().ifPresent(
+                openingbooked -> {
+                    BigDecimal balance = new BigDecimal(openingbooked.getBalanceAmount().getAmount());
+                    for(Booking booking : bookings) {
+                        balance = balance.add(booking.getAmount());
+                        booking.setBalance(balance);
+                    }
+                    Optional.ofNullable(balancesReport.getReadyBalance()).ifPresent(
+                        readyBalance -> {
+                            BigDecimal lastBookingBalance = bookings.get(bookings.size() - 1).getBalance();
+                            if (!readyBalance.getAmount().equals(lastBookingBalance)) {
+                                log.error("The closing booked balance {} and the calculated balance after the last transaction {} are not equal", readyBalance.getAmount(), lastBookingBalance);
+                            }
+                        }
+                    );
+                }
+            );
 
         return TransactionsResponse.builder()
             .bookings(bookings)
@@ -264,17 +273,17 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private MultibankingException toMultibankingException(ApiException e, MultibankingError multibankingError) {
         try {
-            Error400NGAIS messagesTO = ObjectMapperConfig.getObjectMapper().readValue(e.getResponseBody(),
+            Error400NGAIS messagesTO = GsonConfig.getGson().fromJson(e.getResponseBody(),
                 Error400NGAIS.class);
             return new MultibankingException(multibankingError, e.getCode(), null,
                 bankingGatewayMapper.toMessagesFromTppMessage400AIS(messagesTO.getTppMessages()));
-        } catch (JsonParseException jpe) {
+        } catch (JsonSyntaxException jpe) {
             // try xml
             TppMessage400AIS messageTO = Optional.ofNullable(e.getResponseBody())
                 .filter(xml -> xml.startsWith("<"))
                 .map(uncheckFunction(XML::toJSONObject))
                 .map(BankingGatewayAdapter::findTppMessage)
-                .map(uncheckFunction(message -> ObjectMapperConfig.getObjectMapper().readValue(message.toString(), TppMessage400AIS.class)))
+                .map(uncheckFunction(message -> GsonConfig.getGson().fromJson(message.toString(), TppMessage400AIS.class)))
                 .orElse(null);
 
             if (messageTO != null) {

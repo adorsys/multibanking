@@ -253,7 +253,7 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
 
     private MultibankingException toMultibankingException(ApiException e, MultibankingError multibankingError) {
         try {
-            MessagesTO messagesTO = ObjectMapperConfig.getObjectMapper().readValue(e.getResponseBody(),
+            MessagesTO messagesTO = GsonConfig.getGson().fromJson(e.getResponseBody(),
                 MessagesTO.class);
             return new MultibankingException(multibankingError, e.getCode(), null,
                 bankingGatewayMapper.toMessages(messagesTO.getMessageList()));

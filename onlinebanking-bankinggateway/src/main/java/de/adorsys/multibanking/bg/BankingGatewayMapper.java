@@ -124,15 +124,18 @@ interface BankingGatewayMapper {
             transactionDetails.getProprietaryBankTransactionCode()); // use bank transaction code as fallback for buchungstext
 
         BankAccount bankAccount = new BankAccount();
-        if (transactionDetails.getCreditorName() != null || transactionDetails.getCreditorAccount() != null) {
+
+        // if amount < 0 the other account gets the money and is therefore the creditor
+        // if amount > 0 we get the money and the other account is the debtor
+        if (BigDecimal.ZERO.compareTo(booking.getAmount()) == 1) { // 0 is bigger than amount
             bankAccount.setOwner(transactionDetails.getCreditorName());
             bankAccount.setIban(transactionDetails.getCreditorAccount() != null ? transactionDetails.getCreditorAccount().getIban() : null);
-        } else if (transactionDetails.getDebtorName() != null || transactionDetails.getDebtorAccount() != null) {
+        } else {
             bankAccount.setOwner(transactionDetails.getDebtorName());
             bankAccount.setIban(transactionDetails.getDebtorAccount() != null ? transactionDetails.getDebtorAccount().getIban() : null);
         }
         booking.setOtherAccount(bankAccount);
-        booking.setExternalId(
+        booking.setExternalId( // TODO use date, amount, balance as in hbci
             Integer.toString(Objects.hash(
                 booking.getBookingDate(),
                 booking.getValutaDate(),

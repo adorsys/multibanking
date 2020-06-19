@@ -28,3 +28,4 @@ keycloak-admin-cli-7.0.0.jar
 bank-catalogue.yml
 banks.yml
 blz-test.properties
+/onlinebanking-bankinggateway/src/test/resources/adapter_response_1592494030801.json
