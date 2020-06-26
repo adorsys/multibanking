@@ -38,7 +38,7 @@ public class DeleteFutureSinglePaymentJob extends AbstractPaymentJob<FutureSingl
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         FutureSinglePayment singlePayment = transactionRequest.getTransaction();
 
-        Konto src = getPsuKonto(passport);
+        Konto src = getHbciKonto(passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();

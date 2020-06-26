@@ -41,7 +41,7 @@ public class NewStandingOrderJob extends AbstractPaymentJob<StandingOrderRequest
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         StandingOrderRequest standingOrder = transactionRequest.getTransaction();
 
-        Konto src = getPsuKonto(passport);
+        Konto src = getHbciKonto(passport);
 
         Konto dst = new Konto();
         dst.name = standingOrder.getOtherAccount().getOwner();

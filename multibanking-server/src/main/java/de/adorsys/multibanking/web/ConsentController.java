@@ -1,15 +1,13 @@
 package de.adorsys.multibanking.web;
 
 import de.adorsys.multibanking.domain.Consent;
+import de.adorsys.multibanking.domain.ConsentStatus;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.pers.spi.repository.BankAccessRepositoryIf;
 import de.adorsys.multibanking.service.ConsentService;
 import de.adorsys.multibanking.web.mapper.BankApiMapper;
 import de.adorsys.multibanking.web.mapper.ConsentMapper;
-import de.adorsys.multibanking.web.model.BankApiTO;
-import de.adorsys.multibanking.web.model.ConsentTO;
-import de.adorsys.multibanking.web.model.CreateConsentResponseTO;
-import de.adorsys.multibanking.web.model.TokenRequestTO;
+import de.adorsys.multibanking.web.model.*;
 import io.micrometer.core.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -86,6 +84,13 @@ public class ConsentController {
         return mapToResource(consentService.getConsent(consentId));
     }
 
+    @Operation(description = "Read consent status", security = {
+        @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
+    @GetMapping("/{consentId}/status")
+    public Resource<ConsentStatusTO> getConsentStatus(@PathVariable("consentId") String consentId) {
+        return mapToResource(consentService.getConsentStatus(consentId));
+    }
+
     @Operation(description = "Read consent", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("redirect/{redirectId}")
@@ -119,6 +124,10 @@ public class ConsentController {
     private Resource<ConsentTO> mapToResource(Consent consent) {
         return new Resource<>(consentMapper.toConsentTO(consent),
             linkTo(methodOn(ConsentController.class).getConsent(consent.getConsentId())).withSelfRel());
+    }
+
+    private Resource<ConsentStatusTO> mapToResource(ConsentStatus consentStatus) {
+        return new Resource<>(consentMapper.toConsentStatusTO(consentStatus));
     }
 
     private Resource<CreateConsentResponseTO> mapToResource(CreateConsentResponse createConsentResponse,

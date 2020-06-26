@@ -363,7 +363,7 @@ public class DirectAccessControllerTest {
 
         //4. select authentication method (optional), can be skipped by banks in case of selection not needed
         if (jsonPath.getString("scaStatus").equals(PSUAUTHENTICATED.toString())) {
-            String selectAuthenticationMethodLink = jsonPath.getString("_links" + ".selectAuthenticationMethod.href");
+            String selectAuthenticationMethodLink = jsonPath.getString("_links.selectAuthenticationMethod.href");
             Map<String, String> scaMethodParams = jsonPath.get("scaMethods[0]");
 
             String scaMethodId = scaMethodParams.get("id");
@@ -387,11 +387,9 @@ public class DirectAccessControllerTest {
         }
 
         String transactionAuthorisationLink = jsonPath.getString("_links" + ".transactionAuthorisation.href");
-        //5. bookings challenge for hbci (Optional)
-        //hbci case
+        //5. bookings challenge for hbci (Optional) hbci case
         if (transactionAuthorisationLink == null) {
-            DirectAccessControllerV2.LoadBookingsRequest loadBookingsRequest =
-                new DirectAccessControllerV2.LoadBookingsRequest();
+            DirectAccessControllerV2.LoadBookingsRequest loadBookingsRequest = new DirectAccessControllerV2.LoadBookingsRequest();
             loadBookingsRequest.setBankAccess(bankAccess);
 
             jsonPath = request
@@ -405,27 +403,23 @@ public class DirectAccessControllerTest {
             }
         }
         //6. send tan
-        TransactionAuthorisationRequestTO transactionAuthorisationRequestTO =
-            new TransactionAuthorisationRequestTO();
-        transactionAuthorisationRequestTO.setScaAuthenticationData(System.getProperty("tan", "tan"));
+        TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
+        transactionAuthorisationRequestTO.setScaAuthenticationData(System.getProperty("tan", "12456"));
 
-        jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links" +
-            ".transactionAuthorisation.href"))
+        jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links.transactionAuthorisation.href"))
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
         assertThat(jsonPath.getString("scaStatus")).isIn(SCAMETHODSELECTED.toString(), FINALISED.toString());
 
         //7. load transactions
-        DirectAccessControllerV2.LoadBookingsRequest loadBookingsRequest =
-            new DirectAccessControllerV2.LoadBookingsRequest();
+        DirectAccessControllerV2.LoadBookingsRequest loadBookingsRequest = new DirectAccessControllerV2.LoadBookingsRequest();
+        loadBookingsRequest.setBankAccess(bankAccess);
         if (jsonPath.getString("bankAccounts") != null) {
             loadBookingsRequest.setUserId(jsonPath.getString("bankAccounts[0].userId"));
             loadBookingsRequest.setAccessId(jsonPath.getString("bankAccounts[0].bankAccessId"));
             loadBookingsRequest.setAccountId(jsonPath.getString("bankAccounts[0].id"));
         }
-
-        loadBookingsRequest.setBankAccess(bankAccess);
 
         return request.body(loadBookingsRequest).post(getRemoteMultibankingUrl() + "/api/v2/direct/bookings")
             .then().assertThat().statusCode(HttpStatus.OK.value())
@@ -606,20 +600,25 @@ public class DirectAccessControllerTest {
         BankEntity test_bank = bankRepository.findByBankCode(bankCode).orElseGet(() -> {
             BankEntity bankEntity = TestUtil.getBankEntity("Test Bank", bankCode, onlineBankingService.bankApi());
             bankEntity.setName("UNITTEST BANK");
-            bankEntity.setBankingUrl(System.getProperty("bankUrl"));
             bankEntity.setRedirectPreferred(redirectPreferred);
             bankEntity.setBic(System.getProperty("bic"));
             bankRepository.save(bankEntity);
             return bankEntity;
         });
 
-        if (onlineBankingService instanceof HbciBanking && HBCIUtils.getBankInfo(bankCode) == null) {
-            BankInfo bankInfo = new BankInfo();
-            bankInfo.setBlz(test_bank.getBankCode());
-            bankInfo.setPinTanAddress(System.getProperty("bankUrl"));
-            bankInfo.setPinTanVersion(HBCI_300);
-            bankInfo.setBic(System.getProperty("bic"));
-            HBCIUtils.addBankInfo(bankInfo);
+        if (onlineBankingService instanceof HbciBanking) {
+            BankInfo bankInfo = Optional.ofNullable(HBCIUtils.getBankInfo(bankCode))
+                .orElseGet(() -> {
+                    BankInfo newBank = new BankInfo();
+                    newBank.setBlz(test_bank.getBankCode());
+                    newBank.setPinTanVersion(HBCI_300);
+                    newBank.setBic(System.getProperty("bic"));
+                    HBCIUtils.addBankInfo(newBank);
+                    return newBank;
+                });
+
+            Optional.ofNullable(System.getProperty("bankUrl"))
+                .ifPresent(bankInfo::setPinTanAddress);
         }
     }
 

@@ -22,7 +22,6 @@ import lombok.Data;
 public class Bank {
 
     private String bankCode;
-    private String bankingUrl;
     private String bankApiBankCode;
     private String bic;
     private String name;

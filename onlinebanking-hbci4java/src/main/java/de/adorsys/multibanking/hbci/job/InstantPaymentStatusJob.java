@@ -40,7 +40,7 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         paymentStatusHbciJob = new GVInstanstUebSEPAStatus(passport);
-        paymentStatusHbciJob.setParam("my", getPsuKonto(passport));
+        paymentStatusHbciJob.setParam("my", getHbciKonto(passport));
         paymentStatusHbciJob.setParam("orderid", paymentStatusReqest.getTransaction().getPaymentId());
         return paymentStatusHbciJob;
     }

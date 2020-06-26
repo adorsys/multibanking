@@ -17,6 +17,7 @@
 package de.adorsys.multibanking.hbci;
 
 import de.adorsys.multibanking.domain.Consent;
+import de.adorsys.multibanking.domain.ConsentStatus;
 import de.adorsys.multibanking.domain.ScaStatus;
 import de.adorsys.multibanking.domain.TanTransportType;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
@@ -91,7 +92,12 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
     }
 
     @Override
-    public Consent getConsent(String consentId) {
+    public Consent getConsent(String consentId, Object bankApiConsentData) {
+        return null;
+    }
+
+    @Override
+    public ConsentStatus getConsentStatus(String consentId, Object bankApiConsentData) {
         return null;
     }
 
@@ -170,7 +176,7 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
     }
 
     @Override
-    public void revokeConsent(String consentId) {
+    public void revokeConsent(String consentId, Object bankApiConsentData) {
         //noop
     }
 

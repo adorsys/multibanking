@@ -121,8 +121,7 @@ public class BookingService extends AccountInformationService {
                 bankAccess.getConsentId(), expectedConsentStatus);
 
             TransactionsResponse response = loadBookingsOnline(consentEntity, authorisationCode,
-                onlineBankingService,
-                bankAccess, bankAccount);
+                onlineBankingService, bankAccess, bankAccount);
 
             if (!bankAccess.isTemporary()) {
                 //update bankaccess, passportstate changed
@@ -157,7 +156,12 @@ public class BookingService extends AccountInformationService {
         List<BookingEntity> existingBookings = bookingRepository.findByUserIdAndAccountIdAndBankApi(
             bankAccess.getUserId(), bankAccount.getId(), onlineBankingService.bankApi());
 
-        List<BookingEntity> mergedBookings = mergeBookings(existingBookings, newBookings);
+        List<BookingEntity> mergedBookings = null;
+        if (existingBookings.size() > 0) {
+            mergedBookings = mergeBookings(existingBookings, newBookings);
+        } else {
+            mergedBookings = newBookings;
+        }
 
         if (mergedBookings.size() == existingBookings.size() && !rulesVersionChanged(bankAccess.getUserId(),
             bankAccount.getId())) {
@@ -210,7 +214,7 @@ public class BookingService extends AccountInformationService {
 
     }
 
-    private void saveAnalytics(AnalyticsResult analyticsResult, BankAccessEntity bankAccess,
+    void saveAnalytics(AnalyticsResult analyticsResult, BankAccessEntity bankAccess,
                                BankAccountEntity bankAccount, List<BookingEntity> bookingEntities) {
         if (analyticsResult == null) {
             return;
@@ -223,6 +227,7 @@ public class BookingService extends AccountInformationService {
             .forEach(bookingGroup ->
                 bookingGroup.getBookingPeriods().forEach(period ->
                     period.getBookings().forEach(executedBooking -> bookingEntities.stream()
+                        .filter(bookingEntity -> bookingEntity.getExternalId() != null)
                         .filter(bookingEntity -> bookingEntity.getExternalId().equals(executedBooking.getBookingId()))
                         .findFirst()
                         .ifPresent(bookingEntity -> executedBooking.setBookingId(bookingEntity.getId())))));
@@ -324,15 +329,14 @@ public class BookingService extends AccountInformationService {
         loadBookings.setDateTo(LocalDate.now());
         loadBookings.setWithBalance(true);
 
-        TransactionRequest<LoadTransactions> transactionRequest =
-            TransactionRequestFactory.create(loadBookings, bankApiUser, bankAccess, bankEntity,
-                consentEntity.getBankApiConsentData());
+        TransactionRequest<LoadTransactions> transactionRequest = TransactionRequestFactory.create(loadBookings,
+            bankApiUser, bankAccess, bankEntity, consentEntity.getBankApiConsentData());
 
         transactionRequest.setAuthorisationCode(authorisationCode);
         return transactionRequest;
     }
 
-    private List<BookingEntity> mapBookings(BankAccountEntity bankAccount, List<Booking> bookings) {
+    List<BookingEntity> mapBookings(BankAccountEntity bankAccount, List<Booking> bookings) {
         return bookings.stream()
             .map(booking -> {
                 BookingEntity target = new BookingEntity();
@@ -344,12 +348,12 @@ public class BookingService extends AccountInformationService {
             .collect(Collectors.toList());
     }
 
-    private List<BookingEntity> mergeBookings(List<BookingEntity> dbBookings,
+    List<BookingEntity> mergeBookings(List<BookingEntity> dbBookings,
                                               List<BookingEntity> newBookings) {
         return Stream.of(dbBookings, newBookings)
             .flatMap(Collection::stream)
             .collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
-                new TreeSet<>(Comparator.comparing(Booking::getExternalId))), ArrayList::new));
+                new TreeSet<>(Comparator.comparing(Booking::getExternalId, Comparator.nullsLast(Comparator.naturalOrder())))), ArrayList::new));
     }
 
     //only for figo

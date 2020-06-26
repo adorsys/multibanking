@@ -3,7 +3,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} %level [%logger{0}] [%X{correlationId}] %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %X{correlationId} %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -23,7 +23,7 @@
                 <maskPattern>(?>chargeValue)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>text)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>additional)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>usage)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>usage)\=(.*?)[)|,](?= addkey=)</maskPattern>
                 <maskPattern>(?>mandateReference)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>owner)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>mainCategory)\=(.*?)[)|,]</maskPattern>
@@ -34,9 +34,51 @@
                 <maskPattern>(?>data)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>imageLink)\=(.*?)[)|,]</maskPattern>
                 <maskPattern>(?>scaAuthenticationData)\=(.*?)[)|,]</maskPattern>
-                <pattern>%d{HH:mm:ss.SSS} [%X{user}:%X{accessId}] - %msg%n</pattern>
+                <maskPattern>(?>iban)\=(.*?)[)|,]</maskPattern>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %X{correlationId} %msg%n</pattern>
             </layout>
         </encoder>
+    </appender>
+
+    <appender name="FILE-AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="de.adorsys.multibanking.logging.PatternMaskingLayout">
+                <maskPattern>(?>customerId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>userId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>pin)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>pin2)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>psuId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>psuCorporateId)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>password)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>amount)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>balance)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>origValue)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>chargeValue)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>text)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>additional)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>usage)\=(.*?)[)|,](?= addkey=)</maskPattern>
+                <maskPattern>(?>mandateReference)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>owner)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>mainCategory)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>subCategory)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>specification)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>provider)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>image)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>data)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>imageLink)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>scaAuthenticationData)\=(.*?)[)|,]</maskPattern>
+                <maskPattern>(?>iban)\=(.*?)[)|,]</maskPattern>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %X{correlationId} %msg%n</pattern>
+            </layout>
+        </encoder>
+        <file>/tmp/mbs-audit.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <cleanHistoryOnStart>false</cleanHistoryOnStart>
+            <fileNamePattern>/tmp/mbs-audit.log.%d{yyyy-MM-dd}.%i.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>20</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
     </appender>
 
     <root level="INFO">
@@ -45,6 +87,7 @@
 
     <logger name="de.adorsys.multibanking.logging.RestControllerAspectLogging" level="TRACE" additivity="false">
         <appender-ref ref="STDOUT-AUDIT"/>
+        <appender-ref ref="FILE-AUDIT"/>
     </logger>
 
     <logger name="org.kapott.hbci.comm.CommPinTan" level="WARN"/>

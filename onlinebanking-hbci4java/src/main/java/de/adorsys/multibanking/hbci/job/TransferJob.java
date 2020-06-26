@@ -40,12 +40,12 @@ public class TransferJob extends AbstractPaymentJob<SinglePayment> {
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         SinglePayment singlePayment = transactionRequest.getTransaction();
 
-        Konto src = getPsuKonto(passport);
+        Konto src = getHbciKonto(passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();
         dst.iban = singlePayment.getReceiverIban();
-        dst.bic = singlePayment.getReceiverBic();
+        dst.bic = singlePayment.getReceiverBic() != null ? singlePayment.getReceiverBic() : src.bic; //internal transfer, same bic
 
         hbciTransferJob = new GVUmbSEPA(passport, GVUmbSEPA.getLowlevelName(), null);
 

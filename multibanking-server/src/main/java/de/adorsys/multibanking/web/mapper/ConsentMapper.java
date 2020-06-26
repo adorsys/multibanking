@@ -3,7 +3,9 @@ package de.adorsys.multibanking.web.mapper;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.domain.ConsentEntity;
+import de.adorsys.multibanking.domain.ConsentStatus;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
+import de.adorsys.multibanking.web.model.ConsentStatusTO;
 import de.adorsys.multibanking.web.model.ConsentTO;
 import de.adorsys.multibanking.web.model.CreateConsentResponseTO;
 import org.mapstruct.Mapper;
@@ -19,6 +21,8 @@ public interface ConsentMapper {
     @Mapping(target = "temporary", ignore = true)
     @Mapping(target = "consentId", source = "id")
     Consent toConsent(ConsentTO consent);
+
+    ConsentStatusTO toConsentStatusTO(ConsentStatus consentStatus);
 
     @Mapping(target = "consentId", source = "id")
     @Mapping(target = "accounts", ignore = true)

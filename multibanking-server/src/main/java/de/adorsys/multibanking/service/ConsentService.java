@@ -163,7 +163,7 @@ public class ConsentService {
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        onlineBankingService.getStrongCustomerAuthorisation().revokeConsent(consentId);
+        onlineBankingService.getStrongCustomerAuthorisation().revokeConsent(consentId, internalConsent.getBankApiConsentData());
         throw new ResourceNotFoundException(ConsentTO.class, consentId);
     }
 
@@ -183,7 +183,21 @@ public class ConsentService {
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        return onlineBankingService.getStrongCustomerAuthorisation().getConsent(consentId);
+        return onlineBankingService.getStrongCustomerAuthorisation().getConsent(consentId, internalConsent.getBankApiConsentData());
+    }
+
+    public ConsentStatus getConsentStatus(String consentId) {
+        ConsentEntity internalConsent = consentRepository.findById(consentId)
+            .orElseThrow(() -> new ResourceNotFoundException(ConsentEntity.class, consentId));
+
+        if (internalConsent.isTemporary()) {
+            return null; // prestep oauth: no consent in bank
+        }
+
+        OnlineBankingService onlineBankingService =
+            bankingServiceProducer.getBankingService(internalConsent.getBankApi());
+
+        return onlineBankingService.getStrongCustomerAuthorisation().getConsentStatus(consentId, internalConsent.getBankApiConsentData());
     }
 
     public Consent getConsentByRedirectId(String redirectId) {
@@ -197,7 +211,7 @@ public class ConsentService {
         OnlineBankingService onlineBankingService =
             bankingServiceProducer.getBankingService(internalConsent.getBankApi());
 
-        return onlineBankingService.getStrongCustomerAuthorisation().getConsent(internalConsent.getId());
+        return onlineBankingService.getStrongCustomerAuthorisation().getConsent(internalConsent.getId(), internalConsent.getBankApiConsentData());
     }
 
     public UpdateAuthResponse getAuthorisationStatus(String consentId) {
@@ -262,5 +276,4 @@ public class ConsentService {
 
         return internalConsent;
     }
-
 }

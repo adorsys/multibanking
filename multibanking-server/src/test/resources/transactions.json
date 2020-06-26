@@ -1,0 +1,556 @@
+{
+  "account": {
+    "iban": "******",
+    "currency": "******"
+  },
+  "transactions": {
+    "booked": [
+      {
+        "endToEndId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "******"
+      }
+    ],
+    "_links": {
+      "account": {
+        "href": "******"
+      }
+    }
+  },
+  "balances": [
+    {
+      "balanceAmount": {
+        "currency": "******",
+        "amount": "100.00"
+      },
+      "balanceType": "******",
+      "referenceDate": "2017-10-25"
+    },
+    {
+      "balanceAmount": {
+        "currency": "******",
+        "amount": "100.00"
+      },
+      "balanceType": "******",
+      "referenceDate": "2017-10-25"
+    }
+  ]
+}

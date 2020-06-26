@@ -38,7 +38,7 @@ public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment> {
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
         SinglePayment singlePayment = transactionRequest.getTransaction();
 
-        Konto src = getPsuKonto(passport);
+        Konto src = getHbciKonto(passport);
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();

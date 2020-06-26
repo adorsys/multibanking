@@ -11,6 +11,7 @@ import de.adorsys.multibanking.xs2a_adapter.model.AccountDetails;
 import de.adorsys.multibanking.xs2a_adapter.model.TppMessage400AIS;
 import de.adorsys.multibanking.xs2a_adapter.model.TransactionDetails;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.StringUtils;
 import org.iban4j.Iban;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -18,9 +19,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.math.BigDecimal;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static de.adorsys.multibanking.domain.BankAccountType.fromXS2AType;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
@@ -108,33 +107,47 @@ interface BankingGatewayMapper {
 
     List<Booking> toBookings(List<TransactionDetails> transactionDetails);
 
-    @Mapping(source = "valueDate", target = "valutaDate")
-    @Mapping(source = "transactionAmount.amount", target = "amount")
-    @Mapping(source = "transactionAmount.currency", target = "currency")
-    @Mapping(source = "endToEndId", target = "externalId")
-    @Mapping(source = "remittanceInformationUnstructured", target = "usage")
     default Booking toBooking(TransactionDetails transactionDetails) {
         Booking booking = new Booking();
         booking.setBankApi(XS2A);
         booking.setBookingDate(transactionDetails.getBookingDate());
         booking.setValutaDate(transactionDetails.getValueDate());
-        booking.setAmount(new BigDecimal(transactionDetails.getTransactionAmount().getAmount()));
-        booking.setCurrency(transactionDetails.getTransactionAmount().getCurrency());
-        booking.setExternalId(transactionDetails.getEndToEndId());
+        if (transactionDetails.getTransactionAmount() != null) {
+            booking.setAmount(new BigDecimal(transactionDetails.getTransactionAmount().getAmount()));
+            booking.setCurrency(transactionDetails.getTransactionAmount().getCurrency());
+        }
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
         booking.setTransactionCode(transactionDetails.getPurposeCode() == null ? null :
             transactionDetails.getPurposeCode().toString());
+        booking.setText(transactionDetails.getAdditionalInformation() != null ?
+            transactionDetails.getAdditionalInformation() :
+            transactionDetails.getProprietaryBankTransactionCode()); // use bank transaction code as fallback for buchungstext
 
         BankAccount bankAccount = new BankAccount();
-        if (transactionDetails.getCreditorName() != null || transactionDetails.getCreditorAccount() != null) {
+
+        // if amount < 0 the other account gets the money and is therefore the creditor
+        // if amount > 0 we get the money and the other account is the debtor
+        if (BigDecimal.ZERO.compareTo(booking.getAmount()) == 1) { // 0 is bigger than amount
             bankAccount.setOwner(transactionDetails.getCreditorName());
-            bankAccount.setIban(transactionDetails.getCreditorAccount().getIban());
-        } else if (transactionDetails.getDebtorName() != null || transactionDetails.getDebtorAccount() != null) {
+            bankAccount.setIban(transactionDetails.getCreditorAccount() != null ? transactionDetails.getCreditorAccount().getIban() : null);
+        } else {
             bankAccount.setOwner(transactionDetails.getDebtorName());
-            bankAccount.setIban(transactionDetails.getDebtorAccount().getIban());
+            bankAccount.setIban(transactionDetails.getDebtorAccount() != null ? transactionDetails.getDebtorAccount().getIban() : null);
         }
         booking.setOtherAccount(bankAccount);
-
+        booking.setExternalId( // TODO use date, amount, balance as in hbci
+            Integer.toString(Objects.hash(
+                booking.getBookingDate(),
+                booking.getValutaDate(),
+                booking.getAmount(),
+                booking.getCurrency(),
+                booking.getUsage(),
+                transactionDetails.getEndToEndId(),
+                booking.getTransactionCode(),
+                booking.getOtherAccount().getOwner(),
+                booking.getOtherAccount().getIban()
+            ))
+        );
         return booking;
     }
 
