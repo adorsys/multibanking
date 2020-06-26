@@ -82,6 +82,8 @@ public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, Stand
                 Optional.ofNullable(dauerAuftrag.lastdate).ifPresent(date ->
                     standingOrder.setEndDate(LocalDateTime.ofInstant(date.toInstant(), ZoneOffset.UTC).toLocalDate()));
                 standingOrder.setDayOfExecution(dauerAuftrag.execday);
+                standingOrder.setEndToEndId(dauerAuftrag.endToEndId);
+                standingOrder.setPurposeCode(dauerAuftrag.purposecode);
 
                 switch (dauerAuftrag.turnus) {
                     case 1:

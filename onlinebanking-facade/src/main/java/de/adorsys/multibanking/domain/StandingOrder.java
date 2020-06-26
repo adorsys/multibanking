@@ -23,9 +23,11 @@ import java.time.LocalDate;
 @Data
 public class StandingOrder {
 
+    private String endToEndId;
     private String creditorName;
     private String creditorAccount;
     private Amount transactionAmount;
+    private String purposeCode;
     private String remittanceInformationUnstructured;
     private String bankTransactionCode;
     private LocalDate startDate;

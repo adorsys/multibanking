@@ -281,12 +281,16 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
     Konto getHbciKonto(PinTanPassport passport) {
         return getPsuAccount()
             .map(account -> {
-                String accountNumber = account.getAccountNumber() != null ? account.getAccountNumber() : Iban.valueOf(account.getIban()).getAccountNumber();
+                String accountNumber = account.getAccountNumber() != null
+                    ? account.getAccountNumber()
+                    : Iban.valueOf(account.getIban()).getAccountNumber();
 
                 Konto konto = passport.findAccountByAccountNumber(accountNumber);
                 konto.iban = account.getIban();
-                konto.bic = Optional.ofNullable(account.getBic())
-                    .orElse(HBCIUtils.getBankInfo(konto.blz).getBic());
+                if (konto.bic == null) {
+                    konto.bic = Optional.ofNullable(account.getBic())
+                        .orElse(HBCIUtils.getBankInfo(konto.blz).getBic());
+                }
                 return konto;
             })
             .orElseGet(() -> passport.getAccounts().get(0));
