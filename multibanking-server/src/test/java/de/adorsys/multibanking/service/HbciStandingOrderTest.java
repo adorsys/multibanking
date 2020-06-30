@@ -1,7 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.transaction.StandingOrderRequest;
+import de.adorsys.multibanking.domain.transaction.PeriodicPayment;
 import de.adorsys.multibanking.hbci.HbciBanking;
 import de.adorsys.multibanking.pers.spi.repository.BankRepositoryIf;
 import lombok.extern.slf4j.Slf4j;
@@ -92,7 +92,7 @@ public class HbciStandingOrderTest {
             .filter(bankAccountEntity -> bankAccountEntity.getAccountNumber().equals("3312345678"))
             .findFirst().get();
 
-        StandingOrderRequest standingOrder = new StandingOrderRequest();
+        PeriodicPayment standingOrder = new PeriodicPayment();
         standingOrder.setOtherAccount(new BankAccount());
         standingOrder.getOtherAccount().setIban("DE56760905000002257793");
         standingOrder.getOtherAccount().setOwner("Alexander Geist");

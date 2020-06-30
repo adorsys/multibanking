@@ -317,7 +317,7 @@ public class HbciIntegrationIT {
 
     @Test
     public void hbciDeleteStandingOrder() {
-        StandingOrderRequest standingOrder = new StandingOrderRequest();
+        PeriodicPayment standingOrder = new PeriodicPayment();
         standingOrder.setAmount(new BigDecimal("12.00"));
         standingOrder.setUsage("Test zum Löschen");
         standingOrder.setCycle(Frequency.MONTHLY);

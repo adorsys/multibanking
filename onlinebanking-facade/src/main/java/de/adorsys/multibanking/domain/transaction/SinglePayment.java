@@ -36,6 +36,7 @@ public class SinglePayment extends AbstractPayment {
     private String purposecode;
     private BigDecimal amount;
     private String currency;
+    private String endToEndId;
     private LocalDateTime submittedTime;
     private boolean instantPayment;
     private boolean transfer;

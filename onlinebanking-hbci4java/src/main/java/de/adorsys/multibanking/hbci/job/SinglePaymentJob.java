@@ -65,6 +65,9 @@ public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment> {
         if (singlePayment.getPurposecode() != null) {
             hbciSinglePaymentJob.setParam("purposecode", singlePayment.getPurposecode());
         }
+        if (singlePayment.getEndToEndId() != null) {
+            hbciSinglePaymentJob.setParam("endtoendid", singlePayment.getEndToEndId());
+        }
         hbciSinglePaymentJob.verifyConstraints();
 
         return hbciSinglePaymentJob;
