@@ -18,7 +18,7 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
-import de.adorsys.multibanking.domain.transaction.StandingOrderRequest;
+import de.adorsys.multibanking.domain.transaction.PeriodicPayment;
 import de.adorsys.multibanking.hbci.model.HbciCycleMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +31,14 @@ import org.kapott.hbci.structures.Value;
 
 @RequiredArgsConstructor
 @Slf4j
-public class DeleteStandingOrderJob extends AbstractPaymentJob<StandingOrderRequest> {
+public class DeleteStandingOrderJob extends AbstractPaymentJob<PeriodicPayment> {
 
-    private final TransactionRequest<StandingOrderRequest> transactionRequest;
+    private final TransactionRequest<PeriodicPayment> transactionRequest;
     private GVDauerSEPADel hbciDeleteStandingOrderJob;
 
     @Override
     public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        StandingOrderRequest standingOrder = transactionRequest.getTransaction();
+        PeriodicPayment standingOrder = transactionRequest.getTransaction();
 
         Konto src = getHbciKonto(passport);
 
@@ -85,7 +85,7 @@ public class DeleteStandingOrderJob extends AbstractPaymentJob<StandingOrderRequ
     }
 
     @Override
-    TransactionRequest<StandingOrderRequest> getTransactionRequest() {
+    TransactionRequest<PeriodicPayment> getTransactionRequest() {
         return transactionRequest;
     }
 

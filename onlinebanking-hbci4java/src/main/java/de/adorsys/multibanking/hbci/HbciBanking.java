@@ -299,7 +299,7 @@ public class HbciBanking implements OnlineBankingService {
             case FUTURE_BULK_PAYMENT:
                 return (ScaAwareJob<T, R>) new BulkPaymentJob((TransactionRequest<BulkPayment>) transactionRequest);
             case STANDING_ORDER:
-                return (ScaAwareJob<T, R>) new NewStandingOrderJob((TransactionRequest<StandingOrderRequest>) transactionRequest);
+                return (ScaAwareJob<T, R>) new PeriodicPaymentJob((TransactionRequest<PeriodicPayment>) transactionRequest);
             case RAW_SEPA:
                 return (ScaAwareJob<T, R>) new RawSepaJob((TransactionRequest<RawSepaPayment>) transactionRequest);
             case FUTURE_SINGLE_PAYMENT_DELETE:
@@ -307,7 +307,7 @@ public class HbciBanking implements OnlineBankingService {
             case FUTURE_BULK_PAYMENT_DELETE:
                 return (ScaAwareJob<T, R>) new DeleteFutureBulkPaymentJob((TransactionRequest<FutureBulkPayment>) transactionRequest);
             case STANDING_ORDER_DELETE:
-                return (ScaAwareJob<T, R>) new DeleteStandingOrderJob((TransactionRequest<StandingOrderRequest>) transactionRequest);
+                return (ScaAwareJob<T, R>) new DeleteStandingOrderJob((TransactionRequest<PeriodicPayment>) transactionRequest);
             case TAN_REQUEST:
                 return (ScaAwareJob<T, R>) new TanRequestJob((TransactionRequest<TanRequest>) transactionRequest);
             case LOAD_BANKACCOUNTS:

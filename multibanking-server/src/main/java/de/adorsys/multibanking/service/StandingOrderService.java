@@ -6,8 +6,7 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
-import de.adorsys.multibanking.domain.transaction.SinglePayment;
-import de.adorsys.multibanking.domain.transaction.StandingOrderRequest;
+import de.adorsys.multibanking.domain.transaction.PeriodicPayment;
 import de.adorsys.multibanking.exception.domain.MissingPinException;
 import de.adorsys.multibanking.pers.spi.repository.StandingOrderRepositoryIf;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public class StandingOrderService {
     private final StandingOrderRepositoryIf standingOrderRepository;
     private final OnlineBankingServiceProducer bankingServiceProducer;
 
-    Object createStandingOrder(BankAccessEntity bankAccess, Credentials credentials, StandingOrderRequest standingOrder) {
+    Object createStandingOrder(BankAccessEntity bankAccess, Credentials credentials, PeriodicPayment standingOrder) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 
         BankApiUser bankApiUser = userService.checkApiRegistration(bankingService,
@@ -40,7 +39,7 @@ public class StandingOrderService {
         BankEntity bankEntity = bankService.findBank(bankAccess.getBankCode());
 
         try {
-            TransactionRequest<StandingOrderRequest> request =
+            TransactionRequest<PeriodicPayment> request =
                 TransactionRequestFactory.create(standingOrder, bankApiUser, bankAccess, bankEntity, null);
             AbstractResponse response = bankingService.executePayment(request);
 
@@ -57,7 +56,7 @@ public class StandingOrderService {
         }
     }
 
-    void submitStandingOrder(StandingOrderRequest standingOrder, Object tanSubmit, BankAccessEntity bankAccess,
+    void submitStandingOrder(PeriodicPayment standingOrder, Object tanSubmit, BankAccessEntity bankAccess,
                              Credentials credentials, String tan) {
         OnlineBankingService bankingService = bankingServiceProducer.getBankingService(bankAccess.getBankCode());
 

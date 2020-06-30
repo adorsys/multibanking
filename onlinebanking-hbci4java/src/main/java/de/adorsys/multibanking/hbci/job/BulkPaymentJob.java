@@ -71,6 +71,9 @@ public class BulkPaymentJob extends AbstractPaymentJob<BulkPayment> {
             if (payment.getPurposecode() != null) {
                 bulkPaymentHbciJob.setParam("purposecode", i, payment.getPurposecode());
             }
+            if (payment.getEndToEndId() != null) {
+                bulkPaymentHbciJob.setParam("endtoendid", i, payment.getEndToEndId());
+            }
         }
 
         bulkPaymentHbciJob.verifyConstraints();

@@ -29,8 +29,9 @@ import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.Tra
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class StandingOrderRequest extends AbstractPayment implements DeletablePayment {
+public class PeriodicPayment extends AbstractPayment implements DeletablePayment {
 
+    private String endToEndId;
     private Frequency cycle;
     private int executionDay;
     private LocalDate firstExecutionDate;
