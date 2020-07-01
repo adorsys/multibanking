@@ -55,6 +55,9 @@ public class TransferJob extends AbstractPaymentJob<SinglePayment> {
         if (singlePayment.getPurpose() != null) {
             hbciTransferJob.setParam("usage", singlePayment.getPurpose());
         }
+        if (singlePayment.getEndToEndId() != null) {
+            hbciTransferJob.setParam("endtoendid", singlePayment.getEndToEndId());
+        }
 
         hbciTransferJob.verifyConstraints();
 
