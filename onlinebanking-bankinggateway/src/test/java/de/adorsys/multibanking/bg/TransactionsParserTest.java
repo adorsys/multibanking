@@ -35,5 +35,9 @@ public class TransactionsParserTest {
         TransactionsResponse loadBookingsResponse = new BankingGatewayAdapter(null, null).jsonStringToLoadBookingsResponse(json);
         assertNotNull(loadBookingsResponse);
         assertEquals("Wrong count of bookings", 30, loadBookingsResponse.getBookings().size());
+        loadBookingsResponse.getBookings().forEach(
+            booking -> assertNotNull(booking.getText())
+        );
+        assertEquals("Buchungstext wrong","Auszahlungen/Bargeldauszahlung", loadBookingsResponse.getBookings().get(0).getText());
     }
 }

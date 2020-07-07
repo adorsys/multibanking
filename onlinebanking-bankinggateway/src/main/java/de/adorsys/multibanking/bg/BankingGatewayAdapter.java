@@ -205,6 +205,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     for(Booking booking : bookings) {
                         balance = balance.add(booking.getAmount());
                         booking.setBalance(balance);
+                        booking.setExternalId(booking.getValutaDate() + "_" + booking.getAmount() + "_" + booking.getBalance()); // override fallback external id
                     }
                     Optional.ofNullable(balancesReport.getReadyBalance()).ifPresent(
                         readyBalance -> {

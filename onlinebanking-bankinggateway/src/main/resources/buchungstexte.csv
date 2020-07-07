@@ -1,0 +1,196 @@
+001;Inhaberscheck (nicht eurocheque)
+002;Orderscheck
+003;DM-Reisescheck
+006;Kreditkartenabrechnung
+009;Rücklastschrift aus Datenträgeraustausch, Lastschrift (Rückbelastung) - DTA -
+012;Zahlungsanweisung zur Verrechnung
+014;Lastschrift für Fremdwährungs-eurocheque / Lastschrift für über die GZS abge-wickelte Auslandsschecks
+058;Bank-an-Bank-Zahlung (Überweisungsgutschrift)
+070;Scheckeinreichung
+072;Wechseleinreichung
+073;Wechsel
+075;Scheck BSE
+076;Telefonauftrag
+079;Sammler
+082;Einzahlungen
+083;Auszahlungen/Bargeldauszahlung
+084;Online-Einzugsauftrag
+087;Eilüberweisung
+088;Überweisungsgutschrift mit Festvaluta
+093;Diskont-Wechsel
+095;Aval (Inland)
+098;GeldKarte (Sammlergutschrift für Händler)
+0XX;Zahlungsverkehr in Euro innerhalb der EU und des EWR (nicht spezifiziert)
+101;Inhaberscheck
+102;Orderscheck
+103;Reisescheck
+104;SEPA Direct Debit (Einzelbuchung-Soll, B2B)
+105;SEPA Direct Debit (Einzelbuchung-Soll, Core)
+106;SEPA Cards Clearing (Einzelbuchung-Soll)
+107;SEPA Direct Debit (Einzelbuchung-Soll, mittels Karte am Point of Sale generierte Lastschrift)
+108;SEPA Direct Debit (Soll, Rückbelastung, B2B)
+109;SEPA Direct Debit (Soll, Rückbelastung, Core)
+110;SEPA Cards Clearing (Soll, Rückbelastung)
+111;Rückrechnung von Schecks
+112;Zahlungsanweisung zur Verrechnung
+116;SEPA Credit Transfer (Einzelbuchung-Soll)
+117;SEPA Credit Transfer (Dauerauftrag-Soll)
+118;SEPA Credit Transfer Instant (Einzelbuchung-Soll)
+119;SEPA Credit Transfer (Einzelbuchung-Soll, Spende)
+122;Währungsscheck auf Euro
+152;SEPA Dauerauftragsgutschrift
+153;SEPA Credit Transfer (Einzelbuchung-Haben, Lohn-, Gehalts-, Rentengutschrift)
+154;SEPA Credit Transfer (Einzelbuchung-Haben, Vermögenswirksame Leistungen)
+155;SEPA Credit Transfer (Einzelbuchung-Haben, Altersvermögenswirksame Leistungen)
+156;SEPA Credit Transfer (Einzelbuchung-Haben, Überweisung öffentlicher Kassen)
+157;SEPA Credit Transfer Instant (Einzelbuchung-Haben, Lohn-, Gehalts-, Rentengutschrift)
+159;SEPA Credit Transfer Rückbuchung (resultierend aus unanbringlicher Überweisung oder Rückruf)
+160;SEPA Credit Transfer Instant Rückbuchung (resultierend aus unanbringlicher Überweisung oder Rückruf)
+161;SEPA Credit Transfer Instant (Einzelbuchung-Haben, Vermögenswirksame Leistungen)6
+162;SEPA Credit Transfer Instant (Einzelbuchung-Haben, Altersvermögenswirksame Leistungen)
+163;SEPA Credit Transfer Instant (Einzelbuchung-Haben, Überweisung öffentlicher Kassen)
+164;SEPA Credit Transfer Instant (Einzelbuchung-Haben, Überweisung mit prüfziffergesicherten Referenzdaten(RF))
+165;SEPA Credit Transfer Instant (Einzelbuchung-Haben, Spende)
+166;SEPA Credit Transfer (Einzelbuchung-Haben)
+167;SEPA Credit Transfer (Einzelbuchung-Haben, Überweisung mit prüfziffergesicherten Referenzdaten (RF))
+168;SEPA Credit Transfer Instant (Einzelbuchung-Haben)
+169;SEPA Credit Transfer (Einzelbuchung-Haben, Spende)
+170;Gutschrift aus Scheckeinreichung
+171;SEPA Direct Debit Einreichung (Einzelbuchung-Haben, Core)
+174;SEPA Direct Debit (Einzelbuchung-Haben, B2B)
+177;SEPA Credit Transfer Online (Einzelbuchung-Soll)
+181;SEPA Direct Debit (Haben Wiedergutschrift, Core)
+182;SEPA Cards Clearing (Haben Wiedergutschrift)
+183;Scheckrückgabe (Habenbuchung)
+184;SEPA Direct Debit (Haben Wiedergutschrift, B2B)
+185;Scheckbelastung (Sammler, Soll)
+188;SEPA Credit Transfer Instant (Sammler-Soll)
+189;SEPA Credit Transfer Instant (Sammler-Haben)
+190;SEPA Cards Clearing (Sammler-Soll)
+191;SEPA Credit Transfer (Sammler-Soll)
+192;SEPA Direct Debit (Sammler-Haben, Core)
+193;SEPA Direct Debit (Soll, Reversal)
+194;SEPA Credit Transfer (Sammler-Haben)
+195;SEPA Direct Debit (Sammler-Soll, Core)
+196;SEPA Direct Debit (Sammler-Haben, B2B)
+197;SEPA Direct Debit (Sammler-Soll, B2B)
+198;SEPA Cards Clearing (Sammler-Haben)
+199;SEPA Cards Clearing (Soll, Reversal)
+1XX;Zahlungsverkehr in Euro innerhalb der EU und des EWR (nicht spezifiziert)
+201;Zahlungsauftrag
+202;Auslandsvergütung
+203;Inkasso
+204;Akkreditiv
+205;Aval
+206;Auslandsüberweisung
+208;Rembourse
+209;Zahlung per Scheck
+210;Zahlung über elektronische Medien
+211;Zahlungseingang über elektronische Medien
+212;Dauerauftrag
+213;Lastschrift-Einzug aus dem Ausland
+214;Dokumenten-Inkasso (Import)
+215;Dokumenten-Inkasso (Export)
+216;Wechsel-Inkasso (Import)
+217;Wechsel-Inkasso (Export)
+218;Import-Akkreditiv
+219;Export-Akkreditiv
+220;Gutschrift e.V. eines Auslands-Schecks
+221;Gutschrift Auslands-Scheck-Inkasso
+222;Belastung Auslands-Scheck
+223;Belastung Auslands-ec-Scheck
+224;Sorten-Ankauf
+225;Sorten-Verkauf
+2XX;Auslandsgeschäft / Auslandszahlungsverkehr (nicht spezifiziert)
+301;Inkasso
+302;Kupon/Dividenden
+303;Effekten
+304;Übertrag
+305;Namensschuldverschreibung
+306;Schuldschein
+307;Wertpapierzeichnung
+308;Handel von Bezugsrechten
+309;Handel von Bonusrechten
+310;Handel von Optionen
+311;Termingeschäfte
+320;Gebühren für Wertpapiergeschäfte
+321;Depotgebühren
+330;Erträge aus Wertpapieren
+340;Gutschrift für fällige Wertpapiere
+399;Storno
+3XX;Wertpapiergeschäft (nicht spezifiziert)
+401;Kassedevisen
+402;Termindevisen
+403;Reisedevisen
+404;Devisenscheck
+405;Finanzinnovationen
+406;Devisenhandel
+407;Geldhandel
+408;Zinsen Geldhandel
+409;Kapital plus Zinsen
+411;Devisenkassa-Kauf
+412;Devisenkassa-Verkauf
+413;Devisentermin-Kauf
+414;Devisentermin-Verkauf
+415;FW-Tagegeld-Aktiv
+416;FW-Tagegeld-Passiv
+417;FW-Termingeld-Aktiv
+418;FW-Termingeld-Passiv
+419;Call-Geld-Aktiv
+420;Call-Geld-Passiv
+421;Optionen
+422;Swap
+423;Edelmetall-Ankauf
+424;Edelmetall-Verkauf
+4XX;Devisengeschäft (nicht spezifiziert)
+601;Einzug von Raten/Annuitäten
+602;Überweisung von Raten/Annuitäten
+603;Tilgung
+604;Darlehenszinsen
+605;Darlehenszinsen mit Nebenleistungen
+606;Kredit Kapital
+607;Kredit- und/oder Zinszahlung
+6XX;Kreditgeschäft (nicht spezifiziert)
+801;Scheckkarte
+802;Scheckheft
+803;Depotverwahrung
+804;Dauerauftragsgebühren
+805;Abschluss
+806;Porto/Zustellgebühren (bzw. deren Erstattung)
+807;Preise/Spesen (bzw. deren Erstattung)
+808;Gebühren (bzw. deren Erstattung)
+809;Provisionen
+810;Mahngebühren
+811;Kreditkosten
+812;Stundungszinsen
+813;Disagio
+814;Zinsen
+815;kapitalisierte Zinsen
+816;Zinssatzänderung
+817;Zinsberichtigung
+818;Abbuchung/Belastung
+819;Bezüge/Vergütung
+820;Übertrag
+821;Telefon
+822;Auszahlplan
+823;Festgeld/Termingeld
+824;Leihgeld
+825;Universaldarlehen
+826;dynamisches Sparen
+827;Überschusssparen
+828;Sparbrief
+829;Sparplan
+830;Bonus
+831;alte Rechnung
+832;Hypothek
+833;Cash Concentrating - Buchung Hauptkonten/Übertrag/Saldoberichtigung
+834;Cash Concentrating - Avisinformation für Nebenkonten
+835;Sonstige nicht definierte GV-Arten
+836;Reklamationsbuchung
+837;Umsatzsteuer
+888;Umbuchung wegen Euro-Umstellung
+899;Storno
+8XX;Sonstige (nicht spezifiziert)
+997;Depotaufstellung MT 571
+999;Unstrukturierte Belegung des Mehrzweckfeldes 86
+9XX;Unstrukturierter Inhalt (nicht spezifiziert)
