@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.ChallengeData;
 import de.adorsys.multibanking.domain.PsuMessage;
+import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
@@ -293,7 +294,14 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
                 }
                 return konto;
             })
-            .orElseGet(() -> passport.getAccounts().get(0));
+            .orElseGet(() -> getFirstAccountOrThrowException(passport.getAccounts()));
+    }
+
+    private Konto getFirstAccountOrThrowException(List<Konto> accounts) {
+        if (accounts.size() > 0) {
+            return accounts.get(0);
+        }
+        throw new MultibankingException(MultibankingError.INVALID_ACCOUNT_REFERENCE, "No account available");
     }
 
     private Optional<BankAccount> getPsuAccount() {
