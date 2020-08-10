@@ -22,7 +22,7 @@
           "iban": "******"
         },
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NMSC+083+05443"
       },
       {
         "bookingDate": "2017-10-25",
@@ -33,7 +33,7 @@
         },
         "creditorName": "******",
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NDDT+106+00931"
       },
       {
         "bookingDate": "2017-10-25",
@@ -44,7 +44,7 @@
         },
         "creditorName": "******",
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NMSC+083+05443"
       },
       {
         "endToEndId": "******",
@@ -66,7 +66,7 @@
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NDDT+106+00931"
       },
       {
         "endToEndId": "******",
@@ -85,7 +85,7 @@
           "iban": "******"
         },
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NDDT+106+00931"
       },
       {
         "bookingDate": "2017-10-25",
@@ -96,40 +96,7 @@
         },
         "creditorName": "******",
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
-      },
-      {
-        "endToEndId": "******",
-        "mandateId": "******",
-        "bookingDate": "2017-10-25",
-        "valueDate": "2017-10-25",
-        "transactionAmount": {
-          "currency": "******",
-          "amount": "100.00"
-        },
-        "creditorName": "******",
-        "creditorAccount": {
-          "iban": "******"
-        },
-        "ultimateCreditor": "******",
-        "debtorName": "******",
-        "debtorAccount": {
-          "iban": "******"
-        },
-        "remittanceInformationUnstructured": "******",
-        "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
-      },
-      {
-        "bookingDate": "2017-10-25",
-        "valueDate": "2017-10-25",
-        "transactionAmount": {
-          "currency": "******",
-          "amount": "100.00"
-        },
-        "creditorName": "******",
-        "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NDDT+106+00931"
       },
       {
         "endToEndId": "******",
@@ -151,7 +118,7 @@
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NMSC+166+00931"
       },
       {
         "bookingDate": "2017-10-25",
@@ -162,7 +129,7 @@
         },
         "creditorName": "******",
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NTRF+117+00900"
       },
       {
         "endToEndId": "******",
@@ -184,7 +151,18 @@
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NTRF+153+00931"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "NTRF+153+00931"
       },
       {
         "endToEndId": "******",
@@ -206,7 +184,7 @@
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NMSC+083+05443"
       },
       {
         "endToEndId": "******",
@@ -228,137 +206,7 @@
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
-      },
-      {
-        "bookingDate": "2017-10-25",
-        "valueDate": "2017-10-25",
-        "transactionAmount": {
-          "currency": "******",
-          "amount": "100.00"
-        },
-        "debtorName": "******",
-        "debtorAccount": {
-          "iban": "******"
-        },
-        "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
-      },
-      {
-        "endToEndId": "******",
-        "bookingDate": "2017-10-25",
-        "valueDate": "2017-10-25",
-        "transactionAmount": {
-          "currency": "******",
-          "amount": "100.00"
-        },
-        "creditorName": "******",
-        "creditorAccount": {
-          "iban": "******"
-        },
-        "debtorName": "******",
-        "debtorAccount": {
-          "iban": "******"
-        },
-        "remittanceInformationUnstructured": "******",
-        "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
-      },
-      {
-        "endToEndId": "******",
-        "bookingDate": "2017-10-25",
-        "valueDate": "2017-10-25",
-        "transactionAmount": {
-          "currency": "******",
-          "amount": "100.00"
-        },
-        "creditorName": "******",
-        "creditorAccount": {
-          "iban": "******"
-        },
-        "debtorName": "******",
-        "debtorAccount": {
-          "iban": "******"
-        },
-        "remittanceInformationUnstructured": "******",
-        "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
-      },
-      {
-        "endToEndId": "******",
-        "bookingDate": "2017-10-25",
-        "valueDate": "2017-10-25",
-        "transactionAmount": {
-          "currency": "******",
-          "amount": "100.00"
-        },
-        "creditorName": "******",
-        "creditorAccount": {
-          "iban": "******"
-        },
-        "debtorName": "******",
-        "debtorAccount": {
-          "iban": "******"
-        },
-        "remittanceInformationUnstructured": "******",
-        "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
-      },
-      {
-        "bookingDate": "2017-10-25",
-        "valueDate": "2017-10-25",
-        "transactionAmount": {
-          "currency": "******",
-          "amount": "100.00"
-        },
-        "creditorName": "******",
-        "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
-      },
-      {
-        "bookingDate": "2017-10-25",
-        "valueDate": "2017-10-25",
-        "transactionAmount": {
-          "currency": "******",
-          "amount": "100.00"
-        },
-        "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
-      },
-      {
-        "bookingDate": "2017-10-25",
-        "valueDate": "2017-10-25",
-        "transactionAmount": {
-          "currency": "******",
-          "amount": "100.00"
-        },
-        "creditorName": "******",
-        "creditorAccount": {
-          "iban": "******"
-        },
-        "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
-      },
-      {
-        "endToEndId": "******",
-        "mandateId": "******",
-        "bookingDate": "2017-10-25",
-        "valueDate": "2017-10-25",
-        "transactionAmount": {
-          "currency": "******",
-          "amount": "100.00"
-        },
-        "creditorName": "******",
-        "creditorAccount": {
-          "iban": "******"
-        },
-        "ultimateCreditor": "******",
-        "debtorName": "******",
-        "debtorAccount": {
-          "iban": "******"
-        },
-        "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NMSC+805+00905"
       },
       {
         "endToEndId": "******",
@@ -380,7 +228,137 @@
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NDDT+105+00931"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "NDDT+105+00931"
+      },
+      {
+        "endToEndId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "NDDT+106+00931"
+      },
+      {
+        "endToEndId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "NDDT+106+00931"
+      },
+      {
+        "endToEndId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "NDDT+106+00931"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "NMSC+083+05443"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "NMSC+083+05443"
+      },
+      {
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "NDDT+105+00814"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "proprietaryBankTransactionCode": "NMSC+083+05443"
       },
       {
         "endToEndId": "******",
@@ -402,7 +380,29 @@
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NTRF+177+00801"
+      },
+      {
+        "endToEndId": "******",
+        "mandateId": "******",
+        "bookingDate": "2017-10-25",
+        "valueDate": "2017-10-25",
+        "transactionAmount": {
+          "currency": "******",
+          "amount": "100.00"
+        },
+        "creditorName": "******",
+        "creditorAccount": {
+          "iban": "******"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "******"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "NDDT+106+00931"
       },
       {
         "endToEndId": "******",
@@ -424,7 +424,7 @@
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NTRF+177+00801"
       },
       {
         "bookingDate": "2017-10-25",
@@ -435,7 +435,7 @@
         },
         "creditorName": "******",
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NMSC+083+05443"
       },
       {
         "endToEndId": "******",
@@ -455,7 +455,7 @@
           "iban": "******"
         },
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NDDT+106+00931"
       },
       {
         "bookingDate": "2017-10-25",
@@ -466,7 +466,7 @@
         },
         "creditorName": "******",
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NMSC+166+00931"
       },
       {
         "endToEndId": "******",
@@ -485,7 +485,7 @@
           "iban": "******"
         },
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NTRF+153+00931"
       },
       {
         "endToEndId": "******",
@@ -507,7 +507,7 @@
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NTRF+153+00931"
       },
       {
         "endToEndId": "******",
@@ -526,7 +526,7 @@
           "iban": "******"
         },
         "remittanceInformationUnstructured": "******",
-        "proprietaryBankTransactionCode": "******"
+        "proprietaryBankTransactionCode": "NDDT+106+00931"
       }
     ],
     "_links": {

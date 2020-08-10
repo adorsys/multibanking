@@ -119,9 +119,18 @@ interface BankingGatewayMapper {
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
         booking.setTransactionCode(transactionDetails.getPurposeCode() == null ? null :
             transactionDetails.getPurposeCode().toString());
-        booking.setText(transactionDetails.getAdditionalInformation() != null ?
-            transactionDetails.getAdditionalInformation() :
-            transactionDetails.getProprietaryBankTransactionCode()); // use bank transaction code as fallback for buchungstext
+
+        if(transactionDetails.getAdditionalInformation() != null) {
+            booking.setText(transactionDetails.getAdditionalInformation());
+        } else {
+            // fallback use gvcode from bank transaction code to lookup buchungstext
+            String text = Optional.ofNullable(transactionDetails.getProprietaryBankTransactionCode())
+                .map(bankTransactionCode -> bankTransactionCode.split("\\+"))
+                .map(array -> array.length > 2 ? array[1] : null)
+                .map(BuchungstextMapper::gvcode2Buchungstext)
+                .orElse(null);
+            booking.setText(text);
+        }
 
         BankAccount bankAccount = new BankAccount();
 
@@ -135,7 +144,7 @@ interface BankingGatewayMapper {
             bankAccount.setIban(transactionDetails.getDebtorAccount() != null ? transactionDetails.getDebtorAccount().getIban() : null);
         }
         booking.setOtherAccount(bankAccount);
-        booking.setExternalId( // TODO use date, amount, balance as in hbci
+        booking.setExternalId( // fallback external id if balance cannot be calculated
             Integer.toString(Objects.hash(
                 booking.getBookingDate(),
                 booking.getValutaDate(),
