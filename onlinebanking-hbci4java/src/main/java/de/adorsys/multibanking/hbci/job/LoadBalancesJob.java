@@ -20,54 +20,44 @@ import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadBalancesResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadBalances;
-import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
-import org.kapott.hbci.passport.PinTanPassport;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
-@RequiredArgsConstructor
 @Slf4j
-public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesResponse> {
+public class LoadBalancesJob extends ScaAwareJob<LoadBalances, GVSaldoReq, LoadBalancesResponse> {
 
-    private final TransactionRequest<LoadBalances> loadBalanceRequest;
-    private AbstractHBCIJob balanceJob;
-
-    @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        balanceJob = new GVSaldoReq(passport);
-        balanceJob.setParam("my", getHbciKonto(passport));
-        return balanceJob;
+    public LoadBalancesJob(TransactionRequest<LoadBalances> transactionRequest) {
+        super(transactionRequest);
     }
 
     @Override
-    TransactionRequest<LoadBalances> getTransactionRequest() {
-        return loadBalanceRequest;
+    GVSaldoReq createHbciJob() {
+        GVSaldoReq hbciJob = new GVSaldoReq(dialog.getPassport());
+        hbciJob.setParam("my", getHbciKonto());
+        return hbciJob;
     }
 
     @Override
-    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+    String getHbciJobName() {
         return GVSaldoReq.getLowlevelName();
     }
 
     @Override
-    public LoadBalancesResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
-        if (balanceJob.getJobResult().getJobStatus().hasErrors()) {
+    public LoadBalancesResponse createJobResponse() {
+        if (getHbciJob().getJobResult().getJobStatus().hasErrors()) {
             log.error("Balance job not OK");
-            throw new MultibankingException(HBCI_ERROR, collectMessages(balanceJob.getJobResult().getJobStatus().getRetVals()));
+            throw new MultibankingException(HBCI_ERROR, collectMessages(getHbciJob().getJobResult().getJobStatus().getRetVals()));
         }
 
-        BankAccount bankAccount = loadBalanceRequest.getTransaction().getPsuAccount();
+        BankAccount bankAccount = transactionRequest.getTransaction().getPsuAccount();
 
-        GVRSaldoReq jobResult = (GVRSaldoReq) balanceJob.getJobResult();
+        GVRSaldoReq jobResult = (GVRSaldoReq) getHbciJob().getJobResult();
         if (jobResult.getEntries() != null && !jobResult.getEntries().isEmpty()) {
-            bankAccount.setBalances(accountStatementMapper.createBalancesReport((GVRSaldoReq) balanceJob.getJobResult(),
+            bankAccount.setBalances(accountStatementMapper.createBalancesReport((GVRSaldoReq) getHbciJob().getJobResult(),
                 bankAccount.getAccountNumber()));
         }
 

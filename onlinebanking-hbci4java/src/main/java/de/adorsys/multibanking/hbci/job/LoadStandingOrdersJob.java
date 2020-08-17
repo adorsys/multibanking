@@ -20,16 +20,11 @@ import de.adorsys.multibanking.domain.Amount;
 import de.adorsys.multibanking.domain.StandingOrder;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.StandingOrdersResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadStandingOrders;
-import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDauerSEPAList;
 import org.kapott.hbci.GV_Result.GVRDauerList;
 import org.kapott.hbci.manager.HBCIUtils;
-import org.kapott.hbci.passport.PinTanPassport;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -41,34 +36,28 @@ import java.util.stream.Collectors;
 
 import static de.adorsys.multibanking.domain.Frequency.*;
 
-@RequiredArgsConstructor
 @Slf4j
-public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, StandingOrdersResponse> {
+public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, GVDauerSEPAList, StandingOrdersResponse> {
 
-    private final TransactionRequest<LoadStandingOrders> loadStandingOrdersRequest;
-
-    private GVDauerSEPAList standingOrdersHbciJob;
-
-    @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        standingOrdersHbciJob = new GVDauerSEPAList(passport);
-        standingOrdersHbciJob.setParam("src", getHbciKonto(passport));
-        return standingOrdersHbciJob;
+    public LoadStandingOrdersJob(TransactionRequest<LoadStandingOrders> transactionRequest) {
+        super(transactionRequest);
     }
 
     @Override
-    TransactionRequest<LoadStandingOrders> getTransactionRequest() {
-        return loadStandingOrdersRequest;
+    GVDauerSEPAList createHbciJob() {
+        GVDauerSEPAList hbciJob = new GVDauerSEPAList(dialog.getPassport());
+        hbciJob.setParam("src", getHbciKonto());
+        return hbciJob;
     }
 
     @Override
-    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+    String getHbciJobName() {
         return GVDauerSEPAList.getLowlevelName();
     }
 
     @Override
-    public StandingOrdersResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
-        List<StandingOrder> standingOrders = ((GVRDauerList) standingOrdersHbciJob.getJobResult()).getEntries().stream()
+    public StandingOrdersResponse createJobResponse() {
+        List<StandingOrder> standingOrders = ((GVRDauerList) getHbciJob().getJobResult()).getEntries().stream()
             .map(dauerAuftrag -> {
                 StandingOrder standingOrder = new StandingOrder();
                 standingOrder.setCreditorAccount(dauerAuftrag.other.iban);

@@ -23,6 +23,8 @@ import lombok.Data;
 public abstract class AbstractTransaction {
 
     private BankAccount psuAccount;
+    private boolean veu2ndSignature = false;
+    private String orderId;
 
     public abstract TransactionType getTransactionType();
 
@@ -42,6 +44,7 @@ public abstract class AbstractTransaction {
         TAN_REQUEST,
         LOAD_BANKACCOUNTS,
         LOAD_BALANCES,
+        LOAD_VEU_LIST,
         LOAD_TRANSACTIONS,
         LOAD_STANDING_ORDERS,
         GET_PAYMENT_STATUS

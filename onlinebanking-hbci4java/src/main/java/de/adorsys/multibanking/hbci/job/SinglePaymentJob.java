@@ -17,75 +17,65 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
-import lombok.RequiredArgsConstructor;
 import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV_Result.GVRPayment;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-@RequiredArgsConstructor
-public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment> {
+import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.FUTURE_SINGLE_PAYMENT;
 
-    private final TransactionRequest<SinglePayment> transactionRequest;
-    private AbstractSEPAGV hbciSinglePaymentJob;
+public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment, AbstractHBCIJob> {
+
+    public SinglePaymentJob(TransactionRequest<SinglePayment> transactionRequest) {
+        super(transactionRequest);
+    }
 
     @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
+    AbstractHBCIJob createHbciJob() {
         SinglePayment singlePayment = transactionRequest.getTransaction();
 
-        Konto src = getHbciKonto(passport);
+        AbstractSEPAGV paympentJob;
+        if (singlePayment instanceof FutureSinglePayment) {
+            paympentJob = new GVTermUebSEPA(dialog.getPassport(), GVTermUebSEPA.getLowlevelName());
+            paympentJob.setParam("date", ((FutureSinglePayment) singlePayment).getExecutionDate().toString());
+        } else {
+            if (singlePayment.isInstantPayment()) {
+                paympentJob = new GVInstantUebSEPA(dialog.getPassport(), GVInstantUebSEPA.getLowlevelName());
+            } else {
+                paympentJob = new GVUebSEPA(dialog.getPassport(), GVUebSEPA.getLowlevelName());
+            }
+        }
 
+        paympentJob.setParam("src", getHbciKonto());
+        paympentJob.setParam("dst", createReceiverAccount(singlePayment));
+        paympentJob.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
+        if (singlePayment.getPurpose() != null) {
+            paympentJob.setParam("usage", singlePayment.getPurpose());
+        }
+        if (singlePayment.getPurposecode() != null) {
+            paympentJob.setParam("purposecode", singlePayment.getPurposecode());
+        }
+        if (singlePayment.getEndToEndId() != null) {
+            paympentJob.setParam("endtoendid", singlePayment.getEndToEndId());
+        }
+
+        return paympentJob;
+    }
+
+    private Konto createReceiverAccount(SinglePayment singlePayment) {
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();
         dst.iban = singlePayment.getReceiverIban();
         dst.bic = singlePayment.getReceiverBic();
-
-        if (singlePayment instanceof FutureSinglePayment) {
-            hbciSinglePaymentJob = new GVTermUebSEPA(passport, GVTermUebSEPA.getLowlevelName());
-            hbciSinglePaymentJob.setParam("date", ((FutureSinglePayment) singlePayment).getExecutionDate().toString());
-        } else {
-            if (singlePayment.isInstantPayment()) {
-                hbciSinglePaymentJob = new GVInstantUebSEPA(passport, GVInstantUebSEPA.getLowlevelName());
-            } else {
-                hbciSinglePaymentJob = new GVUebSEPA(passport, GVUebSEPA.getLowlevelName());
-            }
-        }
-
-        hbciSinglePaymentJob.setParam("src", src);
-        hbciSinglePaymentJob.setParam("dst", dst);
-        hbciSinglePaymentJob.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
-        if (singlePayment.getPurpose() != null) {
-            hbciSinglePaymentJob.setParam("usage", singlePayment.getPurpose());
-        }
-        if (singlePayment.getPurposecode() != null) {
-            hbciSinglePaymentJob.setParam("purposecode", singlePayment.getPurposecode());
-        }
-        if (singlePayment.getEndToEndId() != null) {
-            hbciSinglePaymentJob.setParam("endtoendid", singlePayment.getEndToEndId());
-        }
-        hbciSinglePaymentJob.verifyConstraints();
-
-        return hbciSinglePaymentJob;
+        return dst;
     }
 
     @Override
-    AbstractHBCIJob getHbciJob() {
-        return hbciSinglePaymentJob;
-    }
-
-    @Override
-    TransactionRequest<SinglePayment> getTransactionRequest() {
-        return transactionRequest;
-    }
-
-    @Override
-    protected String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
-        if (transactionType == AbstractTransaction.TransactionType.FUTURE_SINGLE_PAYMENT) {
+    protected String getHbciJobName() {
+        if (transactionRequest.getTransaction().getTransactionType() == FUTURE_SINGLE_PAYMENT) {
             return GVTermUebSEPA.getLowlevelName();
         }
         return GVUebSEPA.getLowlevelName();

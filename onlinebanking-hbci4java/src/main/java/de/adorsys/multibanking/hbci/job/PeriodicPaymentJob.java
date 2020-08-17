@@ -17,85 +17,71 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.PeriodicPayment;
 import de.adorsys.multibanking.hbci.model.HbciCycleMapper;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDauerSEPANew;
 import org.kapott.hbci.GV_Result.GVRPayment;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-@RequiredArgsConstructor
 @Slf4j
-public class PeriodicPaymentJob extends AbstractPaymentJob<PeriodicPayment> {
+public class PeriodicPaymentJob extends AbstractPaymentJob<PeriodicPayment, GVDauerSEPANew> {
 
-    private final TransactionRequest<PeriodicPayment> transactionRequest;
-    private GVDauerSEPANew hbciNewStandingOrderJob;
+    public PeriodicPaymentJob(TransactionRequest<PeriodicPayment> transactionRequest) {
+        super(transactionRequest);
+    }
 
     @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
+    GVDauerSEPANew createHbciJob() {
         PeriodicPayment standingOrder = transactionRequest.getTransaction();
 
-        Konto src = getHbciKonto(passport);
+        Konto src = getHbciKonto();
 
         Konto dst = new Konto();
         dst.name = standingOrder.getOtherAccount().getOwner();
         dst.iban = standingOrder.getOtherAccount().getIban();
         dst.bic = standingOrder.getOtherAccount().getBic();
 
-        hbciNewStandingOrderJob = new GVDauerSEPANew(passport);
+        GVDauerSEPANew hbciJob = new GVDauerSEPANew(dialog.getPassport());
 
-        hbciNewStandingOrderJob.setParam("src", src);
-        hbciNewStandingOrderJob.setParam("dst", dst);
-        hbciNewStandingOrderJob.setParam("btg", new Value(standingOrder.getAmount(), standingOrder.getCurrency()));
-        hbciNewStandingOrderJob.setParam("usage", standingOrder.getUsage());
+        hbciJob.setParam("src", src);
+        hbciJob.setParam("dst", dst);
+        hbciJob.setParam("btg", new Value(standingOrder.getAmount(), standingOrder.getCurrency()));
+        hbciJob.setParam("usage", standingOrder.getUsage());
 
         // standing order specific parameter
         if (standingOrder.getFirstExecutionDate() != null) {
-            hbciNewStandingOrderJob.setParam("firstdate", standingOrder.getFirstExecutionDate().toString());
+            hbciJob.setParam("firstdate", standingOrder.getFirstExecutionDate().toString());
         }
         if (standingOrder.getCycle() != null) {
-            hbciNewStandingOrderJob.setParam("timeunit", HbciCycleMapper.cycleToTimeunit(standingOrder.getCycle()));
+            hbciJob.setParam("timeunit", HbciCycleMapper.cycleToTimeunit(standingOrder.getCycle()));
             // M
             // month, W
             // week
-            hbciNewStandingOrderJob.setParam("turnus", HbciCycleMapper.cycleToTurnus(standingOrder.getCycle())); //
+            hbciJob.setParam("turnus", HbciCycleMapper.cycleToTurnus(standingOrder.getCycle())); //
             // 1W = every
             // week, 2M = every two months
         }
-        hbciNewStandingOrderJob.setParam("execday", standingOrder.getExecutionDay()); // W: 1-7, M: 1-31
+        hbciJob.setParam("execday", standingOrder.getExecutionDay()); // W: 1-7, M: 1-31
         if (standingOrder.getLastExecutionDate() != null) {
-            hbciNewStandingOrderJob.setParam("lastdate", standingOrder.getLastExecutionDate().toString());
+            hbciJob.setParam("lastdate", standingOrder.getLastExecutionDate().toString());
         }
         if (standingOrder.getPurposecode() != null) {
-            hbciNewStandingOrderJob.setParam("purposecode", standingOrder.getPurposecode());
+            hbciJob.setParam("purposecode", standingOrder.getPurposecode());
         }
         if (standingOrder.getEndToEndId() != null) {
-            hbciNewStandingOrderJob.setParam("endtoendid", standingOrder.getEndToEndId());
+            hbciJob.setParam("endtoendid", standingOrder.getEndToEndId());
         }
 
-        hbciNewStandingOrderJob.verifyConstraints();
+        hbciJob.verifyConstraints();
 
-        return hbciNewStandingOrderJob;
+        return hbciJob;
     }
 
     @Override
-    AbstractHBCIJob getHbciJob() {
-        return hbciNewStandingOrderJob;
-    }
-
-    @Override
-    TransactionRequest<PeriodicPayment> getTransactionRequest() {
-        return transactionRequest;
-    }
-
-    @Override
-    protected String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+    protected String getHbciJobName() {
         return GVDauerSEPANew.getLowlevelName();
     }
 

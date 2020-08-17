@@ -31,6 +31,7 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.*;
 import de.adorsys.multibanking.hbci.job.*;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIProduct;
 import org.kapott.hbci.manager.HBCIUtils;
@@ -231,7 +232,7 @@ public class HbciBanking implements OnlineBankingService {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
                 HbciBpdUpdCallback hbciCallback = createCallback(request);
 
-                ScaAwareJob<? extends AbstractPayment, PaymentResponse> paymentJob = createScaJob(request);
+                ScaAwareJob<? extends AbstractPayment, ? extends AbstractHBCIJob, PaymentResponse> paymentJob = createScaJob(request);
 
                 PaymentResponse response = paymentJob.execute(hbciCallback);
                 response.setBankApiConsentData(hbciCallback.updateConsentUpd(hbciConsent));
@@ -255,12 +256,12 @@ public class HbciBanking implements OnlineBankingService {
         return hbciScaHandler;
     }
 
-    private <T extends AbstractTransaction, R extends AbstractResponse> TransactionAuthorisationResponse<R> transactionAuthorisation(TransactionAuthorisation<T> transactionAuthorisation) {
+    private <T extends AbstractTransaction, J extends AbstractHBCIJob, R extends AbstractResponse> TransactionAuthorisationResponse<R> transactionAuthorisation(TransactionAuthorisation<T> transactionAuthorisation) {
         createCallback(transactionAuthorisation.getOriginTransactionRequest());
         try {
-            ScaAwareJob<T, R> scaJob = createScaJob(transactionAuthorisation.getOriginTransactionRequest());
+            ScaAwareJob<T, J, R> scaJob = createScaJob(transactionAuthorisation.getOriginTransactionRequest());
 
-            TransactionAuthorisationJob<T, R> transactionAuthorisationJob = new TransactionAuthorisationJob<>(scaJob, transactionAuthorisation);
+            TransactionAuthorisationJob<T, J, R> transactionAuthorisationJob = new TransactionAuthorisationJob<>(scaJob, transactionAuthorisation);
             TransactionAuthorisationResponse<R> response = transactionAuthorisationJob.execute();
 
             HbciConsent hbciConsent = ((HbciConsent) transactionAuthorisation.getOriginTransactionRequest().getBankApiConsentData());
@@ -285,41 +286,41 @@ public class HbciBanking implements OnlineBankingService {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends AbstractTransaction, R extends AbstractResponse> ScaAwareJob<T, R> createScaJob(TransactionRequest<T> transactionRequest) {
+    private <T extends AbstractTransaction, J extends AbstractHBCIJob, R extends AbstractResponse> ScaAwareJob<T, J, R> createScaJob(TransactionRequest<T> transactionRequest) {
         switch (transactionRequest.getTransaction().getTransactionType()) {
             case SINGLE_PAYMENT:
             case FUTURE_SINGLE_PAYMENT:
             case INSTANT_PAYMENT:
-                return (ScaAwareJob<T, R>) new SinglePaymentJob((TransactionRequest<SinglePayment>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new SinglePaymentJob((TransactionRequest<SinglePayment>) transactionRequest);
             case TRANSFER_PAYMENT:
-                return (ScaAwareJob<T, R>) new TransferJob((TransactionRequest<SinglePayment>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new TransferJob((TransactionRequest<SinglePayment>) transactionRequest);
             case FOREIGN_PAYMENT:
-                return (ScaAwareJob<T, R>) new ForeignPaymentJob((TransactionRequest<ForeignPayment>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new ForeignPaymentJob((TransactionRequest<ForeignPayment>) transactionRequest);
             case BULK_PAYMENT:
             case FUTURE_BULK_PAYMENT:
-                return (ScaAwareJob<T, R>) new BulkPaymentJob((TransactionRequest<BulkPayment>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new BulkPaymentJob((TransactionRequest<BulkPayment>) transactionRequest);
             case STANDING_ORDER:
-                return (ScaAwareJob<T, R>) new PeriodicPaymentJob((TransactionRequest<PeriodicPayment>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new PeriodicPaymentJob((TransactionRequest<PeriodicPayment>) transactionRequest);
             case RAW_SEPA:
-                return (ScaAwareJob<T, R>) new RawSepaJob((TransactionRequest<RawSepaPayment>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new RawSepaJob((TransactionRequest<RawSepaPayment>) transactionRequest);
             case FUTURE_SINGLE_PAYMENT_DELETE:
-                return (ScaAwareJob<T, R>) new DeleteFutureSinglePaymentJob((TransactionRequest<FutureSinglePayment>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new DeleteFutureSinglePaymentJob((TransactionRequest<FutureSinglePayment>) transactionRequest);
             case FUTURE_BULK_PAYMENT_DELETE:
-                return (ScaAwareJob<T, R>) new DeleteFutureBulkPaymentJob((TransactionRequest<FutureBulkPayment>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new DeleteFutureBulkPaymentJob((TransactionRequest<FutureBulkPayment>) transactionRequest);
             case STANDING_ORDER_DELETE:
-                return (ScaAwareJob<T, R>) new DeleteStandingOrderJob((TransactionRequest<PeriodicPayment>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new DeleteStandingOrderJob((TransactionRequest<PeriodicPayment>) transactionRequest);
             case TAN_REQUEST:
-                return (ScaAwareJob<T, R>) new TanRequestJob((TransactionRequest<TanRequest>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new TanRequestJob((TransactionRequest<TanRequest>) transactionRequest);
             case LOAD_BANKACCOUNTS:
-                return (ScaAwareJob<T, R>) new AccountInformationJob((TransactionRequest<LoadAccounts>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new AccountInformationJob((TransactionRequest<LoadAccounts>) transactionRequest);
             case LOAD_BALANCES:
-                return (ScaAwareJob<T, R>) new LoadBalancesJob((TransactionRequest<LoadBalances>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new LoadBalancesJob((TransactionRequest<LoadBalances>) transactionRequest);
             case LOAD_TRANSACTIONS:
-                return (ScaAwareJob<T, R>) new LoadTransactionsJob((TransactionRequest<LoadTransactions>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new LoadTransactionsJob((TransactionRequest<LoadTransactions>) transactionRequest);
             case LOAD_STANDING_ORDERS:
-                return (ScaAwareJob<T, R>) new LoadStandingOrdersJob((TransactionRequest<LoadStandingOrders>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new LoadStandingOrdersJob((TransactionRequest<LoadStandingOrders>) transactionRequest);
             case GET_PAYMENT_STATUS:
-                return (ScaAwareJob<T, R>) new InstantPaymentStatusJob((TransactionRequest<PaymentStatusReqest>) transactionRequest);
+                return (ScaAwareJob<T, J, R>) new InstantPaymentStatusJob((TransactionRequest<PaymentStatusReqest>) transactionRequest);
             default:
                 throw new IllegalArgumentException("invalid transaction type " + transactionRequest.getTransaction().getTransactionType());
         }

@@ -17,15 +17,15 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.kapott.hbci.GV.*;
+import org.kapott.hbci.GV.GVDauerSEPANew;
+import org.kapott.hbci.GV.GVInstantUebSEPA;
+import org.kapott.hbci.GV.GVRawSEPA;
+import org.kapott.hbci.GV.GVUebSEPA;
 import org.kapott.hbci.GV.parsers.ISEPAParser;
 import org.kapott.hbci.GV.parsers.SEPAParserFactory;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.sepa.SepaVersion;
 
 import java.io.ByteArrayInputStream;
@@ -35,19 +35,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@RequiredArgsConstructor
-public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
+public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment, GVRawSEPA> {
 
-    private final TransactionRequest<RawSepaPayment> transactionRequest;
-    private GVRawSEPA hbciRawSepaJob;
-
-    @Override
-    TransactionRequest<RawSepaPayment> getTransactionRequest() {
-        return transactionRequest;
+    public RawSepaJob(TransactionRequest<RawSepaPayment> transactionRequest) {
+        super(transactionRequest);
     }
 
     @Override
-    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+    String getHbciJobName() {
         return GVRawSEPA.getLowlevelName();
     }
 
@@ -57,7 +52,7 @@ public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
     }
 
     @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
+    GVRawSEPA createHbciJob() {
         RawSepaPayment sepaPayment = transactionRequest.getTransaction();
 
         String jobName;
@@ -78,22 +73,13 @@ public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
                 throw new IllegalArgumentException("unsupported raw sepa transaction: " + sepaPayment.getSepaTransactionType());
         }
 
-        hbciRawSepaJob = new GVRawSEPA(passport, jobName, sepaPayment.getRawRequestData());
-        hbciRawSepaJob.setParam("src", getHbciKonto(passport));
-
-        appendPainValues(sepaPayment, hbciRawSepaJob);
-
-        hbciRawSepaJob.verifyConstraints();
-
-        return hbciRawSepaJob;
+        return createRowSepaJob(sepaPayment, jobName);
     }
 
-    @Override
-    AbstractHBCIJob getHbciJob() {
-        return hbciRawSepaJob;
-    }
+    private GVRawSEPA createRowSepaJob(RawSepaPayment sepaPayment, String jobName) {
+        GVRawSEPA rawSEPAJob = new GVRawSEPA(dialog.getPassport(), jobName, sepaPayment.getRawRequestData());
+        getHbciJob().setParam("src", getHbciKonto());
 
-    private void appendPainValues(RawSepaPayment sepaPayment, GVRawSEPA sepagv) {
         String creditorIban = "";
         BigDecimal amount = new BigDecimal(0);
         String currency = "";
@@ -111,11 +97,12 @@ public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
         }
 
         if (result.size() > 1) {
-            sepagv.setLowlevelParam(sepagv.getName() + ".sepa.dst.iban", creditorIban);
+            rawSEPAJob.setLowlevelParam(rawSEPAJob.getName() + ".sepa.dst.iban", creditorIban);
         }
 
-        sepagv.setLowlevelParam(sepagv.getName() + ".sepa.btg.value", amount.toString());
-        sepagv.setLowlevelParam(sepagv.getName() + ".sepa.btg.curr", currency);
+        rawSEPAJob.setLowlevelParam(rawSEPAJob.getName() + ".sepa.btg.value", amount.toString());
+        rawSEPAJob.setLowlevelParam(rawSEPAJob.getName() + ".sepa.btg.curr", currency);
+        return rawSEPAJob;
     }
 
     @SuppressWarnings("unchecked")

@@ -21,10 +21,7 @@ import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
-import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVKUmsAll;
@@ -42,48 +39,41 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.BOOKING
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.domain.transaction.LoadTransactions.RawResponseType.CAMT;
 
-@RequiredArgsConstructor
 @Slf4j
-public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, TransactionsResponse> {
+public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, AbstractHBCIJob, TransactionsResponse> {
 
-    private final TransactionRequest<LoadTransactions> loadTransactionsRequest;
-
-    private AbstractHBCIJob transactionsHbciJob;
-
-    @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        transactionsHbciJob = createTransactionsJob(passport);
-        return transactionsHbciJob;
+    public LoadTransactionsJob(TransactionRequest<LoadTransactions> transactionRequest) {
+        super(transactionRequest);
     }
 
     @Override
-    TransactionRequest<LoadTransactions> getTransactionRequest() {
-        return loadTransactionsRequest;
+    AbstractHBCIJob createHbciJob() {
+        return createTransactionsJob();
     }
 
     @Override
-    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
-        if (transactionsHbciJob instanceof GVKUmsAllCamt) {
+    String getHbciJobName() {
+        if (getHbciJob() instanceof GVKUmsAllCamt) {
             return "KUmsAllCamt";
         }
         return "KUmsAll";
     }
 
     @Override
-    public TransactionsResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
-        if (transactionsHbciJob.getJobResult().getJobStatus().hasErrors()) {
+    public TransactionsResponse createJobResponse() {
+        if (getHbciJob().getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
-            throw new MultibankingException(HBCI_ERROR, collectMessages(transactionsHbciJob.getJobResult().getJobStatus().getRetVals()));
+            throw new MultibankingException(HBCI_ERROR, collectMessages(getHbciJob().getJobResult().getJobStatus().getRetVals()));
         }
 
         List<Booking> bookingList = null;
         BalancesReport balancesReport = null;
         List<String> raw = null;
-        GVRKUms bookingsResult = (GVRKUms) transactionsHbciJob.getJobResult();
-        if (loadTransactionsRequest.getTransaction().getRawResponseType() != null) {
-            raw = bookingsResult.getRaw(loadTransactionsRequest.getTransaction().getBookingStatus() == LoadTransactions.BookingStatus.PENDING);
+        GVRKUms bookingsResult = (GVRKUms) getHbciJob().getJobResult();
+        if (transactionRequest.getTransaction().getRawResponseType() != null) {
+            raw = bookingsResult.getRaw(transactionRequest.getTransaction().getBookingStatus() == LoadTransactions.BookingStatus.PENDING);
         } else {
-            if (loadTransactionsRequest.getTransaction().isWithBalance() && !bookingsResult.getDataPerDay().isEmpty()) {
+            if (transactionRequest.getTransaction().isWithBalance() && !bookingsResult.getDataPerDay().isEmpty()) {
                 GVRKUms.BTag lastBoookingDay =
                     bookingsResult.getDataPerDay().get(bookingsResult.getDataPerDay().size() - 1);
                 balancesReport = createBalancesReport(lastBoookingDay.end);
@@ -107,24 +97,26 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
         return balancesReport;
     }
 
-    private AbstractHBCIJob createTransactionsJob(PinTanPassport passport) {
-        AbstractHBCIJob hbciJob = createBookingsJobInternal(passport);
+    private AbstractHBCIJob createTransactionsJob() {
+        AbstractHBCIJob hbciJob = createBookingsJobInternal();
 
-        hbciJob.setParam("my", getHbciKonto(passport));
+        hbciJob.setParam("my", getHbciKonto());
 
-        LocalDate dateFrom = Optional.ofNullable(loadTransactionsRequest.getTransaction().getDateFrom())
-            .orElseGet(() -> getStartDate(passport.getJobRestrictions(hbciJob.getName())));
+        LocalDate dateFrom = Optional.ofNullable(transactionRequest.getTransaction().getDateFrom())
+            .orElseGet(() -> getStartDate(dialog.getPassport().getJobRestrictions(hbciJob.getName())));
         hbciJob.setParam("startdate", Date.from(dateFrom.atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-        Optional.ofNullable(loadTransactionsRequest.getTransaction().getDateTo())
+        Optional.ofNullable(transactionRequest.getTransaction().getDateTo())
             .ifPresent(localDate -> hbciJob.setParam("enddate",
                 Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
         return hbciJob;
     }
 
-    private AbstractHBCIJob createBookingsJobInternal(PinTanPassport passport) {
-        LoadTransactions.RawResponseType rawResponseType = loadTransactionsRequest.getTransaction().getRawResponseType();
+    private AbstractHBCIJob createBookingsJobInternal() {
+        PinTanPassport passport = dialog.getPassport();
+
+        LoadTransactions.RawResponseType rawResponseType = transactionRequest.getTransaction().getRawResponseType();
         if (rawResponseType != null && !passport.jobSupported(rawResponseType == CAMT ? GVKUmsAllCamt.getLowlevelName() : GVKUmsAll.getLowlevelName())) {
             throw new MultibankingException(BOOKINGS_FORMAT_NOT_SUPPORTED, "hbci transcations format not supported: " + rawResponseType);
         }

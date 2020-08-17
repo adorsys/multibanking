@@ -22,18 +22,13 @@ import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadBalances;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
-import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVSEPAInfo;
-import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -41,56 +36,50 @@ import java.util.stream.Collectors;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
 @Slf4j
-public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInformationResponse> {
+public class AccountInformationJob extends ScaAwareJob<LoadAccounts, GVSEPAInfo, AccountInformationResponse> {
 
-    private final TransactionRequest<LoadAccounts> loadAccountInformationRequest;
-    private AbstractHBCIJob sepaInfoJob;
-
-    public AccountInformationJob(TransactionRequest<LoadAccounts> loadAccountInformationRequest) {
-        this.loadAccountInformationRequest = loadAccountInformationRequest;
-        if (loadAccountInformationRequest.getTransaction().isWithBalances()) {
-            ((HbciConsent) loadAccountInformationRequest.getBankApiConsentData()).setCloseDialog(false);
+    public AccountInformationJob(TransactionRequest<LoadAccounts> transactionRequest) {
+        super(transactionRequest);
+        if (transactionRequest.getTransaction().isWithBalances()) {
+            ((HbciConsent) transactionRequest.getBankApiConsentData()).setCloseDialog(false);
         }
     }
 
     @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        if (!passport.jobSupported("SEPAInfo"))
+    GVSEPAInfo createHbciJob() {
+        if (!dialog.getPassport().jobSupported("SEPAInfo"))
             throw new MultibankingException(HBCI_ERROR, "SEPAInfo job not supported");
 
-        sepaInfoJob = new GVSEPAInfo(passport);
-        return sepaInfoJob;
+        return new GVSEPAInfo(dialog.getPassport());
     }
 
     @Override
-    TransactionRequest<LoadAccounts> getTransactionRequest() {
-        return loadAccountInformationRequest;
-    }
-
-    @Override
-    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+    String getHbciJobName() {
         return GVSEPAInfo.getLowlevelName();
     }
 
     @Override
-    public AccountInformationResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
-        loadAccountInformationRequest.getBankAccess().setBankName(passport.getInstName());
+    public AccountInformationResponse createJobResponse() {
+        transactionRequest.getBankAccess().setBankName(dialog.getPassport().getInstName());
 
-        List<Konto> hbciAccounts = passport.getAccounts();
+        List<Konto> hbciAccounts = dialog.getPassport().getAccounts();
         List<BankAccount> result = hbciAccounts.stream()
             .map(konto -> {
                 BankAccount bankAccount = accountStatementMapper.toBankAccount(konto);
                 bankAccount.externalId(BankApi.HBCI, UUID.randomUUID().toString());
-                bankAccount.bankName(loadAccountInformationRequest.getBankAccess().getBankName());
+                bankAccount.bankName(transactionRequest.getBankAccess().getBankName());
 
-                if (sepaInfoJob.getJobResult().isOK() && loadAccountInformationRequest.getTransaction().isWithBalances() && konto.allowedGVs.contains("HKSAL")) {
+                if (getHbciJob().getJobResult().isOK() && transactionRequest.getTransaction().isWithBalances() && konto.allowedGVs.contains("HKSAL")) {
                     LoadBalances loadBalances = new LoadBalances();
                     loadBalances.setPsuAccount(bankAccount);
 
                     TransactionRequest<LoadBalances> loadBalancesRequest =
-                        TransactionRequestFactory.create(loadBalances, null, loadAccountInformationRequest.getBankAccess(),
-                            loadAccountInformationRequest.getBank(), loadAccountInformationRequest.getBankApiConsentData());
-                    new LoadBalancesJob(loadBalancesRequest).execute(null, this.dialog);
+                        TransactionRequestFactory.create(loadBalances, null, transactionRequest.getBankAccess(),
+                            transactionRequest.getBank(), transactionRequest.getBankApiConsentData());
+
+                    LoadBalancesJob loadBalancesJob = new LoadBalancesJob(loadBalancesRequest);
+                    loadBalancesJob.dialog = this.dialog;
+                    loadBalancesJob.execute(null);
                 }
 
                 return bankAccount;
@@ -98,12 +87,12 @@ public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInfo
             .collect(Collectors.toList());
 
         //finally close dialog
-        if (sepaInfoJob.getJobResult().isOK() && loadAccountInformationRequest.getTransaction().isWithBalances()) {
+        if (getHbciJob().getJobResult().isOK() && transactionRequest.getTransaction().isWithBalances()) {
             this.dialog.dialogEnd();
         }
 
         return AccountInformationResponse.builder()
-            .bankAccess(loadAccountInformationRequest.getBankAccess())
+            .bankAccess(transactionRequest.getBankAccess())
             .bankAccounts(result)
             .build();
     }

@@ -293,8 +293,7 @@ public class DirectAccessControllerTest {
         UpdateAuthResponse updateAuthResponse = new UpdateAuthResponse(HBCI, EMBEDDED, ScaStatus.SCAMETHODSELECTED);
         updateAuthResponse.setChallenge(new ChallengeData());
 
-        AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(null);
-        authorisationCodeResponse.setUpdateAuthResponse(updateAuthResponse);
+        AuthorisationCodeResponse authorisationCodeResponse = new AuthorisationCodeResponse(null, updateAuthResponse);
 
         TransactionsResponse scaRequiredResponse = TransactionsResponse.builder().build();
         scaRequiredResponse.setAuthorisationCodeResponse(authorisationCodeResponse);

@@ -17,45 +17,31 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
-import lombok.RequiredArgsConstructor;
-import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTermMultiUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.passport.PinTanPassport;
 
-@RequiredArgsConstructor
-public class DeleteFutureBulkPaymentJob extends AbstractPaymentJob<FutureBulkPayment> {
+public class DeleteFutureBulkPaymentJob extends AbstractPaymentJob<FutureBulkPayment, GVTermMultiUebSEPADel> {
 
-    private final TransactionRequest<FutureBulkPayment> transactionRequest;
-    private GVTermMultiUebSEPADel hbciDeleteFutureBulkPaymentJob;
+    public DeleteFutureBulkPaymentJob(TransactionRequest<FutureBulkPayment> transactionRequest) {
+        super(transactionRequest);
+    }
 
     @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
+    GVTermMultiUebSEPADel createHbciJob() {
         FutureBulkPayment futureBulkPayment = transactionRequest.getTransaction();
 
-        hbciDeleteFutureBulkPaymentJob = new GVTermMultiUebSEPADel(passport, GVTermMultiUebSEPADel.getLowlevelName());
+        GVTermMultiUebSEPADel hbciJob = new GVTermMultiUebSEPADel(dialog.getPassport(), GVTermMultiUebSEPADel.getLowlevelName());
 
-        hbciDeleteFutureBulkPaymentJob.setParam("orderid", futureBulkPayment.getOrderId());
-        hbciDeleteFutureBulkPaymentJob.setParam("src", getHbciKonto(passport));
-        hbciDeleteFutureBulkPaymentJob.verifyConstraints();
+        hbciJob.setParam("orderid", futureBulkPayment.getOrderId());
+        hbciJob.setParam("src", getHbciKonto());
+        hbciJob.verifyConstraints();
 
-        return hbciDeleteFutureBulkPaymentJob;
+        return hbciJob;
     }
 
     @Override
-    AbstractHBCIJob getHbciJob() {
-        return hbciDeleteFutureBulkPaymentJob;
-    }
-
-    @Override
-    TransactionRequest<FutureBulkPayment> getTransactionRequest() {
-        return transactionRequest;
-    }
-
-    @Override
-    protected String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+    protected String getHbciJobName() {
         return "TermMultiUebSEPADel";
     }
 
