@@ -24,7 +24,7 @@ import org.kapott.hbci.GV_Result.HBCIJobResult;
 
 import java.util.Optional;
 
-public abstract class AbstractPaymentJob<T extends AbstractPayment, J extends AbstractHBCIJob> extends ScaAwareJob<T, J, PaymentResponse> {
+public abstract class AbstractPaymentJob<T extends AbstractPayment, J extends AbstractHBCIJob> extends ScaAwareJob<T, PaymentResponse> {
 
     public AbstractPaymentJob(TransactionRequest<T> transactionRequest) {
         super(transactionRequest);

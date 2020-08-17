@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVVeuList;
 
 @Slf4j
-public class VeuListJob extends ScaAwareJob<LoadVeuList, GVVeuList, VeuListResponse> {
+public class VeuListJob extends ScaAwareJob<LoadVeuList, VeuListResponse> {
 
     public VeuListJob(TransactionRequest<LoadVeuList> transactionRequest) {
         super(transactionRequest);

@@ -28,7 +28,7 @@ import org.kapott.hbci.GV_Result.GVRSaldoReq;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
 @Slf4j
-public class LoadBalancesJob extends ScaAwareJob<LoadBalances, GVSaldoReq, LoadBalancesResponse> {
+public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesResponse> {
 
     public LoadBalancesJob(TransactionRequest<LoadBalances> transactionRequest) {
         super(transactionRequest);

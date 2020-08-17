@@ -66,7 +66,7 @@ import static de.adorsys.multibanking.hbci.model.HbciDialogType.JOBS;
 
 @RequiredArgsConstructor
 @Slf4j
-public abstract class ScaAwareJob<T extends AbstractTransaction, J extends AbstractHBCIJob, R extends AbstractResponse> {
+public abstract class ScaAwareJob<T extends AbstractTransaction, R extends AbstractResponse> {
 
     static AccountStatementMapper accountStatementMapper = new AccountStatementMapperImpl();
     private static HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();

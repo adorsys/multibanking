@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 import static de.adorsys.multibanking.domain.Frequency.*;
 
 @Slf4j
-public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, GVDauerSEPAList, StandingOrdersResponse> {
+public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, StandingOrdersResponse> {
 
     public LoadStandingOrdersJob(TransactionRequest<LoadStandingOrders> transactionRequest) {
         super(transactionRequest);

@@ -5,7 +5,6 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import org.junit.Test;
-import org.kapott.hbci.GV.GVSEPAInfo;
 import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.passport.PinTanPassport;
@@ -19,7 +18,7 @@ public class ScaAwareJobTest {
 
     @Test(expected = MultibankingException.class)
     public void testGetKontoFailure() throws NoSuchFieldException {
-        ScaAwareJob<LoadAccounts, GVSEPAInfo, AccountInformationResponse> job = mock(AccountInformationJob.class,
+        ScaAwareJob<LoadAccounts, AccountInformationResponse> job = mock(AccountInformationJob.class,
             withSettings()
                 .useConstructor(new TransactionRequest<>(new LoadAccounts()))
                 .defaultAnswer(CALLS_REAL_METHODS));

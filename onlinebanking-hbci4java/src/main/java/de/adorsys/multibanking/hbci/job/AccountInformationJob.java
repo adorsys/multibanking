@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
 @Slf4j
-public class AccountInformationJob extends ScaAwareJob<LoadAccounts, GVSEPAInfo, AccountInformationResponse> {
+public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInformationResponse> {
 
     public AccountInformationJob(TransactionRequest<LoadAccounts> transactionRequest) {
         super(transactionRequest);

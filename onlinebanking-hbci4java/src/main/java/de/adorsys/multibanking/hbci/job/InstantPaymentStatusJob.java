@@ -26,7 +26,7 @@ import org.kapott.hbci.GV_Result.GVRInstantUebSEPAStatus;
 import org.kapott.hbci.status.HBCIExecStatus;
 
 @Slf4j
-public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, GVInstanstUebSEPAStatus, PaymentStatusResponse> {
+public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, PaymentStatusResponse> {
 
     private GVInstanstUebSEPAStatus paymentStatusHbciJob;
 

@@ -23,8 +23,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.kapott.hbci.callback.HBCICallback;
 
-import java.util.Map;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

@@ -235,16 +235,8 @@ public class HbciIntegrationIT {
             paymentResponse = hbciInitTransaction(payment);
             paymentResponse = hbciSubmitTransaction(payment, paymentResponse.getBankApiConsentData());
         }
-    }
 
-    private void loadVeuList() {
-        HbciConsent hbciConsent = createHbciConsent();
-        BankAccess bankAccess = createBankAccess();
-        Bank bank = createBank(bankAccess);
-
-        TransactionRequest<LoadVeuList> transactionRequest = TransactionRequestFactory.create(new LoadVeuList(), null, bankAccess, bank, hbciConsent);
-        VeuListJob veuListJob = new VeuListJob(transactionRequest);
-        VeuListResponse execute = veuListJob.execute(createCallback(transactionRequest));
+        assertThat(paymentResponse).isNotNull();
     }
 
     @Test

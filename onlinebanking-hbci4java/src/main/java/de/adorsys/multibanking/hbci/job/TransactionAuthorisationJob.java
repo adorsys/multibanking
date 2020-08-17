@@ -49,19 +49,19 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNA
 import static de.adorsys.multibanking.hbci.HbciCacheHandler.getBpd;
 
 @Slf4j
-public class TransactionAuthorisationJob<T extends AbstractTransaction, J extends AbstractHBCIJob, R extends AbstractResponse> {
+public class TransactionAuthorisationJob<T extends AbstractTransaction, R extends AbstractResponse> {
 
     private static final ObjectMapper objectMapper = new ObjectMapper()
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .findAndRegisterModules();
 
-    private final ScaAwareJob<T, J, R> scaJob;
+    private final ScaAwareJob<T, R> scaJob;
     private final TransactionAuthorisation<T> transactionAuthorisation;
     private final HbciConsent consent;
 
     private final HBCIJobsDialog hbciDialog;
 
-    public TransactionAuthorisationJob(ScaAwareJob<T, J, R> scaJob, TransactionAuthorisation<T> transactionAuthorisation) {
+    public TransactionAuthorisationJob(ScaAwareJob<T, R> scaJob, TransactionAuthorisation<T> transactionAuthorisation) {
         this.scaJob = scaJob;
         this.transactionAuthorisation = transactionAuthorisation;
 

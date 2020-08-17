@@ -40,7 +40,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 import static de.adorsys.multibanking.domain.transaction.LoadTransactions.RawResponseType.CAMT;
 
 @Slf4j
-public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, AbstractHBCIJob, TransactionsResponse> {
+public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, TransactionsResponse> {
 
     public LoadTransactionsJob(TransactionRequest<LoadTransactions> transactionRequest) {
         super(transactionRequest);
