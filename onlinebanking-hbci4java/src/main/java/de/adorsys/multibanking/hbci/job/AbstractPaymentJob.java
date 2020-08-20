@@ -16,21 +16,24 @@
 
 package de.adorsys.multibanking.hbci.job;
 
+import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
-import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.passport.PinTanPassport;
 
 import java.util.Optional;
 
-public abstract class AbstractPaymentJob<T extends AbstractPayment> extends ScaAwareJob<T, PaymentResponse> {
+public abstract class AbstractPaymentJob<T extends AbstractPayment, J extends AbstractHBCIJob> extends ScaAwareJob<T, PaymentResponse> {
+
+    public AbstractPaymentJob(TransactionRequest<T> transactionRequest) {
+        super(transactionRequest);
+    }
 
     @Override
-    PaymentResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
+    protected PaymentResponse createJobResponse() {
         return new PaymentResponse(Optional.ofNullable(getTransactionId())
-            .orElseGet(tanSubmit::getOrderRef));
+            .orElseGet(hbciTanSubmit::getOrderRef));
     }
 
     private String getTransactionId() {
@@ -38,8 +41,6 @@ public abstract class AbstractPaymentJob<T extends AbstractPayment> extends ScaA
             .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
             .orElse(null);
     }
-
-    abstract AbstractHBCIJob getHbciJob();
 
     public abstract String orderIdFromJobResult(HBCIJobResult paymentGV);
 }

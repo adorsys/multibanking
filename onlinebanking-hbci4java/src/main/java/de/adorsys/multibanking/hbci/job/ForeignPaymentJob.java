@@ -17,46 +17,32 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.ForeignPayment;
-import lombok.RequiredArgsConstructor;
-import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVDTAZV;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 
-@RequiredArgsConstructor
-public class ForeignPaymentJob extends AbstractPaymentJob<ForeignPayment> {
+public class ForeignPaymentJob extends AbstractPaymentJob<ForeignPayment, GVDTAZV> {
 
-    private final TransactionRequest<ForeignPayment> transactionRequest;
-    private GVDTAZV hbciForeignPaymentJob;
-
-    @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        Konto src = getHbciKonto(passport);
-
-        hbciForeignPaymentJob = new GVDTAZV(passport, GVDTAZV.getLowlevelName());
-
-        hbciForeignPaymentJob.setParam("src", src);
-        hbciForeignPaymentJob.setParam("dtazv", "B" + transactionRequest.getTransaction().getRawRequestData());
-        hbciForeignPaymentJob.verifyConstraints();
-
-        return hbciForeignPaymentJob;
+    public ForeignPaymentJob(TransactionRequest<ForeignPayment> transactionRequest) {
+        super(transactionRequest);
     }
 
     @Override
-    AbstractHBCIJob getHbciJob() {
-        return hbciForeignPaymentJob;
+    GVDTAZV createHbciJob() {
+        Konto src = getHbciKonto();
+
+        GVDTAZV hbciJob = new GVDTAZV(dialog.getPassport(), GVDTAZV.getLowlevelName());
+
+        hbciJob.setParam("src", src);
+        hbciJob.setParam("dtazv", "B" + transactionRequest.getTransaction().getRawRequestData());
+        hbciJob.verifyConstraints();
+
+        return hbciJob;
     }
 
     @Override
-    TransactionRequest<ForeignPayment> getTransactionRequest() {
-        return transactionRequest;
-    }
-
-    @Override
-    protected String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+    protected String getHbciJobName() {
         return GVDTAZV.getLowlevelName();
     }
 

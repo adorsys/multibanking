@@ -17,28 +17,25 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
-import lombok.RequiredArgsConstructor;
-import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTermUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-@RequiredArgsConstructor
-public class DeleteFutureSinglePaymentJob extends AbstractPaymentJob<FutureSinglePayment> {
+public class DeleteFutureSinglePaymentJob extends AbstractPaymentJob<FutureSinglePayment, GVTermUebSEPADel> {
 
-    private final TransactionRequest<FutureSinglePayment> transactionRequest;
-    private GVTermUebSEPADel hbciDeleteFutureSinglePaymentJob;
     private String jobName;
 
+    public DeleteFutureSinglePaymentJob(TransactionRequest<FutureSinglePayment> transactionRequest) {
+        super(transactionRequest);
+    }
+
     @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
+    GVTermUebSEPADel createHbciJob() {
         FutureSinglePayment singlePayment = transactionRequest.getTransaction();
 
-        Konto src = getHbciKonto(passport);
+        Konto src = getHbciKonto();
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();
@@ -47,36 +44,26 @@ public class DeleteFutureSinglePaymentJob extends AbstractPaymentJob<FutureSingl
 
         jobName = GVTermUebSEPADel.getLowlevelName();
 
-        hbciDeleteFutureSinglePaymentJob = new GVTermUebSEPADel(passport, jobName, null);
+        GVTermUebSEPADel hbciJob = new GVTermUebSEPADel(dialog.getPassport(), jobName, null);
 
-        hbciDeleteFutureSinglePaymentJob.setParam("orderid", singlePayment.getOrderId());
-        hbciDeleteFutureSinglePaymentJob.setParam("date", singlePayment.getExecutionDate().toString());
+        hbciJob.setParam("orderid", singlePayment.getOrderId());
+        hbciJob.setParam("date", singlePayment.getExecutionDate().toString());
 
-        hbciDeleteFutureSinglePaymentJob.setParam("src", src);
-        hbciDeleteFutureSinglePaymentJob.setParam("dst", dst);
-        hbciDeleteFutureSinglePaymentJob.setParam("btg", new Value(singlePayment.getAmount(),
+        hbciJob.setParam("src", src);
+        hbciJob.setParam("dst", dst);
+        hbciJob.setParam("btg", new Value(singlePayment.getAmount(),
             singlePayment.getCurrency()));
         if (singlePayment.getPurpose() != null) {
-            hbciDeleteFutureSinglePaymentJob.setParam("usage", singlePayment.getPurpose());
+            hbciJob.setParam("usage", singlePayment.getPurpose());
         }
 
-        hbciDeleteFutureSinglePaymentJob.verifyConstraints();
+        hbciJob.verifyConstraints();
 
-        return hbciDeleteFutureSinglePaymentJob;
+        return hbciJob;
     }
 
     @Override
-    AbstractHBCIJob getHbciJob() {
-        return hbciDeleteFutureSinglePaymentJob;
-    }
-
-    @Override
-    TransactionRequest<FutureSinglePayment> getTransactionRequest() {
-        return transactionRequest;
-    }
-
-    @Override
-    protected String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+    protected String getHbciJobName() {
         return jobName;
     }
 

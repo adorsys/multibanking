@@ -19,49 +19,41 @@ package de.adorsys.multibanking.hbci.job;
 import de.adorsys.multibanking.domain.PaymentStatus;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.PaymentStatusResponse;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.PaymentStatusReqest;
-import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVInstanstUebSEPAStatus;
 import org.kapott.hbci.GV_Result.GVRInstantUebSEPAStatus;
-import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.status.HBCIExecStatus;
 
-@RequiredArgsConstructor
 @Slf4j
 public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, PaymentStatusResponse> {
 
-    private final TransactionRequest<PaymentStatusReqest> paymentStatusReqest;
     private GVInstanstUebSEPAStatus paymentStatusHbciJob;
 
+    public InstantPaymentStatusJob(TransactionRequest<PaymentStatusReqest> transactionRequest) {
+        super(transactionRequest);
+    }
+
     @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
-        paymentStatusHbciJob = new GVInstanstUebSEPAStatus(passport);
-        paymentStatusHbciJob.setParam("my", getHbciKonto(passport));
-        paymentStatusHbciJob.setParam("orderid", paymentStatusReqest.getTransaction().getPaymentId());
+    GVInstanstUebSEPAStatus createHbciJob() {
+        paymentStatusHbciJob = new GVInstanstUebSEPAStatus(dialog.getPassport());
+        paymentStatusHbciJob.setParam("my", getHbciKonto());
+        paymentStatusHbciJob.setParam("orderid", transactionRequest.getTransaction().getPaymentId());
         return paymentStatusHbciJob;
     }
 
     @Override
-    TransactionRequest<PaymentStatusReqest> getTransactionRequest() {
-        return paymentStatusReqest;
-    }
-
-    @Override
-    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+    String getHbciJobName() {
         return GVInstanstUebSEPAStatus.getLowlevelName();
     }
 
     @Override
-    protected void checkExecuteStatus(HBCIExecStatus execStatus) {
+    void checkExecuteStatus(HBCIExecStatus execStatus) {
         //noop
     }
 
     @Override
-    public PaymentStatusResponse createJobResponse(PinTanPassport passport, HbciTanSubmit tanSubmit) {
+    public PaymentStatusResponse createJobResponse() {
         GVRInstantUebSEPAStatus hbciStatus = (GVRInstantUebSEPAStatus) paymentStatusHbciJob.getJobResult();
 
 //        1: in Terminierung

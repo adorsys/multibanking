@@ -31,6 +31,7 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.*;
 import de.adorsys.multibanking.hbci.job.*;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIProduct;
 import org.kapott.hbci.manager.HBCIUtils;
@@ -255,7 +256,7 @@ public class HbciBanking implements OnlineBankingService {
         return hbciScaHandler;
     }
 
-    private <T extends AbstractTransaction, R extends AbstractResponse> TransactionAuthorisationResponse<R> transactionAuthorisation(TransactionAuthorisation<T> transactionAuthorisation) {
+    private <T extends AbstractTransaction, J extends AbstractHBCIJob, R extends AbstractResponse> TransactionAuthorisationResponse<R> transactionAuthorisation(TransactionAuthorisation<T> transactionAuthorisation) {
         createCallback(transactionAuthorisation.getOriginTransactionRequest());
         try {
             ScaAwareJob<T, R> scaJob = createScaJob(transactionAuthorisation.getOriginTransactionRequest());
@@ -285,7 +286,7 @@ public class HbciBanking implements OnlineBankingService {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends AbstractTransaction, R extends AbstractResponse> ScaAwareJob<T, R> createScaJob(TransactionRequest<T> transactionRequest) {
+    private <T extends AbstractTransaction, J extends AbstractHBCIJob, R extends AbstractResponse> ScaAwareJob<T, R> createScaJob(TransactionRequest<T> transactionRequest) {
         switch (transactionRequest.getTransaction().getTransactionType()) {
             case SINGLE_PAYMENT:
             case FUTURE_SINGLE_PAYMENT:

@@ -17,66 +17,51 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kapott.hbci.GV.AbstractHBCIJob;
-import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVUmbSEPA;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-@RequiredArgsConstructor
 @Slf4j
-public class TransferJob extends AbstractPaymentJob<SinglePayment> {
+public class TransferJob extends AbstractPaymentJob<SinglePayment, GVUmbSEPA> {
 
-    private final TransactionRequest<SinglePayment> transactionRequest;
-    private AbstractSEPAGV hbciTransferJob;
+    public TransferJob(TransactionRequest<SinglePayment> transactionRequest) {
+        super(transactionRequest);
+    }
 
     @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
+    GVUmbSEPA createHbciJob() {
         SinglePayment singlePayment = transactionRequest.getTransaction();
 
-        Konto src = getHbciKonto(passport);
+        Konto src = getHbciKonto();
 
         Konto dst = new Konto();
         dst.name = singlePayment.getReceiver();
         dst.iban = singlePayment.getReceiverIban();
         dst.bic = singlePayment.getReceiverBic() != null ? singlePayment.getReceiverBic() : src.bic; //internal transfer, same bic
 
-        hbciTransferJob = new GVUmbSEPA(passport, GVUmbSEPA.getLowlevelName(), null);
+        GVUmbSEPA hbciJob = new GVUmbSEPA(dialog.getPassport(), GVUmbSEPA.getLowlevelName(), null);
 
-        hbciTransferJob.setParam("src", src);
-        hbciTransferJob.setParam("dst", dst);
-        hbciTransferJob.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
+        hbciJob.setParam("src", src);
+        hbciJob.setParam("dst", dst);
+        hbciJob.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
         if (singlePayment.getPurpose() != null) {
-            hbciTransferJob.setParam("usage", singlePayment.getPurpose());
+            hbciJob.setParam("usage", singlePayment.getPurpose());
         }
         if (singlePayment.getEndToEndId() != null) {
-            hbciTransferJob.setParam("endtoendid", singlePayment.getEndToEndId());
+            hbciJob.setParam("endtoendid", singlePayment.getEndToEndId());
         }
 
-        hbciTransferJob.verifyConstraints();
+        hbciJob.verifyConstraints();
 
-        return hbciTransferJob;
+        return hbciJob;
     }
 
     @Override
-    TransactionRequest<SinglePayment> getTransactionRequest() {
-        return transactionRequest;
-    }
-
-    @Override
-    String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
+    String getHbciJobName() {
         return GVUmbSEPA.getLowlevelName();
-    }
-
-    @Override
-    AbstractHBCIJob getHbciJob() {
-        return hbciTransferJob;
     }
 
     @Override

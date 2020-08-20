@@ -17,43 +17,42 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
 import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
-import org.kapott.hbci.GV.AbstractHBCIJob;
-import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV.GVMultiUebSEPA;
 import org.kapott.hbci.GV.GVTermMultiUebSEPA;
+import org.kapott.hbci.GV.GVUebSEPA;
 import org.kapott.hbci.GV_Result.GVRPayment;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
-import org.kapott.hbci.passport.PinTanPassport;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-@RequiredArgsConstructor
-public class BulkPaymentJob extends AbstractPaymentJob<BulkPayment> {
+import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.FUTURE_BULK_PAYMENT;
 
-    private final TransactionRequest<BulkPayment> transactionRequest;
-    private AbstractSEPAGV bulkPaymentHbciJob;
+public class BulkPaymentJob extends AbstractPaymentJob<BulkPayment, GVUebSEPA> {
+
+    public BulkPaymentJob(TransactionRequest<BulkPayment> transactionRequest) {
+        super(transactionRequest);
+    }
 
     @Override
-    public AbstractHBCIJob createJobMessage(PinTanPassport passport) {
+    GVUebSEPA createHbciJob() {
         BulkPayment bulkPayment = transactionRequest.getTransaction();
 
-        Konto src = getHbciKonto(passport);
+        Konto src = getHbciKonto();
 
+        GVUebSEPA hbciJob;
         if (bulkPayment instanceof FutureBulkPayment) {
-            bulkPaymentHbciJob = new GVTermMultiUebSEPA(passport, GVTermMultiUebSEPA.getLowlevelName());
-            bulkPaymentHbciJob.setParam("date", ((FutureBulkPayment) bulkPayment).getExecutionDate().toString());
+            hbciJob = new GVTermMultiUebSEPA(dialog.getPassport(), GVTermMultiUebSEPA.getLowlevelName());
+            hbciJob.setParam("date", ((FutureBulkPayment) bulkPayment).getExecutionDate().toString());
         } else {
-            bulkPaymentHbciJob = new GVMultiUebSEPA(passport, GVMultiUebSEPA.getLowlevelName());
+            hbciJob = new GVMultiUebSEPA(dialog.getPassport(), GVMultiUebSEPA.getLowlevelName());
         }
 
-        bulkPaymentHbciJob.setParam("src", src);
-        bulkPaymentHbciJob.setParam("batchbook", BooleanUtils.isTrue(bulkPayment.getBatchbooking()) ? "1" : "0");
+        hbciJob.setParam("src", src);
+        hbciJob.setParam("batchbook", BooleanUtils.isTrue(bulkPayment.getBatchbooking()) ? "1" : "0");
 
         for (int i = 0; i < bulkPayment.getPayments().size(); i++) {
             SinglePayment payment = bulkPayment.getPayments().get(i);
@@ -63,37 +62,25 @@ public class BulkPaymentJob extends AbstractPaymentJob<BulkPayment> {
             dst.iban = payment.getReceiverIban();
             dst.bic = payment.getReceiverBic();
 
-            bulkPaymentHbciJob.setParam("dst", i, dst);
-            bulkPaymentHbciJob.setParam("btg", i, new Value(payment.getAmount(), payment.getCurrency()));
+            hbciJob.setParam("dst", i, dst);
+            hbciJob.setParam("btg", i, new Value(payment.getAmount(), payment.getCurrency()));
             if (payment.getPurpose() != null) {
-                bulkPaymentHbciJob.setParam("usage", i, payment.getPurpose());
+                hbciJob.setParam("usage", i, payment.getPurpose());
             }
             if (payment.getPurposecode() != null) {
-                bulkPaymentHbciJob.setParam("purposecode", i, payment.getPurposecode());
+                hbciJob.setParam("purposecode", i, payment.getPurposecode());
             }
             if (payment.getEndToEndId() != null) {
-                bulkPaymentHbciJob.setParam("endtoendid", i, payment.getEndToEndId());
+                hbciJob.setParam("endtoendid", i, payment.getEndToEndId());
             }
         }
 
-        bulkPaymentHbciJob.verifyConstraints();
-
-        return bulkPaymentHbciJob;
+        return hbciJob;
     }
 
     @Override
-    AbstractHBCIJob getHbciJob() {
-        return bulkPaymentHbciJob;
-    }
-
-    @Override
-    TransactionRequest<BulkPayment> getTransactionRequest() {
-        return transactionRequest;
-    }
-
-    @Override
-    protected String getHbciJobName(AbstractTransaction.TransactionType transactionType) {
-        if (transactionType == AbstractTransaction.TransactionType.FUTURE_BULK_PAYMENT) {
+    protected String getHbciJobName() {
+        if (transactionRequest.getTransaction().getTransactionType() == FUTURE_BULK_PAYMENT) {
             return "TermMultiUebSEPA";
         }
         return "MultiUebSEPA";

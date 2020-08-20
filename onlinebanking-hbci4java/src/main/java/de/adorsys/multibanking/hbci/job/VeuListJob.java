@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 adorsys GmbH & Co KG
+ * Copyright 2018-2020 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,37 +17,32 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
-import de.adorsys.multibanking.domain.response.PaymentResponse;
-import de.adorsys.multibanking.domain.transaction.TanRequest;
-import org.kapott.hbci.GV.AbstractSEPAGV;
-import org.kapott.hbci.GV_Result.HBCIJobResult;
+import de.adorsys.multibanking.domain.response.VeuListResponse;
+import de.adorsys.multibanking.domain.transaction.LoadVeuList;
+import lombok.extern.slf4j.Slf4j;
+import org.kapott.hbci.GV.GVVeuList;
 
-public class TanRequestJob extends AbstractPaymentJob<TanRequest, AbstractSEPAGV> {
+@Slf4j
+public class VeuListJob extends ScaAwareJob<LoadVeuList, VeuListResponse> {
 
-
-    public TanRequestJob(TransactionRequest<TanRequest> transactionRequest) {
+    public VeuListJob(TransactionRequest<LoadVeuList> transactionRequest) {
         super(transactionRequest);
     }
 
     @Override
+    GVVeuList createHbciJob() {
+        GVVeuList veuListJob = new GVVeuList(dialog.getPassport());
+        veuListJob.setParam("my", getHbciKonto());
+        return veuListJob;
+    }
+
+    @Override
     String getHbciJobName() {
-        return null;
+        return GVVeuList.getLowlevelName();
     }
 
     @Override
-    AbstractSEPAGV createHbciJob() {
-        return null;
+    VeuListResponse createJobResponse() {
+        return new VeuListResponse();
     }
-
-    @Override
-    protected PaymentResponse createJobResponse() {
-        return new PaymentResponse(null);
-    }
-
-    @Override
-    public String orderIdFromJobResult(HBCIJobResult paymentGV) {
-        return null;
-    }
-
-
 }

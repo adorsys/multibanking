@@ -19,10 +19,15 @@ package de.adorsys.multibanking.domain.transaction;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.LOAD_VEU_LIST;
+
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AbstractPayment extends AbstractTransaction {
+public class LoadVeuList extends AbstractTransaction {
 
-    private String paymentId;
+    @Override
+    public TransactionType getTransactionType() {
+        return LOAD_VEU_LIST;
+    }
 
 }

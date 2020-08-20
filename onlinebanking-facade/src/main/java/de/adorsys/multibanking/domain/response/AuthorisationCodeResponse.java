@@ -24,6 +24,6 @@ import lombok.RequiredArgsConstructor;
 public class AuthorisationCodeResponse {
 
     private final Object tanSubmit;
-    private UpdateAuthResponse updateAuthResponse;
+    private final UpdateAuthResponse updateAuthResponse;
 
 }
