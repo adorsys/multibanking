@@ -73,12 +73,12 @@ public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment, GVRawSEPA> {
                 throw new IllegalArgumentException("unsupported raw sepa transaction: " + sepaPayment.getSepaTransactionType());
         }
 
-        return createRowSepaJob(sepaPayment, jobName);
+        return createRawSepaJob(sepaPayment, jobName);
     }
 
-    private GVRawSEPA createRowSepaJob(RawSepaPayment sepaPayment, String jobName) {
+    private GVRawSEPA createRawSepaJob(RawSepaPayment sepaPayment, String jobName) {
         GVRawSEPA rawSEPAJob = new GVRawSEPA(dialog.getPassport(), jobName, sepaPayment.getRawRequestData());
-        getHbciJob().setParam("src", getHbciKonto());
+        rawSEPAJob.setParam("src", getHbciKonto());
 
         String creditorIban = "";
         BigDecimal amount = new BigDecimal(0);
