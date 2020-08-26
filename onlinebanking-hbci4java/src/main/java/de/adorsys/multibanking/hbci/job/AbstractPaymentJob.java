@@ -37,7 +37,7 @@ public abstract class AbstractPaymentJob<T extends AbstractPayment, J extends Ab
     }
 
     private String getTransactionId() {
-        return Optional.ofNullable(getHbciJob())
+        return Optional.ofNullable(getOrCreateHbciJob())
             .map(abstractHBCIJob -> orderIdFromJobResult(abstractHBCIJob.getJobResult()))
             .orElse(null);
     }
