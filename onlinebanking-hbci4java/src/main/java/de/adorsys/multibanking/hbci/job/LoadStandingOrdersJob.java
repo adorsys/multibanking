@@ -57,7 +57,7 @@ public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, Stand
 
     @Override
     public StandingOrdersResponse createJobResponse() {
-        List<StandingOrder> standingOrders = ((GVRDauerList) getOrCreateHbciJob().getJobResult()).getEntries().stream()
+        List<StandingOrder> standingOrders = ((GVRDauerList) getHbciJob().getJobResult()).getEntries().stream()
             .map(dauerAuftrag -> {
                 StandingOrder standingOrder = new StandingOrder();
                 standingOrder.setCreditorAccount(dauerAuftrag.other.iban);

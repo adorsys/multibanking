@@ -16,13 +16,12 @@
 
 package de.adorsys.multibanking.hbci;
 
-import de.adorsys.multibanking.domain.Message;
+import de.adorsys.multibanking.domain.PsuMessage;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.callback.AbstractHBCICallback;
 
 import java.time.LocalDateTime;
@@ -57,16 +56,7 @@ public class HbciBpdUpdCallback extends AbstractHBCICallback {
     public void callback(int reason, List<String> messages, int datatype, StringBuilder retData) {
         if (reason == WRONG_PIN) {
             throw new MultibankingException(INVALID_PIN, messages.stream()
-                .map(messageString -> {
-                    if (StringUtils.equals(":", StringUtils.substring(messageString, 4, 5))) {
-                        String hbciCode = StringUtils.substring(messageString, 0, 4);
-                        String msg = StringUtils.substring(messageString, 5);
-                        return new Message(hbciCode, null, null, msg, null);
-                    } else {
-                        return new Message(null, null, null, messageString, null);
-                    }
-
-                })
+                .map(messageString -> new PsuMessage(null, messageString))
                 .collect(Collectors.toList()));
         }
     }
@@ -79,13 +69,13 @@ public class HbciBpdUpdCallback extends AbstractHBCICallback {
     }
 
     public HbciConsent updateConsentUpd(HbciConsent consent) {
-        Optional.ofNullable(upd).ifPresent(newUpd -> {
-            consent.setHbciUpd(newUpd);
+        Optional.ofNullable(upd).ifPresent(upd -> {
+            consent.setHbciUpd(upd);
             consent.setUpdCacheUpdateTime(LocalDateTime.now());
             consent.setSysIdUpdUpdated(true);
         });
-        Optional.ofNullable(sysId).ifPresent(newSysId -> {
-            consent.setHbciSysId(newSysId);
+        Optional.ofNullable(sysId).ifPresent(sysId -> {
+            consent.setHbciSysId(sysId);
             consent.setSysIdCacheUpdateTime(LocalDateTime.now());
             consent.setSysIdUpdUpdated(true);
         });

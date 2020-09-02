@@ -16,7 +16,6 @@
 
 package de.adorsys.multibanking.hbci;
 
-import de.adorsys.multibanking.domain.Bank;
 import de.adorsys.multibanking.domain.request.AbstractRequest;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -29,18 +28,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public class HbciCacheHandler {
 
     @Getter
-    private final Map<String, Map<String, String>> bpdCache = new ConcurrentHashMap<>();
+    private static Map<String, Map<String, String>> bpdCache = new ConcurrentHashMap<>();
 
-    public Map<String, String> getBpd(AbstractRequest request) {
+    public static Map<String, String> getBpd(AbstractRequest request) {
         String bankCode = Optional.ofNullable(request.getBank().getBankApiBankCode())
             .orElse(request.getBank().getBankCode());
 
         return bpdCache.get(bankCode);
     }
 
-    HbciBpdUpdCallback createCallback(Bank bank) {
-        String bankCode = Optional.ofNullable(bank.getBankApiBankCode())
-            .orElse(bank.getBankCode());
+    static HbciBpdUpdCallback createCallback(AbstractRequest request) {
+        String bankCode = Optional.ofNullable(request.getBank().getBankApiBankCode())
+            .orElse(request.getBank().getBankCode());
 
         return new HbciBpdUpdCallback(bankCode, bpdCache);
     }

@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.ing;
 
-import de.adorsys.multibanking.domain.Message;
+import de.adorsys.multibanking.domain.exception.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.ing.api.TokenResponse;
 import de.adorsys.multibanking.ing.oauth.IngOauth2Service;

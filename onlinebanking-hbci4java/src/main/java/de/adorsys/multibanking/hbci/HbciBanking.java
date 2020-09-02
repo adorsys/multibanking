@@ -31,6 +31,7 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.*;
 import de.adorsys.multibanking.hbci.job.*;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
+import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.exceptions.HBCI_Exception;
 import org.kapott.hbci.manager.HBCIProduct;
 import org.kapott.hbci.manager.HBCIUtils;
@@ -40,17 +41,17 @@ import java.io.InputStream;
 import java.util.Optional;
 
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
-import static de.adorsys.multibanking.hbci.HbciCacheHandler.*;
-import static de.adorsys.multibanking.hbci.util.HbciErrorUtils.*;
+import static de.adorsys.multibanking.hbci.HbciCacheHandler.createCallback;
+import static de.adorsys.multibanking.hbci.HbciExceptionHandler.handleHbciException;
 
 public class HbciBanking implements OnlineBankingService {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    private final HbciScaHandler hbciScaHandler;
+    private HbciScaHandler hbciScaHandler;
 
-    private final long sysIdExpirationTimeMs;
-    private final long updExpirationTimeMs;
+    private long sysIdExpirationTimeMs;
+    private long updExpirationTimeMs;
 
     public HbciBanking(HBCIProduct hbciProduct, long sysIdExpirationTimeMs, long updExpirationTimeMs) {
         this(hbciProduct, null, sysIdExpirationTimeMs, updExpirationTimeMs);
@@ -125,7 +126,7 @@ public class HbciBanking implements OnlineBankingService {
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
-                HbciBpdUpdCallback hbciCallback = createCallback(request.getBank());
+                HbciBpdUpdCallback hbciCallback = createCallback(request);
 
                 AccountInformationJob accountInformationJob = new AccountInformationJob(request);
                 AccountInformationResponse response = accountInformationJob.execute(hbciCallback);
@@ -151,7 +152,7 @@ public class HbciBanking implements OnlineBankingService {
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
-                HbciBpdUpdCallback hbciCallback = createCallback(loadTransactionsRequest.getBank());
+                HbciBpdUpdCallback hbciCallback = createCallback(loadTransactionsRequest);
 
                 LoadTransactionsJob loadBookingsJob = new LoadTransactionsJob(loadTransactionsRequest);
                 TransactionsResponse response = loadBookingsJob.execute(hbciCallback);
@@ -177,7 +178,7 @@ public class HbciBanking implements OnlineBankingService {
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
-                HbciBpdUpdCallback hbciCallback = createCallback(loadStandingOrdersRequest.getBank());
+                HbciBpdUpdCallback hbciCallback = createCallback(loadStandingOrdersRequest);
 
                 LoadStandingOrdersJob loadStandingOrdersJob = new LoadStandingOrdersJob(loadStandingOrdersRequest);
                 StandingOrdersResponse response = loadStandingOrdersJob.execute(hbciCallback);
@@ -203,7 +204,7 @@ public class HbciBanking implements OnlineBankingService {
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
-                HbciBpdUpdCallback hbciCallback = createCallback(request.getBank());
+                HbciBpdUpdCallback hbciCallback = createCallback(request);
 
                 LoadBalancesJob loadBalancesJob = new LoadBalancesJob(request);
                 LoadBalancesResponse response = loadBalancesJob.execute(hbciCallback);
@@ -229,7 +230,7 @@ public class HbciBanking implements OnlineBankingService {
 
         try {
             if (hbciConsent.getHbciTanSubmit() == null || hbciConsent.getStatus() == FINALISED) {
-                HbciBpdUpdCallback hbciCallback = createCallback(request.getBank());
+                HbciBpdUpdCallback hbciCallback = createCallback(request);
 
                 ScaAwareJob<? extends AbstractPayment, PaymentResponse> paymentJob = createScaJob(request);
 
@@ -255,7 +256,8 @@ public class HbciBanking implements OnlineBankingService {
         return hbciScaHandler;
     }
 
-    private <T extends AbstractTransaction, R extends AbstractResponse> TransactionAuthorisationResponse<R> transactionAuthorisation(TransactionAuthorisation<T> transactionAuthorisation) {
+    private <T extends AbstractTransaction, J extends AbstractHBCIJob, R extends AbstractResponse> TransactionAuthorisationResponse<R> transactionAuthorisation(TransactionAuthorisation<T> transactionAuthorisation) {
+        createCallback(transactionAuthorisation.getOriginTransactionRequest());
         try {
             ScaAwareJob<T, R> scaJob = createScaJob(transactionAuthorisation.getOriginTransactionRequest());
 
@@ -284,7 +286,7 @@ public class HbciBanking implements OnlineBankingService {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends AbstractTransaction, R extends AbstractResponse> ScaAwareJob<T, R> createScaJob(TransactionRequest<T> transactionRequest) {
+    private <T extends AbstractTransaction, J extends AbstractHBCIJob, R extends AbstractResponse> ScaAwareJob<T, R> createScaJob(TransactionRequest<T> transactionRequest) {
         switch (transactionRequest.getTransaction().getTransactionType()) {
             case SINGLE_PAYMENT:
             case FUTURE_SINGLE_PAYMENT:

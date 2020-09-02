@@ -29,7 +29,6 @@ import de.adorsys.multibanking.hbci.model.HbciConsent;
 import de.adorsys.multibanking.hbci.model.HbciDialogFactory;
 import de.adorsys.multibanking.hbci.model.HbciPassport;
 import de.adorsys.multibanking.hbci.model.HbciTanSubmit;
-import de.adorsys.multibanking.hbci.util.HbciErrorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -45,8 +44,9 @@ import java.util.Optional;
 
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
+import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
-import static de.adorsys.multibanking.hbci.HbciCacheHandler.*;
+import static de.adorsys.multibanking.hbci.HbciCacheHandler.getBpd;
 
 @Slf4j
 public class TransactionAuthorisationJob<T extends AbstractTransaction, R extends AbstractResponse> {
@@ -84,7 +84,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
             if (consent.isCloseDialog()) {
                 hbciDialog.dialogEnd();
             }
-            throw HbciErrorUtils.toMultibankingException(hbciExecStatus.getMsgStatusList());
+            throw new MultibankingException(HBCI_ERROR, scaJob.msgStatusListToPsuMessages(hbciExecStatus.getMsgStatusList()));
         }
 
         if (StringUtils.equals("HKIDN", scaJob.hbciTanSubmit.getHbciJobName())) {
@@ -106,7 +106,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
     private void submitProcess1() {
         //1. Schritt: HKTAN <-> HITAN
         //2. Schritt: HKUEB <-> HIRMS zu HKUEB
-        AbstractHBCIJob hbciJob = scaJob.getOrCreateHbciJob();
+        AbstractHBCIJob hbciJob = scaJob.getHbciJob();
 
         if (scaJob.hbciTanSubmit.getSepaPain() != null) {
             hbciJob.getConstraints().remove("_sepapain"); //prevent pain generation
@@ -121,7 +121,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
         //Schritt 2: HKTAN <-> HITAN und HIRMS zu HIUEB
         AbstractHBCIJob originJob = Optional.ofNullable(scaJob.hbciTanSubmit.getOriginJobName())
             .map(originJobName -> {
-                AbstractHBCIJob hbciJob = scaJob.getOrCreateHbciJob();
+                AbstractHBCIJob hbciJob = scaJob.getHbciJob();
                 try {
                     hbciJob.setLlParams(objectMapper.readValue(scaJob.hbciTanSubmit.getLowLevelParams(), HashMap.class));
                 } catch (Exception e) {
@@ -145,7 +145,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
 
     private TransactionAuthorisationResponse<R> createResponse(HBCIExecStatus hbciExecStatus) {
         R jobResponse = scaJob.createJobResponse();
-        jobResponse.setMessages(HbciErrorUtils.msgStatusListToMessages(hbciExecStatus.getMsgStatusList()));
+        jobResponse.setMessages(scaJob.msgStatusListToPsuMessages(hbciExecStatus.getMsgStatusList()));
 
         TransactionAuthorisationResponse<R> response = new TransactionAuthorisationResponse<>(jobResponse);
 

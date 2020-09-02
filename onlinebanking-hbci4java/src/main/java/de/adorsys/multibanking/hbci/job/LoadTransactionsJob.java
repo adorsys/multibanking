@@ -22,7 +22,6 @@ import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
-import de.adorsys.multibanking.hbci.util.HbciErrorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVKUmsAll;
@@ -54,7 +53,7 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
 
     @Override
     String getHbciJobName() {
-        if (getOrCreateHbciJob() instanceof GVKUmsAllCamt) {
+        if (getHbciJob() instanceof GVKUmsAllCamt) {
             return "KUmsAllCamt";
         }
         return "KUmsAll";
@@ -62,15 +61,15 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
 
     @Override
     public TransactionsResponse createJobResponse() {
-        if (getOrCreateHbciJob().getJobResult().getJobStatus().hasErrors()) {
+        if (getHbciJob().getJobResult().getJobStatus().hasErrors()) {
             log.error("Bookings job not OK");
-            throw HbciErrorUtils.toMultibankingException(getOrCreateHbciJob().getJobResult().getJobStatus());
+            throw new MultibankingException(HBCI_ERROR, collectMessages(getHbciJob().getJobResult().getJobStatus().getRetVals()));
         }
 
         List<Booking> bookingList = null;
         BalancesReport balancesReport = null;
         List<String> raw = null;
-        GVRKUms bookingsResult = (GVRKUms) getOrCreateHbciJob().getJobResult();
+        GVRKUms bookingsResult = (GVRKUms) getHbciJob().getJobResult();
         if (transactionRequest.getTransaction().getRawResponseType() != null) {
             raw = bookingsResult.getRaw(transactionRequest.getTransaction().getBookingStatus() == LoadTransactions.BookingStatus.PENDING);
         } else {

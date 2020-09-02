@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 adorsys GmbH & Co KG
+ * Copyright 2018-2019 adorsys GmbH & Co KG
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package de.adorsys.multibanking.domain;
+package de.adorsys.multibanking.domain.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,14 +47,4 @@ public class Message implements Serializable {
         WARNING,
         INFO
     }
-
-    @Override
-    public String toString() {
-        if (key != null) {
-            return key + ":" + renderedMessage;
-        } else {
-            return renderedMessage;
-        }
-    }
-
 }

@@ -41,7 +41,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static de.adorsys.multibanking.hbci.HbciCacheHandler.*;
+import static de.adorsys.multibanking.hbci.HbciCacheHandler.createCallback;
 import static java.nio.charset.StandardCharsets.ISO_8859_1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.kapott.hbci.manager.HBCIVersion.HBCI_300;
@@ -59,7 +59,7 @@ public class HbciIntegrationIT {
     private String psuCorporateIdMSCA;
     private String pinMSCA;
 
-    private final HbciBanking hbci4JavaBanking = new HbciBanking(null, 0, 0);
+    private HbciBanking hbci4JavaBanking = new HbciBanking(null, 0, 0);
 
     private static String readFile(String filePath) {
         StringBuilder contentBuilder = new StringBuilder();
@@ -194,7 +194,7 @@ public class HbciIntegrationIT {
         loadVeuList.setPsuAccount(createBankAccount());
         TransactionRequest<LoadVeuList> loadVeuListRequest = TransactionRequestFactory.create(loadVeuList, null, bankAccess, bank, hbciConsent);
 
-        HbciBpdUpdCallback hbciCallback = createCallback(loadVeuListRequest.getBank());
+        HbciBpdUpdCallback hbciCallback = createCallback(loadVeuListRequest);
         VeuListResponse response = new VeuListJob(loadVeuListRequest).execute(hbciCallback);
 
         System.out.println();

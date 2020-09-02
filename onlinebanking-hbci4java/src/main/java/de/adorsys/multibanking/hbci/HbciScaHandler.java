@@ -54,10 +54,10 @@ import static de.adorsys.multibanking.domain.ScaApproach.EMBEDDED;
 import static de.adorsys.multibanking.domain.ScaStatus.*;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NOT_SUPPORTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_SCA_METHOD;
-import static de.adorsys.multibanking.hbci.HbciCacheHandler.*;
+import static de.adorsys.multibanking.hbci.HbciCacheHandler.createCallback;
+import static de.adorsys.multibanking.hbci.HbciExceptionHandler.handleHbciException;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.UPD;
-import static de.adorsys.multibanking.hbci.util.HbciErrorUtils.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -67,8 +67,8 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
     private final long sysIdExpirationTimeMs;
     private final long updExpirationTimeMs;
 
-    private final HbciScaMapper hbciScaMapper = new HbciScaMapperImpl();
-    private final HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
+    private HbciScaMapper hbciScaMapper = new HbciScaMapperImpl();
+    private HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
 
     @Override
     public CreateConsentResponse createConsent(Consent consent, boolean redirectPreferred,
@@ -118,8 +118,9 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
 
     private ScaMethodsResponse authenticatePsu(UpdatePsuAuthenticationRequest authenticatePsuRequest) {
         try {
-            HbciBpdUpdCallback hbciCallback = createCallback(authenticatePsuRequest.getBank());
-            HbciDialogRequest dialogRequest = hbciDialogRequestMapper.toHbciDialogRequest(authenticatePsuRequest, hbciCallback);
+            HbciDialogRequest dialogRequest = hbciDialogRequestMapper.toHbciDialogRequest(authenticatePsuRequest, null);
+            HbciBpdUpdCallback hbciCallback = createCallback(dialogRequest);
+            dialogRequest.setCallback(hbciCallback);
 
             HbciConsent hbciConsent = (HbciConsent) authenticatePsuRequest.getBankApiConsentData();
             hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
@@ -220,7 +221,7 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
             HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
             hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
 
-            HbciBpdUpdCallback hbciCallback = createCallback(request.getBank());
+            HbciBpdUpdCallback hbciCallback = createCallback(request);
 
             InstantPaymentStatusJob instantPaymentStatusJob = new InstantPaymentStatusJob(request);
             PaymentStatusResponse response = instantPaymentStatusJob.execute(hbciCallback);

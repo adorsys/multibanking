@@ -17,13 +17,15 @@
 package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadBalancesResponse;
 import de.adorsys.multibanking.domain.transaction.LoadBalances;
-import de.adorsys.multibanking.hbci.util.HbciErrorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVSaldoReq;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
+
+import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ERROR;
 
 @Slf4j
 public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesResponse> {
@@ -46,16 +48,16 @@ public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesRespo
 
     @Override
     public LoadBalancesResponse createJobResponse() {
-        if (getOrCreateHbciJob().getJobResult().getJobStatus().hasErrors()) {
+        if (getHbciJob().getJobResult().getJobStatus().hasErrors()) {
             log.error("Balance job not OK");
-            throw HbciErrorUtils.toMultibankingException(getOrCreateHbciJob().getJobResult().getJobStatus());
+            throw new MultibankingException(HBCI_ERROR, collectMessages(getHbciJob().getJobResult().getJobStatus().getRetVals()));
         }
 
         BankAccount bankAccount = transactionRequest.getTransaction().getPsuAccount();
 
-        GVRSaldoReq jobResult = (GVRSaldoReq) getOrCreateHbciJob().getJobResult();
+        GVRSaldoReq jobResult = (GVRSaldoReq) getHbciJob().getJobResult();
         if (jobResult.getEntries() != null && !jobResult.getEntries().isEmpty()) {
-            bankAccount.setBalances(accountStatementMapper.createBalancesReport((GVRSaldoReq) getOrCreateHbciJob().getJobResult(),
+            bankAccount.setBalances(accountStatementMapper.createBalancesReport((GVRSaldoReq) getHbciJob().getJobResult(),
                 bankAccount.getAccountNumber()));
         }
 
