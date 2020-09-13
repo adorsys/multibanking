@@ -74,10 +74,10 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
                 paymentStatus = PaymentStatus.RJCT;
                 break;
             case 3:
-                paymentStatus = PaymentStatus.PDNG;
+                paymentStatus = PaymentStatus.ACTC;
                 break;
             case 4:
-                paymentStatus = PaymentStatus.ACCC;
+                paymentStatus = PaymentStatus.ACSC;
                 break;
             case 5:
                 paymentStatus = PaymentStatus.CANC;
@@ -86,7 +86,7 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
                 paymentStatus = PaymentStatus.RJCT;
                 break;
             case 7:
-                paymentStatus = PaymentStatus.ACSC;
+                paymentStatus = PaymentStatus.ACCC;
                 break;
             case 8:
                 paymentStatus = PaymentStatus.RJCT;
