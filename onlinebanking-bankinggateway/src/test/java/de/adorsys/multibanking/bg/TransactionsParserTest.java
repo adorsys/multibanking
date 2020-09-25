@@ -32,7 +32,7 @@ public class TransactionsParserTest {
     @Test
     public void testJson() throws Exception {
         String json = IOUtils.toString(TransactionsParserTest.class.getResourceAsStream("/transactions.json"));
-        TransactionsResponse loadBookingsResponse = new BankingGatewayAdapter(null, null).jsonStringToLoadBookingsResponse(json);
+        TransactionsResponse loadBookingsResponse = new PaginationResolver(null).jsonStringToLoadBookingsResponse(json, null);
         assertNotNull(loadBookingsResponse);
         assertEquals("Wrong count of bookings", 30, loadBookingsResponse.getBookings().size());
         loadBookingsResponse.getBookings().forEach(

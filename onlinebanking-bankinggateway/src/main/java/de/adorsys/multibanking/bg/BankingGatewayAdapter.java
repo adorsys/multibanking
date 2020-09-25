@@ -1,9 +1,9 @@
 package de.adorsys.multibanking.bg;
 
-import com.google.gson.JsonSyntaxException;
 import com.squareup.okhttp.Call;
-import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.exception.MultibankingError;
+import de.adorsys.multibanking.domain.BankAccount;
+import de.adorsys.multibanking.domain.BankApi;
+import de.adorsys.multibanking.domain.BankApiUser;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.*;
@@ -14,18 +14,14 @@ import de.adorsys.multibanking.mapper.TransactionsParser;
 import de.adorsys.multibanking.xs2a_adapter.ApiException;
 import de.adorsys.multibanking.xs2a_adapter.ApiResponse;
 import de.adorsys.multibanking.xs2a_adapter.api.AccountInformationServiceAisApi;
-import de.adorsys.multibanking.xs2a_adapter.model.*;
-import de.adorsys.multibanking.xs2a_adapter.model.Balance;
+import de.adorsys.multibanking.xs2a_adapter.model.AccountDetails;
+import de.adorsys.multibanking.xs2a_adapter.model.AccountList;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
-import org.json.XML;
 
-import java.io.IOException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServiceAisApi;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
@@ -36,11 +32,13 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private final BankingGatewayScaHandler scaHandler;
     private final String xs2aAdapterBaseUrl;
+    private final PaginationResolver paginationResolver;
 
     private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
 
     public BankingGatewayAdapter(String bankingGatewayBaseUrl, String xs2aAdapterBaseUrl) {
         this.scaHandler = new BankingGatewayScaHandler(bankingGatewayBaseUrl);
+        this.paginationResolver = new PaginationResolver(xs2aAdapterBaseUrl);
         this.xs2aAdapterBaseUrl = xs2aAdapterBaseUrl;
     }
 
@@ -110,6 +108,9 @@ public class BankingGatewayAdapter implements OnlineBankingService {
         LoadTransactions loadTransactions = loadTransactionsRequest.getTransaction();
         LocalDate dateFrom = loadTransactions.getDateFrom() != null ? loadTransactions.getDateFrom() :
             LocalDate.now().minusYears(1);
+        LocalDate dateTo = loadTransactions.getDateTo();
+        String consentId = loadTransactionsRequest.getBankAccess().getConsentId();
+        boolean withBalance = loadTransactions.isWithBalance();
 
         String bankCode = loadTransactionsRequest.getBank().getBankApiBankCode() != null
             ? loadTransactionsRequest.getBank().getBankApiBankCode()
@@ -127,10 +128,10 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
             Call aisCall = aisApi.getTransactionListCall(
                 resourceId, "booked", UUID.randomUUID(),
-                loadTransactionsRequest.getBankAccess().getConsentId(), null, bankCode, null, dateFrom,
-                loadTransactions.getDateTo(), null,
-                null, loadTransactions.isWithBalance(), null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null);
+                consentId, null, bankCode, null, dateFrom,
+                dateTo, null,
+                null, withBalance, null, null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, null);
 
             ApiResponse<Object> apiResponse = aisApi.getApiClient().execute(aisCall, String.class);
             String contentTypeKey = apiResponse.getHeaders().keySet().stream()
@@ -141,13 +142,23 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             String contentType = Optional.ofNullable(apiResponse.getHeaders().get(contentTypeKey))
                 .map(list -> list.get(0))
                 .orElse("");
+            String textData = (String) apiResponse.getData();
 
             if (contentType.toLowerCase().contains("application/xml")) {
-                return TransactionsParser.camtStringToLoadBookingsResponse((String) apiResponse.getData());
+                return TransactionsParser.camtStringToLoadBookingsResponse(textData);
             } else if (contentType.toLowerCase().contains("text/plain")) {
-                return TransactionsParser.mt940StringToLoadBookingsResponse((String) apiResponse.getData());
+                return TransactionsParser.mt940StringToLoadBookingsResponse(textData);
             } else {
-                return jsonStringToLoadBookingsResponse((String) apiResponse.getData());
+                PaginationResolver.PaginationNextCallParameters nextCallParams = PaginationResolver.PaginationNextCallParameters.builder()
+                    .bgSessionData(bgSessionData)
+                    .resourceId(resourceId)
+                    .consentId(consentId)
+                    .bankCode(bankCode)
+                    .dateFrom(dateFrom)
+                    .dateTo(dateTo)
+                    .withBalance(withBalance)
+                    .build();
+                return paginationResolver.jsonStringToLoadBookingsResponse(textData, nextCallParams);
             }
         } catch (ApiException e) {
             throw handeAisApiException(e);
@@ -165,63 +176,6 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     @Override
     public LoadBalancesResponse loadBalances(TransactionRequest<LoadBalances> request) {
         throw new UnsupportedOperationException();
-    }
-
-    public TransactionsResponse jsonStringToLoadBookingsResponse(String json) {
-        TransactionsResponse200Json transactionsResponse200JsonTO =
-            GsonConfig.getGson().fromJson(json, TransactionsResponse200Json.class);
-        List<Booking> bookings = Optional.ofNullable(transactionsResponse200JsonTO)
-            .map(TransactionsResponse200Json::getTransactions)
-            .map(AccountReport::getBooked)
-            .map(transactions -> bankingGatewayMapper.toBookings(transactions))
-            .orElse(Collections.emptyList());
-
-        BalancesReport balancesReport = new BalancesReport();
-        Optional.ofNullable(transactionsResponse200JsonTO)
-            .map(TransactionsResponse200Json::getBalances)
-            .map(List::stream).orElse(Stream.empty())
-            .filter(balance -> balance.getBalanceType() != null)
-            .forEach(balance -> {
-                switch (balance.getBalanceType()) {
-                    case EXPECTED:
-                        balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
-                        break;
-                    case CLOSINGBOOKED:
-                        balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
-                        break;
-                    default:
-                        // ignore
-                        break;
-                }
-            });
-
-        Optional.ofNullable(transactionsResponse200JsonTO)
-            .map(TransactionsResponse200Json::getBalances)
-            .map(List::stream).orElse(Stream.empty())
-            .filter(balance -> BalanceType.OPENINGBOOKED.equals(balance.getBalanceType()))
-            .findFirst().ifPresent(
-                openingbooked -> {
-                    BigDecimal balance = new BigDecimal(openingbooked.getBalanceAmount().getAmount());
-                    for(Booking booking : bookings) {
-                        balance = balance.add(booking.getAmount());
-                        booking.setBalance(balance);
-                        booking.setExternalId(booking.getValutaDate() + "_" + booking.getAmount() + "_" + booking.getBalance()); // override fallback external id
-                    }
-                    Optional.ofNullable(balancesReport.getReadyBalance()).ifPresent(
-                        readyBalance -> {
-                            BigDecimal lastBookingBalance = bookings.get(bookings.size() - 1).getBalance();
-                            if (!readyBalance.getAmount().equals(lastBookingBalance)) {
-                                log.error("The closing booked balance {} and the calculated balance after the last transaction {} are not equal", readyBalance.getAmount(), lastBookingBalance);
-                            }
-                        }
-                    );
-                }
-            );
-
-        return TransactionsResponse.builder()
-            .bookings(bookings)
-            .balancesReport(balancesReport)
-            .build();
     }
 
     private String getAccountResourceId(BgSessionData bgSessionData, String iban, String bankCode, String consentId) {
@@ -262,71 +216,13 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private MultibankingException handeAisApiException(ApiException e) {
         switch (e.getCode()) {
             case 401:
-                return toMultibankingException(e, INVALID_PIN);
+                return BankingGatewayExceptionMapper.toMultibankingException(e, INVALID_PIN);
             case 404:
-                return toMultibankingException(e, RESOURCE_NOT_FOUND);
+                return BankingGatewayExceptionMapper.toMultibankingException(e, RESOURCE_NOT_FOUND);
             case 429:
                 return new MultibankingException(INVALID_CONSENT, 429, "consent access exceeded");
             default:
-                return toMultibankingException(e, BANKING_GATEWAY_ERROR);
+                return BankingGatewayExceptionMapper.toMultibankingException(e, BANKING_GATEWAY_ERROR);
         }
-    }
-
-    private MultibankingException toMultibankingException(ApiException e, MultibankingError multibankingError) {
-        try {
-            Error400NGAIS messagesTO = GsonConfig.getGson().fromJson(e.getResponseBody(),
-                Error400NGAIS.class);
-            return new MultibankingException(multibankingError, e.getCode(), null,
-                bankingGatewayMapper.toMessagesFromTppMessage400AIS(messagesTO.getTppMessages()));
-        } catch (JsonSyntaxException jpe) {
-            // try xml
-            TppMessage400AIS messageTO = Optional.ofNullable(e.getResponseBody())
-                .filter(xml -> xml.startsWith("<"))
-                .map(uncheckFunction(XML::toJSONObject))
-                .map(BankingGatewayAdapter::findTppMessage)
-                .map(uncheckFunction(message -> GsonConfig.getGson().fromJson(message.toString(), TppMessage400AIS.class)))
-                .orElse(null);
-
-            if (messageTO != null) {
-                return new MultibankingException(multibankingError, e.getCode(), null,
-                    Collections.singletonList(bankingGatewayMapper.toMessage(messageTO)));
-            } else {
-                return new MultibankingException(multibankingError, 500, e.getMessage());
-            }
-        } catch (Exception e2) {
-            return new MultibankingException(multibankingError, 500, e.getMessage());
-        }
-    }
-
-    private static JSONObject findTppMessage(JSONObject jsonObject) {
-        JSONObject message = null;
-        for (Iterator key = jsonObject.keys(); key.hasNext(); ) {
-            String nextKey = (String) key.next();
-            Object next = jsonObject.get(nextKey);
-            if ("tppMessages".equals(nextKey)) {
-                message = (JSONObject) next;
-            }
-            if (next instanceof JSONObject) {
-                JSONObject override = findTppMessage((JSONObject) next);
-                message = override != null ? override : message;
-            }
-        }
-        return message;
-    }
-
-    private static <T, R> Function<T, R> uncheckFunction(CheckedFunction<T, R> throwingFunction) {
-        return i -> {
-            try {
-                return throwingFunction.apply(i);
-            } catch (Exception ex) {
-                throw new IllegalStateException(ex);
-            }
-        };
-    }
-
-    @FunctionalInterface
-    public interface CheckedFunction<T, R> {
-        R apply(T t) throws IOException;
     }
 }
-

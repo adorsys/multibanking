@@ -1,6 +1,7 @@
 package de.adorsys.multibanking.service;
 
 import de.adorsys.multibanking.bg.BankingGatewayAdapter;
+import de.adorsys.multibanking.bg.PaginationResolver;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BookingEntity;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
@@ -19,12 +20,12 @@ public class BookingServiceTest {
     private BookingService bookingService;
 
     @InjectMocks
-    private BankingGatewayAdapter bankingGatewayAdapter;
+    private PaginationResolver bankingGatewayAdapter;
 
     @Test
     public void testMerge() throws Exception {
         TransactionsResponse transactionsResponse = bankingGatewayAdapter.jsonStringToLoadBookingsResponse(
-            IOUtils.toString(BookingServiceTest.class.getResourceAsStream("/transactions.json"))
+            IOUtils.toString(BookingServiceTest.class.getResourceAsStream("/transactions.json")), null
         );
         List<BookingEntity> newBookingEntities = bookingService.mapBookings(new BankAccountEntity(), transactionsResponse.getBookings());
         bookingService.mergeBookings(Collections.emptyList(), newBookingEntities);
