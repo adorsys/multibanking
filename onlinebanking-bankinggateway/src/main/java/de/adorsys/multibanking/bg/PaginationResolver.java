@@ -145,10 +145,11 @@ public class PaginationResolver {
         AccountInformationServiceAisApi aisApi = accountInformationServiceAisApi(xs2aAdapterBaseUrl,
             params.getBgSessionData());
 
+        // Fiducia: "Only one of 'dateFrom' and 'scrollRef' may exist
         Call aisCall = aisApi.getTransactionListCall(
             params.getResourceId(), "booked", UUID.randomUUID(),
-            params.getConsentId(), null, params.getBankCode(), null, params.getDateFrom(),
-            params.getDateTo(), null,
+            params.getConsentId(), null, params.getBankCode(), null, null,
+            null, null,
             null, params.isWithBalance(), null, null, null, null, null, null, null, null, null, null,
             null, null, null, scrollRef, null, null);
 
