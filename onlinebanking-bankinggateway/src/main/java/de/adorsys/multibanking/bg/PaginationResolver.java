@@ -15,6 +15,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
+import java.net.URLDecoder;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -188,10 +189,10 @@ public class PaginationResolver {
 
     // CAUTION scrollRef is not part of berlin group spec
     // it is used by Fiducia, but can be different at other banks
-    private String resolveScrollRef(String nextLink) {
-        MultiValueMap<String, String> parameters =
-            UriComponentsBuilder.fromUriString(nextLink).build().getQueryParams();
-        return parameters.toSingleValueMap().get(FIDUCIA_PAGINATION_QUERY_PARAMETER);
+    private String resolveScrollRef(String nextLink) throws Exception {
+        MultiValueMap<String, String> parameters = UriComponentsBuilder.fromUriString(nextLink).build().getQueryParams();
+        String scrollRefUrlEncoded = parameters.toSingleValueMap().get(FIDUCIA_PAGINATION_QUERY_PARAMETER);
+        return scrollRefUrlEncoded != null ? URLDecoder.decode(scrollRefUrlEncoded, "UTF-8") : null; // scroll ref contains special characters
     }
 
     @Data
