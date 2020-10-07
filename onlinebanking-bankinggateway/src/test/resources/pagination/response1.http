@@ -1,0 +1,85 @@
+HTTP/1.1 200 OK
+Server: Apache/1.3.29 (Unix) PHP/4.3.4
+Connection: close
+Content-Type: application/json
+
+{
+  "account": {
+    "iban": "******",
+    "currency": "******"
+  },
+  "transactions": {
+    "booked": [
+      {
+        "endToEndId": "e2e",
+        "mandateId": "mid",
+        "bookingDate": "2020-01-01",
+        "valueDate": "2020-01-01",
+        "transactionAmount": {
+          "currency": "EUR",
+          "amount": "100"
+        },
+        "creditorName": "Hansdampf",
+        "creditorAccount": {
+          "iban": "Iban"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "Iban2"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "e3e",
+        "mandateId": "m3d",
+        "bookingDate": "2020-01-01",
+        "valueDate": "2020-01-01",
+        "transactionAmount": {
+          "currency": "EUR",
+          "amount": "150"
+        },
+        "creditorName": "Hansdampf",
+        "creditorAccount": {
+          "iban": "Iban"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "Iban2"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      }
+    ],
+    "_links": {
+      "account": {
+        "href": "******"
+      },
+      "next": {
+        "href": "/v1/account/xxx/transactions?scrollRef=1"
+      }
+    }
+  },
+  "balances": [
+    {
+      "balanceAmount": {
+        "currency": "EUR",
+        "amount": "200.00"
+      },
+      "balanceType": "openingBooked",
+      "referenceDate": "2020-04-01"
+    },
+    {
+      "balanceAmount": {
+        "currency": "EUR",
+        "amount": "450.00"
+      },
+      "balanceType": "closingBooked",
+      "referenceDate": "2020-04-01"
+    }
+  ]
+}

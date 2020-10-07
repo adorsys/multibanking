@@ -69,7 +69,7 @@ public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInfo
                 bankAccount.externalId(BankApi.HBCI, UUID.randomUUID().toString());
                 bankAccount.bankName(transactionRequest.getBankAccess().getBankName());
 
-                if (getHbciJob().getJobResult().isOK() && transactionRequest.getTransaction().isWithBalances() && konto.allowedGVs.contains("HKSAL")) {
+                if (getOrCreateHbciJob().getJobResult().isOK() && transactionRequest.getTransaction().isWithBalances() && konto.allowedGVs.contains("HKSAL")) {
                     LoadBalances loadBalances = new LoadBalances();
                     loadBalances.setPsuAccount(bankAccount);
 
@@ -87,7 +87,7 @@ public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInfo
             .collect(Collectors.toList());
 
         //finally close dialog
-        if (getHbciJob().getJobResult().isOK() && transactionRequest.getTransaction().isWithBalances()) {
+        if (getOrCreateHbciJob().getJobResult().isOK() && transactionRequest.getTransaction().isWithBalances()) {
             this.dialog.dialogEnd();
         }
 
