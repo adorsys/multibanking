@@ -5,7 +5,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>5.5.24</version>
+        <version>5.5.25-SNAPSHOT</version>
     </parent>
 
     <artifactId>onlinebanking-bankinggateway</artifactId>
@@ -22,13 +22,13 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-facade</artifactId>
-            <version>5.5.24</version>
+            <version>5.5.25-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-mapper</artifactId>
-            <version>5.5.24</version>
+            <version>5.5.25-SNAPSHOT</version>
         </dependency>
 
         <dependency>
