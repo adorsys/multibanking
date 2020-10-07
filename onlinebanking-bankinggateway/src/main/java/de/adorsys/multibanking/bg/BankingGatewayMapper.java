@@ -2,7 +2,7 @@ package de.adorsys.multibanking.bg;
 
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
 import de.adorsys.multibanking.domain.*;
-import de.adorsys.multibanking.domain.exception.Message;
+import de.adorsys.multibanking.domain.Message;
 import de.adorsys.multibanking.domain.request.SelectPsuAuthenticationMethodRequest;
 import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
@@ -11,7 +11,6 @@ import de.adorsys.multibanking.xs2a_adapter.model.AccountDetails;
 import de.adorsys.multibanking.xs2a_adapter.model.TppMessage400AIS;
 import de.adorsys.multibanking.xs2a_adapter.model.TransactionDetails;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.StringUtils;
 import org.iban4j.Iban;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;

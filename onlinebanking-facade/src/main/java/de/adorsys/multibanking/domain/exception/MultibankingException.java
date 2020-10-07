@@ -1,6 +1,6 @@
 package de.adorsys.multibanking.domain.exception;
 
-import de.adorsys.multibanking.domain.PsuMessage;
+import de.adorsys.multibanking.domain.Message;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,7 +12,7 @@ import java.util.List;
 public class MultibankingException extends RuntimeException {
 
     private final int httpResponseCode;
-    private final List<PsuMessage> psuMessages;
+    private final List<Message> psuMessages;
     private final List<Message> tppMessages;
     private final MultibankingError multibankingError;
 
@@ -21,20 +21,20 @@ public class MultibankingException extends RuntimeException {
     }
 
     public MultibankingException(MultibankingError multibankingError, int httpResponseCode, String psuMessage) {
-        this(multibankingError, httpResponseCode, Collections.singletonList(new PsuMessage(null, psuMessage)), null
+        this(multibankingError, httpResponseCode, Collections.singletonList(new Message(null, null, null, psuMessage, null)), null
         );
     }
 
     public MultibankingException(MultibankingError multibankingError, String psuMessage) {
-        this(multibankingError, 400, Collections.singletonList(new PsuMessage(null, psuMessage)), null
+        this(multibankingError, 400, Collections.singletonList(new Message(null, null, null, psuMessage, null)), null
         );
     }
 
-    public MultibankingException(MultibankingError multibankingError, List<PsuMessage> psuMessages) {
+    public MultibankingException(MultibankingError multibankingError, List<Message> psuMessages) {
         this(multibankingError, 400, psuMessages, null);
     }
 
-    public MultibankingException(MultibankingError multibankingError, int httpResponseCode, List<PsuMessage> psuMessages, List<Message> tppMessages) {
+    public MultibankingException(MultibankingError multibankingError, int httpResponseCode, List<Message> psuMessages, List<Message> tppMessages) {
         super(toExceptionString(psuMessages, tppMessages));
         this.psuMessages = psuMessages;
         this.multibankingError = multibankingError;
@@ -47,7 +47,7 @@ public class MultibankingException extends RuntimeException {
         return toExceptionString(psuMessages, tppMessages);
     }
 
-    private static String toExceptionString(List<PsuMessage> psuMessages, List<Message> tppMessages) {
+    private static String toExceptionString(List<Message> psuMessages, List<Message> tppMessages) {
         StringBuilder stringBuilder = new StringBuilder();
         if (psuMessages != null) {
             psuMessages.forEach(psuMessage -> stringBuilder.append(psuMessage.toString()).append("\\n"));
