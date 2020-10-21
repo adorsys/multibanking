@@ -217,6 +217,7 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
             AuthorizationCodeTO authorizationCodeTO = new AuthorizationCodeTO();
             authorizationCodeTO.setCode(authorisationCode);
             authorizationCodeTO.setBankCode(sessionData.getBankCode());
+            authorizationCodeTO.setConsentId(sessionData.getConsentId());
 
             OAuthApi bankingGatewayB2COAuthApi = bankingGatewayB2COAuthApi(bankingGatewayBaseUrl);
             OAuthToken token = bankingGatewayB2COAuthApi.resolveAuthCode(authorizationCodeTO);

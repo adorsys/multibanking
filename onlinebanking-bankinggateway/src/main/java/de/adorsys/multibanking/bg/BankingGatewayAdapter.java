@@ -131,7 +131,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 consentId, null, bankCode, null, dateFrom,
                 dateTo, null,
                 null, withBalance, null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null);
+                null, null, null, null, null, null, null);
 
             ApiResponse<Object> apiResponse = aisApi.getApiClient().execute(aisCall, String.class);
             String contentTypeKey = apiResponse.getHeaders().keySet().stream()

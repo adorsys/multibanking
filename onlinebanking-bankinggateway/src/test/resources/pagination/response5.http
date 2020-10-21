@@ -60,7 +60,7 @@ Content-Type: application/json
         "href": "******"
       },
       "next": {
-        "href": "/v1/account/xxx/transactions?scrollRef=5"
+        "href": "http://localhost:1234/v1/account/xxx/transactions?page=5"
       }
     }
   },

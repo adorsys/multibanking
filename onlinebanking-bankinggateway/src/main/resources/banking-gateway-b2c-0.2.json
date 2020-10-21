@@ -1679,6 +1679,9 @@
           },
           "bankCode": {
             "type": "string"
+          },
+          "consentId": {
+            "type": "string"
           }
         }
       },

@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServiceAisApi;
@@ -32,6 +31,7 @@ import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServ
 @Slf4j
 public class PaginationResolver {
     private final static String FIDUCIA_PAGINATION_QUERY_PARAMETER = "scrollRef";
+    private final static String COMMERZBANK_PAGINATION_QUERY_PARAMETER = "page";
     private final static int MAX_PAGES = 50; // prevent infinite loops
 
     private final String xs2aAdapterBaseUrl;
@@ -143,16 +143,26 @@ public class PaginationResolver {
 
     private BookingsAndBalance fetchNext(String nextLink, PaginationNextCallParameters params) throws Exception {
         String scrollRef = resolveScrollRef(nextLink);
+        String page = resolvePage(nextLink);
         AccountInformationServiceAisApi aisApi = accountInformationServiceAisApi(xs2aAdapterBaseUrl,
             params.getBgSessionData());
 
         // Fiducia: "Only one of 'dateFrom' and 'scrollRef' may exist
+        LocalDate dateFrom = null;
+        LocalDate dateTo = null;
+
+        // Commerzbank: Call must be equal
+        if (scrollRef == null && page != null) {
+            dateFrom = params.getDateFrom();
+            dateTo = params.getDateTo();
+        }
+
         Call aisCall = aisApi.getTransactionListCall(
             params.getResourceId(), "booked", UUID.randomUUID(),
-            params.getConsentId(), null, params.getBankCode(), null, null,
-            null, null,
+            params.getConsentId(), null, params.getBankCode(), null, dateFrom,
+            dateTo, null,
             null, params.isWithBalance(), null, null, null, null, null, null, null, null, null, null,
-            null, null, null, scrollRef, null, null);
+            null, null, null, scrollRef, page, null, null);
 
         ApiResponse<Object> apiResponse = aisApi.getApiClient().execute(aisCall, String.class);
         TransactionsResponse200Json transactionsResponse200JsonTO =
@@ -193,6 +203,12 @@ public class PaginationResolver {
         MultiValueMap<String, String> parameters = UriComponentsBuilder.fromUriString(nextLink).build().getQueryParams();
         String scrollRefUrlEncoded = parameters.toSingleValueMap().get(FIDUCIA_PAGINATION_QUERY_PARAMETER);
         return scrollRefUrlEncoded != null ? URLDecoder.decode(scrollRefUrlEncoded, "UTF-8") : null; // scroll ref contains special characters
+    }
+
+    private String resolvePage(String nextLink) throws Exception {
+        MultiValueMap<String, String> parameters = UriComponentsBuilder.fromUriString(nextLink).build().getQueryParams();
+        String pageUrlEncoded = parameters.toSingleValueMap().get(COMMERZBANK_PAGINATION_QUERY_PARAMETER);
+        return pageUrlEncoded != null ? URLDecoder.decode(pageUrlEncoded, "UTF-8") : null; // scroll ref contains special characters
     }
 
     @Data

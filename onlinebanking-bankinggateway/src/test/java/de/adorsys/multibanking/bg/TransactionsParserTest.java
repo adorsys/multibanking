@@ -15,6 +15,8 @@ import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
@@ -65,6 +67,8 @@ public class TransactionsParserTest {
             .consentId("consentID")
             .resourceId("resourceId")
             .bgSessionData(new BgSessionData())
+            .dateFrom(LocalDate.now().minusDays(5))
+            .dateTo(LocalDate.now())
             .withBalance(true)
             .build();
         TransactionsResponse loadBookingsResponse = new PaginationResolver("http://localhost:" + MOCK_SERVER_PORT)
