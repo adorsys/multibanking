@@ -32,27 +32,12 @@
       "account": {
         "href": "******"
       },
+      "balances" : {
+        "href" : "https://testbank.nowhere/some/path/parts/v1/accounts/xxx/balances"
+      },
       "next": {
         "href": "/v1/account/xxx/transactions?scrollRef=0_%3D2%23%3D20200728%23%3D4340161%23%3D0%23%3D0%23%3D"
       }
     }
-  },
-  "balances": [
-    {
-      "balanceAmount": {
-        "currency": "EUR",
-        "amount": "100.00"
-      },
-      "balanceType": "openingBooked",
-      "referenceDate": "2020-04-01"
-    },
-    {
-      "balanceAmount": {
-        "currency": "EUR",
-        "amount": "200.00"
-      },
-      "balanceType": "closingBooked",
-      "referenceDate": "2020-04-01"
-    }
-  ]
+  }
 }

@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServiceAisApi;
@@ -26,12 +27,17 @@ import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServ
  * Some banks (e.g. Fiducia) don't deliver all transactions in one chunk.
  * Instead they deliver for example the first 150 transactions in the first JSON and provide a "next" link.
  * This link must be used to fetch the next 150 transaction and so on until all transactions are fetched.
+ *
  * This class also parses the JSON and map it into TransactionsResponse
+ * If a transaction details link is present in the Transaction, the link will be resolved
+ * If no balance information is present in the transactions report, a separate call to the balance endpoint will be tried
  */
 @Slf4j
 public class PaginationResolver {
     private final static String FIDUCIA_PAGINATION_QUERY_PARAMETER = "scrollRef";
     private final static String COMMERZBANK_PAGINATION_QUERY_PARAMETER = "page";
+    private final static String TRANSACTION_DETAILS_LINK_KEY = "transactionDetails";
+    private final static String BALANCES_LINK_KEY ="balances";
     private final static int MAX_PAGES = 50; // prevent infinite loops
 
     private final String xs2aAdapterBaseUrl;
@@ -48,13 +54,22 @@ public class PaginationResolver {
         List<Booking> bookings = Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getTransactions)
             .map(AccountReport::getBooked)
-            .map(transactions -> bankingGatewayMapper.toBookings(transactions))
-            .orElse(Collections.emptyList());
+            .map(TransactionList::stream).orElse(Stream.empty())
+            .map(transactionDetails -> resolveTransactionDetailsLink(nextCallParams, transactionDetails))
+            .map(bankingGatewayMapper::toBooking)
+            .collect(Collectors.toList());
 
         BalancesReport balancesReport = new BalancesReport();
-        Optional.ofNullable(transactionsResponse200JsonTO)
+        BalanceList balanceList = Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getBalances)
-            .map(List::stream).orElse(Stream.empty())
+            .orElse(null);
+
+        if (balanceList == null) {
+            balanceList = resolveBalanceListFromLink(nextCallParams, transactionsResponse200JsonTO);
+        }
+
+        Optional.ofNullable(balanceList)
+            .map(BalanceList::stream).orElse(Stream.empty())
             .filter(balance -> balance.getBalanceType() != null)
             .forEach(balance -> {
                 switch (balance.getBalanceType()) {
@@ -91,9 +106,8 @@ public class PaginationResolver {
                 }
             );
 
-        Optional.ofNullable(transactionsResponse200JsonTO)
-            .map(TransactionsResponse200Json::getBalances)
-            .map(List::stream).orElse(Stream.empty())
+        Optional.ofNullable(balanceList)
+            .map(BalanceList::stream).orElse(Stream.empty())
             .filter(balance -> BalanceType.OPENINGBOOKED.equals(balance.getBalanceType()))
             .findFirst().ifPresent(
             openingbooked -> {
@@ -171,8 +185,10 @@ public class PaginationResolver {
         List<Booking> bookings = Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getTransactions)
             .map(AccountReport::getBooked)
-            .map(transactions -> bankingGatewayMapper.toBookings(transactions))
-            .orElse(Collections.emptyList());
+            .map(TransactionList::stream).orElse(Stream.empty())
+            .map(transactionDetails -> resolveTransactionDetailsLink(params, transactionDetails))
+            .map(bankingGatewayMapper::toBooking)
+            .collect(Collectors.toList());
 
         Balance closingBookedBalance = Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getBalances)
@@ -211,6 +227,103 @@ public class PaginationResolver {
         return pageUrlEncoded != null ? URLDecoder.decode(pageUrlEncoded, "UTF-8") : null; // scroll ref contains special characters
     }
 
+    /**
+     * Sometimes the transaction list does not contain all transaction details. Instead a transactionDetails link is provided.
+     * If so, we try to fetch the detail by resolving this link
+     *
+     * @param params original call technical data
+     * @param originalTransactionDetails
+     * @return transactionDetails either resolved or the same as before in case of an error or if no link was inside
+     */
+    private TransactionDetails resolveTransactionDetailsLink(PaginationNextCallParameters params, TransactionDetails originalTransactionDetails) {
+        if (originalTransactionDetails.getLinks() == null || !originalTransactionDetails.getLinks().containsKey(TRANSACTION_DETAILS_LINK_KEY)) { // no details
+            return originalTransactionDetails;
+        }
+        String transactionDetailsLink = originalTransactionDetails.getLinks().get(TRANSACTION_DETAILS_LINK_KEY).getHref();
+        AccountAndTransaction accountAndTransaction = resolveAccountAndTransaction(transactionDetailsLink);
+        if (accountAndTransaction == null) {
+            return originalTransactionDetails;
+        }
+
+        // fetch details
+        AccountInformationServiceAisApi aisApi = accountInformationServiceAisApi(xs2aAdapterBaseUrl, params.getBgSessionData()); // should be cheap
+        try {
+            Call transactionDetailsCall = aisApi.getTransactionDetailsCall(accountAndTransaction.getAccount(), accountAndTransaction.getTransaction(),
+                UUID.randomUUID(), params.getConsentId(), null, params.getBankCode(), null, null, null, null,
+                null, null,null, null, null, null, null, null,
+                null, null, null, null);
+            ApiResponse<InlineResponse200> apiResponse = aisApi.getApiClient().execute(transactionDetailsCall, InlineResponse200.class);
+            if (apiResponse == null || apiResponse.getStatusCode() > 299) {
+                log.error("Wrong status code on transaction detail: " + apiResponse.getStatusCode());
+            } else {
+                return apiResponse.getData().getTransactionsDetails();
+            }
+        } catch (Exception e) {
+            log.error("Exception fetching transaction detail: " + accountAndTransaction.getTransaction(), e);
+        }
+
+        return originalTransactionDetails;
+    }
+
+    AccountAndTransaction resolveAccountAndTransaction(String transactionDetailsLink) {
+        List<String> pathSegments = UriComponentsBuilder.fromUriString(transactionDetailsLink).build().getPathSegments();
+        int accountsIndex = pathSegments.lastIndexOf("accounts");
+        if (accountsIndex == -1) {
+            log.error("TransactionDetails link without accounts: " + transactionDetailsLink);
+            return null;
+        }
+        int transactionsIndex = pathSegments.lastIndexOf("transactions");
+        if (transactionsIndex == -1) {
+            log.error("TransactionDetails link without transactions: " + transactionDetailsLink);
+            return null;
+        }
+        if (pathSegments.size() < (transactionsIndex + 2)) {
+            log.error("TransactionDetails link to short: " + transactionDetailsLink);
+            return null;
+        }
+        return AccountAndTransaction.builder()
+            .account(pathSegments.get(++accountsIndex))
+            .transaction(pathSegments.get(++transactionsIndex))
+            .build();
+    }
+
+    private BalanceList resolveBalanceListFromLink(PaginationNextCallParameters params, TransactionsResponse200Json transactionsResponse200JsonTO) {
+        String balancesLink = Optional.ofNullable(transactionsResponse200JsonTO)
+            .map(TransactionsResponse200Json::getTransactions)
+            .map(AccountReport::getLinks)
+            .map(linksDownload -> linksDownload.get(BALANCES_LINK_KEY))
+            .map(HrefType::getHref)
+            .orElse(null);
+
+        if (balancesLink == null) {
+            return null;
+        }
+
+        List<String> pathSegments = UriComponentsBuilder.fromUriString(balancesLink).build().getPathSegments();
+        int accountsIndex = pathSegments.lastIndexOf("accounts");
+        if (accountsIndex == -1) {
+            log.error("Balances link without accounts: " + balancesLink);
+            return null;
+        }
+        String account = pathSegments.get(++accountsIndex);
+
+        AccountInformationServiceAisApi aisApi = accountInformationServiceAisApi(xs2aAdapterBaseUrl, params.getBgSessionData());
+        try {
+            Call balanceCall = aisApi.getBalancesCall(account, UUID.randomUUID(), params.getConsentId(), null, params.getBankCode(), null, null,
+                null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null);
+            ApiResponse<ReadAccountBalanceResponse200> apiResponse = aisApi.getApiClient().execute(balanceCall, ReadAccountBalanceResponse200.class);
+            if (apiResponse == null || apiResponse.getStatusCode() > 299) {
+                log.error("Wrong status code on balance: " + apiResponse.getStatusCode());
+            } else {
+                return apiResponse.getData().getBalances();
+            }
+        } catch (Exception e) {
+            log.error("Exception fetching balances for account: " + account, e);
+        }
+        return null;
+    }
+
     @Data
     @Builder
     private static class BookingsAndBalance {
@@ -229,5 +342,12 @@ public class PaginationResolver {
         private LocalDate dateFrom;
         private LocalDate dateTo;
         private boolean withBalance;
+    }
+
+    @Data
+    @Builder
+    static class AccountAndTransaction {
+        private String account;
+        private String transaction;
     }
 }
