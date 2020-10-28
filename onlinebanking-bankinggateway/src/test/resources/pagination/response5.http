@@ -30,12 +30,7 @@ Content-Type: application/json
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******",
-        "_links" : {
-            "transactionDetails" : {
-              "href" : "https://testbank.nowhere/some/path/v1/accounts/XXX/transactions/YYY"
-            }
-          }
+        "proprietaryBankTransactionCode": "******"
       },
       {
         "endToEndId": "e2e",
@@ -57,12 +52,7 @@ Content-Type: application/json
         },
         "remittanceInformationUnstructured": "******",
         "purposeCode": "******",
-        "proprietaryBankTransactionCode": "******",
-        "_links" : {
-            "transactionDetails" : {
-              "href" : "https://testbank.nowhere/some/path/v1/accounts/ZZZ/transactions/AAA"
-            }
-          }
+        "proprietaryBankTransactionCode": "******"
       }
     ],
     "_links": {

@@ -1,6 +1,5 @@
 package de.adorsys.multibanking.bg;
 
-import com.google.gson.annotations.SerializedName;
 import com.squareup.okhttp.Call;
 import de.adorsys.multibanking.domain.Balance;
 import de.adorsys.multibanking.domain.BalancesReport;
@@ -56,7 +55,6 @@ public class PaginationResolver {
             .map(TransactionsResponse200Json::getTransactions)
             .map(AccountReport::getBooked)
             .map(TransactionList::stream).orElse(Stream.empty())
-            .map(transactionDetails -> resolveTransactionDetailsLink(nextCallParams, transactionDetails))
             .map(bankingGatewayMapper::toBooking)
             .collect(Collectors.toList());
 
@@ -187,7 +185,6 @@ public class PaginationResolver {
             .map(TransactionsResponse200Json::getTransactions)
             .map(AccountReport::getBooked)
             .map(TransactionList::stream).orElse(Stream.empty())
-            .map(transactionDetails -> resolveTransactionDetailsLink(params, transactionDetails))
             .map(bankingGatewayMapper::toBooking)
             .collect(Collectors.toList());
 
@@ -226,66 +223,6 @@ public class PaginationResolver {
         MultiValueMap<String, String> parameters = UriComponentsBuilder.fromUriString(nextLink).build().getQueryParams();
         String pageUrlEncoded = parameters.toSingleValueMap().get(COMMERZBANK_PAGINATION_QUERY_PARAMETER);
         return pageUrlEncoded != null ? URLDecoder.decode(pageUrlEncoded, "UTF-8") : null; // scroll ref contains special characters
-    }
-
-    /**
-     * Sometimes the transaction list does not contain all transaction details. Instead a transactionDetails link is provided.
-     * If so, we try to fetch the detail by resolving this link
-     *
-     * @param params original call technical data
-     * @param originalTransactionDetails
-     * @return transactionDetails either resolved or the same as before in case of an error or if no link was inside
-     */
-    private TransactionDetails resolveTransactionDetailsLink(PaginationNextCallParameters params, TransactionDetails originalTransactionDetails) {
-        if (originalTransactionDetails.getLinks() == null || !originalTransactionDetails.getLinks().containsKey(TRANSACTION_DETAILS_LINK_KEY)) { // no details
-            return originalTransactionDetails;
-        }
-        String transactionDetailsLink = originalTransactionDetails.getLinks().get(TRANSACTION_DETAILS_LINK_KEY).getHref();
-        AccountAndTransaction accountAndTransaction = resolveAccountAndTransaction(transactionDetailsLink);
-        if (accountAndTransaction == null) {
-            return originalTransactionDetails;
-        }
-
-        // fetch details
-        AccountInformationServiceAisApi aisApi = accountInformationServiceAisApi(xs2aAdapterBaseUrl, params.getBgSessionData()); // should be cheap
-        try {
-            Call transactionDetailsCall = aisApi.getTransactionDetailsCall(accountAndTransaction.getAccount(), accountAndTransaction.getTransaction(),
-                UUID.randomUUID(), params.getConsentId(), null, params.getBankCode(), null, null, null, null,
-                null, null,null, null, null, null, null, null,
-                null, null, null, null);
-            ApiResponse<TransactionDetailsMultiFields> apiResponse = aisApi.getApiClient().execute(transactionDetailsCall, TransactionDetailsMultiFields.class);
-            if (apiResponse == null || apiResponse.getStatusCode() > 299) {
-                log.error("Wrong status code on transaction detail: " + apiResponse.getStatusCode());
-            } else {
-                return apiResponse.getData().getTransactionDetails();
-            }
-        } catch (Exception e) {
-            log.error("Exception fetching transaction detail: " + accountAndTransaction.getTransaction(), e);
-        }
-
-        return originalTransactionDetails;
-    }
-
-    AccountAndTransaction resolveAccountAndTransaction(String transactionDetailsLink) {
-        List<String> pathSegments = UriComponentsBuilder.fromUriString(transactionDetailsLink).build().getPathSegments();
-        int accountsIndex = pathSegments.lastIndexOf("accounts");
-        if (accountsIndex == -1) {
-            log.error("TransactionDetails link without accounts: " + transactionDetailsLink);
-            return null;
-        }
-        int transactionsIndex = pathSegments.lastIndexOf("transactions");
-        if (transactionsIndex == -1) {
-            log.error("TransactionDetails link without transactions: " + transactionDetailsLink);
-            return null;
-        }
-        if (pathSegments.size() < (transactionsIndex + 2)) {
-            log.error("TransactionDetails link to short: " + transactionDetailsLink);
-            return null;
-        }
-        return AccountAndTransaction.builder()
-            .account(pathSegments.get(++accountsIndex))
-            .transaction(pathSegments.get(++transactionsIndex))
-            .build();
     }
 
     private BalanceList resolveBalanceListFromLink(PaginationNextCallParameters params, TransactionsResponse200Json transactionsResponse200JsonTO) {
@@ -350,20 +287,5 @@ public class PaginationResolver {
     static class AccountAndTransaction {
         private String account;
         private String transaction;
-    }
-
-    @Data
-    public static class TransactionDetailsMultiFields { // Workaround for different transaction fields
-        @SerializedName("transactionsDetails")
-        private TransactionDetails transactionsDetails = null;
-        @SerializedName("transaction")
-        private TransactionDetails transaction = null;
-
-        public TransactionDetails getTransactionDetails() {
-            if (transactionsDetails != null) {
-                return transactionsDetails;
-            }
-            return transaction;
-        }
     }
 }

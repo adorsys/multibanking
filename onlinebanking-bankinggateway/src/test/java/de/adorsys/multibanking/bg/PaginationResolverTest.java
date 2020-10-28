@@ -108,25 +108,4 @@ public class PaginationResolverTest {
             }
         }
     }
-
-    @Test
-    public void testTransactionDetailsLinkResolving() {
-        PaginationResolver paginationResolver = new PaginationResolver(null);
-        String correctLink = "https://testbank.nowhere/whatever/is/in/the/path/v1/accounts/XXX/transactions/YYY";
-        PaginationResolver.AccountAndTransaction accountAndTransaction = paginationResolver.resolveAccountAndTransaction(correctLink);
-        assertEquals("Wrong account id", "XXX", accountAndTransaction.getAccount());
-        assertEquals("Wrong transaction id", "YYY", accountAndTransaction.getTransaction());
-
-        String correctRelativeLink = "/whatever/is/in/the/path/v1/accounts/XXX/transactions/YYY";
-        PaginationResolver.AccountAndTransaction accountAndTransaction2 = paginationResolver.resolveAccountAndTransaction(correctLink);
-        assertEquals("Wrong account id", "XXX", accountAndTransaction2.getAccount());
-        assertEquals("Wrong transaction id", "YYY", accountAndTransaction2.getTransaction());
-
-        String linkWithoutAccounts = "https://testbank.nowhere/whatever/is/in/the/path/v1/account/XXX/transactions/YYY";
-        assertNull("Wrong accounts not recognized", paginationResolver.resolveAccountAndTransaction(linkWithoutAccounts));
-        String linkWithoutTransactions = "https://testbank.nowhere/whatever/is/in/the/path/v1/accounts/XXX/transaction/YYY";
-        assertNull("Wrong transactions not recognized", paginationResolver.resolveAccountAndTransaction(linkWithoutTransactions));
-        String shortLink = "https://testbank.nowhere/whatever/is/in/the/path/v1/accounts/XXX/transactions/";
-        assertNull("Missing transaction id not recognized", paginationResolver.resolveAccountAndTransaction(shortLink));
-    }
 }
