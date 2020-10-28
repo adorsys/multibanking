@@ -4,7 +4,7 @@ Connection: close
 Content-Type: application/json
 
 {
-  "transactionsDetails": {
+  "transaction": {
     "transactionId": "1234567",
     "debtorName": "John Miles",
     "debtorAccount": {

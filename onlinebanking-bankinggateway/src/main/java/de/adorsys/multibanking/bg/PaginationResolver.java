@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.bg;
 
+import com.google.gson.annotations.SerializedName;
 import com.squareup.okhttp.Call;
 import de.adorsys.multibanking.domain.Balance;
 import de.adorsys.multibanking.domain.BalancesReport;
@@ -252,11 +253,11 @@ public class PaginationResolver {
                 UUID.randomUUID(), params.getConsentId(), null, params.getBankCode(), null, null, null, null,
                 null, null,null, null, null, null, null, null,
                 null, null, null, null);
-            ApiResponse<InlineResponse200> apiResponse = aisApi.getApiClient().execute(transactionDetailsCall, InlineResponse200.class);
+            ApiResponse<TransactionDetailsMultiFields> apiResponse = aisApi.getApiClient().execute(transactionDetailsCall, TransactionDetailsMultiFields.class);
             if (apiResponse == null || apiResponse.getStatusCode() > 299) {
                 log.error("Wrong status code on transaction detail: " + apiResponse.getStatusCode());
             } else {
-                return apiResponse.getData().getTransactionsDetails();
+                return apiResponse.getData().getTransactionDetails();
             }
         } catch (Exception e) {
             log.error("Exception fetching transaction detail: " + accountAndTransaction.getTransaction(), e);
@@ -349,5 +350,20 @@ public class PaginationResolver {
     static class AccountAndTransaction {
         private String account;
         private String transaction;
+    }
+
+    @Data
+    public static class TransactionDetailsMultiFields { // Workaround for different transaction fields
+        @SerializedName("transactionsDetails")
+        private TransactionDetails transactionsDetails = null;
+        @SerializedName("transaction")
+        private TransactionDetails transaction = null;
+
+        public TransactionDetails getTransactionDetails() {
+            if (transactionsDetails != null) {
+                return transactionsDetails;
+            }
+            return transaction;
+        }
     }
 }
