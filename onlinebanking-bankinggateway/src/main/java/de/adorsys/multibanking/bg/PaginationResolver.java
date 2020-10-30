@@ -36,7 +36,6 @@ import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServ
 public class PaginationResolver {
     private final static String FIDUCIA_PAGINATION_QUERY_PARAMETER = "scrollRef";
     private final static String COMMERZBANK_PAGINATION_QUERY_PARAMETER = "page";
-    private final static String TRANSACTION_DETAILS_LINK_KEY = "transactionDetails";
     private final static String BALANCES_LINK_KEY ="balances";
     private final static int MAX_PAGES = 50; // prevent infinite loops
 
@@ -59,6 +58,7 @@ public class PaginationResolver {
             .collect(Collectors.toList());
 
         BalancesReport balancesReport = new BalancesReport();
+        Balance openingBookedBalance = new Balance();
         BalanceList balanceList = Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getBalances)
             .orElse(null);
@@ -77,6 +77,9 @@ public class PaginationResolver {
                         break;
                     case CLOSINGBOOKED:
                         balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
+                        break;
+                    case OPENINGBOOKED:
+                        openingBookedBalance.setAmount(bankingGatewayMapper.toBalance(balance).getAmount());
                         break;
                     default:
                         // ignore
@@ -105,22 +108,33 @@ public class PaginationResolver {
                 }
             );
 
-        Optional.ofNullable(balanceList)
-            .map(BalanceList::stream).orElse(Stream.empty())
-            .filter(balance -> BalanceType.OPENINGBOOKED.equals(balance.getBalanceType()))
-            .findFirst().ifPresent(
-            openingbooked -> {
-                BigDecimal balance = new BigDecimal(openingbooked.getBalanceAmount().getAmount());
-                for(Booking booking : bookings) {
-                    balance = balance.add(booking.getAmount());
+        // reverse order - some banks deliver the last booking as the first in the list
+        if (!bookings.isEmpty()) {
+            LocalDate firstValuta = bookings.get(0).getValutaDate();
+            LocalDate lastValuta = bookings.get(bookings.size() - 1).getValutaDate();
+
+            if (firstValuta != null && lastValuta != null && firstValuta.compareTo(lastValuta) > 0) {
+                Collections.reverse(bookings);
+            }
+        }
+
+        // calculate balance after transaction by subtracting the balance amounts from closing booked balance
+        Optional.ofNullable(balancesReport.getReadyBalance()).ifPresent(
+            closingBookedBalance -> {
+                BigDecimal balance = closingBookedBalance.getAmount();
+                for(int i = bookings.size() -1; i >= 0; i--) {
+                    Booking booking = bookings.get(i);
                     booking.setBalance(balance);
                     booking.setExternalId(booking.getValutaDate() + "_" + booking.getAmount() + "_" + booking.getBalance()); // override fallback external id
+                    balance = balance.subtract(booking.getAmount());
                 }
-                Optional.ofNullable(balancesReport.getReadyBalance()).ifPresent(
-                    readyBalance -> {
-                        BigDecimal lastBookingBalance = bookings.get(bookings.size() - 1).getBalance();
-                        if (!readyBalance.getAmount().equals(lastBookingBalance)) {
-                            log.error("The closing booked balance {} and the calculated balance after the last transaction {} are not equal", readyBalance.getAmount(), lastBookingBalance);
+                Optional.ofNullable(openingBookedBalance.getAmount()).ifPresent(
+                    openingBookedAmount -> {
+                        Booking firstBooking = bookings.get(0);
+                        BigDecimal firstBookingBalance = firstBooking.getBalance();
+                        BigDecimal balanceBeforeFirstBooking = firstBookingBalance.subtract(firstBooking.getAmount());
+                        if (!openingBookedAmount.equals(balanceBeforeFirstBooking)) {
+                            log.error("The opening booked balance {} and the calculated balance before the first transaction {} are not equal", openingBookedBalance, balanceBeforeFirstBooking);
                         }
                     }
                 );

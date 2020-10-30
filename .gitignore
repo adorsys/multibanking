@@ -30,3 +30,5 @@ banks.yml
 blz-test.properties
 /onlinebanking-bankinggateway/src/test/resources/adapter_response_1592494030801.json
 resolveDetails.java
+/onlinebanking-bankinggateway/src/test/resources/response5a.http
+/onlinebanking-bankinggateway/src/test/resources/response5b.http
