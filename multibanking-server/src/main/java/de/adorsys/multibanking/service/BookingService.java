@@ -190,7 +190,7 @@ public class BookingService extends AccountInformationService {
 
         saveAnalytics(analyticsResult, bankAccess, bankAccount, mergedBookings);
 
-        mergedBookings.sort((o1, o2) -> o2.getBookingDate().compareTo(o1.getBookingDate()));
+        Collections.reverse(mergedBookings); // just switch order of bookings without changing siblings
 
         return mergedBookings;
     }
