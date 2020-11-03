@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -47,6 +48,7 @@ public class PaginationResolverTest {
 
         //Test correct order and balances
         List<Booking> bookings = loadBookingsResponse.getBookings();
+        Collections.reverse(bookings); //last comes first
         checkAmountAndBalance(bookings.get(0), 100, 200 );
         checkAmountAndBalance(bookings.get(1), 100, 300 );
         checkAmountAndBalance(bookings.get(2), 150, 450 );

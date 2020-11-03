@@ -8,7 +8,7 @@
       {
         "endToEndId": "eid",
         "mandateId": "mid",
-        "bookingDate": "2020-01-01",
+        "bookingDate": "2019-01-01",
         "valueDate": "2020-01-01",
         "transactionAmount": {
           "currency": "EUR",

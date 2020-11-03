@@ -108,13 +108,13 @@ public class PaginationResolver {
                 }
             );
 
-        // reverse order - some banks deliver the last booking as the first in the list
+        // reverse order - last booking must be first in the list
         if (!bookings.isEmpty()) {
-            LocalDate firstValuta = bookings.get(0).getValutaDate();
-            LocalDate lastValuta = bookings.get(bookings.size() - 1).getValutaDate();
+            LocalDate firstBookingDate = bookings.get(0).getBookingDate();
+            LocalDate lastBookingDate = bookings.get(bookings.size() - 1).getBookingDate();
 
-            if (firstValuta != null && lastValuta != null && firstValuta.compareTo(lastValuta) > 0) {
-                Collections.reverse(bookings);
+            if (firstBookingDate != null && lastBookingDate != null && firstBookingDate.compareTo(lastBookingDate) < 0) {
+                Collections.reverse(bookings); // just switch order of bookings without changing siblings
             }
         }
 
@@ -122,15 +122,14 @@ public class PaginationResolver {
         Optional.ofNullable(balancesReport.getReadyBalance()).ifPresent(
             closingBookedBalance -> {
                 BigDecimal balance = closingBookedBalance.getAmount();
-                for(int i = bookings.size() -1; i >= 0; i--) {
-                    Booking booking = bookings.get(i);
+                for(Booking booking : bookings) {
                     booking.setBalance(balance);
                     booking.setExternalId(booking.getValutaDate() + "_" + booking.getAmount() + "_" + booking.getBalance()); // override fallback external id
                     balance = balance.subtract(booking.getAmount());
                 }
                 Optional.ofNullable(openingBookedBalance.getAmount()).ifPresent(
                     openingBookedAmount -> {
-                        Booking firstBooking = bookings.get(0);
+                        Booking firstBooking = bookings.get(bookings.size() - 1);
                         BigDecimal firstBookingBalance = firstBooking.getBalance();
                         BigDecimal balanceBeforeFirstBooking = firstBookingBalance.subtract(firstBooking.getAmount());
                         if (!openingBookedAmount.equals(balanceBeforeFirstBooking)) {

@@ -190,7 +190,15 @@ public class BookingService extends AccountInformationService {
 
         saveAnalytics(analyticsResult, bankAccess, bankAccount, mergedBookings);
 
-        Collections.reverse(mergedBookings); // just switch order of bookings without changing siblings
+        // reverse order - last booking must be first in the list
+        if (!mergedBookings.isEmpty()) {
+            LocalDate firstBookingData = mergedBookings.get(0).getBookingDate();
+            LocalDate lastBookingDate = mergedBookings.get(mergedBookings.size() - 1).getBookingDate();
+
+            if (firstBookingData != null && lastBookingDate != null && firstBookingData.compareTo(lastBookingDate) < 0) {
+                Collections.reverse(mergedBookings); // just switch order of bookings without changing siblings
+            }
+        }
 
         return mergedBookings;
     }
