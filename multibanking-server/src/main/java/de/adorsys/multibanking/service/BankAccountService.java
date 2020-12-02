@@ -117,7 +117,7 @@ public class BankAccountService extends AccountInformationService {
             return response.getBankAccounts();
         } catch (MultibankingException e) {
             metricsCollector.count("loadAccounts", bankAccess.getBankCode(), onlineBankingService.bankApi(), e);
-            throw handleMultibankingException(bankAccess, (MultibankingException) e);
+            throw handleMultibankingException(bankAccess, e);
         } catch (Exception e) {
             metricsCollector.count("loadAccounts", bankAccess.getBankCode(), onlineBankingService.bankApi(), e);
             throw e;

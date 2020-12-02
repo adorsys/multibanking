@@ -51,11 +51,11 @@ public class HbciErrorUtils {
     }
 
     public MultibankingException toMultibankingException(List<HBCIMsgStatus> msgStatusList) {
-        return new MultibankingException(MultibankingError.HBCI_ERROR, -1, null, msgStatusListToMessages(msgStatusList));
+        return new MultibankingException(MultibankingError.HBCI_ERROR, -1, msgStatusListToMessages(msgStatusList), null);
     }
 
     public MultibankingException toMultibankingException(HBCIStatus hbciStatus) {
-        return new MultibankingException(MultibankingError.HBCI_ERROR, -1, null, collectMessages(hbciStatus.getRetVals()));
+        return new MultibankingException(MultibankingError.HBCI_ERROR, -1, collectMessages(hbciStatus.getRetVals()), null);
     }
 
     public List<Message> msgStatusListToMessages(List<HBCIMsgStatus> msgStatusList) {

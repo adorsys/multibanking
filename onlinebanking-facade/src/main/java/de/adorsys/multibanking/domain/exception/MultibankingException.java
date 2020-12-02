@@ -17,21 +17,21 @@ public class MultibankingException extends RuntimeException {
     private final MultibankingError multibankingError;
 
     public MultibankingException(MultibankingError multibankingError) {
-        this(multibankingError, 400, Collections.emptyList(), null);
+        this(multibankingError, 400, Collections.emptyList(), Collections.emptyList());
     }
 
     public MultibankingException(MultibankingError multibankingError, int httpResponseCode, String psuMessage) {
-        this(multibankingError, httpResponseCode, Collections.singletonList(new Message(null, null, null, psuMessage, null)), null
+        this(multibankingError, httpResponseCode, Collections.singletonList(new Message(null, null, null, psuMessage, null)), Collections.emptyList()
         );
     }
 
     public MultibankingException(MultibankingError multibankingError, String psuMessage) {
-        this(multibankingError, 400, Collections.singletonList(new Message(null, null, null, psuMessage, null)), null
+        this(multibankingError, 400, Collections.singletonList(new Message(null, null, null, psuMessage, null)), Collections.emptyList()
         );
     }
 
     public MultibankingException(MultibankingError multibankingError, List<Message> psuMessages) {
-        this(multibankingError, 400, psuMessages, null);
+        this(multibankingError, 400, psuMessages, Collections.emptyList());
     }
 
     public MultibankingException(MultibankingError multibankingError, int httpResponseCode, List<Message> psuMessages, List<Message> tppMessages) {

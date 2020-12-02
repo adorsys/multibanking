@@ -18,7 +18,6 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.ChallengeData;
-import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.AbstractResponse;
@@ -107,7 +106,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
         if (tan2StepRequired) {
             hbciTanSubmit.update(dialog, newHbciJob, getHbciJobName(),
-                getUserTanTransportType(dialog.getPassport().getBankTwostepMechanisms()), getHbciKonto().number);
+                getUserTanTransportType(dialog.getPassport().getBankTwostepMechanisms()), getHbciKonto());
             jobResponse.setAuthorisationCodeResponse(new AuthorisationCodeResponse(hbciTanSubmit, challenge));
         } else if (getConsent().isCloseDialog()) { //sca not needed
             dialog.dialogEnd();
@@ -144,7 +143,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
         if (scaRequired) {
             HBCITwoStepMechanism userTanTransportType = getUserTanTransportType(dialog.getPassport().getBankTwostepMechanisms());
-            hbciTanSubmit.update(dialog, getOrCreateHbciJob(), getHbciJobName(), userTanTransportType, getHbciKonto().number);
+            hbciTanSubmit.update(dialog, getOrCreateHbciJob(), getHbciJobName(), userTanTransportType, getHbciKonto());
             hbciTanSubmit.setHbciJobName("HKIDN"); //overwrite hbci job name for second HKTAN request
 
             String header = "TAN2StepRes" + userTanTransportType.getSegversion();
@@ -243,7 +242,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
     }
 
     Konto getHbciKonto() {
-        return getPsuAccount()
+        return Account()
             .map(account -> {
                 String accountNumber = account.getAccountNumber() != null
                     ? account.getAccountNumber()
@@ -257,16 +256,17 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
                 }
                 return konto;
             })
-            .orElseGet(this::getFirstAccountOrThrowException);
+            .orElseGet(this::getFirstAccount);
     }
 
-    private Konto getFirstAccountOrThrowException() {
+    private Konto getFirstAccount() {
+        //could be null in case of needed sca for loadAccounts request
         return Optional.of(dialog.getPassport().getAccounts())
             .map(kontos -> !kontos.isEmpty() ? kontos.get(0) : null)
-            .orElseThrow(() -> new MultibankingException(MultibankingError.INVALID_ACCOUNT_REFERENCE, "No account available"));
+            .orElse(null);
     }
 
-    private Optional<BankAccount> getPsuAccount() {
+    private OptiongetPsual<BankAccount> getPsuAccount() {
         return Optional.ofNullable(transactionRequest.getTransaction().getPsuAccount());
     }
 
