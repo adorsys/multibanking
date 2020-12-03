@@ -242,7 +242,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
     }
 
     Konto getHbciKonto() {
-        return Account()
+        return getPsuAccount()
             .map(account -> {
                 String accountNumber = account.getAccountNumber() != null
                     ? account.getAccountNumber()
@@ -266,7 +266,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
             .orElse(null);
     }
 
-    private OptiongetPsual<BankAccount> getPsuAccount() {
+    private Optional<BankAccount> getPsuAccount() {
         return Optional.ofNullable(transactionRequest.getTransaction().getPsuAccount());
     }
 
