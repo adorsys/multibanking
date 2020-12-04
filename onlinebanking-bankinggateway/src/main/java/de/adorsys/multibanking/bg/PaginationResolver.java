@@ -5,6 +5,7 @@ import de.adorsys.multibanking.domain.Balance;
 import de.adorsys.multibanking.domain.BalancesReport;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
+import de.adorsys.multibanking.xs2a_adapter.ApiException;
 import de.adorsys.multibanking.xs2a_adapter.ApiResponse;
 import de.adorsys.multibanking.xs2a_adapter.api.AccountInformationServiceAisApi;
 import de.adorsys.multibanking.xs2a_adapter.model.*;
@@ -150,7 +151,18 @@ public class PaginationResolver {
         List<Booking> bookings = new ArrayList<>();
         Balance closingBookedBalance = null;
         for (int i = 0; i < MAX_PAGES; i++) {
-            BookingsAndBalance bookingsAndBalance = fetchNext(nextLink, nextCallParams);
+            BookingsAndBalance bookingsAndBalance = null;
+            try {
+                bookingsAndBalance = fetchNext(nextLink, nextCallParams);
+            } catch (Exception e) {
+                String message = e.getMessage();
+                if (e instanceof ApiException)  {
+                    message = ((ApiException) e).getResponseBody();
+                }
+                log.error("Error fetching page " + i + ": " + message);
+                log.error("We ignore this error and take what we got so far");
+                break;
+            }
             bookings.addAll(bookingsAndBalance.getBookings());
             if (bookingsAndBalance.getClosingBookedBalance() != null) {
                 closingBookedBalance = bookingsAndBalance.getClosingBookedBalance();

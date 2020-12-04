@@ -36,7 +36,10 @@ Content-Type: application/json
     "_links": {
       "account": {
         "href": "******"
-      }
+      },
+     "next": {
+       "href": "http://localhost:1234/v1/account/xxx/transactions?page=6"
+     }
     }
   },
   "balances": [

@@ -12,11 +12,13 @@ import org.mockito.internal.util.reflection.FieldSetter;
 
 import java.util.HashMap;
 
+import static org.junit.Assert.assertNull;
+
 import static org.mockito.Mockito.*;
 
 public class ScaAwareJobTest {
 
-    @Test(expected = MultibankingException.class)
+    @Test
     public void testGetKontoFailure() throws NoSuchFieldException {
         ScaAwareJob<LoadAccounts, AccountInformationResponse> job = mock(AccountInformationJob.class,
             withSettings()
@@ -28,6 +30,6 @@ public class ScaAwareJobTest {
 
         FieldSetter.setField(job, ScaAwareJob.class.getDeclaredField("dialog"), dialog);
 
-        job.getHbciKonto();
+        assertNull("HbciKonto must be null", job.getHbciKonto());
     }
 }
