@@ -2,72 +2,76 @@
     <include resource="/org/springframework/boot/logging/logback/base.xml"/>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %X{correlationId} %msg%n</pattern>
-        </encoder>
-    </appender>
-
-    <appender name="STDOUT-AUDIT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="de.adorsys.multibanking.logging.PatternMaskingLayout">
-                <maskPattern>(?>customerId)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>userId)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>pin)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>pin2)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>psuId)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>psuCorporateId)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>password)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>amount)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>balance)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>origValue)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>chargeValue)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>text)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>additional)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>usage)\=(.*?)[)|,](?= addkey=)</maskPattern>
-                <maskPattern>(?>mandateReference)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>owner)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>mainCategory)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>subCategory)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>specification)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>provider)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>image)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>data)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>imageLink)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>scaAuthenticationData)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>iban)\=(.*?)[)|,]</maskPattern>
+            <layout class="de.adorsys.multibanking.logging.WhitelistMaskEverythingLayout">
+                <whitelistEntry>bankName</whitelistEntry>
+                <whitelistEntry>type</whitelistEntry>
+                <whitelistEntry>bic</whitelistEntry>
+                <whitelistEntry>bankCode</whitelistEntry>
+                <whitelistEntry>tppRedirectUri</whitelistEntry>
+                <whitelistEntry>additionalInformation</whitelistEntry>
+                <whitelistEntry>data</whitelistEntry>
+                <whitelistEntry>otpFormat</whitelistEntry>
+                <whitelistEntry>label</whitelistEntry>
+                <whitelistEntry>otpMaxLength</whitelistEntry>
+                <whitelistEntry>blz</whitelistEntry>
+                <whitelistEntry>jointAccount</whitelistEntry>
+                <whitelistEntry>id</whitelistEntry>
+                <whitelistEntry>scaStatus</whitelistEntry>
+                <whitelistEntry>executionInterval</whitelistEntry>
+                <whitelistEntry>amount</whitelistEntry>
+                <whitelistEntry>bookingDate</whitelistEntry>
+                <whitelistEntry>category</whitelistEntry>
+                <whitelistEntry>balance</whitelistEntry>
+                <whitelistEntry>balances</whitelistEntry>
+                <whitelistEntry>transactionCode</whitelistEntry>
+                <whitelistEntry>valutaDate</whitelistEntry>
+                <whitelistEntry>bankName</whitelistEntry>
+                <whitelistEntry>bic</whitelistEntry>
+                <whitelistEntry>bankCode</whitelistEntry>
+                <whitelistEntry>bankApi</whitelistEntry>
+                <whitelistEntry>key</whitelistEntry>
+                <whitelistEntry>severity</whitelistEntry>
+                <whitelistEntry>field</whitelistEntry>
+                <whitelistEntry>renderedMessage</whitelistEntry>
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %X{correlationId} %msg%n</pattern>
             </layout>
         </encoder>
     </appender>
 
-    <appender name="FILE-AUDIT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="de.adorsys.multibanking.logging.PatternMaskingLayout">
-                <maskPattern>(?>customerId)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>userId)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>pin)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>pin2)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>psuId)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>psuCorporateId)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>password)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>amount)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>balance)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>origValue)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>chargeValue)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>text)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>additional)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>usage)\=(.*?)[)|,](?= addkey=)</maskPattern>
-                <maskPattern>(?>mandateReference)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>owner)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>mainCategory)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>subCategory)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>specification)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>provider)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>image)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>data)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>imageLink)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>scaAuthenticationData)\=(.*?)[)|,]</maskPattern>
-                <maskPattern>(?>iban)\=(.*?)[)|,]</maskPattern>
+            <layout class="de.adorsys.multibanking.logging.WhitelistMaskEverythingLayout">
+                <whitelistEntry>bankName</whitelistEntry>
+                <whitelistEntry>type</whitelistEntry>
+                <whitelistEntry>bic</whitelistEntry>
+                <whitelistEntry>bankCode</whitelistEntry>
+                <whitelistEntry>tppRedirectUri</whitelistEntry>
+                <whitelistEntry>additionalInformation</whitelistEntry>
+                <whitelistEntry>data</whitelistEntry>
+                <whitelistEntry>otpFormat</whitelistEntry>
+                <whitelistEntry>label</whitelistEntry>
+                <whitelistEntry>otpMaxLength</whitelistEntry>
+                <whitelistEntry>blz</whitelistEntry>
+                <whitelistEntry>jointAccount</whitelistEntry>
+                <whitelistEntry>id</whitelistEntry>
+                <whitelistEntry>scaStatus</whitelistEntry>
+                <whitelistEntry>executionInterval</whitelistEntry>
+                <whitelistEntry>amount</whitelistEntry>
+                <whitelistEntry>bookingDate</whitelistEntry>
+                <whitelistEntry>category</whitelistEntry>
+                <whitelistEntry>balance</whitelistEntry>
+                <whitelistEntry>balances</whitelistEntry>
+                <whitelistEntry>transactionCode</whitelistEntry>
+                <whitelistEntry>valutaDate</whitelistEntry>
+                <whitelistEntry>bankName</whitelistEntry>
+                <whitelistEntry>bic</whitelistEntry>
+                <whitelistEntry>bankCode</whitelistEntry>
+                <whitelistEntry>bankApi</whitelistEntry>
+                <whitelistEntry>key</whitelistEntry>
+                <whitelistEntry>severity</whitelistEntry>
+                <whitelistEntry>field</whitelistEntry>
+                <whitelistEntry>renderedMessage</whitelistEntry>
                 <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %level [%thread] %X{correlationId} %msg%n</pattern>
             </layout>
         </encoder>
@@ -86,8 +90,8 @@
     </root>
 
     <logger name="de.adorsys.multibanking.logging.RestControllerAspectLogging" level="TRACE" additivity="false">
-        <appender-ref ref="STDOUT-AUDIT"/>
-        <appender-ref ref="FILE-AUDIT"/>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
     </logger>
 
     <logger name="org.kapott.hbci.comm.CommPinTan" level="WARN"/>
