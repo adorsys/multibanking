@@ -15,6 +15,12 @@
             <groupId>de.adorsys</groupId>
             <artifactId>hbci4j-adorsys</artifactId>
             <version>3.5.28</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
@@ -54,7 +60,7 @@
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-jdk8</artifactId>
+            <artifactId>mapstruct</artifactId>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
