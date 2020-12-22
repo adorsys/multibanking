@@ -116,13 +116,14 @@ interface BankingGatewayMapper {
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
         booking.setTransactionCode(transactionDetails.getPurposeCode() == null ? null :
             transactionDetails.getPurposeCode().toString());
+        booking.setProprietaryBankTransactionCode(transactionDetails.getProprietaryBankTransactionCode());
 
         // balance after transaction
         Optional.ofNullable(transactionDetails.getBalanceAfterTransaction())
             .map(de.adorsys.multibanking.xs2a_adapter.model.Balance::getBalanceAmount)
             .map(de.adorsys.multibanking.xs2a_adapter.model.Amount::getAmount)
             .map(BigDecimal::new)
-            .ifPresent(balance -> booking.setBalance(balance));
+            .ifPresent(booking::setBalance);
 
         if(transactionDetails.getAdditionalInformation() != null) {
             booking.setText(transactionDetails.getAdditionalInformation());
@@ -140,7 +141,7 @@ interface BankingGatewayMapper {
 
         // if amount < 0 the other account gets the money and is therefore the creditor
         // if amount > 0 we get the money and the other account is the debtor
-        if (booking.getAmount() != null && BigDecimal.ZERO.compareTo(booking.getAmount()) == 1) { // 0 is bigger than amount
+        if (booking.getAmount() != null && BigDecimal.ZERO.compareTo(booking.getAmount()) > 0) { // 0 is bigger than amount
             bankAccount.setOwner(transactionDetails.getCreditorName());
             bankAccount.setIban(transactionDetails.getCreditorAccount() != null ? transactionDetails.getCreditorAccount().getIban() : null);
         } else {

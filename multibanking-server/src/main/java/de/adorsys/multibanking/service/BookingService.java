@@ -156,8 +156,8 @@ public class BookingService extends AccountInformationService {
         List<BookingEntity> existingBookings = bookingRepository.findByUserIdAndAccountIdAndBankApi(
             bankAccess.getUserId(), bankAccount.getId(), onlineBankingService.bankApi());
 
-        List<BookingEntity> mergedBookings = null;
-        if (existingBookings.size() > 0) {
+        List<BookingEntity> mergedBookings;
+        if (!existingBookings.isEmpty()) {
             mergedBookings = mergeBookings(existingBookings, newBookings);
         } else {
             mergedBookings = newBookings;
@@ -223,7 +223,7 @@ public class BookingService extends AccountInformationService {
     }
 
     void saveAnalytics(AnalyticsResult analyticsResult, BankAccessEntity bankAccess,
-                               BankAccountEntity bankAccount, List<BookingEntity> bookingEntities) {
+                       BankAccountEntity bankAccount, List<BookingEntity> bookingEntities) {
         if (analyticsResult == null) {
             return;
         }
@@ -356,8 +356,7 @@ public class BookingService extends AccountInformationService {
             .collect(Collectors.toList());
     }
 
-    List<BookingEntity> mergeBookings(List<BookingEntity> dbBookings,
-                                              List<BookingEntity> newBookings) {
+    List<BookingEntity> mergeBookings(List<BookingEntity> dbBookings, List<BookingEntity> newBookings) {
         return Stream.of(dbBookings, newBookings)
             .flatMap(Collection::stream)
             .collect(Collectors.collectingAndThen(Collectors.toCollection(() ->
