@@ -144,6 +144,10 @@ public enum BankAccountType {
 //    your transacting account and neither are you offered an overdraft facility
 //    TRAS("Cash Trading");
     public static BankAccountType fromXS2AType(String xs2aAccountType) {
+        if (xs2aAccountType == null) {
+            return BankAccountType.UNKNOWN;
+        }
+
         switch (xs2aAccountType) {
             case "CACC":
             case "CASH":
