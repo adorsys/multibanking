@@ -69,7 +69,7 @@ public class WhitelistMaskEverythingLayout extends PatternLayout {
                 continue;
             }
 
-            if (value != null) {
+            if (value != null && !"null".equals(value)) {
                 IntStream.range(matcher.start(valuePosition), matcher.end(valuePosition))
                     .forEach(i -> sb.setCharAt(i, '*')); // replace each character with asterisk
             }

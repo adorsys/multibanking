@@ -71,7 +71,7 @@ interface BankingGatewayMapper {
 
     @Mapping(target = "country", ignore = true)
     @Mapping(target = "bankName", ignore = true)
-    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "owner", source = "ownerName")
     @Mapping(target = "syncStatus", ignore = true)
     @Mapping(target = "lastSync", ignore = true)
     @Mapping(target = "balances", ignore = true)
