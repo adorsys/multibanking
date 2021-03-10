@@ -31,5 +31,6 @@ public class UpdateAuthResponse extends AbstractResponse {
     private final ScaStatus scaStatus;
     private List<TanTransportType> scaMethods;
     private ChallengeData challenge;
+    private String psuMessage;
 
 }
