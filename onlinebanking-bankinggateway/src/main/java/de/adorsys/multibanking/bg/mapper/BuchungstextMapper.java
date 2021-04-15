@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.bg;
+package de.adorsys.multibanking.bg.mapper;
 
 import lombok.extern.slf4j.Slf4j;
 

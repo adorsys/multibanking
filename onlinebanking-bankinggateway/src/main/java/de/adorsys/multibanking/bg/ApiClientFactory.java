@@ -8,6 +8,8 @@ import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import de.adorsys.multibanking.banking_gateway_b2c.ApiClient;
 import de.adorsys.multibanking.banking_gateway_b2c.api.AisApi;
 import de.adorsys.multibanking.banking_gateway_b2c.api.OAuthApi;
+import de.adorsys.multibanking.bg.BgSessionData;
+import de.adorsys.multibanking.bg.utils.OkHttpHeaderInterceptor;
 import de.adorsys.multibanking.xs2a_adapter.JSON;
 import de.adorsys.multibanking.xs2a_adapter.api.AccountInformationServiceAisApi;
 import lombok.experimental.UtilityClass;

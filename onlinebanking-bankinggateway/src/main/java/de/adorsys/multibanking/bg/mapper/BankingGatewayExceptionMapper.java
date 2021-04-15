@@ -1,6 +1,7 @@
-package de.adorsys.multibanking.bg;
+package de.adorsys.multibanking.bg.mapper;
 
 import com.google.gson.JsonSyntaxException;
+import de.adorsys.multibanking.bg.utils.GsonConfig;
 import de.adorsys.multibanking.domain.exception.MultibankingError;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.xs2a_adapter.ApiException;

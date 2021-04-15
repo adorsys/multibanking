@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.bg;
+package de.adorsys.multibanking.bg.utils;
 
 import com.squareup.okhttp.Interceptor;
 import com.squareup.okhttp.Request;
@@ -9,7 +9,7 @@ import org.slf4j.MDC;
 import java.io.IOException;
 import java.util.Optional;
 
-import static de.adorsys.multibanking.bg.Constants.*;
+import static de.adorsys.multibanking.bg.utils.Constants.*;
 
 @RequiredArgsConstructor
 public class OkHttpHeaderInterceptor implements Interceptor {

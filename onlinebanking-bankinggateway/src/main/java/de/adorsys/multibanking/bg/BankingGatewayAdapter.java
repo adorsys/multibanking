@@ -1,6 +1,9 @@
 package de.adorsys.multibanking.bg;
 
 import com.squareup.okhttp.Call;
+import de.adorsys.multibanking.bg.mapper.BankingGatewayExceptionMapper;
+import de.adorsys.multibanking.bg.mapper.BankingGatewayMapper;
+import de.adorsys.multibanking.bg.mapper.BankingGatewayMapperImpl;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankApiUser;

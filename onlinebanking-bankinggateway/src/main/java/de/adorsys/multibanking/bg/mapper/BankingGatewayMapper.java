@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.bg;
+package de.adorsys.multibanking.bg.mapper;
 
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
 import de.adorsys.multibanking.domain.*;
@@ -25,13 +25,14 @@ import static de.adorsys.multibanking.domain.BankApi.XS2A;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Mapper
-interface BankingGatewayMapper {
+public interface BankingGatewayMapper {
 
     @Mapping(source = "psuAccountIban", target = "psuAccount")
     @Mapping(source = "accounts", target = "access.accounts")
     @Mapping(source = "balances", target = "access.balances")
     @Mapping(source = "transactions", target = "access.transactions")
     @Mapping(target = "consentStatus", ignore = true)
+    @Mapping(target = "psuCorporateId", ignore = true)
     ConsentTO toConsentTO(Consent consentTemplate);
 
     @Mapping(target = "redirectId", ignore = true)
@@ -162,6 +163,13 @@ interface BankingGatewayMapper {
                 booking.getOtherAccount().getIban()
             ))
         );
+
+        Optional.ofNullable(transactionDetails.getBalanceAfterTransaction())
+            .map(de.adorsys.multibanking.xs2a_adapter.model.Balance::getBalanceAmount)
+            .map(de.adorsys.multibanking.xs2a_adapter.model.Amount::getAmount)
+            .map(BigDecimal::new)
+            .ifPresent(balance -> booking.setBalance(balance));
+
         return booking;
     }
 

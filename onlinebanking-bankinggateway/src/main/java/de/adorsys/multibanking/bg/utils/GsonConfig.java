@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.bg;
+package de.adorsys.multibanking.bg.utils;
 
 import com.google.gson.Gson;
 import de.adorsys.multibanking.xs2a_adapter.JSON;

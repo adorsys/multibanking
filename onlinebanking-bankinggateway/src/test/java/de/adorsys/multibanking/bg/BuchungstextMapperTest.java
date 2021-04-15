@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.bg;
 
+import de.adorsys.multibanking.bg.mapper.BuchungstextMapper;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
