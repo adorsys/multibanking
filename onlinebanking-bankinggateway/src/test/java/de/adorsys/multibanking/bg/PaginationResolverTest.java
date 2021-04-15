@@ -141,9 +141,6 @@ public class PaginationResolverTest {
                     outputStream.flush();
                     server.close();
                     serverSocket.close();
-                    if (!serverSocket.isClosed()) {
-                        throw new RuntimeException("LECK MICH");
-                    }
                 }
             } catch (Exception e) {
                 log.error("Error in Mock Server", e);
