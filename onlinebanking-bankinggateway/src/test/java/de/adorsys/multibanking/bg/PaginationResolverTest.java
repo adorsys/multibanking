@@ -5,7 +5,6 @@ import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -22,6 +21,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -33,6 +33,8 @@ public class PaginationResolverTest {
     @Test
     public void testJsonPaginationClosingBooked() throws Exception {
         Executors.newSingleThreadExecutor().submit(new MockServer("/paginationClosingBooked"));
+        TimeUnit.MICROSECONDS.sleep(500); // wait for server
+
         String json = IOUtils.toString(TransactionsParserTest.class.getResourceAsStream("/pagination.json"), "UTF-8");
         PaginationResolver.PaginationNextCallParameters params = PaginationResolver.PaginationNextCallParameters.builder()
             .bankCode("00000000")
@@ -70,6 +72,8 @@ public class PaginationResolverTest {
     @Test
     public void testJsonPaginationExpected() throws Exception {
         Executors.newSingleThreadExecutor().submit(new MockServer("/paginationExpected"));
+        TimeUnit.MICROSECONDS.sleep(500); // wait for server
+
         String json = IOUtils.toString(TransactionsParserTest.class.getResourceAsStream("/pagination.json"), "UTF-8");
         PaginationResolver.PaginationNextCallParameters params = PaginationResolver.PaginationNextCallParameters.builder()
             .bankCode("00000000")
