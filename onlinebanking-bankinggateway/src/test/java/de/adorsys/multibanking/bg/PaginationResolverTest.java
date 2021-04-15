@@ -33,7 +33,7 @@ public class PaginationResolverTest {
     @Test
     public void testJsonPaginationClosingBooked() throws Exception {
         Executors.newSingleThreadExecutor().submit(new MockServer("/paginationClosingBooked"));
-        TimeUnit.MICROSECONDS.sleep(500); // wait for server
+        TimeUnit.SECONDS.sleep(1); // wait for server
 
         String json = IOUtils.toString(TransactionsParserTest.class.getResourceAsStream("/pagination.json"), "UTF-8");
         PaginationResolver.PaginationNextCallParameters params = PaginationResolver.PaginationNextCallParameters.builder()
@@ -72,7 +72,7 @@ public class PaginationResolverTest {
     @Test
     public void testJsonPaginationExpected() throws Exception {
         Executors.newSingleThreadExecutor().submit(new MockServer("/paginationExpected"));
-        TimeUnit.MICROSECONDS.sleep(500); // wait for server
+        TimeUnit.SECONDS.sleep(2); // wait for server
 
         String json = IOUtils.toString(TransactionsParserTest.class.getResourceAsStream("/pagination.json"), "UTF-8");
         PaginationResolver.PaginationNextCallParameters params = PaginationResolver.PaginationNextCallParameters.builder()
