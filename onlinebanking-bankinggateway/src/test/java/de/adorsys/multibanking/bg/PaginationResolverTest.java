@@ -131,7 +131,7 @@ public class PaginationResolverTest {
 
                 for (int i = 0; i < responses.size(); i++) {
                     serverSocket = new ServerSocket(MOCK_SERVER_PORT);
-                    serverSocket.setSoTimeout(2000);
+                    serverSocket.setSoTimeout(2500);
                     Socket server = serverSocket.accept();
                     BufferedReader in = new BufferedReader(new InputStreamReader(server.getInputStream()));
                     char[] buffer = new char[2048];

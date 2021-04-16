@@ -126,10 +126,10 @@ public interface BankingGatewayMapper {
             .map(BigDecimal::new)
             .ifPresent(booking::setBalance);
 
-        if(transactionDetails.getAdditionalInformation() != null) {
-            booking.setText(transactionDetails.getAdditionalInformation());
-        } else {
-            // fallback use gvcode from bank transaction code to lookup buchungstext
+        // Buchungstext
+        booking.setText(transactionDetails.getAdditionalInformation());
+        if (booking.getText() == null) {
+            // II. try: use geschaeftsvorfallcode
             String text = Optional.ofNullable(transactionDetails.getProprietaryBankTransactionCode())
                 .map(bankTransactionCode -> bankTransactionCode.split("\\+"))
                 .map(array -> array.length > 2 ? array[1] : null)
@@ -137,6 +137,14 @@ public interface BankingGatewayMapper {
                 .orElse(null);
             booking.setText(text);
         }
+        if (booking.getText() == null) {
+            // III. try: use bankTransactionCode
+            String text = Optional.ofNullable(transactionDetails.getBankTransactionCode())
+                .map(BuchungstextMapper::bankTransactionCode2Buchungstext)
+                .orElse(null);
+            booking.setText(text);
+        }
+
 
         BankAccount bankAccount = new BankAccount();
 

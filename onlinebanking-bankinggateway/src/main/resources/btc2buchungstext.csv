@@ -1,0 +1,121 @@
+ACMT-ACOP-PSTE;Storno
+ACMT-ADOP-PSTE;Storno
+ACMT-MCOP-ADJT;Reklamationsbuchung
+ACMT-MCOP-CHRG;Erstattung von Gebühren
+ACMT-MCOP-COMM;Erstattung von Provisionen
+ACMT-MCOP-INTR;Zinsen
+ACMT-MDOP-ADJT;Reklamationsbuchung
+ACMT-MDOP-CHRG;Gebühren
+ACMT-MDOP-COMM;Provisionen
+ACMT-MDOP-INTR;Zinsen
+ACMT-MDOP-TAXE;Umsatzsteuer
+ACMT-OPCL-ACCC;Abschluss
+ACMT-OTHR-OTHR;kapitalisierte Zinsen
+CAMT-CAPL-OTHR;Cash Concentrating
+DERV-OTHR-OTHR;Termingeschäfte
+FORX-FWRD-OTHR;Termindevisen
+FORX-MDOP-OTHR;Reisedevisen
+FORX-OTHR-OTHR;Zinsen Geldhandel
+FORX-SPOT-OTHR;Devisenhandel
+FORX-SWAP-OTHR;Swap
+LDAS-FTDP-DPST;Festgeld/Sparplan
+LDAS-FTDP-INTR;Bonus
+LDAS-FTDP-RPMT;Festgeld/Sparplan
+LDAS-FTLN-DDWN;Kredit Kapital
+LDAS-FTLN-OTHR;Raten/Annuitäten
+LDAS-FTLN-PPAY;Tilgung
+LDAS-MCOP-CHRG;Erstattung von Kreditkosten
+LDAS-MCOP-COMM;Erstattung von Provisionen
+LDAS-MCOP-INTR;Erstattung von Stundungszinsen
+LDAS-MDOP-CHRG;Kreditkosten
+LDAS-MDOP-COMM;Provisionen
+LDAS-MDOP-INTR;Darlehenszinsen
+LDAS-OTHR-OTHR;Kredit- und/oder Zinszahlung/dynamisches Sparen
+PMET-SPOT-OTHR;Edelmetall
+PMNT-CCRD-CWDL;SEPA Card Clearing (Einzelbuchung-Soll)
+PMNT-CCRD-OTHR;SEPA Direct Debit
+PMNT-CCRD-POSC;Kreditkartenabrechnung
+PMNT-CCRD-POSD;SEPA Card Clearing (Einzelbuchung-Soll)
+PMNT-CCRD-RIMB;SEPA Card Clearing (Haben Wiedergutschrift)
+PMNT-CCRD-SMRT;SEPA Card Clearing (Einzelbuchung-Soll)
+PMNT-CNTR-CDPT;Einzahlungen
+PMNT-CNTR-CWDL;Auszahlungen
+PMNT-CNTR-FCDP;Sorten-Ankauf
+PMNT-CNTR-FCWD;Sorten-Verkauf
+PMNT-DRFT-DDFT;Diskont-Wechsel
+PMNT-DRFT-STAM;Wechsel-Inkasso
+PMNT-DRFT-STLR;Wechsel-Inkasso
+PMNT-ICDT-BOOK;Übertrag
+PMNT-ICDT-ESCT;SEPA Credit Transfer
+PMNT-ICDT-RRTN;SEPA Credit Transfer Rückbuchung (resultierend aus unanbringlicher Überweisung oder Rückruf)
+PMNT-ICDT-SDVA;Eilüberweisung
+PMNT-ICDT-STDO;SEPA Credit Transfer (Dauerauftrag-Soll)
+PMNT-ICDT-XBCT;Zahlungsauftrag
+PMNT-ICDT-XBST;Dauerauftrag
+PMNT-ICHQ-CCHQ;Scheckbelastung
+PMNT-ICHQ-ORCQ;Orderscheck
+PMNT-ICHQ-OTHR;Zahlungsanweisung zur Verrechnung
+PMNT-ICHQ-UPCQ;Rückrechnung von Schecks
+PMNT-ICHQ-XBCQ;Zahlung per Scheck
+PMNT-IDDT-BBDD;SEPA Direct Debit (B2B)
+PMNT-IDDT-ESDD;SEPA Direct Debit (Core)
+PMNT-IDDT-RCDD;SEPA Direct Debit (Soll, Reversal)
+PMNT-IDDT-UPDD;SEPA Direct Debit (Rückbelastung)
+PMNT-IRCT-ESCT;SEPA Credit Transfer Instant
+PMNT-IRCT-RRTN;SEPA Credit Transfer Instant Rückbuchung (resultierend aus unanbringlicher Überweisung oder Rückruf)
+PMNT-MCOP-CHRG;Erstattung von Gebühren
+PMNT-MCOP-COMM;Erstattung von Provisionen
+PMNT-MCOP-OTHR;Sammler
+PMNT-MCRD-CHRG;SEPA Card Clearing (Einzelbuchung-Soll)
+PMNT-MCRD-DAJT;SEPA Card Clearing (Soll, Reversal)
+PMNT-MCRD-POSP;SEPA Card Clearing (Sammler-Haben)
+PMNT-MCRD-SMCD;Geldkarte (Sammelgutschrift für Händler)
+PMNT-MCRD-UPCT;SEPA Card Clearing (Soll, Rückbelastung)
+PMNT-MDOP-CHRG;Gebühren
+PMNT-MDOP-COMM;Provisionen
+PMNT-MDOP-OTHR;Sammler
+PMNT-OTHR-OTHR;Abbuchung
+PMNT-RCDT-BOOK;Übertrag
+PMNT-RCDT-ESCT;SEPA Credit Transfer
+PMNT-RCDT-FICT;Bank-an-Bank-Zahlung (Überweisungsgutschrift)
+PMNT-RCDT-RRTN;SEPA Credit Transfer Rückbuchung (resultierend aus unanbringlicher Überweisung oder Rückruf)
+PMNT-RCDT-SALA;SEPA Credit Transfer (Einzelbuchung-Haben, Lohn-, Gehalts-, Rentengutschrift)
+PMNT-RCDT-SDVA;Überweisungsgutschrift mit Festvaluta
+PMNT-RCDT-STDO;SEPA Dauerauftragsgutschrift
+PMNT-RCDT-XBCT;Auslandsüberweisung
+PMNT-RCHQ-OTHR;Rückrechnung Zahlungsanweisung zur Verrechnung
+PMNT-RCHQ-UPCQ;Scheckrückgabe (Habenbuchung)
+PMNT-RCHQ-URCQ;Gutschrift aus Scheckeinreichung
+PMNT-RCHQ-XBCQ;Gutschrift Auslands-Scheck-Inkasso
+PMNT-RCHQ-XRCQ;Gutschrift E.v. eines Auslands-Schecks
+PMNT-RDDT-BBDD;SEPA Direct Debit (B2B)
+PMNT-RDDT-ESDD;SEPA Direct Debit (Core)
+PMNT-RDDT-OODD;Online-Einzugsauftrag
+PMNT-RDDT-UPDD;SEPA Direct Debit
+PMNT-RDDT-XBDD;Lastschrift-Einzug aus dem Ausland
+PMNT-RRCT-ESCT;SEPA Credit Transfer Instant
+PMNT-RRCT-RRTN;SEPA Credit Transfer Instant Rückbuchung (resultierend aus unanbringlicher Überweisung oder Rückruf)
+PMNT-RRCT-SALA;SEPA Credit Transfer Instant (Einzelbuchung-Haben, Lohn-, Gehalts-, Rentengutschrift)
+SECU-CASH-TRFE;Gebühren für Wertpapiergeschäfte
+SECU-CORP-BONU;Handel von Bonusrechten
+SECU-CORP-EXWA;Handel von Bezugsrechten
+SECU-CUST-CHRG;Depotgebühren
+SECU-CUST-DVCA;Kupon/Dividenden
+SECU-CUST-INTR;Erträge aus Wertpapieren
+SECU-CUST-REDM;Inkasso
+SECU-MCOP-OTHR;Handel von Optionen
+SECU-MDOP-OTHR;Handel von Optionen
+SECU-OTHR-OTHR;Übertrag
+SECU-SETT-SUBS;Wertpapierzeichnung
+SECU-SETT-TRAD;Effekten
+TRAD-CLNC-OTHR;Inkasso
+TRAD-DCCT-OTHR;Akkreditiv
+TRAD-DOCC-OTHR;Dokumenten-Inkasso
+TRAD-GUAR-OTHR;Aval
+TRAD-MCOP-CHRG;Erstattung von Gebühren
+TRAD-MCOP-COMM;Erstattung von Provisionen
+TRAD-MCOP-OTHR;Rembourse
+TRAD-MDOP-CHRG;Gebühren
+TRAD-MDOP-COMM;Provisionen
+TRAD-MDOP-OTHR;Rembourse
+XTND-NTAV-NTAV;Unstrukturierte Belegung
