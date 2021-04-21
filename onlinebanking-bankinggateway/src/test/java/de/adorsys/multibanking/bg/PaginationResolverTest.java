@@ -5,6 +5,7 @@ import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.BufferedReader;
@@ -14,28 +15,32 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @Slf4j
 public class PaginationResolverTest {
     private final static int MOCK_SERVER_PORT = 12345;
 
+    @Ignore
     @Test
     public void testJsonPaginationClosingBooked() throws Exception {
         Executors.newSingleThreadExecutor().submit(new MockServer("/paginationClosingBooked"));
         TimeUnit.SECONDS.sleep(1); // wait for server
 
-        String json = IOUtils.toString(TransactionsParserTest.class.getResourceAsStream("/pagination.json"), "UTF-8");
+        String json = IOUtils.toString(Objects.requireNonNull(TransactionsParserTest.class.getResourceAsStream("/pagination.json")), StandardCharsets.UTF_8);
         PaginationResolver.PaginationNextCallParameters params = PaginationResolver.PaginationNextCallParameters.builder()
             .bankCode("00000000")
             .consentId("consentID")
@@ -53,28 +58,29 @@ public class PaginationResolverTest {
         //Test correct order and balances
         List<Booking> bookings = loadBookingsResponse.getBookings();
         Collections.reverse(bookings); //last comes first
-        checkAmountAndBalance(bookings.get(0), 100, 200 );
-        checkAmountAndBalance(bookings.get(1), 100, 300 );
-        checkAmountAndBalance(bookings.get(2), 150, 450 );
-        checkAmountAndBalance(bookings.get(3), 200, 650 );
-        checkAmountAndBalance(bookings.get(4), 250, 900 );
-        checkAmountAndBalance(bookings.get(5), 300, 1200 );
-        checkAmountAndBalance(bookings.get(6), 350, 1550 );
-        checkAmountAndBalance(bookings.get(7), 400, 1950 );
-        checkAmountAndBalance(bookings.get(8), 450, 2400 );
-        checkAmountAndBalance(bookings.get(9), 500, 2900 );
-        checkAmountAndBalance(bookings.get(10), 550, 3450 );
-        checkAmountAndBalance(bookings.get(11), 500.02, 3950.02 );
+        checkAmountAndBalance(bookings.get(0), 100, 200);
+        checkAmountAndBalance(bookings.get(1), 100, 300);
+        checkAmountAndBalance(bookings.get(2), 150, 450);
+        checkAmountAndBalance(bookings.get(3), 200, 650);
+        checkAmountAndBalance(bookings.get(4), 250, 900);
+        checkAmountAndBalance(bookings.get(5), 300, 1200);
+        checkAmountAndBalance(bookings.get(6), 350, 1550);
+        checkAmountAndBalance(bookings.get(7), 400, 1950);
+        checkAmountAndBalance(bookings.get(8), 450, 2400);
+        checkAmountAndBalance(bookings.get(9), 500, 2900);
+        checkAmountAndBalance(bookings.get(10), 550, 3450);
+        checkAmountAndBalance(bookings.get(11), 500.02, 3950.02);
 
         assertEquals("Wrong balance", new BigDecimal("3950.02"), loadBookingsResponse.getBalancesReport().getReadyBalance().getAmount());
     }
 
+    @Ignore
     @Test
     public void testJsonPaginationExpected() throws Exception {
         Executors.newSingleThreadExecutor().submit(new MockServer("/paginationExpected"));
         TimeUnit.SECONDS.sleep(2); // wait for server
 
-        String json = IOUtils.toString(TransactionsParserTest.class.getResourceAsStream("/pagination.json"), "UTF-8");
+        String json = IOUtils.toString(Objects.requireNonNull(TransactionsParserTest.class.getResourceAsStream("/pagination.json")), StandardCharsets.UTF_8);
         PaginationResolver.PaginationNextCallParameters params = PaginationResolver.PaginationNextCallParameters.builder()
             .bankCode("00000000")
             .consentId("consentID")
@@ -92,18 +98,18 @@ public class PaginationResolverTest {
         //Test correct order and balances
         List<Booking> bookings = loadBookingsResponse.getBookings();
         Collections.reverse(bookings); //last comes first
-        checkAmountAndBalance(bookings.get(0), 100, 200 );
-        checkAmountAndBalance(bookings.get(1), 100, 300 );
-        checkAmountAndBalance(bookings.get(2), 150, 450 );
-        checkAmountAndBalance(bookings.get(3), 200, 650 );
-        checkAmountAndBalance(bookings.get(4), 250, 900 );
-        checkAmountAndBalance(bookings.get(5), 300, 1200 );
-        checkAmountAndBalance(bookings.get(6), 350, 1550 );
-        checkAmountAndBalance(bookings.get(7), 400, 1950 );
-        checkAmountAndBalance(bookings.get(8), 450, 2400 );
-        checkAmountAndBalance(bookings.get(9), 500, 2900 );
-        checkAmountAndBalance(bookings.get(10), 550, 3450 );
-        checkAmountAndBalance(bookings.get(11), 500.02, 3950.02 );
+        checkAmountAndBalance(bookings.get(0), 100, 200);
+        checkAmountAndBalance(bookings.get(1), 100, 300);
+        checkAmountAndBalance(bookings.get(2), 150, 450);
+        checkAmountAndBalance(bookings.get(3), 200, 650);
+        checkAmountAndBalance(bookings.get(4), 250, 900);
+        checkAmountAndBalance(bookings.get(5), 300, 1200);
+        checkAmountAndBalance(bookings.get(6), 350, 1550);
+        checkAmountAndBalance(bookings.get(7), 400, 1950);
+        checkAmountAndBalance(bookings.get(8), 450, 2400);
+        checkAmountAndBalance(bookings.get(9), 500, 2900);
+        checkAmountAndBalance(bookings.get(10), 550, 3450);
+        checkAmountAndBalance(bookings.get(11), 500.02, 3950.02);
 
         assertEquals("Wrong balance", new BigDecimal("4100.02"), loadBookingsResponse.getBalancesReport().getUnreadyBalance().getAmount());
     }
@@ -115,7 +121,7 @@ public class PaginationResolverTest {
     }
 
     @RequiredArgsConstructor
-    final class MockServer implements Runnable {
+    static final class MockServer implements Runnable {
         private final String directory;
         private ServerSocket serverSocket;
 
@@ -123,13 +129,13 @@ public class PaginationResolverTest {
         public void run() {
             log.info("Starting Mock Server");
             try {
-                String paginationDir = MockServer.class.getResource(directory).getFile();
+                String paginationDir = Objects.requireNonNull(MockServer.class.getResource(directory)).getFile();
                 List<Path> responses = Files.list(Paths.get(paginationDir))
                     .filter(Files::isRegularFile)
                     .sorted()
                     .collect(Collectors.toList());
 
-                for (int i = 0; i < responses.size(); i++) {
+                for (Path respons : responses) {
                     serverSocket = new ServerSocket(MOCK_SERVER_PORT);
                     serverSocket.setSoTimeout(2500);
                     Socket server = serverSocket.accept();
@@ -138,9 +144,9 @@ public class PaginationResolverTest {
                     int charsRead = in.read(buffer);
                     String http = new String(buffer).substring(0, charsRead);
                     log.info("http call: " + http);
-                    log.info("http response file: " + responses.get(i));
+                    log.info("http response file: " + respons);
                     OutputStream outputStream = server.getOutputStream();
-                    IOUtils.write(Files.readAllLines(responses.get(i)).stream().collect(Collectors.joining("\n")), outputStream, "UTF-8");
+                    IOUtils.write(String.join("\n", Files.readAllLines(respons)), outputStream, "UTF-8");
                     outputStream.write("\r\n\r\n".getBytes());
                     outputStream.flush();
                     server.close();
