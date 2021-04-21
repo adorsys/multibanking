@@ -252,7 +252,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
                 konto.iban = account.getIban();
                 if (konto.bic == null) {
                     konto.bic = Optional.ofNullable(account.getBic())
-                        .orElse(HBCIUtils.getBankInfo(konto.blz).getBic());
+                        .orElseGet(() -> HBCIUtils.getBankInfo(konto.blz).getBic());
                 }
                 return konto;
             })

@@ -41,7 +41,7 @@ public class TanRequestJob extends AbstractPaymentJob<TanRequest, AbstractSEPAGV
 
     @Override
     protected PaymentResponse createJobResponse() {
-        return new PaymentResponse(null);
+        return new PaymentResponse(null, null);
     }
 
     @Override

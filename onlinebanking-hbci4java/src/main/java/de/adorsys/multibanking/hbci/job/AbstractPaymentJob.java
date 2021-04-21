@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.hbci.job;
 
+import de.adorsys.multibanking.domain.PaymentStatus;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
@@ -26,14 +27,21 @@ import java.util.Optional;
 
 public abstract class AbstractPaymentJob<T extends AbstractPayment, J extends AbstractHBCIJob> extends ScaAwareJob<T, PaymentResponse> {
 
-    public AbstractPaymentJob(TransactionRequest<T> transactionRequest) {
+    protected AbstractPaymentJob(TransactionRequest<T> transactionRequest) {
         super(transactionRequest);
     }
 
     @Override
     protected PaymentResponse createJobResponse() {
+
+        PaymentStatus paymentStatus = Optional.ofNullable(getOrCreateHbciJob())
+            .map(hbciJob -> hbciJob.getJobResult().getResultData().get("content.status"))
+            .map(Integer::parseInt)
+            .map(InstantPaymentStatusJob::mapPaymentStatus)
+            .orElse(null);
+
         return new PaymentResponse(Optional.ofNullable(getTransactionId())
-            .orElseGet(hbciTanSubmit::getOrderRef));
+            .orElseGet(hbciTanSubmit::getOrderRef), paymentStatus);
     }
 
     private String getTransactionId() {

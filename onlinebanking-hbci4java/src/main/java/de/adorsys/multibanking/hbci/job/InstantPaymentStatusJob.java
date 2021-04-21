@@ -55,7 +55,10 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
     @Override
     public PaymentStatusResponse createJobResponse() {
         GVRInstantUebSEPAStatus hbciStatus = (GVRInstantUebSEPAStatus) paymentStatusHbciJob.getJobResult();
+        return new PaymentStatusResponse(mapPaymentStatus(hbciStatus.getStatus()));
+    }
 
+    public static PaymentStatus mapPaymentStatus(int hbciStatus) {
 //        1: in Terminierung
 //        2: abgelehnt von erster Inkassostelle
 //        3: in Bearbeitung
@@ -66,7 +69,7 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
 //        8: Abgelehnt durch Zahlungsdienstleister des Zahlers
 //        9: Abgelehnt durch Zahlungsdienstleister des Zahlungsempfängers
         PaymentStatus paymentStatus = null;
-        switch (hbciStatus.getStatus()) {
+        switch (hbciStatus) {
             case 1:
                 paymentStatus = PaymentStatus.CANC;
                 break;
@@ -95,9 +98,8 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
                 paymentStatus = PaymentStatus.RJCT;
                 break;
             default:
-                log.warn("unexpected payment status: " + hbciStatus.getStatus());
+                log.warn("unexpected payment status: " + hbciStatus);
         }
-
-        return new PaymentStatusResponse(paymentStatus);
+        return paymentStatus;
     }
 }
