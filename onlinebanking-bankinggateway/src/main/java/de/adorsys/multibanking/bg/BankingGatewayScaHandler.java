@@ -4,6 +4,9 @@ import de.adorsys.multibanking.banking_gateway_b2c.ApiException;
 import de.adorsys.multibanking.banking_gateway_b2c.api.AisApi;
 import de.adorsys.multibanking.banking_gateway_b2c.api.OAuthApi;
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
+import de.adorsys.multibanking.bg.mapper.BankingGatewayMapper;
+import de.adorsys.multibanking.bg.mapper.BankingGatewayMapperImpl;
+import de.adorsys.multibanking.bg.utils.GsonConfig;
 import de.adorsys.multibanking.domain.Consent;
 import de.adorsys.multibanking.domain.ConsentStatus;
 import de.adorsys.multibanking.domain.ScaApproach;
@@ -217,6 +220,7 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
             AuthorizationCodeTO authorizationCodeTO = new AuthorizationCodeTO();
             authorizationCodeTO.setCode(authorisationCode);
             authorizationCodeTO.setBankCode(sessionData.getBankCode());
+            authorizationCodeTO.setConsentId(sessionData.getConsentId());
 
             OAuthApi bankingGatewayB2COAuthApi = bankingGatewayB2COAuthApi(bankingGatewayBaseUrl);
             OAuthToken token = bankingGatewayB2COAuthApi.resolveAuthCode(authorizationCodeTO);

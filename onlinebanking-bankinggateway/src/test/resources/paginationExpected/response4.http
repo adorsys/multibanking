@@ -1,0 +1,83 @@
+HTTP/1.1 200 OK
+Server: Apache/1.3.29 (Unix) PHP/4.3.4
+Connection: close
+Content-Type: application/json
+
+{
+  "account": {
+    "iban": "******",
+    "currency": "******"
+  },
+  "transactions": {
+    "booked": [
+      {
+        "endToEndId": "e4",
+        "mandateId": "m4",
+        "bookingDate": "2020-01-01",
+        "valueDate": "2020-01-01",
+        "transactionAmount": {
+          "currency": "EUR",
+          "amount": "400"
+        },
+        "creditorName": "Hansdampf",
+        "creditorAccount": {
+          "iban": "Iban"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "Iban2"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "e2e",
+        "mandateId": "mid",
+        "bookingDate": "2020-01-01",
+        "valueDate": "2020-01-01",
+        "transactionAmount": {
+          "currency": "EUR",
+          "amount": "450"
+        },
+        "creditorName": "Hansdampf",
+        "creditorAccount": {
+          "iban": "Iban"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "Iban2"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      }
+    ],
+    "_links": {
+      "account": {
+        "href": "******"
+      },
+      "next": {
+        "href": "/v1/account/xxx/transactions?scrollRef=4"
+      }
+    }
+  },
+  "balances": [
+    {
+      "balanceType": "expected",
+      "balanceAmount": {
+        "amount": "27.40",
+        "currency": "EUR"
+      }
+    },
+    {
+      "balanceType": "forwardAvailable",
+      "balanceAmount": {
+        "amount": "27.40",
+        "currency": "EUR"
+      }
+    }
+  ]
+}

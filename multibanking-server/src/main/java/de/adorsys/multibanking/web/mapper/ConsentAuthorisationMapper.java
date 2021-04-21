@@ -28,7 +28,6 @@ public interface ConsentAuthorisationMapper {
     @Mapping(target = "authorisationCode", ignore = true)
     UpdatePsuAuthenticationRequest toUpdatePsuAuthenticationRequest(UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequest, ConsentEntity consentEntity, BankEntity bank);
 
-    @Mapping(target = "psuMessage", ignore = true)
     UpdateAuthResponseTO toUpdateAuthResponseTO(UpdateAuthResponse updateAuthResponse);
 
     @Mapping(target = "consentId", source = "consentEntity.id")

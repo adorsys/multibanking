@@ -5,7 +5,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>5.5.24</version>
+        <version>5.5.25</version>
     </parent>
 
     <artifactId>onlinebanking-bankinggateway</artifactId>
@@ -22,13 +22,13 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-facade</artifactId>
-            <version>5.5.24</version>
+            <version>5.5.25</version>
         </dependency>
 
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-mapper</artifactId>
-            <version>5.5.24</version>
+            <version>5.5.25</version>
         </dependency>
 
         <dependency>
@@ -85,6 +85,10 @@
             <groupId>io.gsonfire</groupId>
             <artifactId>gson-fire</artifactId>
             <version>${gson-fire-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
         </dependency>
 
         <!-- test -->

@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.bg;
+package de.adorsys.multibanking.bg.mapper;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,14 +16,14 @@ import java.util.stream.Collectors;
  * The csv contains the fallback Buchungstext after the key 0XX, 1XX, 2XX etc.
  */
 @Slf4j
-public class BuchungstextMapper {
-    private static final String MAPPINGFILE = "/buchungstexte.csv";
+public class Gvc2Buchungstext {
+    private static final String MAPPINGFILE = "/gvc2buchungstext.csv";
 
     private static final Map<String, String> GVCODES = new HashMap();
     private static final Map<String, String> FALLBACKS = new HashMap();
 
     static {
-        InputStream inputStream = BuchungstextMapper.class.getResourceAsStream(MAPPINGFILE);
+        InputStream inputStream = Gvc2Buchungstext.class.getResourceAsStream(MAPPINGFILE);
         try (BufferedReader reader = new BufferedReader(
             new InputStreamReader(inputStream, "UTF-8"))) {
 

@@ -49,4 +49,5 @@ public class Booking {
     private BankApi bankApi;
     private BookingCategory bookingCategory;
     private String transactionCode;
+    private String proprietaryBankTransactionCode;
 }

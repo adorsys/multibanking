@@ -156,8 +156,8 @@ public class BookingService extends AccountInformationService {
         List<BookingEntity> existingBookings = bookingRepository.findByUserIdAndAccountIdAndBankApi(
             bankAccess.getUserId(), bankAccount.getId(), onlineBankingService.bankApi());
 
-        List<BookingEntity> mergedBookings = null;
-        if (existingBookings.size() > 0) {
+        List<BookingEntity> mergedBookings;
+        if (!existingBookings.isEmpty()) {
             mergedBookings = mergeBookings(existingBookings, newBookings);
         } else {
             mergedBookings = newBookings;
@@ -190,7 +190,15 @@ public class BookingService extends AccountInformationService {
 
         saveAnalytics(analyticsResult, bankAccess, bankAccount, mergedBookings);
 
-        mergedBookings.sort((o1, o2) -> o2.getBookingDate().compareTo(o1.getBookingDate()));
+        // reverse order - last booking must be first in the list
+        if (!mergedBookings.isEmpty()) {
+            LocalDate firstBookingData = mergedBookings.get(0).getBookingDate();
+            LocalDate lastBookingDate = mergedBookings.get(mergedBookings.size() - 1).getBookingDate();
+
+            if (firstBookingData != null && lastBookingDate != null && firstBookingData.compareTo(lastBookingDate) < 0) {
+                Collections.reverse(mergedBookings); // just switch order of bookings without changing siblings
+            }
+        }
 
         return mergedBookings;
     }
@@ -215,7 +223,7 @@ public class BookingService extends AccountInformationService {
     }
 
     void saveAnalytics(AnalyticsResult analyticsResult, BankAccessEntity bankAccess,
-                               BankAccountEntity bankAccount, List<BookingEntity> bookingEntities) {
+                       BankAccountEntity bankAccount, List<BookingEntity> bookingEntities) {
         if (analyticsResult == null) {
             return;
         }
@@ -348,8 +356,7 @@ public class BookingService extends AccountInformationService {
             .collect(Collectors.toList());
     }
 
-    List<BookingEntity> mergeBookings(List<BookingEntity> dbBookings,
-                                              List<BookingEntity> newBookings) {
+    List<BookingEntity> mergeBookings(List<BookingEntity> dbBookings, List<BookingEntity> newBookings) {
         return Stream.of(dbBookings, newBookings)
             .flatMap(Collection::stream)
             .collect(Collectors.collectingAndThen(Collectors.toCollection(() ->

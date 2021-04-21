@@ -86,4 +86,5 @@ public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment, Abstract
         return paymentGV instanceof GVRPayment ? ((GVRPayment) paymentGV).getOrderId() : null; // no order id for
         // single payment
     }
+
 }

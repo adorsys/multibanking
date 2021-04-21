@@ -1,5 +1,10 @@
 package de.adorsys.multibanking.bg;
 
+import de.adorsys.multibanking.bg.mapper.BankingGatewayMapper;
+import de.adorsys.multibanking.bg.mapper.BankingGatewayMapperImpl;
+import de.adorsys.multibanking.bg.mapper.BuchungstextMapper;
+import de.adorsys.multibanking.domain.Booking;
+import de.adorsys.multibanking.xs2a_adapter.model.TransactionDetails;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -26,5 +31,25 @@ public class BuchungstextMapperTest {
         assertNull(BuchungstextMapper.gvcode2Buchungstext("500"));
         assertNull(BuchungstextMapper.gvcode2Buchungstext("700"));
         assertNull(BuchungstextMapper.gvcode2Buchungstext("Bla"));
+    }
+
+    @Test
+    public void testBankTransactionCode() {
+        assertEquals("SEPA Credit Transfer", BuchungstextMapper.bankTransactionCode2Buchungstext("PMNT-ICDT-ESCT"));
+        assertEquals("Unstrukturierte Belegung", BuchungstextMapper.bankTransactionCode2Buchungstext("XTND-NTAV-NTAV"));
+        assertNull(BuchungstextMapper.bankTransactionCode2Buchungstext("xx"));
+    }
+
+    @Test
+    public void testBankingGatewayMapper() {
+        BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
+        TransactionDetails transactionDetails = new TransactionDetails();
+        transactionDetails.setBankTransactionCode("PMNT-ICDT-ESCT");
+        Booking booking = bankingGatewayMapper.toBooking(transactionDetails);
+        assertEquals("SEPA Credit Transfer", booking.getText());
+
+        transactionDetails.setProprietaryBankTransactionCode("BLI+157+BLUB");
+        Booking booking2 = bankingGatewayMapper.toBooking(transactionDetails);
+        assertEquals("SEPA Credit Transfer Instant (Einzelbuchung-Haben, Lohn-, Gehalts-, Rentengutschrift)", booking2.getText());
     }
 }

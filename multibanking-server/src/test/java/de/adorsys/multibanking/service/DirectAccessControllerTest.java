@@ -27,6 +27,7 @@ import io.restassured.RestAssured;
 import io.restassured.filter.log.ErrorLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -385,44 +386,74 @@ public class DirectAccessControllerTest {
             return jsonPath;
         }
 
-        String transactionAuthorisationLink = jsonPath.getString("_links" + ".transactionAuthorisation.href");
-        //5. bookings challenge for hbci (Optional) hbci case
-        if (transactionAuthorisationLink == null) {
-            DirectAccessControllerV2.LoadBookingsRequest loadBookingsRequest = new DirectAccessControllerV2.LoadBookingsRequest();
-            loadBookingsRequest.setBankAccess(bankAccess);
+        //5. load accounts, accounts challenge for hbci (Optional) hbci case
+        Object loadBankAccountsResponse = loadBankAccounts(bankAccess);
+        if (loadBankAccountsResponse instanceof JsonPath) {
+            String transactionAuthorisationLink = ((JsonPath) loadBankAccountsResponse).getString("_links" + ".transactionAuthorisation.href");
+            transactionAuthorisation(transactionAuthorisationLink);
 
-            jsonPath = request
-                .body(loadBookingsRequest)
-                .post(getRemoteMultibankingUrl() + "/api/v2/direct/bookings")
-                .then().extract().jsonPath();
-
-            if (jsonPath.get("bookings") != null) {
-                //response contains bookings -> sca not needed
-                return null;
-            }
+            loadBankAccountsResponse = loadBankAccounts(bankAccess);
+            assertThat(loadBankAccountsResponse).isNotNull();
         }
-        //6. send tan
+
+        //7. load transactions
+        JsonPath loadBookingsResponse = loadBookings(consent, bankAccess, (DirectAccessControllerV2.LoadBankAccountsResponse) loadBankAccountsResponse);
+        String transactionAuthorisationLink = loadBookingsResponse.getString("_links" + ".transactionAuthorisation.href");
+        if (transactionAuthorisationLink != null) {
+            transactionAuthorisation(transactionAuthorisationLink);
+
+            loadBookingsResponse = loadBookings(consent, bankAccess, (DirectAccessControllerV2.LoadBankAccountsResponse) loadBankAccountsResponse);
+            assertThat(loadBookingsResponse).isNotNull();
+        }
+
+        return loadBookingsResponse;
+    }
+
+    private Object loadBankAccounts(BankAccessTO bankAccess) {
+        DirectAccessControllerV2.LoadAccountsRequest loadAccountsRequest = new DirectAccessControllerV2.LoadAccountsRequest();
+        loadAccountsRequest.setBankAccess(bankAccess);
+
+        Response response = request
+            .body(loadAccountsRequest)
+            .post(getRemoteMultibankingUrl() + "/api/v2/direct/accounts")
+            .andReturn();
+
+        if (response.getStatusCode() == HttpStatus.OK.value()) {
+            return response.getBody().as(DirectAccessControllerV2.LoadBankAccountsResponse.class);
+        } else if (response.getStatusCode() == HttpStatus.ACCEPTED.value()) {
+            return response.getBody().jsonPath();
+        }
+        return null;
+    }
+
+    private JsonPath loadBookings(ConsentTO consent, BankAccessTO bankAccess, DirectAccessControllerV2.LoadBankAccountsResponse loadBankAccountsResponse) {
+        DirectAccessControllerV2.LoadBookingsRequest loadBookingsRequest = new DirectAccessControllerV2.LoadBookingsRequest();
+        loadBookingsRequest.setBankAccess(bankAccess);
+
+        BankAccountTO bankAccount = loadBankAccountsResponse.getBankAccounts().stream()
+            .filter(bankAccountTO -> StringUtils.equals(bankAccountTO.getIban(), consent.getPsuAccountIban()))
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException("psu account not found"));
+        loadBookingsRequest.setUserId(bankAccount.getUserId());
+        loadBookingsRequest.setAccessId(bankAccount.getBankAccessId());
+        loadBookingsRequest.setAccountId(bankAccount.getId());
+
+        return request
+            .body(loadBookingsRequest)
+            .post(getRemoteMultibankingUrl() + "/api/v2/direct/bookings")
+            .andReturn()
+            .jsonPath();
+    }
+
+    private void transactionAuthorisation(String authorisationLink) {
         TransactionAuthorisationRequestTO transactionAuthorisationRequestTO = new TransactionAuthorisationRequestTO();
         transactionAuthorisationRequestTO.setScaAuthenticationData(System.getProperty("tan", "12456"));
 
-        jsonPath = request.body(transactionAuthorisationRequestTO).put(jsonPath.getString("_links.transactionAuthorisation.href"))
+        JsonPath jsonPath = request.body(transactionAuthorisationRequestTO).put(authorisationLink)
             .then().assertThat().statusCode(HttpStatus.OK.value())
             .and().extract().jsonPath();
 
         assertThat(jsonPath.getString("scaStatus")).isIn(SCAMETHODSELECTED.toString(), FINALISED.toString());
-
-        //7. load transactions
-        DirectAccessControllerV2.LoadBookingsRequest loadBookingsRequest = new DirectAccessControllerV2.LoadBookingsRequest();
-        loadBookingsRequest.setBankAccess(bankAccess);
-        if (jsonPath.getString("bankAccounts") != null) {
-            loadBookingsRequest.setUserId(jsonPath.getString("bankAccounts[0].userId"));
-            loadBookingsRequest.setAccessId(jsonPath.getString("bankAccounts[0].bankAccessId"));
-            loadBookingsRequest.setAccountId(jsonPath.getString("bankAccounts[0].id"));
-        }
-
-        return request.body(loadBookingsRequest).post(getRemoteMultibankingUrl() + "/api/v2/direct/bookings")
-            .then().assertThat().statusCode(HttpStatus.OK.value())
-            .and().extract().jsonPath();
     }
 
     @Test

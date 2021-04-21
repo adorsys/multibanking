@@ -1,74 +1,63 @@
 package de.adorsys.multibanking.bg;
 
-import com.squareup.okhttp.Call;
+import de.adorsys.multibanking.bg.mapper.BankingGatewayMapper;
+import de.adorsys.multibanking.bg.mapper.BankingGatewayMapperImpl;
+import de.adorsys.multibanking.bg.resolver.BalanceCalculator;
+import de.adorsys.multibanking.bg.resolver.BalanceResolver;
+import de.adorsys.multibanking.bg.resolver.PageResolver;
+import de.adorsys.multibanking.bg.utils.GsonConfig;
 import de.adorsys.multibanking.domain.Balance;
 import de.adorsys.multibanking.domain.BalancesReport;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
-import de.adorsys.multibanking.xs2a_adapter.ApiResponse;
-import de.adorsys.multibanking.xs2a_adapter.api.AccountInformationServiceAisApi;
-import de.adorsys.multibanking.xs2a_adapter.model.*;
+import de.adorsys.multibanking.xs2a_adapter.ApiException;
+import de.adorsys.multibanking.xs2a_adapter.model.AccountReport;
+import de.adorsys.multibanking.xs2a_adapter.model.HrefType;
+import de.adorsys.multibanking.xs2a_adapter.model.TransactionList;
+import de.adorsys.multibanking.xs2a_adapter.model.TransactionsResponse200Json;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
-import java.net.URLDecoder;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServiceAisApi;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Some banks (e.g. Fiducia) don't deliver all transactions in one chunk.
  * Instead they deliver for example the first 150 transactions in the first JSON and provide a "next" link.
  * This link must be used to fetch the next 150 transaction and so on until all transactions are fetched.
+ * <p>
  * This class also parses the JSON and map it into TransactionsResponse
+ * If a transaction details link is present in the Transaction, the link will be resolved
+ * If no balance information is present in the transactions report, a separate call to the balance endpoint will be tried
  */
 @Slf4j
 public class PaginationResolver {
-    private final static String FIDUCIA_PAGINATION_QUERY_PARAMETER = "scrollRef";
-    private final static int MAX_PAGES = 50; // prevent infinite loops
+    private static final int MAX_PAGES = 50; // prevent infinite loops
 
-    private final String xs2aAdapterBaseUrl;
-    private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
+    private final BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
+    private final PageResolver pageResolver;
+    private final BalanceResolver balanceResolver;
+    private final BalanceCalculator balanceCalculator;
 
     public PaginationResolver(String xs2aAdapterBaseUrl) {
-        this.xs2aAdapterBaseUrl = xs2aAdapterBaseUrl;
+        this.pageResolver = new PageResolver(xs2aAdapterBaseUrl);
+        this.balanceResolver = new BalanceResolver(xs2aAdapterBaseUrl);
+        this.balanceCalculator = new BalanceCalculator();
     }
 
     public TransactionsResponse jsonStringToLoadBookingsResponse(String json, PaginationNextCallParameters nextCallParams) throws Exception {
         TransactionsResponse200Json transactionsResponse200JsonTO =
             GsonConfig.getGson().fromJson(json, TransactionsResponse200Json.class);
 
-        List<Booking> bookings = Optional.ofNullable(transactionsResponse200JsonTO)
-            .map(TransactionsResponse200Json::getTransactions)
-            .map(AccountReport::getBooked)
-            .map(transactions -> bankingGatewayMapper.toBookings(transactions))
-            .orElse(Collections.emptyList());
+        List<Booking> bookings = extractBookings(transactionsResponse200JsonTO, AccountReport::getBooked);
+        List<Booking> pendingBookings = extractBookings(transactionsResponse200JsonTO, AccountReport::getPending);
 
-        BalancesReport balancesReport = new BalancesReport();
-        Optional.ofNullable(transactionsResponse200JsonTO)
-            .map(TransactionsResponse200Json::getBalances)
-            .map(List::stream).orElse(Stream.empty())
-            .filter(balance -> balance.getBalanceType() != null)
-            .forEach(balance -> {
-                switch (balance.getBalanceType()) {
-                    case EXPECTED:
-                        balancesReport.setUnreadyBalance(bankingGatewayMapper.toBalance(balance));
-                        break;
-                    case CLOSINGBOOKED:
-                        balancesReport.setReadyBalance(bankingGatewayMapper.toBalance(balance));
-                        break;
-                    default:
-                        // ignore
-                        break;
-                }
-            });
+        BalancesReport balancesReport = balanceResolver.createBalancesReport(nextCallParams, transactionsResponse200JsonTO);
 
         // Pagination. If "next" link is present
         Optional.ofNullable(transactionsResponse200JsonTO)
@@ -82,37 +71,31 @@ public class PaginationResolver {
                     try {
                         BookingsAndBalance bookingsAndBalance = resolve(nextLink, nextCallParams);
                         bookings.addAll(bookingsAndBalance.getBookings());
+                        pendingBookings.addAll(bookingsAndBalance.getPendingBookings());
                         if (bookingsAndBalance.getClosingBookedBalance() != null) {
                             balancesReport.setReadyBalance(bookingsAndBalance.getClosingBookedBalance());
                         }
+                        if (bookingsAndBalance.getExpectedBalance() != null) {
+                            balancesReport.setUnreadyBalance(bookingsAndBalance.getExpectedBalance());
+                        }
                     } catch (Exception e) {
-                        throw new RuntimeException("Error resolving transactions page", e);
+                        throw new IllegalStateException("Error resolving transactions page", e);
                     }
                 }
             );
 
-        Optional.ofNullable(transactionsResponse200JsonTO)
-            .map(TransactionsResponse200Json::getBalances)
-            .map(List::stream).orElse(Stream.empty())
-            .filter(balance -> BalanceType.OPENINGBOOKED.equals(balance.getBalanceType()))
-            .findFirst().ifPresent(
-            openingbooked -> {
-                BigDecimal balance = new BigDecimal(openingbooked.getBalanceAmount().getAmount());
-                for(Booking booking : bookings) {
-                    balance = balance.add(booking.getAmount());
-                    booking.setBalance(balance);
-                    booking.setExternalId(booking.getValutaDate() + "_" + booking.getAmount() + "_" + booking.getBalance()); // override fallback external id
-                }
-                Optional.ofNullable(balancesReport.getReadyBalance()).ifPresent(
-                    readyBalance -> {
-                        BigDecimal lastBookingBalance = bookings.get(bookings.size() - 1).getBalance();
-                        if (!readyBalance.getAmount().equals(lastBookingBalance)) {
-                            log.error("The closing booked balance {} and the calculated balance after the last transaction {} are not equal", readyBalance.getAmount(), lastBookingBalance);
-                        }
-                    }
-                );
+        // reverse order - last booking must be first in the list
+        if (!bookings.isEmpty()) {
+            LocalDate firstBookingDate = bookings.get(0).getBookingDate();
+            LocalDate lastBookingDate = bookings.get(bookings.size() - 1).getBookingDate();
+
+            if (firstBookingDate != null && lastBookingDate != null && firstBookingDate.compareTo(lastBookingDate) < 0) {
+                Collections.reverse(bookings); // just switch order of bookings without changing siblings
             }
-        );
+        }
+
+        // calculate balance after transaction
+        balanceCalculator.calculateBalance(bookings, pendingBookings, balancesReport);
 
         return TransactionsResponse.builder()
             .bookings(bookings)
@@ -120,15 +103,39 @@ public class PaginationResolver {
             .build();
     }
 
-    private BookingsAndBalance resolve(String nextLink, PaginationNextCallParameters nextCallParams) throws Exception {
+    private BookingsAndBalance resolve(String nextLink, PaginationNextCallParameters nextCallParams) {
         List<Booking> bookings = new ArrayList<>();
+        List<Booking> pendingBookings = new ArrayList<>();
+
         Balance closingBookedBalance = null;
+        Balance expectedBalance = null;
+
         for (int i = 0; i < MAX_PAGES; i++) {
-            BookingsAndBalance bookingsAndBalance = fetchNext(nextLink, nextCallParams);
+            BookingsAndBalance bookingsAndBalance = null;
+            try {
+                bookingsAndBalance = pageResolver.fetchNext(nextLink, nextCallParams);
+            } catch (Exception e) {
+                String message = e.getMessage();
+                if (e instanceof ApiException) {
+                    String responseBody = ((ApiException) e).getResponseBody();
+                    if (StringUtils.isNotEmpty(responseBody)) {
+                        message = responseBody;
+                    }
+                }
+                log.error("Error fetching page " + i + ": " + message);
+                log.error("We ignore this error and take what we got so far");
+                break;
+            }
             bookings.addAll(bookingsAndBalance.getBookings());
+            pendingBookings.addAll(bookingsAndBalance.getPendingBookings());
+
             if (bookingsAndBalance.getClosingBookedBalance() != null) {
                 closingBookedBalance = bookingsAndBalance.getClosingBookedBalance();
             }
+            if (bookingsAndBalance.getExpectedBalance() != null) {
+                expectedBalance = bookingsAndBalance.getExpectedBalance();
+            }
+
             if (bookingsAndBalance.getNextLink() != null) {
                 nextLink = bookingsAndBalance.getNextLink();
             } else {
@@ -137,69 +144,30 @@ public class PaginationResolver {
         }
         return BookingsAndBalance.builder()
             .bookings(bookings)
+            .pendingBookings(pendingBookings)
             .closingBookedBalance(closingBookedBalance)
+            .expectedBalance(expectedBalance)
             .build();
     }
 
-    private BookingsAndBalance fetchNext(String nextLink, PaginationNextCallParameters params) throws Exception {
-        String scrollRef = resolveScrollRef(nextLink);
-        AccountInformationServiceAisApi aisApi = accountInformationServiceAisApi(xs2aAdapterBaseUrl,
-            params.getBgSessionData());
 
-        // Fiducia: "Only one of 'dateFrom' and 'scrollRef' may exist
-        Call aisCall = aisApi.getTransactionListCall(
-            params.getResourceId(), "booked", UUID.randomUUID(),
-            params.getConsentId(), null, params.getBankCode(), null, null,
-            null, null,
-            null, params.isWithBalance(), null, null, null, null, null, null, null, null, null, null,
-            null, null, null, scrollRef, null, null);
-
-        ApiResponse<Object> apiResponse = aisApi.getApiClient().execute(aisCall, String.class);
-        TransactionsResponse200Json transactionsResponse200JsonTO =
-            GsonConfig.getGson().fromJson((String) apiResponse.getData(), TransactionsResponse200Json.class);
-
-        List<Booking> bookings = Optional.ofNullable(transactionsResponse200JsonTO)
+    private List<Booking> extractBookings(TransactionsResponse200Json transactionsResponse200JsonTO, Function<AccountReport, TransactionList> mapper) {
+        return Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getTransactions)
-            .map(AccountReport::getBooked)
-            .map(transactions -> bankingGatewayMapper.toBookings(transactions))
-            .orElse(Collections.emptyList());
-
-        Balance closingBookedBalance = Optional.ofNullable(transactionsResponse200JsonTO)
-            .map(TransactionsResponse200Json::getBalances)
-            .map(List::stream).orElse(Stream.empty())
-            .filter(balance -> BalanceType.CLOSINGBOOKED.equals(balance.getBalanceType()))
-            .map(bankingGatewayMapper::toBalance)
-            .findFirst()
-            .orElse(null);
-
-        // Pagination. If another "next" link is present
-        String next = Optional.ofNullable(transactionsResponse200JsonTO)
-            .map(TransactionsResponse200Json::getTransactions)
-            .map(AccountReport::getLinks)
-            .map(linksAccountReport -> linksAccountReport.get("next"))
-            .map(HrefType::getHref)
-            .orElse(null);
-
-        return BookingsAndBalance.builder()
-            .bookings(bookings)
-            .closingBookedBalance(closingBookedBalance)
-            .nextLink(next)
-            .build();
-    }
-
-    // CAUTION scrollRef is not part of berlin group spec
-    // it is used by Fiducia, but can be different at other banks
-    private String resolveScrollRef(String nextLink) throws Exception {
-        MultiValueMap<String, String> parameters = UriComponentsBuilder.fromUriString(nextLink).build().getQueryParams();
-        String scrollRefUrlEncoded = parameters.toSingleValueMap().get(FIDUCIA_PAGINATION_QUERY_PARAMETER);
-        return scrollRefUrlEncoded != null ? URLDecoder.decode(scrollRefUrlEncoded, "UTF-8") : null; // scroll ref contains special characters
+            .map(mapper)
+            .stream()
+            .flatMap(Collection::stream)
+            .map(bankingGatewayMapper::toBooking)
+            .collect(Collectors.toList());
     }
 
     @Data
     @Builder
-    private static class BookingsAndBalance {
+    public static class BookingsAndBalance {
         private List<Booking> bookings;
+        private List<Booking> pendingBookings;
         private Balance closingBookedBalance;
+        private Balance expectedBalance;
         private String nextLink;
     }
 
@@ -213,5 +181,12 @@ public class PaginationResolver {
         private LocalDate dateFrom;
         private LocalDate dateTo;
         private boolean withBalance;
+    }
+
+    @Data
+    @Builder
+    public static class AccountAndTransaction {
+        private String account;
+        private String transaction;
     }
 }

@@ -11,13 +11,35 @@ Content-Type: application/json
   "transactions": {
     "booked": [
       {
-        "endToEndId": "e6",
-        "mandateId": "m6",
+        "endToEndId": "e5",
+        "mandateId": "m5",
         "bookingDate": "2020-01-01",
         "valueDate": "2020-01-01",
         "transactionAmount": {
           "currency": "EUR",
-          "amount": "500.02"
+          "amount": "500"
+        },
+        "creditorName": "Hansdampf",
+        "creditorAccount": {
+          "iban": "Iban"
+        },
+        "ultimateCreditor": "******",
+        "debtorName": "******",
+        "debtorAccount": {
+          "iban": "Iban2"
+        },
+        "remittanceInformationUnstructured": "******",
+        "purposeCode": "******",
+        "proprietaryBankTransactionCode": "******"
+      },
+      {
+        "endToEndId": "e2e",
+        "mandateId": "mid",
+        "bookingDate": "2020-01-01",
+        "valueDate": "2020-01-01",
+        "transactionAmount": {
+          "currency": "EUR",
+          "amount": "550"
         },
         "creditorName": "Hansdampf",
         "creditorAccount": {
@@ -36,6 +58,9 @@ Content-Type: application/json
     "_links": {
       "account": {
         "href": "******"
+      },
+      "next": {
+        "href": "http://localhost:1234/v1/account/xxx/transactions?page=5"
       }
     }
   },
@@ -43,7 +68,7 @@ Content-Type: application/json
     {
       "balanceAmount": {
         "currency": "EUR",
-        "amount": "3450.00"
+        "amount": "2400.00"
       },
       "balanceType": "openingBooked",
       "referenceDate": "2020-04-01"
@@ -51,7 +76,7 @@ Content-Type: application/json
     {
       "balanceAmount": {
         "currency": "EUR",
-        "amount": "3950.02"
+        "amount": "3450.00"
       },
       "balanceType": "closingBooked",
       "referenceDate": "2020-04-01"

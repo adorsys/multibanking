@@ -88,4 +88,7 @@ public class BookingTO {
 
     @Schema(description = "Transaction type as DTA Tx Key code", example = "4")
     private String transactionCode;
+
+    @Schema(description = "Proprietary bank transaction code", example = "NTRF+117+009000")
+    private String proprietaryBankTransactionCode;
 }

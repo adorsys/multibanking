@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.domain.response;
 
+import de.adorsys.multibanking.domain.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,5 +27,6 @@ import lombok.EqualsAndHashCode;
 public class PaymentResponse extends AbstractResponse {
 
     private final String transactionId;
+    private PaymentStatus paymentStatus;
 
 }

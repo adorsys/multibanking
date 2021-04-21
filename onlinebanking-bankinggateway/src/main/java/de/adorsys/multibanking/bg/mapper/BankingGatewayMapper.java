@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.bg;
+package de.adorsys.multibanking.bg.mapper;
 
 import de.adorsys.multibanking.banking_gateway_b2c.model.*;
 import de.adorsys.multibanking.domain.*;
@@ -25,13 +25,14 @@ import static de.adorsys.multibanking.domain.BankApi.XS2A;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Mapper
-interface BankingGatewayMapper {
+public interface BankingGatewayMapper {
 
     @Mapping(source = "psuAccountIban", target = "psuAccount")
     @Mapping(source = "accounts", target = "access.accounts")
     @Mapping(source = "balances", target = "access.balances")
     @Mapping(source = "transactions", target = "access.transactions")
     @Mapping(target = "consentStatus", ignore = true)
+    @Mapping(target = "psuCorporateId", ignore = true)
     ConsentTO toConsentTO(Consent consentTemplate);
 
     @Mapping(target = "redirectId", ignore = true)
@@ -71,7 +72,7 @@ interface BankingGatewayMapper {
 
     @Mapping(target = "country", ignore = true)
     @Mapping(target = "bankName", ignore = true)
-    @Mapping(target = "owner", ignore = true)
+    @Mapping(target = "owner", source = "ownerName")
     @Mapping(target = "syncStatus", ignore = true)
     @Mapping(target = "lastSync", ignore = true)
     @Mapping(target = "balances", ignore = true)
@@ -104,8 +105,6 @@ interface BankingGatewayMapper {
         return new String(value, UTF_8);
     }
 
-    List<Booking> toBookings(List<TransactionDetails> transactionDetails);
-
     default Booking toBooking(TransactionDetails transactionDetails) {
         Booking booking = new Booking();
         booking.setBankApi(XS2A);
@@ -118,11 +117,19 @@ interface BankingGatewayMapper {
         booking.setUsage(transactionDetails.getRemittanceInformationUnstructured());
         booking.setTransactionCode(transactionDetails.getPurposeCode() == null ? null :
             transactionDetails.getPurposeCode().toString());
+        booking.setProprietaryBankTransactionCode(transactionDetails.getProprietaryBankTransactionCode());
 
-        if(transactionDetails.getAdditionalInformation() != null) {
-            booking.setText(transactionDetails.getAdditionalInformation());
-        } else {
-            // fallback use gvcode from bank transaction code to lookup buchungstext
+        // balance after transaction
+        Optional.ofNullable(transactionDetails.getBalanceAfterTransaction())
+            .map(de.adorsys.multibanking.xs2a_adapter.model.Balance::getBalanceAmount)
+            .map(de.adorsys.multibanking.xs2a_adapter.model.Amount::getAmount)
+            .map(BigDecimal::new)
+            .ifPresent(booking::setBalance);
+
+        // Buchungstext
+        booking.setText(transactionDetails.getAdditionalInformation());
+        if (booking.getText() == null) {
+            // II. try: use geschaeftsvorfallcode
             String text = Optional.ofNullable(transactionDetails.getProprietaryBankTransactionCode())
                 .map(bankTransactionCode -> bankTransactionCode.split("\\+"))
                 .map(array -> array.length > 2 ? array[1] : null)
@@ -130,12 +137,20 @@ interface BankingGatewayMapper {
                 .orElse(null);
             booking.setText(text);
         }
+        if (booking.getText() == null) {
+            // III. try: use bankTransactionCode
+            String text = Optional.ofNullable(transactionDetails.getBankTransactionCode())
+                .map(BuchungstextMapper::bankTransactionCode2Buchungstext)
+                .orElse(null);
+            booking.setText(text);
+        }
+
 
         BankAccount bankAccount = new BankAccount();
 
         // if amount < 0 the other account gets the money and is therefore the creditor
         // if amount > 0 we get the money and the other account is the debtor
-        if (BigDecimal.ZERO.compareTo(booking.getAmount()) == 1) { // 0 is bigger than amount
+        if (booking.getAmount() != null && BigDecimal.ZERO.compareTo(booking.getAmount()) > 0) { // 0 is bigger than amount
             bankAccount.setOwner(transactionDetails.getCreditorName());
             bankAccount.setIban(transactionDetails.getCreditorAccount() != null ? transactionDetails.getCreditorAccount().getIban() : null);
         } else {
@@ -156,6 +171,13 @@ interface BankingGatewayMapper {
                 booking.getOtherAccount().getIban()
             ))
         );
+
+        Optional.ofNullable(transactionDetails.getBalanceAfterTransaction())
+            .map(de.adorsys.multibanking.xs2a_adapter.model.Balance::getBalanceAmount)
+            .map(de.adorsys.multibanking.xs2a_adapter.model.Amount::getAmount)
+            .map(BigDecimal::new)
+            .ifPresent(balance -> booking.setBalance(balance));
+
         return booking;
     }
 

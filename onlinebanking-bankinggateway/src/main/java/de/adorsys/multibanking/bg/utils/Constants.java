@@ -1,4 +1,4 @@
-package de.adorsys.multibanking.bg;
+package de.adorsys.multibanking.bg.utils;
 
 import lombok.experimental.UtilityClass;
 

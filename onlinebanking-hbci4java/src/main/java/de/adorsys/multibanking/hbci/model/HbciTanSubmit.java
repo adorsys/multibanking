@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.manager.HBCITwoStepMechanism;
+import org.kapott.hbci.structures.Konto;
 
 import java.util.Optional;
 
@@ -48,7 +49,7 @@ public class HbciTanSubmit {
     private boolean veu;
 
     public void update(AbstractHbciDialog dialog, AbstractHBCIJob hbciJob, String originJobName,
-                       HBCITwoStepMechanism twoStepMechanism, String accountNumber) {
+                       HBCITwoStepMechanism twoStepMechanism, Konto konto) {
         setOriginJobName(originJobName);
         setPassportState(new HbciPassport.State(dialog.getPassport()).toJson());
         setDialogId(dialog.getDialogId());
@@ -68,7 +69,9 @@ public class HbciTanSubmit {
             setOriginLowLevelName(hbciJob.getJobName());
             setOriginSegVersion(hbciJob.getSegVersion());
             setHbciJobName(hbciJob.getHBCICode());
-            setVeu(dialog.getPassport().getRequiredSigsCount(accountNumber, hbciJob.getHBCICode()) > 1);
+            if (konto != null) {
+                setVeu(dialog.getPassport().getRequiredSigsCount(konto.number, hbciJob.getHBCICode()) > 1);
+            }
         }
     }
 
