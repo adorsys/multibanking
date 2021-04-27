@@ -1,5 +1,6 @@
 package de.adorsys.multibanking.bg;
 
+import de.adorsys.multibanking.domain.Balance;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -35,7 +37,6 @@ import static org.junit.Assert.assertNotNull;
 public class PaginationResolverTest {
     private final static int MOCK_SERVER_PORT = 12345;
 
-    @Ignore
     @Test
     public void testJsonPaginationClosingBooked() throws Exception {
         Executors.newSingleThreadExecutor().submit(new MockServer("/paginationClosingBooked"));
@@ -75,7 +76,6 @@ public class PaginationResolverTest {
         assertEquals("Wrong balance", new BigDecimal("3950.02"), loadBookingsResponse.getBalancesReport().getReadyBalance().getAmount());
     }
 
-    @Ignore
     @Test
     public void testJsonPaginationExpected() throws Exception {
         Executors.newSingleThreadExecutor().submit(new MockServer("/paginationExpected"));
@@ -112,7 +112,8 @@ public class PaginationResolverTest {
         checkAmountAndBalance(bookings.get(10), 550, 3450);
         checkAmountAndBalance(bookings.get(11), 500.02, 3950.02);
 
-        assertEquals("Wrong balance", new BigDecimal("4100.02"), loadBookingsResponse.getBalancesReport().getUnreadyBalance().getAmount());
+        assertEquals("Wrong expected balance", new BigDecimal("4100.02"), loadBookingsResponse.getBalancesReport().getUnreadyBalance().getAmount());
+        assertEquals("Wrong closingBooked balance", new BigDecimal("3950.02"), Optional.ofNullable(loadBookingsResponse.getBalancesReport().getReadyBalance()).map(Balance::getAmount).orElse(null));
     }
 
     private void checkAmountAndBalance(Booking booking, double amount, double balance) {

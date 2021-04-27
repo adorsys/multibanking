@@ -38,6 +38,7 @@ public class BalanceCalculator {
             closingBookedBalance = Balance.builder()
                 .amount(expectedBalance.getAmount().subtract(sum)) // expected = closingBooked + sum(pending)
                 .build();
+            balancesReport.setReadyBalance(closingBookedBalance);
         }
 
         if (closingBookedBalance == null) {
