@@ -123,7 +123,7 @@
             <plugin>
                 <groupId>io.swagger.codegen.v3</groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.10</version>
+                <version>3.0.25</version>
                 <executions>
                     <execution>
                         <id>generate-b2c-client</id>
@@ -149,7 +149,7 @@
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/xs2a-adapter-0.0.5.json</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/xs2a-adapter-0.1.12-nopayment.json</inputSpec>
                             <output>${basedir}/target/generated-sources</output>
                             <language>java</language>
                             <generateApiTests>false</generateApiTests>

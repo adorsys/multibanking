@@ -4,7 +4,7 @@ import de.adorsys.multibanking.bg.mapper.BankingGatewayMapper;
 import de.adorsys.multibanking.bg.mapper.BankingGatewayMapperImpl;
 import de.adorsys.multibanking.bg.mapper.BuchungstextMapper;
 import de.adorsys.multibanking.domain.Booking;
-import de.adorsys.multibanking.xs2a_adapter.model.TransactionDetails;
+import de.adorsys.multibanking.xs2a_adapter.model.Transactions;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -43,7 +43,7 @@ public class BuchungstextMapperTest {
     @Test
     public void testBankingGatewayMapper() {
         BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
-        TransactionDetails transactionDetails = new TransactionDetails();
+        Transactions transactionDetails = new Transactions();
         transactionDetails.setBankTransactionCode("PMNT-ICDT-ESCT");
         Booking booking = bankingGatewayMapper.toBooking(transactionDetails);
         assertEquals("SEPA Credit Transfer", booking.getText());

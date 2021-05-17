@@ -97,9 +97,9 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private AccountList getAccountList(BgSessionData bgSessionData, String bankCode, String consentId) throws ApiException {
         AccountInformationServiceAisApi aisApi = accountInformationServiceAisApi(xs2aAdapterBaseUrl, bgSessionData);
 
-        return aisApi.getAccountList(UUID.randomUUID(), consentId, null, bankCode, null, false, null, null,
+        return aisApi.getAccountList(UUID.randomUUID(), consentId, null, bankCode, null, null, false, null,
             null, null,
-            null, null, null, null, null, null, null, null, null);
+            null, null, null, null, null, null, null, null, null, null);
     }
 
     @Override

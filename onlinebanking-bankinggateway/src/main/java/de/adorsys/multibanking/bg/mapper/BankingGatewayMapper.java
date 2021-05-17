@@ -9,7 +9,7 @@ import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.xs2a_adapter.model.AccountDetails;
 import de.adorsys.multibanking.xs2a_adapter.model.TppMessage400AIS;
-import de.adorsys.multibanking.xs2a_adapter.model.TransactionDetails;
+import de.adorsys.multibanking.xs2a_adapter.model.Transactions;
 import org.apache.commons.codec.binary.Base64;
 import org.iban4j.Iban;
 import org.mapstruct.InheritInverseConfiguration;
@@ -105,7 +105,7 @@ public interface BankingGatewayMapper {
         return new String(value, UTF_8);
     }
 
-    default Booking toBooking(TransactionDetails transactionDetails) {
+    default Booking toBooking(Transactions transactionDetails) {
         Booking booking = new Booking();
         booking.setBankApi(XS2A);
         booking.setBookingDate(transactionDetails.getBookingDate());

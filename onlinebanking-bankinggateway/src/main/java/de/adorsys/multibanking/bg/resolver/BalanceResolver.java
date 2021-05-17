@@ -86,7 +86,7 @@ public class BalanceResolver {
         try {
             Call balanceCall = aisApi.getBalancesCall(account, UUID.randomUUID(), params.getConsentId(), null, params.getBankCode(), null, null,
                 null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null);
+                null, null, null, null, null, null);
             ApiResponse<ReadAccountBalanceResponse200> apiResponse = aisApi.getApiClient().execute(balanceCall, ReadAccountBalanceResponse200.class);
             if (apiResponse == null || apiResponse.getStatusCode() > 299) {
                 log.error("Wrong status code on balance: " + (apiResponse != null ? apiResponse.getStatusCode() : ""));
