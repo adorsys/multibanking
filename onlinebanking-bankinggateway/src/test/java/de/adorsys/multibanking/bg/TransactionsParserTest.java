@@ -1,7 +1,9 @@
 package de.adorsys.multibanking.bg;
 
+import de.adorsys.multibanking.bg.utils.GsonConfig;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.mapper.TransactionsParser;
+import de.adorsys.multibanking.xs2a_adapter.model.TransactionsResponse200Json;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
@@ -35,7 +37,9 @@ public class TransactionsParserTest {
     @Test
     public void testJson() throws Exception {
         String json = IOUtils.toString(TransactionsParserTest.class.getResourceAsStream("/transactions.json"), "UTF-8");
-        TransactionsResponse loadBookingsResponse = new PaginationResolver(null).jsonStringToLoadBookingsResponse(json, null);
+        TransactionsResponse200Json transactionsResponse200JsonTO =
+            GsonConfig.getGson().fromJson(json, TransactionsResponse200Json.class);
+        TransactionsResponse loadBookingsResponse = new PaginationResolver(null).toLoadBookingsResponse(transactionsResponse200JsonTO, null);
         assertNotNull(loadBookingsResponse);
         assertEquals("Wrong count of bookings", 30, loadBookingsResponse.getBookings().size());
         loadBookingsResponse.getBookings().forEach(

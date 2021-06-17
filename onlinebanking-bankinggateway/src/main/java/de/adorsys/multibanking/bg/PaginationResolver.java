@@ -50,10 +50,7 @@ public class PaginationResolver {
         this.balanceCalculator = new BalanceCalculator();
     }
 
-    public TransactionsResponse jsonStringToLoadBookingsResponse(String json, PaginationNextCallParameters nextCallParams) throws Exception {
-        TransactionsResponse200Json transactionsResponse200JsonTO =
-            GsonConfig.getGson().fromJson(json, TransactionsResponse200Json.class);
-
+    public TransactionsResponse toLoadBookingsResponse(TransactionsResponse200Json transactionsResponse200JsonTO, PaginationNextCallParameters nextCallParams) {
         List<Booking> bookings = extractBookings(transactionsResponse200JsonTO, AccountReport::getBooked);
         List<Booking> pendingBookings = extractBookings(transactionsResponse200JsonTO, AccountReport::getPending);
 

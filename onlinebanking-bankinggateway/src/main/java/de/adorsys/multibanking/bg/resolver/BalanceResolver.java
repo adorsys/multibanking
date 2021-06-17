@@ -23,7 +23,7 @@ import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServ
 @Slf4j
 @RequiredArgsConstructor
 public class BalanceResolver {
-    private static final String BALANCES_LINK_KEY = "balances";
+    private static final String ACCOUNTS_LINK_KEY = "account";
     private final BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
     private final String xs2aAdapterBaseUrl;
 
@@ -63,21 +63,22 @@ public class BalanceResolver {
     }
 
     private BalanceList resolveBalanceListFromLink(PaginationResolver.PaginationNextCallParameters params, TransactionsResponse200Json transactionsResponse200JsonTO) {
-        String balancesLink = Optional.ofNullable(transactionsResponse200JsonTO)
+        String accountLink = Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getTransactions)
             .map(AccountReport::getLinks)
-            .map(linksDownload -> linksDownload.get(BALANCES_LINK_KEY))
+            .map(linksDownload -> linksDownload.get(ACCOUNTS_LINK_KEY))
             .map(HrefType::getHref)
             .orElse(null);
 
-        if (balancesLink == null) {
+        if (accountLink == null) {
+            log.error("No account link. Cannot fetch balances");
             return null;
         }
 
-        List<String> pathSegments = UriComponentsBuilder.fromUriString(balancesLink).build().getPathSegments();
+        List<String> pathSegments = UriComponentsBuilder.fromUriString(accountLink).build().getPathSegments();
         int accountsIndex = pathSegments.lastIndexOf("accounts");
         if (accountsIndex == -1) {
-            log.error("Balances link without accounts: " + balancesLink);
+            log.error("Account link without accounts: " + accountLink);
             return null;
         }
         String account = pathSegments.get(++accountsIndex);

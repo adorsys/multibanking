@@ -1,8 +1,10 @@
 package de.adorsys.multibanking.bg;
 
+import de.adorsys.multibanking.bg.utils.GsonConfig;
 import de.adorsys.multibanking.domain.Balance;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
+import de.adorsys.multibanking.xs2a_adapter.model.TransactionsResponse200Json;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -43,6 +45,8 @@ public class PaginationResolverTest {
         TimeUnit.SECONDS.sleep(1); // wait for server
 
         String json = IOUtils.toString(Objects.requireNonNull(TransactionsParserTest.class.getResourceAsStream("/pagination.json")), StandardCharsets.UTF_8);
+        TransactionsResponse200Json transactionsResponse200JsonTO =
+            GsonConfig.getGson().fromJson(json, TransactionsResponse200Json.class);
         PaginationResolver.PaginationNextCallParameters params = PaginationResolver.PaginationNextCallParameters.builder()
             .bankCode("00000000")
             .consentId("consentID")
@@ -53,7 +57,7 @@ public class PaginationResolverTest {
             .withBalance(true)
             .build();
         TransactionsResponse loadBookingsResponse = new PaginationResolver("http://localhost:" + MOCK_SERVER_PORT)
-            .jsonStringToLoadBookingsResponse(json, params);
+            .toLoadBookingsResponse(transactionsResponse200JsonTO, params);
         assertNotNull(loadBookingsResponse);
         assertEquals("Wrong count of bookings", 12, loadBookingsResponse.getBookings().size());
 
@@ -82,6 +86,8 @@ public class PaginationResolverTest {
         TimeUnit.SECONDS.sleep(2); // wait for server
 
         String json = IOUtils.toString(Objects.requireNonNull(TransactionsParserTest.class.getResourceAsStream("/pagination.json")), StandardCharsets.UTF_8);
+        TransactionsResponse200Json transactionsResponse200JsonTO =
+            GsonConfig.getGson().fromJson(json, TransactionsResponse200Json.class);
         PaginationResolver.PaginationNextCallParameters params = PaginationResolver.PaginationNextCallParameters.builder()
             .bankCode("00000000")
             .consentId("consentID")
@@ -92,7 +98,7 @@ public class PaginationResolverTest {
             .withBalance(true)
             .build();
         TransactionsResponse loadBookingsResponse = new PaginationResolver("http://localhost:" + MOCK_SERVER_PORT)
-            .jsonStringToLoadBookingsResponse(json, params);
+            .toLoadBookingsResponse(transactionsResponse200JsonTO, params);
         assertNotNull(loadBookingsResponse);
         assertEquals("Wrong count of bookings", 12, loadBookingsResponse.getBookings().size());
 

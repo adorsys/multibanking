@@ -12,6 +12,7 @@ import de.adorsys.multibanking.bg.BgSessionData;
 import de.adorsys.multibanking.bg.utils.OkHttpHeaderInterceptor;
 import de.adorsys.multibanking.xs2a_adapter.JSON;
 import de.adorsys.multibanking.xs2a_adapter.api.AccountInformationServiceAisApi;
+import de.adorsys.multibanking.xs2a_adapter.api.DownloadControllerApi;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import okio.ByteString;
@@ -88,6 +89,10 @@ public class ApiClientFactory {
 
     public static OAuthApi bankingGatewayB2COAuthApi(String baseUrl) {
         return new OAuthApi(apiClientBankingGateway(baseUrl));
+    }
+
+    public static DownloadControllerApi xs2aAdapterDownloadControllerApi(String baseUrl) {
+        return new DownloadControllerApi(apiClientXs2aAdapter(baseUrl));
     }
 
     public static AisApi bankingGatewayB2CAisApi(String baseUrl, BgSessionData bgSessionData) {

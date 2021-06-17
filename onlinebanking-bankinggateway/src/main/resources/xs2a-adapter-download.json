@@ -1,0 +1,48 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "XS2A-Adapter Download Service"
+  },
+  "paths": {
+    "/v1/download": {
+      "get": {
+        "tags": [
+          "download-controller"
+        ],
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-GTW-Bank-Code",
+            "in": "header",
+            "description": "Bank code of bank to which the request addressed",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
