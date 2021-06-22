@@ -39,7 +39,7 @@ jobs:
         run: mvn clean test -B -V -q
 
   deploy:
-    name: Build Docker Image in Openshift 
+    name: Build Docker Image in Openshift
     needs: build_and_test
     runs-on: ubuntu-latest
     steps:
@@ -67,7 +67,7 @@ jobs:
         with:
           registry: ${{ env.OPENSHIFT_REGISTRY }}
           username: ${{ secrets.OPENSHIFT_BANKING_GATEWAY_DEV_USER }}
-          password: ${{ secrets.OPENSHIFT_BANKING_GATEWAY_DEV_TOKEN }}
+          password: ${{ secrets.OPENSHIFT_BANKING_GATEWAY_TOKEN }}
 
       - name: BG DEV Deploy docker image to openshift
         env:
