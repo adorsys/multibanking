@@ -14,9 +14,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -28,10 +26,10 @@ public class DownloadResolver {
         this.downloadControllerApi = ApiClientFactory.xs2aAdapterDownloadControllerApi(xs2aAdapterBaseUrl);
     }
 
-    public TransactionsResponse loadTransactions(String downloadlink, String bankCode) throws ApiException, IOException {
+    public TransactionsResponse loadTransactions(String downloadlink, String bankCode, String consentId) throws ApiException, IOException {
         log.info("Trying to downwload: {}", downloadlink);
 
-        ApiResponse<byte[]> apiResponse = downloadControllerApi.downloadWithHttpInfo(downloadlink, bankCode);
+        ApiResponse<byte[]> apiResponse = downloadControllerApi.downloadWithHttpInfo(downloadlink, UUID.randomUUID(), bankCode, consentId);
 
         // there is no way to determine which content-type is downloaded since xs2a-adapter replaces any content-type with application/octet-stream
         // content-disposition is filtered by the xs2a-adapter so we must assume that the download is a zip with camts
@@ -55,7 +53,7 @@ public class DownloadResolver {
 
                 if (zipEntry == null) {
                     log.error("Download is not a ZIP");
-                    return TransactionsResponse.builder().build();
+                    return TransactionsResponse.builder().bookings(Collections.emptyList()).build();
                 }
 
                 do {

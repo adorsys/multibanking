@@ -155,7 +155,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 String downloadlink = getDownloadLink(transactionsResponse200JsonTO);
 
                 if (downloadlink != null) {
-                    return downloadResolver.loadTransactions(downloadlink, bankCode);
+                    return downloadResolver.loadTransactions(downloadlink, bankCode, consentId);
                 }
 
                 PaginationResolver.PaginationNextCallParameters nextCallParams = PaginationResolver.PaginationNextCallParameters.builder()
@@ -238,7 +238,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private String getDownloadLink(TransactionsResponse200Json transactionsResponse200JsonTO) {
         return Optional.ofNullable(transactionsResponse200JsonTO)
             .map(TransactionsResponse200Json::getLinks)
-            .map(LinksDownload::getDownload)
+            .map(links -> links.get("download"))
             .map(HrefType::getHref)
             .orElse(null);
     }

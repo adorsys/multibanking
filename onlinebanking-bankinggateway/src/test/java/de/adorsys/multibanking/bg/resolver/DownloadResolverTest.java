@@ -16,7 +16,7 @@ public class DownloadResolverTest {
     @Test
     public void downloadZipWithXs2aAdapter() throws Exception {
         DownloadResolver downloadResolver = new DownloadResolver("http://localhost:8999");
-        TransactionsResponse transactionsResponse = downloadResolver.loadTransactions("http://localhost:12345", "30020900"); // caution without http:// it goes to targo
+        TransactionsResponse transactionsResponse = downloadResolver.loadTransactions("http://localhost:12345", "30020900", "egal"); // caution without http:// it goes to targo
         assertEquals("3 camt files expected", 3, transactionsResponse.getRawData().size());
         assertEquals("12 bookings expected", 12, transactionsResponse.getBookings().size());
         assertEquals("balance 123 expected", BigDecimal.valueOf(123), transactionsResponse.getBalancesReport().getReadyBalance().getAmount());
