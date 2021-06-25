@@ -4,7 +4,7 @@
 
     <groupId>de.adorsys.multibanking</groupId>
     <artifactId>multibanking</artifactId>
-    <version>5.5.27</version>
+    <version>5.5.28</version>
     <packaging>pom</packaging>
     <name>Multibanking</name>
     <url>https://github.com/adorsys/multibanking</url>
@@ -376,6 +376,12 @@
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

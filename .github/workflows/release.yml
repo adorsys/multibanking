@@ -72,4 +72,4 @@ jobs:
           -Dhttp.keepAlive=false \
           -Dmaven.wagon.http.pool=false \
           -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 \
-          package gpg:sign deploy -Prelease -DskipTests -q -B -U
+          -Prelease -DskipTests -U deploy
