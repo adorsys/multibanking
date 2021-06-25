@@ -8,6 +8,7 @@ on:
 env:
   MULTIBANKING_IMAGE_NAME: multibanking-service
   MULTIBANKING_IMAGE_TAG: develop
+  MULTIBANKING_APP_IMAGE_NAME: mmultibanking-app
   OPENSHIFT_REGISTRY: openshift-registry.adorsys.de
   OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV: banking-gateway-dev
 
@@ -72,6 +73,9 @@ jobs:
       - name: BG DEV Deploy docker image to openshift
         env:
           OPENSHIFT_IMAGE_NAME: ${{ env.OPENSHIFT_REGISTRY }}/${{ env.OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV }}/${{ env.MULTIBANKING_IMAGE_NAME }}:latest
+          OPENSHIFT_APP_IMAGE_NAME: ${{ env.OPENSHIFT_REGISTRY }}/${{ env.OPENSHIFT_NAMESPACE_BANKING_GATEWAY_DEV }}/${{ env.MULTIBANKING_APP_IMAGE_NAME }}:latest
         run: |
           docker build -t ${{ env.OPENSHIFT_IMAGE_NAME }} multibanking-server/
           docker push ${{ env.OPENSHIFT_IMAGE_NAME }}
+          docker build -t ${{ env.OPENSHIFT_APP_IMAGE_NAME }} multibanking-app/
+          docker push ${{ env.OPENSHIFT_APP_IMAGE_NAME }}
