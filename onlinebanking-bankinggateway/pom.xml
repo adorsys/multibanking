@@ -5,7 +5,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>5.5.26</version>
+        <version>5.5.27</version>
     </parent>
 
     <artifactId>onlinebanking-bankinggateway</artifactId>
@@ -22,13 +22,13 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-facade</artifactId>
-            <version>5.5.26</version>
+            <version>5.5.27</version>
         </dependency>
 
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-mapper</artifactId>
-            <version>5.5.26</version>
+            <version>5.5.27</version>
         </dependency>
 
         <dependency>
@@ -123,7 +123,7 @@
             <plugin>
                 <groupId>io.swagger.codegen.v3</groupId>
                 <artifactId>swagger-codegen-maven-plugin</artifactId>
-                <version>3.0.10</version>
+                <version>3.0.25</version>
                 <executions>
                     <execution>
                         <id>generate-b2c-client</id>
@@ -144,12 +144,30 @@
                         </configuration>
                     </execution>
                     <execution>
+                        <id>generate-adapter-download-client</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/xs2a-adapter-download.json</inputSpec>
+                            <output>${basedir}/target/generated-sources</output>
+                            <language>java</language>
+                            <generateApiTests>false</generateApiTests>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <modelPackage>de.adorsys.multibanking.xs2a-adapter.model</modelPackage>
+                                <apiPackage>de.adorsys.multibanking.xs2a-adapter.api</apiPackage>
+                                <dateLibrary>java8</dateLibrary>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
                         <id>generate-adapter-client</id>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/src/main/resources/xs2a-adapter-0.0.5.json</inputSpec>
+                            <inputSpec>${project.basedir}/src/main/resources/xs2a-adapter-0.1.12-nopayment.json</inputSpec>
                             <output>${basedir}/target/generated-sources</output>
                             <language>java</language>
                             <generateApiTests>false</generateApiTests>

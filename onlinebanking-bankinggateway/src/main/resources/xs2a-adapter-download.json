@@ -1,0 +1,69 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "XS2A-Adapter Download Service"
+  },
+  "paths": {
+    "/v1/download": {
+      "get": {
+        "tags": [
+          "download-controller"
+        ],
+        "operationId": "download",
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-GTW-Bank-Code",
+            "in": "header",
+            "description": "Bank code of bank to which the request addressed",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "X-Request-ID",
+            "in": "header",
+            "description": "ID of the request, unique to the call, as determined by the initiating party.",
+            "required": true,
+            "example": "99391c7e-ad88-49ec-a2ad-99ddcb1f7721",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Consent-ID",
+            "in": "header",
+            "description": "This data element may be contained, if the payment initiation transaction is part of a session, i.e. combined AIS/PIS service.\nThis then contains the consentId of the related AIS consent, which was performed prior to this payment initiation.\n",
+            "required": false,
+            "schema": {
+              "description": "ID of the corresponding consent object as returned by an account information consent request.\n",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "default response",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "byte"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

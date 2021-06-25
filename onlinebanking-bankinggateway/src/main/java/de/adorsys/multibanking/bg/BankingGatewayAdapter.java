@@ -4,6 +4,8 @@ import com.squareup.okhttp.Call;
 import de.adorsys.multibanking.bg.mapper.BankingGatewayExceptionMapper;
 import de.adorsys.multibanking.bg.mapper.BankingGatewayMapper;
 import de.adorsys.multibanking.bg.mapper.BankingGatewayMapperImpl;
+import de.adorsys.multibanking.bg.resolver.DownloadResolver;
+import de.adorsys.multibanking.bg.utils.GsonConfig;
 import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.BankApi;
 import de.adorsys.multibanking.domain.BankApiUser;
@@ -17,14 +19,15 @@ import de.adorsys.multibanking.mapper.TransactionsParser;
 import de.adorsys.multibanking.xs2a_adapter.ApiException;
 import de.adorsys.multibanking.xs2a_adapter.ApiResponse;
 import de.adorsys.multibanking.xs2a_adapter.api.AccountInformationServiceAisApi;
-import de.adorsys.multibanking.xs2a_adapter.model.AccountDetails;
-import de.adorsys.multibanking.xs2a_adapter.model.AccountList;
+import de.adorsys.multibanking.xs2a_adapter.api.DownloadControllerApi;
+import de.adorsys.multibanking.xs2a_adapter.model.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.bg.ApiClientFactory.accountInformationServiceAisApi;
 import static de.adorsys.multibanking.domain.BankApi.XS2A;
@@ -36,12 +39,14 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private final BankingGatewayScaHandler scaHandler;
     private final String xs2aAdapterBaseUrl;
     private final PaginationResolver paginationResolver;
+    private final DownloadResolver downloadResolver;
 
     private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
 
     public BankingGatewayAdapter(String bankingGatewayBaseUrl, String xs2aAdapterBaseUrl) {
         this.scaHandler = new BankingGatewayScaHandler(bankingGatewayBaseUrl);
         this.paginationResolver = new PaginationResolver(xs2aAdapterBaseUrl);
+        this.downloadResolver = new DownloadResolver(xs2aAdapterBaseUrl);
         this.xs2aAdapterBaseUrl = xs2aAdapterBaseUrl;
     }
 
@@ -97,9 +102,9 @@ public class BankingGatewayAdapter implements OnlineBankingService {
     private AccountList getAccountList(BgSessionData bgSessionData, String bankCode, String consentId) throws ApiException {
         AccountInformationServiceAisApi aisApi = accountInformationServiceAisApi(xs2aAdapterBaseUrl, bgSessionData);
 
-        return aisApi.getAccountList(UUID.randomUUID(), consentId, null, bankCode, null, false, null, null,
+        return aisApi.getAccountList(UUID.randomUUID(), consentId, null, bankCode, null, null, false, null,
             null, null,
-            null, null, null, null, null, null, null, null, null);
+            null, null, null, null, null, null, null, null, null, null);
     }
 
     @Override
@@ -113,7 +118,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             LocalDate.now().minusYears(1);
         LocalDate dateTo = loadTransactions.getDateTo();
         String consentId = loadTransactionsRequest.getBankAccess().getConsentId();
-        boolean withBalance = loadTransactions.isWithBalance();
+        boolean withBalance = false; // targo breaks when its true
 
         String bankCode = loadTransactionsRequest.getBank().getBankApiBankCode() != null
             ? loadTransactionsRequest.getBank().getBankApiBankCode()
@@ -137,21 +142,22 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                 null, null, null, null, null, null, null);
 
             ApiResponse<Object> apiResponse = aisApi.getApiClient().execute(aisCall, String.class);
-            String contentTypeKey = apiResponse.getHeaders().keySet().stream()
-                .filter(header -> header.toLowerCase().contains("content-type"))
-                .findFirst()
-                .orElse("");
-
-            String contentType = Optional.ofNullable(apiResponse.getHeaders().get(contentTypeKey))
-                .map(list -> list.get(0))
-                .orElse("");
+            MediaType mediaType = readHeader(apiResponse.getHeaders(), "content-type", MediaType::parseMediaType);
             String textData = (String) apiResponse.getData();
 
-            if (contentType.toLowerCase().contains("application/xml")) {
+            if (MediaType.APPLICATION_XML.isCompatibleWith(mediaType)) {
                 return TransactionsParser.camtStringToLoadBookingsResponse(textData);
-            } else if (contentType.toLowerCase().contains("text/plain")) {
+            } else if (MediaType.TEXT_PLAIN.isCompatibleWith(mediaType)) {
                 return TransactionsParser.mt940StringToLoadBookingsResponse(textData);
-            } else {
+            } else { // json
+                TransactionsResponse200Json transactionsResponse200JsonTO =
+                    GsonConfig.getGson().fromJson(textData, TransactionsResponse200Json.class);
+                String downloadlink = getDownloadLink(transactionsResponse200JsonTO);
+
+                if (downloadlink != null) {
+                    return downloadResolver.loadTransactions(downloadlink, bankCode, consentId);
+                }
+
                 PaginationResolver.PaginationNextCallParameters nextCallParams = PaginationResolver.PaginationNextCallParameters.builder()
                     .bgSessionData(bgSessionData)
                     .resourceId(resourceId)
@@ -161,7 +167,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     .dateTo(dateTo)
                     .withBalance(withBalance)
                     .build();
-                return paginationResolver.jsonStringToLoadBookingsResponse(textData, nextCallParams);
+                return paginationResolver.toLoadBookingsResponse(transactionsResponse200JsonTO, nextCallParams);
             }
         } catch (ApiException e) {
             throw handeAisApiException(e);
@@ -227,5 +233,24 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             default:
                 return BankingGatewayExceptionMapper.toMultibankingException(e, BANKING_GATEWAY_ERROR);
         }
+    }
+
+    private String getDownloadLink(TransactionsResponse200Json transactionsResponse200JsonTO) {
+        return Optional.ofNullable(transactionsResponse200JsonTO)
+            .map(TransactionsResponse200Json::getLinks)
+            .map(links -> links.get("download"))
+            .map(HrefType::getHref)
+            .orElse(null);
+    }
+
+    private <T> T readHeader(Map<String, List<String>> headers, String headerName, Function<String, T> parserFunction) {
+        return headers.keySet().stream()
+            .filter(header -> header.toLowerCase().contains(headerName))
+            .findFirst()
+            .map(headers::get)
+            .map(Collection::stream)
+            .flatMap(Stream::findFirst)
+            .map(parserFunction)
+            .orElse(null);
     }
 }

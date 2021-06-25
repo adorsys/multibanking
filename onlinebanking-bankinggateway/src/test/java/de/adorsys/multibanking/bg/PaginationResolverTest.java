@@ -1,7 +1,10 @@
 package de.adorsys.multibanking.bg;
 
+import de.adorsys.multibanking.bg.utils.GsonConfig;
+import de.adorsys.multibanking.domain.Balance;
 import de.adorsys.multibanking.domain.Booking;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
+import de.adorsys.multibanking.xs2a_adapter.model.TransactionsResponse200Json;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -23,6 +26,7 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -30,17 +34,19 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+@Ignore("Fails in travis. This test is needed only for local development.")
 @Slf4j
 public class PaginationResolverTest {
     private final static int MOCK_SERVER_PORT = 12345;
 
-    @Ignore
     @Test
     public void testJsonPaginationClosingBooked() throws Exception {
         Executors.newSingleThreadExecutor().submit(new MockServer("/paginationClosingBooked"));
         TimeUnit.SECONDS.sleep(1); // wait for server
 
         String json = IOUtils.toString(Objects.requireNonNull(TransactionsParserTest.class.getResourceAsStream("/pagination.json")), StandardCharsets.UTF_8);
+        TransactionsResponse200Json transactionsResponse200JsonTO =
+            GsonConfig.getGson().fromJson(json, TransactionsResponse200Json.class);
         PaginationResolver.PaginationNextCallParameters params = PaginationResolver.PaginationNextCallParameters.builder()
             .bankCode("00000000")
             .consentId("consentID")
@@ -51,7 +57,7 @@ public class PaginationResolverTest {
             .withBalance(true)
             .build();
         TransactionsResponse loadBookingsResponse = new PaginationResolver("http://localhost:" + MOCK_SERVER_PORT)
-            .jsonStringToLoadBookingsResponse(json, params);
+            .toLoadBookingsResponse(transactionsResponse200JsonTO, params);
         assertNotNull(loadBookingsResponse);
         assertEquals("Wrong count of bookings", 12, loadBookingsResponse.getBookings().size());
 
@@ -74,13 +80,14 @@ public class PaginationResolverTest {
         assertEquals("Wrong balance", new BigDecimal("3950.02"), loadBookingsResponse.getBalancesReport().getReadyBalance().getAmount());
     }
 
-    @Ignore
     @Test
     public void testJsonPaginationExpected() throws Exception {
         Executors.newSingleThreadExecutor().submit(new MockServer("/paginationExpected"));
         TimeUnit.SECONDS.sleep(2); // wait for server
 
         String json = IOUtils.toString(Objects.requireNonNull(TransactionsParserTest.class.getResourceAsStream("/pagination.json")), StandardCharsets.UTF_8);
+        TransactionsResponse200Json transactionsResponse200JsonTO =
+            GsonConfig.getGson().fromJson(json, TransactionsResponse200Json.class);
         PaginationResolver.PaginationNextCallParameters params = PaginationResolver.PaginationNextCallParameters.builder()
             .bankCode("00000000")
             .consentId("consentID")
@@ -91,7 +98,7 @@ public class PaginationResolverTest {
             .withBalance(true)
             .build();
         TransactionsResponse loadBookingsResponse = new PaginationResolver("http://localhost:" + MOCK_SERVER_PORT)
-            .jsonStringToLoadBookingsResponse(json, params);
+            .toLoadBookingsResponse(transactionsResponse200JsonTO, params);
         assertNotNull(loadBookingsResponse);
         assertEquals("Wrong count of bookings", 12, loadBookingsResponse.getBookings().size());
 
@@ -111,7 +118,8 @@ public class PaginationResolverTest {
         checkAmountAndBalance(bookings.get(10), 550, 3450);
         checkAmountAndBalance(bookings.get(11), 500.02, 3950.02);
 
-        assertEquals("Wrong balance", new BigDecimal("4100.02"), loadBookingsResponse.getBalancesReport().getUnreadyBalance().getAmount());
+        assertEquals("Wrong expected balance", new BigDecimal("4100.02"), loadBookingsResponse.getBalancesReport().getUnreadyBalance().getAmount());
+        assertEquals("Wrong closingBooked balance", new BigDecimal("3950.02"), Optional.ofNullable(loadBookingsResponse.getBalancesReport().getReadyBalance()).map(Balance::getAmount).orElse(null));
     }
 
     private void checkAmountAndBalance(Booking booking, double amount, double balance) {

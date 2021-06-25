@@ -125,8 +125,8 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
 
             return bankingGatewayMapper.toUpdateAuthResponse(resourceUpdateAuthResponse,
                 new UpdateAuthResponse(XS2A,
-                    ScaApproach.valueOf(resourceUpdateAuthResponse.getScaApproach().toString()),
-                    ScaStatus.valueOf(resourceUpdateAuthResponse.getScaStatus().toString())));
+                    bankingGatewayMapper.toScaApproach(resourceUpdateAuthResponse.getScaApproach()),
+                    bankingGatewayMapper.toScaStatus(resourceUpdateAuthResponse.getScaStatus())));
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }
@@ -147,8 +147,8 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
 
             return bankingGatewayMapper.toUpdateAuthResponse(resourceUpdateAuthResponse,
                 new UpdateAuthResponse(XS2A,
-                    ScaApproach.valueOf(resourceUpdateAuthResponse.getScaApproach().toString()),
-                    ScaStatus.valueOf(resourceUpdateAuthResponse.getScaStatus().toString())));
+                    bankingGatewayMapper.toScaApproach(resourceUpdateAuthResponse.getScaApproach()),
+                    bankingGatewayMapper.toScaStatus(resourceUpdateAuthResponse.getScaStatus())));
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }
@@ -165,8 +165,8 @@ public class BankingGatewayScaHandler implements StrongCustomerAuthorisable {
 
             return bankingGatewayMapper.toUpdateAuthResponse(resourceUpdateAuthResponse,
                 new UpdateAuthResponse(XS2A,
-                    ScaApproach.valueOf(resourceUpdateAuthResponse.getScaApproach().toString()),
-                    ScaStatus.valueOf(resourceUpdateAuthResponse.getScaStatus().toString())));
+                    bankingGatewayMapper.toScaApproach(resourceUpdateAuthResponse.getScaApproach()),
+                    bankingGatewayMapper.toScaStatus(resourceUpdateAuthResponse.getScaStatus())));
         } catch (ApiException e) {
             throw handeAisApiException(e);
         }

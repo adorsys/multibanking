@@ -1,10 +1,11 @@
 package de.adorsys.multibanking.service;
 
-import de.adorsys.multibanking.bg.BankingGatewayAdapter;
 import de.adorsys.multibanking.bg.PaginationResolver;
+import de.adorsys.multibanking.bg.utils.GsonConfig;
 import de.adorsys.multibanking.domain.BankAccountEntity;
 import de.adorsys.multibanking.domain.BookingEntity;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
+import de.adorsys.multibanking.xs2a_adapter.model.TransactionsResponse200Json;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,9 +25,9 @@ public class BookingServiceTest {
 
     @Test
     public void testMerge() throws Exception {
-        TransactionsResponse transactionsResponse = bankingGatewayAdapter.jsonStringToLoadBookingsResponse(
-            IOUtils.toString(BookingServiceTest.class.getResourceAsStream("/transactions.json")), null
-        );
+        String json =  IOUtils.toString(BookingServiceTest.class.getResourceAsStream("/transactions.json"), "UTF-8");
+        TransactionsResponse200Json transactionsResponse200JsonTO = GsonConfig.getGson().fromJson(json, TransactionsResponse200Json.class);
+        TransactionsResponse transactionsResponse = bankingGatewayAdapter.toLoadBookingsResponse(transactionsResponse200JsonTO , null);
         List<BookingEntity> newBookingEntities = bookingService.mapBookings(new BankAccountEntity(), transactionsResponse.getBookings());
         bookingService.mergeBookings(Collections.emptyList(), newBookingEntities);
     }
