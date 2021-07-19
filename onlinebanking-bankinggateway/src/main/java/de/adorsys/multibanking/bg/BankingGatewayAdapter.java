@@ -153,7 +153,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     GsonConfig.getGson().fromJson(textData, TransactionsResponse200Json.class);
                 String downloadlink = getDownloadLink(transactionsResponse200JsonTO);
 
-                if (downloadlink != null) { // && responseContainsNoTransactions(transactionsResponse200JsonTO)) { // sandbox delivers bookings and download link
+                if (downloadlink != null && responseContainsNoTransactions(transactionsResponse200JsonTO)) { // sandbox delivers bookings and download link
                     return downloadResolver.loadTransactions(downloadlink, bankCode, consentId);
                 }
 
