@@ -19,7 +19,6 @@ import de.adorsys.multibanking.mapper.TransactionsParser;
 import de.adorsys.multibanking.xs2a_adapter.ApiException;
 import de.adorsys.multibanking.xs2a_adapter.ApiResponse;
 import de.adorsys.multibanking.xs2a_adapter.api.AccountInformationServiceAisApi;
-import de.adorsys.multibanking.xs2a_adapter.api.DownloadControllerApi;
 import de.adorsys.multibanking.xs2a_adapter.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -43,10 +42,10 @@ public class BankingGatewayAdapter implements OnlineBankingService {
 
     private BankingGatewayMapper bankingGatewayMapper = new BankingGatewayMapperImpl();
 
-    public BankingGatewayAdapter(String bankingGatewayBaseUrl, String xs2aAdapterBaseUrl) {
+    public BankingGatewayAdapter(String bankingGatewayBaseUrl, String xs2aAdapterBaseUrl, boolean dumpDownloadFiles) {
         this.scaHandler = new BankingGatewayScaHandler(bankingGatewayBaseUrl);
         this.paginationResolver = new PaginationResolver(xs2aAdapterBaseUrl);
-        this.downloadResolver = new DownloadResolver(xs2aAdapterBaseUrl);
+        this.downloadResolver = new DownloadResolver(xs2aAdapterBaseUrl, dumpDownloadFiles);
         this.xs2aAdapterBaseUrl = xs2aAdapterBaseUrl;
     }
 
@@ -154,7 +153,7 @@ public class BankingGatewayAdapter implements OnlineBankingService {
                     GsonConfig.getGson().fromJson(textData, TransactionsResponse200Json.class);
                 String downloadlink = getDownloadLink(transactionsResponse200JsonTO);
 
-                if (downloadlink != null) {
+                if (downloadlink != null) { // && responseContainsNoTransactions(transactionsResponse200JsonTO)) { // sandbox delivers bookings and download link
                     return downloadResolver.loadTransactions(downloadlink, bankCode, consentId);
                 }
 
@@ -253,4 +252,14 @@ public class BankingGatewayAdapter implements OnlineBankingService {
             .map(parserFunction)
             .orElse(null);
     }
+
+    private boolean responseContainsNoTransactions(TransactionsResponse200Json transactionsResponse200JsonTO) {
+        return Optional.ofNullable(transactionsResponse200JsonTO)
+            .map(TransactionsResponse200Json::getTransactions)
+            .map(AccountReport::getBooked)
+            .map(TransactionList::size)
+            .map(size -> size == 0)
+            .orElse(true);
+    }
+
 }

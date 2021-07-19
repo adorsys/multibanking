@@ -14,6 +14,8 @@ import org.apache.commons.io.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -21,9 +23,11 @@ import java.util.zip.ZipInputStream;
 @Slf4j
 public class DownloadResolver {
     private final DownloadControllerApi downloadControllerApi;
+    private final boolean dumpDownloadFiles;
 
-    public DownloadResolver(String xs2aAdapterBaseUrl) {
+    public DownloadResolver(String xs2aAdapterBaseUrl, boolean dumpDownloadFiles) {
         this.downloadControllerApi = ApiClientFactory.xs2aAdapterDownloadControllerApi(xs2aAdapterBaseUrl);
+        this.dumpDownloadFiles = dumpDownloadFiles;
     }
 
     public TransactionsResponse loadTransactions(String downloadlink, String bankCode, String consentId) throws ApiException, IOException {
@@ -37,6 +41,10 @@ public class DownloadResolver {
         log.info("Assume that download is a zip with camt files");
 
         byte[] zip = apiResponse.getData();
+
+        if (dumpDownloadFiles) {
+            Files.write(Files.createFile(Paths.get("/tmp/download_" + System.currentTimeMillis() + ".zip")), zip);
+        }
 
         return readZip(zip);
     }

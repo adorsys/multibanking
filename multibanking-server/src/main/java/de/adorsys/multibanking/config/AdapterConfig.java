@@ -40,6 +40,8 @@ public class AdapterConfig {
     private long fintsSysIdCacheExpirationMs;
     @Value("${fints.sysUpdCacheExpirationMs:0}")
     private long fintsUpdCacheExpirationMs;
+    @Value("${dump.download.files:false}")
+    private boolean dumpDownloadFiles;
 
     private IngAdapter ingAdapter;
     private BankingGatewayAdapter bankingGatewayAdapter;
@@ -52,7 +54,7 @@ public class AdapterConfig {
         ingAdapter = new IngAdapter(ingBaseUrl, keyStoreUrl, keyStorePassword, ingQwacAlias,
             ingQsealAlias);
         bankingGatewayAdapter = new BankingGatewayAdapter(bankingGatewayBaseUrl,
-            bankingAdapterBaseUrl);
+            bankingAdapterBaseUrl, dumpDownloadFiles);
 
         if (StringUtils.isEmpty(fintsProduct)) {
             log.warn("missing FinTS product configuration");

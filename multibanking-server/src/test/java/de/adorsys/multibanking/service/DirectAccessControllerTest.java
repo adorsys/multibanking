@@ -132,7 +132,7 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, false),
             createConsentTO().getPsuAccountIban(),
             true);
 
@@ -167,7 +167,7 @@ public class DirectAccessControllerTest {
     @Test
     public void consent_authorisation_bankinggateway_decoupled() {
         ConsentTO consentTO = createConsentTO();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, false),
             consentTO.getPsuAccountIban(),
             false);
 
@@ -235,7 +235,7 @@ public class DirectAccessControllerTest {
     public void consent_authorisation_bankinggateway() {
         ConsentTO consentTO = createConsentTO();
 
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, false),
             consentTO.getPsuAccountIban(),
             false);
 
@@ -545,7 +545,7 @@ public class DirectAccessControllerTest {
     public void consent_authorisation_bankinggateway_oauth() {
         ConsentTO consentTO = createConsentTO();
 
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, false),
             consentTO.getPsuAccountIban(),
             true);
 
