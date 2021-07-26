@@ -70,7 +70,7 @@ public class DownloadResolver {
                         log.error("Unexpected zip Entry: {}", filename);
                     } else {
                         log.info("Unzip entry: {}", filename);
-                        String camt = IOUtils.toString(zipInputStream, StandardCharsets.ISO_8859_1);
+                        String camt = IOUtils.toString(zipInputStream, StandardCharsets.UTF_8);
                         TransactionsResponse temp = TransactionsParser.camtStringToLoadBookingsResponse(camt);
                         rawData.add(camt);
                         bookings.addAll(temp.getBookings());
