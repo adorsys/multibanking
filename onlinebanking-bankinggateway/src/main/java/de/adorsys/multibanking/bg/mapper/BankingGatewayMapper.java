@@ -8,6 +8,7 @@ import de.adorsys.multibanking.domain.request.TransactionAuthorisationRequest;
 import de.adorsys.multibanking.domain.response.CreateConsentResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.xs2a_adapter.model.AccountDetails;
+import de.adorsys.multibanking.xs2a_adapter.model.PurposeCode;
 import de.adorsys.multibanking.xs2a_adapter.model.TppMessage400AIS;
 import de.adorsys.multibanking.xs2a_adapter.model.Transactions;
 import org.apache.commons.codec.binary.Base64;
@@ -141,6 +142,14 @@ public interface BankingGatewayMapper {
             // III. try: use bankTransactionCode
             String text = Optional.ofNullable(transactionDetails.getBankTransactionCode())
                 .map(BuchungstextMapper::bankTransactionCode2Buchungstext)
+                .orElse(null);
+            booking.setText(text);
+        }
+        if (booking.getText() == null) {
+            // IV. try: use purposeCoe
+            String text = Optional.ofNullable(transactionDetails.getPurposeCode())
+                .map(PurposeCode::getValue)
+                .map(BuchungstextMapper::purposeCode2Buchungstext)
                 .orElse(null);
             booking.setText(text);
         }

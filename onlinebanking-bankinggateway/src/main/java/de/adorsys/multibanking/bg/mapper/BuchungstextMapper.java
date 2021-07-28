@@ -17,4 +17,12 @@ public class BuchungstextMapper {
     public static String bankTransactionCode2Buchungstext(String bankTransactionCode) {
         return Btc2Buchungstext.btc2Buchungstext(bankTransactionCode);
     }
+
+    /**
+     * @param purposeCode
+     * @return buchungstext or null if nothing matches
+     */
+    public static String purposeCode2Buchungstext(String purposeCode) {
+        return Ppc2Buchungstext.ppc2Buchungstext(purposeCode);
+    }
 }
