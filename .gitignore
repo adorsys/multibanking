@@ -32,3 +32,4 @@ blz-test.properties
 resolveDetails.java
 /onlinebanking-bankinggateway/src/test/resources/response5a.http
 /onlinebanking-bankinggateway/src/test/resources/response5b.http
+/onlinebanking-bankinggateway/src/test/resources/download/targo.zip

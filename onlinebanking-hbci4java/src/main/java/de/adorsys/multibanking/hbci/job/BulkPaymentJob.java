@@ -20,6 +20,7 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.BulkPayment;
 import de.adorsys.multibanking.domain.transaction.FutureBulkPayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import org.apache.commons.lang3.BooleanUtils;
 import org.kapott.hbci.GV.GVMultiUebSEPA;
 import org.kapott.hbci.GV.GVTermMultiUebSEPA;
@@ -31,10 +32,10 @@ import org.kapott.hbci.structures.Value;
 
 import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.FUTURE_BULK_PAYMENT;
 
-public class BulkPaymentJob extends AbstractPaymentJob<BulkPayment, GVUebSEPA> {
+public class BulkPaymentJob extends AbstractPaymentJob<BulkPayment> {
 
-    public BulkPaymentJob(TransactionRequest<BulkPayment> transactionRequest) {
-        super(transactionRequest);
+    public BulkPaymentJob(TransactionRequest<BulkPayment> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

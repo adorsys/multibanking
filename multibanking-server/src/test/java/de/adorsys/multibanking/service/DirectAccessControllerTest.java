@@ -117,7 +117,7 @@ public class DirectAccessControllerTest {
     @Test
     public void createConsent_should_return_a_authorisationStatus_link_hbci() {
         ConsentTO consentTO = createConsentTO();
-        prepareBank(new HbciBanking(null, 0, 0), consentTO.getPsuAccountIban(), false);
+        prepareBank(new HbciBanking(null, 0, 0, 0), consentTO.getPsuAccountIban(), false);
 
         JsonPath jsonPath = request.body(consentTO)
             .post(getRemoteMultibankingUrl() + "/api/v1/consents")
@@ -132,7 +132,7 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_bankinggateway_redirect() {
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, false),
             createConsentTO().getPsuAccountIban(),
             true);
 
@@ -167,7 +167,7 @@ public class DirectAccessControllerTest {
     @Test
     public void consent_authorisation_bankinggateway_decoupled() {
         ConsentTO consentTO = createConsentTO();
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, false),
             consentTO.getPsuAccountIban(),
             false);
 
@@ -235,7 +235,7 @@ public class DirectAccessControllerTest {
     public void consent_authorisation_bankinggateway() {
         ConsentTO consentTO = createConsentTO();
 
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, false),
             consentTO.getPsuAccountIban(),
             false);
 
@@ -250,7 +250,7 @@ public class DirectAccessControllerTest {
     @Ignore("uses real data - please setup ENV")
     @Test
     public void consent_authorisation_hbci() {
-        HbciBanking hbci4JavaBanking = new HbciBanking(null, 0, 0);
+        HbciBanking hbci4JavaBanking = new HbciBanking(null, 0, 0, 0);
 
         ConsentTO consentTO = createConsentTO();
         prepareBank(hbci4JavaBanking, consentTO.getPsuAccountIban(), false);
@@ -269,7 +269,7 @@ public class DirectAccessControllerTest {
     public void consent_authorisation_hbci_mock() {
         ConsentTO consentTO = createConsentTO();
 
-        HbciBanking hbci4JavaBanking = spy(new HbciBanking(null, 0, 0));
+        HbciBanking hbci4JavaBanking = spy(new HbciBanking(null, 0, 0, 0));
         prepareBank(hbci4JavaBanking, consentTO.getPsuAccountIban(), false);
 
         //mock hbci authenticate "authenticatePsu" that's why we need to use an answer to manipulate the consent
@@ -545,7 +545,7 @@ public class DirectAccessControllerTest {
     public void consent_authorisation_bankinggateway_oauth() {
         ConsentTO consentTO = createConsentTO();
 
-        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl),
+        prepareBank(new BankingGatewayAdapter(bankingGatewayBaseUrl, bankingGatewayAdapterUrl, false),
             consentTO.getPsuAccountIban(),
             true);
 

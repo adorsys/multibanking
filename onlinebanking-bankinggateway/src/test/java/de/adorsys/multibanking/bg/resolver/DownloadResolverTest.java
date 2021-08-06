@@ -15,7 +15,7 @@ public class DownloadResolverTest {
     @Ignore("needs xs2a-adapter on 8999 and netcat on 12345 - see src/test/resources/download") // cat camts.http camts.zip | nc -l 12345
     @Test
     public void downloadZipWithXs2aAdapter() throws Exception {
-        DownloadResolver downloadResolver = new DownloadResolver("http://localhost:8999");
+        DownloadResolver downloadResolver = new DownloadResolver("http://localhost:8999", false);
         TransactionsResponse transactionsResponse = downloadResolver.loadTransactions("http://localhost:12345", "30020900", "egal"); // caution without http:// it goes to targo
         assertEquals("3 camt files expected", 3, transactionsResponse.getRawData().size());
         assertEquals("12 bookings expected", 12, transactionsResponse.getBookings().size());
@@ -24,7 +24,7 @@ public class DownloadResolverTest {
 
     @Test
     public void readZipFromFilesystem() throws Exception {
-        DownloadResolver downloadResolver = new DownloadResolver(null);
+        DownloadResolver downloadResolver = new DownloadResolver(null, false);
         byte [] zip = Files.readAllBytes(Paths.get(DownloadResolverTest.class.getResource("/download/camts.zip").toURI()));
         TransactionsResponse transactionsResponse = downloadResolver.readZip(zip);
 

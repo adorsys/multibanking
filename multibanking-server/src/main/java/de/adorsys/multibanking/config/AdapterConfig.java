@@ -38,8 +38,12 @@ public class AdapterConfig {
     private String fintsProductVersion;
     @Value("${fints.sysIdCacheExpirationMs:0}")
     private long fintsSysIdCacheExpirationMs;
-    @Value("${fints.sysUpdCacheExpirationMs:0}")
+    @Value("${fints.updCacheExpirationMs:0}")
     private long fintsUpdCacheExpirationMs;
+    @Value("${dump.download.files:false}")
+    private boolean dumpDownloadFiles;
+    @Value("${fints.bpdCacheExpirationMs:86400000}") //one day
+    private long fintsBpdCacheExpirationMs;
 
     private IngAdapter ingAdapter;
     private BankingGatewayAdapter bankingGatewayAdapter;
@@ -52,13 +56,13 @@ public class AdapterConfig {
         ingAdapter = new IngAdapter(ingBaseUrl, keyStoreUrl, keyStorePassword, ingQwacAlias,
             ingQsealAlias);
         bankingGatewayAdapter = new BankingGatewayAdapter(bankingGatewayBaseUrl,
-            bankingAdapterBaseUrl);
+            bankingAdapterBaseUrl, dumpDownloadFiles);
 
         if (StringUtils.isEmpty(fintsProduct)) {
             log.warn("missing FinTS product configuration");
-            hbci4JavaBanking = new HbciBanking(null, fintsSysIdCacheExpirationMs, fintsUpdCacheExpirationMs);
+            hbci4JavaBanking = new HbciBanking(null, fintsSysIdCacheExpirationMs, fintsUpdCacheExpirationMs, fintsBpdCacheExpirationMs);
         } else {
-            hbci4JavaBanking = new HbciBanking(new HBCIProduct(fintsProduct, fintsProductVersion), fintsSysIdCacheExpirationMs, fintsUpdCacheExpirationMs);
+            hbci4JavaBanking = new HbciBanking(new HBCIProduct(fintsProduct, fintsProductVersion), fintsSysIdCacheExpirationMs, fintsUpdCacheExpirationMs, fintsBpdCacheExpirationMs);
         }
     }
 

@@ -16,6 +16,7 @@
 
 package de.adorsys.multibanking.hbci;
 
+import de.adorsys.multibanking.domain.Bank;
 import de.adorsys.multibanking.domain.Message;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
@@ -39,7 +40,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID
 public class HbciBpdUpdCallback extends AbstractHBCICallback {
 
     private final String bankCode;
-    private final Map<String, Map<String, String>> bpdCache;
+    private final HbciBpdCacheHolder hbciBpdCacheHolder;
     private Map<String, String> upd;
     private String sysId;
 
@@ -47,7 +48,7 @@ public class HbciBpdUpdCallback extends AbstractHBCICallback {
     @Override
     public void status(int statusTag, Object o) {
         if (statusTag == STATUS_INST_BPD_INIT_DONE) {
-            Optional.of(bpdCache).ifPresent(cache -> cache.put(bankCode, (Map<String, String>) o));
+            hbciBpdCacheHolder.updateBpd(bankCode, (Map<String, String>) o);
         } else if (statusTag == STATUS_INIT_UPD_DONE) {
             this.upd = (Map<String, String>) o;
         }
@@ -91,5 +92,12 @@ public class HbciBpdUpdCallback extends AbstractHBCICallback {
         });
 
         return consent;
+    }
+
+    public static HbciBpdUpdCallback createCallback(Bank bank, HbciBpdCacheHolder hbciBpdCacheHolder) {
+        String bankCode = Optional.ofNullable(bank.getBankApiBankCode())
+            .orElse(bank.getBankCode());
+
+        return new HbciBpdUpdCallback(bankCode, hbciBpdCacheHolder);
     }
 }

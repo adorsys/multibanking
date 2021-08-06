@@ -19,6 +19,7 @@ package de.adorsys.multibanking.hbci.job;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV_Result.GVRPayment;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -27,10 +28,10 @@ import org.kapott.hbci.structures.Value;
 
 import static de.adorsys.multibanking.domain.transaction.AbstractTransaction.TransactionType.FUTURE_SINGLE_PAYMENT;
 
-public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment, AbstractHBCIJob> {
+public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment> {
 
-    public SinglePaymentJob(TransactionRequest<SinglePayment> transactionRequest) {
-        super(transactionRequest);
+    public SinglePaymentJob(TransactionRequest<SinglePayment> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

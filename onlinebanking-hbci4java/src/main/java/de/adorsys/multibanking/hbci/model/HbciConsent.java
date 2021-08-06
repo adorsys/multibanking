@@ -64,17 +64,17 @@ public class HbciConsent {
         setScaAuthenticationData(null);
     }
 
-    public void checkUpdSysIdCache(long sysIdExpirationTimeMs, long updExpirationTimeMs) {
+    public void checkUpdSysIdCache(long sysIdMaxAgeMs, long updMaxAgeMs) {
         Optional.ofNullable(sysIdCacheUpdateTime)
             .ifPresent(cacheUpdateTime -> {
-                if (cacheUpdateTime.plus(sysIdExpirationTimeMs, MILLIS).isBefore(LocalDateTime.now())) {
+                if (cacheUpdateTime.plus(sysIdMaxAgeMs, MILLIS).isBefore(LocalDateTime.now())) {
                     hbciSysId = null;
                     log.debug("sysid expired");
                 }
             });
         Optional.ofNullable(updCacheUpdateTime)
             .ifPresent(cacheUpdateTime -> {
-                if (cacheUpdateTime.plus(updExpirationTimeMs, MILLIS).isBefore(LocalDateTime.now())) {
+                if (cacheUpdateTime.plus(updMaxAgeMs, MILLIS).isBefore(LocalDateTime.now())) {
                     hbciUpd = null;
                     log.debug("upd expired");
                 }

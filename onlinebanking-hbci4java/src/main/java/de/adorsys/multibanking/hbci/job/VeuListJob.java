@@ -19,14 +19,15 @@ package de.adorsys.multibanking.hbci.job;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.VeuListResponse;
 import de.adorsys.multibanking.domain.transaction.LoadVeuList;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVVeuList;
 
 @Slf4j
 public class VeuListJob extends ScaAwareJob<LoadVeuList, VeuListResponse> {
 
-    public VeuListJob(TransactionRequest<LoadVeuList> transactionRequest) {
-        super(transactionRequest);
+    public VeuListJob(TransactionRequest<LoadVeuList> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

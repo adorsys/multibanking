@@ -19,14 +19,14 @@ package de.adorsys.multibanking.hbci.job;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.TanRequest;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import org.kapott.hbci.GV.AbstractSEPAGV;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 
-public class TanRequestJob extends AbstractPaymentJob<TanRequest, AbstractSEPAGV> {
+public class TanRequestJob extends AbstractPaymentJob<TanRequest> {
 
-
-    public TanRequestJob(TransactionRequest<TanRequest> transactionRequest) {
-        super(transactionRequest);
+    public TanRequestJob(TransactionRequest<TanRequest> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

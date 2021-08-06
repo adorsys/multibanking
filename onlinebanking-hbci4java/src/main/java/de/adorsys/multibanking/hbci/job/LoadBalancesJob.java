@@ -20,6 +20,7 @@ import de.adorsys.multibanking.domain.BankAccount;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.LoadBalancesResponse;
 import de.adorsys.multibanking.domain.transaction.LoadBalances;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import de.adorsys.multibanking.hbci.util.HbciErrorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVSaldoReq;
@@ -28,8 +29,8 @@ import org.kapott.hbci.GV_Result.GVRSaldoReq;
 @Slf4j
 public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesResponse> {
 
-    public LoadBalancesJob(TransactionRequest<LoadBalances> transactionRequest) {
-        super(transactionRequest);
+    public LoadBalancesJob(TransactionRequest<LoadBalances> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

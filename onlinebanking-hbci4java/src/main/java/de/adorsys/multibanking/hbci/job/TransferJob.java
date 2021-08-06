@@ -18,6 +18,7 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.SinglePayment;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVUmbSEPA;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -25,10 +26,10 @@ import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
 @Slf4j
-public class TransferJob extends AbstractPaymentJob<SinglePayment, GVUmbSEPA> {
+public class TransferJob extends AbstractPaymentJob<SinglePayment> {
 
-    public TransferJob(TransactionRequest<SinglePayment> transactionRequest) {
-        super(transactionRequest);
+    public TransferJob(TransactionRequest<SinglePayment> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

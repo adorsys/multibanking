@@ -31,6 +31,7 @@ import de.adorsys.multibanking.domain.spi.StrongCustomerAuthorisable;
 import de.adorsys.multibanking.domain.transaction.PaymentStatusReqest;
 import de.adorsys.multibanking.hbci.job.InstantPaymentStatusJob;
 import de.adorsys.multibanking.hbci.model.*;
+import de.adorsys.multibanking.hbci.util.HbciErrorUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.SerializationUtils;
@@ -54,18 +55,17 @@ import static de.adorsys.multibanking.domain.ScaApproach.EMBEDDED;
 import static de.adorsys.multibanking.domain.ScaStatus.*;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NOT_SUPPORTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INVALID_SCA_METHOD;
-import static de.adorsys.multibanking.hbci.HbciCacheHandler.*;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.BPD;
 import static de.adorsys.multibanking.hbci.model.HbciDialogType.UPD;
-import static de.adorsys.multibanking.hbci.util.HbciErrorUtils.*;
 
 @Slf4j
 @RequiredArgsConstructor
 public class HbciScaHandler implements StrongCustomerAuthorisable {
 
     private final HBCIProduct hbciProduct;
-    private final long sysIdExpirationTimeMs;
-    private final long updExpirationTimeMs;
+    private final long sysIdMaxAgeMs;
+    private final long updMaxAgeMs;
+    private final HbciBpdCacheHolder hbciBpdCacheHolder;
 
     private final HbciScaMapper hbciScaMapper = new HbciScaMapperImpl();
     private final HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
@@ -118,19 +118,20 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
 
     private ScaMethodsResponse authenticatePsu(UpdatePsuAuthenticationRequest authenticatePsuRequest) {
         try {
-            HbciBpdUpdCallback hbciCallback = createCallback(authenticatePsuRequest.getBank());
+            HbciBpdUpdCallback hbciCallback = HbciBpdUpdCallback.createCallback(authenticatePsuRequest.getBank(), hbciBpdCacheHolder);
             HbciDialogRequest dialogRequest = hbciDialogRequestMapper.toHbciDialogRequest(authenticatePsuRequest, hbciCallback);
 
             HbciConsent hbciConsent = (HbciConsent) authenticatePsuRequest.getBankApiConsentData();
-            hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+            hbciConsent.checkUpdSysIdCache(sysIdMaxAgeMs, updMaxAgeMs);
 
-            HBCIExecStatus bpdExecStatus = fetchBpd(dialogRequest);
+            AbstractHbciDialog dialog = HbciDialogFactory.createDialog(BPD, dialogRequest, null, hbciBpdCacheHolder.getBpd(dialogRequest));
+            HBCIExecStatus bpdExecStatus = dialog.execute(true);
             boolean withHktan = !bpdExecStatus.hasMessage("9400");
             if (!withHktan) {
                 hbciConsent.setWithHktan(false);
             }
 
-            PinTanPassport passport = fetchUpd(dialogRequest, withHktan);
+            PinTanPassport passport = fetchUpd(dialogRequest, withHktan, dialog.getPassport().getBPD());
 
             List<GVRTANMediaList.TANMediaInfo> tanMediaList = null;
             if (passport.jobSupported(GVTANMediaList.getLowlevelName())) {
@@ -143,7 +144,7 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
             response.setBankApiConsentData(hbciCallback.updateConsentUpd(hbciConsent));
             return response;
         } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
+            throw HbciErrorUtils.handleHbciException(e);
         }
     }
 
@@ -218,27 +219,22 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
     public PaymentStatusResponse getPaymentStatus(TransactionRequest<PaymentStatusReqest> request) {
         try {
             HbciConsent hbciConsent = (HbciConsent) request.getBankApiConsentData();
-            hbciConsent.checkUpdSysIdCache(sysIdExpirationTimeMs, updExpirationTimeMs);
+            hbciConsent.checkUpdSysIdCache(sysIdMaxAgeMs, updMaxAgeMs);
 
-            HbciBpdUpdCallback hbciCallback = createCallback(request.getBank());
+            HbciBpdUpdCallback hbciCallback = HbciBpdUpdCallback.createCallback(request.getBank(), hbciBpdCacheHolder);
 
-            InstantPaymentStatusJob instantPaymentStatusJob = new InstantPaymentStatusJob(request);
+            InstantPaymentStatusJob instantPaymentStatusJob = new InstantPaymentStatusJob(request, hbciBpdCacheHolder);
             PaymentStatusResponse response = instantPaymentStatusJob.execute(hbciCallback);
             response.setBankApiConsentData(hbciCallback.updateConsentUpd(hbciConsent));
 
             return response;
         } catch (HBCI_Exception e) {
-            throw handleHbciException(e);
+            throw HbciErrorUtils.handleHbciException(e);
         }
     }
 
-    private HBCIExecStatus fetchBpd(HbciDialogRequest dialogRequest) {
-        AbstractHbciDialog dialog = HbciDialogFactory.createDialog(BPD, dialogRequest, null);
-        return dialog.execute(true);
-    }
-
-    private PinTanPassport fetchUpd(HbciDialogRequest dialogRequest, boolean withHktan) {
-        HBCIUpdDialog dialog = (HBCIUpdDialog) HbciDialogFactory.createDialog(UPD, dialogRequest, null);
+    private PinTanPassport fetchUpd(HbciDialogRequest dialogRequest, boolean withHktan, Map<String, String> bpd) {
+        HBCIUpdDialog dialog = (HBCIUpdDialog) HbciDialogFactory.createDialog(UPD, dialogRequest, null, bpd);
         dialog.setWithHktan(withHktan);
         dialog.execute(true);
 
