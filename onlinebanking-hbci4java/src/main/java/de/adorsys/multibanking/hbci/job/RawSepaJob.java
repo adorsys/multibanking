@@ -18,6 +18,7 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.kapott.hbci.GV.GVDauerSEPANew;
 import org.kapott.hbci.GV.GVInstantUebSEPA;
@@ -35,10 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment, GVRawSEPA> {
+public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
 
-    public RawSepaJob(TransactionRequest<RawSepaPayment> transactionRequest) {
-        super(transactionRequest);
+    public RawSepaJob(TransactionRequest<RawSepaPayment> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

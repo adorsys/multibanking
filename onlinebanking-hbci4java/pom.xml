@@ -14,7 +14,7 @@
         <dependency>
             <groupId>de.adorsys</groupId>
             <artifactId>hbci4j-adorsys</artifactId>
-            <version>3.5.30</version>
+            <version>3.5.31</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.projectlombok</groupId>
@@ -93,6 +93,12 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
             <version>3.2.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.11.10</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

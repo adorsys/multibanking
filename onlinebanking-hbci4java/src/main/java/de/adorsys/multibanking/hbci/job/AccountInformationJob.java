@@ -24,6 +24,7 @@ import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
 import de.adorsys.multibanking.domain.transaction.LoadBalances;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import de.adorsys.multibanking.hbci.model.HbciConsent;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVSEPAInfo;
@@ -38,8 +39,8 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.HBCI_ER
 @Slf4j
 public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInformationResponse> {
 
-    public AccountInformationJob(TransactionRequest<LoadAccounts> transactionRequest) {
-        super(transactionRequest);
+    public AccountInformationJob(TransactionRequest<LoadAccounts> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
         if (transactionRequest.getTransaction().isWithBalances()) {
             ((HbciConsent) transactionRequest.getBankApiConsentData()).setCloseDialog(false);
         }
@@ -77,7 +78,7 @@ public class AccountInformationJob extends ScaAwareJob<LoadAccounts, AccountInfo
                         TransactionRequestFactory.create(loadBalances, null, transactionRequest.getBankAccess(),
                             transactionRequest.getBank(), transactionRequest.getBankApiConsentData());
 
-                    LoadBalancesJob loadBalancesJob = new LoadBalancesJob(loadBalancesRequest);
+                    LoadBalancesJob loadBalancesJob = new LoadBalancesJob(loadBalancesRequest, getHbciBpdCacheHolder());
                     loadBalancesJob.dialog = this.dialog;
                     loadBalancesJob.execute(null);
                 }

@@ -24,10 +24,12 @@ import de.adorsys.multibanking.domain.response.AbstractResponse;
 import de.adorsys.multibanking.domain.response.AuthorisationCodeResponse;
 import de.adorsys.multibanking.domain.response.UpdateAuthResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractTransaction;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import de.adorsys.multibanking.hbci.model.*;
 import de.adorsys.multibanking.hbci.util.HbciErrorUtils;
 import de.adorsys.multibanking.mapper.AccountStatementMapper;
 import de.adorsys.multibanking.mapper.AccountStatementMapperImpl;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -61,10 +63,12 @@ import static de.adorsys.multibanking.hbci.model.HbciDialogType.JOBS;
 @Slf4j
 public abstract class ScaAwareJob<T extends AbstractTransaction, R extends AbstractResponse> {
 
-    static AccountStatementMapper accountStatementMapper = new AccountStatementMapperImpl();
     private static final HbciDialogRequestMapper hbciDialogRequestMapper = new HbciDialogRequestMapperImpl();
-
+    static AccountStatementMapper accountStatementMapper = new AccountStatementMapperImpl();
     final TransactionRequest<T> transactionRequest;
+    @Getter
+    private final HbciBpdCacheHolder hbciBpdCacheHolder;
+
     HBCIJobsDialog dialog;
 
     AbstractHBCIJob hbciJob;
@@ -119,8 +123,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         log.debug("init new hbci dialog");
         PinTanPassport bpdPassport = fetchBpd(hbciCallback);
 
-        dialog = (HBCIJobsDialog) createDialog(JOBS, hbciCallback, getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()));
-        dialog.getPassport().setBPD(bpdPassport.getBPD());
+        dialog = (HBCIJobsDialog) createDialog(JOBS, hbciCallback, getUserTanTransportType(bpdPassport.getBankTwostepMechanisms()), bpdPassport.getBPD());
 
         HBCIMsgStatus dialogInitMsgStatus = dialog.dialogInit(getConsent().isWithHktan());
 
@@ -155,7 +158,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
     }
 
     PinTanPassport fetchBpd(HBCICallback hbciCallback) {
-        AbstractHbciDialog bpdDialog = createDialog(BPD, hbciCallback, null);
+        AbstractHbciDialog bpdDialog = createDialog(BPD, hbciCallback, null, null);
         bpdDialog.execute(true);
         return bpdDialog.getPassport();
     }
@@ -177,11 +180,14 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
     }
 
     private AbstractHbciDialog createDialog(HbciDialogType dialogType, HBCICallback hbciCallback,
-                                            HBCITwoStepMechanism twoStepMechanism) {
+                                            HBCITwoStepMechanism twoStepMechanism, Map<String, String> bpd) {
         HBCICallback callback = createCallback(hbciCallback);
         HbciDialogRequest dialogRequest = createDialogRequest(callback);
 
-        return HbciDialogFactory.createDialog(dialogType, dialogRequest, twoStepMechanism);
+        bpd = Optional.ofNullable(bpd)
+            .orElseGet(() -> hbciBpdCacheHolder.getBpd(dialogRequest));
+
+        return HbciDialogFactory.createDialog(dialogType, dialogRequest, twoStepMechanism, bpd);
     }
 
     void checkExecuteStatus(HBCIExecStatus execStatus) {

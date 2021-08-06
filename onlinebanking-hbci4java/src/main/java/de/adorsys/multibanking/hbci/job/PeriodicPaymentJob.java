@@ -18,6 +18,7 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.PeriodicPayment;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import de.adorsys.multibanking.hbci.model.HbciCycleMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVDauerSEPANew;
@@ -27,10 +28,10 @@ import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
 @Slf4j
-public class PeriodicPaymentJob extends AbstractPaymentJob<PeriodicPayment, GVDauerSEPANew> {
+public class PeriodicPaymentJob extends AbstractPaymentJob<PeriodicPayment> {
 
-    public PeriodicPaymentJob(TransactionRequest<PeriodicPayment> transactionRequest) {
-        super(transactionRequest);
+    public PeriodicPaymentJob(TransactionRequest<PeriodicPayment> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

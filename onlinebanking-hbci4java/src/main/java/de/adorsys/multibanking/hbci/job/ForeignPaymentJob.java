@@ -18,14 +18,15 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.ForeignPayment;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import org.kapott.hbci.GV.GVDTAZV;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.structures.Konto;
 
-public class ForeignPaymentJob extends AbstractPaymentJob<ForeignPayment, GVDTAZV> {
+public class ForeignPaymentJob extends AbstractPaymentJob<ForeignPayment> {
 
-    public ForeignPaymentJob(TransactionRequest<ForeignPayment> transactionRequest) {
-        super(transactionRequest);
+    public ForeignPaymentJob(TransactionRequest<ForeignPayment> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

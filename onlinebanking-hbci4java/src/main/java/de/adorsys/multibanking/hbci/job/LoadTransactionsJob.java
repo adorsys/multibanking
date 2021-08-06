@@ -22,6 +22,7 @@ import de.adorsys.multibanking.domain.exception.MultibankingException;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.TransactionsResponse;
 import de.adorsys.multibanking.domain.transaction.LoadTransactions;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import de.adorsys.multibanking.hbci.util.HbciErrorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.AbstractHBCIJob;
@@ -43,8 +44,8 @@ import static de.adorsys.multibanking.domain.transaction.LoadTransactions.RawRes
 @Slf4j
 public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, TransactionsResponse> {
 
-    public LoadTransactionsJob(TransactionRequest<LoadTransactions> transactionRequest) {
-        super(transactionRequest);
+    public LoadTransactionsJob(TransactionRequest<LoadTransactions> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override
@@ -146,7 +147,7 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
         LocalDate date;
         if (days != null && days.length() > 0 && days.matches("[0-9]{1,4}")) {
             date = LocalDate.now().minusDays(Long.parseLong(days));
-            log.info("earliest start date according to BPD: " + date.toString());
+            log.info("earliest start date according to BPD: " + date);
         } else {
             date = LocalDate.now().minusDays(90);
         }

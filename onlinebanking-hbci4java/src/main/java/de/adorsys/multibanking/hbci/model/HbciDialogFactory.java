@@ -18,7 +18,6 @@ package de.adorsys.multibanking.hbci.model;
 
 import de.adorsys.multibanking.domain.BankAccess;
 import de.adorsys.multibanking.domain.exception.MultibankingException;
-import de.adorsys.multibanking.hbci.HbciCacheHandler;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.kapott.hbci.callback.HBCICallback;
@@ -32,6 +31,7 @@ import org.kapott.hbci.manager.HBCITwoStepMechanism;
 import org.kapott.hbci.manager.HBCIUtils;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NOT_SUPPORTED;
@@ -40,7 +40,7 @@ import static de.adorsys.multibanking.domain.exception.MultibankingError.BANK_NO
 public class HbciDialogFactory {
 
     public static AbstractHbciDialog createDialog(HbciDialogType dialogType, HbciDialogRequest dialogRequest,
-                                                  HBCITwoStepMechanism twoStepMechanism) {
+                                                  HBCITwoStepMechanism twoStepMechanism, Map<String, String> bpd) {
         String bankCode = Optional.ofNullable(dialogRequest.getBank().getBankApiBankCode())
             .orElse(dialogRequest.getBank().getBankCode());
 
@@ -59,7 +59,7 @@ public class HbciDialogFactory {
             .map(BankAccess::getHbciPassportState)
             .ifPresent(state -> HbciPassport.State.fromJson(state).apply(newPassport));
 
-        Optional.ofNullable(HbciCacheHandler.getBpdCache().get(bankCode))
+        Optional.ofNullable(bpd)
             .ifPresent(newPassport::setBPD);
 
         Optional.ofNullable(hbciConsent.getHbciUpd())

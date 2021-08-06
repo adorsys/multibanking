@@ -21,6 +21,7 @@ import de.adorsys.multibanking.domain.StandingOrder;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.StandingOrdersResponse;
 import de.adorsys.multibanking.domain.transaction.LoadStandingOrders;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVDauerSEPAList;
 import org.kapott.hbci.GV_Result.GVRDauerList;
@@ -39,8 +40,8 @@ import static de.adorsys.multibanking.domain.Frequency.*;
 @Slf4j
 public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, StandingOrdersResponse> {
 
-    public LoadStandingOrdersJob(TransactionRequest<LoadStandingOrders> transactionRequest) {
-        super(transactionRequest);
+    public LoadStandingOrdersJob(TransactionRequest<LoadStandingOrders> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

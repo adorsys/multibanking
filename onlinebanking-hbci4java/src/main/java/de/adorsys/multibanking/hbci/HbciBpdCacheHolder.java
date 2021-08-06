@@ -16,32 +16,43 @@
 
 package de.adorsys.multibanking.hbci;
 
-import de.adorsys.multibanking.domain.Bank;
 import de.adorsys.multibanking.domain.request.AbstractRequest;
-import lombok.Getter;
-import lombok.experimental.UtilityClass;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-@UtilityClass
-public class HbciCacheHandler {
+import static org.kapott.hbci.passport.PinTanPassport.BPD_KEY_LASTUPDATE;
 
-    @Getter
+@RequiredArgsConstructor
+public class HbciBpdCacheHolder {
+
+    private final long bpdMaxAgeMillis;
+
     private final Map<String, Map<String, String>> bpdCache = new ConcurrentHashMap<>();
 
     public Map<String, String> getBpd(AbstractRequest request) {
         String bankCode = Optional.ofNullable(request.getBank().getBankApiBankCode())
             .orElse(request.getBank().getBankCode());
 
-        return bpdCache.get(bankCode);
+        return getBpd(bankCode);
     }
 
-    HbciBpdUpdCallback createCallback(Bank bank) {
-        String bankCode = Optional.ofNullable(bank.getBankApiBankCode())
-            .orElse(bank.getBankCode());
+    public Map<String, String> getBpd(String bankCode) {
+        return Optional.ofNullable(bpdCache.get(bankCode))
+            .map(bpdMap -> {
+                long bpdLastUpdate = Long.parseLong(bpdMap.get(BPD_KEY_LASTUPDATE));
+                if ((System.currentTimeMillis() - bpdLastUpdate) < bpdMaxAgeMillis) {
+                    return bpdMap;
+                }
+                return null;
+            })
+            .orElse(null);
 
-        return new HbciBpdUpdCallback(bankCode, bpdCache);
+    }
+
+    public void updateBpd(String bankCode, Map<String, String> bpd) {
+        bpdCache.put(bankCode, bpd);
     }
 }

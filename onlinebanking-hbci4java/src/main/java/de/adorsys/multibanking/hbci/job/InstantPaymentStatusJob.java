@@ -20,6 +20,7 @@ import de.adorsys.multibanking.domain.PaymentStatus;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.PaymentStatusResponse;
 import de.adorsys.multibanking.domain.transaction.PaymentStatusReqest;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVInstanstUebSEPAStatus;
 import org.kapott.hbci.GV_Result.GVRInstantUebSEPAStatus;
@@ -30,32 +31,8 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
 
     private GVInstanstUebSEPAStatus paymentStatusHbciJob;
 
-    public InstantPaymentStatusJob(TransactionRequest<PaymentStatusReqest> transactionRequest) {
-        super(transactionRequest);
-    }
-
-    @Override
-    GVInstanstUebSEPAStatus createHbciJob() {
-        paymentStatusHbciJob = new GVInstanstUebSEPAStatus(dialog.getPassport());
-        paymentStatusHbciJob.setParam("my", getHbciKonto());
-        paymentStatusHbciJob.setParam("orderid", transactionRequest.getTransaction().getPaymentId());
-        return paymentStatusHbciJob;
-    }
-
-    @Override
-    String getHbciJobName() {
-        return GVInstanstUebSEPAStatus.getLowlevelName();
-    }
-
-    @Override
-    void checkExecuteStatus(HBCIExecStatus execStatus) {
-        //noop
-    }
-
-    @Override
-    public PaymentStatusResponse createJobResponse() {
-        GVRInstantUebSEPAStatus hbciStatus = (GVRInstantUebSEPAStatus) paymentStatusHbciJob.getJobResult();
-        return new PaymentStatusResponse(mapPaymentStatus(hbciStatus.getStatus()));
+    public InstantPaymentStatusJob(TransactionRequest<PaymentStatusReqest> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     public static PaymentStatus mapPaymentStatus(int hbciStatus) {
@@ -101,5 +78,29 @@ public class InstantPaymentStatusJob extends ScaAwareJob<PaymentStatusReqest, Pa
                 log.warn("unexpected payment status: " + hbciStatus);
         }
         return paymentStatus;
+    }
+
+    @Override
+    GVInstanstUebSEPAStatus createHbciJob() {
+        paymentStatusHbciJob = new GVInstanstUebSEPAStatus(dialog.getPassport());
+        paymentStatusHbciJob.setParam("my", getHbciKonto());
+        paymentStatusHbciJob.setParam("orderid", transactionRequest.getTransaction().getPaymentId());
+        return paymentStatusHbciJob;
+    }
+
+    @Override
+    String getHbciJobName() {
+        return GVInstanstUebSEPAStatus.getLowlevelName();
+    }
+
+    @Override
+    void checkExecuteStatus(HBCIExecStatus execStatus) {
+        //noop
+    }
+
+    @Override
+    public PaymentStatusResponse createJobResponse() {
+        GVRInstantUebSEPAStatus hbciStatus = (GVRInstantUebSEPAStatus) paymentStatusHbciJob.getJobResult();
+        return new PaymentStatusResponse(mapPaymentStatus(hbciStatus.getStatus()));
     }
 }

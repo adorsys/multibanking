@@ -18,17 +18,18 @@ package de.adorsys.multibanking.hbci.job;
 
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.FutureSinglePayment;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import org.kapott.hbci.GV.GVTermUebSEPADel;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.structures.Konto;
 import org.kapott.hbci.structures.Value;
 
-public class DeleteFutureSinglePaymentJob extends AbstractPaymentJob<FutureSinglePayment, GVTermUebSEPADel> {
+public class DeleteFutureSinglePaymentJob extends AbstractPaymentJob<FutureSinglePayment> {
 
     private String jobName;
 
-    public DeleteFutureSinglePaymentJob(TransactionRequest<FutureSinglePayment> transactionRequest) {
-        super(transactionRequest);
+    public DeleteFutureSinglePaymentJob(TransactionRequest<FutureSinglePayment> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override

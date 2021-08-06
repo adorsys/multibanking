@@ -46,7 +46,6 @@ import java.util.Optional;
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
 import static de.adorsys.multibanking.domain.exception.MultibankingError.INTERNAL_ERROR;
-import static de.adorsys.multibanking.hbci.HbciCacheHandler.*;
 
 @Slf4j
 public class TransactionAuthorisationJob<T extends AbstractTransaction, R extends AbstractResponse> {
@@ -177,7 +176,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
 
     private HbciPassport createPassport() {
         Map<String, String> bpd =
-            Optional.ofNullable(getBpd(transactionAuthorisation.getOriginTransactionRequest()))
+            Optional.ofNullable(scaJob.getHbciBpdCacheHolder().getBpd(transactionAuthorisation.getOriginTransactionRequest()))
                 .orElseGet(() -> scaJob.fetchBpd(null).getBPD());
 
         HbciPassport.State state = HbciPassport.State.fromJson(scaJob.hbciTanSubmit.getPassportState());

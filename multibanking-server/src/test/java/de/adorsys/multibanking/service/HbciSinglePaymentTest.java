@@ -54,7 +54,7 @@ public class HbciSinglePaymentTest {
 
     @Before
     public void beforeTest() throws IOException {
-        HbciBanking hbci4JavaBanking = new HbciBanking(null, banksConfigUrl.openStream(), 0, 0);
+        HbciBanking hbci4JavaBanking = new HbciBanking(null, banksConfigUrl.openStream(), 0, 0, 0);
 
         MockitoAnnotations.initMocks(this);
         when(bankingServiceProducer.getBankingService(anyString())).thenReturn(hbci4JavaBanking);

@@ -20,15 +20,15 @@ import de.adorsys.multibanking.domain.PaymentStatus;
 import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.response.PaymentResponse;
 import de.adorsys.multibanking.domain.transaction.AbstractPayment;
-import org.kapott.hbci.GV.AbstractHBCIJob;
+import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
 
 import java.util.Optional;
 
-public abstract class AbstractPaymentJob<T extends AbstractPayment, J extends AbstractHBCIJob> extends ScaAwareJob<T, PaymentResponse> {
+public abstract class AbstractPaymentJob<T extends AbstractPayment> extends ScaAwareJob<T, PaymentResponse> {
 
-    protected AbstractPaymentJob(TransactionRequest<T> transactionRequest) {
-        super(transactionRequest);
+    protected AbstractPaymentJob(TransactionRequest<T> transactionRequest, HbciBpdCacheHolder bpdCacheHolder) {
+        super(transactionRequest, bpdCacheHolder);
     }
 
     @Override
