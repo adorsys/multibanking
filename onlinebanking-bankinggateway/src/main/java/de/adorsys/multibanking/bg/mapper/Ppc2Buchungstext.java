@@ -29,7 +29,7 @@ public class Ppc2Buchungstext {
     }
 
     /**
-     * @param PurposeCode
+     * @param purposeCode
      * @return buchungstext or null if nothing matches
      */
     public static String ppc2Buchungstext(String purposeCode) {
