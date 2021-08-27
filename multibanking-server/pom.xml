@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>5.5.31</version>
+        <version>5.5.32</version>
     </parent>
     <artifactId>multibanking-server</artifactId>
     <packaging>jar</packaging>
@@ -45,22 +45,22 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-figo</artifactId>
-            <version>5.5.31</version>
+            <version>5.5.32</version>
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-hbci4java</artifactId>
-            <version>5.5.31</version>
+            <version>5.5.32</version>
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-ing</artifactId>
-            <version>5.5.31</version>
+            <version>5.5.32</version>
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-bankinggateway</artifactId>
-            <version>5.5.31</version>
+            <version>5.5.32</version>
             <exclusions>
                 <exclusion>
                     <groupId>io.swagger.core.v3</groupId>
@@ -73,12 +73,12 @@
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>multibanking-persistence-mongodb</artifactId>
-            <version>5.5.31</version>
+            <version>5.5.32</version>
         </dependency>
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
             <artifactId>multibanking-persistence-jpa</artifactId>
-            <version>5.5.31</version>
+            <version>5.5.32</version>
         </dependency>
         <dependency>
             <groupId>com.github.mongobee</groupId>
