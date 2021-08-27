@@ -34,4 +34,8 @@ public class TanTransportType implements Serializable {
     private String inputInfo;
     private boolean needTanMedia;
     private AuthenticationType type;
+
+    private int timeoutDecoupledFirstStatusRequest;
+    private int timeoutDecoupledNextStatusRequest;
+    private int decoupledMaxStatusRequests;
 }

@@ -263,6 +263,9 @@ public class HbciScaHandler implements StrongCustomerAuthorisable {
                 .name(hbciTwoStepMechanism.getName())
                 .inputInfo(hbciTwoStepMechanism.getInputinfo())
                 .needTanMedia(hbciTwoStepMechanism.getNeedtanmedia().equals("2"))
+                .timeoutDecoupledFirstStatusRequest(hbciTwoStepMechanism.getTimeoutDecoupledFirstStatusRequest())
+                .timeoutDecoupledNextStatusRequest(hbciTwoStepMechanism.getTimeoutDecoupledNextStatusRequest())
+                .decoupledMaxStatusRequests(hbciTwoStepMechanism.getMaxDecoupledStatusRequests())
                 .build())
             .map(tanTransportType -> {
                 if (!tanTransportType.isNeedTanMedia()) {
