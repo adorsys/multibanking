@@ -132,6 +132,7 @@ public class TransactionAuthorisationJob<T extends AbstractTransaction, R extend
             }).orElse(null);
 
         GVTAN2Step hktan = new GVTAN2Step(hbciDialog.getPassport(), originJob);
+        hktan.setSegVersion(scaJob.hbciTanSubmit.getTwoStepMechanism().getSegversion());
         hktan.setProcess(KnownTANProcess.PROCESS2_STEP2);
         Optional.ofNullable(scaJob.hbciTanSubmit.getHbciJobName())
             .ifPresent(hbciSegCode -> hktan.setParam("ordersegcode", hbciSegCode));
