@@ -44,11 +44,6 @@
         <!-- banking -->
         <dependency>
             <groupId>de.adorsys.multibanking</groupId>
-            <artifactId>onlinebanking-figo</artifactId>
-            <version>5.5.35-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>de.adorsys.multibanking</groupId>
             <artifactId>onlinebanking-hbci4java</artifactId>
             <version>5.5.36-SNAPSHOT</version>
         </dependency>
