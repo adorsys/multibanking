@@ -58,7 +58,6 @@ public class HbciSinglePaymentTest {
 
         MockitoAnnotations.initMocks(this);
         when(bankingServiceProducer.getBankingService(anyString())).thenReturn(hbci4JavaBanking);
-        when(bankingServiceProducer.getBankingService(BankApi.FIGO)).thenReturn(hbci4JavaBanking);
         when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(hbci4JavaBanking);
 
         bankRepository.findByBankCode(System.getProperty("blz")).orElseGet(() -> {

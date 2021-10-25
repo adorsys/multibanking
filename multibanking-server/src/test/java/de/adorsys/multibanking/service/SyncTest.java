@@ -69,7 +69,6 @@ public class SyncTest {
 
         MockitoAnnotations.initMocks(this);
         when(bankingServiceProducer.getBankingService(anyString())).thenReturn(hbci4JavaBanking);
-        when(bankingServiceProducer.getBankingService(BankApi.FIGO)).thenReturn(hbci4JavaBanking);
         when(bankingServiceProducer.getBankingService(BankApi.HBCI)).thenReturn(hbci4JavaBanking);
 
         if (rulesFile.exists()) {

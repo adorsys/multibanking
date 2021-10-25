@@ -20,5 +20,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name = "BankApi", description = "The banking access backend")
 public enum BankApiTO {
-    HBCI, FIGO, XS2A, FIGO_ALTERNATIVE, ING
+    HBCI, XS2A
 }

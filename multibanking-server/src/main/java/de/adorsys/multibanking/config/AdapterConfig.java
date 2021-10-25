@@ -1,10 +1,7 @@
 package de.adorsys.multibanking.config;
 
 import de.adorsys.multibanking.bg.BankingGatewayAdapter;
-import de.adorsys.multibanking.domain.BankApi;
-import de.adorsys.multibanking.figo.FigoBanking;
 import de.adorsys.multibanking.hbci.HbciBanking;
-import de.adorsys.multibanking.ing.IngAdapter;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.manager.HBCIProduct;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,16 +42,11 @@ public class AdapterConfig {
     @Value("${fints.bpdCacheExpirationMs:86400000}") //one day
     private long fintsBpdCacheExpirationMs;
 
-    private IngAdapter ingAdapter;
     private BankingGatewayAdapter bankingGatewayAdapter;
     private HbciBanking hbci4JavaBanking;
-    private FigoBanking figoBanking = new FigoBanking(BankApi.FIGO);
-    private FigoBanking figoBankingAlternative = new FigoBanking(BankApi.FIGO_ALTERNATIVE);
 
     @PostConstruct
     public void postConstruct() {
-        ingAdapter = new IngAdapter(ingBaseUrl, keyStoreUrl, keyStorePassword, ingQwacAlias,
-            ingQsealAlias);
         bankingGatewayAdapter = new BankingGatewayAdapter(bankingGatewayBaseUrl,
             bankingAdapterBaseUrl, dumpDownloadFiles);
 
@@ -67,11 +59,6 @@ public class AdapterConfig {
     }
 
     @Bean
-    public IngAdapter ingAdapter() {
-        return ingAdapter;
-    }
-
-    @Bean
     public BankingGatewayAdapter bankingGatewayAdapter() {
         return bankingGatewayAdapter;
     }
@@ -81,13 +68,4 @@ public class AdapterConfig {
         return hbci4JavaBanking;
     }
 
-    @Bean
-    public FigoBanking figoBanking() {
-        return figoBanking;
-    }
-
-    @Bean
-    public FigoBanking figoBankingAlternative() {
-        return figoBankingAlternative;
-    }
 }

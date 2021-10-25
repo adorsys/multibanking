@@ -7,7 +7,6 @@ import de.adorsys.multibanking.domain.request.TransactionRequestFactory;
 import de.adorsys.multibanking.domain.response.AccountInformationResponse;
 import de.adorsys.multibanking.domain.spi.OnlineBankingService;
 import de.adorsys.multibanking.domain.transaction.LoadAccounts;
-import de.adorsys.multibanking.exception.BankAccessAlreadyExistException;
 import de.adorsys.multibanking.exception.InvalidBankAccessException;
 import de.adorsys.multibanking.exception.ResourceNotFoundException;
 import de.adorsys.multibanking.metrics.MetricsCollector;
@@ -19,11 +18,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 
@@ -82,13 +79,7 @@ public class BankAccountService extends AccountInformationService {
         List<BankAccount> bankAccounts = loadBankAccountsOnline(expectedConsentStatus, bankAccess,
             onlineBankingService, bankApiUser, bankEntity);
 
-        if (onlineBankingService.bankApi() == BankApi.FIGO) {
-            filterAccounts(bankAccess, onlineBankingService, bankAccounts);
-        }
-
-        return Optional.ofNullable(bankAccounts)
-            .map(Collection::stream)
-            .orElseGet(Stream::empty)
+        return Optional.ofNullable(bankAccounts).stream().flatMap(Collection::stream)
             .map(source -> {
                 BankAccountEntity target = new BankAccountEntity();
                 BeanUtils.copyProperties(source, target);
@@ -123,29 +114,4 @@ public class BankAccountService extends AccountInformationService {
             throw e;
         }
     }
-
-    private void filterAccounts(BankAccessEntity bankAccess, OnlineBankingService onlineBankingService,
-                                List<BankAccount> bankAccounts) {
-        List<BankAccountEntity> userBankAccounts = bankAccountRepository.findByUserId(bankAccess.getUserId());
-        //filter out previous created accounts
-        Iterator<BankAccount> accountIterator = bankAccounts.iterator();
-        while (accountIterator.hasNext()) {
-            BankAccount newAccount = accountIterator.next();
-            userBankAccounts.stream()
-                .filter(bankAccountEntity -> {
-                    String newAccountExternalID = newAccount.getExternalIdMap().get(onlineBankingService.bankApi());
-                    String existingAccountExternalID =
-                        bankAccountEntity.getExternalIdMap().get(onlineBankingService.bankApi());
-                    return newAccountExternalID.equals(existingAccountExternalID);
-                })
-                .findFirst()
-                .ifPresent(bankAccountEntity -> accountIterator.remove());
-        }
-        //all accounts created in the past
-        if (bankAccounts.isEmpty()) {
-            throw new BankAccessAlreadyExistException();
-        }
-        bankAccess.setBankName(bankAccounts.get(0).getBankName());
-    }
-
 }
