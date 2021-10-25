@@ -24,6 +24,7 @@ import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import de.adorsys.multibanking.hbci.util.HbciErrorUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.kapott.hbci.GV.GVSaldoReq;
+import org.kapott.hbci.GV.GVSaldoReqSEPA;
 import org.kapott.hbci.GV_Result.GVRSaldoReq;
 
 @Slf4j
@@ -35,7 +36,12 @@ public class LoadBalancesJob extends ScaAwareJob<LoadBalances, LoadBalancesRespo
 
     @Override
     GVSaldoReq createHbciJob() {
-        GVSaldoReq hbciJob = new GVSaldoReq(dialog.getPassport());
+        GVSaldoReq hbciJob;
+        if (dialog.getPassport().jobSupported("Saldo")) {
+            hbciJob = new GVSaldoReq(dialog.getPassport());
+        } else {
+            hbciJob = new GVSaldoReqSEPA(dialog.getPassport());
+        }
         hbciJob.setParam("my", getHbciKonto());
         return hbciJob;
     }
