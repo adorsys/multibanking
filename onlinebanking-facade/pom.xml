@@ -4,7 +4,7 @@
     <parent>
         <groupId>de.adorsys.multibanking</groupId>
         <artifactId>multibanking</artifactId>
-        <version>5.5.35</version>
+        <version>5.5.36</version>
     </parent>
 
     <artifactId>onlinebanking-facade</artifactId>
