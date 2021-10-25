@@ -17,7 +17,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,7 +40,7 @@ public class BankAccessRepositoryJpaTest {
         assertThat(repository.findByUserId(bankAccess.getUserId())).isNotEmpty();
 
         BankAccessEntity bankAccessEntity = repository.findByUserIdAndId(bankAccess.getUserId(), bankAccess.getId())
-                .orElseThrow(() -> new IllegalStateException("bankaccess is null"));
+            .orElseThrow(() -> new IllegalStateException("bankaccess is null"));
 
         assertThat(bankAccessEntity.getTanTransportTypes()).isNotEmpty();
 
@@ -61,12 +60,8 @@ public class BankAccessRepositoryJpaTest {
 
         entity.setTanTransportTypes(new HashMap<>());
         entity.getTanTransportTypes().put(BankApi.HBCI, Collections.singletonList(TanTransportType.builder()
-                .id("SMS_OTP")
-                .build()));
-
-        entity.getTanTransportTypes().put(BankApi.FIGO, Collections.singletonList(TanTransportType.builder()
-                .id("PUSH_OTP")
-                .build()));
+            .id("SMS_OTP")
+            .build()));
 
         repository.save(entity);
 

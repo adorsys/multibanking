@@ -173,11 +173,7 @@ public class ImportBanks {
                 }
 
                 bankEntity.setBic(bankInfo.getBic());
-                if (bankInfo.getPinTanVersion() != null) {
-                    bankEntity.setBankApi(BankApi.HBCI);
-                } else {
-                    bankEntity.setBankApi(BankApi.FIGO);
-                }
+                bankEntity.setBankApi(BankApi.HBCI);
             });
         }
 

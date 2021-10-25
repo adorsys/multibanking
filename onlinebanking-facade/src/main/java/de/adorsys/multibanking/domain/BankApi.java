@@ -17,5 +17,5 @@
 package de.adorsys.multibanking.domain;
 
 public enum BankApi {
-    HBCI, FIGO, XS2A, ING, FIGO_ALTERNATIVE
+    HBCI, XS2A
 }
