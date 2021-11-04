@@ -38,6 +38,7 @@ import org.iban4j.Iban;
 import org.kapott.hbci.GV.AbstractHBCIJob;
 import org.kapott.hbci.GV.GVTAN2Step;
 import org.kapott.hbci.GV.GVVeuStep;
+import org.kapott.hbci.GV_Result.HBCIJobResult;
 import org.kapott.hbci.callback.AbstractHBCICallback;
 import org.kapott.hbci.callback.HBCICallback;
 import org.kapott.hbci.dialog.AbstractHbciDialog;
@@ -50,6 +51,7 @@ import org.kapott.hbci.structures.Konto;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static de.adorsys.multibanking.domain.BankApi.HBCI;
@@ -101,8 +103,7 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
 
         //check for SCA is really needed after execution
         tan2StepRequired = Optional.ofNullable(hktan)
-            .map(gvtan2Step -> KnownReturncode.W3076.searchReturnValue(gvtan2Step.getJobResult().getJobStatus().getRetVals()) == null
-                && KnownReturncode.W3076.searchReturnValue(gvtan2Step.getJobResult().getGlobStatus().getRetVals()) == null)
+            .map(gvtan2Step -> !isScaExempted(hbciExecStatus, gvtan2Step.getJobResult()))
             .orElse(false);
 
         R jobResponse = createJobResponse();
@@ -117,6 +118,17 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
         }
 
         return jobResponse;
+    }
+
+    private boolean isScaExempted(HBCIExecStatus hbciExecStatus, HBCIJobResult hbciJobResult) {
+        return KnownReturncode.W3076.searchReturnValue(hbciJobResult.getJobStatus().getRetVals()) != null ||
+            KnownReturncode.W3076.searchReturnValue(hbciJobResult.getGlobStatus().getRetVals()) != null ||
+            hbciExecStatus.getMsgStatusList().stream()
+                .filter(Objects::nonNull)
+                .anyMatch(hbciMsgStatus ->
+                    KnownReturncode.W3076.searchReturnValue(hbciMsgStatus.globStatus.getRetVals()) != null
+                        || KnownReturncode.W3076.searchReturnValue(hbciMsgStatus.segStatus.getRetVals()) != null
+                );
     }
 
     private R initDialog(HBCICallback hbciCallback) {
