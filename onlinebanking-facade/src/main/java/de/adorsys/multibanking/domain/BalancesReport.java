@@ -23,6 +23,7 @@ public class BalancesReport {
 
     private Balance readyBalance;
     private Balance unreadyBalance;
+    private Balance reservedBalance;
     private Balance creditBalance;
     private Balance availableBalance;
     private Balance usedBalance;
@@ -34,6 +35,11 @@ public class BalancesReport {
 
     public BalancesReport unreadyBalance(Balance unreadyBalance) {
         this.unreadyBalance = unreadyBalance;
+        return this;
+    }
+
+    public BalancesReport reservedBalance(Balance reservedBalance) {
+        this.reservedBalance = reservedBalance;
         return this;
     }
 
