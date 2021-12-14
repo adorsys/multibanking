@@ -38,32 +38,32 @@ public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment> {
     AbstractHBCIJob createHbciJob() {
         SinglePayment singlePayment = transactionRequest.getTransaction();
 
-        AbstractSEPAGV paympentJob;
+        AbstractSEPAGV paymentJob;
         if (singlePayment instanceof FutureSinglePayment) {
-            paympentJob = new GVTermUebSEPA(dialog.getPassport(), GVTermUebSEPA.getLowlevelName());
-            paympentJob.setParam("date", ((FutureSinglePayment) singlePayment).getExecutionDate().toString());
+            paymentJob = new GVTermUebSEPA(dialog.getPassport(), GVTermUebSEPA.getLowlevelName());
+            paymentJob.setParam("date", ((FutureSinglePayment) singlePayment).getExecutionDate().toString());
         } else {
             if (singlePayment.isInstantPayment()) {
-                paympentJob = new GVInstantUebSEPA(dialog.getPassport(), GVInstantUebSEPA.getLowlevelName());
+                paymentJob = new GVInstantUebSEPA(dialog.getPassport(), GVInstantUebSEPA.getLowlevelName());
             } else {
-                paympentJob = new GVUebSEPA(dialog.getPassport(), GVUebSEPA.getLowlevelName());
+                paymentJob = new GVUebSEPA(dialog.getPassport(), GVUebSEPA.getLowlevelName());
             }
         }
 
-        paympentJob.setParam("src", getHbciKonto());
-        paympentJob.setParam("dst", createReceiverAccount(singlePayment));
-        paympentJob.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
+        paymentJob.setParam("src", getHbciKonto());
+        paymentJob.setParam("dst", createReceiverAccount(singlePayment));
+        paymentJob.setParam("btg", new Value(singlePayment.getAmount(), singlePayment.getCurrency()));
         if (singlePayment.getPurpose() != null) {
-            paympentJob.setParam("usage", singlePayment.getPurpose());
+            paymentJob.setParam("usage", singlePayment.getPurpose());
         }
         if (singlePayment.getPurposecode() != null) {
-            paympentJob.setParam("purposecode", singlePayment.getPurposecode());
+            paymentJob.setParam("purposecode", singlePayment.getPurposecode());
         }
         if (singlePayment.getEndToEndId() != null) {
-            paympentJob.setParam("endtoendid", singlePayment.getEndToEndId());
+            paymentJob.setParam("endtoendid", singlePayment.getEndToEndId());
         }
 
-        return paympentJob;
+        return paymentJob;
     }
 
     private Konto createReceiverAccount(SinglePayment singlePayment) {
