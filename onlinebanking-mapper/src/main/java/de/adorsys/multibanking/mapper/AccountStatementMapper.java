@@ -53,6 +53,7 @@ public interface AccountStatementMapper {
     @Mapping(target = "availableBalance", source = "available")
     @Mapping(target = "creditBalance", source = "kredit")
     @Mapping(target = "unreadyBalance", source = "unready")
+    @Mapping(target = "reservedBalance", source = "reserved")
     @Mapping(target = "usedBalance", source = "used")
     BalancesReport toBalancesReport(GVRSaldoReq.Info saldoInfo);
 
