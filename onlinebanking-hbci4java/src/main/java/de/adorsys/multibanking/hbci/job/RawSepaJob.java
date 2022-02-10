@@ -20,10 +20,7 @@ import de.adorsys.multibanking.domain.request.TransactionRequest;
 import de.adorsys.multibanking.domain.transaction.RawSepaPayment;
 import de.adorsys.multibanking.hbci.HbciBpdCacheHolder;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.kapott.hbci.GV.GVDauerSEPANew;
-import org.kapott.hbci.GV.GVInstantUebSEPA;
-import org.kapott.hbci.GV.GVRawSEPA;
-import org.kapott.hbci.GV.GVUebSEPA;
+import org.kapott.hbci.GV.*;
 import org.kapott.hbci.GV.parsers.ISEPAParser;
 import org.kapott.hbci.GV.parsers.SEPAParserFactory;
 import org.kapott.hbci.GV_Result.HBCIJobResult;
@@ -61,11 +58,17 @@ public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
             case SINGLE_PAYMENT:
                 jobName = GVUebSEPA.getLowlevelName();
                 break;
+            case FUTURE_SINGLE_PAYMENT:
+                jobName = GVTermUebSEPA.getLowlevelName();
+                break;
             case INSTANT_PAYMENT:
                 jobName = GVInstantUebSEPA.getLowlevelName();
                 break;
             case BULK_PAYMENT:
-                jobName = "SammelUebSEPA";
+                jobName = GVMultiUebSEPA.getLowlevelName();
+                break;
+            case FUTURE_BULK_PAYMENT:
+                jobName = GVTermMultiUebSEPA.getLowlevelName();
                 break;
             case STANDING_ORDER:
                 jobName = GVDauerSEPANew.getLowlevelName();
