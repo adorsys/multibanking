@@ -14,7 +14,7 @@
         <dependency>
             <groupId>de.adorsys</groupId>
             <artifactId>hbci4j-adorsys</artifactId>
-            <version>3.5.39</version>
+            <version>3.5.41</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.projectlombok</groupId>
