@@ -32,6 +32,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
 
@@ -46,7 +47,8 @@ public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
 
     @Override
     public String orderIdFromJobResult(HBCIJobResult jobResult) {
-        return null;
+        return Optional.ofNullable(jobResult.getResultData().get("orderid"))
+            .orElse(null);
     }
 
     @Override
