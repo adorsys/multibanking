@@ -46,10 +46,10 @@ public class BulkPaymentJob extends AbstractPaymentJob<BulkPayment> {
 
         GVUebSEPA hbciJob;
         if (bulkPayment instanceof FutureBulkPayment) {
-            hbciJob = new GVTermMultiUebSEPA(dialog.getPassport(), GVTermMultiUebSEPA.getLowlevelName());
+            hbciJob = new GVTermMultiUebSEPA(dialog.getPassport(), GVTermMultiUebSEPA.getLowlevelName(), getSepaVersion());
             hbciJob.setParam("date", ((FutureBulkPayment) bulkPayment).getExecutionDate().toString());
         } else {
-            hbciJob = new GVMultiUebSEPA(dialog.getPassport(), GVMultiUebSEPA.getLowlevelName());
+            hbciJob = new GVMultiUebSEPA(dialog.getPassport(), GVMultiUebSEPA.getLowlevelName(), getSepaVersion());
         }
 
         hbciJob.setParam("src", src);

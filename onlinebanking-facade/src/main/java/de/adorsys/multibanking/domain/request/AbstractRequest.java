@@ -27,6 +27,7 @@ public abstract class AbstractRequest {
     private BankApiUser bankApiUser;
     private BankAccess bankAccess;
     private Bank bank;
+    private String sepaVersion;
 
     private Object bankApiConsentData;
 

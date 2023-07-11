@@ -83,7 +83,7 @@ public class RawSepaJob extends AbstractPaymentJob<RawSepaPayment> {
     }
 
     private GVRawSEPA createRawSepaJob(RawSepaPayment sepaPayment, String jobName) {
-        GVRawSEPA rawSEPAJob = new GVRawSEPA(dialog.getPassport(), jobName, sepaPayment.getRawRequestData());
+        GVRawSEPA rawSEPAJob = new GVRawSEPA(dialog.getPassport(), jobName, getSepaVersion(), sepaPayment.getRawRequestData());
         rawSEPAJob.setParam("src", getHbciKonto());
 
         String creditorIban = "";

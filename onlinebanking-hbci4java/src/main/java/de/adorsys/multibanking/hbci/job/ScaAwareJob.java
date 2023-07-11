@@ -45,6 +45,7 @@ import org.kapott.hbci.dialog.AbstractHbciDialog;
 import org.kapott.hbci.dialog.HBCIJobsDialog;
 import org.kapott.hbci.manager.*;
 import org.kapott.hbci.passport.PinTanPassport;
+import org.kapott.hbci.sepa.SepaVersion;
 import org.kapott.hbci.status.HBCIExecStatus;
 import org.kapott.hbci.status.HBCIMsgStatus;
 import org.kapott.hbci.structures.Konto;
@@ -363,6 +364,12 @@ public abstract class ScaAwareJob<T extends AbstractTransaction, R extends Abstr
             return Optional.of(veuStep);
         }
         return Optional.empty();
+    }
+
+    SepaVersion getSepaVersion() {
+        return Optional.ofNullable(transactionRequest.getSepaVersion())
+            .map(s -> SepaVersion.byFileName(transactionRequest.getSepaVersion() + ".xsd"))
+            .orElse(null);
     }
 
     private HbciConsent getConsent() {

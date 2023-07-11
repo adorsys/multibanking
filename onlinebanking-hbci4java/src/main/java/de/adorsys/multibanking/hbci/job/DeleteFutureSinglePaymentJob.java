@@ -45,7 +45,7 @@ public class DeleteFutureSinglePaymentJob extends AbstractPaymentJob<FutureSingl
 
         jobName = GVTermUebSEPADel.getLowlevelName();
 
-        GVTermUebSEPADel hbciJob = new GVTermUebSEPADel(dialog.getPassport(), jobName, null);
+        GVTermUebSEPADel hbciJob = new GVTermUebSEPADel(dialog.getPassport(), jobName, getSepaVersion(), null);
 
         hbciJob.setParam("orderid", singlePayment.getOrderId());
         hbciJob.setParam("date", singlePayment.getExecutionDate().toString());

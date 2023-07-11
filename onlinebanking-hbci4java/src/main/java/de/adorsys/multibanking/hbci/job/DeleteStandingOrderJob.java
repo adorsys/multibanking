@@ -44,7 +44,7 @@ public class DeleteStandingOrderJob extends AbstractPaymentJob<PeriodicPayment> 
         dst.iban = standingOrder.getOtherAccount().getIban();
         dst.bic = standingOrder.getOtherAccount().getBic();
 
-        GVDauerSEPADel hbciJob = new GVDauerSEPADel(dialog.getPassport());
+        GVDauerSEPADel hbciJob = new GVDauerSEPADel(dialog.getPassport(), getSepaVersion());
 
         hbciJob.setParam("src", src);
         hbciJob.setParam("dst", dst);

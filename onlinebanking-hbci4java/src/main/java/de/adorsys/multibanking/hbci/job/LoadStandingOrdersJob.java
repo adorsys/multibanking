@@ -46,7 +46,7 @@ public class LoadStandingOrdersJob extends ScaAwareJob<LoadStandingOrders, Stand
 
     @Override
     GVDauerSEPAList createHbciJob() {
-        GVDauerSEPAList hbciJob = new GVDauerSEPAList(dialog.getPassport());
+        GVDauerSEPAList hbciJob = new GVDauerSEPAList(dialog.getPassport(), getSepaVersion());
         hbciJob.setParam("src", getHbciKonto());
         return hbciJob;
     }
