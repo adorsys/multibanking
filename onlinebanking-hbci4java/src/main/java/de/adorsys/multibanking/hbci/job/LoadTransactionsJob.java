@@ -126,14 +126,14 @@ public class LoadTransactionsJob extends ScaAwareJob<LoadTransactions, Transacti
         return Optional.ofNullable(rawResponseType)
             .map(format -> {
                 if (format == CAMT) {
-                    return new GVKUmsAllCamt(passport, true);
+                    return new GVKUmsAllCamt(passport, getSepaVersion(), true);
                 } else {
                     return new GVKUmsAll(passport);
                 }
             })
             .orElseGet(() -> {
                 if (passport.jobSupported(GVKUmsAllCamt.getLowlevelName())) {
-                    return new GVKUmsAllCamt(passport, false);
+                    return new GVKUmsAllCamt(passport, getSepaVersion(), false);
                 } else if (passport.jobSupported(GVKUmsAll.getLowlevelName())) {
                     return new GVKUmsAll(passport);
                 } else {

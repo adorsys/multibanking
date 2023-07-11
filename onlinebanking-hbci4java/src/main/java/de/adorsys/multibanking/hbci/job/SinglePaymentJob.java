@@ -40,13 +40,13 @@ public class SinglePaymentJob extends AbstractPaymentJob<SinglePayment> {
 
         AbstractSEPAGV paymentJob;
         if (singlePayment instanceof FutureSinglePayment) {
-            paymentJob = new GVTermUebSEPA(dialog.getPassport(), GVTermUebSEPA.getLowlevelName());
+            paymentJob = new GVTermUebSEPA(dialog.getPassport(), GVTermUebSEPA.getLowlevelName(), getSepaVersion());
             paymentJob.setParam("date", ((FutureSinglePayment) singlePayment).getExecutionDate().toString());
         } else {
             if (singlePayment.isInstantPayment()) {
-                paymentJob = new GVInstantUebSEPA(dialog.getPassport(), GVInstantUebSEPA.getLowlevelName());
+                paymentJob = new GVInstantUebSEPA(dialog.getPassport(), GVInstantUebSEPA.getLowlevelName(), getSepaVersion());
             } else {
-                paymentJob = new GVUebSEPA(dialog.getPassport(), GVUebSEPA.getLowlevelName());
+                paymentJob = new GVUebSEPA(dialog.getPassport(), GVUebSEPA.getLowlevelName(), getSepaVersion());
             }
         }
 

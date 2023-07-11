@@ -64,7 +64,7 @@ public class HbciTanSubmit {
                 throw new MultibankingException(INTERNAL_ERROR, 500, e.getMessage());
             }
 
-            Optional.ofNullable(hbciJob.getPainVersion())
+            Optional.ofNullable(hbciJob.getSepaVersion())
                 .ifPresent(version -> setPainVersion(version.getURN()));
             setOriginLowLevelName(hbciJob.getJobName());
             setOriginSegVersion(hbciJob.getSegVersion());

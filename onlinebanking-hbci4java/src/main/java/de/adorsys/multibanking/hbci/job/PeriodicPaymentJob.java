@@ -45,7 +45,7 @@ public class PeriodicPaymentJob extends AbstractPaymentJob<PeriodicPayment> {
         dst.iban = standingOrder.getOtherAccount().getIban();
         dst.bic = standingOrder.getOtherAccount().getBic();
 
-        GVDauerSEPANew hbciJob = new GVDauerSEPANew(dialog.getPassport());
+        GVDauerSEPANew hbciJob = new GVDauerSEPANew(dialog.getPassport(), getSepaVersion());
 
         hbciJob.setParam("src", src);
         hbciJob.setParam("dst", dst);

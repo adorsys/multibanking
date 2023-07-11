@@ -43,7 +43,7 @@ public class TransferJob extends AbstractPaymentJob<SinglePayment> {
         dst.iban = singlePayment.getReceiverIban();
         dst.bic = singlePayment.getReceiverBic() != null ? singlePayment.getReceiverBic() : src.bic; //internal transfer, same bic
 
-        GVUmbSEPA hbciJob = new GVUmbSEPA(dialog.getPassport(), GVUmbSEPA.getLowlevelName(), null);
+        GVUmbSEPA hbciJob = new GVUmbSEPA(dialog.getPassport(), GVUmbSEPA.getLowlevelName(), getSepaVersion(), null);
 
         hbciJob.setParam("src", src);
         hbciJob.setParam("dst", dst);
