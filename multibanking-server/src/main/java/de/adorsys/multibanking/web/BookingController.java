@@ -21,8 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +32,8 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Timed("booking")
 @Tag(name = "Booking")
@@ -55,13 +55,13 @@ public class BookingController {
     @Operation(description = "Read account bookings", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
-    public Resources<BookingTO> getBookings(@PathVariable String accessId,
-                                            @PathVariable String accountId,
-                                            @RequestParam(required = false) BankApiTO bankApi,
-                                            @RequestParam(required = false) List<String> ids,
-                                            @PageableDefault(size = 20, sort = "valutaDate", direction =
+    public CollectionModel<BookingTO> getBookings(@PathVariable String accessId,
+                                                  @PathVariable String accountId,
+                                                  @RequestParam(required = false) BankApiTO bankApi,
+                                                  @RequestParam(required = false) List<String> ids,
+                                                  @PageableDefault(size = 20, sort = "valutaDate", direction =
                                                 Sort.Direction.DESC) Pageable pageable,
-                                            PagedResourcesAssembler assembler) {
+                                                  PagedResourcesAssembler assembler) {
         checkBankAccountExists(accessId, accountId);
 
         if (bankAccountRepository.getSyncStatus(accountId) == BankAccount.SyncStatus.SYNC) {
@@ -71,20 +71,20 @@ public class BookingController {
         return Optional.ofNullable(ids)
             .map(strings -> {
                 Iterable<BookingEntity> bookingEntities = bookingService.getBookingsById(principal.getName(), ids);
-                return new Resources<>(bookingMapper.toBookingTOs(bookingEntities));
+                return CollectionModel.of(bookingMapper.toBookingTOs(bookingEntities));
             })
             .orElseGet(() -> {
                 Page<BookingEntity> bookingEntities = bookingService.getBookingsPageable(pageable,
                     principal.getName(), accessId, accountId, bankApiMapper.toBankApi(bankApi));
-                return assembler.toResource(bookingEntities.map(bookingMapper::toBookingTO));
+                return assembler.toModel(bookingEntities.map(bookingMapper::toBookingTO));
             });
     }
 
     @Operation(description = "Read account bookings search index", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/index")
-    public Resource<BookingsIndexEntity> getBookingsIndex(@PathVariable String accessId,
-                                                          @PathVariable String accountId) {
+    public EntityModel<BookingsIndexEntity> getBookingsIndex(@PathVariable String accessId,
+                                                             @PathVariable String accountId) {
         checkBankAccountExists(accessId, accountId);
 
         if (bankAccountRepository.getSyncStatus(accountId) == BankAccount.SyncStatus.SYNC) {
@@ -94,7 +94,7 @@ public class BookingController {
         BookingsIndexEntity bookingsIndexEntity = bookingService.getSearchIndex(principal.getName(), accountId)
             .orElseThrow(() -> new ResourceNotFoundException(BookingsIndexEntity.class, accountId));
 
-        return new Resource<>(bookingsIndexEntity);
+        return EntityModel.of(bookingsIndexEntity);
     }
 
     @Operation(description = "Download bookings", security = {
@@ -111,7 +111,7 @@ public class BookingController {
     @Operation(description = "Read booking", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{bookingId}")
-    public Resource<BookingTO> getBooking(@PathVariable String accessId, @PathVariable String accountId,
+    public EntityModel<BookingTO> getBooking(@PathVariable String accessId, @PathVariable String accountId,
                                           @PathVariable String bookingId) {
         checkBankAccountExists(accessId, accountId);
 
@@ -130,8 +130,8 @@ public class BookingController {
         }
     }
 
-    private Resource<BookingTO> mapToResource(BookingEntity entity, String accessId, String accountId) {
-        return new Resource<>(bookingMapper.toBookingTO(entity),
+    private EntityModel<BookingTO> mapToResource(BookingEntity entity, String accessId, String accountId) {
+        return EntityModel.of(bookingMapper.toBookingTO(entity),
             linkTo(methodOn(BookingController.class).getBooking(accessId, accountId, entity.getId()))
                 .withSelfRel());
     }

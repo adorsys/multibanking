@@ -20,9 +20,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,8 +34,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Timed("bank-access")
 @Tag(name = "Bankaccess")
@@ -79,26 +79,26 @@ public class BankAccessController {
                 e.getAuthorisationId())).withSelfRel());
             links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(e.getConsentId(),
                 e.getAuthorisationId(), null)).withRel("transactionAuthorisation"));
-            return ResponseEntity.accepted().body(new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(e.getResponse()), links));
+            return ResponseEntity.accepted().body(EntityModel.of(consentAuthorisationMapper.toUpdateAuthResponseTO(e.getResponse()), links));
         }
     }
 
     @Operation(description = "Read bank accesses", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
-    public Resources<Resource<BankAccessTO>> getBankAccesses() {
+    public CollectionModel<EntityModel<BankAccessTO>> getBankAccesses() {
         if (!userRepository.exists(principal.getName())) {
-            return new Resources<>(Collections.emptyList());
+            return CollectionModel.empty();
         }
 
         List<BankAccessEntity> accessEntities = bankAccessRepository.findByUserId(principal.getName());
-        return new Resources<>(mapToResources(accessEntities));
+        return CollectionModel.of(mapToEntityModels(accessEntities));
     }
 
     @Operation(description = "Read bank access", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{accessId}")
-    public Resource<BankAccessTO> getBankAccess(@PathVariable String accessId) {
+    public EntityModel<BankAccessTO> getBankAccess(@PathVariable String accessId) {
         BankAccessEntity bankAccessEntity = bankAccessRepository.findByUserIdAndId(principal.getName(), accessId)
             .orElseThrow(() -> new ResourceNotFoundException(BankAccessEntity.class, accessId));
 
@@ -130,14 +130,14 @@ public class BankAccessController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private List<Resource<BankAccessTO>> mapToResources(List<BankAccessEntity> accessEntities) {
+    private List<EntityModel<BankAccessTO>> mapToEntityModels(List<BankAccessEntity> accessEntities) {
         return accessEntities.stream()
             .map(this::mapToResource)
             .collect(toList());
     }
 
-    private Resource<BankAccessTO> mapToResource(BankAccessEntity accessEntity) {
-        return new Resource<>(bankAccessMapper.toBankAccessTO(accessEntity),
+    private EntityModel<BankAccessTO> mapToResource(BankAccessEntity accessEntity) {
+        return EntityModel.of(bankAccessMapper.toBankAccessTO(accessEntity),
             linkTo(methodOn(BankAccessController.class).getBankAccess(accessEntity.getId())).withSelfRel(),
             linkTo(methodOn(BankAccountController.class).getBankAccounts(accessEntity.getId())).withRel("accounts"));
     }

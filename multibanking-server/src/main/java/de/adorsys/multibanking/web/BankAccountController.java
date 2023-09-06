@@ -23,9 +23,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +36,8 @@ import java.util.List;
 
 import static de.adorsys.multibanking.domain.ScaStatus.FINALISED;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Timed("bank-account")
 @Tag(name = "Bankaccount")
@@ -62,15 +62,15 @@ public class BankAccountController {
         @Content(schema = @Schema(implementation = Messages.class))
     })
     @GetMapping
-    public Resources<Resource<BankAccountTO>> getBankAccounts(@PathVariable String accessId) {
+    public CollectionModel<EntityModel<BankAccountTO>> getBankAccounts(@PathVariable String accessId) {
         List<BankAccountEntity> bankAccounts = bankAccountService.getBankAccounts(principal.getName(), accessId);
-        return new Resources<>(mapToResources(bankAccounts, accessId));
+        return CollectionModel.of(mapToResources(bankAccounts, accessId));
     }
 
     @Operation(description = "Read bank account", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{accountId}")
-    public Resource<BankAccountTO> getBankAccount(@PathVariable String accessId,
+    public EntityModel<BankAccountTO> getBankAccount(@PathVariable String accessId,
                                                   @PathVariable("accountId") String accountId) {
         if (!bankAccessRepository.exists(accessId)) {
             throw new ResourceNotFoundException(BankAccessEntity.class, accessId);
@@ -111,18 +111,18 @@ public class BankAccountController {
                 e.getAuthorisationId())).withSelfRel());
             links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(e.getConsentId(),
                 e.getAuthorisationId(), null)).withRel("transactionAuthorisation"));
-            return ResponseEntity.accepted().body(new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(e.getResponse()), links));
+            return ResponseEntity.accepted().body(EntityModel.of(consentAuthorisationMapper.toUpdateAuthResponseTO(e.getResponse()), links));
         }
     }
 
-    private List<Resource<BankAccountTO>> mapToResources(List<BankAccountEntity> accountEntities, String accessId) {
+    private List<EntityModel<BankAccountTO>> mapToResources(List<BankAccountEntity> accountEntities, String accessId) {
         return accountEntities.stream()
             .map(accountEntity -> mapToResource(accountEntity, accessId))
             .collect(toList());
     }
 
-    private Resource<BankAccountTO> mapToResource(BankAccountEntity accountEntity, String accessId) {
-        return new Resource<>(bankAccountMapper.toBankAccountTO(accountEntity),
+    private EntityModel<BankAccountTO> mapToResource(BankAccountEntity accountEntity, String accessId) {
+        return EntityModel.of(bankAccountMapper.toBankAccountTO(accountEntity),
             linkTo(methodOn(BankAccountController.class).getBankAccount(accessId, accountEntity.getId())).withSelfRel(),
             linkTo(methodOn(BankAccessController.class).getBankAccess(accessId)).withRel("bankAccess"),
             linkTo(methodOn(BankAccountAnalyticsController.class).getAccountAnalytics(accessId,

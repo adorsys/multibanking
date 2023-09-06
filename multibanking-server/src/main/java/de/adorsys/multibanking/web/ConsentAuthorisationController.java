@@ -8,13 +8,13 @@ import de.adorsys.multibanking.web.model.TransactionAuthorisationRequestTO;
 import de.adorsys.multibanking.web.model.UpdateAuthResponseTO;
 import de.adorsys.multibanking.web.model.UpdatePsuAuthenticationRequestTO;
 import io.micrometer.core.annotation.Timed;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.iban4j.Iban;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +24,8 @@ import java.util.List;
 
 import static de.adorsys.multibanking.domain.BankApi.HBCI;
 import static de.adorsys.multibanking.domain.ScaApproach.*;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Timed("consent-authorisation")
 @Tag(name = "Consent authorisation")
@@ -41,7 +41,7 @@ public class ConsentAuthorisationController {
 
     @Operation(description = "Update authorisation (authenticate user)")
     @PutMapping("/updatePsuAuthentication")
-    public ResponseEntity<Resource<UpdateAuthResponseTO>> updateAuthentication(@PathVariable String consentId,
+    public ResponseEntity<EntityModel<UpdateAuthResponseTO>> updateAuthentication(@PathVariable String consentId,
                                                                                @PathVariable String authorisationId,
                                                                                @RequestBody @Valid UpdatePsuAuthenticationRequestTO updatePsuAuthenticationRequestTO) {
         String bankCode = Iban.valueOf(consentService.getInternalConsent(consentId).getPsuAccountIban()).getBankCode();
@@ -55,7 +55,7 @@ public class ConsentAuthorisationController {
 
     @Operation(description = "Update authorisation (select SCA method)")
     @PutMapping("/selectPsuAuthenticationMethod")
-    public ResponseEntity<Resource<UpdateAuthResponseTO>> selectAuthenticationMethod(@PathVariable String consentId,
+    public ResponseEntity<EntityModel<UpdateAuthResponseTO>> selectAuthenticationMethod(@PathVariable String consentId,
                                                                                      @PathVariable String authorisationId,
                                                                                      @RequestBody @Valid SelectPsuAuthenticationMethodRequestTO selectPsuAuthenticationMethodRequest) {
         String bankCode = Iban.valueOf(consentService.getInternalConsent(consentId).getPsuAccountIban()).getBankCode();
@@ -68,7 +68,7 @@ public class ConsentAuthorisationController {
 
     @Operation(description = "Update authorisation (authorize transaction)")
     @PutMapping("/transactionAuthorisation")
-    public ResponseEntity<Resource<UpdateAuthResponseTO>> transactionAuthorisation(@PathVariable String consentId,
+    public ResponseEntity<EntityModel<UpdateAuthResponseTO>> transactionAuthorisation(@PathVariable String consentId,
                                                                                    @PathVariable String authorisationId,
                                                                                    @RequestBody @Valid TransactionAuthorisationRequestTO transactionAuthorisationRequest) {
         String bankCode = Iban.valueOf(consentService.getInternalConsent(consentId).getPsuAccountIban()).getBankCode();
@@ -81,7 +81,7 @@ public class ConsentAuthorisationController {
 
     @Operation(description = "Get consent authorisation status")
     @GetMapping
-    public ResponseEntity<Resource<UpdateAuthResponseTO>> getConsentAuthorisationStatus(@PathVariable String consentId,
+    public ResponseEntity<EntityModel<UpdateAuthResponseTO>> getConsentAuthorisationStatus(@PathVariable String consentId,
                                                                                         @PathVariable String authorisationId) {
         String bankCode = Iban.valueOf(consentService.getInternalConsent(consentId).getPsuAccountIban()).getBankCode();
 
@@ -90,7 +90,7 @@ public class ConsentAuthorisationController {
         return ResponseEntity.ok(mapToResource(updateAuthResponse, consentId, authorisationId, bankCode));
     }
 
-    private Resource<UpdateAuthResponseTO> mapToResource(UpdateAuthResponse response, String consentId,
+    private EntityModel<UpdateAuthResponseTO> mapToResource(UpdateAuthResponse response, String consentId,
                                                          String authorisationId, String bankCode) {
         List<Link> links = new ArrayList<>();
         links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId,
@@ -101,7 +101,8 @@ public class ConsentAuthorisationController {
             appendEmbeddedAuthLinks(response, consentId, authorisationId, links);
         }
 
-        return new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links);
+        return
+            EntityModel.of(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links);
     }
 
     private void appendEmbeddedAuthLinks(UpdateAuthResponse response, String consentId, String authorisationId,

@@ -11,8 +11,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Tag(name = "Bank")
 @RequiredArgsConstructor
@@ -38,7 +38,7 @@ public class BankController {
 
     @Operation(description = "get bank by bank code")
     @GetMapping(value = "/{bankCode}")
-    public Resource<BankTO> getBank(@PathVariable String bankCode) {
+    public EntityModel<BankTO> getBank(@PathVariable String bankCode) {
         long start = System.currentTimeMillis();
         Exception exception = null;
 
@@ -56,8 +56,8 @@ public class BankController {
     @Timed("bank")
     @Operation(description = "find bank")
     @GetMapping
-    public Resources<Resource<BankTO>> searchBank(@RequestParam String query) {
-        return new Resources<>(mapToResources(bankService.search(query)));
+    public CollectionModel<EntityModel<BankTO>> searchBank(@RequestParam String query) {
+        return CollectionModel.of(mapToResources(bankService.search(query)));
     }
 
     @Timed("bank")
@@ -73,14 +73,14 @@ public class BankController {
         }
     }
 
-    private List<Resource<BankTO>> mapToResources(List<BankEntity> entities) {
+    private List<EntityModel<BankTO>> mapToResources(List<BankEntity> entities) {
         return entities.stream()
             .map(this::mapToResource)
             .collect(toList());
     }
 
-    private Resource<BankTO> mapToResource(BankEntity entity) {
-        return new Resource<>(bankMapper.toBankTO(entity),
+    private EntityModel<BankTO> mapToResource(BankEntity entity) {
+        return EntityModel.of(bankMapper.toBankTO(entity),
             linkTo(methodOn(BankController.class).getBank(entity.getBankCode())).withSelfRel());
     }
 

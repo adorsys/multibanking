@@ -15,9 +15,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.iban4j.Iban;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.LinkRelation;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -31,8 +32,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Timed("consent")
 @Tag(name = "Consent")
@@ -51,7 +52,7 @@ public class ConsentController {
 
     @Operation(description = "Create new consent")
     @PostMapping
-    public ResponseEntity<Resource<CreateConsentResponseTO>> createConsent(@Valid @RequestBody ConsentTO consent,
+    public ResponseEntity<EntityModel<CreateConsentResponseTO>> createConsent(@Valid @RequestBody ConsentTO consent,
                                                                            @RequestParam(required = false) BankApiTO bankApi) {
         Consent consentInput = consentMapper.toConsent(consent);
         CreateConsentResponse createConsentResponse = consentService.createConsent(consentInput,
@@ -68,33 +69,33 @@ public class ConsentController {
     @Operation(description = "Read user consents", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
-    public Resources<Resource<ConsentTO>> getConsents() {
+    public CollectionModel<EntityModel<ConsentTO>> getConsents() {
         List<Consent> consents = bankAccessRepository.findByUserId(principal.getName())
             .stream()
             .map(bankAccessEntity -> consentService.getConsent(bankAccessEntity.getConsentId()))
             .collect(toList());
 
-        return new Resources<>(mapToResources(consents));
+        return CollectionModel.of(mapToResources(consents));
     }
 
     @Operation(description = "Read consent", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{consentId}")
-    public Resource<ConsentTO> getConsent(@PathVariable("consentId") String consentId) {
+    public EntityModel<ConsentTO> getConsent(@PathVariable("consentId") String consentId) {
         return mapToResource(consentService.getConsent(consentId));
     }
 
     @Operation(description = "Read consent status", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{consentId}/status")
-    public Resource<ConsentStatusTO> getConsentStatus(@PathVariable("consentId") String consentId) {
+    public EntityModel<ConsentStatusTO> getConsentStatus(@PathVariable("consentId") String consentId) {
         return mapToResource(consentService.getConsentStatus(consentId));
     }
 
     @Operation(description = "Read consent", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("redirect/{redirectId}")
-    public Resource<ConsentTO> getConsentByRedirectId(@PathVariable("redirectId") String redirectId) {
+    public EntityModel<ConsentTO> getConsentByRedirectId(@PathVariable("redirectId") String redirectId) {
         return mapToResource(consentService.getConsentByRedirectId(redirectId));
     }
 
@@ -115,22 +116,22 @@ public class ConsentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private List<Resource<ConsentTO>> mapToResources(List<Consent> consents) {
+    private List<EntityModel<ConsentTO>> mapToResources(List<Consent> consents) {
         return consents.stream()
             .map(this::mapToResource)
             .collect(toList());
     }
 
-    private Resource<ConsentTO> mapToResource(Consent consent) {
-        return new Resource<>(consentMapper.toConsentTO(consent),
+    private EntityModel<ConsentTO> mapToResource(Consent consent) {
+        return EntityModel.of(consentMapper.toConsentTO(consent),
             linkTo(methodOn(ConsentController.class).getConsent(consent.getConsentId())).withSelfRel());
     }
 
-    private Resource<ConsentStatusTO> mapToResource(ConsentStatus consentStatus) {
-        return new Resource<>(consentMapper.toConsentStatusTO(consentStatus));
+    private EntityModel<ConsentStatusTO> mapToResource(ConsentStatus consentStatus) {
+        return EntityModel.of(consentMapper.toConsentStatusTO(consentStatus));
     }
 
-    private Resource<CreateConsentResponseTO> mapToResource(CreateConsentResponse createConsentResponse,
+    private EntityModel<CreateConsentResponseTO> mapToResource(CreateConsentResponse createConsentResponse,
                                                             String bankCode) {
         String consentId = createConsentResponse.getConsentId();
 
@@ -141,12 +142,12 @@ public class ConsentController {
             .ifPresent(authorisationId -> links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId, authorisationId)).withRel("authorisationStatus")));
 
         Optional.ofNullable(createConsentResponse.getRedirectUrl())
-            .ifPresent(redirectUrl -> links.add(new Link(redirectUrl, "redirectUrl")));
+            .ifPresent(redirectUrl -> links.add(Link.of(redirectUrl, LinkRelation.of("redirectUrl"))));
 
         Optional.ofNullable(createConsentResponse.getOauthRedirectUrl())
-            .ifPresent(oauthUrl -> links.add(new Link(oauthUrl, "oauthRedirectUrl")));
+            .ifPresent(oauthUrl -> links.add(Link.of(oauthUrl, LinkRelation.of("oauthRedirectUrl"))));
 
-        return new Resource<>(consentMapper.toCreateConsentResponseTO(createConsentResponse), links);
+        return EntityModel.of(consentMapper.toCreateConsentResponseTO(createConsentResponse), links);
     }
 
 }

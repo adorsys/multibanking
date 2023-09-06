@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.Resources;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,8 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.security.Principal;
 import java.util.List;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 
 @Timed("contract")
 @Tag(name = "Contract")
@@ -45,7 +46,7 @@ public class ContractController {
     @Operation(description = "Read account contracts", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
-    public Resources<ContractTO> getContracts(@PathVariable String accessId, @PathVariable String accountId) {
+    public CollectionModel<ContractTO> getContracts(@PathVariable String accessId, @PathVariable String accountId) {
         if (!bankAccessRepository.exists(accessId)) {
             throw new ResourceNotFoundException(BankAccessEntity.class, accessId);
         }
@@ -59,7 +60,7 @@ public class ContractController {
         List<ContractEntity> contractEntities = contractRepository.findByUserIdAndAccountId(principal.getName(),
             accountId);
 
-        return new Resources<>(
+        return CollectionModel.of(
             contractMapper.toContractTOs(contractEntities),
             linkTo(methodOn(ContractController.class).getContracts(accessId, accountId)).withSelfRel()
         );

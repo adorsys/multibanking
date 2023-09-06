@@ -23,8 +23,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +38,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static de.adorsys.multibanking.domain.ScaStatus.SCAMETHODSELECTED;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Timed("direct-access2")
 @Tag(name = "Direct access v2")
@@ -204,15 +204,15 @@ public class DirectAccessControllerV2 {
         return new ResponseEntity<>(loadBookingsResponse, HttpStatus.OK);
     }
 
-    private ResponseEntity<Resource<UpdateAuthResponseTO>> createChallengeResponse(UpdateAuthResponse response,
-                                                                                   String consentId,
-                                                                                   String authorisationId) {
+    private ResponseEntity<EntityModel<UpdateAuthResponseTO>> createChallengeResponse(UpdateAuthResponse response,
+                                                                                      String consentId,
+                                                                                      String authorisationId) {
         List<Link> links = new ArrayList<>();
         links.add(linkTo(methodOn(ConsentAuthorisationController.class).getConsentAuthorisationStatus(consentId,
             authorisationId)).withSelfRel());
         links.add(linkTo(methodOn(ConsentAuthorisationController.class).transactionAuthorisation(consentId,
             authorisationId, null)).withRel("transactionAuthorisation"));
-        return ResponseEntity.accepted().body(new Resource<>(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links));
+        return ResponseEntity.accepted().body(EntityModel.of(consentAuthorisationMapper.toUpdateAuthResponseTO(response), links));
     }
 
     @Data

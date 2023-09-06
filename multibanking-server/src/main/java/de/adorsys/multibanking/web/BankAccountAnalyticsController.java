@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,8 +41,8 @@ public class BankAccountAnalyticsController {
     @Operation(description = "Read account analytics", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping
-    public Resource<AnalyticsTO> getAccountAnalytics(@PathVariable String accessId,
-                                                     @PathVariable String accountId) {
+    public EntityModel<AnalyticsTO> getAccountAnalytics(@PathVariable String accessId,
+                                                        @PathVariable String accountId) {
         if (!bankAccessRepository.exists(accessId)) {
             throw new ResourceNotFoundException(BankAccessEntity.class, accessId);
         }
@@ -60,6 +60,6 @@ public class BankAccountAnalyticsController {
                 "user-id: " + principal.getName()
             ));
 
-        return new Resource<>(analyticsMapper.toAnalyticsTO(accountAnalyticsEntity));
+        return EntityModel.of(analyticsMapper.toAnalyticsTO(accountAnalyticsEntity));
     }
 }
