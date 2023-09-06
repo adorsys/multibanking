@@ -49,8 +49,11 @@ public class FongoConfig extends MongoConfiguration {
     @Bean(destroyMethod = "close")
     public MongoClient mongoClient() {
 
+
+        String serverAddress = String.format("mongodb://%s", mongoServer().getLocalAddress().toString());
+
         MongoClientSettings settings = MongoClientSettings.builder()
-            .applyConnectionString(new ConnectionString(mongoServer().getLocalAddress().toString()))
+            .applyConnectionString(new ConnectionString(serverAddress))
             .build();
 
         MongoDriverInformation driverInformation = MongoDriverInformation.builder().driverName(MongoDriverVersion.NAME)
