@@ -11,13 +11,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
-import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.SimpleMongoClientDbFactory;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.lang.NonNull;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -38,7 +38,7 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
 
     @Bean
     public GridFsTemplate gridFsTemplate() throws Exception {
-        return new GridFsTemplate(mongoDbFactory(), mappingMongoConverter());
+        return new GridFsTemplate(mongoDbFactory(), mappingMongoConverter(mongoDbFactory(), customConversions(), mongoMappingContext(customConversions())));
     }
 
     private MongoCredential createMongoCredential() {
@@ -97,12 +97,12 @@ public class MongoConfig extends AbstractMongoClientConfiguration {
         } else {
             MongoCredential mongoCredential = createMongoCredential();
 
-            return new com.mongodb.MongoClient(serverAddress, mongoCredential, mongoClientOptions);
+            return new com.mongodb.MongoClient(serverAddress, Collections.singletonList(mongoCredential), mongoClientOptions);
         }
     }
 
     @Override
-    public @NonNull MongoDbFactory mongoDbFactory() {
+    public @NonNull SimpleMongoClientDbFactory mongoDbFactory() {
         return Optional.ofNullable(env.getProperty("mongo.databaseName"))
             .map(databaseName -> new SimpleMongoClientDbFactory(mongoClient(), databaseName))
             .orElseThrow(() -> new IllegalStateException("missing env property mongo.databaseName"));

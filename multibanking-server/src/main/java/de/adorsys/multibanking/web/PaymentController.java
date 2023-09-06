@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,8 +26,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
-import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 
 @Timed("payment")
 @Tag(name = "Payment")
@@ -47,8 +48,8 @@ public class PaymentController {
     @Operation(description = "Read payment", security = {
         @SecurityRequirement(name = "multibanking_auth", scopes = "openid")})
     @GetMapping("/{paymentId}")
-    public Resource<SinglePaymentEntity> getPayment(@PathVariable String accessId, @PathVariable String accountId,
-                                                    @PathVariable String paymentId) {
+    public EntityModel<SinglePaymentEntity> getPayment(@PathVariable String accessId, @PathVariable String accountId,
+                                                       @PathVariable String paymentId) {
         SinglePaymentEntity paymentEntity = paymentRepository.findByUserIdAndId(principal.getName(), paymentId)
             .orElseThrow(() -> new ResourceNotFoundException(SinglePaymentEntity.class, paymentId));
 
@@ -96,9 +97,9 @@ public class PaymentController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    private Resource<SinglePaymentEntity> mapToResource(@PathVariable String accessId, @PathVariable String accountId,
+    private EntityModel<SinglePaymentEntity> mapToResource(@PathVariable String accessId, @PathVariable String accountId,
                                                         SinglePaymentEntity paymentEntity) {
-        return new Resource<>(paymentEntity,
+        return EntityModel.of(paymentEntity,
             linkTo(methodOn(PaymentController.class).getPayment(accessId, accountId, paymentEntity.getId())).withSelfRel());
     }
 

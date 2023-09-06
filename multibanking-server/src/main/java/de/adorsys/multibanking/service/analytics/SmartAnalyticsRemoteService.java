@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.hateoas.Resource;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -46,11 +46,11 @@ public class SmartAnalyticsRemoteService implements SmartAnalyticsIf {
     }
 
     private AnalyticsResult analyzeBookingsRemote(AnalyticsRequest analyticsRequest) {
-        ResponseEntity<Resource<AnalyticsResult>> responseEntity = smartanalyticsRestTemplate
+        ResponseEntity<EntityModel<AnalyticsResult>> responseEntity = smartanalyticsRestTemplate
             .exchange(
                 "/api/v1/analytics", HttpMethod.PUT, new HttpEntity<Object>(analyticsRequest),
-                new ParameterizedTypeReference<Resource<AnalyticsResult>>() {
-                }, Collections.emptyMap());
+                    new ParameterizedTypeReference<>() {
+                    }, Collections.emptyMap());
 
         if (responseEntity.getStatusCode() == HttpStatus.OK) {
             return responseEntity.getBody().getContent();

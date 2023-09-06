@@ -50,7 +50,7 @@ public class SwaggerConfig {
     @Bean
     public GroupedOpenApi multibankingApi() {
         return GroupedOpenApi.builder()
-            .setGroup("multibanking")
+            .group("multibanking")
             .packagesToScan("de.adorsys.multibanking.web")
             .addOpenApiCustomiser(sortPathsAlphabetically())
             .build();
@@ -60,7 +60,7 @@ public class SwaggerConfig {
     @Profile("smartanalytics-embedded")
     public GroupedOpenApi smartanalyticsApi() {
         return GroupedOpenApi.builder()
-            .setGroup("smartanalytics")
+            .group("smartanalytics")
             .packagesToScan("de.adorsys.smartanalytics.web")
             .addOpenApiCustomiser(sortPathsAlphabetically())
             .build();
