@@ -14,7 +14,7 @@
         <sts.version>0.26.0</sts.version>
         <mongobee.version>0.12</mongobee.version>
         <mongo-java-server.version>1.9.8</mongo-java-server.version>
-        <springdoc.version>1.2.26</springdoc.version>
+        <springdoc.version>1.7.0</springdoc.version>
     </properties>
 
     <dependencies>

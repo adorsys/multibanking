@@ -31,7 +31,7 @@
     </developers>
 
     <properties>
-        <spring-boot.version>2.1.18.RELEASE</spring-boot.version>
+        <spring-boot.version>2.7.11</spring-boot.version>
         <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
         <lombok.version>1.18.16</lombok.version>
         <swagger-annotations.version>2.1.1</swagger-annotations.version>
@@ -371,9 +371,9 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <additionalparam>-Xdoclint:none</additionalparam>
-                        </configuration>
+<!--                        <configuration>-->
+<!--                            <additionalparam>-Xdoclint:none</additionalparam>-->
+<!--                        </configuration>-->
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
