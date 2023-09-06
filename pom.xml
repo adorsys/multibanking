@@ -31,13 +31,13 @@
     </developers>
 
     <properties>
-        <spring-boot.version>2.1.18.RELEASE</spring-boot.version>
+        <spring-boot.version>3.1.2</spring-boot.version>
         <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
         <lombok.version>1.18.16</lombok.version>
         <swagger-annotations.version>2.1.1</swagger-annotations.version>
         <junit.version>4.13.2</junit.version>
 
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -103,7 +103,7 @@
             <dependency>
                 <groupId>org.iban4j</groupId>
                 <artifactId>iban4j</artifactId>
-                <version>3.2.1</version>
+                <version>3.2.3-RELEASE</version>
             </dependency>
 
             <dependency>
@@ -328,7 +328,7 @@
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>1.6.8</version>
+                        <version>1.6.13</version>
                         <extensions>true</extensions>
                         <configuration>
                             <serverId>sonatype</serverId>
@@ -350,7 +350,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <configuration>
                         </configuration>
                         <executions>
@@ -371,9 +371,6 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <additionalparam>-Xdoclint:none</additionalparam>
-                        </configuration>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
