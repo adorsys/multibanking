@@ -37,7 +37,7 @@
         <swagger-annotations.version>2.1.1</swagger-annotations.version>
         <junit.version>4.13.2</junit.version>
 
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
